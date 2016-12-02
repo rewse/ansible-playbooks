@@ -7,7 +7,7 @@
   vars_files:
     - vault.yml
   tasks:
-    - name: check time zone
+    - name: check timezone
       command: timedatectl status
       register: timedatectl_status_out
       changed_when: False
