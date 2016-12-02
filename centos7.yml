@@ -24,3 +24,73 @@
         removes: /dev/{{swap_device}}
       when: swaps_out.stdout.find('{{swap_device}}') == -1
       tags: [storage, swap]
+
+    - name: install additional packages
+      yum: name={{item}} state=installed
+      with_items:
+        - at
+        - bash-completion
+        - bc
+        - bind-utils
+        - dstat
+        - epel-release
+        - git
+        - logwatch
+        - mlocate
+        - net-tools
+        - nfs-utils
+        - patch
+        - prelink
+        - selinux-policy-devel
+        - setroubleshoot-server
+        - source-highlight
+        - sysstat
+        - telnet
+        - tmux
+        - tree
+        - unzip
+        - vim-enhanced
+        - yum-cron
+        - yum-plugin-priorities
+      tags: [package]
+
+    - name: install additional packages from EPEL
+      yum: name={{item}} state=installed
+      with_items:
+        - etckeeper
+      tags: [package]
+
+    - name: etckeeper; init /etc
+      command: etckeeper init
+      args:
+          creates: /etc/.git
+      tags: [package]
+
+    - name: etckeeper; Initial commit
+      command: etckeeper commit "Initial commit"
+      args:
+        chdir: /etc
+        creates: /etc/.git/logs
+      tags: [package]
+
+    - name: add priority into /etc/yum.repos.d/CentOS-Base.repo
+      ini_file:
+        dest: /etc/yum.repos.d/CentOS-Base.repo
+        section: "{{item}}"
+        option: priority
+        value: 10
+        no_extra_spaces: True
+      with_items:
+        - base
+        - updates
+        - extras
+      tags: [package]
+
+    - name: add priority into /etc/yum.repos.d/epel.repo
+      ini_file:
+        dest: /etc/yum.repos.d/epel.repo
+        section: epel
+        option: priority
+        value: 50
+        no_extra_spaces: True
+      tags: [package]
