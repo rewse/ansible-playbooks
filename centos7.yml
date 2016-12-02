@@ -133,15 +133,17 @@
       tags: [mail]
 
     - name: postfix; create sasl_passwd
-      shell: echo "[mail.so-net.ne.jp]:587 {{sonet_username}}:{{sonet_password}}" > /etc/postfix/sasl_passwd
-      args:
-        creates: /etc/postfix/sasl_passwd
+      lineinfile:
+        dest: /etc/postfix/sasl_passwd
+        regexp: '^\[mail.so-net.ne.jp\]:587'
+        line: '[mail.so-net.ne.jp]:587 {{sonet_username}}:{{sonet_password}}'
+        create: yes
+      register: postfix_sasl_password_res
       tags: [mail]
 
     - name: postfix; hash sasl_passwd
       command: postmap /etc/postfix/sasl_passwd
-      args:
-        creates: /etc/postfix/sasl_passwd.db
+      when: postfix_sasl_password_res|changed
       notify: reload postfix
       tags: [mail]
 
