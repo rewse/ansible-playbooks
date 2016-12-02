@@ -5,6 +5,17 @@
   vars:
     swap_device: xvdb
   tasks:
+    - name: check time zone
+      command: timedatectl status
+      register: timedatectl_status_out
+      changed_when: False
+      tags: [time]
+
+    - name: set timezone
+      command: timedatectl set-timezone Asia/Tokyo
+      when: timedatectl_status_out.stdout.find('Asia/Tokyo') == -1
+      tags: [time]
+
     - name: check swap status
       command: cat /proc/swaps
       register: swaps_out
