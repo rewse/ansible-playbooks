@@ -150,12 +150,8 @@
       with_items:
         - cyrus-sasl-md5
         - cyrus-sasl-plain
-      notify: restart postfix
       tags: [mail]
 
   handlers:
-    - name: restart postfix
-      service: name=postfix state=restarted
-
     - name: reload postfix
       service: name=postfix state=reloaded
