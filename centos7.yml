@@ -4,6 +4,8 @@
   remote_user: centos
   vars:
     swap_device: xvdb
+  vars_files:
+    - vault.yml
   tasks:
     - name: check time zone
       command: timedatectl status
@@ -105,3 +107,59 @@
         value: 50
         no_extra_spaces: True
       tags: [package]
+
+    - name: postfix; change myorigin
+      lineinfile:
+        dest: /etc/postfix/main.cf
+        insertafter: '^#myorigin'
+        regexp: '^myorigin'
+        line: 'myorigin = rewse.jp'
+      notify: reload postfix
+      tags: [mail]
+
+    - name: postfix; change relayhost
+      lineinfile:
+        dest: /etc/postfix/main.cf
+        insertafter: '^#relayhost'
+        regexp: '^relayhost'
+        line: 'relayhost = [mail.so-net.ne.jp]:587'
+      notify: reload postfix
+      tags: [mail]
+
+    - name: postfix; support sasl
+      blockinfile:
+        dest: /etc/postfix/main.cf
+        content: |
+          smtp_sasl_auth_enable = yes
+          smtp_sasl_password_maps = hash:/etc/postfix/sasl_passwd
+          smtp_sasl_security_options = noplaintext, noanonymous
+      notify: reload postfix
+      tags: [mail]
+
+    - name: postfix; create sasl_passwd
+      shell: echo "[mail.so-net.ne.jp]:587 {{sonet_username}}:{{sonet_password}}" > /etc/postfix/sasl_passwd
+      args:
+        creates: /etc/postfix/sasl_passwd
+      tags: [mail]
+
+    - name: postfix; hash sasl_passwd
+      command: postmap /etc/postfix/sasl_passwd
+      args:
+        creates: /etc/postfix/sasl_passwd.db
+      notify: reload postfix
+      tags: [mail]
+
+    - name: install sasl packages
+      yum: name={{item}} state=installed
+      with_items:
+        - cyrus-sasl-md5
+        - cyrus-sasl-plain
+      notify: restart postfix
+      tags: [mail]
+
+  handlers:
+    - name: restart postfix
+      service: name=postfix state=restarted
+
+    - name: reload postfix
+      service: name=postfix state=reloaded
