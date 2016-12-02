@@ -158,6 +158,7 @@
         insertafter: '^#START_HOURS_RANGE'
         regexp: '^START_HOURS_RANGE'
         line: 'START_HOURS_RANGE=3-7'
+      tags: [anacron]
 
   handlers:
     - name: reload postfix
