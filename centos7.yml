@@ -26,15 +26,11 @@
 
     - name: make swap
       command: mkswap /dev/{{swap_device}}
-      args:
-        removes: /dev/{{swap_device}}
       when: swaps_out.stdout.find('{{swap_device}}') == -1
       tags: [storage, swap]
 
     - name: enable swap
       command: swapon /dev/{{swap_device}}
-      args:
-        removes: /dev/{{swap_device}}
       when: swaps_out.stdout.find('{{swap_device}}') == -1
       tags: [storage, swap]
 
