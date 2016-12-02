@@ -152,6 +152,13 @@
         - cyrus-sasl-plain
       tags: [mail]
 
+    - name: anacron; change start_hours_range
+      lineinfile:
+        dest: /etc/anacrontab
+        insertafter: '^#START_HOURS_RANGE'
+        regexp: '^START_HOURS_RANGE'
+        line: 'START_HOURS_RANGE=3-7'
+
   handlers:
     - name: reload postfix
       service: name=postfix state=reloaded
