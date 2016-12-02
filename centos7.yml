@@ -160,6 +160,19 @@
         line: 'START_HOURS_RANGE=3-7'
       tags: [anacron]
 
+    - name: rsyslog; add a template
+      blockinfile:
+        dest: /etc/rsyslog.d/00-template.conf
+        content: |
+          $template VerboseTraditionalFileFormat,"%timestamp% <%syslogfacility-text%.%syslogseverity-text%> %hostname% %syslogtag%%msg:::sp-if-no-1st-sp%%msg:::drop-last-lf%\n"
+          $ActionFileDefaultTemplate VerboseTraditionalFileFormat
+        create: yes
+      notify: restart rsyslog
+      tags: [rsyslog]
+
   handlers:
     - name: reload postfix
       service: name=postfix state=reloaded
+
+    - name: restart rsyslog
+      service: name=rsyslog state=restarted
