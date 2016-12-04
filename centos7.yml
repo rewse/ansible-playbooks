@@ -7,15 +7,9 @@
   vars_files:
     - vault.yml
   tasks:
-    - name: check timezone
-      command: timedatectl status
-      register: timedatectl_status_out
-      changed_when: False
-      tags: [time]
-
     - name: set timezone
-      command: timedatectl set-timezone Asia/Tokyo
-      when: timedatectl_status_out.stdout.find('Asia/Tokyo') == -1
+      timezone:
+        name: Asia/Tokyo
       tags: [time]
 
     - name: check swap status
