@@ -28,6 +28,15 @@
       when: swaps_out.stdout.find('{{swap_device}}') == -1
       tags: [storage, swap]
 
+    - name: add swap into fstab
+      mount:
+        name: swap
+        src: /dev/{{swap_device}}
+        fstype: swap
+        opts: default
+        state: present
+      tags: [storage, swap]
+
     - name: install additional packages
       yum:
         name: "{{item}}"
