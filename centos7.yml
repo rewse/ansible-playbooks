@@ -35,7 +35,9 @@
       tags: [storage, swap]
 
     - name: install additional packages
-      yum: name={{item}} state=installed
+      yum:
+        name: "{{item}}"
+        state: installed
       with_items:
         - at
         - bash-completion
@@ -64,7 +66,9 @@
       tags: [package]
 
     - name: install additional packages from EPEL
-      yum: name={{item}} state=installed
+      yum:
+        name: "{{item}}"
+        state: installed
       with_items:
         - etckeeper
       tags: [package]
@@ -158,7 +162,9 @@
       tags: [mail]
 
     - name: install sasl packages
-      yum: name={{item}} state=installed
+      yum:
+        name: "{{item}}"
+        state: installed
       with_items:
         - cyrus-sasl-md5
         - cyrus-sasl-plain
@@ -184,7 +190,11 @@
 
   handlers:
     - name: reload postfix
-      service: name=postfix state=reloaded
+      service:
+        name: postfix
+        state: reloaded
 
     - name: restart rsyslog
-      service: name=rsyslog state=restarted
+      service:
+        name: rsyslog
+        state: restarted
