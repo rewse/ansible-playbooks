@@ -114,6 +114,18 @@
         - extras
       tags: [package]
 
+    - name: add priority into /etc/yum.repos.d/zabbix.repo
+      ini_file:
+        dest: /etc/yum.repos.d/zabbix.repo
+        section: "{{item}}"
+        option: priority
+        value: 30
+        no_extra_spaces: True
+      with_items:
+        - zabbix
+        - zabbix-non-supported
+      tags: [package, zabbix]
+
     - name: add priority into /etc/yum.repos.d/epel.repo
       ini_file:
         dest: /etc/yum.repos.d/epel.repo
