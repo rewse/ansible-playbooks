@@ -104,6 +104,16 @@
         no_extra_spaces: True
       tags: [package]
 
+    - name: disable the unnecessary services
+      service:
+        name: "{{item}}"
+        enabled: no
+        state: stopped
+      with_items:
+        - kdump
+        - sysstat
+      tags: [package]
+
     - name: postfix; change myorigin
       lineinfile:
         dest: /etc/postfix/main.cf
