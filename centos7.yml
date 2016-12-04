@@ -4,6 +4,7 @@
   remote_user: centos
   vars:
     swap_device: xvdb
+    zabbix_servername: zabbix.rewse.jp
   vars_files:
     - vault.yml
   tasks:
@@ -214,6 +215,47 @@
         line: 'START_HOURS_RANGE=3-7'
       tags: [anacron]
 
+    - name: zabbix; set zabbix server
+      lineinfile:
+        dest: /etc/zabbix/zabbix_agentd.d/common.conf
+        regexp: '^Server='
+        line: 'Server={{zabbix_servername}}'
+        create: yes
+      notify: restart zabbix-agent
+      tags: [zabbix]
+
+    - name: zabbix; set zabbix server active
+      lineinfile:
+        dest: /etc/zabbix/zabbix_agentd.d/common.conf
+        regexp: '^ServerActive='
+        line: 'ServerActive={{zabbix_servername}}'
+        create: yes
+      notify: restart zabbix-agent
+      tags: [zabbix]
+
+    - name: zabbix; set hostname
+      lineinfile:
+        dest: /etc/zabbix/zabbix_agentd.d/common.conf
+        regexp: '^Hostname='
+        line: 'Hostname={{ansible_fqdn}}'
+        create: yes
+      notify: restart zabbix-agent
+      tags: [zabbix]
+
+    - name: zabbix; rm userparameter_mysql.conf
+      file:
+        path: /etc/zabbix/zabbix_agentd.d/userparameter_mysql.conf
+        state: absent
+      notify: restart zabbix-agent
+      tags: [zabbix]
+
+    - name: zabbix; enable zabbix-agent
+      service:
+        name: zabbix-agent
+        enabled: yes
+      notify: restart zabbix-agent
+      tags: [zabbix]
+
     - name: rsyslog; add a template
       blockinfile:
         dest: /etc/rsyslog.d/00-template.conf
@@ -233,4 +275,9 @@
     - name: restart rsyslog
       service:
         name: rsyslog
+        state: restarted
+
+    - name: restart zabbix-agent
+      service:
+        name: zabbix-agent
         state: restarted
