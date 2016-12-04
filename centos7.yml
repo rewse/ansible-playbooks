@@ -73,6 +73,12 @@
         - etckeeper
       tags: [package]
 
+    - name: update all packages
+      yum:
+        name: '*'
+        state: latest
+      tags: [package]
+
     - name: etckeeper; init /etc
       command: etckeeper init
       args:
