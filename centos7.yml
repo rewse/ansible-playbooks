@@ -79,6 +79,15 @@
         state: present
       tags: [package, zabbix]
 
+    - name: install zabbix clients
+      yum:
+        name: "{{item}}"
+        state: installed
+      with_items:
+        - zabbix-agent
+        - zabbix-sender
+      tags: [package, zabbix]
+
     - name: update all packages
       yum:
         name: '*'
