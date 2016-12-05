@@ -238,6 +238,14 @@
       notify: restart chronyd
       tags: [time, chrony]
 
+    - name: yum-cron; enable auto-update
+      ini_file:
+        dest: /etc/yum/yum-cron.conf
+        section: commands
+        option: apply_updates
+        value: yes
+      tags: [yum-cron]
+
     - name: zabbix; set zabbix server
       lineinfile:
         dest: /etc/zabbix/zabbix_agentd.d/common.conf
