@@ -8,3 +8,21 @@
         name: centos-release-scl
         state: installed
       tags: [package]
+
+    - name: add priority into /etc/yum.repos.d/CentOS-SCLo-scl.repo
+      ini_file:
+        dest: /etc/yum.repos.d/CentOS-SCLo-scl.repo
+        section: centos-sclo-sclo
+        option: priority
+        value: 30
+        no_extra_spaces: True
+      tags: [package]
+
+    - name: add priority into /etc/yum.repos.d/CentOS-SCLo-scl-rh.repo
+      ini_file:
+        dest: /etc/yum.repos.d/CentOS-SCLo-scl-rh.repo
+        section: centos-sclo-rh
+        option: priority
+        value: 30
+        no_extra_spaces: True
+      tags: [package]
