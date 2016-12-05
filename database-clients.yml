@@ -3,3 +3,8 @@
   become: yes
   remote_user: centos
   tasks:
+    - name: install centos-release-scl
+      yum:
+        name: centos-release-scl
+        state: installed
+      tags: [package]
