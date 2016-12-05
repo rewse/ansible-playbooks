@@ -244,6 +244,14 @@
         section: commands
         option: apply_updates
         value: yes
+      notify: restart yum-cron
+      tags: [yum-cron]
+
+    - name: yum-cron; enable yum-cron
+      service:
+        name: yum-cron
+        enabled: yes
+      notify: restart yum-cron
       tags: [yum-cron]
 
     - name: zabbix; set zabbix server
@@ -374,6 +382,11 @@
     - name: restart rsyslog
       service:
         name: rsyslog
+        state: restarted
+
+    - name: restart yum-cron
+      service:
+        name: yum-cron
         state: restarted
 
     - name: restart zabbix-agent
