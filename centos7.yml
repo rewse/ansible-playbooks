@@ -3,7 +3,6 @@
   become: yes
   remote_user: centos
   vars:
-    admin_username: tats
     relayhostname: mail.so-net.ne.jp
     relayhostport: 587
     swap_device: xvdb
@@ -11,6 +10,7 @@
     zabbix_servername: zabbix.rewse.jp
   vars_files:
     - vault.yml
+    - gitignored_vars.yml
   tasks:
     - name: set timezone
       timezone:
