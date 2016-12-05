@@ -27,3 +27,9 @@
         - RictyDiscord-Regular.ttf
         - RictyDiscord-Bold.ttf
       tags: [font]
+
+    - name: git; clone base-16-terminal-app.git
+      git:
+        repo: https://github.com/vbwx/base16-terminal-app.git
+        dest: /srv/git/base16-terminal-app
+      tags: [terminal]
