@@ -1,0 +1,10 @@
+---
+- hosts: centos
+  become: yes
+  remote_user: centos
+  tasks:
+    - name: install gnome desktop
+      yum:
+        name: "@^gnome-desktop-environment"
+        state: installed
+      tags: [package]
