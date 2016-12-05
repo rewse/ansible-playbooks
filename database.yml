@@ -26,3 +26,12 @@
         value: 30
         no_extra_spaces: True
       tags: [package]
+
+    - name: install postgresql-9.5 client
+      yum:
+        name: "{{item}}"
+        state: installed
+      with_items:
+        - postgresql-jdbc
+        - rh-postgresql95-postgresql
+      tags: [client, postgresql]
