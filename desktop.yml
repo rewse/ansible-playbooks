@@ -20,7 +20,7 @@
         state: installed
       tags: [package]
 
-    - name: Make Ricty dir
+    - name: make Ricty dir
       file:
         path: /usr/local/share/fonts/Ricty
         state: directory
