@@ -215,6 +215,7 @@
       with_items:
         - cyrus-sasl-md5
         - cyrus-sasl-plain
+      notify: restart postfix
       tags: [mail]
 
     - name: anacron; change start_hours_range
@@ -288,15 +289,15 @@
       tags: [rsyslog]
 
   handlers:
-    - name: restart chronyd
-      service:
-        name: chronyd
-        state: restarted
-
     - name: reload postfix
       service:
         name: postfix
         state: reloaded
+
+    - name: restart chronyd
+      service:
+        name: chronyd
+        state: restarted
 
     - name: restart rsyslog
       service:
