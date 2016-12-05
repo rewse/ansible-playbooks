@@ -218,6 +218,17 @@
         line: 'START_HOURS_RANGE=3-7'
       tags: [anacron]
 
+    - name: add NTP servers
+      blockinfile:
+        dest: /etc/chrony.conf
+        insertafter: '^# Please consider joining the pool'
+        content: |
+          server ntp.nict.jp iburst
+          server ntp.jst.mfeed.ad.jp iburst
+          server ats1.e-timing.ne.jp iburst
+      notify: restart chronyd
+      tags: [time, chrony]
+
     - name: zabbix; set zabbix server
       lineinfile:
         dest: /etc/zabbix/zabbix_agentd.d/common.conf
@@ -270,6 +281,11 @@
       tags: [rsyslog]
 
   handlers:
+    - name: restart chronyd
+      service:
+        name: chronyd
+        state: restarted
+
     - name: reload postfix
       service:
         name: postfix
