@@ -192,7 +192,14 @@
         regexp: '^\[{{relayhostname}}\]:{{relayhostport}}'
         line: '[{{relayhostname}}]:{{relayhostport}} {{sonet_username}}:{{sonet_password}}'
         create: yes
+        mode: 0600
       register: postfix_sasl_password_res
+      tags: [mail]
+
+    - name: postfix; create sasl_passwd.db
+      file:
+        path: /etc/postfix/sasl_passwd.db
+        mode: 0600
       tags: [mail]
 
     - name: postfix; hash sasl_passwd
