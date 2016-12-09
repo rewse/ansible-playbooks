@@ -3,6 +3,34 @@
   become: yes
   remote_user: centos
   tasks:
+    - name: install mysql57-community-release-el7-9
+      yum:
+        name: http://repo.mysql.com//mysql57-community-release-el7-9.noarch.rpm
+        state: installed
+      tags: [mysql, package]
+
+    - name: add priority into /etc/yum.repos.d/mysql-community.repo
+      ini_file:
+        dest: /etc/yum.repos.d/mysql-community.repo
+        section: "{{item}}"
+        option: priority
+        value: 30
+        no_extra_spaces: True
+      with_items:
+        - mysql-connectors-community
+        - mysql-tools-community
+        - mysql57-community
+      tags: [mysql, package]
+
+    - name: install mysql client
+      yum:
+        name: "{{item}}"
+        state: installed
+      with_items:
+        - mysql-community-client
+        - mysql-connector-java
+      tags: [client, mysql]
+
     - name: install centos-release-scl
       yum:
         name: centos-release-scl
