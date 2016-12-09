@@ -2,3 +2,29 @@
 - hosts: centos
   become: yes
   remote_user: centos
+  vars:
+    jdk_filename: jdk-8u112-linux-x64.rpm
+  tasks:
+      # Download the files before the following task
+      # from <http://www.oracle.com/technetwork/topics/linuxx86-64soft-092277.html>
+    - name: copy jdk.rpm
+      copy:
+        src: ~/Downloads/{{jdk_filename}}
+        dest: /usr/local/src
+      tags: [jdk, package]
+
+    - name: install jdk
+      yum:
+        name: /usr/local/src/{{jdk_filename}}
+        state: installed
+      tags: [jdk, package]
+
+    - name: erase openjdk
+      yum:
+        name: "{{item}}"
+        state: absent
+      with_items:
+        - java-1.8.0-openjdk-headless
+        - java-1.7.0-openjdk-headless
+        - java-1.8.0-openjdk
+      tags: [jdk, package]
