@@ -296,6 +296,79 @@
       notify: restart zabbix-agent
       tags: [zabbix]
 
+    - name: rsyslog; add a template
+      blockinfile:
+        dest: /etc/rsyslog.d/00-template.conf
+        content: |
+          $template VerboseTraditionalFileFormat,"%timestamp% <%syslogfacility-text%.%syslogseverity-text%> %hostname% %syslogtag%%msg:::sp-if-no-1st-sp%%msg:::drop-last-lf%\n"
+          $ActionFileDefaultTemplate VerboseTraditionalFileFormat
+        create: yes
+      notify: restart rsyslog
+      tags: [rsyslog]
+
+    - name: add a group for admin user
+      group:
+        name: "{{admin_username}}"
+        gid: 1001
+      tags: [user]
+
+    - name: add admin user
+      user:
+        name: "{{admin_username}}"
+        uid: 1001
+        group: "{{admin_username}}"
+        groups: 'adm,wheel,systemd-journal'
+        skeleton: /etc/skel
+      tags: [user]
+
+    - name: allow sudo to admin user
+      lineinfile:
+        dest: /etc/sudoers.d/00-{{admin_username}}
+        regexp: '^{{admin_username}}'
+        line: '{{admin_username}} ALL=(ALL) NOPASSWD:ALL'
+        create: yes
+        mode: 0440
+        validate: 'visudo -cf %s'
+      tags: [user]
+
+    - name: make .ssh dir for admin user
+      file:
+        path: /home/{{admin_username}}/.ssh
+        owner: "{{admin_username}}"
+        group: "{{admin_username}}"
+        state: directory
+        mode: 0700
+      tags: [user]
+
+    - name: copy authorized_keys
+      copy:
+        src: /home/centos/.ssh/authorized_keys
+        dest: /home/{{admin_username}}/.ssh/authorized_keys
+        remote_src: True
+        owner: "{{admin_username}}"
+        group: "{{admin_username}}"
+        mode: 0600
+      tags: [user]
+
+    - name: copy id_rsa
+      copy:
+        src: ~/.ssh/id_rsa
+        dest: /home/{{admin_username}}/.ssh/id_rsa
+        owner: "{{admin_username}}"
+        group: "{{admin_username}}"
+        mode: 0600
+        follow: yes
+      tags: [user]
+
+    - name: copy id_rsa.pub
+      copy:
+        src: ~/.ssh/id_rsa.pub
+        dest: /home/{{admin_username}}/.ssh/id_rsa.pub
+        owner: "{{admin_username}}"
+        group: "{{admin_username}}"
+        follow: yes
+      tags: [user]
+
     - name: clone dotfiles.git
       git:
         repo: git@github.com:rewse/dotfiles.git
@@ -373,79 +446,6 @@
         dest: /etc/vimrc
         line: 'source /usr/share/vim/vimfiles/vimrc'
       tags: [dotifiles, vim]
-
-    - name: rsyslog; add a template
-      blockinfile:
-        dest: /etc/rsyslog.d/00-template.conf
-        content: |
-          $template VerboseTraditionalFileFormat,"%timestamp% <%syslogfacility-text%.%syslogseverity-text%> %hostname% %syslogtag%%msg:::sp-if-no-1st-sp%%msg:::drop-last-lf%\n"
-          $ActionFileDefaultTemplate VerboseTraditionalFileFormat
-        create: yes
-      notify: restart rsyslog
-      tags: [rsyslog]
-
-    - name: add a group for admin user
-      group:
-        name: "{{admin_username}}"
-        gid: 1001
-      tags: [user]
-
-    - name: add admin user
-      user:
-        name: "{{admin_username}}"
-        uid: 1001
-        group: "{{admin_username}}"
-        groups: 'adm,wheel,systemd-journal'
-        skeleton: /etc/skel
-      tags: [user]
-
-    - name: allow sudo to admin user
-      lineinfile:
-        dest: /etc/sudoers.d/00-{{admin_username}}
-        regexp: '^{{admin_username}}'
-        line: '{{admin_username}} ALL=(ALL) NOPASSWD:ALL'
-        create: yes
-        mode: 0440
-        validate: 'visudo -cf %s'
-      tags: [user]
-
-    - name: make .ssh dir for admin user
-      file:
-        path: /home/{{admin_username}}/.ssh
-        owner: "{{admin_username}}"
-        group: "{{admin_username}}"
-        state: directory
-        mode: 0700
-      tags: [user]
-
-    - name: copy authorized_keys
-      copy:
-        src: /home/centos/.ssh/authorized_keys
-        dest: /home/{{admin_username}}/.ssh/authorized_keys
-        remote_src: True
-        owner: "{{admin_username}}"
-        group: "{{admin_username}}"
-        mode: 0600
-      tags: [user]
-
-    - name: copy id_rsa
-      copy:
-        src: ~/.ssh/id_rsa
-        dest: /home/{{admin_username}}/.ssh/id_rsa
-        owner: "{{admin_username}}"
-        group: "{{admin_username}}"
-        mode: 0600
-        follow: yes
-      tags: [user]
-
-    - name: copy id_rsa.pub
-      copy:
-        src: ~/.ssh/id_rsa.pub
-        dest: /home/{{admin_username}}/.ssh/id_rsa.pub
-        owner: "{{admin_username}}"
-        group: "{{admin_username}}"
-        follow: yes
-      tags: [user]
 
   handlers:
     - name: reload postfix
