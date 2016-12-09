@@ -295,6 +295,76 @@
       notify: restart zabbix-agent
       tags: [zabbix]
 
+    - name: copy dotfiles
+      git:
+        repo: git@github.com:rewse/dotfiles.git
+        dest: /srv/git/dotfiles
+        accept_hostkey: yes
+        key_file: /home/{{admin_username}}/.ssh/id_rsa
+      tags: [dotfiles]
+
+    - name: copy bash_profile
+      copy:
+        src: /srv/git/dotfiles/bash_profile
+        dest: /etc/profile.d/bash_profile.sh
+        remote_src: True
+      tags: [dotfiles, bash]
+
+    - name: copy bashrc
+      copy:
+        src: /srv/git/dotfiles/bashrc
+        dest: /etc/profile.d/bashrc.sh
+        remote_src: True
+      tags: [dotfiles, bash]
+
+    - name: copy gitconfig
+      copy:
+        src: /srv/git/dotfiles/gitconfig
+        dest: /home/{{admin_username}}/.gitconfig
+        remote_src: True
+      tags: [dotfiles, git]
+
+    - name: git; set user email
+      ini_file:
+        dest: /home/{{admin_username}}/.gitconfig
+        section: user
+        option: email
+        value: "{{email}}"
+      tags: [dotfiles, git]
+
+    - name: copy inputrc
+      copy:
+        src: /srv/git/dotfiles/inputrc
+        dest: /home/{{admin_username}}/.inputrc
+        remote_src: True
+      tags: [dotfiles, inputrc]
+
+    - name: tmux; copy tmux.conf
+      copy:
+        src: /srv/git/dotfiles/tmux.conf
+        dest: /etc/tmux.conf
+        remote_src: True
+      tags: [dotfiles, tmux]
+
+    - name: vim; copy vimfiles
+      copy:
+        src: /srv/git/dotfiles/vim/{{item}}
+        dest: /usr/share/vim/vimfiles/{{item}}
+        remote_src: True
+      with_items:
+        - colors/base16-tomorrow.vim
+        - ftplugin/python_match.vim
+        - plugin/matrix.vim
+        - plugin/NERD_commenter.vim
+        - vimrc
+      tags: [dotifiles, vim]
+
+    - name: vim; add to import vimrc
+      lineinfile:
+        dest: /etc/vimrc
+        line: 'source /usr/share/vim/vimfiles/vimrc'
+      tags: [dotifiles, vim]
+
     - name: rsyslog; add a template
       blockinfile:
         dest: /etc/rsyslog.d/00-template.conf
