@@ -35,7 +35,7 @@
       yum:
         name: centos-release-scl
         state: installed
-      tags: [package]
+      tags: [package, postgresql]
 
     - name: add priority into /etc/yum.repos.d/CentOS-SCLo-scl.repo
       ini_file:
@@ -44,7 +44,7 @@
         option: priority
         value: 30
         no_extra_spaces: True
-      tags: [package]
+      tags: [package, postgresql]
 
     - name: add priority into /etc/yum.repos.d/CentOS-SCLo-scl-rh.repo
       ini_file:
@@ -53,7 +53,7 @@
         option: priority
         value: 30
         no_extra_spaces: True
-      tags: [package]
+      tags: [package, postgresql]
 
     - name: install postgresql-9.5 client
       yum:
