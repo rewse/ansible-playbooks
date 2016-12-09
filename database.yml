@@ -2,6 +2,8 @@
 - hosts: centos
   become: yes
   remote_user: centos
+  vars_files:
+    - gitignored_vars.yml
   tasks:
     - name: install mysql57-community-release-el7-9
       yum:
@@ -76,6 +78,36 @@
         - /usr/local/src/oracle-instantclient12.1-basic-12.1.0.2.0-1.x86_64.rpm
         - /usr/local/src/oracle-instantclient12.1-jdbc-12.1.0.2.0-1.x86_64.rpm
         - /usr/local/src/oracle-instantclient12.1-sqlplus-12.1.0.2.0-1.x86_64.rpm
+      tags: [client, oracle]
+
+    - name: clone orascript.git
+      git:
+        repo: git@github.com:rewse/orascript.git
+        dest: /srv/git/orascript
+        accept_hostkey: yes
+        key_file: /home/{{admin_username}}/.ssh/id_rsa
+      tags: [client, oracle]
+
+    - name: change mode of git/orascript
+      file:
+        path: /srv/git/orascript
+        owner: "{{admin_username}}"
+        group: "{{admin_username}}"
+        recurse: yes
+      tags: [client, oracle]
+
+    - name: copy orarc
+      copy:
+        src: /srv/git/orascript/orarc
+        dest: /home/{{admin_username}}/.orarc
+        remote_src: True
+      tags: [client, oracle]
+
+    - name: create symlink for orascript/common
+      file:
+        src: /srv/git/orascript/common
+        dest: /home/{{admin_username}}/oracle
+        state: link
       tags: [client, oracle]
 
     - name: install postgresql-9.5 client
