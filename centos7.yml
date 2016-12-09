@@ -200,6 +200,7 @@
     - name: postfix; create sasl_passwd.db
       file:
         path: /etc/postfix/sasl_passwd.db
+        state: touch
         mode: 0600
       tags: [mail]
 
