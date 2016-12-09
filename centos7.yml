@@ -453,6 +453,11 @@
         name: postfix
         state: reloaded
 
+    - name: restart postfix
+      service:
+        name: postfix
+        state: restarted
+
     - name: restart chronyd
       service:
         name: chronyd
