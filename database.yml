@@ -55,6 +55,29 @@
         no_extra_spaces: True
       tags: [package, postgresql]
 
+      # Download the files before the following task
+      # from <http://www.oracle.com/technetwork/topics/linuxx86-64soft-092277.html>
+    - name: copy oracle-12.1 client
+      copy:
+        src: ~/Downloads/{{item}}
+        dest: /usr/local/src
+      with_items:
+        - oracle-instantclient12.1-basic-12.1.0.2.0-1.x86_64.rpm
+        - oracle-instantclient12.1-jdbc-12.1.0.2.0-1.x86_64.rpm
+        - oracle-instantclient12.1-sqlplus-12.1.0.2.0-1.x86_64.rpm
+      tags: [client, oracle]
+
+    - name: install oracle-12.1 client
+      yum:
+        name: "{{item}}"
+        state: installed
+      with_items:
+        - rlwrap
+        - /usr/local/src/oracle-instantclient12.1-basic-12.1.0.2.0-1.x86_64.rpm
+        - /usr/local/src/oracle-instantclient12.1-jdbc-12.1.0.2.0-1.x86_64.rpm
+        - /usr/local/src/oracle-instantclient12.1-sqlplus-12.1.0.2.0-1.x86_64.rpm
+      tags: [client, oracle]
+
     - name: install postgresql-9.5 client
       yum:
         name: "{{item}}"
