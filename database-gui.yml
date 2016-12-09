@@ -1,0 +1,4 @@
+---
+- hosts: centos
+  become: yes
+  remote_user: centos
