@@ -295,12 +295,20 @@
       notify: restart zabbix-agent
       tags: [zabbix]
 
-    - name: copy dotfiles
+    - name: clone dotfiles.git
       git:
         repo: git@github.com:rewse/dotfiles.git
         dest: /srv/git/dotfiles
         accept_hostkey: yes
         key_file: /home/{{admin_username}}/.ssh/id_rsa
+      tags: [dotfiles]
+
+    - name: change mode of git/dotfiles
+      file:
+        path: /srv/git/dotfiles
+        owner: "{{admin_username}}"
+        group: "{{admin_username}}"
+        recurse: yes
       tags: [dotfiles]
 
     - name: copy bash_profile
