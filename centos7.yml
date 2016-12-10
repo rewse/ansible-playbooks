@@ -385,6 +385,18 @@
         follow: yes
       tags: [user]
 
+    - name: create .ssh/config
+      blockinfile:
+        dest: /home/{{admin_username}}/.ssh/config
+        content: |
+          rewse.jp
+            User {{rewsejp_ssh_user}}
+            Port {{rewsejp_ssh_port}}
+        create: yes
+        owner: "{{admin_username}}"
+        group: "{{admin_username}}"
+      tags: [user]
+
     - name: clone dotfiles.git
       git:
         repo: git@github.com:rewse/dotfiles.git
