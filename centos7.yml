@@ -404,6 +404,8 @@
         src: /srv/git/dotfiles/gitconfig
         dest: /home/{{admin_username}}/.gitconfig
         remote_src: True
+        owner: "{{admin_username}}"
+        group: "{{admin_username}}"
       tags: [dotfiles, git]
 
     - name: git; set user email
@@ -419,6 +421,8 @@
         src: /srv/git/dotfiles/inputrc
         dest: /home/{{admin_username}}/.inputrc
         remote_src: True
+        owner: "{{admin_username}}"
+        group: "{{admin_username}}"
       tags: [dotfiles, inputrc]
 
     - name: tmux; copy tmux.conf
