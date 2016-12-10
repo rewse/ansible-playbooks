@@ -33,30 +33,6 @@
         - mysql-connector-java
       tags: [client, mysql]
 
-    - name: install centos-release-scl
-      yum:
-        name: centos-release-scl
-        state: installed
-      tags: [package, postgresql]
-
-    - name: add priority into /etc/yum.repos.d/CentOS-SCLo-scl.repo
-      ini_file:
-        dest: /etc/yum.repos.d/CentOS-SCLo-scl.repo
-        section: centos-sclo-sclo
-        option: priority
-        value: 30
-        no_extra_spaces: True
-      tags: [package, postgresql]
-
-    - name: add priority into /etc/yum.repos.d/CentOS-SCLo-scl-rh.repo
-      ini_file:
-        dest: /etc/yum.repos.d/CentOS-SCLo-scl-rh.repo
-        section: centos-sclo-rh
-        option: priority
-        value: 30
-        no_extra_spaces: True
-      tags: [package, postgresql]
-
       # Download the files before the following task
       # from <http://www.oracle.com/technetwork/topics/linuxx86-64soft-092277.html>
     - name: copy oracle-12.1 client
@@ -110,13 +86,13 @@
         state: link
       tags: [client, oracle]
 
-    - name: install postgresql-9.5 client
+    - name: install postgresql client
       yum:
         name: "{{item}}"
         state: installed
       with_items:
+        - postgresql
         - postgresql-jdbc
-        - rh-postgresql95-postgresql
       tags: [client, postgresql]
 
     - name: install redshift-1.2.1 client
