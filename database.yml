@@ -2,12 +2,19 @@
 - hosts: centos
   become: yes
   remote_user: centos
+  vars:
+    mysql_release_filename: mysql57-community-release-el7-9.noarch.rpm
+    mysql_community_ini_section: mysql57_community
+    oracle_instantcelint_basic: oracle-instantclient12.1-basic-12.1.0.2.0-1.x86_64.rpm
+    oracle_instantclient_sqlplus: oracle-instantclient12.1-sqlplus-12.1.0.2.0-1.x86_64.rpm
+    postgersql_jdbc_filename: postgresql-9.4.1212.jar
+    redshift_jdbc_filename: RedshiftJDBC42-1.2.1.1001.jar
   vars_files:
     - gitignored_vars.yml
   tasks:
-    - name: install mysql57-community-release-el7-9
+    - name: install mysql57-community-release
       yum:
-        name: http://repo.mysql.com//mysql57-community-release-el7-9.noarch.rpm
+        name: http://repo.mysql.com/{{mysql_release_filename}}
         state: installed
       tags: [mysql, package]
 
@@ -21,7 +28,7 @@
       with_items:
         - mysql-connectors-community
         - mysql-tools-community
-        - mysql57-community
+        - "{{mysql_community_ini_section}}"
       tags: [mysql, package]
 
     - name: install mysql client
@@ -35,23 +42,23 @@
 
       # Download the files before the following task
       # from <http://www.oracle.com/technetwork/topics/linuxx86-64soft-092277.html>
-    - name: copy oracle-12.1 client
+    - name: copy oracle-instantcelint
       copy:
         src: ~/Downloads/{{item}}
         dest: /usr/local/src
       with_items:
-        - oracle-instantclient12.1-basic-12.1.0.2.0-1.x86_64.rpm
-        - oracle-instantclient12.1-sqlplus-12.1.0.2.0-1.x86_64.rpm
+        - "{{oracle_instantcelint_basic}}"
+        - "{{oracle_instantclient_sqlplus}}"
       tags: [client, oracle]
 
-    - name: install oracle-12.1 client
+    - name: install oracle-instantcelint
       yum:
         name: "{{item}}"
         state: installed
       with_items:
         - rlwrap
-        - /usr/local/src/oracle-instantclient12.1-basic-12.1.0.2.0-1.x86_64.rpm
-        - /usr/local/src/oracle-instantclient12.1-sqlplus-12.1.0.2.0-1.x86_64.rpm
+        - /usr/local/src/{{oracle_instantcelint_basic}}
+        - /usr/local/src/{{oracle_instantclient_sqlplus}}
       tags: [client, oracle]
 
     - name: create symlink for ojdbc.jar
@@ -102,15 +109,15 @@
         - postgresql
       tags: [client, postgresql]
 
-    - name: install postgresql-jdbc
+    - name: install postgresql jdbc driver
       get_url:
-        url: https://jdbc.postgresql.org/download/postgresql-9.4.1212.jar
+        url: https://jdbc.postgresql.org/download/{{postgersql_jdbc_filename}}
         dest: /usr/share/java
       tags: [client, postgresql]
 
     - name: create symlinks postgresql.jar
       file:
-        src: postgresql-9.4.1212.jar
+        src: "{{postgersql_jdbc_filename}}"
         dest: /usr/share/java/postgresql.jar
         state: link
       tags: [client, postgresql]
@@ -125,15 +132,15 @@
         - postgresql.jre6.jar
       tags: [client, postgresql]
 
-    - name: install redshift-1.2.1 client
+    - name: install redshift jdbc driver
       get_url:
-        url: https://s3.amazonaws.com/redshift-downloads/drivers/RedshiftJDBC42-1.2.1.1001.jar
+        url: https://s3.amazonaws.com/redshift-downloads/drivers/{{redshift_jdbc_filename}}
         dest: /usr/share/java
       tags: [client, redshift]
 
     - name: create symlink RedShiftJDBC.jar
       file:
-        src: RedshiftJDBC42-1.2.1.1001.jar
+        src: "{{redshift_jdbc_filename}}"
         dest: /usr/share/java/RedshiftJDBC.jar
         state: link
       tags: [client, redshift]
