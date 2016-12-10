@@ -228,6 +228,22 @@
         line: 'START_HOURS_RANGE=3-7'
       tags: [anacron]
 
+    - name: ssh; change ClientAliveInterval
+      lineinfile:
+        dest: /etc/ssh/sshd_config
+        insertafter: '^#ClientAliveInterval'
+        regexp: '^ClientAliveInterval'
+        line: 'ClientAliveInterval 59'
+      notify: restart sshd
+      tags: [ssh]
+
+    - name: ssh; change ServerAliveInterval
+      lineinfile:
+        dest: /etc/ssh/ssh_config
+        regexp: '^.*ServerAliveInterval'
+        line: '  ServerAliveInterval 59'
+      tags: [ssh]
+
     - name: add NTP servers
       blockinfile:
         dest: /etc/chrony.conf
@@ -470,6 +486,11 @@
     - name: restart rsyslog
       service:
         name: rsyslog
+        state: restarted
+
+    - name: restart sshd
+      service:
+        name: sshd
         state: restarted
 
     - name: restart yum-cron
