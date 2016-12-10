@@ -1,5 +1,5 @@
 ---
-- hosts: centos
+- hosts: all
   become: yes
   remote_user: centos
   vars:
