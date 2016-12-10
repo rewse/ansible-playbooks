@@ -41,7 +41,6 @@
         dest: /usr/local/src
       with_items:
         - oracle-instantclient12.1-basic-12.1.0.2.0-1.x86_64.rpm
-        - oracle-instantclient12.1-jdbc-12.1.0.2.0-1.x86_64.rpm
         - oracle-instantclient12.1-sqlplus-12.1.0.2.0-1.x86_64.rpm
       tags: [client, oracle]
 
@@ -52,8 +51,17 @@
       with_items:
         - rlwrap
         - /usr/local/src/oracle-instantclient12.1-basic-12.1.0.2.0-1.x86_64.rpm
-        - /usr/local/src/oracle-instantclient12.1-jdbc-12.1.0.2.0-1.x86_64.rpm
         - /usr/local/src/oracle-instantclient12.1-sqlplus-12.1.0.2.0-1.x86_64.rpm
+      tags: [client, oracle]
+
+    - name: create symlink for ojdbc.jar
+      file:
+        src: /usr/lib/oracle/12.1/client64/lib/{{item}}
+        dest: /usr/share/java/{{item}}
+        state: link
+      with_items:
+        - ojdbc6.jar
+        - ojdbc7.jar
       tags: [client, oracle]
 
     - name: clone orascript.git
