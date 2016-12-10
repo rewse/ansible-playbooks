@@ -5,7 +5,6 @@
   vars:
     ricty_dir: "~/Workdocs/Documents/Fonts/Ricty 4.0.1"
   vars_files:
-    - vault.yml
     - gitignored_vars.yml
   tasks:
     - name: install gnome desktop
