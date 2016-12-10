@@ -48,7 +48,6 @@
         src: /usr/lib/systemd/system/vncserver@.service
         dest: /etc/systemd/system/vncserver@:1.service
         remote_src: True
-      notify: restart vncserver@:1
       tags: [vnc]
 
     - name: tigervnc; replace <USER> in systemd file
@@ -56,51 +55,4 @@
         dest: /etc/systemd/system/vncserver@:1.service
         regexp: '<USER>'
         replace: "{{admin_username}}"
-      notify: restart vncserver@:1
       tags: [vnc]
-
-    - name: Make .vnc dir
-      file:
-        path: /home/{{admin_username}}/.vnc
-        state: directory
-      tags: [vnc]
-
-    - name: save VNC password source
-      lineinfile:
-        dest: /home/{{admin_username}}/.vnc/passwd.plain
-        regexp: '^.'
-        line: "{{vnc_password}}"
-        create: yes
-        mode: 0600
-      register: save_vnc_password_source_res
-      tags: [vnc]
-
-    - name: create VNC password
-      shell: 'cat /home/{{admin_username}}/.vnc/passwd.plain | vncpasswd -f > /home/{{admin_username}}/.vnc/passwd'
-      when: save_vnc_password_source_res|changed
-      tags: [vnc]
-
-    - name: change mode of VNC password
-      file:
-        path: /home/{{admin_username}}/.vnc/passwd
-        mode: 0600
-      tags: [vnc]
-
-    - name: remove VNC passwors source
-      file:
-        path: /home/{{admin_username}}/.vnc/passwd.plain
-        state: absent
-      tags: [vnc]
-
-    - name: tigervnc; enable vncserver
-      service:
-        name: vncserver@:1
-        enabled: yes
-      notify: restart vncserver@:1
-      tags: [vnc]
-
-  handlers:
-    - name: restart vncserver@:1
-      service:
-        name: vncserver@:1
-        state: restarted
