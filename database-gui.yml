@@ -8,7 +8,7 @@
     sqldeveloper_filename: sqldeveloper-4.1.5.21.78-1.noarch.rpm
   tasks:
       # Download the files before the following task
-      # from <http://www.oracle.com/technetwork/topics/linuxx86-64soft-092277.html>
+      # from <http://www.oracle.com/technetwork/java/javase/downloads/jdk8-downloads-2133151.html>
     - name: copy jdk.rpm
       copy:
         src: ~/Downloads/{{jdk_filename}}
