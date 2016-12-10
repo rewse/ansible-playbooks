@@ -100,7 +100,29 @@
         state: installed
       with_items:
         - postgresql
-        - postgresql-jdbc
+      tags: [client, postgresql]
+
+    - name: install postgresql-jdbc
+      get_url:
+        url: https://jdbc.postgresql.org/download/postgresql-9.4.1212.jar
+        dest: /usr/share/java
+      tags: [client, postgresql]
+
+    - name: create symlinks postgresql.jar
+      file:
+        src: postgresql-9.4.1212.jar
+        dest: /usr/share/java/postgresql.jar
+        state: link
+      tags: [client, postgresql]
+
+    - name: create symlinks from postgresql.jar
+      file:
+        src: postgresql.jar
+        dest: /usr/share/java/{{item}}
+        state: link
+      with_items:
+        - postgresql.jre7.jar
+        - postgresql.jre6.jar
       tags: [client, postgresql]
 
     - name: install redshift-1.2.1 client
