@@ -228,6 +228,14 @@
         line: 'START_HOURS_RANGE=3-7'
       tags: [anacron]
 
+    - name: cloud-init; add preserve_hostname
+      lineinfile:
+        dest: /etc/cloud/cloud.cfg
+        insertbefore: '^# vim:syntax'
+        regexp: '^preserve_hostname'
+        line: 'preserve_hostname: true'
+      tags: [cloudinit]
+
     - name: ssh; change ClientAliveInterval
       lineinfile:
         dest: /etc/ssh/sshd_config
