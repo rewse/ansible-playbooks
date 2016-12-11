@@ -4,8 +4,6 @@
   remote_user: centos
   vars:
     ricty_dir: "~/Workdocs/Documents/Fonts/Ricty 4.0.1"
-  vars_files:
-    - gitignored_vars.yml
   tasks:
     - name: install gnome desktop
       yum:

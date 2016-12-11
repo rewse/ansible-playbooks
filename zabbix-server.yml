@@ -5,9 +5,6 @@
   vars:
     aurora_ep: rewse-aurora-cluster.cluster-c8xun5aepybs.ap-northeast-1.rds.amazonaws.com
     zabbix_version: 3.2.2
-  vars_files:
-    - vault.yml
-    - gitignored_vars.yml
   tasks:
     - name: install additional packages
       yum:
