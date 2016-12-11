@@ -66,7 +66,7 @@
     state: installed
   with_items:
     - etckeeper
-  tags: [package]
+  tags: [epel, package]
 
 - name: install zabbix-release
   yum:
@@ -93,14 +93,14 @@
   command: etckeeper init
   args:
       creates: /etc/.git
-  tags: [package]
+  tags: [etckeeper]
 
 - name: etckeeper; Initial commit
   command: etckeeper commit "Initial commit"
   args:
     chdir: /etc
     creates: /etc/.git/logs
-  tags: [package]
+  tags: [etckeeper]
 
 - name: add priority into /etc/yum.repos.d/CentOS-Base.repo
   ini_file:
@@ -134,7 +134,7 @@
     option: priority
     value: 50
     no_extra_spaces: True
-  tags: [package]
+  tags: [epel, package]
 
 - name: disable the unnecessary services
   service:
@@ -153,7 +153,7 @@
     regexp: '^myorigin'
     line: 'myorigin = rewse.jp'
   notify: reload postfix
-  tags: [mail]
+  tags: [mail, postfix]
 
 - name: postfix; change relayhost
   lineinfile:
@@ -162,7 +162,7 @@
     regexp: '^relayhost'
     line: 'relayhost = [{{relayhost.name}}]:{{relayhost.port}}'
   notify: reload postfix
-  tags: [mail]
+  tags: [mail, postfix]
 
 - name: postfix; support sasl
   blockinfile:
@@ -172,7 +172,7 @@
       smtp_sasl_password_maps = hash:/etc/postfix/sasl_passwd
       smtp_sasl_security_options = noplaintext, noanonymous
   notify: reload postfix
-  tags: [mail]
+  tags: [mail, postfix]
 
 - name: postfix; create sasl_passwd
   lineinfile:
@@ -182,20 +182,20 @@
     create: yes
     mode: 0600
   register: postfix_sasl_password_res
-  tags: [mail]
+  tags: [mail, postfix]
 
 - name: postfix; create sasl_passwd.db
   file:
     path: /etc/postfix/sasl_passwd.db
-    state: touch
+    state: file
     mode: 0600
-  tags: [mail]
+  tags: [mail, postfix]
 
 - name: postfix; hash sasl_passwd
   command: postmap /etc/postfix/sasl_passwd
   when: postfix_sasl_password_res|changed
   notify: reload postfix
-  tags: [mail]
+  tags: [mail, postfix]
 
 - name: install sasl packages
   yum:
@@ -205,7 +205,7 @@
     - cyrus-sasl-md5
     - cyrus-sasl-plain
   notify: restart postfix
-  tags: [mail]
+  tags: [mail, postfix]
 
 - name: anacron; change start_hours_range
   lineinfile:
@@ -221,7 +221,7 @@
     insertbefore: '^# vim:syntax'
     regexp: '^preserve_hostname'
     line: 'preserve_hostname: true'
-  tags: [cloudinit]
+  tags: [cloud-init]
 
 - name: logwatch; disable all services
   lineinfile:
@@ -296,7 +296,7 @@
     line: 'Server={{zabbix_server_name}}'
     create: yes
   notify: restart zabbix-agent
-  tags: [zabbix]
+  tags: [zabbix, zabbix-agent]
 
 - name: zabbix; set zabbix server active
   lineinfile:
@@ -305,7 +305,7 @@
     line: 'ServerActive={{zabbix_server_name}}'
     create: yes
   notify: restart zabbix-agent
-  tags: [zabbix]
+  tags: [zabbix, zabbix-agent]
 
 - name: zabbix; set hostname
   lineinfile:
@@ -314,21 +314,21 @@
     line: 'Hostname={{ansible_fqdn}}'
     create: yes
   notify: restart zabbix-agent
-  tags: [zabbix]
+  tags: [zabbix, zabbix-agent]
 
 - name: zabbix; rm userparameter_mysql.conf
   file:
     path: /etc/zabbix/zabbix_agentd.d/userparameter_mysql.conf
     state: absent
   notify: restart zabbix-agent
-  tags: [zabbix]
+  tags: [zabbix, zabbix-agent]
 
 - name: zabbix; enable zabbix-agent
   service:
     name: zabbix-agent
     enabled: yes
   notify: restart zabbix-agent
-  tags: [zabbix]
+  tags: [zabbix, zabbix-agent]
 
 - name: add a group for admin user
   group:
