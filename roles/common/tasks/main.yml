@@ -239,6 +239,13 @@
     line: 'Service = yum'
   tags: [logwatch]
 
+- name: rsyslog; add a template
+  template:
+    src: rsyslog.conf.j2
+    dest: /etc/rsyslog.d/00-template.conf
+  notify: restart rsyslog
+  tags: [rsyslog]
+
 - name: ssh; change ClientAliveInterval
   lineinfile:
     dest: /etc/ssh/sshd_config
@@ -322,13 +329,6 @@
     enabled: yes
   notify: restart zabbix-agent
   tags: [zabbix]
-
-- name: rsyslog; add a template
-  template:
-    src: rsyslog.conf.j2
-    dest: /etc/rsyslog.d/00-template.conf
-  notify: restart rsyslog
-  tags: [rsyslog]
 
 - name: add a group for admin user
   group:
