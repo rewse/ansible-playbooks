@@ -1,55 +1,49 @@
 ---
-- hosts: all
-  become: yes
-  remote_user: centos
-  vars:
-    ricty_dir: "~/Workdocs/Documents/Fonts/Ricty 4.0.1"
-  tasks:
-    - name: install gnome desktop
-      yum:
-        name: "@^gnome-desktop-environment"
-        state: installed
-      tags: [package]
+- name: install gnome desktop
+  yum:
+    name: "@^gnome-desktop-environment"
+    state: installed
+  tags: [desktop, package]
 
-    - name: install tigervnc-server
-      yum:
-        name: tigervnc-server
-        state: installed
-      tags: [package]
+- name: make Ricty dir
+  file:
+    path: /usr/local/share/fonts/Ricty
+    state: directory
+  tags: [desktop, font, Ricty]
 
-    - name: make Ricty dir
-      file:
-        path: /usr/local/share/fonts/Ricty
-        state: directory
-      tags: [font]
+- name: copy Ricty fonts
+  copy:
+    src: "{{ricty_dir}}/{{item}}"
+    dest: /usr/local/share/fonts/Ricty
+  with_items:
+    - Ricty-Regular.ttf
+    - Ricty-Bold.ttf
+    - RictyDiscord-Regular.ttf
+    - RictyDiscord-Bold.ttf
+  tags: [desktop, font, Ricty]
 
-    - name: copy Ricty fonts
-      copy:
-        src: "{{ricty_dir}}/{{item}}"
-        dest: /usr/local/share/fonts/Ricty
-      with_items:
-        - Ricty-Regular.ttf
-        - Ricty-Bold.ttf
-        - RictyDiscord-Regular.ttf
-        - RictyDiscord-Bold.ttf
-      tags: [font]
+- name: git; clone base-16-gnome-terminal.git
+  git:
+    repo: https://github.com/chriskempson/base16-gnome-terminal.git
+    dest: /srv/git/base16-gnome-terminal
+  tags: [desktop, terminal]
 
-    - name: git; clone base-16-gnome-terminal.git
-      git:
-        repo: https://github.com/chriskempson/base16-gnome-terminal.git
-        dest: /srv/git/base16-gnome-terminal
-      tags: [terminal]
+- name: install tigervnc-server
+  yum:
+    name: tigervnc-server
+    state: installed
+  tags: [desktop, package, vnc]
 
-    - name: tigervnc; copy systemd file
-      copy:
-        src: /usr/lib/systemd/system/vncserver@.service
-        dest: /etc/systemd/system/vncserver@:1.service
-        remote_src: True
-      tags: [vnc]
+- name: tigervnc; copy systemd file
+  copy:
+    src: /usr/lib/systemd/system/vncserver@.service
+    dest: /etc/systemd/system/vncserver@:1.service
+    remote_src: True
+  tags: [desktop, vnc]
 
-    - name: tigervnc; replace <USER> in systemd file
-      replace:
-        dest: /etc/systemd/system/vncserver@:1.service
-        regexp: '<USER>'
-        replace: "{{admin_username}}"
-      tags: [vnc]
+- name: tigervnc; replace <USER> in systemd file
+  replace:
+    dest: /etc/systemd/system/vncserver@:1.service
+    regexp: '<USER>'
+    replace: "{{admin}}"
+  tags: [desktop, vnc]
