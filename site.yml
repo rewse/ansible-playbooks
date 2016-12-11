@@ -1,0 +1,3 @@
+---
+- include: home.yml
+- include: office.yml
