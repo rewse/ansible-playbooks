@@ -236,6 +236,21 @@
         line: 'preserve_hostname: true'
       tags: [cloudinit]
 
+    - name: logwatch; disable all services
+      lineinfile:
+        dest: /usr/share/logwatch/default.conf/logwatch.conf
+        regexp: '^Service = All'
+        line: '# Service = All'
+      tags: [logwatch]
+
+    - name: logwatch; enable yum
+      lineinfile:
+        dest: /usr/share/logwatch/default.conf/logwatch.conf
+        insertafter: '^#Service = pam'
+        regexp: '^Service = yum'
+        line: 'Service = yum'
+      tags: [logwatch]
+
     - name: ssh; change ClientAliveInterval
       lineinfile:
         dest: /etc/ssh/sshd_config
