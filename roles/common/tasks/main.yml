@@ -2,23 +2,23 @@
 - name: set timezone
   timezone:
     name: Asia/Tokyo
-  tags: [time]
+  tags: [common, time]
 
 - name: check swap status
   command: cat /proc/swaps
   register: swaps_out
   changed_when: False
-  tags: [storage, swap]
+  tags: [common, storage, swap]
 
 - name: make swap
   command: mkswap /dev/{{swap_device_name}}
   when: swaps_out.stdout.find('{{swap_device_name}}') == -1
-  tags: [storage, swap]
+  tags: [common, storage, swap]
 
 - name: enable swap
   command: swapon /dev/{{swap_device_name}}
   when: swaps_out.stdout.find('{{swap_device_name}}') == -1
-  tags: [storage, swap]
+  tags: [common, storage, swap]
 
 - name: add swap into fstab
   mount:
@@ -27,7 +27,7 @@
     fstype: swap
     opts: default
     state: present
-  tags: [storage, swap]
+  tags: [common, storage, swap]
 
 - name: install additional packages
   yum:
@@ -58,7 +58,7 @@
     - vim-enhanced
     - yum-cron
     - yum-plugin-priorities
-  tags: [package]
+  tags: [common, package]
 
 - name: install additional packages from EPEL
   yum:
@@ -66,13 +66,13 @@
     state: installed
   with_items:
     - etckeeper
-  tags: [epel, package]
+  tags: [common, epel, package]
 
 - name: install zabbix-release
   yum:
     name: "{{zabbix_release_url}}"
     state: installed
-  tags: [package, zabbix]
+  tags: [common, package, zabbix]
 
 - name: install zabbix clients
   yum:
@@ -81,26 +81,26 @@
   with_items:
     - zabbix-agent
     - zabbix-sender
-  tags: [package, zabbix]
+  tags: [common, package, zabbix]
 
 - name: update all packages
   yum:
     name: '*'
     state: latest
-  tags: [package]
+  tags: [common, package]
 
 - name: etckeeper; init /etc
   command: etckeeper init
   args:
       creates: /etc/.git
-  tags: [etckeeper]
+  tags: [common, etckeeper]
 
 - name: etckeeper; Initial commit
   command: etckeeper commit "Initial commit"
   args:
     chdir: /etc
     creates: /etc/.git/logs
-  tags: [etckeeper]
+  tags: [common, etckeeper]
 
 - name: add priority into /etc/yum.repos.d/CentOS-Base.repo
   ini_file:
@@ -113,7 +113,7 @@
     - base
     - updates
     - extras
-  tags: [package]
+  tags: [common, package]
 
 - name: add priority into /etc/yum.repos.d/zabbix.repo
   ini_file:
@@ -125,7 +125,7 @@
   with_items:
     - zabbix
     - zabbix-non-supported
-  tags: [package, zabbix]
+  tags: [common, package, zabbix]
 
 - name: add priority into /etc/yum.repos.d/epel.repo
   ini_file:
@@ -134,7 +134,7 @@
     option: priority
     value: 50
     no_extra_spaces: True
-  tags: [epel, package]
+  tags: [common, epel, package]
 
 - name: disable the unnecessary services
   service:
@@ -144,7 +144,7 @@
   with_items:
     - kdump
     - sysstat
-  tags: [package]
+  tags: [common, package]
 
 - name: postfix; change myorigin
   lineinfile:
@@ -153,7 +153,7 @@
     regexp: '^myorigin'
     line: 'myorigin = rewse.jp'
   notify: reload postfix
-  tags: [mail, postfix]
+  tags: [common, mail, postfix]
 
 - name: postfix; change relayhost
   lineinfile:
@@ -162,7 +162,7 @@
     regexp: '^relayhost'
     line: 'relayhost = [{{relayhost.name}}]:{{relayhost.port}}'
   notify: reload postfix
-  tags: [mail, postfix]
+  tags: [common, mail, postfix]
 
 - name: postfix; support sasl
   blockinfile:
@@ -172,7 +172,7 @@
       smtp_sasl_password_maps = hash:/etc/postfix/sasl_passwd
       smtp_sasl_security_options = noplaintext, noanonymous
   notify: reload postfix
-  tags: [mail, postfix]
+  tags: [common, mail, postfix]
 
 - name: postfix; create sasl_passwd
   lineinfile:
@@ -182,20 +182,20 @@
     create: yes
     mode: 0600
   register: postfix_sasl_password_res
-  tags: [mail, postfix]
+  tags: [common, mail, postfix]
 
 - name: postfix; create sasl_passwd.db
   file:
     path: /etc/postfix/sasl_passwd.db
     state: file
     mode: 0600
-  tags: [mail, postfix]
+  tags: [common, mail, postfix]
 
 - name: postfix; hash sasl_passwd
   command: postmap /etc/postfix/sasl_passwd
   when: postfix_sasl_password_res|changed
   notify: reload postfix
-  tags: [mail, postfix]
+  tags: [common, mail, postfix]
 
 - name: install sasl packages
   yum:
@@ -205,7 +205,7 @@
     - cyrus-sasl-md5
     - cyrus-sasl-plain
   notify: restart postfix
-  tags: [mail, postfix]
+  tags: [common, mail, postfix]
 
 - name: anacron; change start_hours_range
   lineinfile:
@@ -213,7 +213,7 @@
     insertafter: '^#START_HOURS_RANGE'
     regexp: '^START_HOURS_RANGE'
     line: 'START_HOURS_RANGE=3-7'
-  tags: [anacron]
+  tags: [common, anacron]
 
 - name: cloud-init; add preserve_hostname
   lineinfile:
@@ -221,7 +221,7 @@
     insertbefore: '^# vim:syntax'
     regexp: '^preserve_hostname'
     line: 'preserve_hostname: true'
-  tags: [cloud-init]
+  tags: [common, cloud-init]
 
 - name: logwatch; disable all services
   lineinfile:
@@ -229,7 +229,7 @@
     insertbefore: '^# You can also disable'
     regexp: '^#? ?Service = All'
     line: '# Service = All'
-  tags: [logwatch]
+  tags: [common, logwatch]
 
 - name: logwatch; enable yum
   lineinfile:
@@ -237,14 +237,14 @@
     insertafter: '^#Service = pam'
     regexp: '^Service = yum'
     line: 'Service = yum'
-  tags: [logwatch]
+  tags: [common, logwatch]
 
 - name: rsyslog; add a template
   template:
     src: rsyslog.conf.j2
     dest: /etc/rsyslog.d/00-template.conf
   notify: restart rsyslog
-  tags: [rsyslog]
+  tags: [common, rsyslog]
 
 - name: ssh; change ClientAliveInterval
   lineinfile:
@@ -253,14 +253,14 @@
     regexp: '^ClientAliveInterval'
     line: 'ClientAliveInterval 59'
   notify: restart sshd
-  tags: [ssh]
+  tags: [common, ssh]
 
 - name: ssh; change ServerAliveInterval
   lineinfile:
     dest: /etc/ssh/ssh_config
     regexp: '^.*ServerAliveInterval'
     line: '  ServerAliveInterval 59'
-  tags: [ssh]
+  tags: [common, ssh]
 
 - name: add NTP servers
   blockinfile:
@@ -271,7 +271,7 @@
       server ntp.jst.mfeed.ad.jp iburst
       server ats1.e-timing.ne.jp iburst
   notify: restart chronyd
-  tags: [time, chrony]
+  tags: [common, time, chrony]
 
 - name: yum-cron; enable auto-update
   ini_file:
@@ -280,14 +280,14 @@
     option: apply_updates
     value: yes
   notify: restart yum-cron
-  tags: [yum-cron]
+  tags: [common, yum-cron]
 
 - name: yum-cron; enable yum-cron
   service:
     name: yum-cron
     enabled: yes
   notify: restart yum-cron
-  tags: [yum-cron]
+  tags: [common, yum-cron]
 
 - name: zabbix; set zabbix server
   lineinfile:
@@ -296,7 +296,7 @@
     line: 'Server={{zabbix_server_name}}'
     create: yes
   notify: restart zabbix-agent
-  tags: [zabbix, zabbix-agent]
+  tags: [common, zabbix, zabbix-agent]
 
 - name: zabbix; set zabbix server active
   lineinfile:
@@ -305,7 +305,7 @@
     line: 'ServerActive={{zabbix_server_name}}'
     create: yes
   notify: restart zabbix-agent
-  tags: [zabbix, zabbix-agent]
+  tags: [common, zabbix, zabbix-agent]
 
 - name: zabbix; set hostname
   lineinfile:
@@ -314,27 +314,27 @@
     line: 'Hostname={{ansible_fqdn}}'
     create: yes
   notify: restart zabbix-agent
-  tags: [zabbix, zabbix-agent]
+  tags: [common, zabbix, zabbix-agent]
 
 - name: zabbix; rm userparameter_mysql.conf
   file:
     path: /etc/zabbix/zabbix_agentd.d/userparameter_mysql.conf
     state: absent
   notify: restart zabbix-agent
-  tags: [zabbix, zabbix-agent]
+  tags: [common, zabbix, zabbix-agent]
 
 - name: zabbix; enable zabbix-agent
   service:
     name: zabbix-agent
     enabled: yes
   notify: restart zabbix-agent
-  tags: [zabbix, zabbix-agent]
+  tags: [common, zabbix, zabbix-agent]
 
 - name: add a group for admin user
   group:
     name: "{{admin}}"
     gid: 1001
-  tags: [user]
+  tags: [common, user]
 
 - name: add admin user
   user:
@@ -343,7 +343,7 @@
     group: "{{admin}}"
     groups: 'adm,wheel,systemd-journal'
     skeleton: /etc/skel
-  tags: [user]
+  tags: [common, user]
 
 - name: allow sudo to admin user
   lineinfile:
@@ -353,7 +353,7 @@
     create: yes
     mode: 0440
     validate: 'visudo -cf %s'
-  tags: [user]
+  tags: [common, user]
 
 - name: make .ssh dir for admin user
   file:
@@ -362,7 +362,7 @@
     group: "{{admin}}"
     state: directory
     mode: 0700
-  tags: [user]
+  tags: [common, user]
 
 - name: copy authorized_keys
   copy:
@@ -372,7 +372,7 @@
     owner: "{{admin}}"
     group: "{{admin}}"
     mode: 0600
-  tags: [user]
+  tags: [common, user]
 
 - name: copy id_rsa
   become_user: "{{admin}}"
@@ -381,7 +381,7 @@
     dest: /home/{{admin}}/.ssh/id_rsa
     mode: 0600
     follow: yes
-  tags: [user]
+  tags: [common, user]
 
 - name: copy id_rsa.pub
   become_user: "{{admin}}"
@@ -389,7 +389,7 @@
     src: ~/.ssh/id_rsa.pub
     dest: /home/{{admin}}/.ssh/id_rsa.pub
     follow: yes
-  tags: [user]
+  tags: [common, user]
 
 - name: create .ssh/config
   blockinfile:
@@ -401,7 +401,7 @@
     create: yes
     owner: "{{admin}}"
     group: "{{admin}}"
-  tags: [user]
+  tags: [common, user]
 
 - name: clone dotfiles.git
   git:
@@ -409,7 +409,7 @@
     dest: /srv/git/dotfiles
     accept_hostkey: yes
     key_file: /home/{{admin}}/.ssh/id_rsa
-  tags: [dotfiles]
+  tags: [common, dotfiles]
 
 - name: change mode of git/dotfiles
   file:
@@ -417,21 +417,21 @@
     owner: "{{admin}}"
     group: "{{admin}}"
     recurse: yes
-  tags: [dotfiles]
+  tags: [common, dotfiles]
 
 - name: copy bash_profile
   copy:
     src: /srv/git/dotfiles/bash_profile
     dest: /etc/profile.d/bash_profile.sh
     remote_src: True
-  tags: [dotfiles, bash]
+  tags: [common, dotfiles, bash]
 
 - name: copy bashrc
   copy:
     src: /srv/git/dotfiles/bashrc
     dest: /etc/profile.d/bashrc.sh
     remote_src: True
-  tags: [dotfiles, bash]
+  tags: [common, dotfiles, bash]
 
 - name: copy gitconfig
   become_user: "{{admin}}"
@@ -439,7 +439,7 @@
     src: /srv/git/dotfiles/gitconfig
     dest: /home/{{admin}}/.gitconfig
     remote_src: True
-  tags: [dotfiles, git]
+  tags: [common, dotfiles, git]
 
 - name: git; set user email
   become_user: "{{admin}}"
@@ -448,7 +448,7 @@
     section: user
     option: email
     value: "{{email}}"
-  tags: [dotfiles, git]
+  tags: [common, dotfiles, git]
 
 - name: copy inputrc
   become_user: "{{admin}}"
@@ -456,14 +456,14 @@
     src: /srv/git/dotfiles/inputrc
     dest: /home/{{admin}}/.inputrc
     remote_src: True
-  tags: [dotfiles, inputrc]
+  tags: [common, dotfiles, inputrc]
 
 - name: tmux; copy tmux.conf
   copy:
     src: /srv/git/dotfiles/tmux.conf
     dest: /etc/tmux.conf
     remote_src: True
-  tags: [dotfiles, tmux]
+  tags: [common, dotfiles, tmux]
 
 - name: vim; copy vimfiles
   copy:
@@ -476,10 +476,10 @@
     - plugin/matrix.vim
     - plugin/NERD_commenter.vim
     - vimrc
-  tags: [dotifiles, vim]
+  tags: [common, dotifiles, vim]
 
 - name: vim; add to import vimrc
   lineinfile:
     dest: /etc/vimrc
     line: 'source /usr/share/vim/vimfiles/vimrc'
-  tags: [dotifiles, vim]
+  tags: [common, dotifiles, vim]
