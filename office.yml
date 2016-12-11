@@ -1,0 +1,6 @@
+---
+- hosts: office
+  become: yes
+  remote_user: centos
+  roles:
+    - common

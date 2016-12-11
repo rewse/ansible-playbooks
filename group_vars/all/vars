@@ -4,11 +4,3 @@ aurora:
     password: "{{vault_aurora.master.password}}"
   zabbix::
     password: "{{vault_aurora.zabbix.password}}"
-email: "{{vault_email}}"
-sonet:
-  username: "{{vault_sonet.username}}"
-  password: "{{vault_sonet.password}}"
-ssh:
-  rewsejp:
-    username: "{{vault_ssh.rewsejp.username}}"
-    port: "{{vault_ssh.rewsejp.port}}"
