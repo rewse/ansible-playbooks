@@ -9,8 +9,6 @@
     oracle_instantclient_sqlplus: oracle-instantclient12.1-sqlplus-12.1.0.2.0-1.x86_64.rpm
     postgersql_jdbc_filename: postgresql-9.4.1212.jar
     redshift_jdbc_filename: RedshiftJDBC42-1.2.1.1001.jar
-  vars_files:
-    - gitignored_vars.yml
   tasks:
     - name: install mysql57-community-release
       yum:
