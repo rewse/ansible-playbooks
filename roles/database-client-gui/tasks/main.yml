@@ -1,0 +1,51 @@
+---
+  # Download the files before the following task
+  # from <http://www.oracle.com/technetwork/java/javase/downloads/jdk8-downloads-2133151.html>
+- name: copy jdk.rpm
+  copy:
+    src: "{{jdk_filename}}"
+    dest: /usr/local/src
+  tags: [database-client-gui, jdk, package]
+
+- name: install jdk
+  yum:
+    name: /usr/local/src/{{jdk_filename}}
+    state: installed
+  tags: [database-client-gui, jdk, package]
+
+- name: erase openjdk
+  yum:
+    name: "{{item}}"
+    state: absent
+  with_items:
+    - java-1.8.0-openjdk-headless
+    - java-1.7.0-openjdk-headless
+    - java-1.8.0-openjdk
+  tags: [database-client-gui, jdk, package]
+
+- name: unarchive aws-schema-conversion-tool
+  unarchive:
+    src: https://s3.amazonaws.com/publicsctdownload/Fedora/aws-schema-conversion-tool-1.0.latest.zip
+    dest: /usr/local/src
+    remote_src: yes
+  tags: [database-client-gui, package, sct]
+
+- name: install aws-schema-conversion-tool
+  yum:
+    name: /usr/local/src/{{sct_filename}}
+    state: installed
+  tags: [database-client-gui, package, sct]
+
+  # Download the files before the following task
+  # from <http://www.oracle.com/technetwork/developer-tools/sql-developer/downloads/>
+- name: copy sqldeveloper.rpm
+  copy:
+    src: "{{sqldeveloper_filename}}"
+    dest: /usr/local/src
+  tags: [database-client-gui, package, sqldeveloper]
+
+- name: install sqldeveloper
+  yum:
+    name: /usr/local/src/{{sqldeveloper_filename}}
+    state: installed
+  tags: [database-client-gui, package, sqldeveloper]

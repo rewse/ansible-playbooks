@@ -1,3 +1,5 @@
 .DS_Store
 *.retry
 roles/database-client/files/oracle*
+roles/database-client-gui/files/jdk*
+roles/database-client-gui/files/sqldeveloper*
