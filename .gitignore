@@ -1,1 +1,2 @@
 *.retry
+roles/database-client/files/oracle*

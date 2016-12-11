@@ -1,0 +1,146 @@
+---
+- name: install mysql57-community-release
+  yum:
+    name: http://repo.mysql.com/{{mysql_release_filename}}
+    state: installed
+  tags: [database-client, mysql, package]
+
+- name: add priority into /etc/yum.repos.d/mysql-community.repo
+  ini_file:
+    dest: /etc/yum.repos.d/mysql-community.repo
+    section: "{{item}}"
+    option: priority
+    value: 30
+    no_extra_spaces: True
+  with_items:
+    - mysql-connectors-community
+    - mysql-tools-community
+    - "{{mysql_community_ini_section}}"
+  tags: [database-client, mysql, package]
+
+- name: install mysql client
+  yum:
+    name: "{{item}}"
+    state: installed
+  with_items:
+    - mysql-community-client
+    - mysql-connector-java
+  tags: [database-client, mysql]
+
+  # Download the files before the following task
+  # from <http://www.oracle.com/technetwork/topics/linuxx86-64soft-092277.html>
+- name: copy oracle-instantcelint
+  copy:
+    src: "{{item}}"
+    dest: /usr/local/src
+  with_items:
+    - "{{oracle_instantcelint_basic}}"
+    - "{{oracle_instantclient_sqlplus}}"
+  tags: [database-client, oracle]
+
+- name: install oracle-instantcelint
+  yum:
+    name: "{{item}}"
+    state: installed
+  with_items:
+    - rlwrap
+    - /usr/local/src/{{oracle_instantcelint_basic}}
+    - /usr/local/src/{{oracle_instantclient_sqlplus}}
+  tags: [database-client, oracle]
+
+- name: create symlink for ojdbc.jar
+  file:
+    src: /usr/lib/oracle/12.1/client64/lib/{{item}}
+    dest: /usr/share/java/{{item}}
+    state: link
+  with_items:
+    - ojdbc6.jar
+    - ojdbc7.jar
+  tags: [database-client, oracle]
+
+- name: clone orascript.git
+  git:
+    repo: git@github.com:rewse/orascript.git
+    dest: /srv/git/orascript
+    accept_hostkey: yes
+    key_file: /home/{{admin}}/.ssh/id_rsa
+  tags: [database-client, oracle]
+
+- name: change mode of git/orascript
+  file:
+    path: /srv/git/orascript
+    owner: "{{admin}}"
+    group: "{{admin}}"
+    recurse: yes
+  tags: [database-client, oracle]
+
+- name: copy orarc
+  become_user: "{{admin}}"
+  copy:
+    src: /srv/git/orascript/orarc
+    dest: /home/{{admin}}/.orarc
+    remote_src: True
+  tags: [database-client, oracle]
+
+- name: create symlink for orascript/common
+  become_user: "{{admin}}"
+  file:
+    src: /srv/git/orascript/common
+    dest: /home/{{admin}}/oracle
+    state: link
+  tags: [database-client, oracle]
+
+- name: install postgresql client
+  yum:
+    name: "{{item}}"
+    state: installed
+  with_items:
+    - postgresql
+  tags: [database-client, postgresql]
+
+- name: install postgresql jdbc driver
+  get_url:
+    url: https://jdbc.postgresql.org/download/{{postgersql_jdbc_filename}}
+    dest: /usr/share/java
+  tags: [database-client, postgresql]
+
+- name: create symlinks postgresql.jar
+  file:
+    src: "{{postgersql_jdbc_filename}}"
+    dest: /usr/share/java/postgresql.jar
+    state: link
+  tags: [database-client, postgresql]
+
+- name: create symlinks from postgresql.jar
+  file:
+    src: postgresql.jar
+    dest: /usr/share/java/{{item}}
+    state: link
+  with_items:
+    - postgresql.jre7.jar
+    - postgresql.jre6.jar
+  tags: [database-client, postgresql]
+
+- name: install redshift jdbc driver
+  get_url:
+    url: https://s3.amazonaws.com/redshift-downloads/drivers/{{redshift_jdbc_filename}}
+    dest: /usr/share/java
+  tags: [database-client, redshift]
+
+- name: create symlink RedShiftJDBC.jar
+  file:
+    src: "{{redshift_jdbc_filename}}"
+    dest: /usr/share/java/RedshiftJDBC.jar
+    state: link
+  tags: [database-client, redshift]
+
+- name: create symlinks from RedshiftJDBC.jar
+  file:
+    src: RedshiftJDBC.jar
+    dest: /usr/share/java/{{item}}
+    state: link
+  with_items:
+    - RedshiftJDBC42.jar
+    - RedshiftJDBC41.jar
+    - RedshiftJDBC4.jar
+  tags: [database-client, redshift]
