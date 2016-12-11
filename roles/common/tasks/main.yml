@@ -226,7 +226,8 @@
 - name: logwatch; disable all services
   lineinfile:
     dest: /usr/share/logwatch/default.conf/logwatch.conf
-    regexp: '^Service = All'
+    insertbefore: '^# You can also disable'
+    regexp: '^#? ?Service = All'
     line: '# Service = All'
   tags: [logwatch]
 
