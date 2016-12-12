@@ -67,3 +67,45 @@
     dest: /etc/zabbix/web/zabbix.conf.php
     mode: 0640
   tags: [zabbix-server, zabbix-web]
+
+- name: copy market-price-check.py
+  copy:
+    src: market-price-check.py
+    dest: /usr/local/bin/market-price-check
+    mode: 0755
+  tags: [zabbix-server, zabbix-extra]
+
+- name: copy market-price-check.sh
+  copy:
+    src: market-price-check.py
+    dest: /usr/lib/zabbix/externalscripts
+    mode: 0755
+  tags: [zabbix-server, zabbix-extra]
+
+- name: copy us-market-price-check.py
+  copy:
+    src: us-market-price-check.py
+    dest: /usr/local/bin/us-market-price-check
+    mode: 0755
+  tags: [zabbix-server, zabbix-extra]
+
+- name: copy us-market-price-check.sh
+  copy:
+    src: us-market-price-check.py
+    dest: /usr/lib/zabbix/externalscripts
+    mode: 0755
+  tags: [zabbix-server, zabbix-extra]
+
+- name: download ssl-cert-check
+  get_url:
+    url: http://prefetch.net/code/ssl-cert-check
+    dest: /usr/local/bin
+    mode: 0755
+  tags: [zabbix-server, zabbix-extra]
+
+- name: copy ssl-cert-check.sh
+  copy:
+    src: ssl-cert-check.sh
+    dest: /usr/lib/zabbix/externalscripts
+    mode: 0755
+  tags: [zabbix-server, zabbix-extra]
