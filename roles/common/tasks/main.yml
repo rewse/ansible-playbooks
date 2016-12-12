@@ -403,7 +403,7 @@
   blockinfile:
     dest: /home/{{admin}}/.ssh/config
     content: |
-      rewse.jp
+      Host rewse.jp
         User {{ssh.rewse_jp.username}}
         Port {{ssh.rewse_jp.port}}
     create: yes
