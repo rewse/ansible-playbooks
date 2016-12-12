@@ -324,6 +324,17 @@
   notify: restart zabbix-agent
   tags: [common, zabbix-agent]
 
+- name: zabbix; add centos7.conf
+  blockinfile:
+    dest: /etc/zabbix/zabbix_agentd.d/centos7.conf
+    content: |
+      UserParameter=vfs.dev.util[*],iostat -xk 5 2 | grep $1 | tail -1 | awk '{print $$14}'
+      UserParameter=proc.top[*],top c -b -n 1 -w 512 | sed 's/ *$//' | sed -n '7,17p'
+      UserParameter=postfix.queue.num,echo "(`mailq | wc -l` - 2) / 3" | bc
+      UserParameter=journal[*],journalctl -p $1 -n 10 | tac
+    create: yes
+  tags: [common, zabbix-agent]
+
 - name: zabbix; rm userparameter_mysql.conf
   file:
     path: /etc/zabbix/zabbix_agentd.d/userparameter_mysql.conf
