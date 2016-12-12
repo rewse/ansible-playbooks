@@ -14,23 +14,28 @@
     login_host: "{{aurora.ep}}"
   tags: [zabbix-db]
 
-- name: craeate database user
-  mysql_user:
-    name: zabbix
-    host_all: yes
-    password: "{{aurora.zabbix_password}}"
-    priv: "zabbix.*:ALL"
-    login_user: "{{admin}}"
-    login_password: "{{aurora.master_password}}"
-    login_host: "{{aurora.ep}}"
+- name: check users
+  shell: echo "select user from mysql.user;" | mysql -u{{admin}} -p{{aurora.master_password}} -h{{aurora.ep}}
+  register: check_user_res
+  changed_when: False
   tags: [zabbix-db]
 
+  # Do not use mysql_user due to "mysql_user: db host wildcard",
+  # <https://github.com/ansible/ansible-modules-core/issues/5053>
+- name: craeate user
+  shell: echo "grant all privileges on zabbix.* to zabbix@'%' identified by '{{aurora.zabbix_password}}';" | mysql -u{{admin}} -p{{aurora.master_password}} -h{{aurora.ep}}
+  when: check_user_res.stdout.find('zabbix') == -1
+  tags: [zabbix-db]
+
+- name: check tables
+  shell: echo "show tables;" | mysql -uzabbix -p{{aurora.zabbix_password}} -h{{aurora.ep}} zabbix
+  register: check_tables_res
+  changed_when: False
+  tags: [zabbix-db]
+
+  # Do not use mysql_db with import due to
+  # <http://stackoverflow.com/questions/36770317/why-is-my-mysql-import-failing-w-ansible>
 - name: init database
-  mysql_db:
-    name: zabbix
-    state: import
-    target: /usr/share/doc/zabbix-server-mysql-{{zabbix_version}}/create.sql.gz
-    login_user: "{{admin}}"
-    login_password: "{{aurora.master_password}}"
-    login_host: "{{aurora.ep}}"
+  shell: zcat /usr/share/doc/zabbix-server-mysql-{{zabbix_version}}/create.sql.gz | mysql -uzabbix -p{{aurora.zabbix_password}} -h{{aurora.ep}} zabbix
+  when: check_tables_res.stdout.find('Tables_in_zabbix') == -1
   tags: [zabbix-db]
