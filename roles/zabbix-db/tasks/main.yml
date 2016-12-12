@@ -1,0 +1,36 @@
+---
+- name: install MySQL-python
+  yum:
+    name: MySQL-python
+    state: installed
+  tags: [zabbix-db, package]
+
+- name: create database
+  mysql_db:
+    name: zabbix
+    encoding: utf8
+    login_user: "{{admin}}"
+    login_password: "{{aurora.master_password}}"
+    login_host: "{{aurora.ep}}"
+  tags: [zabbix-db]
+
+- name: craeate database user
+  mysql_user:
+    name: zabbix
+    host_all: yes
+    password: "{{aurora.zabbix_password}}"
+    priv: "zabbix.*:ALL"
+    login_user: "{{admin}}"
+    login_password: "{{aurora.master_password}}"
+    login_host: "{{aurora.ep}}"
+  tags: [zabbix-db]
+
+- name: init database
+  mysql_db:
+    name: zabbix
+    state: import
+    target: /usr/share/doc/zabbix-server-mysql-{{zabbix_version}}/create.sql.gz
+    login_user: "{{admin}}"
+    login_password: "{{aurora.master_password}}"
+    login_host: "{{aurora.ep}}"
+  tags: [zabbix-db]

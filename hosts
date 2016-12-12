@@ -1,27 +1,9 @@
-[business-general]
+[business]
 atom.rewse.jp
 
-[personal-general]
+[personal]
 charlie.rewse.jp
 foxtrot.rewse.jp
 
 [personal-rdsclients]
 charlie.rewse.jp
-
-###
-
-[general:children]
-business-general
-personal-general
-
-[rdsclients:children]
-personal-rdsclients
-
-###
-
-[business:children]
-business-general
-
-[personal:children]
-personal-general
-personal-rdsclients
