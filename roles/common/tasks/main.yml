@@ -223,6 +223,14 @@
     line: 'preserve_hostname: true'
   tags: [common, cloud-init]
 
+- name: create journal dir
+  file:
+    path: /var/log/journal
+    state: directory
+    group: systemd-journal
+    mode: 02755
+  tags: [common, journal]
+
 - name: logwatch; disable all services
   lineinfile:
     dest: /usr/share/logwatch/default.conf/logwatch.conf
