@@ -4,3 +4,4 @@
   remote_user: centos
   roles:
     - zabbix-db
+    - zabbix-internet

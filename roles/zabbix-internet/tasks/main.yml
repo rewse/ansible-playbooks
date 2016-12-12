@@ -1,0 +1,22 @@
+---
+- name: make agentscripts dir
+  file:
+    path: /usr/lib/zabbix/agentscripts
+    state: directory
+  tags: [zabbix-internet]
+
+- name: copy internet.sh
+  copy:
+    src: internet.sh
+    dest: /usr/lib/zabbix/agentscripts
+    mode: 0755
+  tags: [zabbix-internet]
+
+- name: create zabbix_agent.d/internet.conf
+  lineinfile:
+    dest: /etc/zabbix_agent.d/internet.conf
+    regexp: '^UserParameter='
+    line: 'UserParameter=internet.sender,/usr/lib/zabbix/agentscripts/internet.sh'
+    create: yes
+  notify: restart zabbix-agent
+  tags: [zabbix-internet]
