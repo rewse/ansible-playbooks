@@ -7,7 +7,6 @@
     - mod_ssl
     - zabbix-server-mysql
     - zabbix-web-mysql
-    - MySQL-python
   notify: restart httpd
   tags: [zabbix-server, zabbix-server-server, zabbix-web]
 
@@ -24,36 +23,6 @@
     enabled: yes
   notify: restart httpd
   tags: [zabbix-server, zabbix-server-server]
-
-- name: create database
-  mysql_db:
-    name: zabbix
-    encoding: utf8
-    login_user: "{{admin}}"
-    login_password: "{{aurora.master_password}}"
-    login_host: "{{aurora.ep}}"
-  tags: [zabbix-server, zabbix-server-server]
-
-- name: craeate database user
-  mysql_user:
-    name: zabbix
-    host_all: yes
-    password: "{{aurora.zabbix_password}}"
-    priv: "zabbix.*:ALL"
-    login_user: "{{admin}}"
-    login_password: "{{aurora.master_password}}"
-    login_host: "{{aurora.ep}}"
-  tags: [zabbix-server, zabbix-server-server]
-
-# - name: init database
-#   mysql_db:
-#     name: zabbix
-#     state: import
-#     target: /usr/share/doc/zabbix-server-mysql-{{zabbix_version}}/create.sql.gz
-#     login_user: "{{admin}}"
-#     login_password: "{{aurora.master_password}}"
-#     login_host: "{{aurora.ep}}"
-#   tags: [zabbix-server, zabbix-server-server]
 
 - name: set DBHost
   lineinfile:

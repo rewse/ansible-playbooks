@@ -1,5 +1,5 @@
 ---
-- hosts: rdsclients
+- hosts: personal-rdsclients
   become: yes
   remote_user: centos
   roles:

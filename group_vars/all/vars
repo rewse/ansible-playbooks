@@ -1,6 +1,0 @@
----
-aurora:
-  master:
-    password: "{{vault_aurora.master.password}}"
-  zabbix::
-    password: "{{vault_aurora.zabbix.password}}"
