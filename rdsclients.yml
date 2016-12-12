@@ -1,7 +1,6 @@
 ---
-- hosts: home
+- hosts: rdsclients
   become: yes
   remote_user: centos
   roles:
-    - common
-    - zabbix-server
+    - zabbix-db

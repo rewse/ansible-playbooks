@@ -1,0 +1,6 @@
+---
+- hosts: general
+  become: yes
+  remote_user: centos
+  roles:
+    - common
