@@ -319,7 +319,7 @@
   lineinfile:
     dest: /etc/zabbix/zabbix_agentd.d/common.conf
     regexp: '^Hostname='
-    line: 'Hostname={{ansible_fqdn}}'
+    line: 'Hostname={{ansible_nodename}}'
     create: yes
   notify: restart zabbix-agent
   tags: [common, zabbix, zabbix-agent]
