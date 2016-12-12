@@ -304,7 +304,7 @@
     line: 'Server={{zabbix_server_name}}'
     create: yes
   notify: restart zabbix-agent
-  tags: [common, zabbix, zabbix-agent]
+  tags: [common, zabbix-agent]
 
 - name: zabbix; set zabbix server active
   lineinfile:
@@ -313,7 +313,7 @@
     line: 'ServerActive={{zabbix_server_name}}'
     create: yes
   notify: restart zabbix-agent
-  tags: [common, zabbix, zabbix-agent]
+  tags: [common, zabbix-agent]
 
 - name: zabbix; set hostname
   lineinfile:
@@ -322,21 +322,21 @@
     line: 'Hostname={{ansible_nodename}}'
     create: yes
   notify: restart zabbix-agent
-  tags: [common, zabbix, zabbix-agent]
+  tags: [common, zabbix-agent]
 
 - name: zabbix; rm userparameter_mysql.conf
   file:
     path: /etc/zabbix/zabbix_agentd.d/userparameter_mysql.conf
     state: absent
   notify: restart zabbix-agent
-  tags: [common, zabbix, zabbix-agent]
+  tags: [common, zabbix-agent]
 
 - name: zabbix; enable zabbix-agent
   service:
     name: zabbix-agent
     enabled: yes
   notify: restart zabbix-agent
-  tags: [common, zabbix, zabbix-agent]
+  tags: [common, zabbix-agent]
 
 - name: add a group for admin user
   group:
