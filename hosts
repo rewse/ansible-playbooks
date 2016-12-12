@@ -1,9 +1,9 @@
-[business]
+[business-clients]
 atom.rewse.jp
 
-[personal]
+[personal-clients]
+charlie.rewse.jp
+
+[personal-servers]
 charlie.rewse.jp
 foxtrot.rewse.jp
-
-[personal-rdsclients]
-charlie.rewse.jp

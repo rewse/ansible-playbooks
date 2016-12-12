@@ -1,5 +1,5 @@
 ---
-- hosts: business
+- hosts: business-clients
   become: yes
   remote_user: centos
   roles:

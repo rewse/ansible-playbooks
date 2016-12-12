@@ -1,3 +1,4 @@
 ---
-- include: business.yml
-- include: personal.yml
+- include: business-clients.yml
+- include: personal-clients.yml
+- include: personal-servers.yml
