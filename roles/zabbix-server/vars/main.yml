@@ -1,5 +1,5 @@
 ---
-zabbix_server_name: localhost
+zabbix_server_name: zabbix.rewse.jp
 aurora:
   zabbix_password: "{{vault_aurora.zabbix_password}}"
   ep: rewse-aurora-cluster.cluster-c8xun5aepybs.ap-northeast-1.rds.amazonaws.com
