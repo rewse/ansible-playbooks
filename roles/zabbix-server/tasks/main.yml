@@ -68,6 +68,13 @@
     mode: 0640
   tags: [zabbix-server, zabbix-web]
 
+- name: selinux alllows httpd can connect network
+  seboolean:
+    name: httpd_can_network_connect
+    state: yes
+    persistent: yes
+  tags: [zabbix-server, zabbix-web]
+
 - name: copy market-price-check.py
   copy:
     src: market-price-check.py
