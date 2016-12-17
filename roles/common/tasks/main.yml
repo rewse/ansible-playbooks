@@ -254,6 +254,24 @@
   notify: restart rsyslog
   tags: [common, rsyslog]
 
+- name: setroubleshoot; set email
+  lineinfile:
+    dest: /var/lib/setroubleshoot/email_alert_recipients
+    regexp: "{{email.secondary}}"
+    line: "{{email.secondary}}"
+    create: yes
+  notify: restart dbus
+  tags: [common, setroubleshoot]
+
+- name: setroubleshoot; change sender email
+  ini_file:
+    dest: /etc/setroubleshoot/setroubleshoot.conf
+    section: email
+    option: from_address
+    value: SELinux_Troubleshoot@rewse.jp
+  notify: restart dbus
+  tags: [common, setroubleshoot]
+
 - name: ssh; change ClientAliveInterval
   lineinfile:
     dest: /etc/ssh/sshd_config
