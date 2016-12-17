@@ -317,28 +317,25 @@
 
 - name: zabbix; set zabbix server
   lineinfile:
-    dest: /etc/zabbix/zabbix_agentd.d/common.conf
-    regexp: '^Server='
+    dest: /etc/zabbix/zabbix_agentd.conf
+    regexp: 'Server='
     line: 'Server={{zabbix_server_name}}'
-    create: yes
   notify: restart zabbix-agent
   tags: [common, zabbix-agent]
 
 - name: zabbix; set zabbix server active
   lineinfile:
-    dest: /etc/zabbix/zabbix_agentd.d/common.conf
-    regexp: '^ServerActive='
+    dest: /etc/zabbix/zabbix_agentd.conf
+    regexp: 'ServerActive='
     line: 'ServerActive={{zabbix_server_name}}'
-    create: yes
   notify: restart zabbix-agent
   tags: [common, zabbix-agent]
 
 - name: zabbix; set hostname
   lineinfile:
-    dest: /etc/zabbix/zabbix_agentd.d/common.conf
-    regexp: '^Hostname='
+    dest: /etc/zabbix/zabbix_agentd.conf
+    regexp: 'Hostname='
     line: 'Hostname={{ansible_nodename}}'
-    create: yes
   notify: restart zabbix-agent
   tags: [common, zabbix-agent]
 
