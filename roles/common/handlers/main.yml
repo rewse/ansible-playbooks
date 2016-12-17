@@ -4,6 +4,11 @@
     name: chronyd
     state: restarted
 
+- name: restart dbus
+  service:
+    name: dbus
+    state: restarted
+
 - name: reload postfix
   service:
     name: postfix
