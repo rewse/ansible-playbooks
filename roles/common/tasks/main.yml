@@ -210,7 +210,7 @@
   tags: [common, mail, postfix]
 
 - name: postfix; hash sasl_passwd
-  command: postmap /etc/postfix/sasl_passwd
+  command: postmap hash:/etc/postfix/sasl_passwd
   when: postfix_sasl_password_res|changed
   notify: reload postfix
   tags: [common, mail, postfix]
