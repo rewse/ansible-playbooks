@@ -159,6 +159,7 @@
     enabled: no
     state: stopped
   with_items:
+    - firewalld
     - kdump
     - sysstat
   tags: [common, package]
