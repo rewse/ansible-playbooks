@@ -83,6 +83,23 @@
     - zabbix-sender
   tags: [common, package, zabbix]
 
+- name: download get-pip.py
+  get_url:
+    url: https://bootstrap.pypa.io/get-pip.py
+    dest: /tmp
+  tags: [common, package, pip]
+
+- name: run get-pip.py
+  command: python /tmp/get-pip.py
+  tags: [common, package, pip]
+
+- name: install packages with pip
+  pip:
+    name: "{{item}}"
+  with_items:
+    - awscli
+  tags: [common, package, pip]
+
 - name: update all packages
   yum:
     name: '*'
