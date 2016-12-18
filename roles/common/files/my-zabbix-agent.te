@@ -1,0 +1,37 @@
+
+module my-zabbix-agent 1.0.2;
+
+require {
+  type devlog_t;
+  type journalctl_exec_t;
+  type kernel_t;
+  type postfix_etc_t;
+  type postfix_master_t;
+  type postfix_postqueue_exec_t;
+  type postfix_public_t;
+  type sendmail_exec_t;
+  type tmp_t;
+  type var_log_t;
+  type zabbix_agent_t;
+  class dir { add_name remove_name write };
+  class file { create execute execute_no_trans open unlink read write };
+  class process setrlimit;
+  class sock_file write;
+  class unix_dgram_socket { connect create ioctl sendto };
+  class unix_stream_socket connectto;
+}
+
+#============= zabbix_agent_t ==============
+allow zabbix_agent_t devlog_t:sock_file write;
+allow zabbix_agent_t journalctl_exec_t:file { execute execute_no_trans };
+allow zabbix_agent_t kernel_t:unix_dgram_socket sendto;
+allow zabbix_agent_t postfix_etc_t:file { open read };
+allow zabbix_agent_t postfix_master_t:unix_stream_socket connectto;
+allow zabbix_agent_t postfix_postqueue_exec_t:file { execute execute_no_trans };
+allow zabbix_agent_t postfix_public_t:sock_file write;
+allow zabbix_agent_t self:process setrlimit;
+allow zabbix_agent_t self:unix_dgram_socket { connect create ioctl };
+allow zabbix_agent_t sendmail_exec_t:file { execute execute_no_trans };
+allow zabbix_agent_t tmp_t:dir { add_name remove_name write };
+allow zabbix_agent_t tmp_t:file { create open unlink write };
+allow zabbix_agent_t var_log_t:file { open read };
