@@ -114,20 +114,6 @@
     mode: 0755
   tags: [zabbix-server, zabbix-extra]
 
-- name: copy us-market-price-check.py
-  copy:
-    src: us-market-price-check.py
-    dest: /usr/local/bin/us-market-price-check
-    mode: 0755
-  tags: [zabbix-server, zabbix-extra]
-
-- name: copy us-market-price-check.sh
-  copy:
-    src: us-market-price-check.py
-    dest: /usr/lib/zabbix/externalscripts
-    mode: 0755
-  tags: [zabbix-server, zabbix-extra]
-
 - name: download ssl-cert-check
   get_url:
     url: http://prefetch.net/code/ssl-cert-check
