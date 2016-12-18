@@ -271,6 +271,16 @@
   notify: restart rsyslog
   tags: [common, rsyslog]
 
+- name: remove selinux samples
+  file:
+    path: /usr/share/selinux/devel/{{item}}
+    state: absent
+  with_items:
+    - example.fc
+    - example.if
+    - example.te
+  tags: [common, selinux]
+
 - name: setroubleshoot; set email
   lineinfile:
     dest: /var/lib/setroubleshoot/email_alert_recipients
@@ -373,6 +383,22 @@
     state: absent
   notify: restart zabbix-agent
   tags: [common, zabbix-agent]
+
+- name: copy zabbix-agent.te
+  copy:
+    src: zabbix-agent.local.te
+    dest: /usr/share/selinux/devel
+  tags: [common, selinux, zabbix-agent]
+
+- name: rebuild selinux-policy
+  command: make
+  args:
+    chdir: /usr/share/selinux/devel
+  tags: [common, selinux, zabbix-agent]
+
+- name: install zabbix-agent.local selinux module
+  command: semodule -i /usr/share/selinux/devel/zabbix-agent.local.pp
+  tags: [common, selinux, zabbix-agent]
 
 - name: zabbix; enable zabbix-agent
   service:
