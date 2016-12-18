@@ -6,6 +6,7 @@
   with_items:
     - mod_ssl
     - zabbix-server-mysql
+    - zabbix-web-japanese
     - zabbix-web-mysql
   notify: restart httpd
   tags: [zabbix-server, zabbix-server-server, zabbix-web]
