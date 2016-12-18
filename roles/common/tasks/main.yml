@@ -384,9 +384,33 @@
   notify: restart zabbix-agent
   tags: [common, zabbix-agent]
 
+- name: change permission of /var/log/messages
+  file:
+    path: /var/log/messages
+    group: zabbix
+    mode: 0640
+  tags: [common, zabbix-agent]
+
+- name: allow sudo to zabbix
+  lineinfile:
+    dest: /etc/sudoers.d/zabbix
+    regexp: '^zabbix'
+    line: 'zabbix ALL=(ALL) NOPASSWD: /usr/bin/journalctl'
+    create: yes
+    mode: 0440
+    validate: 'visudo -cf %s'
+  tags: [common, zabbix-agent]
+
+- name: add zabbix to systemd-journal group
+  user:
+    name: zabbix
+    groups: 'zabbix,systemd-journal'
+  notify: restart zabbix-agent
+  tags: [common, zabbix-agent]
+
 - name: copy zabbix-agent.te
   copy:
-    src: zabbix-agent.local.te
+    src: my-zabbix-agent.te
     dest: /usr/share/selinux/devel
   tags: [common, selinux, zabbix-agent]
 
@@ -396,9 +420,16 @@
     chdir: /usr/share/selinux/devel
   tags: [common, selinux, zabbix-agent]
 
-- name: install zabbix-agent.local selinux module
-  command: semodule -i /usr/share/selinux/devel/zabbix-agent.local.pp
+- name: install my-zabbix-agent selinux module
+  command: semodule -i /usr/share/selinux/devel/my-zabbix-agent.pp
   tags: [common, selinux, zabbix-agent]
+
+- name: selinux alllows daemons enable coluster mode
+  seboolean:
+    name: daemons_enable_cluster_mode
+    state: yes
+    persistent: yes
+  tags: [zabbix-server, selinux, zabbix-agent]
 
 - name: zabbix; enable zabbix-agent
   service:

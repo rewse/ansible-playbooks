@@ -61,9 +61,8 @@
 
 - name: copy zabbix-server.te
   copy:
-    src: zabbix-server.local.te
+    src: my-zabbix-server.te
     dest: /usr/share/selinux/devel
-  notify: rebuild selinux-policy
   tags: [zabbix-server, selinux, zabbix-server-server]
 
 - name: rebuild selinux-policy
@@ -72,8 +71,8 @@
     chdir: /usr/share/selinux/devel
   tags: [zabbix-server, selinux, zabbix-server-server]
 
-- name: install zabbix-server.local selinux module
-  command: semodule -i /usr/share/selinux/devel/zabbix-server.local.pp
+- name: install my-zabbix-server selinux module
+  command: semodule -i /usr/share/selinux/devel/my-zabbix-server.pp
   tags: [zabbix-server, selinux, zabbix-server-server]
 
 - name: set php_value
