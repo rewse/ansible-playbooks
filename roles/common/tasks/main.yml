@@ -458,7 +458,7 @@
   lineinfile:
     dest: /etc/sudoers.d/00-{{admin}}
     regexp: '^{{admin}}'
-    line: '{{admin}} ALL=(ALL) NOPASSWD:ALL'
+    line: '{{admin}} ALL=(ALL) NOPASSWD: ALL'
     create: yes
     mode: 0440
     validate: 'visudo -cf %s'
