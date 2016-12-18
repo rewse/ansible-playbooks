@@ -51,6 +51,30 @@
   notify: restart zabbix-server
   tags: [zabbix-server, zabbix-server-server]
 
+- name: selinux alllows zabbix can network
+  seboolean:
+    name: zabbix_can_network
+    state: yes
+    persistent: yes
+  tags: [zabbix-server, selinux, zabbix-server-server]
+
+- name: copy zabbix-server.te
+  copy:
+    src: zabbix-server.local.te
+    dest: /usr/share/selinux/devel
+  notify: rebuild selinux-policy
+  tags: [zabbix-server, selinux, zabbix-server-server]
+
+- name: rebuild selinux-policy
+  command: make
+  args:
+    chdir: /usr/share/selinux/devel
+  tags: [zabbix-server, selinux, zabbix-server-server]
+
+- name: install zabbix-server.local selinux module
+  command: semodule -i /usr/share/selinux/devel/zabbix-server.local.pp
+  tags: [zabbix-server, selinux, zabbix-server-server]
+
 - name: set php_value
   lineinfile:
     dest: /etc/httpd/conf.d/zabbix.conf
@@ -68,12 +92,12 @@
     mode: 0640
   tags: [zabbix-server, zabbix-web]
 
-- name: selinux alllows httpd can connect network
+- name: selinux alllows httpd can network connect
   seboolean:
     name: httpd_can_network_connect
     state: yes
     persistent: yes
-  tags: [zabbix-server, zabbix-web]
+  tags: [zabbix-server, selinux, zabbix-web]
 
 - name: copy market-price-check.py
   copy:
