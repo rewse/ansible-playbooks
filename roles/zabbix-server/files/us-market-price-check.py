@@ -31,9 +31,9 @@
 ###############################################################################
 # {{{ const
 
-__version__ = "1.5.0"
+__version__ = "2.0"
 
-BASE_URL = "http://finance.yahoo.com/quote/"
+BASE_URL = "http://www.msn.com/ja-jp/money/stockdetails/?symbol="
 USER_AGENT = "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_12_1) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/54.0.2840.98 Safari/537.36"
 
 #}}}
@@ -133,7 +133,7 @@ def req_product(opener, symbol):
 # {{{ get_price()
 
 def get_price(res, symbol):
-  pat = re.compile(r'<span class="Fw\(b\) Fz\(36px\) Mb\(-4px\)" data-reactid="264">(.+?)</span>')
+  pat = re.compile(r'<span class="current-price" data-role="currentvalue">(.+?)</span>')
   price = "-----"
 
   for match in pat.finditer(res):
