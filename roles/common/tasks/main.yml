@@ -223,6 +223,21 @@
     line: 'preserve_hostname: true'
   tags: [common, cloud-init]
 
+- name: create /etc/profile.d/pathmunge.sh
+  blockinfile:
+    dest: /etc/profile.d/pathmunge.sh
+    content: |
+      pathmunge /usr/local/bin
+
+      if [ "$EUID" = "0" ]; then
+        pathmunge /usr/local/sbin
+      else
+        pathmunge /usr/local/sbin after
+      fi
+
+      export PATH
+  tags: [common, bash]
+
 - name: create journal dir
   file:
     path: /var/log/journal
