@@ -34,8 +34,8 @@
     src: "{{item}}"
     dest: /usr/local/src
   with_items:
-    - "{{oracle_instantcelint_basic}}"
-    - "{{oracle_instantclient_sqlplus}}"
+    - "{{oracle_instantcelint_basic_filename}}"
+    - "{{oracle_instantclient_sqlplus_filename}}"
   tags: [database-client, oracle]
 
 - name: install oracle-instantcelint
@@ -44,8 +44,8 @@
     state: installed
   with_items:
     - rlwrap
-    - /usr/local/src/{{oracle_instantcelint_basic}}
-    - /usr/local/src/{{oracle_instantclient_sqlplus}}
+    - /usr/local/src/{{oracle_instantcelint_basic_filename}}
+    - /usr/local/src/{{oracle_instantclient_sqlplus_filename}}
   tags: [database-client, oracle]
 
 - name: create symlink for ojdbc.jar
