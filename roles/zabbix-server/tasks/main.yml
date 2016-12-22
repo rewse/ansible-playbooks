@@ -108,7 +108,21 @@
 
 - name: copy market-price-check.sh
   copy:
-    src: market-price-check.py
+    src: market-price-check.sh
+    dest: /usr/lib/zabbix/externalscripts
+    mode: 0755
+  tags: [zabbix-server, zabbix-extra]
+
+- name: copy us-market-price-check.py
+  copy:
+    src: us-market-price-check.py
+    dest: /usr/local/bin/us-market-price-check
+    mode: 0755
+  tags: [zabbix-server, zabbix-extra]
+
+- name: copy us-market-price-check.sh
+  copy:
+    src: us-market-price-check.sh
     dest: /usr/lib/zabbix/externalscripts
     mode: 0755
   tags: [zabbix-server, zabbix-extra]
