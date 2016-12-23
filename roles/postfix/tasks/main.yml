@@ -1,4 +1,21 @@
 ---
+- name: install packages
+  yum:
+    name: "{{item}}"
+    state: installed
+  with_items:
+    - certbot
+    - cyrus-sasl
+    - python-certbot-apache
+  tags: [postfix, certbot, package]
+
+- name: start saslauthd
+  service:
+    name: saslauthd
+    enabled: yes
+    state: started
+  tags: [postfix, saslauthd]
+
 - name: set inet_interfaces
   lineinfile:
     dest: /etc/postfix/main.cf
@@ -33,4 +50,49 @@
     owner: '{{admin}}'
     group: '{{admin}}'
     mode: 0700
+  tags: [postfix]
+
+- name: set smtpd_sasl
+  blockinfile:
+    dest: /etc/postfix/main.cf
+    content: |
+      smtp_sasl_auth_enable = yes
+      smtp_sasl_password_maps = hash:/etc/postfix/sasl_passwd
+      smtp_sasl_security_options = noplaintext, noanonymous
+
+      smtpd_sasl_auth_enable = yes
+      smtpd_sasl_security_options = noanonymous
+      smtpd_recipient_restrictions =
+        permit_sasl_authenticated,
+        permit_mynetworks,
+        reject_unauth_destination
+
+      smtpd_use_tls = yes
+      smtpd_tls_auth_only = yes
+      smtpd_tls_cert_file = /etc/letsencrypt/live/rewse.jp/fullchain.pem
+      smtpd_tls_key_file = /etc/letsencrypt/live/rewse.jp/privkey.pem
+      smtpd_tls_loglevel = 1
+      smtpd_tls_session_cache_database = hash:/etc/postfix/smtpd_scache
+      smtpd_tls_received_header = yes
+      tls_random_source = dev:/dev/urandom
+  notify: reload postfix
+  tags: [postfix]
+
+- name: copy certbot.cron
+  copy:
+    src: certbot.cron
+    dest: /etc/cron.monthly
+    mode: 0755
+  tags: [postfix, certbot]
+
+- name: enable smtps and submission
+  blockinfile:
+    dest: /etc/postfix/master.cf
+    insertbefore: '^#smtp '
+    content: |
+      submission inet n       -       n       -       -       smtpd
+        -o syslog_name=postfix/submission
+      smtps     inet  n       -       n       -       -       smtpd
+        -o syslog_name=postfix/smtps
+  notify: reload postfix
   tags: [postfix]
