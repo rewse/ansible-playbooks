@@ -64,7 +64,7 @@
     mode: 0755
   tags: [postfix, certbot]
 
-- name: bypass spam checks by amavisd
+- name: amavisd; bypass spam checks
   lineinfile:
     dest: /etc/amavisd/amavisd.conf
     insertafter: '^# @bypass_spam_checks_maps '
@@ -73,7 +73,7 @@
   notify: reload amavisd
   tags: [postfix, amavisd]
 
-- name: set mydomain of amavisd
+- name: amavisd; set mydomain
   lineinfile:
     dest: /etc/amavisd/amavisd.conf
     regexp: '^\$mydomain '
@@ -81,7 +81,7 @@
   notify: reload amavisd
   tags: [postfix, amavisd]
 
-- name: set virus_admin of amavisd
+- name: amavisd; set virus_admin
   lineinfile:
     dest: /etc/amavisd/amavisd.conf
     regexp: '^\$virus_admin '
@@ -89,7 +89,7 @@
   notify: reload amavisd
   tags: [postfix, amavisd]
 
-- name: set mailfrom_notify_admin of amavisd
+- name: amavisd; set mailfrom_notify_admin
   lineinfile:
     dest: /etc/amavisd/amavisd.conf
     regexp: '^\$mailfrom_notify_admin '
@@ -97,7 +97,7 @@
   notify: reload amavisd
   tags: [postfix, amavisd]
 
-- name: enable always-clean of amavisd
+- name: amavisd; enable always-clean
   lineinfile:
     dest: /etc/amavisd/amavisd.conf
     regexp: 'always-clean'
