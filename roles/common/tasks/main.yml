@@ -288,9 +288,9 @@
   tags: [common, logwatch]
 
 - name: rsyslog; add a template
-  template:
-    src: rsyslog.conf.j2
-    dest: /etc/rsyslog.d/00-template.conf
+  copy:
+    src: 00-template.conf
+    dest: /etc/rsyslog.d
   notify: restart rsyslog
   tags: [common, rsyslog]
 
@@ -300,7 +300,7 @@
 - name: rsyslog; ignore systemd-logind
   copy:
     src: ignore-systemd-logind.conf
-    dest: /etc/rsyslog.d/
+    dest: /etc/rsyslog.d
   notify: restart rsyslog
   tags: [common, rsyslog]
 
