@@ -13,3 +13,8 @@
   service:
     name: postifx
     state: restarted
+
+- name: reload spamassassin
+  service:
+    name: spamassassin
+    state: reloaded
