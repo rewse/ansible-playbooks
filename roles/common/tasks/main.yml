@@ -30,7 +30,7 @@
   tags: [common, storage, swap]
 
 - name: set enforce to 0
-  command: setenfoce 0
+  command: setenforce 0
   tags: [common, selinux]
 
 - name: disable selinux

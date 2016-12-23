@@ -26,13 +26,6 @@
   notify: restart postfix
   tags: [postfix]
 
-- name: create /srv/mail
-  file:
-    path: /srv/mail/
-    state: directory
-    setype: mail_home_rw_t
-  tags: [postfix]
-
 - name: create user's dir for mail
   file:
     path: /srv/mail/{{admin}}
