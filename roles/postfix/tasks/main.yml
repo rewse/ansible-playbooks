@@ -11,9 +11,10 @@
     - clamav-update
     - cyrus-sasl
     - lz4
+    - procmail
     - python-certbot-apache
     - spamassassin
-  tags: [postfix, amavisd, certbot, spamassassin, package]
+  tags: [postfix, amavisd, certbot, procmail, spamassassin, package]
 
 - name: start saslauthd
   service:
@@ -221,3 +222,18 @@
     enabled: yes
     state: started
   tags: [postfix, spamassassin]
+
+- name: use procmail
+  lineinfile:
+    dest: /etc/postfix/main.cf
+    insertafter: '^#mailbox_command '
+    regexp: '^mailbox_command '
+    line: 'mailbox_command = /bin/procmail'
+  notify: reload postfix
+  tags: [postfix, procmail]
+
+- name: copy procmailrc
+  copy:
+    src: procmailrc
+    dest: /etc
+  tags: [postfix, procmail]
