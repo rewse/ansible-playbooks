@@ -294,14 +294,13 @@
   notify: restart rsyslog
   tags: [common, rsyslog]
 
-  # See also "Logs flooded with systemd messages: Created slice & Starting
-  # Session" <https://access.redhat.com/solutions/1564823>
-- name: rsyslog; ignore systemd session slice
-  lineinfile:
-    dest: /etc/rsyslog.d/ignore-systemd-session-slice.conf
-    regexp: 'if '
-    line: 'if $programname == "systemd" and ($msg contains "Starting Session" or $msg contains "Started Session" or $msg contains "Created slice" or $msg contains "Starting user-") then stop'
-    create: yes
+  # See also "Bug 1072368 - user manager message flood"
+  # <https://bugzilla.redhat.com/show_bug.cgi?id=1072368>. Do not use
+  # <https://access.redhat.com/solutions/1564823> because it's not enough.
+- name: rsyslog; ignore systemd-logind
+  copy:
+    src: ignore-systemd-logind.conf
+    dest: /etc/rsyslog.d/
   notify: restart rsyslog
   tags: [common, rsyslog]
 
