@@ -6,12 +6,12 @@
 
 - name: reload postfix
   service:
-    name: postifx
+    name: postfix
     state: reloaded
 
 - name: restart postfix
   service:
-    name: postifx
+    name: postfix
     state: restarted
 
 - name: reload spamassassin
