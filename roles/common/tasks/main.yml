@@ -29,6 +29,15 @@
     state: present
   tags: [common, storage, swap]
 
+- name: set enforce to 0
+  command: setenfoce 0
+  tags: [common, selinux]
+
+- name: disable selinux
+  selinux:
+    state: disabled
+  tags: [common, selinux]
+
 - name: install additional packages
   yum:
     name: "{{item}}"
@@ -47,8 +56,6 @@
     - nfs-utils
     - patch
     - prelink
-    - selinux-policy-devel
-    - setroubleshoot-server
     - source-highlight
     - sysstat
     - telnet
@@ -287,34 +294,6 @@
   notify: restart rsyslog
   tags: [common, rsyslog]
 
-- name: remove selinux samples
-  file:
-    path: /usr/share/selinux/devel/{{item}}
-    state: absent
-  with_items:
-    - example.fc
-    - example.if
-    - example.te
-  tags: [common, selinux]
-
-- name: setroubleshoot; set email
-  lineinfile:
-    dest: /var/lib/setroubleshoot/email_alert_recipients
-    regexp: "{{email.secondary}}"
-    line: "{{email.secondary}}"
-    create: yes
-  notify: restart dbus
-  tags: [common, setroubleshoot]
-
-- name: setroubleshoot; change sender email
-  ini_file:
-    dest: /etc/setroubleshoot/setroubleshoot.conf
-    section: email
-    option: from_address
-    value: SELinux_Troubleshoot@rewse.jp
-  notify: restart dbus
-  tags: [common, setroubleshoot]
-
 - name: ssh; change ClientAliveInterval
   lineinfile:
     dest: /etc/ssh/sshd_config
@@ -423,29 +402,6 @@
     groups: 'zabbix,systemd-journal'
   notify: restart zabbix-agent
   tags: [common, zabbix-agent]
-
-- name: copy zabbix-agent.te
-  copy:
-    src: my-zabbix-agent.te
-    dest: /usr/share/selinux/devel
-  tags: [common, selinux, zabbix-agent]
-
-- name: rebuild selinux-policy
-  command: make
-  args:
-    chdir: /usr/share/selinux/devel
-  tags: [common, selinux, zabbix-agent]
-
-- name: install my-zabbix-agent selinux module
-  command: semodule -i /usr/share/selinux/devel/my-zabbix-agent.pp
-  tags: [common, selinux, zabbix-agent]
-
-- name: selinux alllows daemons enable coluster mode
-  seboolean:
-    name: daemons_enable_cluster_mode
-    state: yes
-    persistent: yes
-  tags: [zabbix-server, selinux, zabbix-agent]
 
 - name: zabbix; enable zabbix-agent
   service:
