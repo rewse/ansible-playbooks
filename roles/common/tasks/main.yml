@@ -29,8 +29,15 @@
     state: present
   tags: [common, storage, swap]
 
+- name: get enforce
+  command: getenforce
+  register: getenforce_out
+  changed_when: False
+  tags: [common, selinux]
+
 - name: set enforce to 0
   command: setenforce 0
+  when: getenforce_out.stdout.find('Disabled') == -1
   tags: [common, selinux]
 
 - name: disable selinux
@@ -49,6 +56,7 @@
     - bind-utils
     - dstat
     - epel-release
+    - firewalld
     - git
     - logwatch
     - mlocate
@@ -468,7 +476,6 @@
   become_user: "{{admin}}"
   copy:
     src: ~/.ssh/id_rsa
-    create: yes
     dest: /home/{{admin}}/.ssh/id_rsa
     mode: 0600
     follow: yes

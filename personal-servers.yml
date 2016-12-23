@@ -5,6 +5,6 @@
   roles:
     - common
     - postfix
-    - zabbix-server
+    - zabbix/server
 
 - include: personal-standby-servers.yml
