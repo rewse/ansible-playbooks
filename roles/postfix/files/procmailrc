@@ -1,0 +1,12 @@
+PATH=/sbin:/bin:/usr/sbin:/usr/bin:/usr/local/sbin:/usr/local/bin:$HOME/bin
+LOCKFILE=$HOME/.lockfile
+MAILDIR=$HOME/Maildir/
+DEFAULT=$MAILDIR
+
+:0 fw
+* ! ^X-Spam-Flag:*
+| spamc
+
+:0
+* ^X-Spam-Flag: *yes
+.Junk/
