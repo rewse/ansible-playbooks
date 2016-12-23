@@ -3,7 +3,6 @@
   become: yes
   remote_user: centos
   roles:
-    - common
     - zabbix/agent
     - postfix
     - zabbix/server
