@@ -4,10 +4,15 @@
     name: "{{item}}"
     state: installed
   with_items:
+    - amavisd-new
     - certbot
+    - clamav
+    - clamav-server-systemd
+    - clamav-update
     - cyrus-sasl
+    - lz4
     - python-certbot-apache
-  tags: [postfix, certbot, package]
+  tags: [postfix, certbot, amavisd, package]
 
 - name: start saslauthd
   service:
@@ -52,7 +57,73 @@
     mode: 0700
   tags: [postfix]
 
-- name: set smtpd_sasl
+- name: copy certbot.cron
+  copy:
+    src: certbot.cron
+    dest: /etc/cron.monthly
+    mode: 0755
+  tags: [postfix, certbot]
+
+- name: bypass spam checks by amavisd
+  lineinfile:
+    dest: /etc/amavisd/amavisd.conf
+    insertafter: '^# @bypass_spam_checks_maps '
+    regexp: '^@bypass_spam_checks_maps '
+    line: '@bypass_spam_checks_maps = (1);'
+  notify: reload amavisd
+  tags: [postfix, amavisd]
+
+- name: set mydomain of amavisd
+  lineinfile:
+    dest: /etc/amavisd/amavisd.conf
+    regexp: '^\$mydomain '
+    line: "$mydomain = 'rewse.jp';"
+  notify: reload amavisd
+  tags: [postfix, amavisd]
+
+- name: set virus_admin of amavisd
+  lineinfile:
+    dest: /etc/amavisd/amavisd.conf
+    regexp: '^\$virus_admin '
+    line: "$virus_admin = '{{vault_email.secondary}}';"
+  notify: reload amavisd
+  tags: [postfix, amavisd]
+
+- name: set mailfrom_notify_admin of amavisd
+  lineinfile:
+    dest: /etc/amavisd/amavisd.conf
+    regexp: '^\$mailfrom_notify_admin '
+    line: "$mailfrom_notify_admin = 'amavisd@rewse.jp';"
+  notify: reload amavisd
+  tags: [postfix, amavisd]
+
+- name: enable always-clean of amavisd
+  lineinfile:
+    dest: /etc/amavisd/amavisd.conf
+    regexp: 'always-clean'
+    line: "['always-clean', sub {0}],"
+  notify: reload amavisd
+  tags: [postfix, amavisd]
+
+- name: enable freshclam.conf
+  lineinfile:
+    dest: /etc/freshclam.conf
+    regexp: 'Example'
+    line: '#Example'
+  tags: [postfix, amavisd]
+
+- name: refresh clamav db
+  command: freshclam
+  tags: [postfix, amavisd]
+
+- name: start amavisd
+  service:
+    name: amavisd
+    enabled: yes
+    state: started
+  tags: [postfix, amavisd]
+
+- name: set posfix/main.cf
   blockinfile:
     dest: /etc/postfix/main.cf
     content: |
@@ -75,17 +146,12 @@
       smtpd_tls_session_cache_database = hash:/etc/postfix/smtpd_scache
       smtpd_tls_received_header = yes
       tls_random_source = dev:/dev/urandom
+
+      content_filter=amavisfeed:[127.0.0.1]:10024
   notify: reload postfix
-  tags: [postfix]
+  tags: [postfix, amavisd]
 
-- name: copy certbot.cron
-  copy:
-    src: certbot.cron
-    dest: /etc/cron.monthly
-    mode: 0755
-  tags: [postfix, certbot]
-
-- name: enable smtps and submission
+- name: set postfix/master.cf
   blockinfile:
     dest: /etc/postfix/master.cf
     insertbefore: '^#smtp '
@@ -94,5 +160,30 @@
         -o syslog_name=postfix/submission
       smtps     inet  n       -       n       -       -       smtpd
         -o syslog_name=postfix/smtps
+
+      amavisfeed unix -       -       n       -       2       smtp
+        -o smtp_data_done_timeout=1200
+        -o smtp_send_xforward_command=yes
+        -o disable_dns_lookups=yes
+        -o max_use=20
+
+      127.0.0.1:10025 inet n  -       n       -       -       smtpd
+        -o content_filter=
+        -o smtpd_delay_reject=no
+        -o smtpd_client_restrictions=permit_mynetworks,reject
+        -o smtpd_helo_restrictions=
+        -o smtpd_sender_restrictions=
+        -o smtpd_recipient_restrictions=permit_mynetworks,reject
+        -o smtpd_data_restrictions=reject_unauth_pipelining
+        -o smtpd_end_of_data_restrictions=
+        -o smtpd_restriction_classes=
+        -o mynetworks=127.0.0.0/8
+        -o smtpd_error_sleep_time=0
+        -o smtpd_soft_error_limit=1001
+        -o smtpd_hard_error_limit=1000
+        -o smtpd_client_connection_count_limit=0
+        -o smtpd_client_connection_rate_limit=0
+        -o receive_override_options=no_header_body_checks,no_unknown_recipient_checks,no_milters
+        -o local_header_rewrite_clients=
   notify: reload postfix
-  tags: [postfix]
+  tags: [postfix, amavisd]

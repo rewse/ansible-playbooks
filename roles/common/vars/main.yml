@@ -1,7 +1,4 @@
 ---
-email:
-  primary: "{{vault_email.primary}}"
-  secondary: "{{vault_email.secondary}}"
 relayhost:
   name: mail.so-net.ne.jp
   port: 587
