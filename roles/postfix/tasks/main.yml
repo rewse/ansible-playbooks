@@ -41,23 +41,26 @@
   notify: reload postfix
   tags: [postfix]
 
-- name: set mail_spool_directory
+- name: set home_mailbox
   lineinfile:
     dest: /etc/postfix/main.cf
-    insertafter: '^#mail_spool_directory'
-    regexp: '^mail_spool_directory'
-    line: 'mail_spool_directory= /srv/mail/'
+    insertafter: '^#home_mailbox '
+    regexp: '^home_mailbox '
+    line: 'home_mailbox = Maildir/'
   notify: reload postfix
   tags: [postfix]
 
-- name: create user's dir for mail
-  file:
-    path: /srv/mail/{{admin}}
-    state: directory
-    owner: '{{admin}}'
-    group: '{{admin}}'
-    mode: 0700
-  tags: [postfix]
+- name: mount rewse-mail-tats
+  mount:
+    name: /home/{{admin}}/Maildir
+    src: /opt/go/bin/goofys#rewse-mail-{{admin}}
+    fstype: fuse
+    opts: _netdev,allow_other,--file-mode=0644,--uid=1001,--gid=1001
+    state: "{{item}}"
+  with_items:
+    - mounted
+    - present
+  tags: [postfix, goofys]
 
 - name: copy certbot.cron
   copy:
