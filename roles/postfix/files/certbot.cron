@@ -5,7 +5,7 @@ certbot renew --force-renew --webroot-path=/srv/www/html --quiet
 retval=$?
 
 if [ $retval -ne 0 ]; then
-  echo "<ERROR> certbot can't renew the certification"
+  echo "<ERROR> certbot can't renew the certification [CODE=$retval]" >&2
   exit $retval
 fi
 
