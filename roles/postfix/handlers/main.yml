@@ -1,4 +1,9 @@
 ---
+- name: reload postfix
+  service:
+    name: postifx
+    state: reloaded
+
 - name: restart postfix
   service:
     name: postifx

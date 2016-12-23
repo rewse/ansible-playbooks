@@ -5,7 +5,7 @@
     insertafter: '^#inet_interfaces'
     regexp: '^inet_interfaces'
     line: 'inet_interfaces = all'
-  notify: restart postfix
+  notify: reload postfix
   tags: [postfix]
 
 - name: set mydestination
@@ -14,7 +14,7 @@
     insertbefore: '^#mydestination'
     regexp: '^mydestination'
     line: 'mydestination = $myhostname, localhost.$mydomain, localhost, $mydomain'
-  notify: restart postfix
+  notify: reload postfix
   tags: [postfix]
 
 - name: set mail_spool_directory
@@ -23,7 +23,7 @@
     insertafter: '^#mail_spool_directory'
     regexp: '^mail_spool_directory'
     line: 'mail_spool_directory= /srv/mail/'
-  notify: restart postfix
+  notify: reload postfix
   tags: [postfix]
 
 - name: create user's dir for mail
