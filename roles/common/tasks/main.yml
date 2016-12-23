@@ -155,30 +155,44 @@
 - name: postfix; change myorigin
   lineinfile:
     dest: /etc/postfix/main.cf
-    insertafter: '^#myorigin'
-    regexp: '^myorigin'
+    insertafter: '^#myorigin '
+    regexp: '^myorigin '
     line: 'myorigin = rewse.jp'
   notify: reload postfix
-  tags: [common, mail, postfix]
+  tags: [common, postfix]
 
 - name: postfix; change relayhost
   lineinfile:
     dest: /etc/postfix/main.cf
-    insertafter: '^#relayhost'
-    regexp: '^relayhost'
+    insertafter: '^#relayhost '
+    regexp: '^relayhost '
     line: 'relayhost = [{{relayhost.name}}]:{{relayhost.port}}'
   notify: reload postfix
-  tags: [common, mail, postfix]
+  tags: [common, postfix]
 
-- name: postfix; support sasl
-  blockinfile:
+- name: postfix; set smtp_sasl_auth_enable
+  lineinfile:
     dest: /etc/postfix/main.cf
-    content: |
-      smtp_sasl_auth_enable = yes
-      smtp_sasl_password_maps = hash:/etc/postfix/sasl_passwd
-      smtp_sasl_security_options = noplaintext, noanonymous
+    regexp: '^smtp_sasl_auth_enable '
+    line: 'smtp_sasl_auth_enable = yes'
   notify: reload postfix
-  tags: [common, mail, postfix]
+  tags: [common, postfix]
+
+- name: postfix; set smtp_sasl_password_maps
+  lineinfile:
+    dest: /etc/postfix/main.cf
+    regexp: 'smtp_sasl_password_maps '
+    line: 'smtp_sasl_password_maps = hash:/etc/postfix/sasl_passwd'
+  notify: reload postfix
+  tags: [common, postfix]
+
+- name: postfix; set smtp_sasl_security_options
+  lineinfile:
+    dest: /etc/postfix/main.cf
+    regexp: 'smtp_sasl_security_options '
+    line: 'smtp_sasl_security_options = noplaintext, noanonymous'
+  notify: reload postfix
+  tags: [common, postfix]
 
 - name: postfix; create sasl_passwd
   lineinfile:
@@ -188,20 +202,20 @@
     create: yes
     mode: 0600
   register: postfix_sasl_password_res
-  tags: [common, mail, postfix]
+  tags: [common, postfix]
 
 - name: postfix; create sasl_passwd.db
   file:
     path: /etc/postfix/sasl_passwd.db
     state: file
     mode: 0600
-  tags: [common, mail, postfix]
+  tags: [common, postfix]
 
 - name: postfix; hash sasl_passwd
   command: postmap hash:/etc/postfix/sasl_passwd
   when: postfix_sasl_password_res|changed
   notify: reload postfix
-  tags: [common, mail, postfix]
+  tags: [common, postfix]
 
 - name: install sasl packages
   yum:
@@ -211,7 +225,7 @@
     - cyrus-sasl-md5
     - cyrus-sasl-plain
   notify: restart postfix
-  tags: [common, mail, postfix]
+  tags: [common, postfix]
 
 - name: anacron; change start_hours_range
   lineinfile:

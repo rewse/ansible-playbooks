@@ -132,10 +132,6 @@
   blockinfile:
     dest: /etc/postfix/main.cf
     content: |
-      smtp_sasl_auth_enable = yes
-      smtp_sasl_password_maps = hash:/etc/postfix/sasl_passwd
-      smtp_sasl_security_options = noplaintext, noanonymous
-
       smtpd_sasl_auth_enable = yes
       smtpd_sasl_security_options = noanonymous
       smtpd_recipient_restrictions =
