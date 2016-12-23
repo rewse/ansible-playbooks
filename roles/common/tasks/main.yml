@@ -83,21 +83,6 @@
     - etckeeper
   tags: [common, epel, package]
 
-- name: install zabbix-release
-  yum:
-    name: "{{zabbix_release_url}}"
-    state: installed
-  tags: [common, package, zabbix]
-
-- name: install zabbix clients
-  yum:
-    name: "{{item}}"
-    state: installed
-  with_items:
-    - zabbix-agent
-    - zabbix-sender
-  tags: [common, package, zabbix]
-
 - name: download get-pip.py
   get_url:
     url: https://bootstrap.pypa.io/get-pip.py
@@ -146,18 +131,6 @@
     - updates
     - extras
   tags: [common, package]
-
-- name: add priority into /etc/yum.repos.d/zabbix.repo
-  ini_file:
-    dest: /etc/yum.repos.d/zabbix.repo
-    section: "{{item}}"
-    option: priority
-    value: 30
-    no_extra_spaces: True
-  with_items:
-    - zabbix
-    - zabbix-non-supported
-  tags: [common, package, zabbix]
 
 - name: add priority into /etc/yum.repos.d/epel.repo
   ini_file:
@@ -354,79 +327,6 @@
     enabled: yes
   notify: restart yum-cron
   tags: [common, yum-cron]
-
-- name: zabbix; set zabbix server
-  lineinfile:
-    dest: /etc/zabbix/zabbix_agentd.conf
-    regexp: 'Server='
-    line: 'Server={{zabbix_server_name}}'
-  notify: restart zabbix-agent
-  tags: [common, zabbix-agent]
-
-- name: zabbix; set zabbix server active
-  lineinfile:
-    dest: /etc/zabbix/zabbix_agentd.conf
-    regexp: 'ServerActive='
-    line: 'ServerActive={{zabbix_server_name}}'
-  notify: restart zabbix-agent
-  tags: [common, zabbix-agent]
-
-- name: zabbix; set hostname
-  lineinfile:
-    dest: /etc/zabbix/zabbix_agentd.conf
-    regexp: 'Hostname='
-    line: 'Hostname={{ansible_nodename}}'
-  notify: restart zabbix-agent
-  tags: [common, zabbix-agent]
-
-- name: zabbix; add centos7.conf
-  blockinfile:
-    dest: /etc/zabbix/zabbix_agentd.d/centos7.conf
-    content: |
-      UserParameter=vfs.dev.util[*],iostat -xk 5 2 | grep $1 | tail -1 | awk '{print $$14}'
-      UserParameter=proc.top[*],top c -b -n 1 -w 512 | sed 's/ *$//' | sed -n '7,17p'
-      UserParameter=postfix.queue.num,echo "(`mailq | wc -l` - 2) / 3" | bc
-      UserParameter=journal[*],journalctl -p $1 -n 10 | tac
-    create: yes
-  tags: [common, zabbix-agent]
-
-- name: zabbix; rm userparameter_mysql.conf
-  file:
-    path: /etc/zabbix/zabbix_agentd.d/userparameter_mysql.conf
-    state: absent
-  notify: restart zabbix-agent
-  tags: [common, zabbix-agent]
-
-- name: change permission of /var/log/messages
-  file:
-    path: /var/log/messages
-    group: zabbix
-    mode: 0640
-  tags: [common, zabbix-agent]
-
-- name: allow sudo to zabbix
-  lineinfile:
-    dest: /etc/sudoers.d/zabbix
-    regexp: '^zabbix'
-    line: 'zabbix ALL=(ALL) NOPASSWD: /usr/bin/journalctl'
-    create: yes
-    mode: 0440
-    validate: 'visudo -cf %s'
-  tags: [common, zabbix-agent]
-
-- name: add zabbix to systemd-journal group
-  user:
-    name: zabbix
-    groups: 'zabbix,systemd-journal'
-  notify: restart zabbix-agent
-  tags: [common, zabbix-agent]
-
-- name: zabbix; enable zabbix-agent
-  service:
-    name: zabbix-agent
-    enabled: yes
-  notify: restart zabbix-agent
-  tags: [common, zabbix-agent]
 
 - name: add a group for admin user
   group:

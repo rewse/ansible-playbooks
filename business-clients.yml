@@ -4,6 +4,7 @@
   remote_user: centos
   roles:
     - common
+    - zabbix/agent
     - desktop
     - database/client
     - database/client/gui
