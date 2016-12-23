@@ -1,4 +1,9 @@
 ---
+- name: reload amavisd
+  service:
+    name: amavisd
+    state: reloaded
+
 - name: reload postfix
   service:
     name: postifx
