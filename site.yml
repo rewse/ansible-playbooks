@@ -2,4 +2,3 @@
 - include: business-clients.yml
 - include: personal-clients.yml
 - include: personal-servers.yml
-- include: standby-servers.yml

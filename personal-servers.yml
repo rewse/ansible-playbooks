@@ -6,3 +6,5 @@
     - common
     - postfix
     - zabbix-server
+
+- include: personal-standby-servers.yml
