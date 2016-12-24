@@ -34,8 +34,8 @@
     src: "{{item}}"
     dest: /usr/local/src
   with_items:
-    - "{{oracle_instantcelint_basic}}"
-    - "{{oracle_instantclient_sqlplus}}"
+    - "{{oracle_instantcelint_basic_filename}}"
+    - "{{oracle_instantclient_sqlplus_filename}}"
   tags: [database-client, oracle]
 
 - name: install oracle-instantcelint
@@ -44,8 +44,8 @@
     state: installed
   with_items:
     - rlwrap
-    - /usr/local/src/{{oracle_instantcelint_basic}}
-    - /usr/local/src/{{oracle_instantclient_sqlplus}}
+    - /usr/local/src/{{oracle_instantcelint_basic_filename}}
+    - /usr/local/src/{{oracle_instantclient_sqlplus_filename}}
   tags: [database-client, oracle]
 
 - name: create symlink for ojdbc.jar
@@ -56,6 +56,31 @@
   with_items:
     - ojdbc6.jar
     - ojdbc7.jar
+  tags: [database-client, oracle]
+
+  # Download the files before the following task
+  # from <http://www.oracle.com/technetwork/topics/linuxx86-64soft-092277.html>
+- name: copy sqlcl
+  unarchive:
+    src: "{{sqlcl_filename}}"
+    dest: /opt
+  tags: [database-client, oracle]
+
+- name: disable sqlcl for windows
+  file:
+    path: /opt/sqlcl/bin/{{item}}
+    mode: 0644
+  with_items:
+    - sql.bat
+    - sql.exe
+  tags: [database-client, oracle]
+
+- name: set PATH for sqlcl
+  lineinfile:
+    dest: /etc/profile.d/sqlcl.sh
+    regexp: 'pathmunge /opt/sqlcl/bin'
+    line: 'pathmunge /opt/sqlcl/bin'
+    create: yes
   tags: [database-client, oracle]
 
 - name: clone orascript.git
