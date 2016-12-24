@@ -59,6 +59,7 @@
     - firewalld
     - git
     - logwatch
+    - lsof
     - mlocate
     - net-tools
     - nfs-utils
