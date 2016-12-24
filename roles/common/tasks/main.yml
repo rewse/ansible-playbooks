@@ -258,6 +258,13 @@
       export PATH
   tags: [common, bash]
 
+- name: input; set editing-mode to vi
+  lineinfile:
+    dest: /etc/inputrc
+    regexp: 'set editing-mode '
+    line: 'set editing-mode vi'
+  tags: [common, input]
+
 - name: create journal dir
   file:
     path: /var/log/journal
@@ -461,14 +468,6 @@
     option: email
     value: "{{email}}"
   tags: [common, dotfiles, git]
-
-- name: copy inputrc
-  become_user: "{{admin}}"
-  copy:
-    src: /srv/git/dotfiles/inputrc
-    dest: /home/{{admin}}/.inputrc
-    remote_src: True
-  tags: [common, dotfiles, inputrc]
 
 - name: tmux; copy tmux.conf
   copy:

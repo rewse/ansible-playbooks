@@ -1,7 +1,8 @@
 ---
 mysql_release_filename: mysql57-community-release-el7-9.noarch.rpm
 mysql_community_ini_section: mysql57-community
-oracle_instantcelint_basic: oracle-instantclient12.1-basic-12.1.0.2.0-1.x86_64.rpm
-oracle_instantclient_sqlplus: oracle-instantclient12.1-sqlplus-12.1.0.2.0-1.x86_64.rpm
+oracle_instantcelint_basic_filename: oracle-instantclient12.1-basic-12.1.0.2.0-1.x86_64.rpm
+oracle_instantclient_sqlplus_filename: oracle-instantclient12.1-sqlplus-12.1.0.2.0-1.x86_64.rpm
 postgersql_jdbc_filename: postgresql-9.4.1212.jar
 redshift_jdbc_filename: RedshiftJDBC42-1.2.1.1001.jar
+sqlcl_filename: sqlcl-4.2.0.16.355.0402-no-jre.zip
