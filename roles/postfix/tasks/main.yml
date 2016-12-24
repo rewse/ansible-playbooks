@@ -10,11 +10,12 @@
     - clamav-server-systemd
     - clamav-update
     - cyrus-sasl
+    - dovecot
     - lz4
     - procmail
     - python-certbot-apache
     - spamassassin
-  tags: [postfix, amavisd, certbot, procmail, spamassassin, package]
+  tags: [postfix, amavisd, certbot, dovecot, procmail, spamassassin, package]
 
 - name: start saslauthd
   service:
@@ -236,3 +237,36 @@
     src: procmailrc
     dest: /etc
   tags: [postfix, procmail]
+
+- name: dovecot; set mail_location
+  lineinfile:
+    dest: /etc/dovecot/conf.d/10-mail.conf
+    insertafter: '^#mail_location '
+    regexp: '^mail_location '
+    line: 'mail_location = maildir:~/Maildir'
+  notify: reload dovecot
+  tags: [postfix, dovecot]
+
+- name: dovecot; enable plaintext auth
+  lineinfile:
+    dest: /etc/dovecot/conf.d/10-auth.conf
+    insertafter: '^#disable_plaintext_auth '
+    regexp: '^disable_plaintext_auth '
+    line: 'disable_plaintext_auth = no'
+  notify: reload dovecot
+  tags: [postfix, dovecot]
+
+- name: dovecot; change ssl to yes
+  lineinfile:
+    dest: /etc/dovecot/conf.d/10-ssl.conf
+    regexp: '^ssl '
+    line: 'ssl = yes'
+  notify: reload dovecot
+  tags: [postfix, dovecot]
+
+- name: start dovecot
+  service:
+    name: dovecot
+    enabled: yes
+    state: started
+  tags: [postfix, dovecot]
