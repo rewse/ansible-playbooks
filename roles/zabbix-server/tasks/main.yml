@@ -6,6 +6,7 @@
   with_items:
     - mod_ssl
     - zabbix-server-mysql
+    - zabbix-web-japanese
     - zabbix-web-mysql
   notify: restart httpd
   tags: [zabbix-server, zabbix-server-server, zabbix-web]
@@ -51,6 +52,29 @@
   notify: restart zabbix-server
   tags: [zabbix-server, zabbix-server-server]
 
+- name: selinux alllows zabbix can network
+  seboolean:
+    name: zabbix_can_network
+    state: yes
+    persistent: yes
+  tags: [zabbix-server, selinux, zabbix-server-server]
+
+- name: copy zabbix-server.te
+  copy:
+    src: my-zabbix-server.te
+    dest: /usr/share/selinux/devel
+  tags: [zabbix-server, selinux, zabbix-server-server]
+
+- name: rebuild selinux-policy
+  command: make
+  args:
+    chdir: /usr/share/selinux/devel
+  tags: [zabbix-server, selinux, zabbix-server-server]
+
+- name: install my-zabbix-server selinux module
+  command: semodule -i /usr/share/selinux/devel/my-zabbix-server.pp
+  tags: [zabbix-server, selinux, zabbix-server-server]
+
 - name: set php_value
   lineinfile:
     dest: /etc/httpd/conf.d/zabbix.conf
@@ -67,6 +91,13 @@
     dest: /etc/zabbix/web/zabbix.conf.php
     mode: 0640
   tags: [zabbix-server, zabbix-web]
+
+- name: selinux alllows httpd can network connect
+  seboolean:
+    name: httpd_can_network_connect
+    state: yes
+    persistent: yes
+  tags: [zabbix-server, selinux, zabbix-web]
 
 - name: copy market-price-check.py
   copy:

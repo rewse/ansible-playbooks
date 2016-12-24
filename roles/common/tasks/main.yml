@@ -83,6 +83,23 @@
     - zabbix-sender
   tags: [common, package, zabbix]
 
+- name: download get-pip.py
+  get_url:
+    url: https://bootstrap.pypa.io/get-pip.py
+    dest: /tmp
+  tags: [common, package, pip]
+
+- name: run get-pip.py
+  command: python /tmp/get-pip.py
+  tags: [common, package, pip]
+
+- name: install packages with pip
+  pip:
+    name: "{{item}}"
+  with_items:
+    - awscli
+  tags: [common, package, pip]
+
 - name: update all packages
   yum:
     name: '*'
@@ -142,6 +159,7 @@
     enabled: no
     state: stopped
   with_items:
+    - firewalld
     - kdump
     - sysstat
   tags: [common, package]
@@ -192,7 +210,7 @@
   tags: [common, mail, postfix]
 
 - name: postfix; hash sasl_passwd
-  command: postmap /etc/postfix/sasl_passwd
+  command: postmap hash:/etc/postfix/sasl_passwd
   when: postfix_sasl_password_res|changed
   notify: reload postfix
   tags: [common, mail, postfix]
@@ -276,6 +294,34 @@
   notify: restart rsyslog
   tags: [common, rsyslog]
 
+- name: remove selinux samples
+  file:
+    path: /usr/share/selinux/devel/{{item}}
+    state: absent
+  with_items:
+    - example.fc
+    - example.if
+    - example.te
+  tags: [common, selinux]
+
+- name: setroubleshoot; set email
+  lineinfile:
+    dest: /var/lib/setroubleshoot/email_alert_recipients
+    regexp: "{{email.secondary}}"
+    line: "{{email.secondary}}"
+    create: yes
+  notify: restart dbus
+  tags: [common, setroubleshoot]
+
+- name: setroubleshoot; change sender email
+  ini_file:
+    dest: /etc/setroubleshoot/setroubleshoot.conf
+    section: email
+    option: from_address
+    value: SELinux_Troubleshoot@rewse.jp
+  notify: restart dbus
+  tags: [common, setroubleshoot]
+
 - name: ssh; change ClientAliveInterval
   lineinfile:
     dest: /etc/ssh/sshd_config
@@ -321,28 +367,25 @@
 
 - name: zabbix; set zabbix server
   lineinfile:
-    dest: /etc/zabbix/zabbix_agentd.d/common.conf
-    regexp: '^Server='
+    dest: /etc/zabbix/zabbix_agentd.conf
+    regexp: 'Server='
     line: 'Server={{zabbix_server_name}}'
-    create: yes
   notify: restart zabbix-agent
   tags: [common, zabbix-agent]
 
 - name: zabbix; set zabbix server active
   lineinfile:
-    dest: /etc/zabbix/zabbix_agentd.d/common.conf
-    regexp: '^ServerActive='
+    dest: /etc/zabbix/zabbix_agentd.conf
+    regexp: 'ServerActive='
     line: 'ServerActive={{zabbix_server_name}}'
-    create: yes
   notify: restart zabbix-agent
   tags: [common, zabbix-agent]
 
 - name: zabbix; set hostname
   lineinfile:
-    dest: /etc/zabbix/zabbix_agentd.d/common.conf
-    regexp: '^Hostname='
+    dest: /etc/zabbix/zabbix_agentd.conf
+    regexp: 'Hostname='
     line: 'Hostname={{ansible_nodename}}'
-    create: yes
   notify: restart zabbix-agent
   tags: [common, zabbix-agent]
 
@@ -363,6 +406,53 @@
     state: absent
   notify: restart zabbix-agent
   tags: [common, zabbix-agent]
+
+- name: change permission of /var/log/messages
+  file:
+    path: /var/log/messages
+    group: zabbix
+    mode: 0640
+  tags: [common, zabbix-agent]
+
+- name: allow sudo to zabbix
+  lineinfile:
+    dest: /etc/sudoers.d/zabbix
+    regexp: '^zabbix'
+    line: 'zabbix ALL=(ALL) NOPASSWD: /usr/bin/journalctl'
+    create: yes
+    mode: 0440
+    validate: 'visudo -cf %s'
+  tags: [common, zabbix-agent]
+
+- name: add zabbix to systemd-journal group
+  user:
+    name: zabbix
+    groups: 'zabbix,systemd-journal'
+  notify: restart zabbix-agent
+  tags: [common, zabbix-agent]
+
+- name: copy zabbix-agent.te
+  copy:
+    src: my-zabbix-agent.te
+    dest: /usr/share/selinux/devel
+  tags: [common, selinux, zabbix-agent]
+
+- name: rebuild selinux-policy
+  command: make
+  args:
+    chdir: /usr/share/selinux/devel
+  tags: [common, selinux, zabbix-agent]
+
+- name: install my-zabbix-agent selinux module
+  command: semodule -i /usr/share/selinux/devel/my-zabbix-agent.pp
+  tags: [common, selinux, zabbix-agent]
+
+- name: selinux alllows daemons enable coluster mode
+  seboolean:
+    name: daemons_enable_cluster_mode
+    state: yes
+    persistent: yes
+  tags: [zabbix-server, selinux, zabbix-agent]
 
 - name: zabbix; enable zabbix-agent
   service:
@@ -390,7 +480,7 @@
   lineinfile:
     dest: /etc/sudoers.d/00-{{admin}}
     regexp: '^{{admin}}'
-    line: '{{admin}} ALL=(ALL) NOPASSWD:ALL'
+    line: '{{admin}} ALL=(ALL) NOPASSWD: ALL'
     create: yes
     mode: 0440
     validate: 'visudo -cf %s'
