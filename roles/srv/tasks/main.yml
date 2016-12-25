@@ -56,6 +56,16 @@
   with_dict: "{{users}}"
   tags: [srv, lvm, postfix]
 
+- name: make mail user link
+  file:
+    src: /srv/mail/{{item.key}}
+    dest: /home/{{item.key}}/Maildir
+    state: link
+    owner: "{{item.key}}"
+    group: "{{item.key}}"
+  with_dict: "{{users}}"
+  tags: [srv, lvm, postfix]
+
 - name: install packages
   yum:
     name: "{{item}}"
