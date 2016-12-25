@@ -60,31 +60,16 @@
     - mail.rewse.jp.{{cert_year}}.ca-bundle
   tags: [postfix, cert]
 
-- name: create mail.rewse.jp.crt link
-  file:
-    src: mail.rewse.jp.{{cert_year}}.crt
-    dest: /etc/pki/tls/certs/mail.rewse.jp.crt
-    state: link
-  tags: [postfix, cert]
-
-- name: create mail.rewse.jp.ca-bundle link
-  file:
-    src: mail.rewse.jp.{{cert_year}}.ca-bundle
-    dest: /etc/pki/tls/certs/mail.rewse.jp.ca-bundle
-    state: link
+- name: concat crt files
+  shell: cat mail.rewse.jp.{{cert_year}}.crt mail.rewse.jp.{{cert_year}}.ca-bundle > mail.rewse.jp.withintermediate.{{cert_year}}.crt
+  args:
+    chdir: /etc/pki/tls/certs
   tags: [postfix, cert]
 
 - name: copy key file
   copy:
     src: mail.rewse.jp.{{cert_year}}.key
     dest: /etc/pki/tls/private
-  tags: [postfix, cert]
-
-- name: create mail.rewse.jp.key link
-  file:
-    src: mail.rewse.jp.{{cert_year}}.key
-    dest: /etc/pki/tls/private/mail.rewse.jp.key
-    state: link
   tags: [postfix, cert]
 
 - name: copy certbot.cron
@@ -166,8 +151,8 @@
 
       smtpd_use_tls = yes
       smtpd_tls_auth_only = yes
-      smtpd_tls_cert_file = /etc/pki/tls/certs/rewse.jp.ca-bundle
-      smtpd_tls_key_file = /etc/pki/tls/private/rewse.jp.key
+      smtpd_tls_cert_file = /etc/pki/tls/certs/mail.rewse.jp.withintermediate.{{cert_year}}.crt
+      smtpd_tls_key_file = /etc/pki/tls/private/mail.rewse.jp.{{cert_year}}.key
       smtpd_tls_loglevel = 1
       smtpd_tls_session_cache_database = hash:/etc/postfix/smtpd_scache
       smtpd_tls_received_header = yes
@@ -175,7 +160,7 @@
 
       content_filter=amavisfeed:[127.0.0.1]:10024
   notify: reload postfix
-  tags: [postfix, amavisd]
+  tags: [postfix, amavisd, cert]
 
 - name: set postfix/master.cf
   blockinfile:
@@ -299,6 +284,22 @@
     line: 'ssl = yes'
   notify: reload dovecot
   tags: [postfix, dovecot]
+
+- name: dovecot; set ssl_cert
+  lineinfile:
+    dest: /etc/dovecot/conf.d/10-ssl.conf
+    regexp: '^ssl_cert '
+    line: 'ssl_cert = </etc/pki/tls/certs/mail.rewse.jp.withintermediate.{{cert_year}}.crt'
+  notify: reload dovecot
+  tags: [postfix, dovecot, cert]
+
+- name: dovecot; set ssl_key
+  lineinfile:
+    dest: /etc/dovecot/conf.d/10-ssl.conf
+    regexp: '^ssl_key '
+    line: 'ssl_key = </etc/pki/tls/private/mail.rewse.jp.{{cert_year}}.key'
+  notify: reload dovecot
+  tags: [postfix, dovecot, cert]
 
 - name: start dovecot
   service:
