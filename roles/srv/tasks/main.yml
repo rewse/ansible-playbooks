@@ -74,7 +74,7 @@
 - name: create rsyncd log
   file:
     path: /var/log/rsyncd.log
-    state: file
+    state: touch
     mode: 0600
   tags: [srv, lsyncd]
 
@@ -94,7 +94,7 @@
 - name: create lsyncd logs
   file:
     path: /var/log/lsyncd/{{item}}
-    state: file
+    state: touch
     mode: 0600
   with_items:
     - lsyncd.log
