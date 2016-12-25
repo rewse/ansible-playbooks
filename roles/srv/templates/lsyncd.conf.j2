@@ -5,13 +5,16 @@ settings {
   pidfile = "/var/run/lsyncd.pid"
 }
 
+{% for user in users %}
 sync {
   default.rsync,
-  source="/srv/mail/",
+  source="/srv/mail/{{user}}",
 {% if ansible_hostname == "charlie" %}
-  target="foxtrot.rewse.jp::mail",
+  target="foxtrot.rewse.jp::mail-{{user}}",
 {% elif ansible_hostname == "foxtrot" %}
-  target="charlie.rewse.jp::mail",
+  target="charlie.rewse.jp::mail-{{user}}",
 {% endif %}
   init = false
 }
+
+{% endfor %}
