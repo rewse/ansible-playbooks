@@ -51,6 +51,42 @@
   notify: reload postfix
   tags: [postfix]
 
+- name: copy crt files
+  copy:
+    src: "{{item}}"
+    dest: /etc/pki/tls/certs
+  with_items:
+    - mail.rewse.jp.{{cert_year}}.crt
+    - mail.rewse.jp.{{cert_year}}.ca-bundle
+  tags: [postfix, cert]
+
+- name: create mail.rewse.jp.crt link
+  file:
+    src: mail.rewse.jp.{{cert_year}}.crt
+    dest: /etc/pki/tls/certs/mail.rewse.jp.crt
+    state: link
+  tags: [postfix, cert]
+
+- name: create mail.rewse.jp.ca-bundle link
+  file:
+    src: mail.rewse.jp.{{cert_year}}.ca-bundle
+    dest: /etc/pki/tls/certs/mail.rewse.jp.ca-bundle
+    state: link
+  tags: [postfix, cert]
+
+- name: copy key file
+  copy:
+    src: mail.rewse.jp.{{cert_year}}.key
+    dest: /etc/pki/tls/private
+  tags: [postfix, cert]
+
+- name: create mail.rewse.jp.key link
+  file:
+    src: mail.rewse.jp.{{cert_year}}.key
+    dest: /etc/pki/tls/private/mail.rewse.jp.key
+    state: link
+  tags: [postfix, cert]
+
 - name: copy certbot.cron
   copy:
     src: certbot.cron
@@ -130,8 +166,8 @@
 
       smtpd_use_tls = yes
       smtpd_tls_auth_only = yes
-      smtpd_tls_cert_file = /etc/letsencrypt/live/rewse.jp/fullchain.pem
-      smtpd_tls_key_file = /etc/letsencrypt/live/rewse.jp/privkey.pem
+      smtpd_tls_cert_file = /etc/pki/tls/certs/rewse.jp.ca-bundle
+      smtpd_tls_key_file = /etc/pki/tls/private/rewse.jp.key
       smtpd_tls_loglevel = 1
       smtpd_tls_session_cache_database = hash:/etc/postfix/smtpd_scache
       smtpd_tls_received_header = yes
