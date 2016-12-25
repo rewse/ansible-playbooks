@@ -90,6 +90,7 @@
   notify: restart lsyncd
   tags: [srv, lsyncd]
 
+  # Do not use sysctl module because it adds to /etc/sysctl.conf diretly.
 - name: set fs.inotify.max_user_watches
   lineinfile:
     dest: /etc/sysctl.d/lsyncd.conf
