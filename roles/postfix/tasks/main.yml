@@ -58,14 +58,14 @@
   with_items:
     - mail.rewse.jp.{{cert_year}}.crt
     - mail.rewse.jp.{{cert_year}}.ca-bundle
-  register: copy_crt_files
+  register: copy_crt_files_out
   tags: [postfix, cert]
 
 - name: concat crt files
   shell: cat mail.rewse.jp.{{cert_year}}.crt mail.rewse.jp.{{cert_year}}.ca-bundle > mail.rewse.jp.withintermediate.{{cert_year}}.crt
   args:
     chdir: /etc/pki/tls/certs
-  when: copy_crt_files|changed
+  when: copy_crt_files_out|changed
   tags: [postfix, cert]
 
 - name: copy key file
@@ -260,6 +260,19 @@
     src: procmailrc
     dest: /etc
   tags: [postfix, procmail]
+
+- name: write aliases
+  blockinfile:
+    dest: /etc/aliases
+    insertbefore: '^# Basic '
+    content: "{{aliases}}"
+  register: write_aliases_out
+  tags: [postfix, aliases]
+
+- name: enable aliases
+  command: newaliases
+  when: write_aliases_out|changed
+  tags: [postfix, aliases]
 
 - name: dovecot; set mail_location
   lineinfile:
