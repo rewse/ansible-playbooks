@@ -29,6 +29,33 @@
     - mounted
   tags: [srv, lvm, postfix]
 
+- name: create groups
+  group:
+    name: "{{item.key}}"
+    gid: "{{item.value.gid}}"
+  with_dict: "{{users}}"
+  tags: [srv, lvm, postfix]
+
+- name: create users
+  user:
+    name: "{{item.key}}"
+    uid: "{{item.value.uid}}"
+    group: "{{item.key}}"
+    comment: "{{item.value.comment}}"
+    shell: "{{item.value.shell}}"
+  with_dict: "{{users}}"
+  tags: [srv, lvm, postfix]
+
+- name: make mail user dir
+  file:
+    path: /srv/mail/{{item.key}}
+    state: directory
+    owner: "{{item.key}}"
+    group: "{{item.key}}"
+    mode: 0700
+  with_dict: "{{users}}"
+  tags: [srv, lvm, postfix]
+
 - name: install packages
   yum:
     name: "{{item}}"
@@ -38,9 +65,9 @@
   tags: [srv, lsyncd, package]
 
 - name: copy rsyncd.conf
-  copy:
-    src: rsyncd.conf
-    dest: /etc
+  template:
+    src: rsyncd.conf.j2
+    dest: /etc/rsyncd.conf
   notify: restart rsyncd
   tags: [srv, lsyncd]
 

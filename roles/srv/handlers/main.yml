@@ -2,7 +2,7 @@
 - name: restart rsyncd
   service:
     name: rsyncd
-    state: reloaded
+    state: restarted
 
 - name: restart lsyncd
   service:
