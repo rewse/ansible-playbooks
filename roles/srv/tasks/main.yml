@@ -96,12 +96,12 @@
     regexp: 'fs.inotify.max_user_watches '
     line: 'fs.inotify.max_user_watches = 100000'
     create: yes
-  register: set_fsinotify
+  register: set_fsinotify_out
   tags: [srv, lsyncd]
 
 - name: reload sysctl
   command: sysctl -p
-  when: set_fsinotify|changed
+  when: set_fsinotify_out|changed
   tags: [srv, lsyncd]
 
 - name: enable rsyncd
