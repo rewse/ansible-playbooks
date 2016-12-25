@@ -58,12 +58,14 @@
   with_items:
     - mail.rewse.jp.{{cert_year}}.crt
     - mail.rewse.jp.{{cert_year}}.ca-bundle
+  register: copy_crt_files
   tags: [postfix, cert]
 
 - name: concat crt files
   shell: cat mail.rewse.jp.{{cert_year}}.crt mail.rewse.jp.{{cert_year}}.ca-bundle > mail.rewse.jp.withintermediate.{{cert_year}}.crt
   args:
     chdir: /etc/pki/tls/certs
+  when: copy_crt_files|changed
   tags: [postfix, cert]
 
 - name: copy key file
