@@ -228,6 +228,19 @@
   notify: restart postfix
   tags: [common, postfix]
 
+- name: wirte centos alias
+  lineinfile:
+    dest: /etc/aliases
+    insertbefore: '^# Basic '
+    line: 'centos: root'
+  register: write_centos_alias_out
+  tags: [common, postfix, aliases]
+
+- name: enable alias
+  command: newaliases
+  when: write_centos_alias_out|changed
+  tags: [common, postfix, aliases]
+
 - name: anacron; change start_hours_range
   lineinfile:
     dest: /etc/anacrontab
