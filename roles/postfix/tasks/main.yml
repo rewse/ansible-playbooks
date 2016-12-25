@@ -246,6 +246,13 @@
     - /etc/logrotate.d/sa-learn-all
   tags: [postfix, spamassassin]
 
+- name: create sa-learn-all.log
+  file:
+    path: /var/log/sa-learn-all.log
+    state: touch
+    mode: 0600
+  tags: [postfix, spamassassin]
+
 - name: use procmail
   lineinfile:
     dest: /etc/postfix/main.cf
