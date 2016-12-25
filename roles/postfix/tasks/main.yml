@@ -206,6 +206,23 @@
     state: started
   tags: [postfix, spamassassin]
 
+- name: clone sa-learn-all.git
+  git:
+    repo: git@github.com:rewse/sa-learn-all.git
+    dest: /srg/git/sa-learn-all
+  tags: [postfix, spamassassin]
+
+- name: copy sa-learn-all
+  copy:
+    src: /srv/git/sa-learn-all/{{item}}
+    dest: "{{item}}"
+    remote_src: yes
+  with_items:
+    - /usr/local/bin/sa-learn-all
+    - /etc/cron.daily/sa-learn-all.cron
+    - /etc/logrotate.d/sa-learn-all
+  tags: [postfix, spamassassin]
+
 - name: use procmail
   lineinfile:
     dest: /etc/postfix/main.cf
