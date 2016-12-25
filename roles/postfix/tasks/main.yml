@@ -232,12 +232,12 @@
 - name: clone sa-learn-all.git
   git:
     repo: git@github.com:rewse/sa-learn-all.git
-    dest: /srg/git/sa-learn-all
+    dest: /srv/git/sa-learn-all
   tags: [postfix, spamassassin]
 
 - name: copy sa-learn-all
   copy:
-    src: /srv/git/sa-learn-all/{{item}}
+    src: /srv/git/sa-learn-all{{item}}
     dest: "{{item}}"
     remote_src: yes
   with_items:
