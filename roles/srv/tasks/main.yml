@@ -71,6 +71,13 @@
   notify: restart rsyncd
   tags: [srv, lsyncd]
 
+- name: create rsyncd log
+  file:
+    path: /var/log/rsyncd.log
+    state: file
+    mode: 0600
+  tags: [srv, lsyncd]
+
 - name: copy logrotate.d/rsyncd
   copy:
     src: rsyncd
@@ -81,6 +88,17 @@
   file:
     path: /var/log/lsyncd
     state: directory
+    mode: 0700
+  tags: [srv, lsyncd]
+
+- name: create lsyncd logs
+  file:
+    path: /var/log/lsyncd/{{item}}
+    state: file
+    mode: 0600
+  with_items:
+    - lsyncd.log
+    - lsyncd.status
   tags: [srv, lsyncd]
 
 - name: copy lsyncd.conf
