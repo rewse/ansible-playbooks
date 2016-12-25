@@ -1,0 +1,8 @@
+/var/log/rsyncd.log {
+  missingok
+  nocreate
+  sharedscripts
+  postrotate
+    /sbin/service rsyncd restart > /dev/null 2>/dev/null || true
+  endscript
+}

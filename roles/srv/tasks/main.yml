@@ -1,0 +1,92 @@
+---
+- name: create vgsrv
+  lvg:
+    vg: vgsrv
+    pvs: /dev/xvdc
+  tags: [srv, strorage, lvm]
+
+- name: create vgsrv/mail
+  lvol:
+    vg: vgsrv
+    lv: mail
+    size: 4g
+  tags: [srv, lvm, postfix]
+
+- name: format vgsrv/mail
+  filesystem:
+    fstype: xfs
+    dev: /dev/vgsrv/mail
+  tags: [srv, lvm, postfix]
+
+- name: mount to /srv/mail
+  mount:
+    name: /srv/mail
+    src: /dev/vgsrv/mail
+    fstype: xfs
+    state: "{{item}}"
+  with_items:
+    - present
+    - mounted
+  tags: [srv, lvm, postfix]
+
+- name: install packages
+  yum:
+    name: "{{item}}"
+    state: installed
+  with_items:
+    - lsyncd
+  tags: [srv, lsyncd, package]
+
+- name: copy rsyncd.conf
+  copy:
+    src: rsyncd.conf
+    dest: /etc
+  notify: restart rsyncd
+  tags: [srv, lsyncd]
+
+- name: copy logrotate.d/rsyncd
+  copy:
+    src: rsyncd
+    dest: /etc/logrotate.d
+  tags: [srv, lsyncd]
+
+- name: create /var/log/lsyncd
+  file:
+    path: /var/log/lsyncd
+    state: directory
+  tags: [srv, lsyncd]
+
+- name: copy lsyncd.conf
+  template:
+    src: lsyncd.conf.j2
+    dest: /etc/lsyncd.conf
+  notify: restart lsyncd
+  tags: [srv, lsyncd]
+
+- name: set fs.inotify.max_user_watches
+  lineinfile:
+    dest: /etc/sysctl.d/lsyncd.conf
+    regexp: 'fs.inotify.max_user_watches '
+    line: 'fs.inotify.max_user_watches = 100000'
+    create: yes
+  register: set_fsinotify
+  tags: [srv, lsyncd]
+
+- name: reload sysctl
+  command: sysctl -p
+  when: set_fsinotify|changed
+  tags: [srv, lsyncd]
+
+- name: enable rsyncd
+  service:
+    name: rsyncd
+    enabled: yes
+    state: started
+  tags: [srv, lsyncd]
+
+- name: enable lsyncd
+  service:
+    name: lsyncd
+    enabled: yes
+    state: started
+  tags: [srv, lsyncd]

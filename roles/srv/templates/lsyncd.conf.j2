@@ -1,0 +1,17 @@
+settings {
+  insist = true,
+  logfile = "/var/log/lsyncd/lsyncd.log",
+  statusFile = "/var/log/lsyncd/lsyncd.status",
+  pidfile = "/var/run/lsyncd.pid"
+}
+
+sync {
+  default.rsync,
+  source="/srv/mail/",
+{% if ansible_hostname == "charlie" %}
+  target="foxtrot.rewse.jp::mail",
+{% elif ansible_hostname == "foxtrot" %}
+  target="charlie.rewse.jp::mail",
+{% endif %}
+  init = false
+}

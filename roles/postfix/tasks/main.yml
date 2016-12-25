@@ -192,15 +192,10 @@
     mode: 0755
   tags: [postfix, spamassassin]
 
-- name: create private_prefs
-  blockinfile:
-    dest: /etc/mail/spamassassin/private_prefs
-    content: |
-      trusted_networks 192.168.0.1/16 {{global_ip.home}} {{global_ip.office}}
-      score BAYES_80 11
-      score BAYES_95 13
-      score BAYES_99 15
-      report_safe 0
+- name: copy private_prefs
+  copy:
+    src: private_prefs
+    dest: /etc/mail/spamassassin
   notify: reload spamassassin
   tags: [postfix, spamassassin]
 

@@ -244,19 +244,10 @@
     line: 'preserve_hostname: true'
   tags: [common, cloud-init]
 
-- name: create /etc/profile.d/pathmunge.sh
-  blockinfile:
-    dest: /etc/profile.d/pathmunge.sh
-    content: |
-      pathmunge /usr/local/bin
-
-      if [ "$EUID" = "0" ]; then
-        pathmunge /usr/local/sbin
-      else
-        pathmunge /usr/local/sbin after
-      fi
-
-      export PATH
+- name: copy profile.d/pathmunge.sh
+  copy:
+    src: pathmunge.sh
+    dest: /etc/profile.d
   tags: [common, bash]
 
 - name: input; set editing-mode to vi
@@ -411,14 +402,10 @@
     follow: yes
   tags: [common, user]
 
-- name: create .ssh/config
-  blockinfile:
-    dest: /home/{{admin}}/.ssh/config
-    content: |
-      Host rewse.jp
-        User {{ssh.rewse_jp.username}}
-        Port {{ssh.rewse_jp.port}}
-    create: yes
+- name: copy .ssh/config
+  copy:
+    src: config
+    dest: /home/{{admin}}/.ssh
     owner: "{{admin}}"
     group: "{{admin}}"
   tags: [common, user]
