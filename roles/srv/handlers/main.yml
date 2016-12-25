@@ -1,0 +1,10 @@
+---
+- name: restart rsyncd
+  service:
+    name: rsyncd
+    state: reloaded
+
+- name: restart lsyncd
+  service:
+    name: lsyncd
+    state: restarted
