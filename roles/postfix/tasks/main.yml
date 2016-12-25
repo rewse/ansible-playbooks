@@ -42,12 +42,12 @@
   notify: reload postfix
   tags: [postfix]
 
-- name: set home_mailbox
+- name: set mail_spool_directory
   lineinfile:
     dest: /etc/postfix/main.cf
-    insertafter: '^#home_mailbox '
-    regexp: '^home_mailbox '
-    line: 'home_mailbox = Maildir/'
+    insertafter: '^#mail_spool_directory '
+    regexp: '^mail_spool_directory '
+    line: 'mail_spool_directory = /srv/mail/'
   notify: reload postfix
   tags: [postfix]
 
@@ -264,7 +264,7 @@
     dest: /etc/dovecot/conf.d/10-mail.conf
     insertafter: '^#mail_location '
     regexp: '^mail_location '
-    line: 'mail_location = maildir:~/Maildir'
+    line: 'mail_location = maildir:/srv/mail/%u'
   notify: reload dovecot
   tags: [postfix, dovecot]
 
