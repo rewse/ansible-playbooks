@@ -51,18 +51,6 @@
   notify: reload postfix
   tags: [postfix]
 
-- name: mount rewse-mail-tats
-  mount:
-    name: /home/{{admin}}/Maildir
-    src: /opt/go/bin/goofys#rewse-mail-{{admin}}
-    fstype: fuse
-    opts: _netdev,allow_other,--file-mode=0644,--uid=1001,--gid=1001
-    state: "{{item}}"
-  with_items:
-    - mounted
-    - present
-  tags: [postfix, goofys]
-
 - name: copy certbot.cron
   copy:
     src: certbot.cron
