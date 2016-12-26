@@ -8,5 +8,10 @@ charlie.rewse.jp
 charlie.rewse.jp
 foxtrot.rewse.jp
 
-[standby-servers]
+[personal-standby-servers]
+foxtrot.rewse.jp
+
+[machines]
+atom.rewse.jp
+charlie.rewse.jp
 foxtrot.rewse.jp

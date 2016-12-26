@@ -3,7 +3,6 @@
   become: yes
   remote_user: centos
   roles:
-    - common
     - desktop
-    - database-client
-    - database-client-gui
+    - database/client
+    - database/client/gui

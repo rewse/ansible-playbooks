@@ -1,0 +1,11 @@
+log file = /var/log/rsyncd.log
+pid file = /var/run/rsyncd.pid
+read only = false
+
+{% for user in users %}
+[mail-{{user}}]
+path = /srv/mail/{{user}}
+uid = {{user}}
+gid = {{user}}
+
+{% endfor %}

@@ -3,6 +3,8 @@
   become: yes
   remote_user: centos
   roles:
-    - common
+    - srv
     - postfix
-    - zabbix-server
+    - zabbix/server
+
+- include: personal-standby-servers.yml

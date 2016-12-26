@@ -1,0 +1,20 @@
+settings {
+  insist = true,
+  logfile = "/var/log/lsyncd/lsyncd.log",
+  statusFile = "/var/log/lsyncd/lsyncd.status",
+  pidfile = "/var/run/lsyncd.pid"
+}
+
+{% for user in users %}
+sync {
+  default.rsync,
+  source="/srv/mail/{{user}}",
+{% if ansible_hostname == "charlie" %}
+  target="foxtrot.rewse.jp::mail-{{user}}",
+{% elif ansible_hostname == "foxtrot" %}
+  target="charlie.rewse.jp::mail-{{user}}",
+{% endif %}
+  init = false
+}
+
+{% endfor %}

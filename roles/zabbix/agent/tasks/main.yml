@@ -1,0 +1,95 @@
+---
+- name: install zabbix-release
+  yum:
+    name: "{{zabbix_release_url}}"
+    state: installed
+  tags: [zabbix-agent, package]
+
+- name: install zabbix clients
+  yum:
+    name: "{{item}}"
+    state: installed
+  with_items:
+    - zabbix-agent
+    - zabbix-sender
+  tags: [zabbix-agent, package]
+
+- name: add priority into /etc/yum.repos.d/zabbix.repo
+  ini_file:
+    dest: /etc/yum.repos.d/zabbix.repo
+    section: "{{item}}"
+    option: priority
+    value: 30
+    no_extra_spaces: True
+  with_items:
+    - zabbix
+    - zabbix-non-supported
+  tags: [zabbix-agent, package]
+
+- name: zabbix; set zabbix server
+  lineinfile:
+    dest: /etc/zabbix/zabbix_agentd.conf
+    regexp: 'Server='
+    line: 'Server={{zabbix_server_name}}'
+  notify: restart zabbix-agent
+  tags: [zabbix-agent]
+
+- name: zabbix; set zabbix server active
+  lineinfile:
+    dest: /etc/zabbix/zabbix_agentd.conf
+    regexp: 'ServerActive='
+    line: 'ServerActive={{zabbix_server_name}}'
+  notify: restart zabbix-agent
+  tags: [zabbix-agent]
+
+- name: zabbix; set hostname
+  lineinfile:
+    dest: /etc/zabbix/zabbix_agentd.conf
+    regexp: 'Hostname='
+    line: 'Hostname={{ansible_nodename}}'
+  notify: restart zabbix-agent
+  tags: [zabbix-agent]
+
+- name: zabbix; copy centos7.conf
+  copy:
+    src: centos7.conf
+    dest: /etc/zabbix/zabbix_agentd.d
+  tags: [zabbix-agent]
+
+- name: zabbix; rm userparameter_mysql.conf
+  file:
+    path: /etc/zabbix/zabbix_agentd.d/userparameter_mysql.conf
+    state: absent
+  notify: restart zabbix-agent
+  tags: [zabbix-agent]
+
+- name: change permission of /var/log/messages
+  file:
+    path: /var/log/messages
+    group: zabbix
+    mode: 0640
+  tags: [zabbix-agent]
+
+- name: allow sudo to zabbix
+  lineinfile:
+    dest: /etc/sudoers.d/zabbix
+    regexp: '^zabbix'
+    line: 'zabbix ALL=(ALL) NOPASSWD: /usr/bin/journalctl'
+    create: yes
+    mode: 0440
+    validate: 'visudo -cf %s'
+  tags: [zabbix-agent]
+
+- name: add zabbix to systemd-journal group
+  user:
+    name: zabbix
+    groups: 'zabbix,systemd-journal'
+  notify: restart zabbix-agent
+  tags: [zabbix-agent]
+
+- name: zabbix; enable zabbix-agent
+  service:
+    name: zabbix-agent
+    enabled: yes
+  notify: restart zabbix-agent
+  tags: [zabbix-agent]

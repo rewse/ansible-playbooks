@@ -4,3 +4,4 @@ roles/database-client/files/oracle*
 roles/database-client/files/sqlcl*
 roles/database-client-gui/files/jdk*
 roles/database-client-gui/files/sqldeveloper*
+roles/postfix/files/*.key
