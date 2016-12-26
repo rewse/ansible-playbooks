@@ -118,19 +118,11 @@
   notify: restart lsyncd
   tags: [srv, lsyncd]
 
-  # Do not use sysctl module because it adds to /etc/sysctl.conf diretly.
 - name: set fs.inotify.max_user_watches
-  lineinfile:
-    dest: /etc/sysctl.d/lsyncd.conf
-    regexp: 'fs.inotify.max_user_watches '
-    line: 'fs.inotify.max_user_watches = 100000'
-    create: yes
-  register: set_fsinotify_out
-  tags: [srv, lsyncd]
-
-- name: reload sysctl
-  command: sysctl -p
-  when: set_fsinotify_out|changed
+  sysctl:
+    name: fs.inotify.max_user_watches
+    value: 100000
+    sysctl_file: /etc/sysctl.d/lsyncd.conf
   tags: [srv, lsyncd]
 
 - name: enable rsyncd
