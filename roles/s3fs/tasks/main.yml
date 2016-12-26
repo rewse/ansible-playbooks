@@ -1,0 +1,46 @@
+---
+- name: install packages
+  yum:
+    name: "{{item}}"
+    state: installed
+  with_items:
+    - automake
+    - fuse
+    - fuse-devel
+    - gcc-c++
+    - git
+    - libcurl-devel
+    - libxml2-devel
+    - make
+    - openssl-devel
+  tags: [s3fs, package]
+
+- name: clone s3fs
+  git:
+    repo: https://github.com/s3fs-fuse/s3fs-fuse.git
+    dest: /srv/git/s3fs-fuse
+  tags: [s3fs]
+
+- name: run autogen.sh
+  command: ./autogen.sh
+  args:
+    chdir: /srv/git/s3fs-fuse
+  tags: [s3fs]
+
+- name: run configure
+  command: ./configure
+  args:
+    chdir: /srv/git/s3fs-fuse
+  tags: [s3fs]
+
+- name: run make
+  command: make
+  args:
+    chdir: /srv/git/s3fs-fuse
+  tags: [s3fs]
+
+- name: run make install
+  command: make install
+  args:
+    chdir: /srv/git/s3fs-fuse
+  tags: [s3fs]

@@ -1,5 +1,25 @@
 ---
+- name: reload amavisd
+  service:
+    name: amavisd
+    state: reloaded
+
+- name: reload dovecot
+  service:
+    name: dovecot
+    state: reloaded
+
+- name: reload postfix
+  service:
+    name: postfix
+    state: reloaded
+
 - name: restart postfix
   service:
-    name: postifx
+    name: postfix
     state: restarted
+
+- name: reload spamassassin
+  service:
+    name: spamassassin
+    state: reloaded

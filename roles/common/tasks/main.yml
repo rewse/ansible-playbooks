@@ -29,6 +29,22 @@
     state: present
   tags: [common, storage, swap]
 
+- name: get enforce
+  command: getenforce
+  register: getenforce_out
+  changed_when: False
+  tags: [common, selinux]
+
+- name: set enforce to 0
+  command: setenforce 0
+  when: getenforce_out.stdout.find('Disabled') == -1
+  tags: [common, selinux]
+
+- name: disable selinux
+  selinux:
+    state: disabled
+  tags: [common, selinux]
+
 - name: install additional packages
   yum:
     name: "{{item}}"
@@ -40,15 +56,15 @@
     - bind-utils
     - dstat
     - epel-release
+    - firewalld
     - git
     - logwatch
+    - lsof
     - mlocate
     - net-tools
     - nfs-utils
     - patch
     - prelink
-    - selinux-policy-devel
-    - setroubleshoot-server
     - source-highlight
     - sysstat
     - telnet
@@ -67,21 +83,6 @@
   with_items:
     - etckeeper
   tags: [common, epel, package]
-
-- name: install zabbix-release
-  yum:
-    name: "{{zabbix_release_url}}"
-    state: installed
-  tags: [common, package, zabbix]
-
-- name: install zabbix clients
-  yum:
-    name: "{{item}}"
-    state: installed
-  with_items:
-    - zabbix-agent
-    - zabbix-sender
-  tags: [common, package, zabbix]
 
 - name: download get-pip.py
   get_url:
@@ -132,18 +133,6 @@
     - extras
   tags: [common, package]
 
-- name: add priority into /etc/yum.repos.d/zabbix.repo
-  ini_file:
-    dest: /etc/yum.repos.d/zabbix.repo
-    section: "{{item}}"
-    option: priority
-    value: 30
-    no_extra_spaces: True
-  with_items:
-    - zabbix
-    - zabbix-non-supported
-  tags: [common, package, zabbix]
-
 - name: add priority into /etc/yum.repos.d/epel.repo
   ini_file:
     dest: /etc/yum.repos.d/epel.repo
@@ -167,30 +156,44 @@
 - name: postfix; change myorigin
   lineinfile:
     dest: /etc/postfix/main.cf
-    insertafter: '^#myorigin'
-    regexp: '^myorigin'
+    insertafter: '^#myorigin '
+    regexp: '^myorigin '
     line: 'myorigin = rewse.jp'
   notify: reload postfix
-  tags: [common, mail, postfix]
+  tags: [common, postfix]
 
 - name: postfix; change relayhost
   lineinfile:
     dest: /etc/postfix/main.cf
-    insertafter: '^#relayhost'
-    regexp: '^relayhost'
+    insertafter: '^#relayhost '
+    regexp: '^relayhost '
     line: 'relayhost = [{{relayhost.name}}]:{{relayhost.port}}'
   notify: reload postfix
-  tags: [common, mail, postfix]
+  tags: [common, postfix]
 
-- name: postfix; support sasl
-  blockinfile:
+- name: postfix; set smtp_sasl_auth_enable
+  lineinfile:
     dest: /etc/postfix/main.cf
-    content: |
-      smtp_sasl_auth_enable = yes
-      smtp_sasl_password_maps = hash:/etc/postfix/sasl_passwd
-      smtp_sasl_security_options = noplaintext, noanonymous
+    regexp: '^smtp_sasl_auth_enable '
+    line: 'smtp_sasl_auth_enable = yes'
   notify: reload postfix
-  tags: [common, mail, postfix]
+  tags: [common, postfix]
+
+- name: postfix; set smtp_sasl_password_maps
+  lineinfile:
+    dest: /etc/postfix/main.cf
+    regexp: 'smtp_sasl_password_maps '
+    line: 'smtp_sasl_password_maps = hash:/etc/postfix/sasl_passwd'
+  notify: reload postfix
+  tags: [common, postfix]
+
+- name: postfix; set smtp_sasl_security_options
+  lineinfile:
+    dest: /etc/postfix/main.cf
+    regexp: 'smtp_sasl_security_options '
+    line: 'smtp_sasl_security_options = noplaintext, noanonymous'
+  notify: reload postfix
+  tags: [common, postfix]
 
 - name: postfix; create sasl_passwd
   lineinfile:
@@ -200,20 +203,20 @@
     create: yes
     mode: 0600
   register: postfix_sasl_password_res
-  tags: [common, mail, postfix]
+  tags: [common, postfix]
 
 - name: postfix; create sasl_passwd.db
   file:
     path: /etc/postfix/sasl_passwd.db
     state: file
     mode: 0600
-  tags: [common, mail, postfix]
+  tags: [common, postfix]
 
 - name: postfix; hash sasl_passwd
   command: postmap hash:/etc/postfix/sasl_passwd
   when: postfix_sasl_password_res|changed
   notify: reload postfix
-  tags: [common, mail, postfix]
+  tags: [common, postfix]
 
 - name: install sasl packages
   yum:
@@ -223,7 +226,20 @@
     - cyrus-sasl-md5
     - cyrus-sasl-plain
   notify: restart postfix
-  tags: [common, mail, postfix]
+  tags: [common, postfix]
+
+- name: wirte centos alias
+  lineinfile:
+    dest: /etc/aliases
+    insertbefore: '^# Basic '
+    line: 'centos: root'
+  register: write_centos_alias_out
+  tags: [common, postfix, aliases]
+
+- name: enable alias
+  command: newaliases
+  when: write_centos_alias_out|changed
+  tags: [common, postfix, aliases]
 
 - name: anacron; change start_hours_range
   lineinfile:
@@ -241,19 +257,10 @@
     line: 'preserve_hostname: true'
   tags: [common, cloud-init]
 
-- name: create /etc/profile.d/pathmunge.sh
-  blockinfile:
-    dest: /etc/profile.d/pathmunge.sh
-    content: |
-      pathmunge /usr/local/bin
-
-      if [ "$EUID" = "0" ]; then
-        pathmunge /usr/local/sbin
-      else
-        pathmunge /usr/local/sbin after
-      fi
-
-      export PATH
+- name: copy profile.d/pathmunge.sh
+  copy:
+    src: pathmunge.sh
+    dest: /etc/profile.d
   tags: [common, bash]
 
 - name: input; set editing-mode to vi
@@ -288,39 +295,21 @@
   tags: [common, logwatch]
 
 - name: rsyslog; add a template
-  template:
-    src: rsyslog.conf.j2
-    dest: /etc/rsyslog.d/00-template.conf
+  copy:
+    src: 00-template.conf
+    dest: /etc/rsyslog.d
   notify: restart rsyslog
   tags: [common, rsyslog]
 
-- name: remove selinux samples
-  file:
-    path: /usr/share/selinux/devel/{{item}}
-    state: absent
-  with_items:
-    - example.fc
-    - example.if
-    - example.te
-  tags: [common, selinux]
-
-- name: setroubleshoot; set email
-  lineinfile:
-    dest: /var/lib/setroubleshoot/email_alert_recipients
-    regexp: "{{email.secondary}}"
-    line: "{{email.secondary}}"
-    create: yes
-  notify: restart dbus
-  tags: [common, setroubleshoot]
-
-- name: setroubleshoot; change sender email
-  ini_file:
-    dest: /etc/setroubleshoot/setroubleshoot.conf
-    section: email
-    option: from_address
-    value: SELinux_Troubleshoot@rewse.jp
-  notify: restart dbus
-  tags: [common, setroubleshoot]
+  # See also "Bug 1072368 - user manager message flood"
+  # <https://bugzilla.redhat.com/show_bug.cgi?id=1072368>. Do not use
+  # <https://access.redhat.com/solutions/1564823> because it's not enough.
+- name: rsyslog; ignore systemd-logind
+  copy:
+    src: ignore-systemd-logind.conf
+    dest: /etc/rsyslog.d
+  notify: restart rsyslog
+  tags: [common, rsyslog]
 
 - name: ssh; change ClientAliveInterval
   lineinfile:
@@ -364,102 +353,6 @@
     enabled: yes
   notify: restart yum-cron
   tags: [common, yum-cron]
-
-- name: zabbix; set zabbix server
-  lineinfile:
-    dest: /etc/zabbix/zabbix_agentd.conf
-    regexp: 'Server='
-    line: 'Server={{zabbix_server_name}}'
-  notify: restart zabbix-agent
-  tags: [common, zabbix-agent]
-
-- name: zabbix; set zabbix server active
-  lineinfile:
-    dest: /etc/zabbix/zabbix_agentd.conf
-    regexp: 'ServerActive='
-    line: 'ServerActive={{zabbix_server_name}}'
-  notify: restart zabbix-agent
-  tags: [common, zabbix-agent]
-
-- name: zabbix; set hostname
-  lineinfile:
-    dest: /etc/zabbix/zabbix_agentd.conf
-    regexp: 'Hostname='
-    line: 'Hostname={{ansible_nodename}}'
-  notify: restart zabbix-agent
-  tags: [common, zabbix-agent]
-
-- name: zabbix; add centos7.conf
-  blockinfile:
-    dest: /etc/zabbix/zabbix_agentd.d/centos7.conf
-    content: |
-      UserParameter=vfs.dev.util[*],iostat -xk 5 2 | grep $1 | tail -1 | awk '{print $$14}'
-      UserParameter=proc.top[*],top c -b -n 1 -w 512 | sed 's/ *$//' | sed -n '7,17p'
-      UserParameter=postfix.queue.num,echo "(`mailq | wc -l` - 2) / 3" | bc
-      UserParameter=journal[*],journalctl -p $1 -n 10 | tac
-    create: yes
-  tags: [common, zabbix-agent]
-
-- name: zabbix; rm userparameter_mysql.conf
-  file:
-    path: /etc/zabbix/zabbix_agentd.d/userparameter_mysql.conf
-    state: absent
-  notify: restart zabbix-agent
-  tags: [common, zabbix-agent]
-
-- name: change permission of /var/log/messages
-  file:
-    path: /var/log/messages
-    group: zabbix
-    mode: 0640
-  tags: [common, zabbix-agent]
-
-- name: allow sudo to zabbix
-  lineinfile:
-    dest: /etc/sudoers.d/zabbix
-    regexp: '^zabbix'
-    line: 'zabbix ALL=(ALL) NOPASSWD: /usr/bin/journalctl'
-    create: yes
-    mode: 0440
-    validate: 'visudo -cf %s'
-  tags: [common, zabbix-agent]
-
-- name: add zabbix to systemd-journal group
-  user:
-    name: zabbix
-    groups: 'zabbix,systemd-journal'
-  notify: restart zabbix-agent
-  tags: [common, zabbix-agent]
-
-- name: copy zabbix-agent.te
-  copy:
-    src: my-zabbix-agent.te
-    dest: /usr/share/selinux/devel
-  tags: [common, selinux, zabbix-agent]
-
-- name: rebuild selinux-policy
-  command: make
-  args:
-    chdir: /usr/share/selinux/devel
-  tags: [common, selinux, zabbix-agent]
-
-- name: install my-zabbix-agent selinux module
-  command: semodule -i /usr/share/selinux/devel/my-zabbix-agent.pp
-  tags: [common, selinux, zabbix-agent]
-
-- name: selinux alllows daemons enable coluster mode
-  seboolean:
-    name: daemons_enable_cluster_mode
-    state: yes
-    persistent: yes
-  tags: [zabbix-server, selinux, zabbix-agent]
-
-- name: zabbix; enable zabbix-agent
-  service:
-    name: zabbix-agent
-    enabled: yes
-  notify: restart zabbix-agent
-  tags: [common, zabbix-agent]
 
 - name: add a group for admin user
   group:
@@ -522,14 +415,10 @@
     follow: yes
   tags: [common, user]
 
-- name: create .ssh/config
-  blockinfile:
-    dest: /home/{{admin}}/.ssh/config
-    content: |
-      Host rewse.jp
-        User {{ssh.rewse_jp.username}}
-        Port {{ssh.rewse_jp.port}}
-    create: yes
+- name: copy .ssh/config
+  copy:
+    src: config
+    dest: /home/{{admin}}/.ssh
     owner: "{{admin}}"
     group: "{{admin}}"
   tags: [common, user]

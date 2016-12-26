@@ -1,0 +1,5 @@
+trusted_networks 192.168.0.1/16 {{global_ip.home}} {{global_ip.office}}
+score BAYES_80 11
+score BAYES_95 13
+score BAYES_99 15
+report_safe 0

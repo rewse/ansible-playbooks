@@ -1,0 +1,4 @@
+---
+email:
+  primary: "{{vault_email.primary}}"
+  secondary: "{{vault_email.secondary}}"
