@@ -312,7 +312,7 @@
   # <https://access.redhat.com/solutions/1564823> because it's not enough.
 - name: rsyslog; ignore systemd-logind
   copy:
-    src: ignore-systemd-logind.conf
+    src: systemd-logind.conf
     dest: /etc/rsyslog.d
   notify: restart rsyslog
   tags: [common, rsyslog]
