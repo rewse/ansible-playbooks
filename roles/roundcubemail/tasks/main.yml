@@ -1,0 +1,38 @@
+---
+- name: install packages
+  yum:
+    name: "{{item}}"
+    state: installed
+  with_items:
+    - php-mcrypt
+    - roundcubemail
+  tags: [roundcubemail]
+
+- name: copy to config.inc.php
+  copy:
+    src: /etc/roundcubemail/config.inc.php.sample
+    dest: /etc/roundcubemail/config.inc.php
+    remote_src: yes
+  tags: [roundcubemail]
+
+- name: set enable_installer
+  lineinfile:
+    dest: /etc/roundcubemail/config.inc.php
+    regexp: '^\$config\[.enable_installer.\] '
+    line: "$config['enable_installer'] = true;"
+  tags: [roundcubemail]
+
+- name: set db_dsnw
+  lineinfile:
+    dest: /etc/roundcubemail/config.inc.php
+    regexp: '^\$config\[.db_dsnw.\] '
+    line: "$config['db_dsnw'] = 'mysql://roundcubemail:ZxycLPy97bbCq21w@mysql.rewse.jp/roundcubemail';"
+  tags: [roundcubemail]
+
+- name: set Require
+  replace:
+    dest: /etc/httpd/conf.d/roundcubemail.conf
+    regexp: 'Require local'
+    replace: 'Require ip {{global_ip.home}} {{global_ip.office}}'
+  notify: reload httpd
+  tags: [roundcubemail]
