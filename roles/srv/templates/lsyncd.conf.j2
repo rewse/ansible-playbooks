@@ -7,6 +7,17 @@ settings {
 
 sync {
   default.rsync,
+  source="/srv/www",
+{% if ansible_hostname == "srv1" %}
+  target="srv2.rewse.jp::www",
+{% elif ansible_hostname == "srv2" %}
+  target="srv1.rewse.jp::www",
+{% endif %}
+  init = false
+}
+
+sync {
+  default.rsync,
   source="/srv/mailman/etc",
 {% if ansible_hostname == "charlie" %}
   target="foxtrot.rewse.jp::mailman-etc",
