@@ -7,6 +7,7 @@
     - httpd
     - mod_ssl
     - https://dl-ssl.google.com/dl/linux/direct/mod-pagespeed-stable_current_x86_64.rpm
+    - php
   tags: [httpd]
 
 - name: set ServerAdmin
@@ -85,6 +86,14 @@
     src: phpinfo.php
     dest: /srv/www/html/admin
   tags: [httpd]
+
+- name: set PHP timezone
+  lineinfile:
+    dest: /etc/php.ini
+    insertafter: '^;date.timezone '
+    regexp: '^date.timezone '
+    line: 'date.timezone = "Asia/Tokyo"'
+  tags: [httpd, php]
 
 - name: enable httpd
   service:
