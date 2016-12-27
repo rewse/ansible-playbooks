@@ -62,14 +62,14 @@
 - name: copy admin.conf
   template:
     src: admin.conf.j2
-    dest: /etc/httpd/conf.d
+    dest: /etc/httpd/conf.d/admin.conf
   notify: reload httpd
   tags: [httpd]
 
-- name: copy server-status.conf
+- name: copy status.conf
   template:
-    src: server-status.conf.j2
-    dest: /etc/httpd/conf.d
+    src: status.conf.j2
+    dest: /etc/httpd/conf.d/status.conf
   notify: reload httpd
   tags: [httpd]
 
