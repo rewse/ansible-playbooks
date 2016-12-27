@@ -5,6 +5,7 @@
   roles:
     - srv
     - httpd
+    - phpmyadmin
     - postfix
     - mailman
     - zabbix/server
