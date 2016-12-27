@@ -13,7 +13,7 @@
 
 - name: copy Ricty fonts
   copy:
-    src: "{{ricty_dir}}/{{item}}"
+    src: "{{item}}"
     dest: /usr/local/share/fonts/Ricty
   with_items:
     - Ricty-Regular.ttf
