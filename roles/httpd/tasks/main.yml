@@ -1,0 +1,93 @@
+---
+- name: install packages
+  yum:
+    name: "{{item}}"
+    state: installed
+  with_items:
+    - httpd
+    - mod_ssl
+  tags: [httpd]
+
+- name: set ServerAdmin
+  lineinfile:
+    dest: /etc/httpd/conf/httpd.conf
+    regexp: '^ServerAdmin '
+    line: 'ServerAdmin hostmaster@rewse.jp'
+  notify: reload httpd
+  tags: [httpd]
+
+  # TODO: change after rewse.jp moves AWS
+- name: set ServerName
+  lineinfile:
+    dest: /etc/httpd/conf/httpd.conf
+    insertafter: '^#ServerName'
+    regexp: '^ServerName '
+    line: 'ServerName aws.rewse.jp:80'
+  notify: reload httpd
+  tags: [httpd]
+
+- name: set ErrorLog
+  lineinfile:
+    dest: /etc/httpd/conf/httpd.conf
+    regexp: '^ErrorLog '
+    line: 'ErrorLog syslog'
+  notify: reload httpd
+  tags: [httpd]
+
+- name: set LogLevel
+  lineinfile:
+    dest: /etc/httpd/conf/httpd.conf
+    regexp: '^LogLevel '
+    line: 'LogLevel notice'
+  notify: reload httpd
+  tags: [httpd]
+
+- name: set LogFormat
+  lineinfile:
+    dest: /etc/httpd/conf/httpd.conf
+    insertafter: '^    LogFormat'
+    regexp: '^    LogFormat..*elbcombined$'
+    line: '    LogFormat "%{X-Forwarded-For}i %l %u %t \"%r\" %>s %b \"%{Referer}i\" \"%{User-Agent}i\" %h %{X-Forwarded-Proto}i" elbcombined'
+  notify: reload httpd
+  tags: [httpd]
+
+- name: set CustomLog
+  lineinfile:
+    dest: /etc/httpd/conf/httpd.conf
+    regexp: '^    CustomLog'
+    line: '    CustomLog "logs/access_log" elbcombined'
+  notify: reload httpd
+  tags: [httpd]
+
+- name: copy admin.conf
+  template:
+    src: admin.conf.j2
+    dest: /etc/httpd/conf.d
+  notify: reload httpd
+  tags: [httpd]
+
+- name: copy server-status.conf
+  template:
+    src: server-status.conf.j2
+    dest: /etc/httpd/conf.d
+  notify: reload httpd
+  tags: [httpd]
+
+- name: create html/admin dir
+  file:
+    path: /srv/www/html/admin
+    state: directory
+  tags: [httpd]
+
+- name: copy phpinfo.php
+  copy:
+    src: phpinfo.php
+    dest: /srv/www/html/admin
+  tags: [httpd]
+
+- name: enable httpd
+  service:
+    name: httpd
+    enabled: yes
+    state: started
+  tags: [httpd]

@@ -4,6 +4,7 @@
   remote_user: centos
   roles:
     - srv
+    - httpd
     - postfix
     - mailman
     - zabbix/server
