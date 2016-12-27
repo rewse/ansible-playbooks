@@ -1,0 +1,8 @@
+<Directory /srv/www/html/admin>
+  Require ip {{global_ip.home}} {{global_ip.office}}
+  Require host www1.rewse.jp www2.rewse.jp
+
+  RewriteEngine on
+  RewriteCond %{HTTPS} !=on
+  RewriteRule (.*) https://%{HTTP_HOST}%{REQUEST_URI}
+</Directory>
