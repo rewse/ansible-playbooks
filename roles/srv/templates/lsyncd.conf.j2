@@ -19,10 +19,10 @@ sync {
 sync {
   default.rsync,
   source="/srv/mailman/etc",
-{% if ansible_hostname == "charlie" %}
-  target="foxtrot.rewse.jp::mailman-etc",
-{% elif ansible_hostname == "foxtrot" %}
-  target="charlie.rewse.jp::mailman-etc",
+{% if ansible_hostname == "srv1" %}
+  target="srv2.rewse.jp::mailman-etc",
+{% elif ansible_hostname == "srv2" %}
+  target="srv1.rewse.jp::mailman-etc",
 {% endif %}
   init = false
 }
@@ -30,10 +30,10 @@ sync {
 sync {
   default.rsync,
   source="/srv/mailman/var",
-{% if ansible_hostname == "charlie" %}
-  target="foxtrot.rewse.jp::mailman-var",
-{% elif ansible_hostname == "foxtrot" %}
-  target="charlie.rewse.jp::mailman-var",
+{% if ansible_hostname == "srv1" %}
+  target="srv2.rewse.jp::mailman-var",
+{% elif ansible_hostname == "srv2" %}
+  target="srv1.rewse.jp::mailman-var",
 {% endif %}
   init = false
 }
@@ -42,10 +42,10 @@ sync {
 sync {
   default.rsync,
   source="/srv/mail/{{user}}",
-{% if ansible_hostname == "charlie" %}
-  target="foxtrot.rewse.jp::mail-{{user}}",
-{% elif ansible_hostname == "foxtrot" %}
-  target="charlie.rewse.jp::mail-{{user}}",
+{% if ansible_hostname == "srv1" %}
+  target="srv2.rewse.jp::mail-{{user}}",
+{% elif ansible_hostname == "srv2" %}
+  target="srv1.rewse.jp::mail-{{user}}",
 {% endif %}
   init = false
 }
