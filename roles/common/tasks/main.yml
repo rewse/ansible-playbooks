@@ -64,6 +64,7 @@
     - net-tools
     - nfs-utils
     - patch
+    - perl-libwww-perl
     - prelink
     - source-highlight
     - sysstat
@@ -495,3 +496,90 @@
     dest: /etc/vimrc
     line: 'source /usr/share/vim/vimfiles/vimrc'
   tags: [common, dotifiles, vim]
+
+- name: create .aws dir
+  file:
+    path: /root/.aws
+    state: directory
+  tags: [srv, snapshot]
+
+- name: create .aws/config
+  file:
+    path: /root/.aws/config
+    state: touch
+    mode: 0600
+  tags: [srv, snapshot]
+
+- name: create .aws/credentials
+  file:
+    path: /root/.aws/credentials
+    state: touch
+    mode: 0600
+  tags: [srv, snapshot]
+
+- name: Set aws config
+  ini_file:
+    dest: /root/.aws/config
+    section: default
+    option: region
+    value: ap-northeast-1
+  tags: [srv, snapshot]
+
+- name: Set aws_access_key_id
+  ini_file:
+    dest: /root/.aws/credentials
+    section: default
+    option: aws_access_key_id
+    value: "{{aws.access_key_id}}"
+  tags: [srv, snapshot]
+
+- name: Set aws_secret_access_key
+  ini_file:
+    dest: /root/.aws/credentials
+    section: default
+    option: aws_secret_access_key
+    value: "{{aws.secret_access_key}}"
+  tags: [srv, snapshot]
+
+- name: clone aws-ec2-smart-snapshot
+  git:
+    repo: git@github.com:rewse/aws-ec2-smart-snapshot.git
+    dest: /srv/git/aws-ec2-smart-snapshot
+    accept_hostkey: yes
+    key_file: /home/{{admin}}/.ssh/id_rsa
+  tags: [srv, snapshot]
+
+- name: change mode of git/dotfiles
+  file:
+    path: /srv/git/aws-ec2-smart-snapshot
+    owner: "{{admin}}"
+    group: "{{admin}}"
+    recurse: yes
+  tags: [srv, snapshot]
+
+- name: copy aws-ec2-smart-snapshot
+  copy:
+    src: /srv/git/aws-ec2-smart-snapshot{{item}}
+    dest: "{{item}}"
+    remote_src: yes
+  with_items:
+    - /usr/local/sbin/aws-ec2-smart-snapshot
+    - /etc/cron.daily/00-aws-ec2-smart-snapshot.cron
+    - /etc/logrotate.d/aws-ec2-smart-snapshot
+  tags: [srv, snapshot]
+
+- name: change perm of aws-ec2-smart-snapshot
+  file:
+    path: "{{item}}"
+    mode: 0775
+  with_items:
+    - /usr/local/sbin/aws-ec2-smart-snapshot
+    - /etc/cron.daily/00-aws-ec2-smart-snapshot.cron
+  tags: [srv, snapshot]
+
+- name: create log/aws-ec2-smart-snapshot.log
+  file:
+    path: /var/log/aws-ec2-smart-snapshot.log
+    state: touch
+    mode: 0600
+  tags: [srv, snapshot]
