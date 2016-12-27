@@ -129,6 +129,13 @@
     line: '#Example'
   tags: [postfix, amavisd]
 
+- name: enable clamav-update
+  lineinfile:
+    dest: /etc/sysconfig/freshclam
+    regexp: 'FRESHCLAM_DELAY='
+    line: '#FRESHCLAM_DELAY=disabled-warn'
+  tags: [postfix, amavisd]
+
 - name: refresh clamav db
   command: freshclam
   tags: [postfix, amavisd]
