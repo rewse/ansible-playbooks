@@ -74,6 +74,15 @@
   notify: reload postfix
   tags: [mailman]
 
+- name: set RemoteIPHeader
+  lineinfile:
+    dest: /etc/httpd/conf.d/mailman.conf
+    insertbefore: '^ScriptAlias'
+    regexp: '^RemoteIPHeader '
+    line: 'RemoteIPHeader X-Forwarded-For'
+  notify: reload httpd
+  tags: [mailman]
+
 - name: set Require
   replace:
     dest: /etc/httpd/conf.d/mailman.conf

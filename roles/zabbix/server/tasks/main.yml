@@ -58,7 +58,24 @@
     insertafter: '# php_value date.timezone'
     regexp: '^ *php_value date.timezone'
     line: '        php_value date.timezone Asia/Tokyo'
-  notify: restart httpd
+  notify: reload httpd
+  tags: [zabbix-server, zabbix-web]
+
+- name: set RemoteIPHeader
+  lineinfile:
+    dest: /etc/httpd/conf.d/mailman.conf
+    insertbefore: '^Alias'
+    regexp: '^RemoteIPHeader '
+    line: 'RemoteIPHeader X-Forwarded-For'
+  notify: reload httpd
+  tags: [zabbix-server, zabbix-web]
+
+- name: set Require
+  replace:
+    dest: /etc/httpd/conf.d/zabbix.conf
+    regexp: 'Require all granted'
+    replace: 'Require ip {{global_ip.home}} {{global_ip.office}}'
+  notify: reload httpd
   tags: [zabbix-server, zabbix-web]
 
 - name: create zaibbx-web conf
