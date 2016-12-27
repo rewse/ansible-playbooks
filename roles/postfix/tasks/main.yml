@@ -136,6 +136,12 @@
     line: '#FRESHCLAM_DELAY=disabled-warn'
   tags: [postfix, amavisd]
 
+- name: copy rsyslog.d/clamd.conf
+  copy:
+    src: clamd.conf
+    dest: /etc/rsyslog.d
+  tags: [postfix, amavisd]
+
 - name: refresh clamav db
   command: freshclam
   tags: [postfix, amavisd]
