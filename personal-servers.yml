@@ -5,6 +5,7 @@
   roles:
     - srv
     - postfix
+    - mailman
     - zabbix/server
 
 - include: personal-standby-servers.yml

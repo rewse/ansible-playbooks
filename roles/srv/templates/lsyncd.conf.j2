@@ -5,6 +5,28 @@ settings {
   pidfile = "/var/run/lsyncd.pid"
 }
 
+sync {
+  default.rsync,
+  source="/srv/mailman/etc",
+{% if ansible_hostname == "charlie" %}
+  target="foxtrot.rewse.jp::mailman-etc",
+{% elif ansible_hostname == "foxtrot" %}
+  target="charlie.rewse.jp::mailman-etc",
+{% endif %}
+  init = false
+}
+
+sync {
+  default.rsync,
+  source="/srv/mailman/var",
+{% if ansible_hostname == "charlie" %}
+  target="foxtrot.rewse.jp::mailman-var",
+{% elif ansible_hostname == "foxtrot" %}
+  target="charlie.rewse.jp::mailman-var",
+{% endif %}
+  init = false
+}
+
 {% for user in users %}
 sync {
   default.rsync,

@@ -1,0 +1,20 @@
+---
+- name: reload httpd
+  service:
+    name: httpd
+    state: reloaded
+
+- name: restart lsyncd
+  service:
+    name: lsyncd
+    state: restarted
+
+- name: reload postfix
+  service:
+    name: postfix
+    state: reloaded
+
+- name: restart rsyncd
+  service:
+    name: rsyncd
+    state: restarted
