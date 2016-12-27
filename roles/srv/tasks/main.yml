@@ -5,6 +5,62 @@
     pvs: /dev/xvdc
   tags: [srv, strorage, lvm]
 
+- name: create vgsrv/mailman
+  lvol:
+    vg: vgsrv
+    lv: mailman
+    size: 20m
+  tags: [srv, lvm, mailman]
+
+- name: format vgsrv/mailman
+  filesystem:
+    fstype: xfs
+    dev: /dev/vgsrv/mailman
+  tags: [srv, lvm, mailman]
+
+- name: mount to /srv/mailman
+  mount:
+    name: /srv/mailman
+    src: /dev/vgsrv/mailman
+    fstype: xfs
+    state: "{{item}}"
+  with_items:
+    - present
+    - mounted
+  tags: [srv, lvm, mailman]
+
+- name: create /srv/mailman/etc dir
+  file:
+    path: /srv/mailman/etc
+    state: directory
+    owner: mailman
+    group: mailman
+    mode: 0775
+  tags: [srv, mailman]
+
+- name: create /etc/mailman link
+  file:
+    src: /srv/mailman/etc
+    dest: /etc/mailman
+    state: link
+  tags: [srv, mailman]
+
+- name: create /srv/mailman/var dir
+  file:
+    path: /srv/mailman/var
+    state: directory
+    owner: mailman
+    group: mailman
+    mode: 0775
+  tags: [srv, mailman]
+
+- name: create /var/lib/mailman link
+  file:
+    src: /srv/mailman/var
+    dest: /var/lib/mailman
+    state: link
+  tags: [srv, mailman]
+
 - name: create vgsrv/mail
   lvol:
     vg: vgsrv
@@ -34,7 +90,7 @@
     name: "{{item.key}}"
     gid: "{{item.value.gid}}"
   with_dict: "{{users}}"
-  tags: [srv, lvm, postfix]
+  tags: [srv, postfix]
 
 - name: create users
   user:
@@ -44,7 +100,7 @@
     comment: "{{item.value.comment}}"
     shell: "{{item.value.shell}}"
   with_dict: "{{users}}"
-  tags: [srv, lvm, postfix]
+  tags: [srv, postfix]
 
 - name: make mail user dir
   file:
@@ -54,7 +110,7 @@
     group: "{{item.key}}"
     mode: 0700
   with_dict: "{{users}}"
-  tags: [srv, lvm, postfix]
+  tags: [srv, postfix]
 
 - name: make mail user link
   file:
@@ -64,7 +120,7 @@
     owner: "{{item.key}}"
     group: "{{item.key}}"
   with_dict: "{{users}}"
-  tags: [srv, lvm, postfix]
+  tags: [srv, postfix]
 
 - name: install packages
   yum:
