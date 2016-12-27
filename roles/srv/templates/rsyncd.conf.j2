@@ -2,6 +2,11 @@ log file = /var/log/rsyncd.log
 pid file = /var/run/rsyncd.pid
 read only = false
 
+[www]
+path = /srv/www
+uid = root
+gid = root
+
 [mailman-etc]
 path = /srv/mailman/etc
 uid = mailman

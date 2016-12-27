@@ -5,6 +5,37 @@
     pvs: /dev/xvdc
   tags: [srv, strorage, lvm]
 
+- name: create vgsrv/www
+  lvol:
+    vg: vgsrv
+    lv: www
+    size: 4g
+  tags: [srv, lvm, httpd]
+
+- name: format vgsrv/www
+  filesystem:
+    fstype: xfs
+    dev: /dev/vgsrv/www
+  tags: [srv, lvm, httpd]
+
+- name: mount to /srv/www
+  mount:
+    name: /srv/www
+    src: /dev/vgsrv/www
+    fstype: xfs
+    state: "{{item}}"
+  with_items:
+    - present
+    - mounted
+  tags: [srv, lvm, httpd]
+
+- name: create /var/www link
+  file:
+    src: /srv/www
+    dest: /var/www
+    state: link
+  tags: [srv, httpd]
+
 - name: create vgsrv/mailman
   lvol:
     vg: vgsrv
