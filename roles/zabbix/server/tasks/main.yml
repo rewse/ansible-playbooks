@@ -69,14 +69,31 @@
     mode: 0640
   tags: [zabbix-server, zabbix-web]
 
+- name: clone market-price-check.git
+  git:
+    repo: git@github.com:rewse/market-price-check.git
+    dest: /srv/git/market-price-check
+    accept_hostkey: yes
+    key_file: /home/{{admin}}/.ssh/id_rsa
+  tags: [zabbix-server, zabbix-extra]
+
+- name: change mode of git/dotfiles
+  file:
+    path: /srv/git/aws-ec2-smart-snapshot
+    owner: "{{admin}}"
+    group: "{{admin}}"
+    recurse: yes
+  tags: [zabbix-server, zabbix-extra]
+
 - name: copy to /usr/local/bin
   copy:
-    src: "{{item}}"
+    src: /srv/git/market-price-check/{{item}}
     dest: /usr/local/bin/
     mode: 0755
+    remote_src: yes
   with_items:
-    - market-price-check.py
-    - us-market-price-check.py
+    - market-price-check
+    - us-market-price-check
   tags: [zabbix-server, zabbix-extra]
 
 - name: download ssl-cert-check
