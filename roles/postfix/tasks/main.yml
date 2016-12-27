@@ -216,7 +216,7 @@
   tags: [postfix, spamassassin]
 
 - name: copy private_prefs
-  copy:
+  template:
     src: private_prefs
     dest: /etc/mail/spamassassin
   notify: reload spamassassin
