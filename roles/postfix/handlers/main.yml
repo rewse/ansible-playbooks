@@ -19,7 +19,7 @@
     name: postfix
     state: restarted
 
-- name: reload spamassassin
+- name: restart spamassassin
   service:
     name: spamassassin
-    state: reloaded
+    state: restarted
