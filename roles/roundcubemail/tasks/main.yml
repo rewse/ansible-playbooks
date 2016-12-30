@@ -19,14 +19,14 @@
   lineinfile:
     dest: /etc/roundcubemail/config.inc.php
     regexp: '^\$config\[.enable_installer.\] '
-    line: "$config['enable_installer'] = true;"
+    line: "$config['enable_installer'] = false;"
   tags: [roundcubemail]
 
 - name: set db_dsnw
   lineinfile:
     dest: /etc/roundcubemail/config.inc.php
     regexp: '^\$config\[.db_dsnw.\] '
-    line: "$config['db_dsnw'] = 'mysql://roundcubemail:ZxycLPy97bbCq21w@mysql.rewse.jp/roundcubemail';"
+    line: "$config['db_dsnw'] = 'mysql://roundcubemail:{{aurora.roundcubemail_password}}@mysql.rewse.jp/roundcubemail';"
   tags: [roundcubemail]
 
 - name: set Require
