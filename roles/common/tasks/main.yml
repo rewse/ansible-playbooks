@@ -422,7 +422,7 @@
   tags: [common, user]
 
 - name: copy .ssh/config
-  copy:
+  template:
     src: config
     dest: /home/{{admin}}/.ssh
     owner: "{{admin}}"
