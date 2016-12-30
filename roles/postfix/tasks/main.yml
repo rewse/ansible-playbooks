@@ -218,7 +218,7 @@
   get_url:
     url: http://www.flcl.org/~yoh/user_prefs
     dest: /etc/mail/spamassassin/local.cf
-  notify: reload spamassassin
+  notify: restart spamassassin
   tags: [postfix, spamassassin]
 
 - name: copy updatesaconf.cron
@@ -230,9 +230,9 @@
 
 - name: copy private_prefs
   template:
-    src: private_prefs
-    dest: /etc/mail/spamassassin
-  notify: reload spamassassin
+    src: private_prefs.j2
+    dest: /etc/mail/spamassassin/private_prefs
+  notify: restart spamassassin
   tags: [postfix, spamassassin]
 
 - name: start spamassassin
