@@ -19,13 +19,12 @@
   notify: reload httpd
   tags: [httpd]
 
-  # TODO: change after rewse.jp moves AWS
 - name: set ServerName
   lineinfile:
     dest: /etc/httpd/conf/httpd.conf
     insertafter: '^#ServerName'
     regexp: '^ServerName '
-    line: 'ServerName aws.rewse.jp:80'
+    line: 'ServerName rewse.jp:80'
   notify: reload httpd
   tags: [httpd]
 
