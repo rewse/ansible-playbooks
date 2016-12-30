@@ -1,0 +1,4 @@
+#!/bin/sh
+
+cd /srv/www/wordpress
+./permset.sh
