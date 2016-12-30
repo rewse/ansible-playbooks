@@ -9,6 +9,7 @@
     - postfix
     - roundcubemail
     - mailman
+    - wordpress
     - zabbix/server
 
 - include: personal-standby-servers.yml

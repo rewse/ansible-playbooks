@@ -1,0 +1,3 @@
+---
+aurora:
+  wordpress_password: "{{vault_aurora.wordpress_password}}"
