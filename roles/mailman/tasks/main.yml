@@ -20,8 +20,7 @@
   lineinfile:
     dest: /etc/mailman/mm_cfg.py
     regexp: '^DEFAULT_URL_HOST '
-    # TODO: change after rewse.jp moves to AWS
-    line: 'DEFAULT_URL_HOST = "aws.rewse.jp"'
+    line: 'DEFAULT_URL_HOST = "rewse.jp"'
   tags: [mailman]
 
 - name: set DEFAULT_EMAIL_HOST
@@ -96,7 +95,6 @@
     dest: /etc/httpd/conf.d/mailman.conf
     insertafter: '^# RedirectMatch'
     regexp: '^RedirectMatch '
-    # TODO: change after rewse.jp moves to AWS
-    line: 'RedirectMatch ^/mailman[/]*$ https://aws.rewse.jp/mailman/listinfo'
+    line: 'RedirectMatch ^/mailman[/]*$ https://rewse.jp/mailman/listinfo'
   notify: reload httpd
   tags: [mailman]
