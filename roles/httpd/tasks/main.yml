@@ -61,6 +61,20 @@
   notify: reload httpd
   tags: [httpd]
 
+- name: copy 00-forcessl.conf
+  copy:
+    src: 00-forcessl.conf
+    dest: /etc/httpd/conf.d
+  notify: reload httpd
+  tags: [httpd]
+
+- name: copy 01-remoteipheader.conf
+  copy:
+    src: 01-remoteipheader.conf
+    dest: /etc/httpd/conf.d
+  notify: reload httpd
+  tags: [httpd]
+
 - name: copy admin.conf
   template:
     src: admin.conf.j2
