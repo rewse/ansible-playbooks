@@ -3,6 +3,5 @@ ExtendedStatus On
 <Location /server-status>
   SetHandler server-status
 
-  Require ip {{global_ip.home}} {{global_ip.office}}
-  Require host www1.rewse.jp www2.rewse.jp
+  Require ip 192.168.0.0/16 {{global_ip.home}} {{global_ip.office}}
 </Location>
