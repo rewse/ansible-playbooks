@@ -21,6 +21,7 @@
     dest: /etc/mailman/mm_cfg.py
     regexp: '^DEFAULT_URL_HOST '
     line: 'DEFAULT_URL_HOST = "rewse.jp"'
+  notify: reload mailman
   tags: [mailman]
 
 - name: set DEFAULT_EMAIL_HOST
@@ -28,6 +29,7 @@
     dest: /etc/mailman/mm_cfg.py
     regexp: '^DEFAULT_EMAIL_HOST '
     line: 'DEFAULT_EMAIL_HOST = "rewse.jp"'
+  notify: reload mailman
   tags: [mailman]
 
 - name: set MTA
@@ -35,6 +37,7 @@
     dest: /etc/mailman/mm_cfg.py
     regexp: '^MTA '
     line: 'MTA = "Postfix"'
+  notify: reload mailman
   tags: [mailman]
 
 - name: set DEFAULT_URL_PATTERN
@@ -42,6 +45,7 @@
     dest: /etc/mailman/mm_cfg.py
     regexp: '^DEFAULT_URL_PATTERN '
     line: 'DEFAULT_URL_PATTERN = "https://%s/mailman/"'
+  notify: reload mailman
   tags: [mailman]
 
 - name: set DEFAULT_LIST_ADVERTISED
@@ -49,6 +53,7 @@
     dest: /etc/mailman/mm_cfg.py
     regexp: '^DEFAULT_LIST_ADVERTISED '
     line: 'DEFAULT_LIST_ADVERTISED = No'
+  notify: reload mailman
   tags: [mailman]
 
 - name: set site password
@@ -88,4 +93,11 @@
     regexp: '^RedirectMatch '
     line: 'RedirectMatch ^/mailman[/]*$ https://rewse.jp/mailman/listinfo'
   notify: reload httpd
+  tags: [mailman]
+
+- name: enable mailman
+  service:
+    name: mailman
+    enabled: yes
+    state: started
   tags: [mailman]
