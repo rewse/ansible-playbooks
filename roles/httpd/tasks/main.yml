@@ -109,6 +109,26 @@
     line: 'date.timezone = "Asia/Tokyo"'
   tags: [httpd, php]
 
+- name: make agentscripts dir
+  file:
+    path: /usr/lib/zabbix/agentscripts
+    state: directory
+  tags: [httpd, zabbix-agent]
+
+- name: copy httpd.sh
+  copy:
+    src: httpd.sh
+    dest: /usr/lib/zabbix/agentscripts
+    mode: 0755
+  tags: [httpd, zabbix-agent]
+
+- name: copy httpd.conf
+  template:
+    src: httpd.conf.j2
+    dest: /etc/zabbix/zabbix_agentd.d/httpd.conf
+  notify: restart zabbix-agent
+  tags: [httpd, zabbix-agent]
+
 - name: enable httpd
   service:
     name: httpd

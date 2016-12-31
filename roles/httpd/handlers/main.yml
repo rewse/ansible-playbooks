@@ -3,3 +3,8 @@
   service:
     name: httpd
     state: reloaded
+
+- name: restart zabbix-agent
+  service:
+    name: zabbix-agent
+    state: restarted
