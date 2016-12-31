@@ -50,6 +50,15 @@
   notify: restart zabbix-agent
   tags: [zabbix-agent]
 
+- name: set Timeout
+  lineinfile:
+    dest: /etc/zabbix/zabbix_agentd.conf
+    insertafter: '^# Timeout='
+    regexp: '^Timeout='
+    line: 'Timeout=20'
+  notify: restart zabbix-agent
+  tags: [zabbix-agent]
+
 - name: zabbix; copy centos7.conf
   copy:
     src: centos7.conf
