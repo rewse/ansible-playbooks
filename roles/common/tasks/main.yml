@@ -317,6 +317,19 @@
   notify: restart rsyslog
   tags: [common, rsyslog]
 
+- name: rsyslog; move to /var/log/trash.log
+  copy:
+    src: trash.conf
+    dest: /etc/rsyslog.d
+  notify: restart rsyslog
+  tags: [common, rsyslog]
+
+- name: logrotate; config for /var/log/trash.log
+  copy:
+    src: trash
+    dest: /etc/logrotate.d
+  tags: [common, logrotate]
+
 - name: ssh; change ClientAliveInterval
   lineinfile:
     dest: /etc/ssh/sshd_config
