@@ -4,6 +4,11 @@
     name: httpd
     state: reloaded
 
+- name: restart rsyslog
+  service:
+    name: rsyslog
+    state: restarted
+
 - name: restart zabbix-agent
   service:
     name: zabbix-agent
