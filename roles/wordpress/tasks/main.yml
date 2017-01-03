@@ -7,12 +7,6 @@
     key_file: /home/{{admin}}/.ssh/id_rsa
   tags: [wordpress]
 
-- name: copy permset.conf
-  copy:
-    src: permset.conf
-    dest: /srv/www/wordpress
-  tags: [wordpress]
-
 - name: copy wp-cache-config.php
   copy:
     src: wp-cache-config.php
