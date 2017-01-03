@@ -109,6 +109,13 @@
     line: 'date.timezone = "Asia/Tokyo"'
   tags: [httpd, php]
 
+- name: move to /var/log/pagespeed.log
+  copy:
+    src: pagespeed.conf
+    dest: /etc/rsyslog.d
+  notify: restart rsyslog
+  tags: [common, pagespeed, rsyslog]
+
 - name: make agentscripts dir
   file:
     path: /usr/lib/zabbix/agentscripts
