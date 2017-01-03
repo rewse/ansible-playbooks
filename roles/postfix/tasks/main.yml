@@ -42,6 +42,15 @@
   notify: reload postfix
   tags: [postfix]
 
+- name: set mynetworks
+  lineinfile:
+    dest: /etc/postfix/main.cf
+    insertafter: '^#mynetworks '
+    regexp: '^mynetworks '
+    line: 'mynetworks = 192.168.0.0/16 {{global_ip.home}}'
+  notify: reload postfix
+  tags: [postfix]
+
 - name: set mail_spool_directory
   lineinfile:
     dest: /etc/postfix/main.cf
