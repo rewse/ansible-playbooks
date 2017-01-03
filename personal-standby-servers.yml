@@ -9,6 +9,20 @@
         state: absent
       tags: [standby, postfix, certbot]
 
+    - name: stop httpd
+      service:
+        name: httpd
+        enabled: no
+        state: stopped
+      tags: [standby, httpd]
+
+    - name: stop lsyncd
+      service:
+        name: lsyncd
+        enabled: no
+        state: stopped
+      tags: [standby, lysncd]
+
     - name: stop zabbix-server
       service:
         name: zabbix-server
