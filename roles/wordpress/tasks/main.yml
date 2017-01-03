@@ -37,7 +37,7 @@
   copy:
     src: wordpress.cron
     dest: /etc/cron.hourly
-    mode: 02775
+    mode: 0755
   tags: [wordpress]
 
 - name: set perm
