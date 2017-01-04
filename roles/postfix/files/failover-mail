@@ -1,0 +1,64 @@
+#!/bin/sh
+
+TARGET=$1
+JSONFILE=/tmp/upsert-mail-rewse-jp.json
+
+# {{{ switch_dns()
+
+switch_dns() {
+  cat <<! > $JSONFILE
+{
+  "Changes": [
+    {
+      "Action": "UPSERT",
+      "ResourceRecordSet": {
+        "Name": "mail.rewse.jp.",
+        "Type": "CNAME",
+        "TTL": 300,
+        "ResourceRecords": [
+          {
+            "Value": "mail$TARGET.rewse.jp"
+          }
+        ]
+      }
+    }
+  ]
+}
+!
+
+  echo "Switching Private Type DNS..."
+  aws route53 change-resource-record-sets --hosted-zone-id Z2I4KTTS0XIOSB --change-batch file://$JSONFILE
+
+  echo "Switching Public Type DNS..."
+  aws route53 change-resource-record-sets --hosted-zone-id Z34LVKL0P9KD74 --change-batch file://$JSONFILE
+
+  rm -f $JSONFILE
+}
+
+# }}}
+# {{{ Main
+
+if [ `id -u` != 0 ]; then
+  echo "<ERROR> Only root can execute"
+  exit 1
+fi
+
+if [ "$TARGET" == "1" ]; then
+  src=2
+elif [ "$TARGET" == "2" ]; then
+  src=1
+else
+  echo "<USAGE> faiover-mail.sh <target-number>" >&2
+  echo "        target-numuber: 1 or 2" >&2
+  exit 1
+fi
+
+echo "Stopping lsyncd on mail$src..."
+ssh centos@mail$src sudo systemctl stop lsyncd
+
+echo "Starting lsyncd here..."
+sudo systemctl start lsyncd
+
+switch_dns
+
+# }}}
