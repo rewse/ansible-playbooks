@@ -1,7 +1,7 @@
 #!/bin/sh
 
 TARGET=$1
-JSONFILE=/tmp/upsert-mail-rewse-jp.json
+JSONFILE=/tmp/upsert-zabbix-rewse-jp.json
 
 # {{{ switch_dns()
 
@@ -12,12 +12,12 @@ switch_dns() {
     {
       "Action": "UPSERT",
       "ResourceRecordSet": {
-        "Name": "mail.rewse.jp.",
+        "Name": "zabbix.rewse.jp.",
         "Type": "CNAME",
         "TTL": 300,
         "ResourceRecords": [
           {
-            "Value": "mail$TARGET.rewse.jp"
+            "Value": "zabbix$TARGET.rewse.jp"
           }
         ]
       }
@@ -48,35 +48,16 @@ if [ "$TARGET" == "1" ]; then
 elif [ "$TARGET" == "2" ]; then
   src=1
 else
-  echo "<USAGE> failover-mail <target-number>" >&2
+  echo "<USAGE> failover-zabbix-server <target-number>" >&2
   echo "        target-numuber: 1 or 2" >&2
   exit 1
 fi
 
-echo "Stopping postfix on mail$src..."
-ssh centos@mail$src sudo systemctl stop postfix
+echo "Stopping zabbix-server on zabbix$src..."
+ssh centos@zabbix$src sudo systemctl stop zabbix-server
 
-echo "Stopping dovecot on mail$src..."
-ssh centos@mail$src sudo systemctl stop dovecot
-
-echo "Wait 20 seconds to finish lsync..."
-for i in `seq 1 20`; do
-  sleep 1
-  echo -n "."
-done
-
-echo "Stopping lsyncd on mail$src..."
-ssh centos@mail$src sudo systemctl stop lsyncd
-
-echo "Starting lsyncd here..."
-sudo systemctl start lsyncd
+echo "Starting zabbix-server here..."
+sudo systemctl start zabbix-server
 
 switch_dns
-
-echo "Starting postfix on mail$src..."
-ssh centos@mail$src sudo systemctl start postfix
-
-echo "Starting dovecot on mail$src..."
-ssh centos@mail$src sudo systemctl start dovecot
-
 # }}}
