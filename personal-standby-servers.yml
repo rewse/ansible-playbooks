@@ -3,12 +3,6 @@
   become: yes
   remote_user: centos
   tasks:
-    - name: rm certbot.cron
-      file:
-        path: /etc/cron.monthly/certbot.cron
-        state: absent
-      tags: [standby, postfix, certbot]
-
     - name: stop httpd
       service:
         name: httpd
