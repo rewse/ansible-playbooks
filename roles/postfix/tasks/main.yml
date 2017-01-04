@@ -5,7 +5,6 @@
     state: installed
   with_items:
     - amavisd-new
-    - certbot
     - clamav
     - clamav-server-systemd
     - clamav-update
@@ -13,9 +12,8 @@
     - dovecot
     - lz4
     - procmail
-    - python-certbot-apache
     - spamassassin
-  tags: [postfix, amavisd, certbot, dovecot, procmail, spamassassin, package]
+  tags: [postfix, amavisd, dovecot, procmail, spamassassin, package]
 
 - name: start saslauthd
   service:
@@ -82,13 +80,6 @@
     src: mail.rewse.jp.{{cert_year}}.key
     dest: /etc/pki/tls/private
   tags: [postfix, cert]
-
-- name: copy certbot.cron
-  copy:
-    src: certbot.cron
-    dest: /etc/cron.monthly
-    mode: 0755
-  tags: [postfix, certbot]
 
 - name: amavisd; bypass spam checks
   lineinfile:
