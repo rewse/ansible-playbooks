@@ -1,0 +1,49 @@
+#!/bin/sh
+
+TARGET=$1
+
+# {{{ switch_elb()
+
+switch_elb() {
+  echo "Switching ELB target group..."
+
+  echo "Changing HTTP listner..."
+  aws elbv2 modify-listener \
+    --listener-arn arn:aws:elasticloadbalancing:ap-northeast-1:070392599442:listener/app/rewse-public/6405e851e9d18a30/c2c40ad8ad91b375 \
+    --default-actions Type=forward,TargetGroupArn=$arn
+
+  echo "Changing HTTP listner..."
+  aws elbv2 modify-listener \
+    --listener-arn arn:aws:elasticloadbalancing:ap-northeast-1:070392599442:listener/app/rewse-public/6405e851e9d18a30/1c188045a814e16b \
+    --default-actions Type=forward,TargetGroupArn=$arn
+}
+
+# }}}
+# {{{ Main
+
+if [ `id -u` != 0 ]; then
+  echo "<ERROR> Only root can execute"
+  exit 1
+fi
+
+if [ "$TARGET" == "1" ]; then
+  src=2
+  arn=arn:aws:elasticloadbalancing:ap-northeast-1:070392599442:targetgroup/www1-only/3c1cd41a0ad83b00
+elif [ "$TARGET" == "2" ]; then
+  src=1
+  arn=arn:aws:elasticloadbalancing:ap-northeast-1:070392599442:targetgroup/www2-only/0883aaddf820f2b1
+else
+  echo "<USAGE> faiover-mail.sh <target-number>" >&2
+  echo "        target-number: 1 or 2" >&2
+  exit 1
+fi
+
+echo "Stopping httpd on www$src..."
+ssh centos@www$src sudo systemctl stop httpd
+
+echo "Starting httpd here..."
+sudo systemctl start httpd
+
+switch_elb
+
+# }}}
