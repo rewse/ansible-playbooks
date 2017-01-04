@@ -58,6 +58,7 @@
     - epel-release
     - firewalld
     - git
+    - jq
     - logwatch
     - lsof
     - mlocate
