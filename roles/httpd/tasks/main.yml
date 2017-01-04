@@ -116,6 +116,12 @@
   notify: restart rsyslog
   tags: [common, pagespeed, rsyslog]
 
+- name: copy failover-www.sh
+  copy:
+    src: failover-www.sh
+    dest: /usr/local/sbin
+  tags: [httpd]
+
 - name: make agentscripts dir
   file:
     path: /usr/lib/zabbix/agentscripts
