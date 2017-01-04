@@ -486,7 +486,7 @@
     dest: /home/{{admin}}/.gitconfig
     section: user
     option: email
-    value: "{{email}}"
+    value: "{{email.primary}}"
   tags: [common, dotfiles, git]
 
 - name: tmux; copy tmux.conf
