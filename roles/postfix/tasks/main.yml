@@ -354,6 +354,12 @@
   notify: reload dovecot
   tags: [postfix, dovecot, cert]
 
+- name: copy failover-mail
+  copy:
+    src: failover-mail
+    dest: /usr/local/sbin
+  tags: [postfix]
+
 - name: start dovecot
   service:
     name: dovecot
