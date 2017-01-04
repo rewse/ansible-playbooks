@@ -33,7 +33,7 @@ elif [ "$TARGET" == "2" ]; then
   src=1
   arn=arn:aws:elasticloadbalancing:ap-northeast-1:070392599442:targetgroup/www2-only/0883aaddf820f2b1
 else
-  echo "<USAGE> faiover-mail.sh <target-number>" >&2
+  echo "<USAGE> failover-www <target-number>" >&2
   echo "        target-number: 1 or 2" >&2
   exit 1
 fi

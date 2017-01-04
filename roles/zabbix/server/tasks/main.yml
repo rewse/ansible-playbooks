@@ -54,6 +54,13 @@
   notify: restart zabbix-server
   tags: [zabbix-server, zabbix-server-server]
 
+- name: copy failover-zabbix-server
+  copy:
+    src: failover-zabbix-server
+    dest: /usr/local/sbin
+    mode: 0755
+  tags: [zabbix-server, zabbix-server-server]
+
 - name: set php_value
   lineinfile:
     dest: /etc/httpd/conf.d/zabbix.conf
