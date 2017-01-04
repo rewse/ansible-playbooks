@@ -434,14 +434,6 @@
     follow: yes
   tags: [common, user]
 
-- name: copy .ssh/config
-  template:
-    src: config
-    dest: /home/{{admin}}/.ssh
-    owner: "{{admin}}"
-    group: "{{admin}}"
-  tags: [common, user]
-
 - name: clone dotfiles.git
   git:
     repo: git@github.com:rewse/dotfiles.git

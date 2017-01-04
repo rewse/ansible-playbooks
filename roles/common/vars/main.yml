@@ -9,7 +9,3 @@ so_net:
   username: "{{vault_so_net.username}}"
   password: "{{vault_so_net.password}}"
 swap_device_name: xvdb
-ssh:
-  rewse_jp:
-    username: "{{vault_ssh.rewse_jp.username}}"
-    port: "{{vault_ssh.rewse_jp.port}}"
