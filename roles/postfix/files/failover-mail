@@ -53,6 +53,18 @@ else
   exit 1
 fi
 
+echo "Stopping postfix on mail$src..."
+ssh centos@mail$src sudo systemctl stop postfix
+
+echo "Stopping dovecot on mail$src..."
+ssh centos@mail$src sudo systemctl stop dovecot
+
+echo "Wait 20 seconds to finish lsync..."
+for i in `seq 1 20`; do
+  sleep 1
+  echo -n "."
+done
+
 echo "Stopping lsyncd on mail$src..."
 ssh centos@mail$src sudo systemctl stop lsyncd
 
@@ -60,5 +72,11 @@ echo "Starting lsyncd here..."
 sudo systemctl start lsyncd
 
 switch_dns
+
+echo "Starting postfix on mail$src..."
+ssh centos@mail$src sudo systemctl start postfix
+
+echo "Starting dovecot on mail$src..."
+ssh centos@mail$src sudo systemctl start dovecot
 
 # }}}
