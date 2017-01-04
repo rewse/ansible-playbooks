@@ -116,9 +116,9 @@
   notify: restart rsyslog
   tags: [common, pagespeed, rsyslog]
 
-- name: copy failover-www.sh
+- name: copy failover-www
   copy:
-    src: failover-www.sh
+    src: failover-www
     dest: /usr/local/sbin
   tags: [httpd]
 
