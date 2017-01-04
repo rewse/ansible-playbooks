@@ -358,6 +358,7 @@
   copy:
     src: failover-mail
     dest: /usr/local/sbin
+    mode: 0755
   tags: [postfix]
 
 - name: start dovecot
