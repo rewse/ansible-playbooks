@@ -3,13 +3,6 @@
   become: yes
   remote_user: centos
   tasks:
-    - name: stop httpd
-      service:
-        name: httpd
-        enabled: no
-        state: stopped
-      tags: [standby, httpd]
-
     - name: stop lsyncd
       service:
         name: lsyncd
