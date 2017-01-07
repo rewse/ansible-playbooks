@@ -118,6 +118,7 @@
     dest: /usr/lib/zabbix/externalscripts
     mode: 0755
   with_items:
+    - cloudwatch.sh
     - market-price-check.sh
     - us-market-price-check.sh
     - ssl-cert-check.sh
