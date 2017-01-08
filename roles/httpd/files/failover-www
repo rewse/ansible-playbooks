@@ -1,7 +1,5 @@
 #!/bin/sh
 
-TARGET=$1
-
 # {{{ switch_elb()
 
 switch_elb() {
@@ -26,15 +24,14 @@ if [ `id -u` != 0 ]; then
   exit 1
 fi
 
-if [ "$TARGET" == "1" ]; then
+if [ "`hostname -s`" == "charlie" ]; then
   src=2
   arn=arn:aws:elasticloadbalancing:ap-northeast-1:070392599442:targetgroup/www1-only/3c1cd41a0ad83b00
-elif [ "$TARGET" == "2" ]; then
+elif [ "`hostname -s`" == "foxtrot" ]; then
   src=1
   arn=arn:aws:elasticloadbalancing:ap-northeast-1:070392599442:targetgroup/www2-only/0883aaddf820f2b1
 else
-  echo "<USAGE> failover-www <target-number>" >&2
-  echo "        target-number: 1 or 2" >&2
+  echo "<USAGE> failover-www" >&2
   exit 1
 fi
 
