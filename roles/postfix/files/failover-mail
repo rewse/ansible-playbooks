@@ -1,6 +1,5 @@
 #!/bin/sh
 
-TARGET=$1
 JSONFILE=/tmp/upsert-mail-rewse-jp.json
 
 # {{{ switch_dns()
@@ -17,7 +16,7 @@ switch_dns() {
         "TTL": 300,
         "ResourceRecords": [
           {
-            "Value": "mail$TARGET.rewse.jp"
+            "Value": "mail$target.rewse.jp"
           }
         ]
       }
@@ -43,13 +42,14 @@ if [ `id -u` != 0 ]; then
   exit 1
 fi
 
-if [ "$TARGET" == "1" ]; then
+if [ "`hostname -s`" == "charlie" ]; then
   src=2
-elif [ "$TARGET" == "2" ]; then
+  target=1
+elif [ "`hostname -s`" == "foxtrot" ]; then
   src=1
+  target=2
 else
-  echo "<USAGE> failover-mail <target-number>" >&2
-  echo "        target-numuber: 1 or 2" >&2
+  echo "<USAGE> failover-mail" >&2
   exit 1
 fi
 
@@ -64,6 +64,7 @@ for i in `seq 1 20`; do
   sleep 1
   echo -n "."
 done
+echo ""
 
 echo "Stopping lsyncd on mail$src..."
 ssh centos@mail$src sudo systemctl stop lsyncd

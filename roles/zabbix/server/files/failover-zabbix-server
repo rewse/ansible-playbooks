@@ -1,6 +1,5 @@
 #!/bin/sh
 
-TARGET=$1
 JSONFILE=/tmp/upsert-zabbix-rewse-jp.json
 
 # {{{ switch_dns()
@@ -17,7 +16,7 @@ switch_dns() {
         "TTL": 300,
         "ResourceRecords": [
           {
-            "Value": "zabbix$TARGET.rewse.jp"
+            "Value": "zabbix$target.rewse.jp"
           }
         ]
       }
@@ -40,13 +39,14 @@ if [ `id -u` != 0 ]; then
   exit 1
 fi
 
-if [ "$TARGET" == "1" ]; then
+if [ "`hostname -s`" == "charlie" ]; then
   src=2
-elif [ "$TARGET" == "2" ]; then
+  target=1
+elif [ "`hostname -s`" == "foxtrot" ]; then
   src=1
+  target=2
 else
-  echo "<USAGE> failover-zabbix-server <target-number>" >&2
-  echo "        target-numuber: 1 or 2" >&2
+  echo "<USAGE> failover-zabbix-server" >&2
   exit 1
 fi
 
