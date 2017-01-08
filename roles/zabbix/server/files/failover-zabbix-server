@@ -29,9 +29,6 @@ switch_dns() {
   echo "Switching Private Type DNS..."
   aws route53 change-resource-record-sets --hosted-zone-id Z2I4KTTS0XIOSB --change-batch file://$JSONFILE
 
-  echo "Switching Public Type DNS..."
-  aws route53 change-resource-record-sets --hosted-zone-id Z34LVKL0P9KD74 --change-batch file://$JSONFILE
-
   rm -f $JSONFILE
 }
 
