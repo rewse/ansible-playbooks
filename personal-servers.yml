@@ -12,4 +12,6 @@
     - wordpress
     - zabbix/server
 
-- include: personal-standby-servers.yml
+- include: standby-mail-servers.yml
+
+- include: standby-zabbix-servers.yml

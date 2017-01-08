@@ -1,0 +1,11 @@
+---
+- hosts: standby-mail-servers
+  become: yes
+  remote_user: centos
+  tasks:
+    - name: stop lsyncd
+      service:
+        name: lsyncd
+        enabled: no
+        state: stopped
+      tags: [standby, lysncd]
