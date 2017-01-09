@@ -1,10 +1,4 @@
 ---
-- name: make agentscripts dir
-  file:
-    path: /usr/lib/zabbix/agentscripts
-    state: directory
-  tags: [zabbix-internet]
-
 - name: copy internet.sh
   copy:
     src: internet.sh
