@@ -55,17 +55,43 @@
     dest: /etc/zabbix/zabbix_agentd.conf
     insertafter: '^# Timeout='
     regexp: '^Timeout='
-    line: 'Timeout=20'
+    line: 'Timeout=30'
   notify: restart zabbix-agent
   tags: [zabbix-agent]
 
-- name: zabbix; copy centos7.conf
+- name: copy centos7.conf
   copy:
     src: centos7.conf
     dest: /etc/zabbix/zabbix_agentd.d
   tags: [zabbix-agent]
 
-- name: zabbix; rm userparameter_mysql.conf
+- name: copy cloudwatch
+  copy:
+    src: cloudwatch
+    dest: /usr/local/bin
+    mode: 0755
+  tags: [zabbix-agent]
+
+- name: make agentscripts dir
+  file:
+    path: /usr/lib/zabbix/agentscripts
+    state: directory
+  tags: [zabbix-agent]
+
+- name: copy ec2.sh
+  copy:
+    src: ec2.sh
+    dest: /usr/lib/zabbix/agentscripts
+    mode: 0755
+  tags: [zabbix-agent]
+
+- name: copy ec2.conf
+  copy:
+    src: ec2.conf
+    dest: /etc/zabbix/zabbix_agentd.d
+  tags: [zabbix-agent]
+
+- name: rm userparameter_mysql.conf
   file:
     path: /etc/zabbix/zabbix_agentd.d/userparameter_mysql.conf
     state: absent

@@ -1,5 +1,4 @@
 #!/bin/sh
-# This script references <http://qiita.com/digitalpeak/items/83e817022851b5f96ef8>
 
 trap 'exit 1' 1 2 3 15
 
@@ -29,21 +28,7 @@ if [ "$namespace" == "" -o "$metric" == "" -o "$dimensions" == "" -o "$statistic
   show_usage
 fi
 
-start_time=`date --iso-8601=seconds --date '1 hour ago'`
-end_time=`date --iso-8601=seconds`
-
-value=`aws cloudwatch get-metric-statistics \
-  --region ap-northeast-1 \
-  --namespace $namespace \
-  --metric-name $metric \
-  --dimensions $dimensions \
-  --start-time $start_time \
-  --end-time $end_time \
-  --period 300 \
-  --statistics $statistics \
-  --query Datapoints[*].["Timestamp","$statistics"] \
-  --output text |
-  sort | tail -1 | awk '{print $2}'`
+value=$(cloudwatch -n $namespace -m $metric -d $dimensions -s $statistics)
 
 if [ "$divisor" != "" ]; then
   echo "scale=2; $value / $divisor" | bc
