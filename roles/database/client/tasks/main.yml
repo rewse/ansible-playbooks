@@ -48,6 +48,16 @@
     - /usr/local/src/{{oracle_instantclient_sqlplus_filename}}
   tags: [database-client, oracle]
 
+- name: copy librarie path for oracle-instantclient
+  copy:
+    src: oracle-instantclient-sqlplus.conf
+    dest: /etc/ld.so.conf.d
+  tags: [database-client, oracle]
+
+- name: run ldconfig
+  command: ldconfig
+  tags: [database-client, oracle]
+
 - name: create symlink for ojdbc.jar
   file:
     src: /usr/lib/oracle/12.1/client64/lib/{{item}}
