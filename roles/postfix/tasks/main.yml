@@ -329,6 +329,15 @@
   notify: reload dovecot
   tags: [postfix, dovecot]
 
+- name: dovecot; change mail_max_userip_connections
+  lineinfile:
+    dest: /etc/dovecot/conf.d/20-imap.conf
+    insertafter: '^  #mail_max_userip_connections '
+    regexp: '^  mail_max_userip_connections '
+    line: '  mail_max_userip_connections = 20'
+  notify: reload dovecot
+  tags: [postfix, dovecot]
+
 - name: dovecot; set ssl_cert
   lineinfile:
     dest: /etc/dovecot/conf.d/10-ssl.conf
