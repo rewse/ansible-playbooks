@@ -180,7 +180,9 @@ send_ebs() {
 # }}}
 # {{{ Main
 
-send_instance_type
+if [ $(date +%M) -lt 5 ]; then
+  send_instance_type
+fi
 
 obtain_ids
 send_ec2
