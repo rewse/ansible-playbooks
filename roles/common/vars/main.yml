@@ -1,7 +1,4 @@
 ---
-aws:
-  access_key_id: "{{vault_aws.access_key_id}}"
-  secret_access_key: "{{vault_aws.secret_access_key}}"
 relayhost:
   name: mail.so-net.ne.jp
   port: 587
