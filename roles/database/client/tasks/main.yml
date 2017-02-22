@@ -3,7 +3,7 @@
   yum:
     name: http://repo.mysql.com/{{mysql_release_filename}}
     state: installed
-  tags: [database-client, mysql, package]
+  tags: [database-client, mysql]
 
 - name: add priority into /etc/yum.repos.d/mysql-community.repo
   ini_file:
@@ -16,7 +16,7 @@
     - mysql-connectors-community
     - mysql-tools-community
     - "{{mysql_community_ini_section}}"
-  tags: [database-client, mysql, package]
+  tags: [database-client, mysql]
 
 - name: install mysql client
   yum:
