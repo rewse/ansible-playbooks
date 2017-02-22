@@ -139,6 +139,13 @@
     state: installed
   with_items:
     - postgresql
+    - postgresql-devel
+    - python-devel
+  tags: [database-client, postgresql]
+
+- name: install pgcli
+  pip:
+    name: pgcli
   tags: [database-client, postgresql]
 
 - name: install postgresql jdbc driver
