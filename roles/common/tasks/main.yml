@@ -536,22 +536,6 @@
     value: ap-northeast-1
   tags: [srv, snapshot]
 
-- name: Set aws_access_key_id
-  ini_file:
-    dest: /root/.aws/credentials
-    section: default
-    option: aws_access_key_id
-    value: "{{aws.access_key_id}}"
-  tags: [srv, snapshot]
-
-- name: Set aws_secret_access_key
-  ini_file:
-    dest: /root/.aws/credentials
-    section: default
-    option: aws_secret_access_key
-    value: "{{aws.secret_access_key}}"
-  tags: [srv, snapshot]
-
 - name: clone aws-ec2-smart-snapshot
   git:
     repo: git@github.com:rewse/aws-ec2-smart-snapshot.git
