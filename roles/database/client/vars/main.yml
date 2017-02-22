@@ -6,4 +6,5 @@ oracle_instantclient_sqlplus_filename: oracle-instantclient12.1-sqlplus-12.1.0.2
 postgersql_jdbc_filename: postgresql-9.4.1212.jar
 redshift_jdbc_filename: RedshiftJDBC42-1.2.1.1001.jar
 sqlcl_filename: sqlcl-4.2.0.16.355.0402-no-jre.zip
+sqljdbc_filename: sqljdbc_6.0.8112.100_enu.tar.gz
 swingbench_filename: swingbench25971.zip
