@@ -89,22 +89,22 @@
 
   # Download the files before the following task
   # from <http://www.oracle.com/technetwork/topics/linuxx86-64soft-092277.html>
-- name: copy oracle-instantcelint
+- name: copy oracle-instantclient
   copy:
     src: "{{item}}"
     dest: /usr/local/src
   with_items:
-    - "{{oracle_instantcelint_basic_filename}}"
+    - "{{oracle_instantclient_basic_filename}}"
     - "{{oracle_instantclient_sqlplus_filename}}"
   tags: [database-client, oracle]
 
-- name: install oracle-instantcelint
+- name: install oracle-instantclient
   yum:
     name: "{{item}}"
     state: installed
   with_items:
     - rlwrap
-    - /usr/local/src/{{oracle_instantcelint_basic_filename}}
+    - /usr/local/src/{{oracle_instantclient_basic_filename}}
     - /usr/local/src/{{oracle_instantclient_sqlplus_filename}}
   tags: [database-client, oracle]
 
@@ -120,12 +120,11 @@
 
 - name: create symlink for ojdbc.jar
   file:
-    src: /usr/lib/oracle/12.1/client64/lib/{{item}}
+    src: /usr/lib/oracle/12.2/client64/lib/{{item}}
     dest: /usr/share/java/{{item}}
     state: link
   with_items:
-    - ojdbc6.jar
-    - ojdbc7.jar
+    - ojdbc8.jar
   tags: [database-client, oracle]
 
   # Download the files before the following task
