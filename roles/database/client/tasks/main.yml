@@ -96,6 +96,7 @@
   with_items:
     - "{{oracle_instantclient_basic_filename}}"
     - "{{oracle_instantclient_sqlplus_filename}}"
+    - "{{oracle_instantclient_tools_filename}}"
   tags: [database-client, oracle]
 
 - name: install oracle-instantclient
@@ -106,6 +107,7 @@
     - rlwrap
     - /usr/local/src/{{oracle_instantclient_basic_filename}}
     - /usr/local/src/{{oracle_instantclient_sqlplus_filename}}
+    - /usr/local/src/{{oracle_instantclient_tools_filename}}
   tags: [database-client, oracle]
 
 - name: copy librarie path for oracle-instantclient
