@@ -23,6 +23,12 @@
     - java-1.8.0-openjdk
   tags: [database-client-gui, jdk, package]
 
+- name: install dbeaver
+  yum:
+    name: http://dbeaver.jkiss.org/files/dbeaver-ce-latest-stable.x86_64.rpm
+    state: installed
+  tags: [database-client-gui, package, dbeaver]
+
 - name: unarchive aws-schema-conversion-tool
   unarchive:
     src: https://s3.amazonaws.com/publicsctdownload/Fedora/aws-schema-conversion-tool-1.0.latest.zip
