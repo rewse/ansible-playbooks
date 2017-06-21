@@ -30,10 +30,17 @@
     remote_src: yes
   tags: [database-client-gui, package, sct]
 
+- name: rename aws-schema-conversion-tool-extractor dir
+  command: mv /usr/local/src/agents /usr/local/src/aws-schema-conversion-tool-extractor
+  tags: [database-client-gui, package, sct]
+
 - name: install aws-schema-conversion-tool
   yum:
-    name: /usr/local/src/{{sct_filename}}
+    name: "{{item}}"
     state: installed
+  with_items:
+    - /usr/local/src/{{sct_filename}}
+    - /usr/local/src/aws-schema-conversion-tool-extractor/{{sct_extractor_filename}}
   tags: [database-client-gui, package, sct]
 
   # Download the files before the following task
@@ -49,3 +56,9 @@
     name: /usr/local/src/{{sqldeveloper_filename}}
     state: installed
   tags: [database-client-gui, package, sqldeveloper]
+
+- name: install dbeaver
+  yum:
+    name: http://dbeaver.jkiss.org/files/dbeaver-ce-latest-stable.x86_64.rpm
+    state: installed
+  tags: [database-client-gui, dbeaver, package]
