@@ -16,49 +16,6 @@
     - packages-microsoft-com-prod
   tags: [database-client, mssql]
 
-# TODO: mssql-tools.rpm asks I accept the license term interactively
-#       yes command doesn't work
-#- name: install mssql client
-#  yum:
-#    name: "{{item}}"
-#    state: installed
-#  with_items:
-#    - mssql-tools
-#    - unixODBC-devel
-#  tags: [database-client, mssql]
-
-- name: copy mssqlrc
-  become_user: "{{admin}}"
-  copy:
-    src: mssqlrc
-    dest: /home/{{admin}}/.mssqlrc
-  tags: [database-client, mssql]
-
-  # Download the files before the following task
-  # from <https://www.microsoft.com/en-us/download/details.aspx?displaylang=en&id=11774>
-- name: install SQL Server JDBC driver
-  unarchive:
-    src: "{{sqljdbc_filename}}"
-    dest: /opt
-  tags: [database-client, mssql]
-
-- name: create a symlink from sqljdbc_6.0
-  file:
-    src: sqljdbc_6.0
-    dest: /opt/sqljdbc
-    state: link
-  tags: [database-client, mssql]
-
-- name: create symlinks from sqljdbcnn.jar
-  file:
-    src: /opt/sqljdbc/enu/jre{{item.jdk_ver}}/sqljdbc{{item.jdbc_ver}}.jar
-    dest: /usr/share/java/sqljdbc{{item.jdbc_ver}}.jar
-    state: link
-  with_items:
-    - { jdk_ver: 8, jdbc_ver: 42 }
-    - { jdk_ver: 7, jdbc_ver: 41 }
-  tags: [database-client, mssql]
-
 - name: install mysql57-community-release
   yum:
     name: http://repo.mysql.com/{{mysql_release_filename}}
