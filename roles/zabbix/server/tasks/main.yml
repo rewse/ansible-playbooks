@@ -1,5 +1,5 @@
 ---
-  # Do not install mysql-connector-odbc because Zabbix Server 3.2 is always
+  # Do not install mysql-connector-odbc because Zabbix Server 3.4 is always
   # crashes.
 - name: install packages
   yum:
