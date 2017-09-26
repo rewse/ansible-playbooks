@@ -6,15 +6,11 @@ charlie.rewse.jp
 
 [personal-servers]
 charlie.rewse.jp
-foxtrot.rewse.jp
 
 [standby-mail-servers]
-foxtrot.rewse.jp
-
-[standby-zabbix-servers]
 charlie.rewse.jp
 
 [machines]
 atom.rewse.jp
 charlie.rewse.jp
-foxtrot.rewse.jp
+#foxtrot.rewse.jp
