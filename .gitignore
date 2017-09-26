@@ -1,7 +1,7 @@
 .DS_Store
 *.retry
 roles/desktop/files/Ricty*
-roles/database/client/files/oracle*
+roles/database/client/files/oracle*.rpm
 roles/database/client/files/sqlcl*
 roles/database/client/files/sqljdbc*
 roles/database/client/gui/files/jdk*

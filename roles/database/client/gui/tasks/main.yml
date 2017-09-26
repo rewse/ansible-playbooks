@@ -29,15 +29,20 @@
     state: installed
   tags: [database-client-gui, package, dbeaver]
 
+- name: uninstall aws-schema-conversion-tool
+  yum:
+    name: "{{item}}"
+    state: removed
+  with_items:
+    - aws-schema-conversion-tool
+    - aws-schema-conversion-tool-extractor
+  tags: [database-client-gui, package, sct]
+
 - name: unarchive aws-schema-conversion-tool
   unarchive:
     src: https://s3.amazonaws.com/publicsctdownload/Fedora/aws-schema-conversion-tool-1.0.latest.zip
     dest: /usr/local/src
     remote_src: yes
-  tags: [database-client-gui, package, sct]
-
-- name: rename aws-schema-conversion-tool-extractor dir
-  command: mv /usr/local/src/agents /usr/local/src/aws-schema-conversion-tool-extractor
   tags: [database-client-gui, package, sct]
 
 - name: install aws-schema-conversion-tool
@@ -46,7 +51,7 @@
     state: installed
   with_items:
     - /usr/local/src/{{sct_filename}}
-    - /usr/local/src/aws-schema-conversion-tool-extractor/{{sct_extractor_filename}}
+    - /usr/local/src/agents/{{sct_extractor_filename}}
   tags: [database-client-gui, package, sct]
 
   # Download the files before the following task
