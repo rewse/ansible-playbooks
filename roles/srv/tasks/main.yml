@@ -3,6 +3,7 @@
   lvg:
     vg: vgsrv
     pvs: /dev/xvdc
+  ignore_errors: True
   tags: [srv, strorage, lvm]
 
 - name: create vgsrv/www
@@ -10,12 +11,14 @@
     vg: vgsrv
     lv: www
     size: 6g
+  ignore_errors: True
   tags: [srv, lvm, httpd]
 
 - name: format vgsrv/www
   filesystem:
     fstype: xfs
     dev: /dev/vgsrv/www
+  ignore_errors: True
   tags: [srv, lvm, httpd]
 
 - name: mount to /srv/www
@@ -27,6 +30,7 @@
   with_items:
     - present
     - mounted
+  ignore_errors: True
   tags: [srv, lvm, httpd]
 
 - name: create /var/www link
@@ -41,12 +45,14 @@
     vg: vgsrv
     lv: mailman
     size: 20m
+  ignore_errors: True
   tags: [srv, lvm, mailman]
 
 - name: format vgsrv/mailman
   filesystem:
     fstype: xfs
     dev: /dev/vgsrv/mailman
+  ignore_errors: True
   tags: [srv, lvm, mailman]
 
 - name: mount to /srv/mailman
@@ -58,6 +64,7 @@
   with_items:
     - present
     - mounted
+  ignore_errors: True
   tags: [srv, lvm, mailman]
 
 - name: create /srv/mailman/etc dir
@@ -97,12 +104,14 @@
     vg: vgsrv
     lv: mail
     size: 6g
+  ignore_errors: True
   tags: [srv, lvm, postfix]
 
 - name: format vgsrv/mail
   filesystem:
     fstype: xfs
     dev: /dev/vgsrv/mail
+  ignore_errors: True
   tags: [srv, lvm, postfix]
 
 - name: mount to /srv/mail
@@ -114,6 +123,7 @@
   with_items:
     - present
     - mounted
+  ignore_errors: True
   tags: [srv, lvm, postfix]
 
 - name: create groups

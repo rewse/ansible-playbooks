@@ -500,13 +500,13 @@
     - plugin/matrix.vim
     - plugin/NERD_commenter.vim
     - vimrc
-  tags: [common, dotifiles, vim]
+  tags: [common, dotfiles, vim]
 
 - name: vim; add to import vimrc
   lineinfile:
     dest: /etc/vimrc
     line: 'source /usr/share/vim/vimfiles/vimrc'
-  tags: [common, dotifiles, vim]
+  tags: [common, dotfiles, vim]
 
 - name: create .aws dir
   file:
