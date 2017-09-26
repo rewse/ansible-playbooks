@@ -12,6 +12,5 @@
     - wordpress
     - zabbix/server
 
-- include: standby-mail-servers.yml
-
-- include: standby-zabbix-servers.yml
+#- include: standby-mail-servers.yml
+#- include: standby-zabbix-servers.yml
