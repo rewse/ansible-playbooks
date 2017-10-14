@@ -1,5 +1,6 @@
 ---
-- include: machines.yml
+- include: centos.yml
+- include: rhel.yml
 - include: business-clients.yml
 - include: personal-clients.yml
 - include: personal-servers.yml

@@ -7,6 +7,8 @@ charlie.rewse.jp ansible_user=centos
 [personal-servers]
 charlie.rewse.jp ansible_user=centos
 
-[machines]
+[rhel]
+
+[centos]
 atom.rewse.jp ansible_user=centos
 charlie.rewse.jp ansible_user=centos
