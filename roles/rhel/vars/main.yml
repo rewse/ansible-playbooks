@@ -1,4 +1,5 @@
 ---
+epel_release_url: http://ftp.jaist.ac.jp/pub/Linux/Fedora/epel/7/x86_64/e/epel-release-7-10.noarch.rpm
 relayhost:
   name: mail.so-net.ne.jp
   port: 587
