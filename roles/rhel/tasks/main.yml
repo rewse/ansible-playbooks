@@ -2,23 +2,23 @@
 - name: set timezone
   timezone:
     name: Asia/Tokyo
-  tags: [centos, time]
+  tags: [rhel, time]
 
 - name: check swap status
   command: cat /proc/swaps
   register: swaps_out
   changed_when: False
-  tags: [centos, storage, swap]
+  tags: [rhel, storage, swap]
 
 - name: make swap
   command: mkswap /dev/{{swap_device_name}}
   when: swaps_out.stdout.find('{{swap_device_name}}') == -1
-  tags: [centos, storage, swap]
+  tags: [rhel, storage, swap]
 
 - name: enable swap
   command: swapon /dev/{{swap_device_name}}
   when: swaps_out.stdout.find('{{swap_device_name}}') == -1
-  tags: [centos, storage, swap]
+  tags: [rhel, storage, swap]
 
 - name: add swap into fstab
   mount:
@@ -27,23 +27,23 @@
     fstype: swap
     opts: default
     state: present
-  tags: [centos, storage, swap]
+  tags: [rhel, storage, swap]
 
 - name: get enforce
   command: getenforce
   register: getenforce_out
   changed_when: False
-  tags: [centos, selinux]
+  tags: [rhel, selinux]
 
 - name: set enforce to 0
   command: setenforce 0
   when: getenforce_out.stdout.find('Disabled') == -1
-  tags: [centos, selinux]
+  tags: [rhel, selinux]
 
 - name: disable selinux
   selinux:
     state: disabled
-  tags: [centos, selinux]
+  tags: [rhel, selinux]
 
 - name: install additional packages
   yum:
@@ -55,10 +55,9 @@
     - bc
     - bind-utils
     - dstat
-    - epel-release
+    - "{{epel_release_url}}"
     - firewalld
     - git
-    - jq
     - logwatch
     - lsof
     - mlocate
@@ -67,16 +66,13 @@
     - patch
     - perl-libwww-perl
     - prelink
-    - source-highlight
     - sysstat
     - telnet
     - tmux
     - tree
     - unzip
     - vim-enhanced
-    - yum-cron
-    - yum-plugin-priorities
-  tags: [centos, package]
+  tags: [rhel, package]
 
 - name: install additional packages from EPEL
   yum:
@@ -84,65 +80,48 @@
     state: installed
   with_items:
     - etckeeper
-  tags: [centos, epel, package]
+    - jq
+  tags: [rhel, epel, package]
 
 - name: download get-pip.py
   get_url:
     url: https://bootstrap.pypa.io/get-pip.py
     dest: /tmp
-  tags: [centos, package, pip]
+  tags: [rhel, package, pip]
 
 - name: run get-pip.py
   command: python /tmp/get-pip.py
-  tags: [centos, package, pip]
+  tags: [rhel, package, pip]
 
 - name: install packages with pip
   pip:
     name: "{{item}}"
   with_items:
     - awscli
-  tags: [centos, package, pip]
+  tags: [rhel, package, pip]
 
 - name: update all packages
   yum:
     name: '*'
     state: latest
-  tags: [centos, package]
+  tags: [rhel, package]
 
 - name: etckeeper; init /etc
   command: etckeeper init
   args:
       creates: /etc/.git
-  tags: [centos, etckeeper]
+  tags: [rhel, etckeeper]
 
 - name: etckeeper; Initial commit
   command: etckeeper commit "Initial commit"
   args:
     chdir: /etc
     creates: /etc/.git/logs
-  tags: [centos, etckeeper]
+  tags: [rhel, etckeeper]
 
-- name: add priority into /etc/yum.repos.d/CentOS-Base.repo
-  ini_file:
-    dest: /etc/yum.repos.d/CentOS-Base.repo
-    section: "{{item}}"
-    option: priority
-    value: 10
-    no_extra_spaces: True
-  with_items:
-    - base
-    - updates
-    - extras
-  tags: [centos, package]
-
-- name: add priority into /etc/yum.repos.d/epel.repo
-  ini_file:
-    dest: /etc/yum.repos.d/epel.repo
-    section: epel
-    option: priority
-    value: 50
-    no_extra_spaces: True
-  tags: [centos, epel, package]
+- name: set hostname
+  command: hostnamectl set-hostname {{inventory_hostname}}
+  tags: [rhel, hostname]
 
 - name: disable the unnecessary services
   service:
@@ -153,7 +132,7 @@
     - firewalld
     - kdump
     - sysstat
-  tags: [centos, package]
+  tags: [rhel, package]
 
 - name: postfix; change myorigin
   lineinfile:
@@ -162,7 +141,7 @@
     regexp: '^myorigin '
     line: 'myorigin = rewse.jp'
   notify: reload postfix
-  tags: [centos, postfix]
+  tags: [rhel, postfix]
 
 - name: postfix; change relayhost
   lineinfile:
@@ -171,7 +150,7 @@
     regexp: '^relayhost '
     line: 'relayhost = [{{relayhost.name}}]:{{relayhost.port}}'
   notify: reload postfix
-  tags: [centos, postfix]
+  tags: [rhel, postfix]
 
 - name: postfix; set smtp_sasl_auth_enable
   lineinfile:
@@ -179,7 +158,7 @@
     regexp: '^smtp_sasl_auth_enable '
     line: 'smtp_sasl_auth_enable = yes'
   notify: reload postfix
-  tags: [centos, postfix]
+  tags: [rhel, postfix]
 
 - name: postfix; set smtp_sasl_password_maps
   lineinfile:
@@ -187,7 +166,7 @@
     regexp: 'smtp_sasl_password_maps '
     line: 'smtp_sasl_password_maps = hash:/etc/postfix/sasl_passwd'
   notify: reload postfix
-  tags: [centos, postfix]
+  tags: [rhel, postfix]
 
 - name: postfix; set smtp_sasl_security_options
   lineinfile:
@@ -195,7 +174,7 @@
     regexp: 'smtp_sasl_security_options '
     line: 'smtp_sasl_security_options = noplaintext, noanonymous'
   notify: reload postfix
-  tags: [centos, postfix]
+  tags: [rhel, postfix]
 
 - name: postfix; create sasl_passwd
   lineinfile:
@@ -205,20 +184,20 @@
     create: yes
     mode: 0600
   register: postfix_sasl_password_res
-  tags: [centos, postfix]
+  tags: [rhel, postfix]
 
 - name: postfix; create sasl_passwd.db
   file:
     path: /etc/postfix/sasl_passwd.db
-    state: file
+    state: touch
     mode: 0600
-  tags: [centos, postfix]
+  tags: [rhel, postfix]
 
 - name: postfix; hash sasl_passwd
   command: postmap hash:/etc/postfix/sasl_passwd
   when: postfix_sasl_password_res|changed
   notify: reload postfix
-  tags: [centos, postfix]
+  tags: [rhel, postfix]
 
 - name: install sasl packages
   yum:
@@ -228,25 +207,25 @@
     - cyrus-sasl-md5
     - cyrus-sasl-plain
   notify: restart postfix
-  tags: [centos, postfix]
+  tags: [rhel, postfix]
 
 - name: wirte root mail alias
   lineinfile:
     dest: /etc/aliases
     insertbefore: '^# Basic '
     line: 'root: {{email.secondary}}'
-  tags: [centos, postfix, aliases]
+  tags: [rhel, postfix, aliases]
 
-- name: wirte centos mail alias
+- name: wirte rhel mail alias
   lineinfile:
     dest: /etc/aliases
     insertbefore: '^# Basic '
-    line: 'centos: root'
-  tags: [centos, postfix, aliases]
+    line: 'rhel: root'
+  tags: [rhel, postfix, aliases]
 
 - name: enable mail alias
   command: newaliases
-  tags: [centos, postfix, aliases]
+  tags: [rhel, postfix, aliases]
 
 - name: anacron; change start_hours_range
   lineinfile:
@@ -254,7 +233,7 @@
     insertafter: '^#START_HOURS_RANGE'
     regexp: '^START_HOURS_RANGE'
     line: 'START_HOURS_RANGE=3-7'
-  tags: [centos, anacron]
+  tags: [rhel, anacron]
 
 - name: cloud-init; add preserve_hostname
   lineinfile:
@@ -262,20 +241,20 @@
     insertbefore: '^# vim:syntax'
     regexp: '^preserve_hostname'
     line: 'preserve_hostname: true'
-  tags: [centos, cloud-init]
+  tags: [rhel, cloud-init]
 
 - name: copy profile.d/pathmunge.sh
   copy:
     src: pathmunge.sh
     dest: /etc/profile.d
-  tags: [centos, bash]
+  tags: [rhel, bash]
 
 - name: input; set editing-mode to vi
   lineinfile:
     dest: /etc/inputrc
     regexp: 'set editing-mode '
     line: 'set editing-mode vi'
-  tags: [centos, input]
+  tags: [rhel, input]
 
 - name: create journal dir
   file:
@@ -283,7 +262,7 @@
     state: directory
     group: systemd-journal
     mode: 02755
-  tags: [centos, journal]
+  tags: [rhel, journal]
 
 - name: logwatch; disable all services
   lineinfile:
@@ -291,7 +270,7 @@
     insertbefore: '^# You can also disable'
     regexp: '^#? ?Service = All'
     line: '# Service = All'
-  tags: [centos, logwatch]
+  tags: [rhel, logwatch]
 
 - name: logwatch; enable yum
   lineinfile:
@@ -299,14 +278,14 @@
     insertafter: '^#Service = pam'
     regexp: '^Service = yum'
     line: 'Service = yum'
-  tags: [centos, logwatch]
+  tags: [rhel, logwatch]
 
 - name: rsyslog; add a template
   copy:
     src: 00-template.conf
     dest: /etc/rsyslog.d
   notify: restart rsyslog
-  tags: [centos, rsyslog]
+  tags: [rhel, rsyslog]
 
   # See also "Bug 1072368 - user manager message flood"
   # <https://bugzilla.redhat.com/show_bug.cgi?id=1072368>. Do not use
@@ -316,20 +295,20 @@
     src: systemd-logind.conf
     dest: /etc/rsyslog.d
   notify: restart rsyslog
-  tags: [centos, rsyslog]
+  tags: [rhel, rsyslog]
 
 - name: rsyslog; move to /var/log/trash.log
   copy:
     src: trash.conf
     dest: /etc/rsyslog.d
   notify: restart rsyslog
-  tags: [centos, rsyslog]
+  tags: [rhel, rsyslog]
 
 - name: logrotate; config for /var/log/trash.log
   copy:
     src: trash
     dest: /etc/logrotate.d
-  tags: [centos, logrotate]
+  tags: [rhel, logrotate]
 
 - name: ssh; change ClientAliveInterval
   lineinfile:
@@ -338,14 +317,14 @@
     regexp: '^ClientAliveInterval'
     line: 'ClientAliveInterval 59'
   notify: restart sshd
-  tags: [centos, ssh]
+  tags: [rhel, ssh]
 
 - name: ssh; change ServerAliveInterval
   lineinfile:
     dest: /etc/ssh/ssh_config
     regexp: '^.*ServerAliveInterval'
     line: '  ServerAliveInterval 59'
-  tags: [centos, ssh]
+  tags: [rhel, ssh]
 
 - name: add NTP servers
   blockinfile:
@@ -356,29 +335,13 @@
       server ntp.jst.mfeed.ad.jp iburst
       server ats1.e-timing.ne.jp iburst
   notify: restart chronyd
-  tags: [centos, time, chrony]
-
-- name: yum-cron; enable auto-update
-  ini_file:
-    dest: /etc/yum/yum-cron.conf
-    section: commands
-    option: apply_updates
-    value: yes
-  notify: restart yum-cron
-  tags: [centos, yum-cron]
-
-- name: yum-cron; enable yum-cron
-  service:
-    name: yum-cron
-    enabled: yes
-  notify: restart yum-cron
-  tags: [centos, yum-cron]
+  tags: [rhel, time, chrony]
 
 - name: add a group for admin user
   group:
     name: "{{admin}}"
     gid: 1001
-  tags: [centos, user]
+  tags: [rhel, user]
 
 - name: add admin user
   user:
@@ -387,7 +350,7 @@
     group: "{{admin}}"
     groups: 'adm,wheel,systemd-journal'
     skeleton: /etc/skel
-  tags: [centos, user]
+  tags: [rhel, user]
 
 - name: allow sudo to admin user
   lineinfile:
@@ -397,7 +360,7 @@
     create: yes
     mode: 0440
     validate: 'visudo -cf %s'
-  tags: [centos, user]
+  tags: [rhel, user]
 
 - name: make .ssh dir for admin user
   file:
@@ -406,17 +369,17 @@
     group: "{{admin}}"
     state: directory
     mode: 0700
-  tags: [centos, user]
+  tags: [rhel, user]
 
 - name: copy authorized_keys
   copy:
-    src: /home/centos/.ssh/authorized_keys
+    src: /home/ec2-user/.ssh/authorized_keys
     dest: /home/{{admin}}/.ssh/authorized_keys
     remote_src: True
     owner: "{{admin}}"
     group: "{{admin}}"
     mode: 0600
-  tags: [centos, user]
+  tags: [rhel, user]
 
 - name: copy id_rsa
   become_user: "{{admin}}"
@@ -425,7 +388,7 @@
     dest: /home/{{admin}}/.ssh/id_rsa
     mode: 0600
     follow: yes
-  tags: [centos, user]
+  tags: [rhel, user]
 
 - name: copy id_rsa.pub
   become_user: "{{admin}}"
@@ -433,7 +396,7 @@
     src: ~/.ssh/id_rsa.pub
     dest: /home/{{admin}}/.ssh/id_rsa.pub
     follow: yes
-  tags: [centos, user]
+  tags: [rhel, user]
 
 - name: clone dotfiles.git
   git:
@@ -441,7 +404,7 @@
     dest: /srv/git/dotfiles
     accept_hostkey: yes
     key_file: /home/{{admin}}/.ssh/id_rsa
-  tags: [centos, dotfiles]
+  tags: [rhel, dotfiles]
 
 - name: change mode of git/dotfiles
   file:
@@ -449,21 +412,21 @@
     owner: "{{admin}}"
     group: "{{admin}}"
     recurse: yes
-  tags: [centos, dotfiles]
+  tags: [rhel, dotfiles]
 
 - name: copy bash_profile
   copy:
     src: /srv/git/dotfiles/bash_profile
     dest: /etc/profile.d/bash_profile.sh
     remote_src: True
-  tags: [centos, dotfiles, bash]
+  tags: [rhel, dotfiles, bash]
 
 - name: copy bashrc
   copy:
     src: /srv/git/dotfiles/bashrc
     dest: /etc/profile.d/bashrc.sh
     remote_src: True
-  tags: [centos, dotfiles, bash]
+  tags: [rhel, dotfiles, bash]
 
 - name: copy gitconfig
   become_user: "{{admin}}"
@@ -471,7 +434,7 @@
     src: /srv/git/dotfiles/gitconfig
     dest: /home/{{admin}}/.gitconfig
     remote_src: True
-  tags: [centos, dotfiles, git]
+  tags: [rhel, dotfiles, git]
 
 - name: git; set user email
   become_user: "{{admin}}"
@@ -480,14 +443,14 @@
     section: user
     option: email
     value: "{{email.primary}}"
-  tags: [centos, dotfiles, git]
+  tags: [rhel, dotfiles, git]
 
 - name: tmux; copy tmux.conf
   copy:
     src: /srv/git/dotfiles/tmux.conf
     dest: /etc/tmux.conf
     remote_src: True
-  tags: [centos, dotfiles, tmux]
+  tags: [rhel, dotfiles, tmux]
 
 - name: vim; copy vimfiles
   copy:
@@ -500,13 +463,13 @@
     - plugin/matrix.vim
     - plugin/NERD_commenter.vim
     - vimrc
-  tags: [centos, dotfiles, vim]
+  tags: [rhel, dotfiles, vim]
 
 - name: vim; add to import vimrc
   lineinfile:
     dest: /etc/vimrc
     line: 'source /usr/share/vim/vimfiles/vimrc'
-  tags: [centos, dotfiles, vim]
+  tags: [rhel, dotfiles, vim]
 
 - name: create .aws dir
   file:
