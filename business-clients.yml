@@ -1,7 +1,7 @@
 ---
 - hosts: business-clients
   become: yes
-  remote_user: centos
+  remote_user: ec2-user
   roles:
     - desktop
     - database/client

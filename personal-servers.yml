@@ -1,7 +1,7 @@
 ---
 - hosts: personal-servers
   become: yes
-  remote_user: centos
+  remote_user: ec2-user
   roles:
     - srv
     - httpd
