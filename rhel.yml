@@ -1,7 +1,7 @@
 ---
-- hosts: machines
+- hosts: rhel
   become: yes
   remote_user: ec2-user
   roles:
-    - centos
+    - rhel
     - zabbix/agent

@@ -1,0 +1,7 @@
+---
+- hosts: centos
+  become: yes
+  remote_user: centos
+  roles:
+    - centos
+    - zabbix/agent
