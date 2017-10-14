@@ -1,12 +1,12 @@
 [business-clients]
-atom.rewse.jp
+atom.rewse.jp ansible_user=centos
 
 [personal-clients]
-charlie.rewse.jp
+charlie.rewse.jp ansible_user=centos
 
 [personal-servers]
-charlie.rewse.jp
+charlie.rewse.jp ansible_user=centos
 
 [machines]
-atom.rewse.jp
-charlie.rewse.jp
+atom.rewse.jp ansible_user=centos
+charlie.rewse.jp ansible_user=centos
