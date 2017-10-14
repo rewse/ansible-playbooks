@@ -8,6 +8,7 @@ charlie.rewse.jp ansible_user=centos
 charlie.rewse.jp ansible_user=centos
 
 [rhel]
+alfa.rewse.jp
 
 [centos]
 atom.rewse.jp ansible_user=centos
