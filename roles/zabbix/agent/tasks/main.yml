@@ -59,9 +59,9 @@
   notify: restart zabbix-agent
   tags: [zabbix-agent]
 
-- name: copy centos7.conf
+- name: copy rhel7.conf
   copy:
-    src: centos7.conf
+    src: rhel7.conf
     dest: /etc/zabbix/zabbix_agentd.d
   tags: [zabbix-agent]
 
