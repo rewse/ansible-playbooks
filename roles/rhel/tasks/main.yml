@@ -50,6 +50,7 @@
     name: "{{item}}"
     state: installed
   with_items:
+    - "@Development tools"
     - at
     - bash-completion
     - bc
