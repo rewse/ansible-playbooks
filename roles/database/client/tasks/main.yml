@@ -135,14 +135,6 @@
     remote_src: True
   tags: [database-client, oracle]
 
-- name: download swingbench
-  become_user: "{{admin}}"
-  unarchive:
-    src: http://dominicgiles.com/swingbench/{{swingbench_filename}}
-    dest: /home/{{admin}}
-    remote_src: True
-  tags: [database-client, swingbench]
-
 - name: create symlink for orascript/common
   become_user: "{{admin}}"
   file:

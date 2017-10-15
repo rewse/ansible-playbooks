@@ -7,4 +7,3 @@ oracle_instantclient_tools_filename: oracle-instantclient12.2-tools-12.2.0.1.0-1
 postgersql_jdbc_filename: postgresql-9.4.1212.jar
 redshift_jdbc_filename: RedshiftJDBC42-1.2.1.1001.jar
 sqlcl_filename: sqlcl-17.2.0.184.1230-no-jre.zip
-swingbench_filename: swingbench25971.zip
