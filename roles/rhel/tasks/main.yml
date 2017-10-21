@@ -542,3 +542,9 @@
     state: touch
     mode: 0600
   tags: [rhel, snapshot]
+
+- name: copy yum-update.cron
+  copy:
+    src: yum-update.cron
+    dest: /etc/cron.daily
+  tags: [rhel, yum]
