@@ -5,10 +5,23 @@ alfa.rewse.jp
 charlie.rewse.jp ansible_user=centos
 
 [personal-servers]
+<<<<<<< HEAD
 charlie.rewse.jp ansible_user=centos
+=======
+charlie.rewse.jp
+>>>>>>> 4f84f46db07d049867c221a294a564577720a5cc
 
 [rhel]
 alfa.rewse.jp
 
+<<<<<<< HEAD
 [centos]
 charlie.rewse.jp ansible_user=centos
+=======
+[standby-zabbix-servers]
+foxtrot.rewse.jp
+
+[machines]
+atom.rewse.jp
+charlie.rewse.jp
+>>>>>>> 4f84f46db07d049867c221a294a564577720a5cc
