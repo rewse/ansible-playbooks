@@ -476,21 +476,21 @@
   file:
     path: /root/.aws
     state: directory
-  tags: [srv, snapshot]
+  tags: [rhel, snapshot]
 
 - name: create .aws/config
   file:
     path: /root/.aws/config
     state: touch
     mode: 0600
-  tags: [srv, snapshot]
+  tags: [rhel, snapshot]
 
 - name: create .aws/credentials
   file:
     path: /root/.aws/credentials
     state: touch
     mode: 0600
-  tags: [srv, snapshot]
+  tags: [rhel, snapshot]
 
 - name: Set aws config
   ini_file:
@@ -498,7 +498,7 @@
     section: default
     option: region
     value: ap-northeast-1
-  tags: [srv, snapshot]
+  tags: [rhel, snapshot]
 
 - name: clone aws-ec2-smart-snapshot
   git:
@@ -506,7 +506,7 @@
     dest: /srv/git/aws-ec2-smart-snapshot
     accept_hostkey: yes
     key_file: /home/{{admin}}/.ssh/id_rsa
-  tags: [srv, snapshot]
+  tags: [rhel, snapshot]
 
 - name: change mode of git/dotfiles
   file:
@@ -514,7 +514,7 @@
     owner: "{{admin}}"
     group: "{{admin}}"
     recurse: yes
-  tags: [srv, snapshot]
+  tags: [rhel, snapshot]
 
 - name: copy aws-ec2-smart-snapshot
   copy:
@@ -525,7 +525,7 @@
     - /usr/local/sbin/aws-ec2-smart-snapshot
     - /etc/cron.daily/00-aws-ec2-smart-snapshot.cron
     - /etc/logrotate.d/aws-ec2-smart-snapshot
-  tags: [srv, snapshot]
+  tags: [rhel, snapshot]
 
 - name: change perm of aws-ec2-smart-snapshot
   file:
@@ -534,11 +534,11 @@
   with_items:
     - /usr/local/sbin/aws-ec2-smart-snapshot
     - /etc/cron.daily/00-aws-ec2-smart-snapshot.cron
-  tags: [srv, snapshot]
+  tags: [rhel, snapshot]
 
 - name: create log/aws-ec2-smart-snapshot.log
   file:
     path: /var/log/aws-ec2-smart-snapshot.log
     state: touch
     mode: 0600
-  tags: [srv, snapshot]
+  tags: [rhel, snapshot]
