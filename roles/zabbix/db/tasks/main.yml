@@ -1,8 +1,11 @@
 ---
-- name: install MySQL-python
+- name: install mysql clients
   yum:
-    name: MySQL-python
+    name: "{{item}}"
     state: installed
+  with_items:
+    - mysql
+    - MySQL-python
   tags: [zabbix-db, package]
 
 - name: create database
