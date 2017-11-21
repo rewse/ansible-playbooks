@@ -3,7 +3,6 @@
   become: yes
   remote_user: ec2-user
   roles:
-    - srv
     - httpd
     - phpmyadmin
     - postfix
