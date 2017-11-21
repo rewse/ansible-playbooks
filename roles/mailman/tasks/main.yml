@@ -1,4 +1,39 @@
 ---
+- name: create /srv/mailman dir
+  file:
+    path: /srv/mailman/etc
+    state: directory
+    mode: 0775
+  tags: [mailman]
+
+- name: create /srv/mailman/etc dir
+  file:
+    path: /srv/mailman/etc
+    state: directory
+    mode: 0775
+  tags: [mailman]
+
+- name: create /etc/mailman link
+  file:
+    src: /srv/mailman/etc
+    dest: /etc/mailman
+    state: link
+  tags: [mailman]
+
+- name: create /srv/mailman/var dir
+  file:
+    path: /srv/mailman/var
+    state: directory
+    mode: 0775
+  tags: [mailman]
+
+- name: create /var/lib/mailman link
+  file:
+    src: /srv/mailman/var
+    dest: /var/lib/mailman
+    state: link
+  tags: [mailman]
+
 - name: install packages
   yum:
     name: "{{item}}"
@@ -7,7 +42,6 @@
     - mailman
   tags: [mailman, package]
 
-  # Because lsyncd copies everything by mailman user
 - name: change owner in /srv/mailman
   file:
     path: /srv/mailman
