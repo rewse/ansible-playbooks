@@ -1,3 +1,4 @@
 ---
 aliases: "{{vault_aliases}}"
 cert_year: 2016
+users: "{{vault_users}}"
