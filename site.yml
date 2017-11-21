@@ -1,5 +1,4 @@
 ---
-- include: centos.yml
 - include: rhel.yml
 - include: business-clients.yml
 - include: personal-clients.yml
