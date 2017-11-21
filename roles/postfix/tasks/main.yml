@@ -28,7 +28,7 @@
     insertafter: '^#inet_interfaces'
     regexp: '^inet_interfaces'
     line: 'inet_interfaces = all'
-  notify: reload postfix
+  notify: restart postfix
   tags: [postfix]
 
 - name: set mydestination
@@ -246,6 +246,8 @@
   git:
     repo: git@github.com:rewse/sa-learn-all.git
     dest: /srv/git/sa-learn-all
+    accept_hostkey: yes
+    key_file: /home/{{admin}}/.ssh/id_rsa
   tags: [postfix, spamassassin]
 
 - name: copy sa-learn-all
@@ -354,14 +356,51 @@
   notify: reload dovecot
   tags: [postfix, dovecot, cert]
 
-- name: copy failover-mail
-  copy:
-    src: failover-mail
-    dest: /usr/local/sbin
+- name: create groups
+  group:
+    name: "{{item.key}}"
+    gid: "{{item.value.gid}}"
+  with_dict: "{{users}}"
+  tags: [postfix]
+
+- name: create users
+  user:
+    name: "{{item.key}}"
+    uid: "{{item.value.uid}}"
+    group: "{{item.key}}"
+    comment: "{{item.value.comment}}"
+    shell: "{{item.value.shell}}"
+  with_dict: "{{users}}"
+  tags: [postfix]
+
+- name: make /srv/mail dir
+  file:
+    path: /srv/mail
+    state: directory
     mode: 0755
   tags: [postfix]
 
-- name: start dovecot
+- name: make mail user dir
+  file:
+    path: /srv/mail/{{item.key}}
+    state: directory
+    owner: "{{item.key}}"
+    group: "{{item.key}}"
+    mode: 0700
+  with_dict: "{{users}}"
+  tags: [postfix]
+
+- name: make mail user link
+  file:
+    src: /srv/mail/{{item.key}}
+    dest: /home/{{item.key}}/Maildir
+    state: link
+    owner: "{{item.key}}"
+    group: "{{item.key}}"
+  with_dict: "{{users}}"
+  tags: [postfix]
+
+- name: enable dovecot
   service:
     name: dovecot
     enabled: yes
