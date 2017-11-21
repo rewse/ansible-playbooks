@@ -45,6 +45,10 @@
     state: disabled
   tags: [rhel, selinux]
 
+- name: enable yum channels
+  command: yum-config-manager --enable rhui-REGION-rhel-server-extras rhui-REGION-rhel-server-optional rhui-REGION-rhel-server-supplementary
+  tags: [rhel, package]
+
 - name: install additional packages
   yum:
     name: "{{item}}"
@@ -67,12 +71,15 @@
     - patch
     - perl-libwww-perl
     - prelink
+    - source-highlight
     - sysstat
     - telnet
     - tmux
     - tree
     - unzip
     - vim-enhanced
+    - yum-cron
+    - yum-plugin-priorities
   tags: [rhel, package]
 
 - name: install additional packages from EPEL
@@ -81,7 +88,6 @@
     state: installed
   with_items:
     - etckeeper
-    - jq
   tags: [rhel, epel, package]
 
 - name: download get-pip.py
@@ -119,6 +125,43 @@
     chdir: /etc
     creates: /etc/.git/logs
   tags: [rhel, etckeeper]
+
+- name: add priority into /etc/yum.repos.d/redhat-rhui.repo
+  ini_file:
+    dest: /etc/yum.repos.d/redhat-rhui.repo
+    section: "{{item}}"
+    option: priority
+    value: 10
+    no_extra_spaces: True
+  with_items:
+    - rhui-REGION-rhel-server-releases
+    - rhui-REGION-rhel-server-extras
+    - rhui-REGION-rhel-server-optional
+    - rhui-REGION-rhel-server-rh-common
+    - rhui-REGION-rhel-server-supplementary
+  tags: [rhel, package]
+
+- name: add priority into /etc/yum.repos.d/redhat-rhui-client-config.repo
+  ini_file:
+    dest: /etc/yum.repos.d/redhat-rhui-client-config.repo
+    section: "{{item}}"
+    option: priority
+    value: 10
+    no_extra_spaces: True
+  with_items:
+    - rhui-REGION-client-config-server-7
+  tags: [rhel, package]
+
+- name: add priority into /etc/yum.repos.d/epel.repo
+  ini_file:
+    dest: /etc/yum.repos.d/epel.repo
+    section: "{{item}}"
+    option: priority
+    value: 50
+    no_extra_spaces: True
+  with_items:
+    - epel
+  tags: [rhel, package]
 
 - name: set hostname
   command: hostnamectl set-hostname {{inventory_hostname}}
@@ -338,6 +381,22 @@
   notify: restart chronyd
   tags: [rhel, time, chrony]
 
+- name: yum-cron; enable auto-update
+  ini_file:
+    dest: /etc/yum/yum-cron.conf
+    section: commands
+    option: apply_updates
+    value: yes
+  notify: restart yum-cron
+  tags: [rhel, yum-cron]
+
+- name: yum-cron; enable yum-cron
+  service:
+    name: yum-cron
+    enabled: yes
+  notify: restart yum-cron
+  tags: [rhel, yum-cron]
+
 - name: add a group for admin user
   group:
     name: "{{admin}}"
@@ -542,9 +601,3 @@
     state: touch
     mode: 0600
   tags: [rhel, snapshot]
-
-- name: copy yum-update.cron
-  copy:
-    src: yum-update.cron
-    dest: /etc/cron.daily
-  tags: [rhel, yum]
