@@ -98,11 +98,18 @@
     - us-market-price-check
   tags: [zabbix-server, zabbix-extra]
 
-- name: download ssl-cert-check
-  get_url:
-    url: http://prefetch.net/code/ssl-cert-check
+- name: clone ssl-cert-check
+  git:
+    repo: https://github.com/Matty9191/ssl-cert-check.git
+    dest: /srv/git/ssl-cert-check
+  tags: [zabbix-server, zabbix-extra]
+
+- name: clone ssl-cert-check
+  copy:
+    src: /srv/git/ssl-cert-check/ssl-cert-check
     dest: /usr/local/bin
     mode: 0755
+    remote_src: yes
   tags: [zabbix-server, zabbix-extra]
 
 - name: copy to externalscripts
