@@ -2,15 +2,11 @@
 alfa.rewse.jp
 
 [personal-clients]
-charlie.rewse.jp ansible_user=centos
 foxtrot.rewse.jp
 
 [personal-servers]
-charlie.rewse.jp ansible_user=centos
+foxtrot.rewse.jp
 
 [rhel]
 alfa.rewse.jp
 foxtrot.rewse.jp
-
-[centos]
-charlie.rewse.jp ansible_user=centos
