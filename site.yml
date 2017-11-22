@@ -1,5 +1,5 @@
 ---
-- include: rhel.yml
-- include: business-clients.yml
-- include: personal-clients.yml
-- include: personal-servers.yml
+- import_playbook: rhel.yml
+- import_playbook: business-clients.yml
+- import_playbook: personal-clients.yml
+- import_playbook: personal-servers.yml
