@@ -1,4 +1,4 @@
 ---
 aliases: "{{vault_aliases}}"
-cert_year: 2016
+route53py_url: https://gist.githubusercontent.com/rmarchei/98489c05f0898abe612eec916508f2bf/raw/a7f51af111c98544c0cee8739ebd0b88c39b3afa/route53.py
 users: "{{vault_users}}"
