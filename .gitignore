@@ -6,4 +6,3 @@ roles/database/client/files/sqlcl*
 roles/database/client/files/sqljdbc*
 roles/database/client/gui/files/jdk*
 roles/database/client/gui/files/sqldeveloper*
-roles/postfix/files/*.key

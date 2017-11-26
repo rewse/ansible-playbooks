@@ -5,6 +5,7 @@
     state: installed
   with_items:
     - amavisd-new
+    - certbot-apache
     - clamav
     - clamav-server-systemd
     - clamav-update
@@ -13,7 +14,15 @@
     - lz4
     - procmail
     - spamassassin
-  tags: [postfix, amavisd, dovecot, procmail, spamassassin, package]
+  tags: [postfix, amavisd, cert, dovecot, procmail, spamassassin, package]
+
+- name: install packages by pip
+  pip:
+    name: "{{item}}"
+  with_items:
+    - certbot-external-auth
+    - boto
+  tags: [postfix, cert, package]
 
 - name: start saslauthd
   service:
@@ -58,27 +67,24 @@
   notify: reload postfix
   tags: [postfix]
 
-- name: copy crt files
-  copy:
-    src: "{{item}}"
-    dest: /etc/pki/tls/certs
-  with_items:
-    - mail.rewse.jp.{{cert_year}}.crt
-    - mail.rewse.jp.{{cert_year}}.ca-bundle
-  register: copy_crt_files_out
+# Do before
+# - certbot certonly --preferred-challenges dns-01 --authenticator manual --domain mail.rewse.jp
+# - Are you OK with your IP being logged?: Y
+# - _acme-challenge.mail.rewse.jp TXT <token>
+# See also <https://qiita.com/AkihiroTakamura/items/06ced4e780dc217bc1aa>
+
+- name: doownload route53.py
+  get_url:
+    url: "{{route53py_url}}"
+    dest: /usr/local/bin
+    mode: 0755
   tags: [postfix, cert]
 
-- name: concat crt files
-  shell: cat mail.rewse.jp.{{cert_year}}.crt mail.rewse.jp.{{cert_year}}.ca-bundle > mail.rewse.jp.fullchain.{{cert_year}}.crt
-  args:
-    chdir: /etc/pki/tls/certs
-  when: copy_crt_files_out|changed
-  tags: [postfix, cert]
-
-- name: copy key file
-  copy:
-    src: mail.rewse.jp.{{cert_year}}.key
-    dest: /etc/pki/tls/private
+- name: copy updatecertbot.cron
+  template:
+    src: updatecertbot.cron.j2
+    dest: /etc/cron.daily/updatecertbot.cron
+    mode: 0755
   tags: [postfix, cert]
 
 - name: amavisd; bypass spam checks
@@ -166,8 +172,8 @@
 
       smtpd_use_tls = yes
       smtpd_tls_auth_only = yes
-      smtpd_tls_cert_file = /etc/pki/tls/certs/mail.rewse.jp.fullchain.{{cert_year}}.crt
-      smtpd_tls_key_file = /etc/pki/tls/private/mail.rewse.jp.{{cert_year}}.key
+      smtpd_tls_cert_file = /etc/letsencrypt/live/mail.rewse.jp fullchain.pem
+      smtpd_tls_key_file = /etc/letsencrypt/live/mail.rewse.jp/privkey.pem
       smtpd_tls_loglevel = 1
       smtpd_tls_session_cache_database = hash:/etc/postfix/smtpd_scache
       smtpd_tls_received_header = yes
@@ -344,7 +350,7 @@
   lineinfile:
     dest: /etc/dovecot/conf.d/10-ssl.conf
     regexp: '^ssl_cert '
-    line: 'ssl_cert = </etc/pki/tls/certs/mail.rewse.jp.fullchain.{{cert_year}}.crt'
+    line: 'ssl_cert = </etc/letsencrypt/live/mail.rewse.jp/fullchain.pem'
   notify: reload dovecot
   tags: [postfix, dovecot, cert]
 
@@ -352,7 +358,7 @@
   lineinfile:
     dest: /etc/dovecot/conf.d/10-ssl.conf
     regexp: '^ssl_key '
-    line: 'ssl_key = </etc/pki/tls/private/mail.rewse.jp.{{cert_year}}.key'
+    line: 'ssl_key = </etc/letsencrypt/live/mail.rewse.jp/privkey.pem'
   notify: reload dovecot
   tags: [postfix, dovecot, cert]
 
