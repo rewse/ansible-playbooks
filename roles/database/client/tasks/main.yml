@@ -1,21 +1,4 @@
 ---
-- name: download mssql repo
-  get_url:
-    url: https://packages.microsoft.com/config/rhel/7/prod.repo
-    dest: /etc/yum.repos.d/msprod.repo
-  tags: [database-client, mssql]
-
-- name: add priority into /etc/yum.repos.d/msprod.repo
-  ini_file:
-    dest: /etc/yum.repos.d/msprod.repo
-    section: "{{item}}"
-    option: priority
-    value: 30
-    no_extra_spaces: True
-  with_items:
-    - packages-microsoft-com-prod
-  tags: [database-client, mssql]
-
 - name: install mysql57-community-release
   yum:
     name: http://repo.mysql.com/{{mysql_release_filename}}
