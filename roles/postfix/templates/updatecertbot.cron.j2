@@ -1,0 +1,13 @@
+#!/bin/bash
+
+certbot certonly \
+  --domain mail.rewse.jp \
+  --email {{vault_email.secondary}} \
+  --agree-tos \
+  --preferred-challenges dns \
+  --keep-until-expiring \
+  --expand \
+  --text \
+  --configurator certbot-external-auth:out \
+  --certbot-external-auth:out-public-ip-logging-ok \
+  --certbot-external-auth:out-handler /usr/local/bin/route53.py
