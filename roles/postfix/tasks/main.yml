@@ -172,7 +172,7 @@
 
       smtpd_use_tls = yes
       smtpd_tls_auth_only = yes
-      smtpd_tls_cert_file = /etc/letsencrypt/live/mail.rewse.jp fullchain.pem
+      smtpd_tls_cert_file = /etc/letsencrypt/live/mail.rewse.jp/fullchain.pem
       smtpd_tls_key_file = /etc/letsencrypt/live/mail.rewse.jp/privkey.pem
       smtpd_tls_loglevel = 1
       smtpd_tls_session_cache_database = hash:/etc/postfix/smtpd_scache
