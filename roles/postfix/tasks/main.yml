@@ -67,12 +67,6 @@
   notify: reload postfix
   tags: [postfix]
 
-# Do before
-# - certbot certonly --preferred-challenges dns-01 --authenticator manual --domain mail.rewse.jp
-# - Are you OK with your IP being logged?: Y
-# - _acme-challenge.mail.rewse.jp TXT <token>
-# See also <https://qiita.com/AkihiroTakamura/items/06ced4e780dc217bc1aa>
-
 - name: doownload route53.py
   get_url:
     url: "{{route53py_url}}"
@@ -80,11 +74,16 @@
     mode: 0755
   tags: [postfix, cert]
 
+# See also <https://qiita.com/AkihiroTakamura/items/06ced4e780dc217bc1aa>
 - name: copy updatecertbot.cron
   template:
     src: updatecertbot.cron.j2
     dest: /etc/cron.monthly/updatecertbot.cron
     mode: 0755
+  tags: [postfix, cert]
+
+- name: Get a certification
+  command: /etc/cron.monthly/updatecertbot.cron
   tags: [postfix, cert]
 
 - name: amavisd; bypass spam checks
