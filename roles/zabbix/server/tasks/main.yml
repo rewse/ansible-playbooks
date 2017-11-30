@@ -50,7 +50,7 @@
     dest: /etc/zabbix/zabbix_server.conf
     insertafter: '^# Timeout='
     regexp: '^Timeout='
-    line: 'Timeout=20'
+    line: 'Timeout=30'
   notify: restart zabbix-server
   tags: [zabbix-server, zabbix-server-server]
 
