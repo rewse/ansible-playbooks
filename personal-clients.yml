@@ -5,3 +5,4 @@
   roles:
     - zabbix/db
     - zabbix/internet
+    - aws
