@@ -371,13 +371,10 @@
   tags: [rhel, ssh]
 
 - name: add NTP servers
-  blockinfile:
+  lineinfile:
     dest: /etc/chrony.conf
-    insertafter: '^# Please consider joining the pool'
-    content: |
-      server ntp.nict.jp iburst
-      server ntp.jst.mfeed.ad.jp iburst
-      server ats1.e-timing.ne.jp iburst
+    regexp: '^server 169.254.169.123 prefer iburst'
+    line: 'server 169.254.169.123 prefer iburst'
   notify: restart chronyd
   tags: [rhel, time, chrony]
 
