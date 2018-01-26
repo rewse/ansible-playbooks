@@ -74,6 +74,7 @@
     mode: 0755
   tags: [postfix, cert]
 
+# Do "sudo certbot certonly --preferred-challenges dns-01 --authenticator manual --domain mail.rewse.jp"
 # See also <https://qiita.com/AkihiroTakamura/items/06ced4e780dc217bc1aa>
 - name: copy updatecertbot.cron
   template:
@@ -82,7 +83,7 @@
     mode: 0755
   tags: [postfix, cert]
 
-- name: Get a certification
+- name: get a certification
   command: /etc/cron.monthly/updatecertbot.cron
   tags: [postfix, cert]
 
