@@ -6,4 +6,4 @@ oracle_instantclient_sqlplus_filename: oracle-instantclient12.2-sqlplus-12.2.0.1
 oracle_instantclient_tools_filename: oracle-instantclient12.2-tools-12.2.0.1.0-1.x86_64.rpm
 postgersql_jdbc_filename: postgresql-42.1.4.jar
 redshift_jdbc_filename: RedshiftJDBC42-1.2.10.1009.jar
-sqlcl_filename: sqlcl-17.2.0.184.1230-no-jre.zip
+sqlcl_filename: sqlcl-17.3.0.271.1943-no-jre.zip
