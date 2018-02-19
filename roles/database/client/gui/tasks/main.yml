@@ -51,7 +51,7 @@
     state: installed
   with_items:
     - /usr/local/src/{{sct_filename}}
-    - /usr/local/src/agents/{{sct_extractor_filename}}
+    - /usr/local/src/dmsagent/{{sct_extractor_filename}}
   tags: [database-client-gui, package, sct]
 
   # Download the files before the following task
