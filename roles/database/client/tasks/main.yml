@@ -166,13 +166,13 @@
 
 - name: install redshift jdbc driver
   get_url:
-    url: https://s3.amazonaws.com/redshift-downloads/drivers/{{redshift_jdbc_filename}}
+    url: https://s3.amazonaws.com/redshift-downloads/drivers/jdbc/{{redshift_jdbc_version}}/RedshiftJDBC42-{{redshift_jdbc_version}}.jar
     dest: /usr/share/java
   tags: [database-client, redshift]
 
 - name: create symlink RedShiftJDBC.jar
   file:
-    src: "{{redshift_jdbc_filename}}"
+    src: RedshiftJDBC42-{{redshift_jdbc_version}}.jar
     dest: /usr/share/java/RedshiftJDBC.jar
     state: link
   tags: [database-client, redshift]
