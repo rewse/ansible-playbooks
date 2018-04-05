@@ -3,6 +3,7 @@
 certbot certonly \
   --domain mail.rewse.jp \
   --email {{vault_email.secondary}} \
+  --force-renewal \
   --agree-tos \
   --preferred-challenges dns \
   --keep-until-expiring \
