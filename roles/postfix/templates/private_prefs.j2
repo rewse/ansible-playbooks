@@ -4,6 +4,10 @@ score BAYES_95 13
 score BAYES_99 15
 report_safe 0
 
+{% for line in spamassassin_whitelists %}
+whitelist_from {{line}}
+{% endfor %}
+
 header SUBJECT_PAYMENT Subject =~ /FW: Payment \#/
 describe SUBJECT_PAYMENT "FW: Payment" subject
 score SUBJECT_PAYMENT 5
