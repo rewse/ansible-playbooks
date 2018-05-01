@@ -69,31 +69,6 @@
     - ojdbc8.jar
   tags: [database-client, oracle]
 
-  # Download the files before the following task
-  # from <http://www.oracle.com/technetwork/developer-tools/sqlcl/downloads/>
-- name: copy sqlcl
-  unarchive:
-    src: "{{sqlcl_filename}}"
-    dest: /opt
-  tags: [database-client, oracle]
-
-- name: disable sqlcl for windows
-  file:
-    path: /opt/sqlcl/bin/{{item}}
-    mode: 0644
-  with_items:
-    - sql.bat
-    - sql.exe
-  tags: [database-client, oracle]
-
-- name: set PATH for sqlcl
-  lineinfile:
-    dest: /etc/profile.d/sqlcl.sh
-    regexp: 'pathmunge /opt/sqlcl/bin'
-    line: 'pathmunge /opt/sqlcl/bin'
-    create: yes
-  tags: [database-client, oracle]
-
 - name: clone orascript.git
   git:
     repo: git@github.com:rewse/orascript.git
