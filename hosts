@@ -1,7 +1,7 @@
-[business-mac]
+[business-darwin]
 localhost
 
-[personal-mac]
+[personal-darwin]
 localhost
 
 [business-clients]
