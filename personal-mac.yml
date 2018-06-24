@@ -3,4 +3,4 @@
   connection: local
   roles:
     - mac
-    - vim
+    - vim/darwin
