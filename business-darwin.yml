@@ -1,6 +1,6 @@
 ---
-- hosts: business-mac
+- hosts: business-darwin
   connection: local
   roles:
-    - mac
+    - darwin
     - vim/darwin
