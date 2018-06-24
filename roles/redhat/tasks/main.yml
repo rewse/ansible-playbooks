@@ -2,23 +2,23 @@
 - name: set timezone
   timezone:
     name: Asia/Tokyo
-  tags: [rhel, time]
+  tags: [redhat, time]
 
 - name: check swap status
   command: cat /proc/swaps
   register: swaps_out
   changed_when: False
-  tags: [rhel, storage, swap]
+  tags: [redhat, storage, swap]
 
 - name: make swap
   command: mkswap /dev/{{swap_device_name}}
   when: swaps_out.stdout.find('{{swap_device_name}}') == -1
-  tags: [rhel, storage, swap]
+  tags: [redhat, storage, swap]
 
 - name: enable swap
   command: swapon /dev/{{swap_device_name}}
   when: swaps_out.stdout.find('{{swap_device_name}}') == -1
-  tags: [rhel, storage, swap]
+  tags: [redhat, storage, swap]
 
 - name: add swap into fstab
   mount:
@@ -27,27 +27,27 @@
     fstype: swap
     opts: default
     state: present
-  tags: [rhel, storage, swap]
+  tags: [redhat, storage, swap]
 
 - name: get enforce
   command: getenforce
   register: getenforce_out
   changed_when: False
-  tags: [rhel, selinux]
+  tags: [redhat, selinux]
 
 - name: set enforce to 0
   command: setenforce 0
   when: getenforce_out.stdout.find('Disabled') == -1
-  tags: [rhel, selinux]
+  tags: [redhat, selinux]
 
 - name: disable selinux
   selinux:
     state: disabled
-  tags: [rhel, selinux]
+  tags: [redhat, selinux]
 
 - name: enable yum channels
   command: yum-config-manager --enable rhui-REGION-rhel-server-extras rhui-REGION-rhel-server-optional rhui-REGION-rhel-server-supplementary
-  tags: [rhel, package]
+  tags: [redhat, package]
 
 - name: install additional packages
   yum:
@@ -80,7 +80,7 @@
     - vim-enhanced
     - yum-cron
     - yum-plugin-priorities
-  tags: [rhel, package]
+  tags: [redhat, package]
 
 - name: install additional packages from EPEL
   yum:
@@ -88,43 +88,43 @@
     state: installed
   with_items:
     - etckeeper
-  tags: [rhel, epel, package]
+  tags: [redhat, epel, package]
 
 - name: download get-pip.py
   get_url:
     url: https://bootstrap.pypa.io/get-pip.py
     dest: /tmp
-  tags: [rhel, package, pip]
+  tags: [redhat, package, pip]
 
 - name: run get-pip.py
   command: python /tmp/get-pip.py
-  tags: [rhel, package, pip]
+  tags: [redhat, package, pip]
 
 - name: install packages with pip
   pip:
     name: "{{item}}"
   with_items:
     - awscli
-  tags: [rhel, package, pip]
+  tags: [redhat, package, pip]
 
 - name: update all packages
   yum:
     name: '*'
     state: latest
-  tags: [rhel, package]
+  tags: [redhat, package]
 
 - name: etckeeper; init /etc
   command: etckeeper init
   args:
       creates: /etc/.git
-  tags: [rhel, etckeeper]
+  tags: [redhat, etckeeper]
 
 - name: etckeeper; Initial commit
   command: etckeeper commit "Initial commit"
   args:
     chdir: /etc
     creates: /etc/.git/logs
-  tags: [rhel, etckeeper]
+  tags: [redhat, etckeeper]
 
 - name: add priority into /etc/yum.repos.d/redhat-rhui.repo
   ini_file:
@@ -139,7 +139,7 @@
     - rhui-REGION-rhel-server-optional
     - rhui-REGION-rhel-server-rh-common
     - rhui-REGION-rhel-server-supplementary
-  tags: [rhel, package]
+  tags: [redhat, package]
 
 - name: add priority into /etc/yum.repos.d/redhat-rhui-client-config.repo
   ini_file:
@@ -150,7 +150,7 @@
     no_extra_spaces: True
   with_items:
     - rhui-REGION-client-config-server-7
-  tags: [rhel, package]
+  tags: [redhat, package]
 
 - name: add priority into /etc/yum.repos.d/epel.repo
   ini_file:
@@ -161,11 +161,11 @@
     no_extra_spaces: True
   with_items:
     - epel
-  tags: [rhel, package]
+  tags: [redhat, package]
 
 - name: set hostname
   command: hostnamectl set-hostname {{inventory_hostname}}
-  tags: [rhel, hostname]
+  tags: [redhat, hostname]
 
 - name: disable the unnecessary services
   service:
@@ -176,7 +176,7 @@
     - firewalld
     - kdump
     - sysstat
-  tags: [rhel, package]
+  tags: [redhat, package]
 
 - name: postfix; change myorigin
   lineinfile:
@@ -185,7 +185,7 @@
     regexp: '^myorigin '
     line: 'myorigin = rewse.jp'
   notify: reload postfix
-  tags: [rhel, postfix]
+  tags: [redhat, postfix]
 
 - name: postfix; change relayhost
   lineinfile:
@@ -194,7 +194,7 @@
     regexp: '^relayhost '
     line: 'relayhost = [{{relayhost.name}}]:{{relayhost.port}}'
   notify: reload postfix
-  tags: [rhel, postfix]
+  tags: [redhat, postfix]
 
 - name: postfix; set smtp_sasl_auth_enable
   lineinfile:
@@ -202,7 +202,7 @@
     regexp: '^smtp_sasl_auth_enable '
     line: 'smtp_sasl_auth_enable = yes'
   notify: reload postfix
-  tags: [rhel, postfix]
+  tags: [redhat, postfix]
 
 - name: postfix; set smtp_sasl_password_maps
   lineinfile:
@@ -210,7 +210,7 @@
     regexp: 'smtp_sasl_password_maps '
     line: 'smtp_sasl_password_maps = hash:/etc/postfix/sasl_passwd'
   notify: reload postfix
-  tags: [rhel, postfix]
+  tags: [redhat, postfix]
 
 - name: postfix; set smtp_sasl_security_options
   lineinfile:
@@ -218,7 +218,7 @@
     regexp: 'smtp_sasl_security_options '
     line: 'smtp_sasl_security_options = noplaintext, noanonymous'
   notify: reload postfix
-  tags: [rhel, postfix]
+  tags: [redhat, postfix]
 
 - name: postfix; create sasl_passwd
   lineinfile:
@@ -228,20 +228,20 @@
     create: yes
     mode: 0600
   register: postfix_sasl_password_res
-  tags: [rhel, postfix]
+  tags: [redhat, postfix]
 
 - name: postfix; create sasl_passwd.db
   file:
     path: /etc/postfix/sasl_passwd.db
     state: touch
     mode: 0600
-  tags: [rhel, postfix]
+  tags: [redhat, postfix]
 
 - name: postfix; hash sasl_passwd
   command: postmap hash:/etc/postfix/sasl_passwd
   when: postfix_sasl_password_res|changed
   notify: reload postfix
-  tags: [rhel, postfix]
+  tags: [redhat, postfix]
 
 - name: install sasl packages
   yum:
@@ -251,25 +251,25 @@
     - cyrus-sasl-md5
     - cyrus-sasl-plain
   notify: restart postfix
-  tags: [rhel, postfix]
+  tags: [redhat, postfix]
 
 - name: wirte root mail alias
   lineinfile:
     dest: /etc/aliases
     insertbefore: '^# Basic '
     line: 'root: {{email.secondary}}'
-  tags: [rhel, postfix, aliases]
+  tags: [redhat, postfix, aliases]
 
 - name: wirte rhel mail alias
   lineinfile:
     dest: /etc/aliases
     insertbefore: '^# Basic '
     line: 'rhel: root'
-  tags: [rhel, postfix, aliases]
+  tags: [redhat, postfix, aliases]
 
 - name: enable mail alias
   command: newaliases
-  tags: [rhel, postfix, aliases]
+  tags: [redhat, postfix, aliases]
 
 - name: anacron; change start_hours_range
   lineinfile:
@@ -277,7 +277,7 @@
     insertafter: '^#START_HOURS_RANGE'
     regexp: '^START_HOURS_RANGE'
     line: 'START_HOURS_RANGE=3-7'
-  tags: [rhel, anacron]
+  tags: [redhat, anacron]
 
 - name: cloud-init; add preserve_hostname
   lineinfile:
@@ -285,20 +285,20 @@
     insertbefore: '^# vim:syntax'
     regexp: '^preserve_hostname'
     line: 'preserve_hostname: true'
-  tags: [rhel, cloud-init]
+  tags: [redhat, cloud-init]
 
 - name: copy profile.d/pathmunge.sh
   copy:
     src: pathmunge.sh
     dest: /etc/profile.d
-  tags: [rhel, bash]
+  tags: [redhat, bash]
 
 - name: input; set editing-mode to vi
   lineinfile:
     dest: /etc/inputrc
     regexp: 'set editing-mode '
     line: 'set editing-mode vi'
-  tags: [rhel, input]
+  tags: [redhat, input]
 
 - name: create journal dir
   file:
@@ -306,7 +306,7 @@
     state: directory
     group: systemd-journal
     mode: 02755
-  tags: [rhel, journal]
+  tags: [redhat, journal]
 
 - name: logwatch; disable all services
   lineinfile:
@@ -314,7 +314,7 @@
     insertbefore: '^# You can also disable'
     regexp: '^#? ?Service = All'
     line: '# Service = All'
-  tags: [rhel, logwatch]
+  tags: [redhat, logwatch]
 
 - name: logwatch; enable yum
   lineinfile:
@@ -322,14 +322,14 @@
     insertafter: '^#Service = pam'
     regexp: '^Service = yum'
     line: 'Service = yum'
-  tags: [rhel, logwatch]
+  tags: [redhat, logwatch]
 
 - name: rsyslog; add a template
   copy:
     src: 00-template.conf
     dest: /etc/rsyslog.d
   notify: restart rsyslog
-  tags: [rhel, rsyslog]
+  tags: [redhat, rsyslog]
 
   # See also "Bug 1072368 - user manager message flood"
   # <https://bugzilla.redhat.com/show_bug.cgi?id=1072368>. Do not use
@@ -339,20 +339,20 @@
     src: systemd-logind.conf
     dest: /etc/rsyslog.d
   notify: restart rsyslog
-  tags: [rhel, rsyslog]
+  tags: [redhat, rsyslog]
 
 - name: rsyslog; move to /var/log/trash.log
   copy:
     src: trash.conf
     dest: /etc/rsyslog.d
   notify: restart rsyslog
-  tags: [rhel, rsyslog]
+  tags: [redhat, rsyslog]
 
 - name: logrotate; config for /var/log/trash.log
   copy:
     src: trash
     dest: /etc/logrotate.d
-  tags: [rhel, logrotate]
+  tags: [redhat, logrotate]
 
 - name: ssh; change ClientAliveInterval
   lineinfile:
@@ -361,14 +361,14 @@
     regexp: '^ClientAliveInterval'
     line: 'ClientAliveInterval 59'
   notify: restart sshd
-  tags: [rhel, ssh]
+  tags: [redhat, ssh]
 
 - name: ssh; change ServerAliveInterval
   lineinfile:
     dest: /etc/ssh/ssh_config
     regexp: '^.*ServerAliveInterval'
     line: '  ServerAliveInterval 59'
-  tags: [rhel, ssh]
+  tags: [redhat, ssh]
 
 - name: add NTP servers
   lineinfile:
@@ -376,7 +376,7 @@
     regexp: '^server 169.254.169.123 prefer iburst'
     line: 'server 169.254.169.123 prefer iburst'
   notify: restart chronyd
-  tags: [rhel, time, chrony]
+  tags: [redhat, time, chrony]
 
 - name: yum-cron; enable auto-update
   ini_file:
@@ -385,20 +385,20 @@
     option: apply_updates
     value: yes
   notify: restart yum-cron
-  tags: [rhel, yum-cron]
+  tags: [redhat, yum-cron]
 
 - name: yum-cron; enable yum-cron
   service:
     name: yum-cron
     enabled: yes
   notify: restart yum-cron
-  tags: [rhel, yum-cron]
+  tags: [redhat, yum-cron]
 
 - name: add a group for admin user
   group:
     name: "{{admin}}"
     gid: 1001
-  tags: [rhel, user]
+  tags: [redhat, user]
 
 - name: add admin user
   user:
@@ -407,7 +407,7 @@
     group: "{{admin}}"
     groups: 'adm,wheel,systemd-journal'
     skeleton: /etc/skel
-  tags: [rhel, user]
+  tags: [redhat, user]
 
 - name: allow sudo to admin user
   lineinfile:
@@ -417,7 +417,7 @@
     create: yes
     mode: 0440
     validate: 'visudo -cf %s'
-  tags: [rhel, user]
+  tags: [redhat, user]
 
 - name: make .ssh dir for admin user
   file:
@@ -426,7 +426,7 @@
     group: "{{admin}}"
     state: directory
     mode: 0700
-  tags: [rhel, user]
+  tags: [redhat, user]
 
 - name: copy authorized_keys
   copy:
@@ -436,7 +436,7 @@
     owner: "{{admin}}"
     group: "{{admin}}"
     mode: 0600
-  tags: [rhel, user]
+  tags: [redhat, user]
 
 - name: copy id_rsa
   become_user: "{{admin}}"
@@ -445,7 +445,7 @@
     dest: /home/{{admin}}/.ssh/id_rsa
     mode: 0600
     follow: yes
-  tags: [rhel, user]
+  tags: [redhat, user]
 
 - name: copy id_rsa.pub
   become_user: "{{admin}}"
@@ -453,7 +453,7 @@
     src: ~/.ssh/id_rsa.pub
     dest: /home/{{admin}}/.ssh/id_rsa.pub
     follow: yes
-  tags: [rhel, user]
+  tags: [redhat, user]
 
 - name: clone dotfiles.git
   git:
@@ -461,7 +461,7 @@
     dest: /srv/git/dotfiles
     accept_hostkey: yes
     key_file: /home/{{admin}}/.ssh/id_rsa
-  tags: [rhel, dotfiles]
+  tags: [redhat, dotfiles]
 
 - name: change mode of git/dotfiles
   file:
@@ -469,21 +469,21 @@
     owner: "{{admin}}"
     group: "{{admin}}"
     recurse: yes
-  tags: [rhel, dotfiles]
+  tags: [redhat, dotfiles]
 
 - name: copy bash_profile
   copy:
     src: /srv/git/dotfiles/bash_profile
     dest: /etc/profile.d/bash_profile.sh
     remote_src: True
-  tags: [rhel, dotfiles, bash]
+  tags: [redhat, dotfiles, bash]
 
 - name: copy bashrc
   copy:
     src: /srv/git/dotfiles/bashrc
     dest: /etc/profile.d/bashrc.sh
     remote_src: True
-  tags: [rhel, dotfiles, bash]
+  tags: [redhat, dotfiles, bash]
 
 - name: copy gitconfig
   become_user: "{{admin}}"
@@ -491,7 +491,7 @@
     src: /srv/git/dotfiles/gitconfig
     dest: /home/{{admin}}/.gitconfig
     remote_src: True
-  tags: [rhel, dotfiles, git]
+  tags: [redhat, dotfiles, git]
 
 - name: git; set user email
   become_user: "{{admin}}"
@@ -500,14 +500,14 @@
     section: user
     option: email
     value: "{{email.primary}}"
-  tags: [rhel, dotfiles, git]
+  tags: [redhat, dotfiles, git]
 
 - name: tmux; copy tmux.conf
   copy:
     src: /srv/git/dotfiles/tmux.conf
     dest: /etc/tmux.conf
     remote_src: True
-  tags: [rhel, dotfiles, tmux]
+  tags: [redhat, dotfiles, tmux]
 
 - name: vim; copy vimfiles
   copy:
@@ -520,33 +520,33 @@
     - plugin/matrix.vim
     - plugin/NERD_commenter.vim
     - vimrc
-  tags: [rhel, dotfiles, vim]
+  tags: [redhat, dotfiles, vim]
 
 - name: vim; add to import vimrc
   lineinfile:
     dest: /etc/vimrc
     line: 'source /usr/share/vim/vimfiles/vimrc'
-  tags: [rhel, dotfiles, vim]
+  tags: [redhat, dotfiles, vim]
 
 - name: create .aws dir
   file:
     path: /root/.aws
     state: directory
-  tags: [rhel, snapshot]
+  tags: [redhat, snapshot]
 
 - name: create .aws/config
   file:
     path: /root/.aws/config
     state: touch
     mode: 0600
-  tags: [rhel, snapshot]
+  tags: [redhat, snapshot]
 
 - name: create .aws/credentials
   file:
     path: /root/.aws/credentials
     state: touch
     mode: 0600
-  tags: [rhel, snapshot]
+  tags: [redhat, snapshot]
 
 - name: Set aws config
   ini_file:
@@ -554,7 +554,7 @@
     section: default
     option: region
     value: ap-northeast-1
-  tags: [rhel, snapshot]
+  tags: [redhat, snapshot]
 
 - name: clone aws-ec2-smart-snapshot
   git:
@@ -562,7 +562,7 @@
     dest: /srv/git/aws-ec2-smart-snapshot
     accept_hostkey: yes
     key_file: /home/{{admin}}/.ssh/id_rsa
-  tags: [rhel, snapshot]
+  tags: [redhat, snapshot]
 
 - name: change mode of git/dotfiles
   file:
@@ -570,7 +570,7 @@
     owner: "{{admin}}"
     group: "{{admin}}"
     recurse: yes
-  tags: [rhel, snapshot]
+  tags: [redhat, snapshot]
 
 - name: copy aws-ec2-smart-snapshot
   copy:
@@ -581,7 +581,7 @@
     - /usr/local/sbin/aws-ec2-smart-snapshot
     - /etc/cron.daily/00-aws-ec2-smart-snapshot.cron
     - /etc/logrotate.d/aws-ec2-smart-snapshot
-  tags: [rhel, snapshot]
+  tags: [redhat, snapshot]
 
 - name: change perm of aws-ec2-smart-snapshot
   file:
@@ -590,11 +590,11 @@
   with_items:
     - /usr/local/sbin/aws-ec2-smart-snapshot
     - /etc/cron.daily/00-aws-ec2-smart-snapshot.cron
-  tags: [rhel, snapshot]
+  tags: [redhat, snapshot]
 
 - name: create log/aws-ec2-smart-snapshot.log
   file:
     path: /var/log/aws-ec2-smart-snapshot.log
     state: touch
     mode: 0600
-  tags: [rhel, snapshot]
+  tags: [redhat, snapshot]
