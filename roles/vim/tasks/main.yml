@@ -1,0 +1,56 @@
+---
+- name: install packages by homebrew
+  homebrew:
+    name: "{{item}}"
+    state: latest
+    update_homebrew: yes
+  with_items:
+    - nvim
+  tags: [vim, package]
+
+- name: create a symlink, mvim
+  file:
+    src: /Applications/MacVim.app/Contents/bin/mvim
+    dest: /usr/local/bin/mvim
+    state: link
+  tags: [vim]
+
+- name: create a symlink, vim
+  file:
+    src: /usr/local/bin/nvim
+    dest: /usr/local/bin/vim
+    state: link
+  tags: [vim]
+
+- name: create a symlink, vi
+  file:
+    src: /usr/local/bin/vim
+    dest: /usr/local/bin/vi
+    state: link
+  tags: [vim]
+
+- name: install packages by pip
+  pip:
+    executable: pip3
+    name: "{{item}}"
+    state: latest
+  with_items:
+    - neovim
+  tags: [vim, package]
+
+- name: create dein dir
+  file:
+    path: ~/.vim/dein
+    state: directory
+    mode: 0755
+  tags: [vim]
+
+- name: download dein.vim
+  get_url:
+    url: https://raw.githubusercontent.com/Shougo/dein.vim/master/bin/installer.sh
+    dest: /tmp
+  tags: [vim]
+
+- name: install dein.vim
+  command: sh /tmp/installer.sh ~/.vim/dein
+  tags: [vim]
