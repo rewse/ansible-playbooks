@@ -1,0 +1,74 @@
+---
+- name: sudo w/o password for admin
+  become: yes
+  template:
+    src: admin.j2
+    dest: /etc/sudoers.d/{{admin}}.conf
+    mode: 0440
+  tags: [mac, sudo]
+
+- name: install packages by homebrew
+  homebrew:
+    name: "{{item}}"
+    state: latest
+    update_homebrew: yes
+  with_items:
+    - fzf
+    - git
+    - mysql
+    - postgresql
+    - python
+    - pwgen
+    - reattach-to-user-namespace
+    - telnet
+    - tmux
+    - tree
+  tags: [mac, package, homebrew]
+
+- name: tap brew repos
+  homebrew_tap:
+    name: sanemat/font
+  tags: [mac, package, homebrew, ricty]
+
+- name: install ricty
+  homebrew:
+    name: ricty
+    state: latest
+    update_homebrew: yes
+    install_options: with-powerline
+  tags: [mac, package, homebrew, ricty]
+
+- name: create Ricty dir
+  file:
+    path: /Library/Fonts/Ricty
+    state: directory
+    mode: 0755
+  tags: [mac, ricty]
+
+- name: copy ricty
+  copy:
+    src: /usr/local/Cellar/ricty/4.1.0_2/share/fonts/{{item}}
+    dest: /Library/Fonts/Ricty
+  with_items:
+    - "Ricty Bold for Powerline.ttf"
+    - "Ricty Discord Bold for Powerline.ttf"
+    - "Ricty Discord Regular for Powerline.ttf"
+    - "Ricty Regular for Powerline.ttf"
+    - Ricty-Bold.ttf
+    - Ricty-Regular.ttf
+    - RictyDiscord-Bold.ttf
+    - RictyDiscord-Regular.ttf
+  tags: [mac, ricty]
+
+- name: install packages by pip
+  pip:
+    executable: pip3
+    name: "{{item}}"
+    state: latest
+  with_items:
+    - ansible
+    - awscli
+    - pip-review
+    - powerline-status
+    - sqlparse
+  tags: [mac, package, pip]
