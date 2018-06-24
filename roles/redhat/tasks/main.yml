@@ -469,7 +469,7 @@
     owner: "{{admin}}"
     group: "{{admin}}"
     recurse: yes
-  tags: [redhat, dotfiles]
+  tags: [redhat, dotfiles, bash, git, tmux, vim]
 
 - name: copy bash_profile
   copy:
@@ -515,10 +515,6 @@
     dest: /usr/share/vim/vimfiles/{{item}}
     remote_src: True
   with_items:
-    - colors/base16-tomorrow.vim
-    - ftplugin/python_match.vim
-    - plugin/matrix.vim
-    - plugin/NERD_commenter.vim
     - vimrc
   tags: [redhat, dotfiles, vim]
 
