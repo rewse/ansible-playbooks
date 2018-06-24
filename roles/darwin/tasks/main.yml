@@ -5,7 +5,7 @@
     src: admin.j2
     dest: /etc/sudoers.d/{{admin}}.conf
     mode: 0440
-  tags: [mac, sudo]
+  tags: [darwin, sudo]
 
 - name: install packages by homebrew
   homebrew:
@@ -23,12 +23,12 @@
     - telnet
     - tmux
     - tree
-  tags: [mac, package, homebrew]
+  tags: [darwin, package, homebrew]
 
 - name: tap brew repos
   homebrew_tap:
     name: sanemat/font
-  tags: [mac, package, homebrew, ricty]
+  tags: [darwin, package, homebrew, ricty]
 
 - name: install ricty
   homebrew:
@@ -36,14 +36,14 @@
     state: latest
     update_homebrew: yes
     install_options: with-powerline
-  tags: [mac, package, homebrew, ricty]
+  tags: [darwin, package, homebrew, ricty]
 
 - name: create Ricty dir
   file:
     path: /Library/Fonts/Ricty
     state: directory
     mode: 0755
-  tags: [mac, ricty]
+  tags: [darwin, ricty]
 
 - name: copy ricty
   copy:
@@ -58,7 +58,7 @@
     - Ricty-Regular.ttf
     - RictyDiscord-Bold.ttf
     - RictyDiscord-Regular.ttf
-  tags: [mac, ricty]
+  tags: [darwin, ricty]
 
 - name: install packages by pip
   pip:
@@ -71,4 +71,4 @@
     - pip-review
     - powerline-status
     - sqlparse
-  tags: [mac, package, pip]
+  tags: [darwin, package, pip]
