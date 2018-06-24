@@ -1,0 +1,6 @@
+---
+- hosts: personal-mac
+  connection: local
+  roles:
+    - mac
+    - vim
