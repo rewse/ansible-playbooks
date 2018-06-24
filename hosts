@@ -1,3 +1,9 @@
+[business-mac]
+localhost
+
+[personal-mac]
+localhost
+
 [business-clients]
 alfa.rewse.jp
 
