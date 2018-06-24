@@ -1,6 +1,6 @@
 ---
-- hosts: personal-mac
+- hosts: personal-darwin
   connection: local
   roles:
-    - mac
+    - darwin
     - vim/darwin
