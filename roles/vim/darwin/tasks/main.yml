@@ -38,11 +38,34 @@
     - neovim
   tags: [vim, package]
 
-- name: create dein dir
+- name: create ~/.vim dir
   file:
     path: ~/.vim/dein
     state: directory
     mode: 0755
+  tags: [vim]
+
+- name: download vimrc
+  get_url:
+    url: https://raw.githubusercontent.com/rewse/dotfiles/master/vim/{{item}}
+    dest: ~/.vim/{{item}}
+  with_items:
+    - vimrc
+    - gvimrc
+  tags: [vim]
+
+- name: create ~/.config/nvim dir
+  file:
+    path: ~/.config/nvim
+    state: directory
+    mode: 0755
+  tags: [vim]
+
+- name: create init.vim
+  file:
+    src: ~/.vim/vimrc
+    dest: ~/.config/nvim/init.vim
+    state: link
   tags: [vim]
 
 - name: download dein.vim
