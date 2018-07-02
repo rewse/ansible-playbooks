@@ -29,9 +29,19 @@
     state: link
   tags: [vim]
 
-- name: install packages by pip
+- name: install packages by pip3
   pip:
     executable: pip3
+    name: "{{item}}"
+    state: latest
+  with_items:
+    - neovim
+  tags: [vim, package]
+
+# MacVim Kaoriya doesn't support Python3
+- name: install packages by pip2
+  pip:
+    executable: pip2
     name: "{{item}}"
     state: latest
   with_items:
