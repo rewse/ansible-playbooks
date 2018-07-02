@@ -30,6 +30,7 @@
   tags: [vim]
 
 - name: install packages by pip3
+  become: yes
   pip:
     executable: pip3
     name: "{{item}}"
@@ -40,6 +41,7 @@
 
 # MacVim Kaoriya doesn't support Python3
 - name: install packages by pip2
+  become: yes
   pip:
     executable: pip2
     name: "{{item}}"

@@ -62,6 +62,7 @@
   tags: [darwin, ricty]
 
 - name: install packages by pip
+  become: yes
   pip:
     executable: pip3
     name: "{{item}}"
