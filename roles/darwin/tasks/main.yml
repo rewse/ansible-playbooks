@@ -21,6 +21,7 @@
     - pwgen
     - reattach-to-user-namespace
     - telnet
+    - source-highlight
     - tmux
     - tree
   tags: [darwin, package, homebrew]
