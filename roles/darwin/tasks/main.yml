@@ -17,7 +17,7 @@
     - git
     - mysql
     - postgresql
-    - python
+    - python3
     - pwgen
     - reattach-to-user-namespace
     - telnet
