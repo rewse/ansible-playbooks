@@ -1,5 +1,5 @@
 ---
-jdk_filename: jdk-8u172-linux-x64.rpm
-sct_filename: aws-schema-conversion-tool-1.0.614-1.x86_64.rpm
+jdk_filename: jdk-8u181-linux-x64.rpm
+sct_filename: aws-schema-conversion-tool-1.0.618-1.x86_64.rpm
 sct_extractor_filename: aws-schema-conversion-tool-dms-agent-2.4.1-R1.x86_64.rpm
-sqldeveloper_filename: sqldeveloper-18.1.0.095.1630-1.noarch.rpm
+sqldeveloper_filename: sqldeveloper-18.2.0.183.1748-1.noarch.rpm

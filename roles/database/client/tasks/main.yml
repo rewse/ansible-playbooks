@@ -1,5 +1,5 @@
 ---
-- name: install mysql57-community-release
+- name: install mysql80-community-release
   yum:
     name: http://repo.mysql.com/{{mysql_release_filename}}
     state: installed
@@ -62,7 +62,7 @@
 
 - name: create symlink for ojdbc.jar
   file:
-    src: /usr/lib/oracle/12.2/client64/lib/{{item}}
+    src: /usr/lib/oracle/18.3/client64/lib/{{item}}
     dest: /usr/share/java/{{item}}
     state: link
   with_items:
