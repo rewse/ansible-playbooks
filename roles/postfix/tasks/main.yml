@@ -148,10 +148,6 @@
     dest: /etc/rsyslog.d
   tags: [postfix, amavisd]
 
-- name: refresh clamav db
-  command: freshclam
-  tags: [postfix, amavisd]
-
 - name: start amavisd
   service:
     name: amavisd
