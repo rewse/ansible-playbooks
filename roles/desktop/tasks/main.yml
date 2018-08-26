@@ -47,21 +47,3 @@
     regexp: '<USER>'
     replace: "{{admin}}"
   tags: [desktop, vnc]
-
-- name: code; import RPM key
-  rpm_key:
-    state: present
-    key: https://packages.microsoft.com/keys/microsoft.asc
-  tags: [desktop, code]
-
-- name: code; copy vscode.repo
-  copy:
-    src: vscode.repo
-    dest: /etc/yum.repos.d
-  tags: [desktop, code]
-
-- name: code; install code
-  yum:
-    name: code
-    state: installed
-  tags: [desktop, code]
