@@ -167,8 +167,8 @@
 
       smtpd_use_tls = yes
       smtpd_tls_auth_only = yes
-      smtpd_tls_cert_file = /etc/letsencrypt/live/mail.rewse.jp/fullchain.pem
-      smtpd_tls_key_file = /etc/letsencrypt/live/mail.rewse.jp/privkey.pem
+      smtpd_tls_cert_file = /etc/pki/tls/certs/mail.rewse.jp.full.crt
+      smtpd_tls_key_file = /etc/pki/tls/private/mail.rewse.jp.key
       smtpd_tls_loglevel = 1
       smtpd_tls_session_cache_database = hash:/etc/postfix/smtpd_scache
       smtpd_tls_received_header = yes
@@ -345,7 +345,7 @@
   lineinfile:
     dest: /etc/dovecot/conf.d/10-ssl.conf
     regexp: '^ssl_cert '
-    line: 'ssl_cert = </etc/letsencrypt/live/mail.rewse.jp/fullchain.pem'
+    line: 'ssl_cert = </etc/pki/tls/certs/mail.rewse.jp.full.crt'
   notify: reload dovecot
   tags: [postfix, dovecot, cert]
 
@@ -353,7 +353,7 @@
   lineinfile:
     dest: /etc/dovecot/conf.d/10-ssl.conf
     regexp: '^ssl_key '
-    line: 'ssl_key = </etc/letsencrypt/live/mail.rewse.jp/privkey.pem'
+    line: 'ssl_key = </etc/pki/tls/private/mail.rewse.jp.key'
   notify: reload dovecot
   tags: [postfix, dovecot, cert]
 
