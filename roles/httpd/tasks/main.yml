@@ -15,14 +15,13 @@
 
 - name: install packages
   yum:
-    name: "{{item}}"
+    name:
+      - httpd
+      - mod_ssl
+      - https://dl-ssl.google.com/dl/linux/direct/mod-pagespeed-stable_current_x86_64.rpm
+      - php
+      - php-mysql
     state: installed
-  with_items:
-    - httpd
-    - mod_ssl
-    - https://dl-ssl.google.com/dl/linux/direct/mod-pagespeed-stable_current_x86_64.rpm
-    - php
-    - php-mysql
   tags: [httpd]
 
 - name: set ServerAdmin

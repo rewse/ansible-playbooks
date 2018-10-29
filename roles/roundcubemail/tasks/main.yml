@@ -1,11 +1,10 @@
 ---
 - name: install packages
   yum:
-    name: "{{item}}"
+    name:
+      - php-mcrypt
+      - roundcubemail
     state: installed
-  with_items:
-    - php-mcrypt
-    - roundcubemail
   tags: [roundcubemail]
 
 - name: copy to config.inc.php

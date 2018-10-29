@@ -51,43 +51,40 @@
 
 - name: install additional packages
   yum:
-    name: "{{item}}"
+    name:
+      - "@Development tools"
+      - at
+      - bash-completion
+      - bc
+      - bind-utils
+      - dstat
+      - "{{epel_release_url}}"
+      - firewalld
+      - git
+      - logwatch
+      - lsof
+      - mlocate
+      - net-tools
+      - nfs-utils
+      - patch
+      - perl-libwww-perl
+      - prelink
+      - source-highlight
+      - sysstat
+      - telnet
+      - tmux
+      - tree
+      - unzip
+      - vim-enhanced
+      - yum-cron
+      - yum-plugin-priorities
     state: installed
-  with_items:
-    - "@Development tools"
-    - at
-    - bash-completion
-    - bc
-    - bind-utils
-    - dstat
-    - "{{epel_release_url}}"
-    - firewalld
-    - git
-    - logwatch
-    - lsof
-    - mlocate
-    - net-tools
-    - nfs-utils
-    - patch
-    - perl-libwww-perl
-    - prelink
-    - source-highlight
-    - sysstat
-    - telnet
-    - tmux
-    - tree
-    - unzip
-    - vim-enhanced
-    - yum-cron
-    - yum-plugin-priorities
   tags: [redhat, package]
 
 - name: install additional packages from EPEL
   yum:
-    name: "{{item}}"
+    name: etckeeper
     state: installed
-  with_items:
-    - etckeeper
   tags: [redhat, epel, package]
 
 - name: download get-pip.py
@@ -245,11 +242,10 @@
 
 - name: install sasl packages
   yum:
-    name: "{{item}}"
+    name:
+      - cyrus-sasl-md5
+      - cyrus-sasl-plain
     state: installed
-  with_items:
-    - cyrus-sasl-md5
-    - cyrus-sasl-plain
   notify: restart postfix
   tags: [redhat, postfix]
 

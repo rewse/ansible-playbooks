@@ -3,13 +3,12 @@
   # crashes.
 - name: install packages
   yum:
-    name: "{{item}}"
+    name:
+      - mod_ssl
+      - zabbix-server-mysql
+      - zabbix-web-japanese
+      - zabbix-web-mysql
     state: installed
-  with_items:
-    - mod_ssl
-    - zabbix-server-mysql
-    - zabbix-web-japanese
-    - zabbix-web-mysql
   notify: restart httpd
   tags: [zabbix-server, zabbix-server-server, zabbix-web]
 
