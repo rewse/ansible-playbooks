@@ -1,10 +1,8 @@
 ---
 - name: install packages
   yum:
-    name: "{{item}}"
+    name: phpMyAdmin
     state: installed
-  with_items:
-    - phpMyAdmin
   tags: [phpmyadmin]
 
 - name: set host

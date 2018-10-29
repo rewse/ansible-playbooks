@@ -7,11 +7,10 @@
 
 - name: install zabbix clients
   yum:
-    name: "{{item}}"
+    name:
+      - zabbix-agent
+      - zabbix-sender
     state: installed
-  with_items:
-    - zabbix-agent
-    - zabbix-sender
   tags: [zabbix-agent, package]
 
 - name: add priority into /etc/yum.repos.d/zabbix.repo

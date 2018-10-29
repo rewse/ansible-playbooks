@@ -20,11 +20,10 @@
 
 - name: install mysql client
   yum:
-    name: "{{item}}"
+    name:
+      - mysql-community-client
+      - mysql-connector-java
     state: installed
-  with_items:
-    - mysql-community-client
-    - mysql-connector-java
   tags: [database-client, mysql]
 
   # Download the files before the following task
@@ -41,13 +40,12 @@
 
 - name: install oracle-instantclient
   yum:
-    name: "{{item}}"
+    name:
+      - rlwrap
+      - /usr/local/src/{{oracle_instantclient_basic_filename}}
+      - /usr/local/src/{{oracle_instantclient_sqlplus_filename}}
+      - /usr/local/src/{{oracle_instantclient_tools_filename}}
     state: installed
-  with_items:
-    - rlwrap
-    - /usr/local/src/{{oracle_instantclient_basic_filename}}
-    - /usr/local/src/{{oracle_instantclient_sqlplus_filename}}
-    - /usr/local/src/{{oracle_instantclient_tools_filename}}
   tags: [database-client, oracle]
 
 - name: copy librarie path for oracle-instantclient
@@ -103,12 +101,11 @@
 
 - name: install postgresql client
   yum:
-    name: "{{item}}"
+    name:
+      - postgresql
+      - postgresql-devel
+      - python-devel
     state: installed
-  with_items:
-    - postgresql
-    - postgresql-devel
-    - python-devel
   tags: [database-client, postgresql]
 
 - name: install pgcli
