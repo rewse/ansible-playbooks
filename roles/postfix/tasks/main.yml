@@ -1,19 +1,18 @@
 ---
 - name: install packages
   yum:
-    name: "{{item}}"
+    name:
+      - amavisd-new
+      - certbot-apache
+      - clamav
+      - clamav-server-systemd
+      - clamav-update
+      - cyrus-sasl
+      - dovecot
+      - lz4
+      - procmail
+      - spamassassin
     state: installed
-  with_items:
-    - amavisd-new
-    - certbot-apache
-    - clamav
-    - clamav-server-systemd
-    - clamav-update
-    - cyrus-sasl
-    - dovecot
-    - lz4
-    - procmail
-    - spamassassin
   tags: [postfix, amavisd, cert, dovecot, procmail, spamassassin, package]
 
 - name: install packages by pip

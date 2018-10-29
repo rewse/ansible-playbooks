@@ -36,10 +36,8 @@
 
 - name: install packages
   yum:
-    name: "{{item}}"
+    name: mailman
     state: installed
-  with_items:
-    - mailman
   tags: [mailman, package]
 
 - name: change owner in /srv/mailman

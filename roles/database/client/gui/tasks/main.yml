@@ -15,12 +15,11 @@
 
 - name: erase openjdk
   yum:
-    name: "{{item}}"
+    name:
+      - java-1.8.0-openjdk-headless
+      - java-1.7.0-openjdk-headless
+      - java-1.8.0-openjdk
     state: absent
-  with_items:
-    - java-1.8.0-openjdk-headless
-    - java-1.7.0-openjdk-headless
-    - java-1.8.0-openjdk
   tags: [database-client-gui, jdk, package]
 
 - name: install dbeaver
@@ -31,11 +30,10 @@
 
 - name: uninstall aws-schema-conversion-tool
   yum:
-    name: "{{item}}"
+    name:
+      - aws-schema-conversion-tool
+      - aws-schema-conversion-tool-extractor
     state: removed
-  with_items:
-    - aws-schema-conversion-tool
-    - aws-schema-conversion-tool-extractor
   tags: [database-client-gui, package, sct]
 
 - name: unarchive aws-schema-conversion-tool
@@ -47,11 +45,10 @@
 
 - name: install aws-schema-conversion-tool
   yum:
-    name: "{{item}}"
+    name:
+      - /usr/local/src/{{sct_filename}}
+      - /usr/local/src/dmsagent/{{sct_extractor_filename}}
     state: installed
-  with_items:
-    - /usr/local/src/{{sct_filename}}
-    - /usr/local/src/dmsagent/{{sct_extractor_filename}}
   tags: [database-client-gui, package, sct]
 
   # Download the files before the following task
