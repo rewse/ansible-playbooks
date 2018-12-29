@@ -1,7 +1,6 @@
 #!/bin/sh
 
-server=$1
-port=$2
+file=$1
 
-/usr/local/bin/ssl-cert-check -s $server -p $port -n |
+/usr/local/bin/ssl-cert-check -c $file -p $port -n |
   awk '{print $6}' | sed 's/|days=//'
