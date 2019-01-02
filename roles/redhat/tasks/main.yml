@@ -253,7 +253,7 @@
   lineinfile:
     dest: /etc/aliases
     insertbefore: '^# Basic '
-    line: 'root: {{email.secondary}}'
+    line: 'root: "|/usr/sbin/sendmail -oi -f {{vault_email.secondary_from}} {{vault_email.secondary}}"'
   tags: [redhat, postfix, aliases]
 
 - name: enable mail alias
