@@ -256,13 +256,6 @@
     line: 'root: {{email.secondary}}'
   tags: [redhat, postfix, aliases]
 
-- name: wirte rhel mail alias
-  lineinfile:
-    dest: /etc/aliases
-    insertbefore: '^# Basic '
-    line: 'rhel: root'
-  tags: [redhat, postfix, aliases]
-
 - name: enable mail alias
   command: newaliases
   tags: [redhat, postfix, aliases]
