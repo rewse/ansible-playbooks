@@ -60,7 +60,7 @@
 
 - name: create symlink for ojdbc.jar
   file:
-    src: /usr/lib/oracle/18.3/client64/lib/{{item}}
+    src: /usr/lib/oracle/19.3/client64/lib/{{item}}
     dest: /usr/share/java/{{item}}
     state: link
   with_items:
