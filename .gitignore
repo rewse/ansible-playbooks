@@ -4,5 +4,6 @@ roles/desktop/files/Ricty*
 roles/database/client/files/oracle*.rpm
 roles/database/client/files/sqlcl*
 roles/database/client/files/sqljdbc*
+roles/database/client/gui/files/java*
 roles/database/client/gui/files/jdk*
 roles/database/client/gui/files/sqldeveloper*
