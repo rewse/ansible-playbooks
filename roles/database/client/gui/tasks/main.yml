@@ -22,12 +22,6 @@
     state: absent
   tags: [database-client-gui, jdk, package]
 
-- name: install dbeaver
-  yum:
-    name: http://dbeaver.jkiss.org/files/dbeaver-ce-latest-stable.x86_64.rpm
-    state: installed
-  tags: [database-client-gui, package, dbeaver]
-
 - name: uninstall aws-schema-conversion-tool
   yum:
     name:
