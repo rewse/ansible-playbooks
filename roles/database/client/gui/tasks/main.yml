@@ -41,7 +41,6 @@
   yum:
     name:
       - /usr/local/src/{{sct_filename}}
-      - /usr/local/src/dmsagent/{{sct_extractor_filename}}
     state: installed
   tags: [database-client-gui, package, sct]
 
