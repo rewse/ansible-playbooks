@@ -1,5 +1,4 @@
 ---
 jdk_filename: java-1.8.0-amazon-corretto-devel-1.8.0_212.b04-2.x86_64.rpm
-sct_filename: aws-schema-conversion-tool-1.0.627-1.x86_64.rpm
-sct_extractor_filename: aws-schema-conversion-tool-dms-agent-3.3.0-R1.x86_64.rpm
+sct_filename: aws-schema-conversion-tool-1.0.628-1.x86_64.rpm
 sqldeveloper_filename: sqldeveloper-19.1.0.094.2042.noarch.rpm
