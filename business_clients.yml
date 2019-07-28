@@ -1,5 +1,5 @@
 ---
-- hosts: business-clients
+- hosts: business_clients
   become: yes
   remote_user: ec2-user
   roles:
