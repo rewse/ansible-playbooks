@@ -18,7 +18,7 @@
 
 - name: check users
   shell: echo "select user from mysql.user;" | mysql -u{{admin}} -p{{aurora.master_password}} -h{{aurora.ep}}
-  register: check_user_res
+  register: check_user_out
   changed_when: False
   tags: [zabbix-db]
 
@@ -26,12 +26,12 @@
   # <https://github.com/ansible/ansible-modules-core/issues/5053>
 - name: craeate user
   shell: echo "grant all privileges on zabbix.* to zabbix@'%' identified by '{{aurora.zabbix_password}}';" | mysql -u{{admin}} -p{{aurora.master_password}} -h{{aurora.ep}}
-  when: check_user_res.stdout.find('zabbix') == -1
+  when: "'zabbix' not in check_user_out.stdout"
   tags: [zabbix-db]
 
 - name: check tables
   shell: echo "show tables;" | mysql -uzabbix -p{{aurora.zabbix_password}} -h{{aurora.ep}} zabbix
-  register: check_tables_res
+  register: check_tables_out
   changed_when: False
   tags: [zabbix-db]
 
@@ -39,5 +39,5 @@
   # <http://stackoverflow.com/questions/36770317/why-is-my-mysql-import-failing-w-ansible>
 - name: init database
   shell: zcat /usr/share/doc/zabbix-server-mysql-{{zabbix_version}}/create.sql.gz | mysql -uzabbix -p{{aurora.zabbix_password}} -h{{aurora.ep}} zabbix
-  when: check_tables_res.stdout.find('Tables_in_zabbix') == -1
+  when: "'Tables_in_zabbix' not in check_tables_out.stdout"
   tags: [zabbix-db]
