@@ -3,4 +3,3 @@
   connection: local
   roles:
     - darwin
-    - vim/darwin
