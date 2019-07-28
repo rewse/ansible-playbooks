@@ -248,7 +248,7 @@
   notify: restart postfix
   tags: [redhat, postfix]
 
-- name: wirte root mail alias
+- name: write root mail alias
   lineinfile:
     dest: /etc/aliases
     insertbefore: '^# Basic '
