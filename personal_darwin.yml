@@ -1,5 +1,6 @@
 ---
-- hosts: personal-darwin
+- hosts: personal_darwin
   connection: local
   roles:
     - darwin
+    - datadog/darwin
