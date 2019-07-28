@@ -18,7 +18,7 @@
     dest: /etc/yum.repos.d/zabbix.repo
     section: "{{item}}"
     option: priority
-    value: 30
+    value: "30"
     no_extra_spaces: True
   with_items:
     - zabbix
