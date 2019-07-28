@@ -1,5 +1,5 @@
 ---
-- hosts: personal_darwin
+- hosts: darwin
   connection: local
   roles:
     - darwin
