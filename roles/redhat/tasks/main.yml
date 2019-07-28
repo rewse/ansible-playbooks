@@ -12,12 +12,12 @@
 
 - name: make swap
   command: mkswap /dev/{{swap_device_name}}
-  when: swaps_out.stdout.find('{{swap_device_name}}') == -1
+  when: swap_device_name not in swaps_out.stdout
   tags: [redhat, storage, swap]
 
 - name: enable swap
   command: swapon /dev/{{swap_device_name}}
-  when: swaps_out.stdout.find('{{swap_device_name}}') == -1
+  when: swap_device_name not in swaps_out.stdout
   tags: [redhat, storage, swap]
 
 - name: add swap into fstab
@@ -37,7 +37,7 @@
 
 - name: set enforce to 0
   command: setenforce 0
-  when: getenforce_out.stdout.find('Disabled') == -1
+  when: "'Disabled' not in getenforce_out.stdout"
   tags: [redhat, selinux]
 
 - name: disable selinux
@@ -99,9 +99,8 @@
 
 - name: install packages with pip
   pip:
-    name: "{{item}}"
-  with_items:
-    - awscli
+    name:
+      - awscli
   tags: [redhat, package, pip]
 
 - name: update all packages
@@ -128,7 +127,7 @@
     dest: /etc/yum.repos.d/redhat-rhui.repo
     section: "{{item}}"
     option: priority
-    value: 10
+    value: "10"
     no_extra_spaces: True
   with_items:
     - rhui-REGION-rhel-server-releases
@@ -143,7 +142,7 @@
     dest: /etc/yum.repos.d/redhat-rhui-client-config.repo
     section: "{{item}}"
     option: priority
-    value: 10
+    value: "10"
     no_extra_spaces: True
   with_items:
     - rhui-REGION-client-config-server-7
@@ -154,7 +153,7 @@
     dest: /etc/yum.repos.d/epel.repo
     section: "{{item}}"
     option: priority
-    value: 50
+    value: "50"
     no_extra_spaces: True
   with_items:
     - epel
@@ -224,7 +223,7 @@
     line: '[{{relayhost.name}}]:{{relayhost.port}} {{so_net.username}}:{{so_net.password}}'
     create: yes
     mode: 0600
-  register: postfix_sasl_password_res
+  register: postfix_sasl_password_out
   tags: [redhat, postfix]
 
 - name: postfix; create sasl_passwd.db
@@ -236,7 +235,7 @@
 
 - name: postfix; hash sasl_passwd
   command: postmap hash:/etc/postfix/sasl_passwd
-  when: postfix_sasl_password_res|changed
+  when: postfix_sasl_password_out is changed
   notify: reload postfix
   tags: [redhat, postfix]
 
@@ -372,7 +371,7 @@
     dest: /etc/yum/yum-cron.conf
     section: commands
     option: apply_updates
-    value: yes
+    value: "yes"
   notify: restart yum-cron
   tags: [redhat, yum-cron]
 
