@@ -13,7 +13,6 @@
     state: latest
     update_homebrew: yes
   with_items:
-    - fzf
     - git
     - mysql
     - postgresql
