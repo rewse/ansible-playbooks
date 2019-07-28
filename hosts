@@ -1,16 +1,16 @@
-[business-darwin]
+[business_darwin]
 localhost
 
-[personal-darwin]
+[personal_darwin]
 localhost
 
-[business-clients]
+[business_clients]
 alfa.rewse.jp
 
-[personal-clients]
+[personal_clients]
 foxtrot.rewse.jp
 
-[personal-servers]
+[personal_servers]
 foxtrot.rewse.jp
 
 [redhat]
