@@ -1,7 +1,4 @@
-[business_darwin]
-localhost
-
-[personal_darwin]
+[darwin]
 localhost
 
 [business_clients]

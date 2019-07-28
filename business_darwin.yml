@@ -1,5 +1,0 @@
----
-- hosts: business_darwin
-  connection: local
-  roles:
-    - darwin
