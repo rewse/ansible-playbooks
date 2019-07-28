@@ -1,12 +1,9 @@
 ---
-- hosts: personal-servers
+- hosts: personal_servers
   become: yes
   remote_user: ec2-user
   roles:
     - httpd
     - phpmyadmin
-    - postfix
-    - roundcubemail
-    - mailman
     - wordpress
     - zabbix/server
