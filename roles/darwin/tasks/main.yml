@@ -9,20 +9,19 @@
 
 - name: install packages by homebrew
   homebrew:
-    name: "{{item}}"
+    name: 
+      - git
+      - mysql
+      - postgresql
+      - python3
+      - pwgen
+      - reattach-to-user-namespace
+      - telnet
+      - source-highlight
+      - tmux
+      - tree
     state: latest
     update_homebrew: yes
-  with_items:
-    - git
-    - mysql
-    - postgresql
-    - python3
-    - pwgen
-    - reattach-to-user-namespace
-    - telnet
-    - source-highlight
-    - tmux
-    - tree
   tags: [darwin, package, homebrew]
 
 - name: tap brew repos
@@ -64,12 +63,10 @@
   become: yes
   pip:
     executable: pip3
-    name: "{{item}}"
+    name:
+      - ansible
+      - awscli
+      - pip-review
+      - powerline-status
     state: latest
-  with_items:
-    - ansible
-    - awscli
-    - pip-review
-    - powerline-status
-    - sqlparse
   tags: [darwin, package, pip]
