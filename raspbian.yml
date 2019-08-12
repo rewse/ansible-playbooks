@@ -1,0 +1,7 @@
+---
+- hosts: raspbian
+  become: yes
+  remote_user: pi
+  roles:
+    - raspbian
+    - postfix/client

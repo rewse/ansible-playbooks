@@ -1,0 +1,142 @@
+---
+- name: install additional packages
+  apt:
+    name:
+      - aptitude
+      - etckeeper
+      - libsasl2-modules
+      - postfix
+      - python-pip
+    state: present
+  tags: [raspbian, package]
+
+- name: install packages with pip
+  pip:
+    name:
+      - awscli
+  tags: [raspbian, package, pip]
+
+- name: update all repositories
+  apt:
+    name: '*'
+    state: latest
+  tags: [raspbian, package]
+
+- name: upgrade all packages
+  apt:
+    upgrade: dist
+  tags: [raspbian, package]
+
+- name: etckeeper; init /etc
+  command: etckeeper init
+  args:
+      creates: /etc/.git
+  tags: [raspbian, etckeeper]
+
+- name: etckeeper; Initial commit
+  command: etckeeper commit "Initial commit"
+  args:
+    chdir: /etc
+    creates: /etc/.git/logs
+  tags: [raspbian, etckeeper]
+
+- name: input; set editing-mode to vi
+  lineinfile:
+    dest: /etc/inputrc
+    regexp: 'set editing-mode '
+    line: 'set editing-mode vi'
+  tags: [raspbian, input]
+
+- name: ssh; change ClientAliveInterval
+  lineinfile:
+    dest: /etc/ssh/sshd_config
+    insertafter: '^#ClientAliveInterval'
+    regexp: '^ClientAliveInterval'
+    line: 'ClientAliveInterval 59'
+  notify: restart sshd
+  tags: [raspbian, ssh]
+
+- name: ssh; change ServerAliveInterval
+  lineinfile:
+    dest: /etc/ssh/ssh_config
+    regexp: '^.*ServerAliveInterval'
+    line: '  ServerAliveInterval 59'
+  tags: [raspbian, ssh]
+
+- name: ssh; change PubkeyAuthentication
+  lineinfile:
+    dest: /etc/ssh/sshd_config
+    insertafter: '^#PubkeyAuthentication'
+    regexp: '^PubkeyAuthentication'
+    line: 'PubkeyAuthentication yes'
+  notify: restart sshd
+  tags: [raspbian, ssh]
+
+- name: ssh; change PasswordAuthentication
+  lineinfile:
+    dest: /etc/ssh/sshd_config
+    insertafter: '^#PasswordAuthentication'
+    regexp: '^PasswordAuthentication'
+    line: 'PasswordAuthentication no'
+  notify: restart sshd
+  tags: [raspbian, ssh]
+
+- name: add NTP servers
+  lineinfile:
+    dest: /etc/systemd/timesyncd.conf
+    insertafter: '^#NTP='
+    regexp: '^NTP='
+    line: 'NTP=ntp.nict.jp ntp.jst.mfeed.ad.jp'
+  notify: restart systemd-timesyncd
+  tags: [raspbian, time, systemd-timesyncd]
+
+- name: add apt-upgrade cron file
+  copy:
+    src: apt-upgrade
+    dest: /etc/cron.daily
+    mode: 644
+  tags: [raspbian, package]
+
+- name: add a group for admin user
+  group:
+    name: "{{admin}}"
+    gid: 1001
+  tags: [raspbian, user]
+
+- name: add admin user
+  user:
+    name: "{{admin}}"
+    uid: 1001
+    group: "{{admin}}"
+    groups: 'adm'
+    skeleton: /etc/skel
+  tags: [raspbian, user]
+
+- name: allow sudo to admin user
+  lineinfile:
+    dest: /etc/sudoers.d/00-{{admin}}
+    regexp: '^{{admin}}'
+    line: '{{admin}} ALL=(ALL) NOPASSWD: ALL'
+    create: yes
+    mode: 0440
+    validate: 'visudo -cf %s'
+  tags: [raspbian, user]
+
+- name: make .ssh dir for admin user
+  file:
+    path: /home/{{admin}}/.ssh
+    owner: "{{admin}}"
+    group: "{{admin}}"
+    state: directory
+    mode: 0700
+  tags: [raspbian, user]
+
+- name: copy authorized_keys
+  copy:
+    src: /home/pi/.ssh/authorized_keys
+    dest: /home/{{admin}}/.ssh/authorized_keys
+    remote_src: True
+    owner: "{{admin}}"
+    group: "{{admin}}"
+    mode: 0600
+  tags: [raspbian, user]
