@@ -141,3 +141,20 @@
     group: "{{admin}}"
     mode: 0600
   tags: [raspbian, user]
+
+- name: copy id_rsa
+  become_user: "{{admin}}"
+  copy:
+    src: ~/.ssh/id_rsa
+    dest: /home/{{admin}}/.ssh/id_rsa
+    mode: 0600
+    follow: yes
+  tags: [redhat, user]
+
+- name: copy id_rsa.pub
+  become_user: "{{admin}}"
+  copy:
+    src: ~/.ssh/id_rsa.pub
+    dest: /home/{{admin}}/.ssh/id_rsa.pub
+    follow: yes
+  tags: [redhat, user]
