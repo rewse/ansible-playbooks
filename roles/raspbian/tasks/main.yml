@@ -7,6 +7,7 @@
       - libsasl2-modules
       - postfix
       - python-pip
+      - vim
     state: present
   tags: [raspbian, package]
 
