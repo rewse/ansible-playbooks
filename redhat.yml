@@ -4,4 +4,5 @@
   remote_user: ec2-user
   roles:
     - redhat
+    - postfix/client
     - zabbix/agent
