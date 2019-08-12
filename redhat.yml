@@ -5,4 +5,5 @@
   roles:
     - redhat
     - postfix/client
+    - dotfiles
     - zabbix/agent
