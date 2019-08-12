@@ -5,3 +5,4 @@
   roles:
     - raspbian
     - postfix/client
+    - dotfiles
