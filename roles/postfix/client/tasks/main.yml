@@ -37,7 +37,7 @@
   lineinfile:
     dest: /etc/postfix/main.cf
     regexp: 'smtp_sasl_security_options '
-    line: 'smtp_sasl_security_options = noplaintext, noanonymous'
+    line: 'smtp_sasl_security_options = noanonymous'
   notify: reload postfix
   tags: [postfix-client]
 
