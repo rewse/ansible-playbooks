@@ -26,31 +26,25 @@
     state: installed
   tags: [database-client, mysql]
 
-  # Download the files before the following task
-  # from <http://www.oracle.com/technetwork/topics/linuxx86-64soft-092277.html>
-- name: copy oracle-instantclient
+- name: copy oracle-instantclient.repo
   copy:
-    src: "{{item}}"
-    dest: /usr/local/src
-  with_items:
-    - "{{oracle_instantclient_basic_filename}}"
-    - "{{oracle_instantclient_sqlplus_filename}}"
-    - "{{oracle_instantclient_tools_filename}}"
+    src: oracle-instantclient.repo
+    dest: /etc/yum.repos.d
   tags: [database-client, oracle]
 
 - name: install oracle-instantclient
   yum:
     name:
       - rlwrap
-      - /usr/local/src/{{oracle_instantclient_basic_filename}}
-      - /usr/local/src/{{oracle_instantclient_sqlplus_filename}}
-      - /usr/local/src/{{oracle_instantclient_tools_filename}}
+      - oracle-instantclient{{oracle_instantclient_version}}-basic
+      - oracle-instantclient{{oracle_instantclient_version}}-sqlplus
+      - oracle-instantclient{{oracle_instantclient_version}}-tools
     state: installed
   tags: [database-client, oracle]
 
 - name: copy librarie path for oracle-instantclient
-  copy:
-    src: oracle-instantclient-sqlplus.conf
+  template:
+    src: oracle-instantclient-sqlplus.conf.j2
     dest: /etc/ld.so.conf.d
   tags: [database-client, oracle]
 
@@ -60,7 +54,7 @@
 
 - name: create symlink for ojdbc.jar
   file:
-    src: /usr/lib/oracle/19.3/client64/lib/{{item}}
+    src: /usr/lib/oracle/{{oracle_instantclient_version}}/client64/lib/{{item}}
     dest: /usr/share/java/{{item}}
     state: link
   with_items:
