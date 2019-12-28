@@ -1,0 +1,6 @@
+[oracle-instantclient]
+name=Oracle Instant Client
+baseurl=http://yum.oracle.com/repo/OracleLinux/OL7/oracle/instantclient/x86_64/
+enabled=1
+gpgcheck=0
+priority=30
