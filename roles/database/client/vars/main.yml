@@ -2,5 +2,5 @@
 mysql_release_filename: mysql80-community-release-el7-1.noarch.rpm
 mysql_community_ini_section: mysql80-community
 oracle_instantclient_version: 19.5
-postgersql_jdbc_filename: postgresql-42.2.8.jar
+postgersql_jdbc_filename: postgresql-42.2.9.jar
 redshift_jdbc_version: 1.2.37.1061
