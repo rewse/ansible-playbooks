@@ -1,4 +1,5 @@
 .DS_Store
+*.icloud
 *.retry
 roles/desktop/files/Ricty*
 roles/database/client/gui/files/java*
