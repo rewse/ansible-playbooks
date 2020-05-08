@@ -99,11 +99,27 @@
   command: python /tmp/get-pip.py
   tags: [redhat, package, pip]
 
-- name: install packages with pip
-  pip:
-    name:
-      - awscli
-  tags: [redhat, package, pip]
+- name: unarchive awscliv2
+  unarchive:
+    src: https://awscli.amazonaws.com/awscli-exe-linux-x86_64.zip
+    dest: /usr/local/src
+    remote_src: yes
+  tags: [readhat, package, awscliv2]
+
+- name: stat awscliv2
+  stat: path=/usr/local/bin/aws
+  register: aws
+  tags: [readhat, package, awscliv2]
+
+- name: install awscliv2
+  command: /usr/local/src/aws/install
+  when: not aws.stat.exists
+  tags: [readhat, package, awscliv2]
+
+- name: update awscliv2
+  command: /usr/local/src/aws/install --update
+  when: aws.stat.exists
+  tags: [readhat, package, awscliv2]
 
 - name: update all packages
   yum:
