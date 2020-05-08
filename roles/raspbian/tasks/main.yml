@@ -4,6 +4,7 @@
     name:
       - aptitude
       - awscli
+      - dnsutils
       - git
       - etckeeper
       - libsasl2-modules
