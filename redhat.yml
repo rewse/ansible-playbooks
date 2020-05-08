@@ -6,4 +6,4 @@
     - redhat
     - postfix/client
     - dotfiles
-    - zabbix/agent
+    - zabbix/agent/redhat
