@@ -1,0 +1,18 @@
+---
+- name: install additional packages
+  apt:
+    name:
+      - libbluetooth3-dev
+      - libboost-python-dev
+      - libboost-thread-dev
+      - libglib2.0-0
+    state: present
+  tags: [smarthome, package]
+
+- name: install packages with pip3
+  pip:
+    name:
+      - gattlib
+      - pybluez
+    executable: pip3
+  tags: [smarthome, package, pip]
