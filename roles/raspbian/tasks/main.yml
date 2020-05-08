@@ -4,10 +4,13 @@
     name:
       - aptitude
       - awscli
+      - git
       - etckeeper
       - libsasl2-modules
+      - ntpdate
       - postfix
       - python-pip
+      - python3-pip
       - vim
     state: present
   tags: [raspbian, package]
@@ -144,7 +147,7 @@
     dest: /home/{{admin}}/.ssh/id_rsa
     mode: 0600
     follow: yes
-  tags: [redhat, user]
+  tags: [raspbian, user]
 
 - name: copy id_rsa.pub
   become_user: "{{admin}}"
@@ -152,4 +155,4 @@
     src: ~/.ssh/id_rsa.pub
     dest: /home/{{admin}}/.ssh/id_rsa.pub
     follow: yes
-  tags: [redhat, user]
+  tags: [raspbian, user]
