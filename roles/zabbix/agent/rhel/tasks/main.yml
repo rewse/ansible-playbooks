@@ -3,7 +3,7 @@
   yum:
     name: "{{zabbix_release_url}}"
     state: installed
-  tags: [zabbix-agent, package]
+  tags: [zabbix-agent-redhat, package]
 
 - name: install zabbix clients
   yum:
@@ -11,7 +11,7 @@
       - zabbix-agent
       - zabbix-sender
     state: installed
-  tags: [zabbix-agent, package]
+  tags: [zabbix-agent-redhat, package]
 
 - name: add priority into /etc/yum.repos.d/zabbix.repo
   ini_file:
@@ -23,7 +23,7 @@
   with_items:
     - zabbix
     - zabbix-non-supported
-  tags: [zabbix-agent, package]
+  tags: [zabbix-agent-redhat, package]
 
 - name: zabbix; set zabbix server
   lineinfile:
@@ -31,7 +31,7 @@
     regexp: 'Server='
     line: 'Server={{zabbix_server_name}}'
   notify: restart zabbix-agent
-  tags: [zabbix-agent]
+  tags: [zabbix-agent-redhat]
 
 - name: zabbix; set zabbix server active
   lineinfile:
@@ -39,7 +39,7 @@
     regexp: 'ServerActive='
     line: 'ServerActive={{zabbix_server_name}}'
   notify: restart zabbix-agent
-  tags: [zabbix-agent]
+  tags: [zabbix-agent-redhat]
 
 - name: zabbix; set hostname
   lineinfile:
@@ -47,7 +47,7 @@
     regexp: 'Hostname='
     line: 'Hostname={{ansible_nodename}}'
   notify: restart zabbix-agent
-  tags: [zabbix-agent]
+  tags: [zabbix-agent-redhat]
 
 - name: set Timeout
   lineinfile:
@@ -56,53 +56,53 @@
     regexp: '^Timeout='
     line: 'Timeout=30'
   notify: restart zabbix-agent
-  tags: [zabbix-agent]
+  tags: [zabbix-agent-redhat]
 
 - name: copy rhel7.conf
   copy:
     src: rhel7.conf
     dest: /etc/zabbix/zabbix_agentd.d
-  tags: [zabbix-agent]
+  tags: [zabbix-agent-redhat]
 
 - name: copy cloudwatch
   copy:
     src: cloudwatch
     dest: /usr/local/bin
     mode: 0755
-  tags: [zabbix-agent]
+  tags: [zabbix-agent-redhat]
 
 - name: make agentscripts dir
   file:
     path: /usr/lib/zabbix/agentscripts
     state: directory
-  tags: [zabbix-agent]
+  tags: [zabbix-agent-redhat]
 
 - name: copy ec2.sh
   copy:
     src: ec2.sh
     dest: /usr/lib/zabbix/agentscripts
     mode: 0755
-  tags: [zabbix-agent]
+  tags: [zabbix-agent-redhat]
 
 - name: copy ec2.conf
   copy:
     src: ec2.conf
     dest: /etc/zabbix/zabbix_agentd.d
-  tags: [zabbix-agent]
+  tags: [zabbix-agent-redhat]
 
 - name: rm userparameter_mysql.conf
   file:
     path: /etc/zabbix/zabbix_agentd.d/userparameter_mysql.conf
     state: absent
   notify: restart zabbix-agent
-  tags: [zabbix-agent]
+  tags: [zabbix-agent-redhat]
 
 - name: change permission of /var/log/messages
   file:
     path: /var/log/messages
     group: zabbix
     mode: 0640
-  tags: [zabbix-agent]
+  tags: [zabbix-agent-redhat]
 
 - name: allow sudo to zabbix
   lineinfile:
@@ -112,18 +112,18 @@
     create: yes
     mode: 0440
     validate: 'visudo -cf %s'
-  tags: [zabbix-agent]
+  tags: [zabbix-agent-redhat]
 
 - name: add zabbix to systemd-journal group
   user:
     name: zabbix
     groups: 'zabbix,systemd-journal'
   notify: restart zabbix-agent
-  tags: [zabbix-agent]
+  tags: [zabbix-agent-redhat]
 
 - name: zabbix; enable zabbix-agent
   service:
     name: zabbix-agent
     enabled: yes
   notify: restart zabbix-agent
-  tags: [zabbix-agent]
+  tags: [zabbix-agent-redhat]
