@@ -3,6 +3,7 @@
   apt:
     name:
       - aptitude
+      - awscli
       - etckeeper
       - libsasl2-modules
       - postfix
@@ -10,12 +11,6 @@
       - vim
     state: present
   tags: [raspbian, package]
-
-- name: install packages with pip
-  pip:
-    name:
-      - awscli
-  tags: [raspbian, package, pip]
 
 - name: update all repositories
   apt:
