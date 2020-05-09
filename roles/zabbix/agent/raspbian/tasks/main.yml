@@ -1,0 +1,61 @@
+---
+- name: install zabbix-release
+  apt:
+    deb: https://repo.zabbix.com/zabbix/4.0/raspbian/pool/main/z/zabbix-release/zabbix-release_4.0-2+buster_all.deb
+  tags: [zabbix-agent-raspbian, package]
+
+- name: install zabbix clients
+  apt:
+    name:
+      - zabbix-agent
+    state: present
+    update_cache: yes
+  tags: [zabbix-agent-raspbian, package]
+
+- name: set zabbix server
+  lineinfile:
+    dest: /etc/zabbix/zabbix_agentd.conf
+    regexp: 'Server='
+    line: 'Server={{zabbix_server_name}}'
+  tags: [zabbix-agent-raspbian]
+
+- name: set zabbix server active
+  lineinfile:
+    dest: /etc/zabbix/zabbix_agentd.conf
+    regexp: 'ServerActive='
+    line: 'ServerActive={{zabbix_server_name}}'
+  tags: [zabbix-agent-raspbian]
+
+- name: set hostname
+  lineinfile:
+    dest: /etc/zabbix/zabbix_agentd.conf
+    regexp: 'Hostname='
+    line: 'Hostname={{ansible_nodename}}'
+  tags: [zabbix-agent-raspbian]
+
+- name: set Timeout
+  lineinfile:
+    dest: /etc/zabbix/zabbix_agentd.conf
+    insertafter: '^# Timeout='
+    regexp: '^Timeout='
+    line: 'Timeout=30'
+  tags: [zabbix-agent-raspbian]
+
+- name: make agentscripts dir
+  file:
+    path: /usr/lib/zabbix/agentscripts
+    state: directory
+  tags: [zabbix-agent-raspbian]
+
+- name: copy switchbot.sh
+  copy:
+    src: switchbot.sh
+    dest: /usr/lib/zabbix/agentscripts
+    mode: 0755
+  tags: [zabbix-agent-raspbian]
+
+- name: copy switchbot.conf
+  copy:
+    src: switchbot.conf
+    dest: /etc/zabbix/zabbix_agentd.conf.d
+  tags: [zabbix-agent-raspbian]
