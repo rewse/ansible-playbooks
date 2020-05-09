@@ -19,10 +19,10 @@ my_exit() {
 # {{{ sendfrom_sensor()
 
 sendfrom_sensor() {
-    curl "http://$huebridge_ip/api/$user_id/sensors/$sensor_id" \
+    curl "http://$huebridge_ip/api/$user_id/sensors" \
     -o $res_file > /dev/null 2>&1
 
-    presence=$(cat $res_file | jq -r .state.presence)
+    presence=$(cat $res_file | jq -r .[\"$sensor_id\"].state.presence)
 
     if "$presence" ; then
         presence=1
@@ -39,7 +39,13 @@ sendfrom_sensor() {
     zabbix_sender \
         -c /etc/zabbix/zabbix_agentd.conf \
         -k huebridge.sensor.pbattery[$sensor_id] \
-        -o $(cat $res_file | jq -r .config.battery) \
+        -o $(cat $res_file | jq -r .[\"$sensor_id\"].config.battery) \
+    > /dev/null 2>&1
+
+    zabbix_sender \
+        -c /etc/zabbix/zabbix_agentd.conf \
+        -k huebridge.sensor.lightlevel[$sensor_id] \
+        -o $(cat $res_file | jq -r .[\"$(expr $sensor_id + 1)\"].state.lightlevel) \
     > /dev/null 2>&1
 }
 
