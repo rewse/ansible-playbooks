@@ -1,0 +1,53 @@
+#!/bin/bash
+
+trap 'my_exit 1' 1 2 3 15
+
+readonly huebridge_ip=[% huebridge_ip %]
+readonly user_id=[% vault_huebridge_userid %]
+readonly sensor_id=$1
+readonly res_file=$(mktemp --tmpdir huebridge.XXXXXXXXXX)
+
+# {{{ my_exit()
+
+my_exit() {
+    rm -f $res_file
+    echo $1
+    exit $1
+}
+
+# }}}
+# {{{ sendfrom_sensor()
+
+sendfrom_sensor() {
+    curl "http://$huebridge_ip/api/$user_id/sensors/$sensor_id" \
+    -o $res_file > /dev/null 2>&1
+
+    presence=$(cat $res_file | jq -r .state.presence)
+
+    if "$presence" ; then
+        presence=1
+    else
+        presence=0
+    fi
+
+    zabbix_sender \
+        -c /etc/zabbix/zabbix_agentd.conf \
+        -k huebridge.sensor.presence[$sensor_id] \
+        -o $presence \
+    > /dev/null 2>&1
+
+    zabbix_sender \
+        -c /etc/zabbix/zabbix_agentd.conf \
+        -k huebridge.sensor.pbattery[$sensor_id] \
+        -o $(cat $res_file | jq -r .config.battery) \
+    > /dev/null 2>&1
+}
+
+# }}}
+# {{{ Main
+
+sendfrom_sensor
+
+my_exit 0
+
+# }}}
