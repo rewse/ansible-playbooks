@@ -2,6 +2,7 @@
 - name: install additional packages
   apt:
     name:
+      - jq
       - libbluetooth3-dev
       - libboost-python-dev
       - libboost-thread-dev

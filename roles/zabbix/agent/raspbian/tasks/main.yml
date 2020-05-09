@@ -59,3 +59,18 @@
     src: switchbot.conf
     dest: /etc/zabbix/zabbix_agentd.conf.d
   tags: [zabbix-agent-raspbian, switchbot]
+
+- name: copy huebridge.sh
+  template:
+    src: huebridge.sh.j2
+    dest: /usr/lib/zabbix/agentscripts/huebridge.sh
+    mode: 0755
+    variable_start_string: "[%"
+    variable_end_string: "%]"
+  tags: [zabbix-agent-raspbian, huebridge]
+
+- name: copy huebridge.conf
+  copy:
+    src: huebridge.conf
+    dest: /etc/zabbix/zabbix_agentd.conf.d
+  tags: [zabbix-agent-raspbian, huebridge]
