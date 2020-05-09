@@ -30,10 +30,20 @@ sendfrom_sensor() {
         presence=0
     fi
 
+    lastupdated=$(cat $res_file | jq -r .[\"$sensor_id\"].state.lastupdated)
+
+    unixtime=$(date -d "$lastupdated" +%s)
+
     zabbix_sender \
         -c /etc/zabbix/zabbix_agentd.conf \
         -k huebridge.sensor.presence[$sensor_id] \
         -o $presence \
+    > /dev/null 2>&1
+
+    zabbix_sender \
+        -c /etc/zabbix/zabbix_agentd.conf \
+        -k huebridge.sensor.lastupdated[$sensor_id] \
+        -o $unixtime \
     > /dev/null 2>&1
 
     zabbix_sender \
