@@ -52,10 +52,10 @@
     src: switchbot.sh
     dest: /usr/lib/zabbix/agentscripts
     mode: 0755
-  tags: [zabbix-agent-raspbian, smarthome, switchbot]
+  tags: [zabbix-agent-raspbian, switchbot]
 
 - name: copy switchbot.conf
   copy:
     src: switchbot.conf
     dest: /etc/zabbix/zabbix_agentd.conf.d
-  tags: [zabbix-agent-raspbian, smarthome, switchbot]
+  tags: [zabbix-agent-raspbian, switchbot]
