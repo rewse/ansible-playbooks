@@ -1,2 +1,3 @@
 ---
+zabbix_release_url: https://repo.zabbix.com/zabbix/4.0/raspbian/pool/main/z/zabbix-release/zabbix-release_4.0-2+buster_all.deb
 zabbix_server_name: zabbix.rewse.jp

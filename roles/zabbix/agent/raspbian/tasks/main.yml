@@ -1,7 +1,7 @@
 ---
 - name: install zabbix-release
   apt:
-    deb: https://repo.zabbix.com/zabbix/4.0/raspbian/pool/main/z/zabbix-release/zabbix-release_4.0-2+buster_all.deb
+    deb: "{{zabbix_release_url}}"
   tags: [zabbix-agent-raspbian, package]
 
 - name: install zabbix clients
