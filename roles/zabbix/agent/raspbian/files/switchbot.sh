@@ -5,6 +5,11 @@ trap 'my_exit 1' 1 2 3 15
 readonly ble_mac=$1
 readonly res_file=$(mktemp --tmpdir switchbot_meter.XXXXXXXXXX)
 
+if [ ! "$ble_mac" ]; then
+    echo "[USAGE] switchbot.sh ble_mac"
+    exit 1
+fi
+
 # {{{ my_exit()
 
 my_exit() {
