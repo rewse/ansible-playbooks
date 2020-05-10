@@ -43,11 +43,15 @@ sendfrom_sensor() {
         -o $presence \
     > /dev/null 2>&1
 
+    res=$?
+
     zabbix_sender \
         -c /etc/zabbix/zabbix_agentd.conf \
         -k huebridge.sensor.lastupdated[$sensor_id] \
         -o $lastupdated \
     > /dev/null 2>&1
+
+    res=$(expr $res + $?)
 
     zabbix_sender \
         -c /etc/zabbix/zabbix_agentd.conf \
@@ -55,11 +59,15 @@ sendfrom_sensor() {
         -o $(cat $res_file | jq -r .[\"$sensor_id\"].config.battery) \
     > /dev/null 2>&1
 
+    res=$(expr $res + $?)
+
     zabbix_sender \
         -c /etc/zabbix/zabbix_agentd.conf \
         -k huebridge.sensor.lightlevel[$sensor_id] \
         -o $(cat $res_file | jq -r .[\"$(expr $sensor_id + 1)\"].state.lightlevel) \
     > /dev/null 2>&1
+
+    res=$(expr $res + $?)
 }
 
 # }}}
@@ -67,6 +75,6 @@ sendfrom_sensor() {
 
 sendfrom_sensor
 
-my_exit 0
+my_exit $res
 
 # }}}

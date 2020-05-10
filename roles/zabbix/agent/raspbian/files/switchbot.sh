@@ -30,11 +30,15 @@ send_humiture() {
         -o $(cat $res_file | grep $ble_mac | awk '{print $2}' | sed "s/'C//") \
     > /dev/null 2>&1
 
+    res=$?
+
     zabbix_sender \
         -c /etc/zabbix/zabbix_agentd.conf \
         -k switchbot.meter.humi[$ble_mac] \
         -o $(cat $res_file | grep $ble_mac | awk '{print $3}' | sed "s/%//") \
     > /dev/null 2>&1
+
+    res=$(expr $res + $?)
 }
 
 # }}}
@@ -42,6 +46,6 @@ send_humiture() {
 
 send_humiture
 
-my_exit 0
+my_exit $res
 
 # }}}
