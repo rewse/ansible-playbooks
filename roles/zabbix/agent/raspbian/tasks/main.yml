@@ -1,9 +1,4 @@
 ---
-- name: install zabbix-release
-  apt:
-    deb: "{{zabbix_release_url}}"
-  tags: [zabbix-agent-raspbian, package]
-
 - name: install zabbix clients
   apt:
     name:
