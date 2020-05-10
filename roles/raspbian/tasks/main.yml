@@ -3,11 +3,14 @@
   apt:
     name:
       - aptitude
+      - at
       - awscli
       - dnsutils
       - git
       - etckeeper
+      - irqbalance
       - libsasl2-modules
+      - logwatch
       - ntpdate
       - postfix
       - python-pip
