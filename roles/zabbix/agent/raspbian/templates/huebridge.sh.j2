@@ -7,6 +7,11 @@ readonly user_id=[% vault_huebridge_userid %]
 readonly sensor_id=$1
 readonly res_file=$(mktemp --tmpdir huebridge.XXXXXXXXXX)
 
+if [ ! "$sensor_id" ]; then
+    echo "[USAGE] huebridge.sh sensor_id"
+    exit 1
+fi
+
 # {{{ my_exit()
 
 my_exit() {
