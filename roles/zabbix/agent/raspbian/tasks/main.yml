@@ -12,6 +12,7 @@
     dest: /etc/zabbix/zabbix_agentd.conf
     regexp: 'Server='
     line: 'Server={{zabbix_server_name}}'
+  notify: restart zabbix-agent
   tags: [zabbix-agent-raspbian]
 
 - name: set zabbix server active
@@ -19,6 +20,7 @@
     dest: /etc/zabbix/zabbix_agentd.conf
     regexp: 'ServerActive='
     line: 'ServerActive={{zabbix_server_name}}'
+  notify: restart zabbix-agent
   tags: [zabbix-agent-raspbian]
 
 - name: set hostname
@@ -26,6 +28,7 @@
     dest: /etc/zabbix/zabbix_agentd.conf
     regexp: 'Hostname='
     line: 'Hostname={{ansible_nodename}}'
+  notify: restart zabbix-agent
   tags: [zabbix-agent-raspbian]
 
 - name: set Timeout
@@ -34,6 +37,7 @@
     insertafter: '^# Timeout='
     regexp: '^Timeout='
     line: 'Timeout=30'
+  notify: restart zabbix-agent
   tags: [zabbix-agent-raspbian]
 
 - name: make agentscripts dir
@@ -53,6 +57,7 @@
   copy:
     src: switchbot.conf
     dest: /etc/zabbix/zabbix_agentd.conf.d
+  notify: restart zabbix-agent
   tags: [zabbix-agent-raspbian, switchbot]
 
 - name: copy huebridge.sh
@@ -68,4 +73,5 @@
   copy:
     src: huebridge.conf
     dest: /etc/zabbix/zabbix_agentd.conf.d
+  notify: restart zabbix-agent
   tags: [zabbix-agent-raspbian, huebridge]
