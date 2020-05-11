@@ -39,7 +39,7 @@
   copy:
     src: /home/ubuntu/.ssh/authorized_keys
     dest: /home/{{ admin }}/.ssh/authorized_keys
-    remote_src: True
+    remote_src: yes
     owner: "{{ admin }}"
     group: "{{ admin }}"
     mode: 0600
