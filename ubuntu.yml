@@ -1,0 +1,7 @@
+---
+- hosts: ubuntu
+  become: yes
+  remote_user: ubuntu
+  roles:
+    - debian
+    - ubuntu

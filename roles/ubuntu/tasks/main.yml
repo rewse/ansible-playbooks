@@ -1,0 +1,46 @@
+---
+- name: Unarchive awscliv2
+  unarchive:
+    src: https://awscli.amazonaws.com/awscli-exe-linux-x86_64.zip
+    dest: /usr/local/src
+    remote_src: yes
+  tags: [ubuntu, package, awscliv2]
+
+- name: Stat awscliv2
+  stat: path=/usr/local/bin/aws
+  register: aws
+  tags: [ubuntu, package, awscliv2]
+
+- name: Install awscliv2
+  command: /usr/local/src/aws/install
+  when: not aws.stat.exists
+  tags: [ubuntu, package, awscliv2]
+
+- name: Update awscliv2
+  command: /usr/local/src/aws/install --update
+  when: aws.stat.exists
+  tags: [ubuntu, package, awscliv2]
+
+- name: "cloud-init : Enable preserve_hostname"
+  lineinfile:
+    dest: /etc/cloud/cloud.cfg
+    regexp: '^preserve_hostname'
+    line: 'preserve_hostname: true'
+  tags: [ubuntu, cloud-init]
+
+- name: "ssh : Copy authentication.conf"
+  copy:
+    src: authentication.conf
+    dest: /etc/ssh/sshd_config.d
+  notify: Restart sshd
+  tags: [ubuntu, ssh]
+
+- name: Copy authorized_keys
+  copy:
+    src: /home/ubuntu/.ssh/authorized_keys
+    dest: /home/{{ admin }}/.ssh/authorized_keys
+    remote_src: True
+    owner: "{{ admin }}"
+    group: "{{ admin }}"
+    mode: 0600
+  tags: [ubuntu, user]

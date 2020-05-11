@@ -3,8 +3,9 @@
   become: yes
   remote_user: pi
   roles:
+    - debian
     - raspbian
     - postfix/client
     - dotfiles
-    - smarthome
     - zabbix/agent/raspbian
+    - smarthome
