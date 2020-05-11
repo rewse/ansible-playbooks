@@ -1,77 +1,77 @@
 ---
-- name: clone dotfiles.git
+- name: Clone dotfiles.git
   git:
     repo: git@github.com:rewse/dotfiles.git
     dest: /srv/git/dotfiles
     accept_hostkey: yes
-    key_file: /home/{{admin}}/.ssh/id_rsa
+    key_file: /home/{{ admin }}/.ssh/id_rsa
   tags: [dotfiles]
 
-- name: change mode of git/dotfiles
+- name: Change mode of git/dotfiles
   file:
     path: /srv/git/dotfiles
-    owner: "{{admin}}"
-    group: "{{admin}}"
+    owner: "{{ admin }}"
+    group: "{{ admin }}"
     recurse: yes
   tags: [dotfiles, bash, git, tmux, vim]
 
-- name: copy bash_profile
+- name: Copy bash_profile
   copy:
     src: /srv/git/dotfiles/bash_profile
     dest: /etc/profile.d/bash_profile.sh
-    remote_src: True
+    remote_src: yes
   tags: [dotfiles, bash]
 
-- name: copy bashrc
+- name: Copy bashrc
   copy:
     src: /srv/git/dotfiles/bashrc
     dest: /etc/profile.d/bashrc.sh
-    remote_src: True
+    remote_src: yes
   tags: [dotfiles, bash]
 
-- name: copy gitconfig
-  become_user: "{{admin}}"
+- name: Copy gitconfig
+  become_user: "{{ admin }}"
   copy:
     src: /srv/git/dotfiles/gitconfig
-    dest: /home/{{admin}}/.gitconfig
-    remote_src: True
+    dest: /home/{{ admin }}/.gitconfig
+    remote_src: yes
   tags: [dotfiles, git]
 
-- name: git; set user email
-  become_user: "{{admin}}"
+- name: "git : Set user email"
+  become_user: "{{ admin }}"
   ini_file:
-    dest: /home/{{admin}}/.gitconfig
+    dest: /home/{{ admin }}/.gitconfig
     section: user
     option: email
-    value: "{{email.primary}}"
+    value: "{{ email.primary }}"
   tags: [dotfiles, git]
 
-- name: tmux; copy tmux.conf
+- name: "tmux : Copy tmux.conf"
   copy:
     src: /srv/git/dotfiles/tmux.conf
     dest: /etc/tmux.conf
-    remote_src: True
+    remote_src: yes
   tags: [dotfiles, tmux]
 
-- name: vim; copy vimfiles
+- name: "vim : Copy vimfiles"
   copy:
     src: /srv/git/dotfiles/vim/vimrc
     dest: /etc/vim/vimrc.local
-    remote_src: True
-  when: 'ansible_os_family == "Debian"'
+    remote_src: yes
+  when: "ansible_os_family == 'Debian'"
   tags: [dotfiles, vim]
 
-- name: vim; copy vimfiles
+- name: "vim : Copy vimfiles"
   copy:
     src: /srv/git/dotfiles/vim/vimrc
     dest: /usr/share/vim/vimfiles/vimrc
-    remote_src: True
-  when: 'ansible_os_family == "RedHat"'
+    remote_src: yes
+  when: "ansible_os_family == 'RedHat'"
   tags: [dotfiles, vim]
 
-- name: vim; add to import vimrc
+- name: "vim : Add to import vimrc"
   lineinfile:
     dest: /etc/vimrc
-    line: 'source /usr/share/vim/vimfiles/vimrc'
-  when: 'ansible_os_family == "RedHat"'
+    line: source /usr/share/vim/vimfiles/vimrc
+  when: "ansible_os_family == 'RedHat'"
   tags: [dotfiles, vim]
