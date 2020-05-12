@@ -1,76 +1,103 @@
 ---
-- name: postfix; change myorigin
+- name: Change myhostname
   lineinfile:
     dest: /etc/postfix/main.cf
-    insertafter: '^#myorigin '
-    regexp: '^myorigin '
-    line: 'myorigin = rewse.jp'
-  notify: reload postfix
+    insertafter: "^myhostname "
+    regexp: "^myhostname "
+    line: "myhostname = {{ ansible_nodename }}"
+  notify: Reload postfix
   tags: [postfix-client]
 
-- name: postfix; change relayhost
+- name: Add mydomain
   lineinfile:
     dest: /etc/postfix/main.cf
-    insertafter: '^#relayhost '
-    regexp: '^relayhost '
-    line: 'relayhost = [{{relayhost.name}}]:{{relayhost.port}}'
-  notify: reload postfix
+    insertafter: "^myhostname "
+    regexp: "^mydomain "
+    line: "mydomain = rewse.jp"
+  notify: Reload postfix
   tags: [postfix-client]
 
-- name: postfix; set smtp_sasl_auth_enable
+- name: Change myorigin
   lineinfile:
     dest: /etc/postfix/main.cf
-    regexp: '^smtp_sasl_auth_enable '
-    line: 'smtp_sasl_auth_enable = yes'
-  notify: reload postfix
+    insertafter: "^#myorigin "
+    regexp: "^myorigin "
+    line: "myorigin = $mydomain"
+  notify: Reload postfix
   tags: [postfix-client]
 
-- name: postfix; set smtp_sasl_password_maps
+- name: Change relayhost
   lineinfile:
     dest: /etc/postfix/main.cf
-    regexp: 'smtp_sasl_password_maps '
-    line: 'smtp_sasl_password_maps = hash:/etc/postfix/sasl_passwd'
-  notify: reload postfix
+    insertafter: "^#relayhost "
+    regexp: "^relayhost "
+    line: 'relayhost = [{{ relayhost.name }}]:{{ relayhost.port }}'
+  notify: Reload postfix
   tags: [postfix-client]
 
-- name: postfix; set smtp_sasl_security_options
+- name: Set smtp_sasl_auth_enable
   lineinfile:
     dest: /etc/postfix/main.cf
-    regexp: 'smtp_sasl_security_options '
-    line: 'smtp_sasl_security_options = noanonymous'
-  notify: reload postfix
+    regexp: "^smtp_sasl_auth_enable "
+    line: "smtp_sasl_auth_enable = yes"
+  notify: Reload postfix
   tags: [postfix-client]
 
-- name: postfix; create sasl_passwd
+- name: Set smtp_sasl_mechanism_filter
+  lineinfile:
+    dest: /etc/postfix/main.cf
+    regexp: "^smtp_sasl_mechanism_filter"
+    line: "smtp_sasl_mechanism_filter = plain, login"
+  notify: Reload postfix
+  tags: [postfix-client]
+
+- name: Set smtp_sasl_password_maps
+  lineinfile:
+    dest: /etc/postfix/main.cf
+    regexp: "smtp_sasl_password_maps "
+    line: "smtp_sasl_password_maps = hash:/etc/postfix/sasl_passwd"
+  notify: Reload postfix
+  tags: [postfix-client]
+
+- name: Set smtp_sasl_security_options
+  lineinfile:
+    dest: /etc/postfix/main.cf
+    regexp: "smtp_sasl_security_options "
+    line: "smtp_sasl_security_options = noanonymous"
+  notify: Reload postfix
+  tags: [postfix-client]
+
+- name: Create sasl_passwd
   lineinfile:
     dest: /etc/postfix/sasl_passwd
-    regexp: '^\[{{relayhost.name}}\]:{{relayhost.port}}'
-    line: '[{{relayhost.name}}]:{{relayhost.port}} {{so_net.username}}:{{so_net.password}}'
+    regexp: '^\[{{ relayhost.name }}\]:{{ relayhost.port }}'
+    line: '[{{ relayhost.name }}]:{{ relayhost.port }} {{ so_net.username }}:{{ so_net.password }}'
     create: yes
     mode: 0600
   register: postfix_sasl_password_out
   tags: [postfix-client]
 
-- name: postfix; create sasl_passwd.db
+- name: Create sasl_passwd.db
   file:
     path: /etc/postfix/sasl_passwd.db
     state: touch
     mode: 0600
   tags: [postfix-client]
 
-- name: postfix; hash sasl_passwd
+- name: Hash sasl_passwd
   command: postmap hash:/etc/postfix/sasl_passwd
   when: postfix_sasl_password_out is changed
-  notify: reload postfix
+  notify: Reload postfix
   tags: [postfix-client]
 
-- name: write root mail alias
+- name: Write root mail alias
   lineinfile:
     dest: /etc/aliases
-    insertbefore: '^# Basic '
-    line: 'root: {{vault_email.primary}}"'
+    insertafter: "^postmaster:"
+    regexp: "^root: "
+    line: "root: {{ vault_email.primary }}"
   tags: [postfix-client, postfix, aliases]
 
-- name: enable mail alias
+- name: Enable mail alias
   command: newaliases
   tags: [postfix-client, postfix, aliases]
