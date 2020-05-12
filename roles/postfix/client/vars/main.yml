@@ -3,5 +3,5 @@ relayhost:
   name: mail.so-net.ne.jp
   port: 587
 so_net:
-  username: "{{vault_so_net.username}}"
-  password: "{{vault_so_net.password}}"
+  username: "{{ vault_so_net.username }}"
+  password: "{{ vault_so_net.password }}"

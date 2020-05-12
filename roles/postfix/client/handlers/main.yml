@@ -1,10 +1,5 @@
 ---
-- name: reload postfix
-  service:
+- name: Reload postfix
+  systemd:
     name: postfix
     state: reloaded
-
-- name: restart postfix
-  service:
-    name: postfix
-    state: restarted
