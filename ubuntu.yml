@@ -7,3 +7,4 @@
     - ubuntu
     - postfix/client
     - dotfiles
+    - zabbix/agent/debian

@@ -7,5 +7,6 @@
     - raspbian
     - postfix/client
     - dotfiles
+    - zabbix/agent/debian
     - zabbix/agent/raspbian
     - smarthome
