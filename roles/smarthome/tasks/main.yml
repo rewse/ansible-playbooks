@@ -1,5 +1,5 @@
 ---
-- name: install additional packages
+- name: Install additional packages
   apt:
     name:
       - jq
@@ -11,7 +11,7 @@
     state: present
   tags: [smarthome, package]
 
-- name: install packages with pip3
+- name: Install packages with pip3
   pip:
     name:
       - bluepy
@@ -20,14 +20,14 @@
     executable: pip3
   tags: [smarthome, package, pip]
 
-- name: clone python-host.git
+- name: Clone python-host.git
   git:
     repo: https://github.com/OpenWonderLabs/python-host.git
     dest: /srv/git/switchbot
     force: yes
   tags: [smarthome, switchbot]
 
-- name: add a shebang to switchbot_py3.py
+- name: Add a shebang to switchbot_py3.py
   lineinfile:
     dest: /srv/git/switchbot/switchbot_py3.py
     insertbefore: BOF
@@ -35,18 +35,18 @@
     state: present
   tags: [smarthome, switchbot]
 
-- name: copy switchbot_py3.py files to /usr/local/sbin
+- name: Copy switchbot_py3.py files to /usr/local/sbin
   copy:
     src: /srv/git/switchbot/switchbot_py3.py
     dest: /usr/local/sbin/switchbot
-    mode: '0755'
+    mode: 0755
     remote_src: yes
   tags: [smarthome, switchbot]
 
-- name: copy switchbot_meter_py3.py files to /usr/local/sbin
+- name: Copy switchbot_meter_py3.py files to /usr/local/sbin
   copy:
     src: /srv/git/switchbot/switchbot_meter_py3.py
     dest: /usr/local/sbin/switchbot_meter
-    mode: '0755'
+    mode: 0755
     remote_src: yes
   tags: [smarthome, switchbot]
