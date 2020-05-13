@@ -52,7 +52,7 @@
     name: "{{ inventory_hostname }}"
   tags: [debian, hostname]
 
-- name: add NTP servers
+- name: Add NTP servers
   lineinfile:
     dest: /etc/systemd/timesyncd.conf
     insertafter: '^#NTP='
@@ -94,7 +94,7 @@
     validate: 'visudo -cf %s'
   tags: [debian, user]
 
-- name: make .ssh dir for admin user
+- name: Make .ssh dir for admin user
   file:
     path: /home/{{ admin }}/.ssh
     owner: "{{ admin }}"
