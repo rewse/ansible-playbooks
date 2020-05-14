@@ -1,8 +1,8 @@
 ---
 - hosts: business_clients
   become: yes
-  remote_user: ec2-user
+  remote_user: ubuntu
   roles:
-    - desktop
-    - database/client
-    - database/client/gui
+    - desktop/ubuntu
+    - database/client/debian
+    - database/client/gui/debian
