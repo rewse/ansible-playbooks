@@ -53,11 +53,10 @@
 
 - name: install packages by pip
   pip:
-    executable: pip3
     name:
       - ansible
-      - awscli
       - pip-review
       - powerline-status
     state: latest
+    executable: pip3
   tags: [darwin, package, pip]
