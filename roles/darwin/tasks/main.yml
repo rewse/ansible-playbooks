@@ -3,6 +3,7 @@
   homebrew:
     name: 
       - git
+      - fontforge
       - mysql
       - postgresql
       - python3
@@ -38,8 +39,30 @@
 
 - name: copy ricty
   copy:
-    src: /usr/local/Cellar/ricty/4.1.0_2/share/fonts/{{item}}
+    src: /usr/local/Cellar/ricty/{{ ricty_version }}/share/fonts/{{item}}
     dest: /Library/Fonts/Ricty
+    remote_src: yes
+  with_items:
+    - "Ricty Bold for Powerline.ttf"
+    - "Ricty Discord Bold for Powerline.ttf"
+    - "Ricty Discord Regular for Powerline.ttf"
+    - "Ricty Regular for Powerline.ttf"
+    - Ricty-Bold.ttf
+    - Ricty-Regular.ttf
+    - RictyDiscord-Bold.ttf
+    - RictyDiscord-Regular.ttf
+  tags: [darwin, ricty]
+
+- name: Copy fix_ricty.pe
+  copy:
+    src: fix_ricty.pe
+    dest: /tmp
+    mode: 0755
+  tags: [darwin, ricty]
+
+# See also <https://qiita.com/uKLEina/items/ff0877871fc425952b92>
+- name: Fix Ricty
+  command: /tmp/fix_ricty.pe "/Library/Fonts/Ricty/{{ item }}"
   with_items:
     - "Ricty Bold for Powerline.ttf"
     - "Ricty Discord Bold for Powerline.ttf"
