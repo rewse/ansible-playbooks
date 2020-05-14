@@ -1,6 +1,6 @@
 .DS_Store
 *.icloud
 *.retry
-roles/desktop/files/Ricty*
+roles/desktop/redhat/files/Ricty*
 roles/database/client/gui/files/java*
 roles/database/client/gui/files/sqldeveloper*
