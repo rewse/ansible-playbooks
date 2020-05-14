@@ -1,12 +1,4 @@
 ---
-- name: sudo w/o password for admin
-  become: yes
-  replace:
-    path: /private/etc/sudoers
-    regexp: "%admin..*"
-    replace: "%admin ALL = (ALL) NOPASSWD: ALL"
-  tags: [darwin, sudo]
-
 - name: install packages by homebrew
   homebrew:
     name: 
@@ -60,7 +52,6 @@
   tags: [darwin, ricty]
 
 - name: install packages by pip
-  become: yes
   pip:
     executable: pip3
     name:
