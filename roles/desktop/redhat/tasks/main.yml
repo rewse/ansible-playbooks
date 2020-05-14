@@ -3,13 +3,13 @@
   yum:
     name: "@^Server with GUI"
     state: installed
-  tags: [desktop, package]
+  tags: [desktop-redhat, package]
 
 - name: make Ricty dir
   file:
     path: /usr/local/share/fonts/Ricty
     state: directory
-  tags: [desktop, font, Ricty]
+  tags: [desktop-redhat, font, Ricty]
 
 - name: copy Ricty fonts
   copy:
@@ -20,30 +20,30 @@
     - Ricty-Bold.ttf
     - RictyDiscord-Regular.ttf
     - RictyDiscord-Bold.ttf
-  tags: [desktop, font, Ricty]
+  tags: [desktop-redhat, font, Ricty]
 
 - name: git; clone base-16-gnome-terminal.git
   git:
     repo: https://github.com/chriskempson/base16-gnome-terminal.git
     dest: /srv/git/base16-gnome-terminal
-  tags: [desktop, terminal]
+  tags: [desktop-redhat, terminal]
 
 - name: install tigervnc-server
   yum:
     name: tigervnc-server
     state: installed
-  tags: [desktop, package, vnc]
+  tags: [desktop-redhat, package, vnc]
 
 - name: tigervnc; copy systemd file
   copy:
     src: /usr/lib/systemd/system/vncserver@.service
     dest: /etc/systemd/system/vncserver@:1.service
     remote_src: True
-  tags: [desktop, vnc]
+  tags: [desktop-redhat, vnc]
 
 - name: tigervnc; replace <USER> in systemd file
   replace:
     dest: /etc/systemd/system/vncserver@:1.service
     regexp: '<USER>'
     replace: "{{admin}}"
-  tags: [desktop, vnc]
+  tags: [desktop-redhat, vnc]
