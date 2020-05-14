@@ -2,7 +2,7 @@
 localhost
 
 [business_clients]
-alfa.rewse.jp
+bravo.rewse.jp
 
 [personal_clients]
 foxtrot.rewse.jp
@@ -14,7 +14,6 @@ foxtrot.rewse.jp
 hotel.rewse.jp
 
 [redhat]
-alfa.rewse.jp
 foxtrot.rewse.jp
 
 [ubuntu]
