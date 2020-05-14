@@ -1,0 +1,30 @@
+---
+- name: Install additional packages
+  apt:
+    name:
+      - fonts-ricty-diminished
+      - gconf2
+      - tasksel
+      - tigervnc-standalone-server
+    state: present
+  tags: [desktop-ubuntu, package]
+
+- name: Install ubuntu-desktop
+  command: tasksel install ubuntu-desktop
+  tags: [desktop-ubuntu, package]
+
+- name: "git : Clone one-gnome-terminal.git"
+  git:
+    repo: https://github.com/denysdovhan/one-gnome-terminal.git
+    dest: /srv/git/one-gnome-terminal
+  tags: [desktop-ubuntu, terminal]
+
+- name: Execute one-dark.sh
+  become: "{{ admin }}"
+  command: bash /srv/git/one-gnome-terminal/one-dark.sh
+  tags: [desktop-ubuntu, terminal]
+
+- name: Change terminal font to Ricty
+  become: "{{ admin }}"
+  command: gsettings set org.gnome.desktop.interface monospace-font-name "Ricty Diminished Regular 12"
+  tags: [desktop-ubuntu, terminal]
