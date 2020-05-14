@@ -24,7 +24,6 @@
       - libsasl2-modules
       - logwatch
       - mailutils
-      - ntpdate
       - postfix
       - python3-pip
       - sysstat
