@@ -1,0 +1,96 @@
+---
+- name: Install additional packages
+  apt:
+    name:
+      - mysql-client
+      # Ubuntu 20 doesn’t support yet
+      # - libmysql-java
+      - postgresql-client
+      - libpostgresql-jdbc-java
+      - alien
+      - libaio1
+      - rlwrap
+    state: present
+  tags: [database-client-debian, package, mysql, postgresql, oracle]
+
+- name: Copy oracle-instantclient
+  copy:
+    src: oracle-instantclient{{ oracle_instantclient_version }}-{{ item }}-{{ oracle_instantclient_version }}.0.0.0-1.x86_64.rpm
+    dest: /usr/local/src
+  with_items:
+    - basic
+    - sqlplus
+    - tools
+  tags: [database-client-debian, oracle]
+
+- name: Convert oracle-instantclient
+  command: alien /usr/local/src/oracle-instantclient{{ oracle_instantclient_version }}-{{ item }}-{{ oracle_instantclient_version }}.0.0.0-1.x86_64.rpm
+  with_items:
+    - basic
+    - sqlplus
+    - tools
+  tags: [database-client-debian, oracle]
+
+- name: Install oracle-instantclient
+  apt:
+    deb: /usr/local/src/oracle-instantclient{{ oracle_instantclient_version }}-{{ item }}_{{ oracle_instantclient_version }}.0.0.0-2_amd64.deb
+  with_items:
+    - basic
+    - sqlplus
+    - tools
+  tags: [database-client-debian, oracle]
+
+- name: Create symlink for ojdbc.jar
+  file:
+    src: /usr/lib/oracle/{{ oracle_instantclient_version }}/client64/lib/ojdbc8.jar
+    dest: /usr/share/java/ojdbc8.jar
+    state: link
+  tags: [database-client-debian, oracle]
+
+- name: Clone orascript.git
+  git:
+    repo: git@github.com:rewse/orascript.git
+    dest: /srv/git/orascript
+    accept_hostkey: yes
+    key_file: /home/{{ admin }}/.ssh/id_rsa
+  tags: [database-client-debian, oracle]
+
+- name: Change mode of git/orascript
+  file:
+    path: /srv/git/orascript
+    owner: "{{ admin }}"
+    group: "{{ admin }}"
+    recurse: yes
+  tags: [database-client-debian, oracle]
+
+- name: Copy orarc
+  become_user: "{{ admin }}"
+  copy:
+    src: /srv/git/orascript/orarc
+    dest: /home/{{ admin }}/.orarc
+    remote_src: True
+  tags: [database-client-debian, oracle]
+
+- name: Create symlink for orascript/common
+  become_user: "{{ admin }}"
+  file:
+    src: /srv/git/orascript/common
+    dest: /home/{{ admin }}/oracle
+    state: link
+  tags: [database-client-debian, oracle]
+
+- name: Install Redshift JDBC driver
+  get_url:
+    url: https://s3.amazonaws.com/redshift-downloads/drivers/jdbc/{{redshiftjdbc_version}}/RedshiftJDBC42-{{ redshiftjdbc_version }}.jar
+    dest: /usr/share/java
+  tags: [database-client-debian, redshift]
+
+- name: Create symlink RedShiftJDBC.jar
+  file:
+    src: RedshiftJDBC42-{{ redshiftjdbc_version }}.jar
+    dest: /usr/share/java/{{ item }}
+    state: link
+  with_items:
+    - RedshiftJDBC42.jar
+    - RedshiftJDBC.jar
+  tags: [database-client-debian, redshift]
