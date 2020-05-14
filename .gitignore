@@ -2,5 +2,6 @@
 *.icloud
 *.retry
 roles/desktop/redhat/files/Ricty*
+roles/database/client/debian/files/oracle*
 roles/database/client/gui/files/java*
 roles/database/client/gui/files/sqldeveloper*
