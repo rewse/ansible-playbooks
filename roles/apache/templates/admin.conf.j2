@@ -1,0 +1,11 @@
+<IfModule mod_rewrite.c>
+    <Directory /srv/www/html/admin>
+        Require ip {{ global_ip.home }} {{ global_ip.office }}
+
+        RewriteEngine on
+        RewriteCond %{HTTPS} !=on
+        RewriteRule (.*) https://%{HTTP_HOST}%{REQUEST_URI}
+    </Directory>
+</IfModule>
+
+# vim: syntax=apache ts=4 sw=4 sts=4 sr noet
