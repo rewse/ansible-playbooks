@@ -28,6 +28,7 @@
     - rewrite
     - ssl
     - status
+  notify: Reload apache
   tags: [apache]
 
 - name: Enable SSL conf
@@ -42,8 +43,8 @@
 
 - name: Install mod_pagespeed
   apt:
-    deb: https://dl-ssl.google.com/dl/linux/direct/mod-pagespeed-beta_current_amd64.deb
-  notify: Restart apache
+    deb: https://dl-ssl.google.com/dl/linux/direct/mod-pagespeed-stable_current_amd64.deb
+  notify: Reload apache
   tags: [apache, package]
 
 - name: Set ServerName
