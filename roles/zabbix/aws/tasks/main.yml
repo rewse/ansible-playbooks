@@ -1,0 +1,14 @@
+---
+- name: Copy guardduty.sh
+  copy:
+    src: guardduty.sh
+    dest: /usr/lib/zabbix/agentscripts
+    mode: 0755
+  tags: [zabbix-aws, guardduty]
+
+- name: Copy guardduty.conf
+  copy:
+    src: guardduty.conf
+    dest: /etc/zabbix/zabbix_agentd.d
+  notify: Restart zabbix-agent
+  tags: [zabbix-aws, guardduty]
