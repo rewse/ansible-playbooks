@@ -1,5 +1,5 @@
 ---
-- hosts: personal_servers
+- hosts: servers
   become: yes
   remote_user: ec2-user
   roles:

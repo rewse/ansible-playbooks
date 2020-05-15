@@ -1,8 +1,9 @@
 ---
-- hosts: business_clients
+- hosts: clients
   become: yes
   remote_user: ubuntu
   roles:
     - desktop/ubuntu
     - database/client/debian
     - database/client/gui/debian
+    - zabbix/aws

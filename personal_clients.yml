@@ -1,8 +1,0 @@
----
-- hosts: personal_clients
-  become: yes
-  remote_user: ec2-user
-  roles:
-    - zabbix/db
-    - zabbix/internet
-    - aws
