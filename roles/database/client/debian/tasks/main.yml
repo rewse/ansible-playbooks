@@ -1,9 +1,14 @@
 ---
+- name: Add an apt repository for MySQL
+  apt:
+    deb: https://repo.mysql.com//mysql-apt-config_{{ mysql_apt_config_version }}_all.deb
+  tags: [database-client-debian, package, mysql]
+
 - name: Install additional packages
   apt:
     name:
       - mysql-client
-      # Ubuntu 20 doesn’t support yet
+      # Ubuntu 20 doesnÃ¢â‚¬â„¢t support yet
       # - libmysql-java
       - postgresql-client
       - libpostgresql-jdbc-java
