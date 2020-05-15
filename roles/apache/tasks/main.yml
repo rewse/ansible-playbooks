@@ -1,0 +1,200 @@
+---
+- name: Create /srv/www dir
+  file:
+    path: /srv/www
+    state: directory
+    mode: 0755
+  tags: [apache]
+
+- name: Create /var/www link
+  file:
+    src: /srv/www
+    dest: /var/www
+    state: link
+  tags: [apache]
+
+- name: Install packages
+  apt:
+    name:
+      - apache2
+      - php
+      - php-mysql
+  tags: [apache, package, php]
+
+- name: Enable modules
+  apache2_module:
+    name: "{{ item }}"
+  with_items:
+    - rewrite
+    - ssl
+    - status
+  tags: [apache]
+
+- name: Enable SSL conf
+  command: a2ensite default-ssl
+  notify: Reload apache
+  tags: [apache]
+
+- name: Install mod_pagespeed
+  apt:
+    deb: https://dl-ssl.google.com/dl/linux/direct/mod-pagespeed-beta_current_amd64.deb
+  notify: Restart apache
+  tags: [apache, package]
+
+- name: Set ServerName
+  lineinfile:
+    dest: /etc/apache2/sites-enabled/000-default.conf
+    insertafter: "^	#ServerName"
+    regexp: "^	ServerName "
+    line: "	ServerName rewse.jp:80"
+  notify: Reload apache
+  tags: [apache]
+
+- name: Set ServerAdmin for http
+  lineinfile:
+    dest: /etc/apache2/sites-enabled/000-default.conf
+    regexp: "^	ServerAdmin "
+    line: "	ServerAdmin hostmaster@rewse.jp"
+  notify: Reload apache
+  tags: [apache]
+
+- name: Set ServerAdmin for https
+  lineinfile:
+    dest: /etc/apache2/sites-enabled/default-ssl.conf
+    regexp: "^		ServerAdmin "
+    line: "		ServerAdmin hostmaster@rewse.jp"
+  notify: Reload apache
+  tags: [apache]
+
+- name: Disable ErrorLog in 000-default.conf
+  lineinfile:
+    dest: /etc/apache2/sites-enabled/000-default.conf
+    regexp: "^	ErrorLog "
+    line: "	#ErrorLog ${APACHE_LOG_DIR}/error.log"
+  notify: Reload apache
+  tags: [apache]
+
+- name: Disable ErrorLog in default-ssl.conf
+  lineinfile:
+    dest: /etc/apache2/sites-enabled/default-ssl.conf
+    regexp: "^		ErrorLog "
+    line: "		#ErrorLog ${APACHE_LOG_DIR}/error.log"
+  notify: Reload apache
+  tags: [apache]
+
+- name: Disable CustomLog in 000-default.conf
+  lineinfile:
+    dest: /etc/apache2/sites-enabled/000-default.conf
+    regexp: "^	CustomLog "
+    line: "	#CustomLog ${APACHE_LOG_DIR}/access.log combined"
+  notify: Reload apache
+  tags: [apache]
+
+- name: Disable CustomLog in default-ssl.conf
+  lineinfile:
+    dest: /etc/apache2/sites-enabled/default-ssl.conf
+    regexp: "^		CustomLog "
+    line: "		#CustomLog ${APACHE_LOG_DIR}/access.log combined"
+  notify: Reload apache
+  tags: [apache]
+
+- name: Set ErrorLog
+  lineinfile:
+    dest: /etc/apache2/apache2.conf
+    regexp: "^ErrorLog "
+    line: "ErrorLog syslog"
+  notify: Reload apache
+  tags: [apache]
+
+- name: Set LogLevel
+  lineinfile:
+    dest: /etc/apache2/apache2.conf
+    regexp: "^LogLevel "
+    line: "LogLevel notice"
+  notify: Reload apache
+  tags: [apache]
+
+- name: Set LogFormat for combined
+  lineinfile:
+    dest: /etc/apache2/apache2.conf
+    regexp: "^LogFormat ..* combined$"
+    line: 'LogFormat "%{X-Forwarded-For}i %h %l %u %t \"%r\" %>s %b \"%{Referer}i\" \"%{User-Agent}i\"" combined'
+  notify: Reload apache
+  tags: [apache]
+
+- name: Copy 00-forcessl.conf
+  copy:
+    src: 00-forcessl.conf
+    dest: /etc/apache2/conf-available
+  tags: [apache]
+
+- name: Enable forcessl
+  command: a2enconf 00-forcessl
+  notify: Reload apache
+  tags: [apache]
+
+- name: Copy admin.conf
+  template:
+    src: admin.conf.j2
+    dest: /etc/apache2/conf-available/admin.conf
+  tags: [apache]
+
+- name: Enable admin
+  command: a2enconf admin
+  notify: Reload apache
+  tags: [apache]
+
+- name: Copy status.conf
+  template:
+    src: status.conf.j2
+    dest: /etc/apache2/conf-available/status.conf
+  notify: Reload apache
+  tags: [apache]
+
+- name: Enable status
+  command: a2enconf status
+  notify: Reload apache
+  tags: [apache]
+
+- name: Create html/admin dir
+  file:
+    path: /srv/www/html/admin
+    state: directory
+  tags: [apache]
+
+- name: Copy phpinfo.php
+  copy:
+    src: phpinfo.php
+    dest: /srv/www/html/admin
+  tags: [apache]
+
+- name: Copy timezone.ini
+  copy:
+    src: timezone.ini
+    dest: /etc/php/{{ php_version }}/mods-available
+  tags: [apache, php]
+
+- name: Enable timezone
+  command: phpenmod -v {{ php_version }} -s ALL timezone
+  notify: Restart apache
+  tags: [apache, php]
+
+- name: Make agentscripts dir
+  file:
+    path: /usr/lib/zabbix/agentscripts
+    state: directory
+  tags: [apache, zabbix-agent]
+
+- name: Copy apache.sh
+  copy:
+    src: apache.sh
+    dest: /usr/lib/zabbix/agentscripts
+    mode: 0755
+  tags: [apache, zabbix-agent]
+
+- name: Copy apache.conf
+  template:
+    src: apache.conf.j2
+    dest: /etc/zabbix/zabbix_agentd.conf.d/apache.conf
+  notify: Restart zabbix-agent
+  tags: [apache, zabbix-agent]
