@@ -8,8 +8,6 @@
   apt:
     name:
       - mysql-client
-      # Ubuntu 20 doesnÃ¢â‚¬â„¢t support yet
-      # - libmysql-java
       - postgresql-client
       - libpostgresql-jdbc-java
       - alien
@@ -17,6 +15,11 @@
       - rlwrap
     state: present
   tags: [database-client-debian, package, mysql, postgresql, oracle]
+
+- name: Install mysql-connector-java
+  apt:
+    deb: https://cdn.mysql.com//Downloads/Connector-J/mysql-connector-java_{{ mysql_connector_version }}_all.deb
+  tags: [database-client-debian, package, mysql]
 
 - name: Copy oracle-instantclient
   copy:
