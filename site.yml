@@ -1,5 +1,5 @@
 ---
-- import_playbook: redhat.yml
-- import_playbook: business_clients.yml
-- import_playbook: personal_clients.yml
-- import_playbook: personal_servers.yml
+- import_playbook: ubuntu.yml
+- import_playbook: raspbian.yml
+- import_playbook: clients.yml
+#- import_playbook: servers.yml

@@ -1,20 +1,15 @@
 [darwin]
 localhost
 
-[business_clients]
-bravo.rewse.jp
-
-[personal_clients]
-foxtrot.rewse.jp
-
-[personal_servers]
-foxtrot.rewse.jp
-
 [raspbian]
 hotel.rewse.jp
 
-[redhat]
-foxtrot.rewse.jp
-
 [ubuntu]
 bravo.rewse.jp
+charlie.rewse.jp
+
+[clients]
+bravo.rewse.jp
+
+[servers]
+foxtrot.rewse.jp
