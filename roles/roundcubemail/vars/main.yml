@@ -1,3 +1,0 @@
----
-aurora:
-  roundcubemail_password: "{{vault_aurora.roundcubemail_password}}"
