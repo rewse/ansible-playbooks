@@ -1,46 +1,57 @@
 ---
-- name: clone wordpress
+- name: Clone wordpress
   git:
     repo: git@github.com:rewse/WordPress.git
     dest: /srv/www/wordpress
     accept_hostkey: yes
-    key_file: /home/{{admin}}/.ssh/id_rsa
+    key_file: /home/{{ admin }}/.ssh/id_rsa
+    force: yes
   tags: [wordpress]
 
-- name: copy wp-cache-config.php
+- name: Copy wp-cache-config.php
   copy:
     src: wp-cache-config.php
     dest: /srv/www/wordpress/wp-content
   tags: [wordpress]
 
-- name: copy wp-db-config.php
+- name: Copy wp-db-config.php
   template:
     src: wp-db-config.php.j2
     dest: /srv/www/wordpress/wp-db-config.php
   tags: [wordpress]
 
-- name: copy wordpress.conf
+- name: Copy wordpress.conf
   template:
     src: wordpress.conf.j2
-    dest: /etc/httpd/conf.d/wordpress.conf
-  notify: reload httpd
+    dest: /etc/apache2/conf-available/wordpress.conf
+  notify: Reload apache
   tags: [wordpress]
 
-- name: copy welcome.conf
+- name: Enable wordpress.conf
+  command: a2enconf wordpress
+  notify: Reload apache
+  tags: [wordpress]
+
+- name: Copy welcome.conf
   copy:
     src: welcome.conf
-    dest: /etc/httpd/conf.d
-  notify: reload httpd
+    dest: /etc/apache2/conf-available
+  notify: Reload apache
   tags: [wordpress]
 
-- name: copy wordpress.cron
+- name: Enable welcome.conf
+  command: a2enconf welcome
+  notify: Reload apache
+  tags: [wordpress]
+
+- name: Copy wordpress.cron
   copy:
     src: wordpress.cron
     dest: /etc/cron.hourly
     mode: 0755
   tags: [wordpress]
 
-- name: set perm
+- name: Set perm
   command: ./permset.sh
   args:
     chdir: /srv/www/wordpress
