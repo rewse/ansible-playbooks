@@ -1,6 +1,0 @@
----
-- name: install datadog agent
-  command: bash -c "$(curl -L https://raw.githubusercontent.com/DataDog/datadog-agent/master/cmd/agent/install_mac_os.sh)"
-  vars:
-    DD_API_KEY: "{{vault_datadog_api_key}}"
-  tags: [datadog-darwnin]
