@@ -8,3 +8,4 @@
     - postfix/client
     - dotfiles
     - zabbix/agent/debian
+    - zabbix/agent/ec2
