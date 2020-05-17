@@ -1,0 +1,45 @@
+#!/bin/bash
+# This script references <http://qiita.com/digitalpeak/items/83e817022851b5f96ef8>
+
+trap 'exit 1' 1 2 3 15
+
+show_usage() {
+  cat <<! >&2
+<USAGE> cloudwatch.sh -n <NAMESPACE> -m <METRIC> -d <DIMENSIONS> -s <STATISTICS>
+
+Example: cloudwatch.sh -n AWS/EC2 -m CPUUtilization -d Name=InstanceId,Value=i-12345678901234567 -s Average
+!
+
+  exit 1
+}
+
+while getopts n:d:m:s: OPT
+do
+  case $OPT in
+    n) namespace=$OPTARG ;;
+    m) metric=$OPTARG ;;
+    d) dimensions=$OPTARG ;;
+    s) statistics=$OPTARG ;;
+    *) show_usage ;;
+  esac
+done
+
+if [ "$namespace" == "" -o "$metric" == "" -o "$dimensions" == "" -o "$statistics" == "" ]; then
+  show_usage
+fi
+
+start_time=$(date --iso-8601=seconds --date '1 hour ago')
+end_time=$(date --iso-8601=seconds)
+
+aws cloudwatch get-metric-statistics \
+  --region ap-northeast-1 \
+  --namespace $namespace \
+  --metric-name $metric \
+  --dimensions $dimensions \
+  --start-time $start_time \
+  --end-time $end_time \
+  --period 300 \
+  --statistics $statistics \
+  --query Datapoints[*].["Timestamp","$statistics"] \
+  --output text |
+  sort | tail -1 | awk '{print $2}'
