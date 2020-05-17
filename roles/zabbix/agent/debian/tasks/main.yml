@@ -1,9 +1,21 @@
 ---
-- name: Install zabbix clients
+- name: Install zabbix-release
+  apt:
+    deb: https://repo.zabbix.com/zabbix/5.0/ubuntu/pool/main/z/zabbix-release/zabbix-release_5.0-1+focal_all.deb
+  when: "ansible_lsb.id == 'Ubuntu'"
+  tags: [zabbix-agent-debian, package]
+
+- name: Install zabbix-release
+  apt:
+    deb: https://repo.zabbix.com/zabbix/5.0/raspbian/pool/main/z/zabbix-release/zabbix-release_5.0-1+buster_all.deb
+  when: "ansible_lsb.id == 'Raspbian'"
+  tags: [zabbix-agent-debian, package]
+
+- name: Install zabbix agent
   apt:
     name:
       - zabbix-agent
-    state: present
+      - zabbix-sender
     update_cache: yes
   tags: [zabbix-agent-debian, package]
 

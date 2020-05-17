@@ -201,6 +201,6 @@
 - name: Copy apache.conf
   template:
     src: apache.conf.j2
-    dest: /etc/zabbix/zabbix_agentd.conf.d/apache.conf
+    dest: /etc/zabbix/zabbix_agentd.d/apache.conf
   notify: Restart zabbix-agent
   tags: [apache, zabbix-agent]
