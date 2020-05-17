@@ -126,23 +126,23 @@
 - name: Copy admin.conf
   template:
     src: admin.conf.j2
-    dest: /etc/apache2/conf-available/admin.conf
+    dest: /etc/apache2/sites-available/admin.conf
   tags: [apache]
 
 - name: Enable admin
-  command: a2enconf admin
+  command: a2ensite admin
   notify: Reload apache
   tags: [apache]
 
 - name: Copy status.conf
   template:
     src: status.conf.j2
-    dest: /etc/apache2/conf-available/status.conf
+    dest: /etc/apache2/sites-available/status.conf
   notify: Reload apache
   tags: [apache]
 
 - name: Enable status
-  command: a2enconf status
+  command: a2ensite status
   notify: Reload apache
   tags: [apache]
 
