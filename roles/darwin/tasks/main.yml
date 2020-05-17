@@ -1,5 +1,5 @@
 ---
-- name: install packages by homebrew
+- name: Install packages by homebrew
   homebrew:
     name: 
       - git
@@ -13,16 +13,15 @@
       - source-highlight
       - tmux
       - tree
-    state: latest
     update_homebrew: yes
   tags: [darwin, package, homebrew]
 
-- name: tap brew repos
+- name: Tap brew repos
   homebrew_tap:
     name: sanemat/font
   tags: [darwin, package, homebrew, ricty]
 
-- name: install ricty
+- name: Install ricty
   homebrew:
     name: ricty
     state: latest
@@ -30,14 +29,14 @@
     install_options: with-powerline
   tags: [darwin, package, homebrew, ricty]
 
-- name: create Ricty dir
+- name: Create Ricty dir
   file:
     path: /Library/Fonts/Ricty
     state: directory
     mode: 0755
   tags: [darwin, ricty]
 
-- name: copy ricty
+- name: Copy ricty
   copy:
     src: /usr/local/Cellar/ricty/{{ ricty_version }}/share/fonts/{{item}}
     dest: /Library/Fonts/Ricty
@@ -74,7 +73,7 @@
     - RictyDiscord-Regular.ttf
   tags: [darwin, ricty]
 
-- name: install packages by pip
+- name: Install packages by pip
   pip:
     name:
       - ansible
