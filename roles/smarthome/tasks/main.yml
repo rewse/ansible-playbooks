@@ -8,7 +8,6 @@
       - libboost-thread-dev
       - libglib2.0-0
       - python3-pexpect
-    state: present
   tags: [smarthome, package]
 
 - name: Install packages with pip3
@@ -32,7 +31,6 @@
     dest: /srv/git/switchbot/switchbot_py3.py
     insertbefore: BOF
     line: '#!/usr/bin/env python3'
-    state: present
   tags: [smarthome, switchbot]
 
 - name: Copy switchbot_py3.py files to /usr/local/sbin

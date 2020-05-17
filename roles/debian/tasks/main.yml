@@ -30,7 +30,6 @@
       - unattended-upgrades
       - unzip
       - vim
-    state: present
   tags: [debian, package]
 
 - name: "etckeeper : Init /etc"
