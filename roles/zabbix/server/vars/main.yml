@@ -1,5 +1,5 @@
 ---
 zabbix_server_name: zabbix.rewse.jp
 aurora:
-  zabbix_password: "{{vault_aurora.zabbix_password}}"
+  zabbix_password: "{{ vault_aurora.zabbix_password }}"
   ep: mysql.rewse.jp

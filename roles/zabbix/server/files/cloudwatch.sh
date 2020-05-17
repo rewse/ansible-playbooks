@@ -1,4 +1,4 @@
-#!/bin/sh
+#!/usr/bin/env bash
 
 trap 'exit 1' 1 2 3 15
 
