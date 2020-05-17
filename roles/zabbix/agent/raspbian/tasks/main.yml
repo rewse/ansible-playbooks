@@ -9,7 +9,7 @@
 - name: Copy switchbot.conf
   copy:
     src: switchbot.conf
-    dest: /etc/zabbix/zabbix_agentd.conf.d
+    dest: /etc/zabbix/zabbix_agentd.d
   notify: Restart zabbix-agent
   tags: [zabbix-agent-raspbian, switchbot]
 
@@ -25,6 +25,6 @@
 - name: Copy huebridge.conf
   copy:
     src: huebridge.conf
-    dest: /etc/zabbix/zabbix_agentd.conf.d
+    dest: /etc/zabbix/zabbix_agentd.d
   notify: Restart zabbix-agent
   tags: [zabbix-agent-raspbian, huebridge]
