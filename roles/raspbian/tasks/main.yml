@@ -3,7 +3,6 @@
   apt:
     name:
       - awscli
-    state: present
   tags: [raspbian, package]
 
 - name: "ssh : Change PubkeyAuthentication"

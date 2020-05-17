@@ -13,7 +13,6 @@
       - alien
       - libaio1
       - rlwrap
-    state: present
   tags: [database-client-debian, package, mysql, postgresql, oracle]
 
 - name: Install mysql-connector-java

@@ -6,7 +6,6 @@
       - gconf2
       - tasksel
       - tigervnc-standalone-server
-    state: present
   tags: [desktop-ubuntu, package]
 
 - name: Install ubuntu-desktop
