@@ -4,6 +4,5 @@
   remote_user: ubuntu
   roles:
     - apache
-    # - phpmyadmin
-    # - wordpress
-    # - zabbix/server
+    - wordpress
+    - zabbix/server

@@ -1,101 +1,92 @@
 ---
-  # Do not install mysql-connector-odbc because Zabbix Server 3.4 is always
-  # crashes.
-- name: install packages
-  yum:
+- name: Install zabbix-release
+  apt:
+    deb: https://repo.zabbix.com/zabbix/5.0/ubuntu/pool/main/z/zabbix-release/zabbix-release_5.0-1+focal_all.deb
+  tags: [zabbix-server, package, zabbix-frontend]
+
+- name: Install packages
+  apt:
     name:
-      - mod_ssl
-      - zabbix-get
       - zabbix-server-mysql
-      - zabbix-web-japanese
-      - zabbix-web-mysql
-    state: installed
-  notify: restart httpd
-  tags: [zabbix-server, zabbix-server-server, zabbix-web]
+      - zabbix-frontend-php
+      - zabbix-apache-conf
+      - zabbix-get
+      - fonts-noto-cjk
+    update_cache: yes
+  notify: Restart apache
+  tags: [zabbix-server, package, zabbix-frontend]
 
-- name: enable zabbix-server
-  service:
-    name: zabbix-server
-    enabled: yes
-  notify: restart zabbix-server
-  tags: [zabbix-server, zabbix-server-server]
+- name: Change permission of zabbix_server.conf
+  file:
+    path: /etc/zabbix/zabbix_server.conf
+    owner: root
+    group: zabbix
+    mode: 0640
+  tags: [zabbix-server]
 
-- name: enable httpd
-  service:
-    name: httpd
-    enabled: yes
-  notify: restart httpd
-  tags: [zabbix-server, zabbix-server-server]
-
-- name: set DBHost
+- name: Set DBHost
   lineinfile:
     dest: /etc/zabbix/zabbix_server.conf
-    insertafter: '^# DBHost='
-    regexp: '^DBHost='
-    line: 'DBHost={{aurora.ep}}'
-  notify: restart zabbix-server
-  tags: [zabbix-server, zabbix-server-server]
+    insertafter: "^# DBHost="
+    regexp: "^DBHost="
+    line: "DBHost={{ aurora.ep }}"
+  notify: Restart zabbix-server
+  tags: [zabbix-server]
 
-- name: set DBPassword
+- name: Set DBPassword
   lineinfile:
     dest: /etc/zabbix/zabbix_server.conf
-    insertafter: '^# DBPassword='
-    regexp: '^DBPassword='
-    line: 'DBPassword={{aurora.zabbix_password}}'
-  notify: restart zabbix-server
-  tags: [zabbix-server, zabbix-server-server]
+    insertafter: "^# DBPassword="
+    regexp: "^DBPassword="
+    line: "DBPassword={{ aurora.zabbix_password }}"
+  notify: Restart zabbix-server
+  tags: [zabbix-server]
 
-- name: set Timeout
+- name: Set Timeout
   lineinfile:
     dest: /etc/zabbix/zabbix_server.conf
-    insertafter: '^# Timeout='
-    regexp: '^Timeout='
-    line: 'Timeout=30'
-  notify: restart zabbix-server
-  tags: [zabbix-server, zabbix-server-server]
+    insertafter: "^# Timeout="
+    regexp: "^Timeout="
+    line: "Timeout=30"
+  notify: Restart zabbix-server
+  tags: [zabbix-server]
 
-- name: set php_value
+- name: Set php_value
   lineinfile:
-    dest: /etc/httpd/conf.d/zabbix.conf
-    insertafter: '# php_value date.timezone'
-    regexp: '^ *php_value date.timezone'
-    line: '        php_value date.timezone Asia/Tokyo'
-  notify: reload httpd
-  tags: [zabbix-server, zabbix-web]
+    dest: /etc/zabbix/apache.conf
+    insertafter: "# php_value date.timezone"
+    regexp: "^ *php_value date.timezone"
+    line: "        php_value date.timezone Asia/Tokyo"
+  notify: Reload apache
+  tags: [zabbix-server, zabbix-frontend]
 
-- name: create zaibbx-web conf
+- name: Copy zaibbx-frontend conf
   template:
     src: zabbix.conf.php.j2
     dest: /etc/zabbix/web/zabbix.conf.php
-    mode: 0640
-  tags: [zabbix-server, zabbix-web]
+    owner: root
+    group: www-data
+    mode: 0660
+  tags: [zabbix-server, zabbix-frontend]
 
-- name: change owner for zabbix-web conf
+- name: Change font for graphs
   file:
-    path: /etc/zabbix/web/zabbix.conf.php
-    owner: apache
-    group: apache
-  tags: [zabbix-server, zabbix-web]
+    src: /usr/share/fonts/opentype/noto/NotoSansCJK-Regular.ttc
+    dest: /etc/alternatives/zabbix-frontend-font
+    state: link
+  tags: [zabbix-server, zabbix-frontend]
 
-- name: clone market-price-check.git
+- name: Clone market-price-check.git
   git:
     repo: git@github.com:rewse/market-price-check.git
     dest: /srv/git/market-price-check
     accept_hostkey: yes
-    key_file: /home/{{admin}}/.ssh/id_rsa
+    key_file: /home/{{ admin }}/.ssh/id_rsa
   tags: [zabbix-server, zabbix-extra]
 
-- name: change mode of git/dotfiles
-  file:
-    path: /srv/git/aws-ec2-smart-snapshot
-    owner: "{{admin}}"
-    group: "{{admin}}"
-    recurse: yes
-  tags: [zabbix-server, zabbix-extra]
-
-- name: copy to /usr/local/bin
+- name: Copy market-price-check
   copy:
-    src: /srv/git/market-price-check/{{item}}
+    src: /srv/git/market-price-check/{{ item }}
     dest: /usr/local/bin/
     mode: 0755
     remote_src: yes
@@ -104,13 +95,13 @@
     - us-market-price-check
   tags: [zabbix-server, zabbix-extra]
 
-- name: clone ssl-cert-check
+- name: Clone ssl-cert-check
   git:
     repo: https://github.com/Matty9191/ssl-cert-check.git
     dest: /srv/git/ssl-cert-check
   tags: [zabbix-server, zabbix-extra]
 
-- name: clone ssl-cert-check
+- name: Copy ssl-cert-check
   copy:
     src: /srv/git/ssl-cert-check/ssl-cert-check
     dest: /usr/local/bin
@@ -118,9 +109,9 @@
     remote_src: yes
   tags: [zabbix-server, zabbix-extra]
 
-- name: copy to externalscripts
+- name: Copy to externalscripts
   copy:
-    src: "{{item}}"
+    src: "{{ item }}"
     dest: /usr/lib/zabbix/externalscripts
     mode: 0755
   with_items:

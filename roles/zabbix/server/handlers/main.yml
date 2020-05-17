@@ -1,15 +1,15 @@
 ---
-- name: restart httpd
-  service:
-    name: httpd
+- name: Restart apache
+  systemd:
+    name: apache2
     state: restarted
 
-- name: reload httpd
-  service:
-    name: httpd
+- name: Reload apache
+  systemd:
+    name: apache2
     state: reloaded
 
-- name: restart zabbix-server
-  service:
+- name: Restart zabbix-server
+  systemd:
     name: zabbix-server
     state: restarted
