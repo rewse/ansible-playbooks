@@ -2,6 +2,7 @@
 - name: Install packages by homebrew
   homebrew:
     name: 
+      - ansible
       - git
       - fontforge
       - mysql
@@ -18,13 +19,19 @@
 
 - name: Tap brew repos
   homebrew_tap:
+    name: homebrew/cask
     name: sanemat/font
   tags: [darwin, package, homebrew, ricty]
+
+- name: Install chromedriver
+  homebrew_cask:
+    name: chromedriver
+    update_homebrew: yes
+  tags: [darwin, package, homebrew, chromedriver]
 
 - name: Install ricty
   homebrew:
     name: ricty
-    state: latest
     update_homebrew: yes
     install_options: with-powerline
   tags: [darwin, package, homebrew, ricty]
@@ -76,9 +83,9 @@
 - name: Install packages by pip
   pip:
     name:
-      - ansible
       - pip-review
       - powerline-status
+      - selenium
     state: latest
     executable: pip3
   tags: [darwin, package, pip]
