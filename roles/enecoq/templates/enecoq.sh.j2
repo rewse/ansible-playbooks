@@ -1,0 +1,53 @@
+#!/usr/bin/env bash
+
+trap 'my_exit 1' 1 2 3 15
+
+readonly email=[% cyberhome.email %]
+readonly password=[% cyberhome.password %]
+
+# {{{ my_exit()
+
+my_exit() {
+    echo $1
+    exit $1
+}
+
+# }}}
+# {{{ send_enecoq()
+
+send_enecoq() {
+    csv=$(/usr/local/bin/enecoq $email $password)
+
+    zabbix_sender \
+        -c /etc/zabbix/zabbix_agentd.conf \
+        -k enecoq.yen[low] \
+        -o $(echo $csv | awk -F, '{print $1}') \
+    > /dev/null 2>&1
+
+    retval=$(expr $retval + $?)
+
+    zabbix_sender \
+        -c /etc/zabbix/zabbix_agentd.conf \
+        -k enecoq.yen[mid] \
+        -o $(echo $csv | awk -F, '{print $2}') \
+    > /dev/null 2>&1
+
+    retval=$(expr $retval + $?)
+
+    zabbix_sender \
+        -c /etc/zabbix/zabbix_agentd.conf \
+        -k enecoq.yen[high] \
+        -o $(echo $csv | awk -F, '{print $3}') \
+    > /dev/null 2>&1
+
+    retval=$(expr $retval + $?)
+}
+
+# }}}
+# {{{ Main
+
+send_enecoq
+
+my_exit $retval
+
+# }}}

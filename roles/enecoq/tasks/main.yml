@@ -1,0 +1,40 @@
+---
+- name: Install additional packages
+  apt:
+    name:
+      - python3-bs4
+      - python3-selenium
+  tags: [enecoq, package]
+
+- name: Clone enecoq.git
+  git:
+    repo: git@github.com:rewse/enecoq.git
+    dest: /srv/git/enecoq
+    accept_hostkey: yes
+    key_file: /home/{{ admin }}/.ssh/id_rsa
+  tags: [enecoq]
+
+- name: Copy enecoq
+  copy:
+    src: /srv/git/enecoq/enecoq
+    dest: /usr/local/bin/
+    mode: 0755
+    remote_src: yes
+  tags: [enecoq]
+
+- name: Copy enecoq.sh
+  template:
+    src: enecoq.sh.j2
+    dest: /usr/lib/zabbix/agentscripts/enecoq.sh
+    group: zabbix
+    mode: 0750
+    variable_start_string: "[%"
+    variable_end_string: "%]"
+  tags: [enecoq]
+
+- name: Copy enecoq.conf
+  copy:
+    src: enecoq.conf
+    dest: /etc/zabbix/zabbix_agentd.d
+  notify: Restart zabbix-agent
+  tags: [enecoq]
