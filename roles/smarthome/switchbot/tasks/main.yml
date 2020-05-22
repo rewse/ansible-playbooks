@@ -7,31 +7,31 @@
       - libboost-python-dev
       - libboost-thread-dev
       - libglib2.0-0
+      - python3-bluez
       - python3-pexpect
-  tags: [smarthome, package]
+  tags: [smarthome-switchbot, package]
 
 - name: Install packages with pip3
   pip:
     name:
       - bluepy
       - gattlib
-      - pybluez
     executable: pip3
-  tags: [smarthome, package, pip]
+  tags: [smarthome-switchbot, package, pip]
 
 - name: Clone python-host.git
   git:
     repo: https://github.com/OpenWonderLabs/python-host.git
     dest: /srv/git/switchbot
     force: yes
-  tags: [smarthome, switchbot]
+  tags: [smarthome-switchbot, switchbot]
 
 - name: Add a shebang to switchbot_py3.py
   lineinfile:
     dest: /srv/git/switchbot/switchbot_py3.py
     insertbefore: BOF
     line: '#!/usr/bin/env python3'
-  tags: [smarthome, switchbot]
+  tags: [smarthome-switchbot, switchbot]
 
 - name: Copy switchbot_py3.py files to /usr/local/sbin
   copy:
@@ -39,7 +39,7 @@
     dest: /usr/local/sbin/switchbot
     mode: 0755
     remote_src: yes
-  tags: [smarthome, switchbot]
+  tags: [smarthome-switchbot, switchbot]
 
 - name: Copy switchbot_meter_py3.py files to /usr/local/sbin
   copy:
@@ -47,21 +47,21 @@
     dest: /usr/local/sbin/switchbot_meter
     mode: 0755
     remote_src: yes
-  tags: [smarthome, switchbot]
+  tags: [smarthome-switchbot, switchbot]
 
 - name: Copy switchbot.sh
   copy:
     src: switchbot.sh
     dest: /usr/lib/zabbix/agentscripts
     mode: 0755
-  tags: [smarthome, switchbot]
+  tags: [smarthome-switchbot, switchbot]
 
 - name: Copy switchbot.conf
   copy:
     src: switchbot.conf
     dest: /etc/zabbix/zabbix_agentd.d
   notify: Restart zabbix-agent
-  tags: [smarthome, switchbot]
+  tags: [smarthome-switchbot, switchbot]
 
 - name: Copy huebridge.sh
   template:
@@ -70,11 +70,11 @@
     mode: 0755
     variable_start_string: "[%"
     variable_end_string: "%]"
-  tags: [smarthome, huebridge]
+  tags: [smarthome-switchbot, huebridge]
 
 - name: Copy huebridge.conf
   copy:
     src: huebridge.conf
     dest: /etc/zabbix/zabbix_agentd.d
   notify: Restart zabbix-agent
-  tags: [smarthome, huebridge]
+  tags: [smarthome-switchbot, huebridge]
