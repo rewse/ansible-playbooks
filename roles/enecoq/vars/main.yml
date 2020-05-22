@@ -1,0 +1,4 @@
+---
+cyberhome:
+  email: "[% vault_cyberhome.email %]"
+  password: "[% vault_cyberhome.password %]"
