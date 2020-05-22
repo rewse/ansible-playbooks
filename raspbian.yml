@@ -9,4 +9,4 @@
     - dotfiles
     - zabbix/agent/debian
     - zabbix/agent/raspbian
-    - smarthome/switchbot
+    - smarthome
