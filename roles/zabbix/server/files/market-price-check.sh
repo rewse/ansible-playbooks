@@ -1,5 +1,10 @@
 #!/usr/bin/env bash
 
 code=$1
+provider=$2
 
-/usr/local/bin/market-price-check $code
+if [ "$provider" == "msn" ]; then
+    /usr/local/bin/market-price-check -p $provider $code
+else
+    /usr/local/bin/market-price-check $code
+fi
