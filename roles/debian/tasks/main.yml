@@ -28,6 +28,7 @@
       - mailutils
       - postfix
       - python3-pip
+      - reboot-notifier
       - sysstat
       - unattended-upgrades
       - unzip
