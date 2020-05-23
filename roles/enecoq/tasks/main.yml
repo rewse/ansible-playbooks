@@ -38,3 +38,12 @@
     dest: /etc/zabbix/zabbix_agentd.d
   notify: Restart zabbix-agent
   tags: [enecoq]
+
+# Due to "selenium.common.exceptions.WebDriverException: Message: Service
+# chromedriver unexpectedly exited. Status code was: 1"
+- name: Change zabbix home directory
+  user:
+    name: zabbix
+    home: /home/zabbix
+  notify: Restart zabbix-agent
+  tags: [enecoq]
