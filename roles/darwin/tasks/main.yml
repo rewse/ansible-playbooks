@@ -19,8 +19,10 @@
 
 - name: Tap brew repos
   homebrew_tap:
-    name: homebrew/cask
-    name: sanemat/font
+    name: "{{ item }}"
+  with_items:
+    - homebrew/cask
+    - sanemat/font
   tags: [darwin, package, homebrew, ricty]
 
 - name: Install chromedriver
