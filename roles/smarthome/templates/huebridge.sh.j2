@@ -61,10 +61,27 @@ sendfrom_sensor() {
 
     res=$(expr $res + $?)
 
+    lightlevel=$(cat $res_file | jq -r .[\"$(expr $sensor_id + 1)\"].state.lightlevel)
+
     zabbix_sender \
         -c /etc/zabbix/zabbix_agentd.conf \
         -k huebridge.sensor.lightlevel[$sensor_id] \
-        -o $(cat $res_file | jq -r .[\"$(expr $sensor_id + 1)\"].state.lightlevel) \
+        -o $lightlevel \
+    > /dev/null 2>&1
+
+    res=$(expr $res + $?)
+
+    # Expression is in https://developers.meethue.com/develop/hue-api/supported-devices/#clip_zll_lightlevel
+    lx=$(echo "e((($lightlevel - 1) / 10000) * l(10))" | bc -l)
+
+    if [ $(echo $lx | cut -c 1) == . ]; then
+        lx=0
+    fi
+
+    zabbix_sender \
+        -c /etc/zabbix/zabbix_agentd.conf \
+        -k huebridge.sensor.lx[$sensor_id] \
+        -o $lx \
     > /dev/null 2>&1
 
     res=$(expr $res + $?)
