@@ -5,6 +5,7 @@
       - ansible
       - git
       - fontforge
+      - jq
       - mysql
       - postgresql
       - python3
