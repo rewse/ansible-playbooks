@@ -39,7 +39,7 @@ sendfrom_sensor() {
 
     zabbix_sender \
         -c /etc/zabbix/zabbix_agentd.conf \
-        -k huebridge.sensor.presence[$sensor_id] \
+        -k huebridge.sensor.presence.realtime[$sensor_id] \
         -o $presence \
     > /dev/null 2>&1
 
