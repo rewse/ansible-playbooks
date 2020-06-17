@@ -51,6 +51,15 @@
   notify: Restart zabbix-server
   tags: [zabbix-server]
 
+- name: Set MaxHousekeeperDelete
+  lineinfile:
+    dest: /etc/zabbix/zabbix_server.conf
+    insertafter: "^# MaxHousekeeperDelete="
+    regexp: "^MaxHousekeeperDelete="
+    line: "MaxHousekeeperDelete=20000"
+  notify: Restart zabbix-server
+  tags: [zabbix-server]
+
 - name: Set php_value
   lineinfile:
     dest: /etc/zabbix/apache.conf
