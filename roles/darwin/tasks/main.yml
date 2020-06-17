@@ -86,8 +86,10 @@
 - name: Install packages by pip
   pip:
     name:
+      - beautifulsoup4
       - pip-review
       - powerline-status
+      - requests
       - selenium
     state: latest
     executable: pip3
