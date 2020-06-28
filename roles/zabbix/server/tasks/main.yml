@@ -85,30 +85,6 @@
     state: link
   tags: [zabbix-server, zabbix-frontend]
 
-- name: Install additional packages
-  apt:
-    name: 
-      - python3-bs4
-      - python3-requests
-    update_cache: yes
-  tags: [zabbix-server, zabbix-extra, package]
-
-- name: Clone market-price-check.git
-  git:
-    repo: git@github.com:rewse/market-price-check.git
-    dest: /srv/git/market-price-check
-    accept_hostkey: yes
-    key_file: /home/{{ admin }}/.ssh/id_rsa
-  tags: [zabbix-server, zabbix-extra]
-
-- name: Copy market-price-check
-  copy:
-    src: /srv/git/market-price-check/market-price-check
-    dest: /usr/local/bin/
-    mode: 0755
-    remote_src: yes
-  tags: [zabbix-server, zabbix-extra]
-
 - name: Clone ssl-cert-check
   git:
     repo: https://github.com/Matty9191/ssl-cert-check.git
@@ -130,6 +106,5 @@
     mode: 0755
   with_items:
     - cloudwatch.sh
-    - market-price-check.sh
     - ssl-cert-check.sh
   tags: [zabbix-server, zabbix-extra]

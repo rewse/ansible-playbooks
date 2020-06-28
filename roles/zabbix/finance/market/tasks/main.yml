@@ -1,0 +1,33 @@
+---
+- name: Install additional packages
+  apt:
+    name: 
+      - python3-bs4
+      - python3-requests
+    update_cache: yes
+  tags: [zabbix-finance-market, package]
+
+- name: Clone market-price-check.git
+  git:
+    repo: git@github.com:rewse/market-price-check.git
+    dest: /srv/git/market-price-check
+    accept_hostkey: yes
+    key_file: /home/{{ admin }}/.ssh/id_rsa
+  tags: [zabbix-finance-market]
+
+- name: Copy market-price-check
+  copy:
+    src: /srv/git/market-price-check/market-price-check
+    dest: /usr/local/bin/
+    mode: 0755
+    remote_src: yes
+  tags: [zabbix-finance-market]
+
+- name: Copy to externalscripts
+  copy:
+    src: "{{ item }}"
+    dest: /usr/lib/zabbix/externalscripts
+    mode: 0755
+  with_items:
+    - market-price-check.sh
+  tags: [zabbix-finance-market]
