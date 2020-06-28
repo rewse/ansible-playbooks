@@ -1,0 +1,41 @@
+---
+- name: Install additional packages
+  apt:
+    name: 
+      - python3-bs4
+      - python3-selenium
+    update_cache: yes
+  tags: [zabbix-finance-sbisec, package]
+
+- name: Clone sbisec.git
+  git:
+    repo: git@github.com:rewse/sbisec.git
+    dest: /srv/git/sbisec
+    accept_hostkey: yes
+    key_file: /home/{{ admin }}/.ssh/id_rsa
+  tags: [zabbix-finance-sbisec]
+
+- name: Copy sbisec
+  copy:
+    src: /srv/git/sbisec/sbisec
+    dest: /usr/local/bin/
+    mode: 0755
+    remote_src: yes
+  tags: [zabbix-finance-sbisec]
+
+- name: Copy sbisec.sh
+  template:
+    src: sbisec.sh.j2
+    dest: /usr/lib/zabbix/agentscripts/sbisec.sh
+    group: zabbix
+    mode: 0750
+    variable_start_string: "[%"
+    variable_end_string: "%]"
+  tags: [zabbix-finance-sbisec]
+
+- name: Copy sbisec.conf
+  copy:
+    src: sbisec.conf
+    dest: /etc/zabbix/zabbix_agentd.d
+  notify: Restart zabbix-agent
+  tags: [zabbix-finance-sbisec]
