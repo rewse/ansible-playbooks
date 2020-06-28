@@ -1,0 +1,41 @@
+---
+- name: Install additional packages
+  apt:
+    name: 
+      - python3-bs4
+      - python3-selenium
+    update_cache: yes
+  tags: [zabbix-finance-sjdc, package]
+
+- name: Clone sjdc.git
+  git:
+    repo: git@github.com:rewse/sjdc.git
+    dest: /srv/git/sjdc
+    accept_hostkey: yes
+    key_file: /home/{{ admin }}/.ssh/id_rsa
+  tags: [zabbix-finance-sjdc]
+
+- name: Copy sjdc
+  copy:
+    src: /srv/git/sjdc/sjdc
+    dest: /usr/local/bin/
+    mode: 0755
+    remote_src: yes
+  tags: [zabbix-finance-sjdc]
+
+- name: Copy sjdc.sh
+  template:
+    src: sjdc.sh.j2
+    dest: /usr/lib/zabbix/agentscripts/sjdc.sh
+    group: zabbix
+    mode: 0750
+    variable_start_string: "[%"
+    variable_end_string: "%]"
+  tags: [zabbix-finance-sjdc]
+
+- name: Copy sjdc.conf
+  copy:
+    src: sjdc.conf
+    dest: /etc/zabbix/zabbix_agentd.d
+  notify: Restart zabbix-agent
+  tags: [zabbix-finance-sjdc]
