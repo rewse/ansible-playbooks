@@ -7,4 +7,5 @@
     - database/client/debian
     - database/client/gui/debian
     - zabbix/aws
+    - zabbix/finance/sbisec
     - enecoq
