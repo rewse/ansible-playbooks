@@ -26,9 +26,11 @@
       - libwww-perl
       - logwatch
       - mailutils
+      - ncdu
       - postfix
       - python3-pip
       - sysstat
+      - tldr
       - unattended-upgrades
       - unzip
       - vim
