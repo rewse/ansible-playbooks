@@ -3,7 +3,7 @@
   homebrew:
     name: 
       - ansible
-      - git
+      - gh
       - fontforge
       - jq
       - mysql
