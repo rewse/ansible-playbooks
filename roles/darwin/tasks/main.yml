@@ -1,4 +1,14 @@
 ---
+- name: Tap brew repos
+  homebrew_tap:
+    name: "{{ item }}"
+  with_items:
+    - homebrew/cask
+    - homebrew/cask-drivers
+    - homebrew/cask-fonts
+    - sanemat/font
+  tags: [darwin, package, homebrew, ricty]
+
 - name: Install packages by homebrew
   homebrew:
     name: 
@@ -7,6 +17,7 @@
       - gh
       - fontforge
       - jq
+      - mas
       - mysql
       - postgresql
       - python3
@@ -18,20 +29,6 @@
       - tree
     update_homebrew: yes
   tags: [darwin, package, homebrew]
-
-- name: Tap brew repos
-  homebrew_tap:
-    name: "{{ item }}"
-  with_items:
-    - homebrew/cask
-    - sanemat/font
-  tags: [darwin, package, homebrew, ricty]
-
-- name: Install chromedriver
-  homebrew_cask:
-    name: chromedriver
-    update_homebrew: yes
-  tags: [darwin, package, homebrew, chromedriver]
 
 - name: Install ricty
   homebrew:
@@ -84,6 +81,81 @@
     - RictyDiscord-Regular.ttf
   tags: [darwin, ricty]
 
+- name: Install packages by homebrew_cask
+  homebrew_cask:
+    name: 
+      - 1password
+      - adobe-creative-cloud
+      - alfred
+      - amazon-chime
+      - amazon-music
+      - appcleaner
+      - authy
+      - bartender
+      - calibre
+      - chromedriver
+      - corretto
+      - cyberduck
+      - datagrip
+      - dbeaver-community
+      - deepl
+      - epic-games
+      - evernote
+      - fantastical
+      - font-source-han-mono
+      - font-source-han-sans
+      - font-source-han-serif
+      - font-source-sans-pro
+      - font-source-serif-pro
+      - geekbench
+      - google-chrome
+      - gnucash
+      - handbrake
+      - i1profiler
+      - istat-menus
+      - iterm2
+      - jabra-direct
+      - karabiner-elements
+      - kindle
+      - krisp
+      - logitech-camera-settings
+      - notion
+      - parsec
+      - plantronics-hub
+      - quip
+      - raspberry-pi-imager
+      - remember-the-milk
+      - sony-ps4-remote-play
+      - slack
+      - steam
+      - steermouse
+      - tigervnc-viewer
+      - tripmode
+      - valley
+      - visual-studio-code
+      - webex-meetings
+      - wifi-explorer
+      - zoomus
+    update_homebrew: yes
+  tags: [darwin, package, homebrew]
+
+- name: Install packages by mas
+  command: mas install {{item}}
+  with_items:
+    - 417375580   # BetterSnapTool
+    - 425264550   # Blackmagic Disk Speed Test
+    - 539883307   # LINE
+    - 1480068668  # Messenger
+    - 1504024265  # Micro Sniff
+    - 1295203466  # Microsoft Remote Desktop
+    - 973213640   # MSG Viewer for Outlook
+    - 445189367   # PopClip
+    - 1449412482  # Reeder 4
+    - 425424353   # The Unarchiver
+    - 485812721   # Tweetdeck
+    - 599799247   # そら案内
+  tags: [darwin, package, mas]
+
 - name: Install packages by pip
   pip:
     name:
@@ -95,3 +167,14 @@
     state: latest
     executable: pip3
   tags: [darwin, package, pip]
+
+# - name: Install rest of the apps
+#   install_yourself:
+#     - http://jocala.com/                                            # adbLink
+#     - https://mypassport.atok.com/                                  # Atok
+#     - https://www.blackmagicdesign.com/jp/products/davinciresolve/  # DaVinci Resolve
+#     - https://www.houdah.com/houdahGPS/download.html                # HoudahGPS
+#     - https://www.jpegmini.com/downloads/app                        # JPEGmini
+#     - https://my.kaspersky.com/ja/                                  # Kaspersky
+#     - https://account.microsoft.com/                                # Microsoft Office
+#     - https://www.benq.com/ja-jp/support/downloads-faq/products/monitor/sw271/software-driver.html # Palette Master Element
