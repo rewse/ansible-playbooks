@@ -3,6 +3,7 @@
   homebrew:
     name: 
       - ansible
+      - awscli
       - gh
       - fontforge
       - jq
