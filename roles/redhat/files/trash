@@ -1,4 +1,0 @@
-/var/log/trash.log {
-  missingok
-  nocreate
-}
