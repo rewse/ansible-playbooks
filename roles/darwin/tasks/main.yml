@@ -18,8 +18,6 @@
       - fontforge
       - jq
       - mas
-      - mysql
-      - postgresql
       - python3
       - pwgen
       - reattach-to-user-namespace
@@ -96,11 +94,9 @@
       - chromedriver
       - corretto
       - cyberduck
-      - datagrip
-      - dbeaver-community
       - deepl
-      - epic-games
       - evernote
+      - firefox
       - fantastical
       - font-source-han-mono
       - font-source-han-sans
@@ -108,10 +104,9 @@
       - font-source-sans-pro
       - font-source-serif-pro
       - geekbench
-      - google-chrome
       - gnucash
+      - google-chrome
       - handbrake
-      - i1profiler
       - istat-menus
       - iterm2
       - jabra-direct
@@ -120,24 +115,16 @@
       - krisp
       - logitech-camera-settings
       - notion
-      - parsec
-      - plantronics-hub
-      - quip
-      - raspberry-pi-imager
       - remember-the-milk
       - sony-ps4-remote-play
       - slack
-      - steam
       - steermouse
       - tigervnc-viewer
-      - tripmode
       - valley
       - visual-studio-code
-      - webex-meetings
       - wifi-explorer
-      - zoomus
     update_homebrew: yes
-  tags: [darwin, package, homebrew]
+  tags: [darwin, package, cask]
 
 - name: Install packages by mas
   command: mas install {{item}}
@@ -148,7 +135,6 @@
     - 1480068668  # Messenger
     - 1504024265  # Micro Sniff
     - 1295203466  # Microsoft Remote Desktop
-    - 973213640   # MSG Viewer for Outlook
     - 445189367   # PopClip
     - 1449412482  # Reeder 4
     - 425424353   # The Unarchiver
@@ -170,11 +156,7 @@
 
 # - name: Install rest of the apps
 #   install_yourself:
-#     - http://jocala.com/                                            # adbLink
 #     - https://mypassport.atok.com/                                  # Atok
 #     - https://www.blackmagicdesign.com/jp/products/davinciresolve/  # DaVinci Resolve
 #     - https://www.houdah.com/houdahGPS/download.html                # HoudahGPS
 #     - https://www.jpegmini.com/downloads/app                        # JPEGmini
-#     - https://my.kaspersky.com/ja/                                  # Kaspersky
-#     - https://account.microsoft.com/                                # Microsoft Office
-#     - https://www.benq.com/ja-jp/support/downloads-faq/products/monitor/sw271/software-driver.html # Palette Master Element
