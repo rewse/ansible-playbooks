@@ -3,9 +3,7 @@
   become: yes
   remote_user: ubuntu
   roles:
-    - debian
     - ubuntu
     - postfix/client
-    - dotfiles
-    - zabbix/agent/debian
-    - zabbix/agent/ec2
+    - dotfiles/linux
+    - zabbix/agent/ubuntu

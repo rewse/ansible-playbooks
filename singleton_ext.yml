@@ -1,11 +1,11 @@
 ---
-- hosts: clients
+- hosts: singleton_ext
   become: yes
   remote_user: ubuntu
   roles:
-    - desktop/ubuntu
-    - database/client/debian
-    - database/client/gui/debian
+    - desktop
+    - database/client
+    - database/client/gui
     - zabbix/aws
     - zabbix/finance/sbisec
     - zabbix/finance/sjdc

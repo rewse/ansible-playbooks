@@ -1,26 +1,44 @@
 ---
-- name: Format the secondary disk
-  filesystem:
-    fstype: ext4
-    dev: /dev/{{ secondary_diskname }}
-  tags: [ubuntu, storage]
+- name: Set timezone
+  timezone:
+    name: Asia/Tokyo
+  tags: [ubuntu, time]
 
-- name: Label the secondary disk
-  command: e2label /dev/{{ secondary_diskname }} srv
-  tags: [ubuntu, storage]
+- name: Update all packages
+  yum:
+    name: '*'
+    state: latest
+    update_cache: yes
+  tags: [ubuntu, package]
 
-- name: Mount srv
-  mount:
-    src: LABEL=srv
-    path: /srv
-    fstype: ext4
-    opts: defaults,discard
-    state: mounted
-  tags: [ubuntu, storage]
+- name: Install additional packages
+  apt:
+    name:
+      - apt-file
+      - at
+      - bc
+      - dphys-swapfile
+      - dnsutils
+      - etckeeper
+      - git
+      - irqbalance
+      - libsasl2-modules
+      - libwww-perl
+      - logwatch
+      - mailutils
+      - ncdu
+      - postfix
+      - python3-pip
+      - sysstat
+      - tldr
+      - unattended-upgrades
+      - unzip
+      - vim
+  tags: [ubuntu, package]
 
 - name: Unarchive awscliv2
   unarchive:
-    src: https://awscli.amazonaws.com/awscli-exe-linux-x86_64.zip
+    src: https://awscli.amazonaws.com/awscli-exe-linux-{{ ansible_architecture }}.zip
     dest: /usr/local/src
     remote_src: yes
   tags: [ubuntu, package, awscliv2]
@@ -40,12 +58,98 @@
   when: aws.stat.exists
   tags: [ubuntu, package, awscliv2]
 
+- name: "etckeeper : Init /etc"
+  command: etckeeper init
+  args:
+      creates: /etc/.git
+  tags: [ubuntu, etckeeper]
+
+- name: "etckeeper : Initial commit"
+  command: etckeeper commit "Initial commit"
+  args:
+    chdir: /etc
+    creates: /etc/.git/logs
+  tags: [ubuntu, etckeeper]
+
+- name: Set hostname
+  hostname:
+    name: "{{ inventory_hostname }}"
+  tags: [ubuntu, hostname]
+
 - name: "cloud-init : Enable preserve_hostname"
   lineinfile:
     dest: /etc/cloud/cloud.cfg
     regexp: '^preserve_hostname'
     line: 'preserve_hostname: true'
   tags: [ubuntu, cloud-init]
+
+- name: Add NTP servers
+  lineinfile:
+    dest: /etc/systemd/timesyncd.conf
+    insertafter: '^#NTP='
+    regexp: '^NTP='
+    line: 'NTP=ntp.nict.jp ntp.jst.mfeed.ad.jp'
+  notify: Restart systemd-timesyncd
+  tags: [ubuntu, time, systemd-timesyncd]
+
+- name: "input : Set editing-mode to vi"
+  lineinfile:
+    dest: /etc/inputrc
+    regexp: 'set editing-mode '
+    line: 'set editing-mode vi'
+  tags: [ubuntu, input]
+
+- name: Add a group for admin user
+  group:
+    name: "{{ admin }}"
+    gid: 1001
+  tags: [ubuntu, user]
+
+- name: Add admin user
+  user:
+    name: "{{ admin }}"
+    uid: 1001
+    group: "{{ admin }}"
+    groups: "adm,sudo"
+    shell: /bin/bash
+    skeleton: /etc/skel
+  tags: [ubuntu, user]
+
+- name: Allow sudo to admin user
+  lineinfile:
+    dest: /etc/sudoers.d/00-{{ admin }}
+    regexp: '^{{ admin }}'
+    line: '{{ admin }} ALL=(ALL) NOPASSWD: ALL'
+    create: yes
+    mode: 0440
+    validate: 'visudo -cf %s'
+  tags: [ubuntu, user]
+
+- name: Make .ssh dir for admin user
+  file:
+    path: /home/{{ admin }}/.ssh
+    owner: "{{ admin }}"
+    group: "{{ admin }}"
+    state: directory
+    mode: 0700
+  tags: [ubuntu, user]
+
+- name: Copy id_rsa
+  become_user: "{{ admin }}"
+  copy:
+    src: ~/.ssh/id_rsa
+    dest: /home/{{ admin }}/.ssh/id_rsa
+    mode: 0600
+    follow: yes
+  tags: [ubuntu, user]
+
+- name: Copy id_rsa.pub
+  become_user: "{{ admin }}"
+  copy:
+    src: ~/.ssh/id_rsa.pub
+    dest: /home/{{ admin }}/.ssh/id_rsa.pub
+    follow: yes
+  tags: [ubuntu, user]
 
 - name: "ssh : Copy authentication.conf"
   copy:

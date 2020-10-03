@@ -1,6 +1,7 @@
 ---
-- hosts: raspbian
+- hosts: ec2
   become: yes
   remote_user: ubuntu
   roles:
-    - zabbix/agent/raspbian
+    - ec2
+    - zabbix/agent/ec2

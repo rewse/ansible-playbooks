@@ -1,7 +1,5 @@
 .DS_Store
 *.icloud
 *.retry
-roles/desktop/redhat/files/Ricty*
-roles/database/client/debian/files/oracle*
-roles/database/client/gui/redhat/files/sqldeveloper*
-roles/database/client/gui/debian/files/sqldeveloper*
+roles/database/client/files/oracle*
+roles/database/client/gui/files/sqldeveloper*
