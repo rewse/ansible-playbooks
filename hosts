@@ -1,15 +1,24 @@
 [darwin]
 localhost
 
-[raspbian]
-hotel.rewse.jp
 
 [ubuntu]
 bravo.rewse.jp
 charlie.rewse.jp
+hotel.rewse.jp
 
-[clients]
+[ec2]
 bravo.rewse.jp
+charlie.rewse.jp
+
+[raspbian]
+hotel.rewse.jp
+
+[singleton_ext]
+bravo.rewse.jp
+
+[singleton_int]
+hotel.rewse.jp
 
 [servers]
 charlie.rewse.jp

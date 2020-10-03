@@ -2,22 +2,14 @@
 - name: Install zabbix-release
   apt:
     deb: https://repo.zabbix.com/zabbix/5.0/ubuntu/pool/main/z/zabbix-release/zabbix-release_5.0-1+focal_all.deb
-  when: "ansible_lsb.id == 'Ubuntu'"
-  tags: [zabbix-agent-debian, package]
-
-- name: Install zabbix-release
-  apt:
-    deb: https://repo.zabbix.com/zabbix/5.0/raspbian/pool/main/z/zabbix-release/zabbix-release_5.0-1+buster_all.deb
-  when: "ansible_lsb.id == 'Raspbian'"
-  tags: [zabbix-agent-debian, package]
+  tags: [zabbix-agent-ubuntu, package]
 
 - name: Install zabbix agent
   apt:
     name:
       - zabbix-agent
-      - zabbix-sender
     update_cache: yes
-  tags: [zabbix-agent-debian, package]
+  tags: [zabbix-agent-ubuntu, package]
 
 - name: Set zabbix server
   lineinfile:
@@ -25,7 +17,7 @@
     regexp: "Server="
     line: "Server={{ zabbix_server_name }}"
   notify: Restart zabbix-agent
-  tags: [zabbix-agent-debian]
+  tags: [zabbix-agent-ubuntu]
 
 - name: Set zabbix server active
   lineinfile:
@@ -33,7 +25,7 @@
     regexp: "ServerActive="
     line: "ServerActive={{ zabbix_server_name }}"
   notify: Restart zabbix-agent
-  tags: [zabbix-agent-debian]
+  tags: [zabbix-agent-ubuntu]
 
 - name: Set hostname
   lineinfile:
@@ -41,7 +33,7 @@
     regexp: "Hostname="
     line: "Hostname={{ ansible_nodename }}"
   notify: Restart zabbix-agent
-  tags: [zabbix-agent-debian]
+  tags: [zabbix-agent-ubuntu]
 
 - name: Set Timeout
   lineinfile:
@@ -50,31 +42,52 @@
     regexp: "^Timeout="
     line: "Timeout=30"
   notify: Restart zabbix-agent
-  tags: [zabbix-agent-debian]
+  tags: [zabbix-agent-ubuntu]
 
-- name: Copy debian.conf
+- name: Set Include
+  lineinfile:
+    dest: /etc/zabbix/zabbix_agentd.conf
+    insertafter: "^# Include="
+    regexp: "^Include="
+    line: "Include=/etc/zabbix/zabbix_agentd.d/*.conf"
+  notify: Restart zabbix-agent
+  tags: [zabbix-agent-ubuntu]
+
+- name: Remove zabbix_agentd.conf.d
+  file:
+    path: /etc/zabbix/zabbix_agentd.conf.d
+    state: absent
+  tags: [zabbix-agent-ubuntu]
+
+- name: Make zabbix_agentd.d
+  file:
+    path: /etc/zabbix/zabbix_agentd.d
+    state: directory
+  tags: [zabbix-agent-ubuntu]
+
+- name: Copy ubuntu.conf
   copy:
-    src: debian.conf
+    src: ubuntu.conf
     dest: /etc/zabbix/zabbix_agentd.d
   notify: Restart zabbix-agent
-  tags: [zabbix-agent-debian]
+  tags: [zabbix-agent-ubuntu]
 
 - name: Remove userparameter_mysql.conf
   file:
     path: /etc/zabbix/zabbix_agentd.d/userparameter_mysql.conf
     state: absent
   notify: Restart zabbix-agent
-  tags: [zabbix-agent-debian]
+  tags: [zabbix-agent-ubuntu]
 
 - name: Add zabbix to adm group
   user:
     name: zabbix
     groups: 'zabbix,adm'
   notify: Restart zabbix-agent
-  tags: [zabbix-agent-debian]
+  tags: [zabbix-agent-ubuntu]
 
 - name: Make agentscripts dir
   file:
     path: /usr/lib/zabbix/agentscripts
     state: directory
-  tags: [zabbix-agent-debian]
+  tags: [zabbix-agent-ubuntu]

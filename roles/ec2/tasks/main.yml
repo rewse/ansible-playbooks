@@ -1,0 +1,19 @@
+---
+- name: Format the secondary disk
+  filesystem:
+    fstype: ext4
+    dev: /dev/{{ secondary_diskname }}
+  tags: [ec2, storage]
+
+- name: Label the secondary disk
+  command: e2label /dev/{{ secondary_diskname }} srv
+  tags: [ec2, storage]
+
+- name: Mount srv
+  mount:
+    src: LABEL=srv
+    path: /srv
+    fstype: ext4
+    opts: defaults,discard
+    state: mounted
+  tags: [ec2, storage]
