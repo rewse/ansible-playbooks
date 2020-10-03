@@ -1,9 +1,0 @@
----
-epel_release_url: http://ftp.jaist.ac.jp/pub/Linux/Fedora/epel/7/x86_64/Packages/e/epel-release-7-11.noarch.rpm
-relayhost:
-  name: mail.so-net.ne.jp
-  port: 587
-so_net:
-  username: "{{vault_so_net.username}}"
-  password: "{{vault_so_net.password}}"
-swap_device_name: nvme1n1
