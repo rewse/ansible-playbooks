@@ -1,0 +1,51 @@
+---
+- name: Clone dotfiles.git
+  git:
+    repo: git@github.com:rewse/dotfiles.git
+    dest: ~/Documents/git/dotfiles
+    accept_hostkey: yes
+    key_file: ~/.ssh/id_rsa
+  tags: [dotfiles-darwin]
+
+- name: Copy gitconfig
+  copy:
+    src: ~/Documents/git/dotfiles/gitconfig
+    dest: ~/.gitconfig
+    remote_src: yes
+  tags: [dotfiles-darwin, git]
+
+- name: "git : Set user email"
+  ini_file:
+    dest: ~/.gitconfig
+    section: user
+    option: email
+    value: "{{ email.primary }}"
+  tags: [dotfiles-darwin, git]
+
+- name: Copy inputrc
+  copy:
+    src: ~/Documents/git/dotfiles/inputrc
+    dest: ~/.inputrc
+    remote_src: yes
+  tags: [dotfiles-darwin, inputrc]
+
+- name: "tmux : Copy tmux.conf"
+  copy:
+    src: ~/Documents/git/dotfiles/tmux.conf
+    dest: ~/.tmux.conf
+    remote_src: yes
+  tags: [dotfiles-darwin, tmux]
+
+- name: "vim : Copy vimfiles"
+  copy:
+    src: ~/Documents/git/dotfiles/vim
+    dest: ~/.vim
+    remote_src: yes
+  tags: [dotfiles-darwin, vim]
+
+- name: Copy zshrc
+  copy:
+    src: ~/Documents/git/dotfiles/zshrc
+    dest: ~/.zshrc
+    remote_src: yes
+  tags: [dotfiles-darwin, zsh]

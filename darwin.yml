@@ -1,5 +1,0 @@
----
-- hosts: darwin
-  connection: local
-  roles:
-    - darwin

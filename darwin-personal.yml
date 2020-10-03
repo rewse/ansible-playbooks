@@ -1,0 +1,7 @@
+---
+- hosts: darwin_personal
+  connection: local
+  roles:
+    - darwin
+    - darwin/personal
+    - dotfiles/darwin

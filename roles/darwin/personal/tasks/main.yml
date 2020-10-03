@@ -1,0 +1,28 @@
+---
+- name: Tap brew repos
+  homebrew_tap:
+    name: homebrew/cask
+  tags: [darwin-personal, package, homebrew, cask]
+
+- name: Install packages by homebrew_cask
+  homebrew_cask:
+    name: 
+      - android-file-transfer
+      - epic-games
+      - parsec
+      - raspberry-pi-imager
+      - steam
+    update_homebrew: yes
+  tags: [darwin-personal, package, cask]
+
+# - name: Install rest of the apps
+#   install_yourself:
+#     - http://jocala.com/                                            # adbLink
+#     - https://my.kaspersky.com/ja/                                  # Kaspersky
+#     - https://account.microsoft.com/                                # Microsoft Office
+#     - https://downloadcenter.nikonimglib.com/en/products/493/Z_6.html # Nikon Z 6
+#     - https://www.benq.com/ja-jp/support/downloads-faq/products/monitor/sw271/software-driver.html # Palette Master Element
+#     - http://www2.securebrain.co.jp/products/phishwall/smbc_direct.html # PhishWall
+#     - https://web.saat.jp/netizenmac/netbk/                         # SaAT Netizen 
+#     - https://opentype.jp/woffconv.htm                              # WOFFコンバータ
+#     - https://opentype.jp/subsetfontmk.htm                          # サブセットフォントメーカー
