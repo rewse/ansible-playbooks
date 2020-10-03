@@ -1,5 +1,0 @@
----
-jdk_version: 8.242.08.1
-jdk_filename: java-1.8.0-amazon-corretto-devel-1.8.0_242.b08-1.x86_64.rpm
-sct_filename: aws-schema-conversion-tool-1.0.632-1.x86_64.rpm
-sqldeveloper_filename: sqldeveloper-19.2.1.247.2212.noarch.rpm
