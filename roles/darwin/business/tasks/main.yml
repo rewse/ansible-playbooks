@@ -4,6 +4,7 @@
     name: homebrew/cask
   tags: [darwin-business, package, homebrew, cask]
 
+- name: Install packages by homebrew
   homebrew:
     name: 
       - mysql
