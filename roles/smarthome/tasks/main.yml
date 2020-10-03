@@ -2,11 +2,12 @@
 - name: Install additional packages
   apt:
     name:
+      - bluez
       - jq
-      - libbluetooth3-dev
       - libboost-python-dev
       - libboost-thread-dev
-      - libglib2.0-0
+      - libglib2.0-dev
+      - pi-bluetooth
       - python3-bluez
       - python3-pexpect
   tags: [smarthome, package]

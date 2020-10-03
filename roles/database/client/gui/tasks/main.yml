@@ -2,38 +2,38 @@
 - name: Add an apt key for Amazon Corretto
   apt_key:
     url: https://apt.corretto.aws/corretto.key
-  tags: [database-client-gui-debian, package, java]
+  tags: [database-client-gui, package, java]
 
 - name: Add an apt repository for Amazon Corretto
   apt_repository:
     repo: deb https://apt.corretto.aws stable main
-  tags: [database-client-gui-debian, package, java]
+  tags: [database-client-gui, package, java]
 
 - name: Install Amazon Corretto
   apt:
     name: java-11-amazon-corretto-jdk
     update_cache: yes
-  tags: [database-client-gui-debian, package, java]
+  tags: [database-client-gui, package, java]
 
 - name: Unarchive aws-schema-conversion-tool
   unarchive:
     src: https://s3.amazonaws.com/publicsctdownload/Ubuntu/aws-schema-conversion-tool-1.0.latest.zip
     dest: /usr/local/src
     remote_src: yes
-  tags: [database-client-gui-debian, package, sct]
+  tags: [database-client-gui, package, sct]
 
 - name: Install aws-schema-conversion-tool
   apt:
     deb: /usr/local/src/aws-schema-conversion-tool-{{ sct_version }}.deb
-  tags: [database-client-gui-debian, package, sct]
+  tags: [database-client-gui, package, sct]
 
 - name: Unarchive sqldeveloper
   unarchive:
     src: sqldeveloper-{{ sqldeveloper_version }}-no-jre.zip
     dest: /opt
-  tags: [database-client-gui-debian, package, sqldeveloper]
+  tags: [database-client-gui, package, sqldeveloper]
 
 - name: Install dbeaver
   apt:
     deb: https://dbeaver.io/files/dbeaver-ce_latest_amd64.deb
-  tags: [database-client-gui-debian, package, dbeaver]
+  tags: [database-client-gui, package, dbeaver]

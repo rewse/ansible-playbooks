@@ -2,7 +2,7 @@
 - name: Add an apt repository for MySQL
   apt:
     deb: https://repo.mysql.com//mysql-apt-config_{{ mysql_apt_config_version }}_all.deb
-  tags: [database-client-debian, package, mysql]
+  tags: [database-client, package, mysql]
 
 - name: Install additional packages
   apt:
@@ -13,12 +13,12 @@
       - alien
       - libaio1
       - rlwrap
-  tags: [database-client-debian, package, mysql, postgresql, oracle]
+  tags: [database-client, package, mysql, postgresql, oracle]
 
 - name: Install mysql-connector-java
   apt:
     deb: https://cdn.mysql.com//Downloads/Connector-J/mysql-connector-java_{{ mysql_connector_version }}_all.deb
-  tags: [database-client-debian, package, mysql]
+  tags: [database-client, package, mysql]
 
 - name: Copy oracle-instantclient
   copy:
@@ -28,7 +28,7 @@
     - basic
     - sqlplus
     - tools
-  tags: [database-client-debian, oracle]
+  tags: [database-client, oracle]
 
 - name: Convert oracle-instantclient
   command: alien /usr/local/src/oracle-instantclient{{ oracle_instantclient_version }}-{{ item }}-{{ oracle_instantclient_version }}.0.0.0-1.x86_64.rpm
@@ -36,7 +36,7 @@
     - basic
     - sqlplus
     - tools
-  tags: [database-client-debian, oracle]
+  tags: [database-client, oracle]
 
 - name: Install oracle-instantclient
   apt:
@@ -45,14 +45,14 @@
     - basic
     - sqlplus
     - tools
-  tags: [database-client-debian, oracle]
+  tags: [database-client, oracle]
 
 - name: Create symlink for ojdbc.jar
   file:
     src: /usr/lib/oracle/{{ oracle_instantclient_version }}/client64/lib/ojdbc8.jar
     dest: /usr/share/java/ojdbc8.jar
     state: link
-  tags: [database-client-debian, oracle]
+  tags: [database-client, oracle]
 
 - name: Clone orascript.git
   git:
@@ -60,7 +60,7 @@
     dest: /srv/git/orascript
     accept_hostkey: yes
     key_file: /home/{{ admin }}/.ssh/id_rsa
-  tags: [database-client-debian, oracle]
+  tags: [database-client, oracle]
 
 - name: Change mode of git/orascript
   file:
@@ -68,7 +68,7 @@
     owner: "{{ admin }}"
     group: "{{ admin }}"
     recurse: yes
-  tags: [database-client-debian, oracle]
+  tags: [database-client, oracle]
 
 - name: Copy orarc
   become_user: "{{ admin }}"
@@ -76,7 +76,7 @@
     src: /srv/git/orascript/orarc
     dest: /home/{{ admin }}/.orarc
     remote_src: True
-  tags: [database-client-debian, oracle]
+  tags: [database-client, oracle]
 
 - name: Create symlink for orascript/common
   become_user: "{{ admin }}"
@@ -84,20 +84,20 @@
     src: /srv/git/orascript/common
     dest: /home/{{ admin }}/oracle
     state: link
-  tags: [database-client-debian, oracle]
+  tags: [database-client, oracle]
 
 - name: Install Redshift JDBC driver
   get_url:
-    url: https://s3.amazonaws.com/redshift-downloads/drivers/jdbc/{{redshiftjdbc_version}}/RedshiftJDBC42-{{ redshiftjdbc_version }}.jar
+    url: https://s3.amazonaws.com/redshift-downloads/drivers/jdbc/{{redshiftjdbc_version}}/RedshiftJDBC42-no-awssdk-{{ redshiftjdbc_version }}.jar
     dest: /usr/share/java
-  tags: [database-client-debian, redshift]
+  tags: [database-client, redshift]
 
 - name: Create symlink RedShiftJDBC.jar
   file:
-    src: RedshiftJDBC42-{{ redshiftjdbc_version }}.jar
+    src: RedshiftJDBC42-no-awssdk-{{ redshiftjdbc_version }}.jar
     dest: /usr/share/java/{{ item }}
     state: link
   with_items:
     - RedshiftJDBC42.jar
     - RedshiftJDBC.jar
-  tags: [database-client-debian, redshift]
+  tags: [database-client, redshift]
