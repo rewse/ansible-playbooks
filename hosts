@@ -1,6 +1,8 @@
-[darwin]
-localhost
+[darwin_business]
+e0b55fe8e384.local
 
+[darwin_personal]
+youth.local
 
 [ubuntu]
 bravo.rewse.jp
