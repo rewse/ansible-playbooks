@@ -17,6 +17,7 @@
     name: 
       - datagrip
       - dbeaver-community
+      - font-noto-sans-cjk
       - i1profiler
       - plantronics-hub
       - quip
