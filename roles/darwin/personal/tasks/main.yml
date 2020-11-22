@@ -13,6 +13,7 @@
       - raspberry-pi-imager
       - steam
       - vlc
+      - vmware-fusion
     update_homebrew: yes
   tags: [darwin-personal, package, cask]
 
