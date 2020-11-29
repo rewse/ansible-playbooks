@@ -19,11 +19,11 @@
   tags: [desktop, terminal]
 
 - name: Execute one-dark.sh
-  become: "{{ admin }}"
+  become_user: "{{ admin }}"
   command: bash /srv/git/one-gnome-terminal/one-dark.sh
   tags: [desktop, terminal]
 
 - name: Change terminal font to Ricty
-  become: "{{ admin }}"
+  become_user: "{{ admin }}"
   command: gsettings set org.gnome.desktop.interface monospace-font-name "Ricty Diminished Regular 12"
   tags: [desktop, terminal]
