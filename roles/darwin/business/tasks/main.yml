@@ -24,7 +24,7 @@
       - quip
       - tripmode
       - webex-meetings
-      - zoomus
+      - zoom
     update_homebrew: yes
   tags: [darwin-business, package, cask]
 
