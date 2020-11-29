@@ -5,7 +5,7 @@
   tags: [ubuntu, time]
 
 - name: Update all packages
-  yum:
+  apt:
     name: '*'
     state: latest
     update_cache: yes
