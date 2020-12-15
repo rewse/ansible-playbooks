@@ -5,7 +5,7 @@
   tags: [ubuntu, time]
 
 - name: Update all packages
-  yum:
+  apt:
     name: '*'
     state: latest
     update_cache: yes
@@ -36,16 +36,17 @@
       - vim
   tags: [ubuntu, package]
 
+- name: Stat awscliv2
+  stat: path=/usr/local/bin/aws
+  register: aws
+  tags: [ubuntu, package, awscliv2]
+
 - name: Unarchive awscliv2
   unarchive:
     src: https://awscli.amazonaws.com/awscli-exe-linux-{{ ansible_architecture }}.zip
     dest: /usr/local/src
     remote_src: yes
-  tags: [ubuntu, package, awscliv2]
-
-- name: Stat awscliv2
-  stat: path=/usr/local/bin/aws
-  register: aws
+  when: not aws.stat.exists
   tags: [ubuntu, package, awscliv2]
 
 - name: Install awscliv2
