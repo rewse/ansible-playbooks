@@ -39,3 +39,4 @@
 #   install_yourself:
 #     - https://www.oracle.com/database/technologies/instant-client/macos-intel-x86-downloads.html # Oracle Instant Client
 #     - https://www.oracle.com/tools/downloads/sqldev-downloads.html # Oracle SQL Developer
+#     - https://www.realtek.com/en/component/zoo/category/network-interface-controllers-10-100-1000m-gigabit-ethernet-usb-3-0-software # Realtek RTL8153
