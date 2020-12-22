@@ -9,6 +9,7 @@
     name: 
       - android-file-transfer
       - epic-games
+      - gog-galaxy
       - parsec
       - raspberry-pi-imager
       - steam
