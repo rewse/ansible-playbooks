@@ -125,7 +125,6 @@
       - tigervnc-viewer
       - valley
       - visual-studio-code
-      - wifi-explorer
     update_homebrew: yes
   tags: [darwin, package, cask]
 
@@ -144,6 +143,7 @@
     - 1449412482  # Reeder 4
     - 425424353   # The Unarchiver
     - 485812721   # Tweetdeck
+    - 494803304   # WiFi Explorer
     - 599799247   # そら案内
   tags: [darwin, package, mas]
 
