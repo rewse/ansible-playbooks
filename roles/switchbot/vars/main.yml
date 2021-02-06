@@ -1,0 +1,2 @@
+switchbot:
+  token: "[% vault_switchbot_token %]"
