@@ -37,6 +37,7 @@ send_humiture() {
 
     zabbix_sender \
         -c /etc/zabbix/zabbix_agentd.conf \
+        -s SmartHome \
         -k switchbot.meter.temp[$device_id] \
         -o $temp \
     > /dev/null 2>&1
@@ -47,11 +48,12 @@ send_humiture() {
 
     zabbix_sender \
         -c /etc/zabbix/zabbix_agentd.conf \
+        -s SmartHome \
         -k switchbot.meter.humi[$device_id] \
         -o $humi \
     > /dev/null 2>&1
 
-    retval=$?
+    retval=$(expr $retval + $?)
 }
 
 # }}}
