@@ -5,7 +5,7 @@
       - python3-bs4
       - python3-requests
     update_cache: yes
-  tags: [zabbix-finance-market, package]
+  tags: [zabbix-money-market, package]
 
 - name: Clone market-price-check.git
   git:
@@ -13,7 +13,7 @@
     dest: /srv/git/market-price-check
     accept_hostkey: yes
     key_file: /home/{{ admin }}/.ssh/id_rsa
-  tags: [zabbix-finance-market]
+  tags: [zabbix-money-market]
 
 - name: Copy market-price-check
   copy:
@@ -21,7 +21,7 @@
     dest: /usr/local/bin/
     mode: 0755
     remote_src: yes
-  tags: [zabbix-finance-market]
+  tags: [zabbix-money-market]
 
 - name: Copy to externalscripts
   copy:
@@ -30,4 +30,4 @@
     mode: 0755
   with_items:
     - market-price-check.sh
-  tags: [zabbix-finance-market]
+  tags: [zabbix-money-market]
