@@ -6,4 +6,4 @@
     - apache
     - wordpress
     - zabbix/server
-    - zabbix/finance/market
+    - zabbix/money/market
