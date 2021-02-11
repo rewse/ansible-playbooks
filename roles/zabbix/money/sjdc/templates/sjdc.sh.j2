@@ -25,6 +25,7 @@ send_shares() {
 
         zabbix_sender \
             -c /etc/zabbix/zabbix_agentd.conf \
+            -s Money \
             -k asset.shares[$id] \
             -o $shares \
         > /dev/null 2>&1
