@@ -7,7 +7,7 @@
     - database/client
     - database/client/gui
     - zabbix/aws
-    - zabbix/finance/sbisec
-    - zabbix/finance/sjdc
+    - zabbix/money/sbisec
+    - zabbix/money/sjdc
     - enecoq
     - switchbot
