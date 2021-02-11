@@ -39,6 +39,7 @@ sendfrom_sensor() {
 
     zabbix_sender \
         -c /etc/zabbix/zabbix_agentd.conf \
+        -s SmartHome \
         -k huebridge.sensor.presence.realtime[$sensor_id] \
         -o $presence \
     > /dev/null 2>&1
@@ -47,6 +48,7 @@ sendfrom_sensor() {
 
     zabbix_sender \
         -c /etc/zabbix/zabbix_agentd.conf \
+        -s SmartHome \
         -k huebridge.sensor.lastupdated[$sensor_id] \
         -o $lastupdated \
     > /dev/null 2>&1
@@ -55,6 +57,7 @@ sendfrom_sensor() {
 
     zabbix_sender \
         -c /etc/zabbix/zabbix_agentd.conf \
+        -s SmartHome \
         -k huebridge.sensor.pbattery[$sensor_id] \
         -o $(cat $res_file | jq -r .[\"$sensor_id\"].config.battery) \
     > /dev/null 2>&1
@@ -65,6 +68,7 @@ sendfrom_sensor() {
 
     zabbix_sender \
         -c /etc/zabbix/zabbix_agentd.conf \
+        -s SmartHome \
         -k huebridge.sensor.lightlevel[$sensor_id] \
         -o $lightlevel \
     > /dev/null 2>&1
@@ -80,6 +84,7 @@ sendfrom_sensor() {
 
     zabbix_sender \
         -c /etc/zabbix/zabbix_agentd.conf \
+        -s SmartHome \
         -k huebridge.sensor.lx[$sensor_id] \
         -o $lx \
     > /dev/null 2>&1
