@@ -126,6 +126,7 @@
       - tigervnc-viewer
       - valley
       - visual-studio-code
+      - vlc
     update_homebrew: yes
   tags: [darwin, package, cask]
 

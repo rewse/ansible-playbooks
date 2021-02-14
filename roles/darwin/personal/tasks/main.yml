@@ -12,7 +12,6 @@
       - gog-galaxy
       - raspberry-pi-imager
       - steam
-      - vlc
     update_homebrew: yes
   tags: [darwin-personal, package, cask]
 
