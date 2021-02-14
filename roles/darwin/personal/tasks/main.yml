@@ -18,6 +18,7 @@
 # - name: Install rest of the apps
 #   install_yourself:
 #     - http://jocala.com/                                            # adbLink
+#     - https://www.houdah.com/houdahGPS/download.html                # HoudahGPS
 #     - https://my.kaspersky.com/ja/                                  # Kaspersky
 #     - https://account.microsoft.com/                                # Microsoft Office
 #     - https://downloadcenter.nikonimglib.com/en/products/493/Z_6.html # Nikon Z 6
