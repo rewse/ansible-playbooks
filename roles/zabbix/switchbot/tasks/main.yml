@@ -3,7 +3,7 @@
   apt:
     name:
       - jq
-  tags: [switchbot, package]
+  tags: [zabbix-switchbot, package]
 
 - name: Copy switchbot.sh
   template:
@@ -12,11 +12,11 @@
     mode: 0755
     variable_start_string: "[%"
     variable_end_string: "%]"
-  tags: [switchbot]
+  tags: [zabbix-switchbot]
 
 - name: Copy switchbot.conf
   copy:
     src: switchbot.conf
     dest: /etc/zabbix/zabbix_agentd.d
   notify: Restart zabbix-agent
-  tags: [switchbot]
+  tags: [zabbix-switchbot]
