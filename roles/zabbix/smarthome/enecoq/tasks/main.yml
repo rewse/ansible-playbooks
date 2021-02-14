@@ -4,7 +4,7 @@
     name:
       - python3-bs4
       - python3-selenium
-  tags: [enecoq, package]
+  tags: [zabbix-smarthome-enecoq, package]
 
 - name: Clone enecoq.git
   git:
@@ -12,7 +12,7 @@
     dest: /srv/git/enecoq
     accept_hostkey: yes
     key_file: /home/{{ admin }}/.ssh/id_rsa
-  tags: [enecoq]
+  tags: [zabbix-smarthome-enecoq]
 
 - name: Copy enecoq
   copy:
@@ -20,7 +20,7 @@
     dest: /usr/local/bin/
     mode: 0755
     remote_src: yes
-  tags: [enecoq]
+  tags: [zabbix-smarthome-enecoq]
 
 - name: Copy enecoq.sh
   template:
@@ -30,14 +30,14 @@
     mode: 0750
     variable_start_string: "[%"
     variable_end_string: "%]"
-  tags: [enecoq]
+  tags: [zabbix-smarthome-enecoq]
 
 - name: Copy enecoq.conf
   copy:
     src: enecoq.conf
     dest: /etc/zabbix/zabbix_agentd.d
   notify: Restart zabbix-agent
-  tags: [enecoq]
+  tags: [zabbix-smarthome-enecoq]
 
 # Due to "selenium.common.exceptions.WebDriverException: Message: Service
 # chromedriver unexpectedly exited. Status code was: 1"
@@ -46,4 +46,4 @@
     name: zabbix
     home: /home/zabbix
   notify: Restart zabbix-agent
-  tags: [enecoq]
+  tags: [zabbix-smarthome-enecoq]
