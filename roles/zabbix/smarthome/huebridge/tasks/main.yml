@@ -3,7 +3,7 @@
   apt:
     name:
       - jq
-  tags: [huebridge, package]
+  tags: [zabbix-smarthome-huebridge, package]
 
 - name: Copy huebridge.sh
   template:
@@ -12,11 +12,11 @@
     mode: 0755
     variable_start_string: "[%"
     variable_end_string: "%]"
-  tags: [huebridge]
+  tags: [zabbix-smarthome-huebridge]
 
 - name: Copy huebridge.conf
   copy:
     src: huebridge.conf
     dest: /etc/zabbix/zabbix_agentd.d
   notify: Restart zabbix-agent
-  tags: [huebridge]
+  tags: [zabbix-smarthome-huebridge]
