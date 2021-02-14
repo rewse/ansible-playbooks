@@ -3,8 +3,4 @@
   become: yes
   remote_user: ubuntu
   roles:
-<<<<<<< HEAD
     - zabbix/smarthome/huebridge
-=======
-    - zabbix/huebridge
->>>>>>> 972063bb718da61f70b2dc8bc5a7a5ceeef8dfb0
