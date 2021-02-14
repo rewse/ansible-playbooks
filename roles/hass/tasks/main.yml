@@ -1,0 +1,20 @@
+---
+- name: Add to docker-compose.yml
+  blockinfile:
+    path: /etc/docker-compose.yml
+    block: |
+      services:
+        homeassistant:
+          container_name: homeassistant
+          image: homeassistant/raspberrypi3-homeassistant:stable
+          volumes:
+            - /etc/homeassistant:/config
+            - /etc/localtime:/etc/localtime:ro
+          restart: unless-stopped
+          network_mode: host
+  tags: [hass]
+
+- name: Start homeassistant container
+  community.docker.docker_compose:
+    project_src: /etc
+  tags: [hass]
