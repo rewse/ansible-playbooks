@@ -1,0 +1,102 @@
+#!/usr/bin/env bash
+
+trap 'my_exit 1' 1 2 3 15
+
+readonly huebridge_ip=[% huebridge.ip %]
+readonly user_id=[% huebridge.userid %]
+readonly sensor_id=$1
+readonly res_file=$(mktemp --tmpdir huebridge.XXXXXXXXXX)
+
+if [ ! "$sensor_id" ]; then
+    echo "[USAGE] huebridge.sh sensor_id"
+    exit 1
+fi
+
+# {{{ my_exit()
+
+my_exit() {
+    rm -f $res_file
+    echo $1
+    exit $1
+}
+
+# }}}
+# {{{ sendfrom_sensor()
+
+sendfrom_sensor() {
+    curl "http://$huebridge_ip/api/$user_id/sensors" \
+    -o $res_file > /dev/null 2>&1
+
+    presence=$(cat $res_file | jq -r .[\"$sensor_id\"].state.presence)
+
+    if "$presence" ; then
+        presence=1
+    else
+        presence=0
+    fi
+
+    lastupdated=$(cat $res_file | jq -r .[\"$sensor_id\"].state.lastupdated)
+
+    zabbix_sender \
+        -c /etc/zabbix/zabbix_agentd.conf \
+        -s SmartHome \
+        -k huebridge.sensor.presence.realtime[$sensor_id] \
+        -o $presence \
+    > /dev/null 2>&1
+
+    res=$?
+
+    zabbix_sender \
+        -c /etc/zabbix/zabbix_agentd.conf \
+        -s SmartHome \
+        -k huebridge.sensor.lastupdated[$sensor_id] \
+        -o $lastupdated \
+    > /dev/null 2>&1
+
+    res=$(expr $res + $?)
+
+    zabbix_sender \
+        -c /etc/zabbix/zabbix_agentd.conf \
+        -s SmartHome \
+        -k huebridge.sensor.pbattery[$sensor_id] \
+        -o $(cat $res_file | jq -r .[\"$sensor_id\"].config.battery) \
+    > /dev/null 2>&1
+
+    res=$(expr $res + $?)
+
+    lightlevel=$(cat $res_file | jq -r .[\"$(expr $sensor_id + 1)\"].state.lightlevel)
+
+    zabbix_sender \
+        -c /etc/zabbix/zabbix_agentd.conf \
+        -s SmartHome \
+        -k huebridge.sensor.lightlevel[$sensor_id] \
+        -o $lightlevel \
+    > /dev/null 2>&1
+
+    res=$(expr $res + $?)
+
+    # Expression is in https://developers.meethue.com/develop/hue-api/supported-devices/#clip_zll_lightlevel
+    lx=$(echo "e((($lightlevel - 1) / 10000) * l(10))" | bc -l)
+
+    if [ $(echo $lx | cut -c 1) == . ]; then
+        lx=0
+    fi
+
+    zabbix_sender \
+        -c /etc/zabbix/zabbix_agentd.conf \
+        -s SmartHome \
+        -k huebridge.sensor.lx[$sensor_id] \
+        -o $lx \
+    > /dev/null 2>&1
+
+    res=$(expr $res + $?)
+}
+
+# }}}
+# {{{ Main
+
+sendfrom_sensor
+
+my_exit $res
+
+# }}}
