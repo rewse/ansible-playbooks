@@ -48,6 +48,8 @@
     block: |
       lovelace:
         mode: yaml
+      mqtt:
+        broker: localhost
   tags: [hass]
 
 - name: Copy ui-lovelace.yaml
