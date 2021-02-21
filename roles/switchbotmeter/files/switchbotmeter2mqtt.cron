@@ -1,0 +1,10 @@
+SHELL=/bin/bash
+PATH=/usr/local/sbin:/usr/local/bin:/sbin:/bin:/usr/sbin:/usr/bin
+# Living room humiture
+*/5 * * * * root switchbotmeter2mqtt F5DAB9477E91
+# Bedroom humiture
+*/5 * * * * root switchbotmeter2mqtt F980AECF8644
+# Storeroom humiture
+*/5 * * * * root switchbotmeter2mqtt FD13F5CA5563
+# Balcony humiture
+*/5 * * * * root switchbotmeter2mqtt EDE4EAA09EA3
