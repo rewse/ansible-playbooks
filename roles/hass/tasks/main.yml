@@ -41,6 +41,21 @@
     src: zones.yaml.j2
     dest: /etc/homeassistant/zones.yaml
   tags: [hass]
+
+- name: Modify configuration.yaml
+  blockinfile:
+    path: /etc/homeassistant/configuration.yaml
+    block: |
+      lovelace:
+        mode: yaml
+  tags: [hass]
+
+- name: Copy ui-lovelace.yaml
+  copy:
+    src: ui-lovelace.yaml
+    dest: /etc/homeassistant
+  tags: [hass]
+
 - name: Start homeassistant container
   community.docker.docker_compose:
     project_src: /etc
