@@ -1,0 +1,12 @@
+---
+latlng:
+  home:
+    lat: "{{ vault_latlng.home.lat }}"
+    lng: "{{ vault_latlng.home.lng }}"
+  office:
+    lat: "{{ vault_latlng.office.lat }}"
+    lng: "{{ vault_latlng.office.lng }}"
+  s:
+    name: "{{ vault_latlng.s.name }}"
+    lat: "{{ vault_latlng.s.lat }}"
+    lng: "{{ vault_latlng.s.lng }}"
