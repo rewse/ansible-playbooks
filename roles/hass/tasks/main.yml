@@ -28,6 +28,19 @@
     dest: /etc/homeassistant
   tags: [hass]
 
+- name: Config zone
+  lineinfile:
+    path: /etc/homeassistant/configuration.yaml
+    insertafter: '^sensor:'
+    regexp: '^zone:'
+    line: "zone: !include zones.yaml"
+  tags: [hass]
+
+- name: Copy zones.yaml
+  template:
+    src: zones.yaml.j2
+    dest: /etc/homeassistant/zones.yaml
+  tags: [hass]
 - name: Start homeassistant container
   community.docker.docker_compose:
     project_src: /etc
