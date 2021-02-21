@@ -15,7 +15,7 @@
     variable_end_string: "%]"
   tags: [switchbotmeter]
 
-- name: Copy switchbotmeter
+- name: Copy switchbotmeter2mqtt
   copy:
     src: switchbotmeter2mqtt
     dest: /usr/local/bin
