@@ -1,0 +1,62 @@
+#!/usr/bin/env bash
+
+trap 'my_exit 1' 1 2 3 15
+
+readonly token=[% switchbot_token %]
+readonly tmpfile=$(mktemp --tmpdir switchbotmeter.XXXXXXXXXX)
+
+device_id=$1
+
+if [ ! "$device_id" ]; then
+    read -p "Device ID: " device_id
+fi
+
+# {{{ my_exit()
+
+my_exit() {
+    rm -f $tmpfile
+    exit $1
+}
+
+# }}}
+# {{{ echo_humiture()
+
+echo_humiture() {
+    device_id=${device_id//:/}
+    device_id=${device_id^^}
+
+    curl -H """Authorization: $token""" \
+        https://api.switch-bot.com/v1.0/devices/$device_id/status \
+        -o $tmpfile > /dev/null 2>&1
+
+    retval=$?
+
+    if [ "$retval" != "0" ]; then
+        my_exit $retval
+    fi
+
+    datetime=$(date --iso-8601=seconds)
+    temp=$(cat $tmpfile | jq -r .body.temperature)
+    humi=$(cat $tmpfile | jq -r .body.humidity)
+    message=$(cat $tmpfile | jq -r .message)
+
+    cat <<!
+{
+    "datetime": "$datetime",
+    "temperature": "$temp",
+    "humidity": "$humi",
+    "message": "$message"
+}
+!
+
+    retval=$?
+}
+
+# }}}
+# {{{ Main
+
+echo_humiture
+
+my_exit $retval
+
+# }}}

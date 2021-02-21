@@ -4,4 +4,5 @@
   remote_user: ubuntu
   roles:
     - mosquitto
+    - switchbotmeter
     - zabbix/smarthome/huebridge
