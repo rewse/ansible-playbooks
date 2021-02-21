@@ -3,4 +3,5 @@
   become: yes
   remote_user: ubuntu
   roles:
+    - mosquitto
     - zabbix/smarthome/huebridge
