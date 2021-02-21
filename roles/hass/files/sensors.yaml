@@ -1,0 +1,64 @@
+- platform: mqtt
+  name: Living Room Temperature
+  state_topic: switchbotmeter/F5DAB9477E91
+  value_template: "{{ value_json.temperature }}"
+  unit_of_measurement: °C
+  availability:
+    - topic: switchbotmeter/F5DAB9477E91/status
+  device_class: temperature
+- platform: mqtt
+  name: Living Room Humidity
+  state_topic: switchbotmeter/F5DAB9477E91
+  value_template: "{{ value_json.humidity }}"
+  unit_of_measurement: "%"
+  availability:
+    - topic: switchbotmeter/F5DAB9477E91/status
+  device_class: humidity
+- platform: mqtt
+  name: Bedroom Temperature
+  state_topic: switchbotmeter/F980AECF8644
+  value_template: "{{ value_json.temperature }}"
+  unit_of_measurement: °C
+  availability:
+    - topic: switchbotmeter/F980AECF8644/status
+  device_class: temperature
+- platform: mqtt
+  name: Bedroom Humidity
+  state_topic: switchbotmeter/F980AECF8644
+  value_template: "{{ value_json.humidity }}"
+  unit_of_measurement: "%"
+  availability:
+    - topic: switchbotmeter/F980AECF8644/status
+  device_class: humidity
+- platform: mqtt
+  name: Storeroom Temperature
+  state_topic: switchbotmeter/FD13F5CA5563
+  value_template: "{{ value_json.temperature }}"
+  unit_of_measurement: °C
+  availability:
+    - topic: switchbotmeter/FD13F5CA5563/status
+  device_class: temperature
+- platform: mqtt
+  name: Storeroom Humidity
+  state_topic: switchbotmeter/FD13F5CA5563
+  value_template: "{{ value_json.humidity }}"
+  unit_of_measurement: "%"
+  availability:
+    - topic: switchbotmeter/FD13F5CA5563/status
+  device_class: humidity
+- platform: mqtt
+  name: Balcony Temperature
+  state_topic: switchbotmeter/EDE4EAA09EA3
+  value_template: "{{ value_json.temperature }}"
+  unit_of_measurement: °C
+  availability:
+    - topic: switchbotmeter/EDE4EAA09EA3/status
+  device_class: temperature
+- platform: mqtt
+  name: Balcony Humidity
+  state_topic: switchbotmeter/EDE4EAA09EA3
+  value_template: "{{ value_json.humidity }}"
+  unit_of_measurement: "%"
+  availability:
+    - topic: switchbotmeter/EDE4EAA09EA3/status
+  device_class: humidity

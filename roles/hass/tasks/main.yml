@@ -14,6 +14,20 @@
           network_mode: host
   tags: [hass]
 
+- name: Config sensor
+  lineinfile:
+    path: /etc/homeassistant/configuration.yaml
+    insertafter: '^scene:'
+    regexp: '^sensor:'
+    line: "sensor: !include sensors.yaml"
+  tags: [hass]
+
+- name: Copy sensors.yaml
+  copy:
+    src: sensors.yaml
+    dest: /etc/homeassistant
+  tags: [hass]
+
 - name: Start homeassistant container
   community.docker.docker_compose:
     project_src: /etc
