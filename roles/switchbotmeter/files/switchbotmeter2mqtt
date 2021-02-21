@@ -22,8 +22,8 @@ sendto_mqtt() {
         message=offline
     fi
 
-    mosquitto_pub -t switchbotmeter/$device_id -m "$json"
-    mosquitto_pub -t switchbotmeter/$device_id/status -m $message
+    mosquitto_pub -r -t switchbotmeter/$device_id -m "$json"
+    mosquitto_pub -r -t switchbotmeter/$device_id/status -m $message
 }
 
 # }}}
