@@ -4,5 +4,3 @@
   remote_user: ubuntu
   roles:
     - zabbix/agent/raspbian
-    - docker
-    - homeassistant
