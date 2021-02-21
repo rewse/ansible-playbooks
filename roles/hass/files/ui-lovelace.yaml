@@ -1,0 +1,92 @@
+title: Overview
+views:
+  - path: home
+    title: Home
+    icon: 'mdi:home'
+    panel: false
+    badges: []
+    cards:
+      - type: vertical-stack
+        cards:
+          - type: horizontal-stack
+            cards:
+              - type: sensor
+                graph: line
+                entity: sensor.living_room_temperature
+                hours_to_show: 720
+              - type: sensor
+                graph: line
+                entity: sensor.living_room_humidity
+                hours_to_show: 720
+          - type: horizontal-stack
+            cards:
+              - type: sensor
+                graph: line
+                entity: sensor.bedroom_temperature
+                hours_to_show: 720
+              - type: sensor
+                graph: line
+                entity: sensor.bedroom_humidity
+                hours_to_show: 720
+          - type: horizontal-stack
+            cards:
+              - type: sensor
+                graph: line
+                entity: sensor.storeroom_temperature
+                hours_to_show: 720
+              - type: sensor
+                graph: line
+                entity: sensor.storeroom_humidity
+                hours_to_show: 720
+          - type: horizontal-stack
+            cards:
+              - type: sensor
+                graph: line
+                entity: sensor.balcony_temperature
+                hours_to_show: 720
+              - type: sensor
+                graph: line
+                entity: sensor.balcony_humidity
+                hours_to_show: 720
+      - type: vertical-stack
+        cards:
+          - type: history-graph
+            entities:
+              - entity: sensor.living_room_temperature
+            hours_to_show: 48
+            refresh_interval: 300
+          - type: history-graph
+            entities:
+              - entity: sensor.living_room_humidity
+            hours_to_show: 48
+            refresh_interval: 300
+          - type: history-graph
+            entities:
+              - entity: sensor.bedroom_temperature
+            hours_to_show: 48
+            refresh_interval: 300
+          - type: history-graph
+            entities:
+              - entity: sensor.bedroom_humidity
+            hours_to_show: 48
+            refresh_interval: 300
+          - type: history-graph
+            entities:
+              - entity: sensor.storeroom_temperature
+            hours_to_show: 48
+            refresh_interval: 300
+          - type: history-graph
+            entities:
+              - entity: sensor.storeroom_humidity
+            hours_to_show: 48
+            refresh_interval: 300
+          - type: history-graph
+            entities:
+              - entity: sensor.balcony_temperature
+            hours_to_show: 48
+            refresh_interval: 300
+          - type: history-graph
+            entities:
+              - entity: sensor.balcony_humidity
+            hours_to_show: 48
+            refresh_interval: 300
