@@ -1,0 +1,28 @@
+---
+- name: Install additional packages
+  apt:
+    name:
+      - mosquitto
+      - mosquitto-clients
+  tags: [mosquitto, package]
+
+- name: Create a password file
+  file:
+    path: /etc/mosquitto/pwfile
+    state: touch
+  tags: [mosquitto]
+
+- name: Add mosquitto users
+  command: mosquitto_passwd -b /etc/mosquitto/pwfile {{item}} {{mosquitto.password}}
+  with_items:
+    - pub_client
+    - sub_client
+  notify: Restart mosquitto
+  tags: [mosquitto]
+
+- name: Copy password.conf
+  copy:
+    src: password.conf
+    dest: /etc/mosquitto/conf.d
+  notify: Restart mosquitto
+  tags: [mosquitto]
