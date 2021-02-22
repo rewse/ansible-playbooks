@@ -32,6 +32,13 @@ views:
             hours_to_show: 48
             refresh_interval: 300
           - type: entities
+            title: Living Room Downlight
+            entities:
+              - name: Full
+                entity: switch.living_room_downlight
+              - name: Dimmer
+                entity: switch.living_room_dimming_downlight
+            show_header_toggle: false
             entities:
               - entity: light.tv_back_light
               - entity: light.livng_room_entrance_light
