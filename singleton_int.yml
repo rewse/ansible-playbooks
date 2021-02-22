@@ -6,6 +6,7 @@
     - docker
     - homeassistant
     - mosquitto
+    - remo
     - switchbot
     - switchbotmeter
     - zabbix/smarthome/huebridge
