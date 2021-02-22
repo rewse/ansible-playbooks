@@ -14,6 +14,20 @@
           network_mode: host
   tags: [homeassistant]
 
+- name: Config binary_sensor
+  lineinfile:
+    path: /etc/homeassistant/configuration.yaml
+    insertafter: '^automation:'
+    regexp: '^binary_sensor:'
+    line: "binary_sensor: !include binary_sensors.yaml"
+  tags: [homeassistant]
+
+- name: Copy binary_sensors.yaml
+  copy:
+    src: binary_sensors.yaml
+    dest: /etc/homeassistant
+  tags: [homeassistant]
+
 - name: Config sensor
   lineinfile:
     path: /etc/homeassistant/configuration.yaml
