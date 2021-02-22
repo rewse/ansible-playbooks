@@ -42,6 +42,20 @@
     dest: /etc/homeassistant
   tags: [homeassistant]
 
+- name: Config switch
+  lineinfile:
+    path: /etc/homeassistant/configuration.yaml
+    insertafter: '^sensor:'
+    regexp: '^switch:'
+    line: "switch: !include switches.yaml"
+  tags: [homeassistant]
+
+- name: Copy switches.yaml
+  copy:
+    src: switches.yaml
+    dest: /etc/homeassistant
+  tags: [homeassistant]
+
 - name: Config zone
   lineinfile:
     path: /etc/homeassistant/configuration.yaml

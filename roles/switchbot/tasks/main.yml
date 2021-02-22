@@ -1,9 +1,22 @@
 ---
+- name: Create /etc/homeassistant/bin
+  file:
+    path: /etc/homeassistant/bin
+    state: directory
+  tags: [switchbot]
+
 - name: Copy switchbot
   template:
     src: switchbot.j2
-    dest: /usr/local/bin/switchbot
+    dest: /etc/homeassistant/bin/switchbot
     mode: 0755
     variable_start_string: "[%"
     variable_end_string: "%]"
+  tags: [switchbot]
+
+- name: Create a symlink for switchbot
+  file:
+    src: /etc/homeassistant/bin/switchbot
+    dest: /usr/local/bin/switchbot
+    state: link
   tags: [switchbot]

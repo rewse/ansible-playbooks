@@ -1,0 +1,14 @@
+- platform: command_line
+  switches:
+    living_room_humidifier:
+      command_on: "/config/bin/switchbot C12F0898BAC5"
+      command_off: "/config/bin/switchbot C12F0898BAC5"
+      friendly_name: "Living Room Humidifier"
+    living_room_floor_heating:
+      command_on: "/config/bin/switchbot E55CF11F894A"
+      command_off: "/config/bin/switchbot E55CF11F894A"
+      friendly_name: "Living Room Floor Heating"
+    study_floor_heating:
+      command_on: "/config/bin/switchbot D0ECA7E7803F"
+      command_off: "/config/bin/switchbot D0ECA7E7803F"
+      friendly_name: "Study Floor Heating"
