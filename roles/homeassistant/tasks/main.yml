@@ -14,6 +14,12 @@
           network_mode: host
   tags: [homeassistant]
 
+- name: Copy groups.yaml
+  copy:
+    src: groups.yaml
+    dest: /etc/homeassistant
+  tags: [homeassistant]
+
 - name: Config binary_sensor
   lineinfile:
     path: /etc/homeassistant/configuration.yaml
