@@ -1,0 +1,9 @@
+---
+- name: Copy switchbot
+  template:
+    src: switchbot.j2
+    dest: /usr/local/bin/switchbot
+    mode: 0755
+    variable_start_string: "[%"
+    variable_end_string: "%]"
+  tags: [switchbot]
