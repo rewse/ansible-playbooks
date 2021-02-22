@@ -1,0 +1,22 @@
+---
+- name: Create /etc/homeassistant/bin
+  file:
+    path: /etc/homeassistant/bin
+    state: directory
+  tags: [remo]
+
+- name: Copy remo
+  template:
+    src: remo.j2
+    dest: /etc/homeassistant/bin/remo
+    mode: 0755
+    variable_start_string: "[%"
+    variable_end_string: "%]"
+  tags: [remo]
+
+- name: Create a symlink for remo
+  file:
+    src: /etc/homeassistant/bin/remo
+    dest: /usr/local/bin/remo
+    state: link
+  tags: [remo]
