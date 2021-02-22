@@ -11,11 +11,11 @@ views:
           - type: horizontal-stack
             cards:
               - type: entity
-                entity: sensor.living_room_temperature
                 name: Living Room Temperature
+                entity: sensor.living_room_temperature
               - type: entity
-                entity: sensor.living_room_humidity
                 name: Living Room Humidity
+                entity: sensor.living_room_humidity
           - type: history-graph
             entities:
               - entity: sensor.living_room_temperature
@@ -39,24 +39,38 @@ views:
               - name: Dimmer
                 entity: switch.living_room_dimming_downlight
             show_header_toggle: false
+          - type: entities
+            title: Living Room Lights
             entities:
               - entity: light.tv_back_light
               - entity: light.livng_room_entrance_light
             state_color: false
-            title: Living Room Lights
+          - type: horizontal-stack
+            cards:
+              - type: button
+                tap_action:
+                  action: toggle
+                entity: switch.living_room_humidifier
+                icon: 'mdi:air-humidifier'
+                icon_height: 48px
+              - type: button
+                tap_action:
+                  action: toggle
+                entity: group.living_room_floor_heating
+                icon_height: 48px
           - type: entity
-            entity: binary_sensor.living_room_sensor_motion
             name: Living Room Motion Sensor
+            entity: binary_sensor.living_room_sensor_motion
       - type: vertical-stack
         cards:
           - type: horizontal-stack
             cards:
               - type: entity
-                entity: sensor.bedroom_temperature
                 name: Bedroom Temperature
+                entity: sensor.bedroom_temperature
               - type: entity
-                entity: sensor.bedroom_humidity
                 name: Bedroom Humidity
+                entity: sensor.bedroom_humidity
           - type: history-graph
             entities:
               - entity: sensor.bedroom_temperature
@@ -68,21 +82,21 @@ views:
             hours_to_show: 48
             refresh_interval: 300
           - type: entities
+            title: Bedroom Lights
             entities:
               - entity: light.bedroom_light
             state_color: false
             show_header_toggle: false
-            title: Bedroom Lights
       - type: vertical-stack
         cards:
           - type: horizontal-stack
             cards:
               - type: entity
-                entity: sensor.storeroom_temperature
                 name: Storeroom Temperature
+                entity: sensor.storeroom_temperature
               - type: entity
-                entity: sensor.storeroom_humidity
                 name: Storeroom Humidity
+                entity: sensor.storeroom_humidity
           - type: history-graph
             entities:
               - entity: sensor.storeroom_temperature
@@ -96,8 +110,8 @@ views:
       - type: vertical-stack
         cards:
           - type: entity
-            entity: sensor.washroom_sensor_temperature
             name: Washroom Temperature
+            entity: sensor.washroom_sensor_temperature
           - type: history-graph
             entities:
               - entity: sensor.washroom_sensor_temperature
@@ -109,25 +123,25 @@ views:
             hours_to_show: 48
             refresh_interval: 300
           - type: entities
+            title: Washroom Lights
             entities:
               - entity: light.washroom_entrance_light
               - entity: light.washroom_left_light
               - entity: light.washroom_right_light
             state_color: false
-            title: Washroom Lights
           - type: entity
-            entity: binary_sensor.washroom_sensor_motion
             name: Washroom Motion Sensor
+            entity: binary_sensor.washroom_sensor_motion
       - type: vertical-stack
         cards:
           - type: horizontal-stack
             cards:
               - type: entity
-                entity: sensor.balcony_temperature
                 name: Balcony Temperature
+                entity: sensor.balcony_temperature
               - type: entity
-                entity: sensor.balcony_humidity
                 name: Balcony Humidity
+                entity: sensor.balcony_humidity
           - type: history-graph
             entities:
               - entity: sensor.balcony_temperature
@@ -139,24 +153,8 @@ views:
             hours_to_show: 48
             refresh_interval: 300
       - type: entities
+        title: All Lights
         entities:
           - light.living_room
           - light.bedroom
           - light.washroom
-        title: All Lights
-      - type: button
-        tap_action:
-          action: toggle
-        entity: switch.living_room_humidifier
-        icon: 'mdi:air-humidifier'
-        show_state: false
-        show_icon: true
-        show_name: true
-        icon_height: 24px
-      - type: entities
-        entities:
-          - entity: switch.living_room_floor_heating
-          - entity: switch.study_floor_heating
-        state_color: false
-        show_header_toggle: true
-        title: Living Room Floor Heating
