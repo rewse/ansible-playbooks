@@ -137,3 +137,19 @@ views:
           - light.bedroom
           - light.washroom
         title: All Lights
+      - type: button
+        tap_action:
+          action: toggle
+        entity: switch.living_room_humidifier
+        icon: 'mdi:air-humidifier'
+        show_state: false
+        show_icon: true
+        show_name: true
+        icon_height: 24px
+      - type: entities
+        entities:
+          - entity: switch.living_room_floor_heating
+          - entity: switch.study_floor_heating
+        state_color: false
+        show_header_toggle: true
+        title: Living Room Floor Heating
