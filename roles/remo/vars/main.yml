@@ -1,0 +1,2 @@
+---
+remo_token: "[% vault_remo_token %]"
