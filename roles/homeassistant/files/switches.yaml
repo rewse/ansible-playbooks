@@ -3,14 +3,17 @@
     living_room_humidifier:
       command_on: "/config/bin/switchbot C12F0898BAC5"
       command_off: "/config/bin/switchbot C12F0898BAC5"
+      command_state: "false"
       friendly_name: "Living Room Humidifier"
     living_room_floor_heating:
       command_on: "/config/bin/switchbot E55CF11F894A"
       command_off: "/config/bin/switchbot E55CF11F894A"
+      command_state: "false"
       friendly_name: "Living Room Floor Heating"
     study_floor_heating:
       command_on: "/config/bin/switchbot D0ECA7E7803F"
       command_off: "/config/bin/switchbot D0ECA7E7803F"
+      command_state: "false"
       friendly_name: "Study Floor Heating"
     living_room_downlight:
       command_on: "/config/bin/remo signal 917b6ba4-5cff-4e91-88f4-cccc7fe1c5eb"
