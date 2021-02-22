@@ -10,46 +10,12 @@ views:
         cards:
           - type: horizontal-stack
             cards:
-              - type: sensor
-                graph: line
+              - type: entity
                 entity: sensor.living_room_temperature
-                hours_to_show: 720
-              - type: sensor
-                graph: line
+                name: Living Room Temperature
+              - type: entity
                 entity: sensor.living_room_humidity
-                hours_to_show: 720
-          - type: horizontal-stack
-            cards:
-              - type: sensor
-                graph: line
-                entity: sensor.bedroom_temperature
-                hours_to_show: 720
-              - type: sensor
-                graph: line
-                entity: sensor.bedroom_humidity
-                hours_to_show: 720
-          - type: horizontal-stack
-            cards:
-              - type: sensor
-                graph: line
-                entity: sensor.storeroom_temperature
-                hours_to_show: 720
-              - type: sensor
-                graph: line
-                entity: sensor.storeroom_humidity
-                hours_to_show: 720
-          - type: horizontal-stack
-            cards:
-              - type: sensor
-                graph: line
-                entity: sensor.balcony_temperature
-                hours_to_show: 720
-              - type: sensor
-                graph: line
-                entity: sensor.balcony_humidity
-                hours_to_show: 720
-      - type: vertical-stack
-        cards:
+                name: Living Room Humidity
           - type: history-graph
             entities:
               - entity: sensor.living_room_temperature
@@ -62,6 +28,30 @@ views:
             refresh_interval: 300
           - type: history-graph
             entities:
+              - entity: sensor.living_room_sensor_light_level
+            hours_to_show: 48
+            refresh_interval: 300
+          - type: entities
+            entities:
+              - entity: light.tv_back_light
+              - entity: light.livng_room_entrance_light
+            state_color: false
+            title: Living Room Lights
+          - type: entity
+            entity: binary_sensor.living_room_sensor_motion
+            name: Living Room Motion Sensor
+      - type: vertical-stack
+        cards:
+          - type: horizontal-stack
+            cards:
+              - type: entity
+                entity: sensor.bedroom_temperature
+                name: Bedroom Temperature
+              - type: entity
+                entity: sensor.bedroom_humidity
+                name: Bedroom Humidity
+          - type: history-graph
+            entities:
               - entity: sensor.bedroom_temperature
             hours_to_show: 48
             refresh_interval: 300
@@ -70,6 +60,22 @@ views:
               - entity: sensor.bedroom_humidity
             hours_to_show: 48
             refresh_interval: 300
+          - type: entities
+            entities:
+              - entity: light.bedroom_light
+            state_color: false
+            show_header_toggle: false
+            title: Bedroom Lights
+      - type: vertical-stack
+        cards:
+          - type: horizontal-stack
+            cards:
+              - type: entity
+                entity: sensor.storeroom_temperature
+                name: Storeroom Temperature
+              - type: entity
+                entity: sensor.storeroom_humidity
+                name: Storeroom Humidity
           - type: history-graph
             entities:
               - entity: sensor.storeroom_temperature
@@ -80,6 +86,41 @@ views:
               - entity: sensor.storeroom_humidity
             hours_to_show: 48
             refresh_interval: 300
+      - type: vertical-stack
+        cards:
+          - type: entity
+            entity: sensor.washroom_sensor_temperature
+            name: Washroom Temperature
+          - type: history-graph
+            entities:
+              - entity: sensor.washroom_sensor_temperature
+            hours_to_show: 48
+            refresh_interval: 300
+          - type: history-graph
+            entities:
+              - entity: sensor.washroom_sensor_light_level
+            hours_to_show: 48
+            refresh_interval: 300
+          - type: entities
+            entities:
+              - entity: light.washroom_entrance_light
+              - entity: light.washroom_left_light
+              - entity: light.washroom_right_light
+            state_color: false
+            title: Washroom Lights
+          - type: entity
+            entity: binary_sensor.washroom_sensor_motion
+            name: Washroom Motion Sensor
+      - type: vertical-stack
+        cards:
+          - type: horizontal-stack
+            cards:
+              - type: entity
+                entity: sensor.balcony_temperature
+                name: Balcony Temperature
+              - type: entity
+                entity: sensor.balcony_humidity
+                name: Balcony Humidity
           - type: history-graph
             entities:
               - entity: sensor.balcony_temperature
@@ -90,3 +131,9 @@ views:
               - entity: sensor.balcony_humidity
             hours_to_show: 48
             refresh_interval: 300
+      - type: entities
+        entities:
+          - light.living_room
+          - light.bedroom
+          - light.washroom
+        title: All Lights
