@@ -34,6 +34,20 @@
     dest: /etc/homeassistant
   tags: [homeassistant]
 
+- name: Config notify
+  lineinfile:
+    path: /etc/homeassistant/configuration.yaml
+    insertafter: '^binary_sensor:'
+    regexp: '^notify:'
+    line: "notify: !include notify.yaml"
+  tags: [homeassistant]
+
+- name: Copy notify.yaml
+  copy:
+    src: notify.yaml
+    dest: /etc/homeassistant
+  tags: [homeassistant]
+
 - name: Config sensor
   lineinfile:
     path: /etc/homeassistant/configuration.yaml
@@ -85,6 +99,9 @@
         mode: yaml
       mqtt:
         broker: localhost
+      speedtestdotnet:
+        scan_interval:
+          hours: 1
   tags: [homeassistant]
 
 - name: Copy ui-lovelace.yaml
