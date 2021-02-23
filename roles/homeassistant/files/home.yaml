@@ -1,0 +1,170 @@
+path: home
+title: Home
+icon: 'mdi:home'
+panel: false
+badges: []
+cards:
+  - type: vertical-stack
+    cards:
+      - type: horizontal-stack
+        cards:
+          - type: entity
+            name: Living Room Temperature
+            entity: sensor.living_room_temperature
+          - type: entity
+            name: Living Room Humidity
+            entity: sensor.living_room_humidity
+      - type: history-graph
+        entities:
+          - entity: sensor.living_room_temperature
+        hours_to_show: 48
+        refresh_interval: 300
+      - type: history-graph
+        entities:
+          - entity: sensor.living_room_humidity
+        hours_to_show: 48
+        refresh_interval: 300
+      - type: history-graph
+        entities:
+          - entity: sensor.living_room_sensor_light_level
+        hours_to_show: 48
+        refresh_interval: 300
+      - type: entities
+        title: Living Room Downlight
+        entities:
+          - name: Full
+            entity: switch.living_room_downlight
+          - name: Dimmer
+            entity: switch.living_room_dimming_downlight
+        show_header_toggle: false
+      - type: entities
+        title: Living Room Lights
+        entities:
+          - entity: light.tv_back_light
+          - entity: light.livng_room_entrance_light
+        state_color: false
+      - type: horizontal-stack
+        cards:
+          - type: button
+            tap_action:
+              action: toggle
+            entity: switch.living_room_humidifier
+            icon: 'mdi:air-humidifier'
+            icon_height: 48px
+          - type: button
+            tap_action:
+              action: toggle
+            entity: group.living_room_floor_heating
+            icon_height: 48px
+      - type: entity
+        name: Living Room Motion Sensor
+        entity: binary_sensor.living_room_sensor_motion
+      - type: entities
+        title: Living Room Automations
+        entities:
+          - entity: automation.turn_on_living_room_downlight
+            name: Downlight
+            secondary_info: last-triggered
+          - entity: automation.turn_on_living_room_floor_heating
+            name: Floor Heating
+            secondary_info: last-triggered
+          - entity: automation.turn_on_living_room_humidifier
+            name: Humidifier
+            secondary_info: last-triggered
+  - type: vertical-stack
+    cards:
+      - type: horizontal-stack
+        cards:
+          - type: entity
+            name: Bedroom Temperature
+            entity: sensor.bedroom_temperature
+          - type: entity
+            name: Bedroom Humidity
+            entity: sensor.bedroom_humidity
+      - type: history-graph
+        entities:
+          - entity: sensor.bedroom_temperature
+        hours_to_show: 48
+        refresh_interval: 300
+      - type: history-graph
+        entities:
+          - entity: sensor.bedroom_humidity
+        hours_to_show: 48
+        refresh_interval: 300
+      - type: entities
+        title: Bedroom Lights
+        entities:
+          - entity: light.bedroom_light
+        state_color: false
+        show_header_toggle: false
+  - type: vertical-stack
+    cards:
+      - type: horizontal-stack
+        cards:
+          - type: entity
+            name: Storeroom Temperature
+            entity: sensor.storeroom_temperature
+          - type: entity
+            name: Storeroom Humidity
+            entity: sensor.storeroom_humidity
+      - type: history-graph
+        entities:
+          - entity: sensor.storeroom_temperature
+        hours_to_show: 48
+        refresh_interval: 300
+      - type: history-graph
+        entities:
+          - entity: sensor.storeroom_humidity
+        hours_to_show: 48
+        refresh_interval: 300
+  - type: vertical-stack
+    cards:
+      - type: entity
+        name: Washroom Temperature
+        entity: sensor.washroom_sensor_temperature
+      - type: history-graph
+        entities:
+          - entity: sensor.washroom_sensor_temperature
+        hours_to_show: 48
+        refresh_interval: 300
+      - type: history-graph
+        entities:
+          - entity: sensor.washroom_sensor_light_level
+        hours_to_show: 48
+        refresh_interval: 300
+      - type: entities
+        title: Washroom Lights
+        entities:
+          - entity: light.washroom_entrance_light
+          - entity: light.washroom_left_light
+          - entity: light.washroom_right_light
+        state_color: false
+      - type: entity
+        name: Washroom Motion Sensor
+        entity: binary_sensor.washroom_sensor_motion
+  - type: vertical-stack
+    cards:
+      - type: horizontal-stack
+        cards:
+          - type: entity
+            name: Balcony Temperature
+            entity: sensor.balcony_temperature
+          - type: entity
+            name: Balcony Humidity
+            entity: sensor.balcony_humidity
+      - type: history-graph
+        entities:
+          - entity: sensor.balcony_temperature
+        hours_to_show: 48
+        refresh_interval: 300
+      - type: history-graph
+        entities:
+          - entity: sensor.balcony_humidity
+        hours_to_show: 48
+        refresh_interval: 300
+  - type: entities
+    title: All Lights
+    entities:
+      - light.living_room
+      - light.bedroom
+      - light.washroom

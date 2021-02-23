@@ -118,6 +118,13 @@
       fastdotcom:
       lovelace:
         mode: yaml
+        dashboards:
+          lovelace-network:
+            mode: yaml
+            filename: ui/network.yaml
+            title: Network
+            icon: mdi:lan
+            require_admin: true
       mqtt:
         broker: localhost
       speedtestdotnet:
@@ -129,7 +136,25 @@
   copy:
     src: ui-lovelace.yaml
     dest: /srv/homeassistant
-  tags: [homeassistant]
+  tags: [homeassistant, homeassistant-ui]
+
+- name: Create a directory for UI
+  file:
+    path: /srv/homeassistant/ui
+    state: directory
+  tags: [homeassistant, homeassistant-ui]
+
+- name: Copy home.yaml
+  copy:
+    src: home.yaml
+    dest: /srv/homeassistant/ui
+  tags: [homeassistant, homeassistant-ui]
+
+- name: Copy network.yaml
+  copy:
+    src: network.yaml
+    dest: /srv/homeassistant/ui
+  tags: [homeassistant, homeassistant-ui]
 
 - name: Start homeassistant container
   community.docker.docker_compose:
