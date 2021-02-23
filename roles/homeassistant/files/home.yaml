@@ -46,12 +46,14 @@ cards:
       - type: horizontal-stack
         cards:
           - type: button
+            name: Humidifier
             tap_action:
               action: toggle
             entity: switch.living_room_humidifier
             icon: 'mdi:air-humidifier'
             icon_height: 48px
           - type: button
+            name: Floor Heating
             tap_action:
               action: toggle
             entity: group.living_room_floor_heating
