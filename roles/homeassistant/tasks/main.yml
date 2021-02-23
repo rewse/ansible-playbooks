@@ -80,6 +80,7 @@
   blockinfile:
     path: /etc/homeassistant/configuration.yaml
     block: |
+      fastdotcom:
       lovelace:
         mode: yaml
       mqtt:
