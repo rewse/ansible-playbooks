@@ -212,6 +212,7 @@ views:
             icon: mdi:cat
             secondary_info: last-changed
       - type: entities
+        title: Clients
         entities:
           - entity: device_tracker.youth
             icon: mdi:desktop-classic
