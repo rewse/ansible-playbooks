@@ -158,3 +158,74 @@ views:
           - light.living_room
           - light.bedroom
           - light.washroom
+  - path: network
+    title: Network
+    icon: mdi:lan
+    badges: []
+    cards:
+      - type: entities
+        title: Network Devices
+        entities:
+          - entity: binary_sensor.tango
+            icon: mdi:switch
+            secondary_info: last-changed
+          - entity: binary_sensor.xray_living
+            icon: mdi:router-wireless
+            secondary_info: last-changed
+          - entity: binary_sensor.xray_store
+            icon: mdi:router-wireless
+            secondary_info: last-changed
+      - type: entities
+        title: Servers
+        entities:
+          - entity: binary_sensor.remo
+            icon: mdi:access-point-network
+            secondary_info: last-changed
+          - entity: binary_sensor.wfirex
+            icon: mdi:access-point-network
+            secondary_info: last-changed
+          - entity: binary_sensor.switchbothub
+            icon: mdi:access-point-network
+            secondary_info: last-changed
+          - entity: binary_sensor.huebridge
+            icon: mdi:access-point-network
+            secondary_info: last-changed
+          - entity: binary_sensor.guppy
+            icon: mdi:nas
+            secondary_info: last-changed
+          - entity: binary_sensor.colorio
+            icon: mdi:printer
+            secondary_info: last-changed
+          - entity: binary_sensor.justio
+            icon: mdi:printer
+            secondary_info: last-changed
+          - entity: binary_sensor.aventage
+            icon: mdi:audio-video
+            secondary_info: last-changed
+          - entity: binary_sensor.tapo
+            icon: mdi:cctv
+            secondary_info: last-changed
+          - entity: binary_sensor.catloghome_living
+            icon: mdi:cat
+            secondary_info: last-changed
+          - entity: binary_sensor.catloghome_store
+            icon: mdi:cat
+            secondary_info: last-changed
+      - type: entities
+        entities:
+          - entity: device_tracker.youth
+            icon: mdi:desktop-classic
+            secondary_info: last-changed
+          - entity: device_tracker.e0b55fe8e384
+            icon: mdi:laptop
+            secondary_info: last-changed
+          - entity: device_tracker.bio
+            icon: mdi:cellphone
+            secondary_info: last-changed
+          - entity: device_tracker.desert
+            icon: mdi:tablet
+            secondary_info: last-changed
+          - entity: device_tracker.global
+            icon: mdi:cellphone
+            secondary_info: last-changed
+        title: Clients
