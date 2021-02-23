@@ -1,0 +1,22 @@
+- name: all_devices
+  platform: group
+  services:
+    - service: mobile_app_youth
+    - service: mobile_app_e0b55fe8e384
+    - service: mobile_app_bio
+    - service: mobile_app_desert
+    - service: mobile_app_global
+- name: tats_devices
+  platform: group
+  services:
+    - service: mobile_app_youth
+    - service: mobile_app_e0b55fe8e384
+    - service: mobile_app_bio
+    - service: mobile_app_desert
+    - service: mobile_app_global
+- name: tats_mobile_devices
+  platform: group
+  services:
+    - service: mobile_app_bio
+    - service: mobile_app_desert
+    - service: mobile_app_global
