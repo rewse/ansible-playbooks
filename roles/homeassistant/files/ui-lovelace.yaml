@@ -229,4 +229,33 @@ views:
           - entity: device_tracker.global
             icon: mdi:cellphone
             secondary_info: last-changed
-        title: Clients
+      - type: vertical-stack
+        cards:
+          - type: gauge
+            entity: sensor.fast_com_download
+            min: 0
+            max: 300
+            severity:
+              green: 50
+              yellow: 10
+              red: 1
+          - type: gauge
+            entity: sensor.speedtest_download
+            min: 0
+            max: 300
+            severity:
+              green: 50
+              yellow: 10
+              red: 1
+          - type: gauge
+            entity: sensor.speedtest_upload
+            min: 0
+            max: 300
+            severity:
+              green: 50
+              yellow: 10
+              red: 1
+          - type: sensor
+            entity: sensor.speedtest_ping
+            graph: line
+            hours_to_show: 168
