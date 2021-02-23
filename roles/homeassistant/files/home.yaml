@@ -61,18 +61,6 @@ cards:
       - type: entity
         name: Living Room Motion Sensor
         entity: binary_sensor.living_room_sensor_motion
-      - type: entities
-        title: Living Room Automations
-        entities:
-          - entity: automation.turn_on_living_room_downlight
-            name: Downlight
-            secondary_info: last-triggered
-          - entity: automation.turn_on_living_room_floor_heating
-            name: Floor Heating
-            secondary_info: last-triggered
-          - entity: automation.turn_on_living_room_humidifier
-            name: Humidifier
-            secondary_info: last-triggered
   - type: vertical-stack
     cards:
       - type: horizontal-stack
@@ -170,3 +158,15 @@ cards:
       - light.living_room
       - light.bedroom
       - light.washroom
+  - type: entities
+    title: Automations
+    entities:
+      - entity: automation.turn_on_living_room_downlights
+        name: Living Room Downlights
+        secondary_info: last-triggered
+      - entity: automation.turn_on_living_room_floor_heating
+        name: Living Room Floor Heating
+        secondary_info: last-triggered
+      - entity: automation.turn_on_living_room_humidifier
+        name: Living Room Humidifier
+        secondary_info: last-triggered
