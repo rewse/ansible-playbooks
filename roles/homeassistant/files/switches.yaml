@@ -18,7 +18,7 @@
     living_room_downlight:
       command_on: "/config/bin/remo signal 917b6ba4-5cff-4e91-88f4-cccc7fe1c5eb"
       command_off: "/config/bin/remo signal 281417a3-3a19-4a0a-b9fa-9f19d0d3f654"
-      friendly_name: "Living Room Downlight%"
+      friendly_name: "Living Room Downlight"
     living_room_dimming_downlight:
       command_on: "/config/bin/remo signal 4975ccd8-2cfd-42e1-98a2-6e1b29017f70"
       command_off: "/config/bin/remo signal d5f4b519-15a5-4b5e-90a7-0acd736108df"
