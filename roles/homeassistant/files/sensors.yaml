@@ -1,3 +1,4 @@
+- platform: season
 - platform: mqtt
   name: Living Room Temperature
   state_topic: switchbotmeter/F5DAB9477E91
