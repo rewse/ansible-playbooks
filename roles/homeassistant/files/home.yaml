@@ -30,12 +30,12 @@ cards:
         hours_to_show: 48
         refresh_interval: 300
       - type: entities
-        title: Living Room Downlight
+        title: Living Room Downlights
         entities:
           - name: Full
-            entity: switch.living_room_downlight
+            entity: switch.living_room_downlights
           - name: Dimmer
-            entity: switch.living_room_dimming_downlight
+            entity: switch.living_room_dimming_downlights
         show_header_toggle: false
       - type: entities
         title: Living Room Lights
