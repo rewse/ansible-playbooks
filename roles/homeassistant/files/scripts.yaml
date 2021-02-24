@@ -1,0 +1,11 @@
+toggle_x2_living_room_humidifier:
+  alias: Toogle x2 Living Room Humidifer 1
+  sequence:
+  - service: switch.toggle
+    data: {}
+    entity_id: switch.living_room_humidifier
+  - service: switch.toggle
+    data: {}
+    entity_id: switch.living_room_humidifier
+  mode: single
+  icon: mdi:air-humidifier
