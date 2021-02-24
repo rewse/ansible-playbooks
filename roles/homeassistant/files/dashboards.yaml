@@ -1,0 +1,6 @@
+lovelace-network:
+  mode: yaml
+  filename: ui/network.yaml
+  title: Network
+  icon: mdi:lan
+  require_admin: true
