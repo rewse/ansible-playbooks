@@ -69,6 +69,12 @@
     dest: /srv/homeassistant
   tags: [homeassistant]
 
+- name: Copy scripts.yaml
+  copy:
+    src: scripts.yaml
+    dest: /srv/homeassistant
+  tags: [homeassistant]
+
 - name: Config sensor
   lineinfile:
     path: /srv/homeassistant/configuration.yaml
