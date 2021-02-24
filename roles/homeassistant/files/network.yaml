@@ -104,15 +104,15 @@ views:
       - type: entities
         title: Offline Alarm
         entities:
-          - entity: automation.alarm_tango_is_offline
+          - entity: automation.alarm_network_devices_are_offline
             icon: 'mdi:switch'
-            name: tango
+            name: Network Devices
             secondary_info: last-triggered
-          - entity: automation.alarm_tapo_is_offline
-            icon: 'mdi:cctv'
-            name: tapo
+          - entity: automation.alarm_servers_are_offline
+            icon: 'mdi:nas'
+            name: Servers
             secondary_info: last-triggered
-          - entity: automation.colorio_is_offline
-            name: catloghome-living
-            icon: 'mdi:cat'
+          - entity: automation.alarm_internet_speed_is_too_slow
+            icon: 'mdi:speedometer-slow'
+            name: Internet
             secondary_info: last-triggered
