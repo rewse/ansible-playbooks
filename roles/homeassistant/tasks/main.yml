@@ -55,10 +55,24 @@
     dest: /srv/homeassistant
   tags: [homeassistant]
 
+- name: Config input_number
+  lineinfile:
+    path: /srv/homeassistant/configuration.yaml
+    insertafter: '^binary_sesnsor:'
+    regexp: '^input_number:'
+    line: "input_number: !include input_numbers.yaml"
+  tags: [homeassistant]
+
+- name: Copy input_numbers.yaml
+  copy:
+    src: input_numbers.yaml
+    dest: /srv/homeassistant
+  tags: [homeassistant]
+
 - name: Config notify
   lineinfile:
     path: /srv/homeassistant/configuration.yaml
-    insertafter: '^binary_sensor:'
+    insertafter: '^input_number:'
     regexp: '^notify:'
     line: "notify: !include notify.yaml"
   tags: [homeassistant]
