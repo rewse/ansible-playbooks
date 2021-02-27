@@ -18,8 +18,14 @@ living_room_ac_forcibly_turnon_threshold:
   icon: mdi:thermometer-alert
 living_room_downlights_turnon_threshold:
   name: Living Room Downlights Turn on Threshold
-  min: 13
-  max: 21
+  min: 19
+  max: 23
+  unit_of_measurement: lx
+  icon: mdi:weather-sunset-down
+study_downlights_turnon_threshold:
+  name: Study Downlights Turn on Threshold
+  min: 12
+  max: 16
   unit_of_measurement: lx
   icon: mdi:weather-sunset-down
 living_room_floor_heating_turnon_threshold:
