@@ -1,4 +1,7 @@
-- platform: season
+- platform: dnsip
+  name: DNS amazon.com
+  hostname: amazon.com
+  resolver: 192.168.0.1
 - platform: mqtt
   name: Living Room Temperature
   state_topic: switchbotmeter/F5DAB9477E91
@@ -63,3 +66,4 @@
   availability:
     - topic: switchbotmeter/EDE4EAA09EA3/status
   device_class: humidity
+- platform: season
