@@ -2,7 +2,9 @@
 - name: Install additional packages
   apt:
     name:
+      - certbot
       - nfs-common
+      - python3-certbot-apache
   tags: [homeassistant]
 
 - name: Create a mount point
@@ -180,3 +182,31 @@
   community.docker.docker_compose:
     project_src: /etc
   tags: [homeassistant]
+
+- name: Copy index.html
+  copy:
+    src: index.html
+    dest: /srv/www/html
+  tags: [homeassistant]
+
+- name: Enable proxy
+  community.general.apache2_module:
+    name: "{{ item }}"
+  with_items:
+    - proxy
+    - proxy_http
+    - proxy_wstunnel
+  notify: Restart apache
+  tags: [apache]
+
+- name: Copy hass.rewse.jp.conf
+  copy:
+    src: hass.rewse.jp.conf
+    dest: /etc/apache2/sites-available
+  notify: Reload apache
+  tags: [homeassistant]
+
+- name: Enable hass.rewse.jp
+  command: a2ensite hass.rewse.jp
+  notify: Reload apache
+  tags: [apache]
