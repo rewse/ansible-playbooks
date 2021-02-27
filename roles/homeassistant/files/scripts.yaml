@@ -1,5 +1,5 @@
 toggle_x2_living_room_humidifier:
-  alias: Toogle x2 Living Room Humidifer 1
+  alias: Toogle x2 Living Room Humidifier
   sequence:
   - service: switch.toggle
     data: {}
