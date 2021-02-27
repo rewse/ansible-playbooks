@@ -39,11 +39,15 @@
 - name: Add an apt key for mod_pagespeed
   apt_key:
     url: https://dl.google.com/linux/linux_signing_key.pub
+  when:
+    ansible_architecture == "x86_64"
   tags: [apache, package]
 
 - name: Install mod_pagespeed
   apt:
     deb: https://dl-ssl.google.com/dl/linux/direct/mod-pagespeed-stable_current_amd64.deb
+  when:
+    ansible_architecture == "x86_64"
   notify: Reload apache
   tags: [apache, package]
 
@@ -126,23 +130,23 @@
 - name: Copy admin.conf
   template:
     src: admin.conf.j2
-    dest: /etc/apache2/sites-available/admin.conf
+    dest: /etc/apache2/conf-available/admin.conf
   tags: [apache]
 
 - name: Enable admin
-  command: a2ensite admin
+  command: a2enconf admin
   notify: Reload apache
   tags: [apache]
 
 - name: Copy status.conf
   template:
     src: status.conf.j2
-    dest: /etc/apache2/sites-available/status.conf
+    dest: /etc/apache2/conf-available/status.conf
   notify: Reload apache
   tags: [apache]
 
 - name: Enable status
-  command: a2ensite status
+  command: a2enconf status
   notify: Reload apache
   tags: [apache]
 
