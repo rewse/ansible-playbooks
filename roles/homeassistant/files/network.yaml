@@ -71,6 +71,9 @@ views:
           - entity: device_tracker.e0b55fe8e384
             icon: mdi:laptop
             secondary_info: last-changed
+      - type: entity
+        entity: sensor.dns_amazon_com
+        icon: 'mdi:dns'
       - type: vertical-stack
         cards:
           - type: gauge
@@ -104,6 +107,9 @@ views:
       - type: entities
         title: Offline Alarm
         entities:
+          - entity: automation.alarm_dns_is_down
+            icon: 'mdi:dns'
+            name: DNS
           - entity: automation.alarm_network_devices_are_offline
             icon: 'mdi:switch'
             name: Network Devices
