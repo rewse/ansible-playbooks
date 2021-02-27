@@ -138,6 +138,24 @@
     path: /srv/homeassistant/configuration.yaml
     block: |
       fastdotcom:
+      homekit:
+        filter:
+          include_entities:
+            - script.toggle_x2_living_room_humidifier
+            - script.toggle_all_floor_heatings
+            - sensor.living_room_humidity
+            - sensor.living_room_temperature
+            - sensor.bedroom_humidity
+            - sensor.bedroom_temperature
+            - sensor.storage_temperature
+            - sensor.storage_humidity
+            - sensor.balcony_humidity
+            - sensor.balcony_temperature
+            - switch.living_room_dimming_downlights
+            - switch.living_room_downlights
+            - switch.living_room_floor_heating
+            - switch.living_room_humidifier
+            - switch.study_floor_heating
       lovelace:
         mode: yaml
         dashboards: !include dashboards.yaml
