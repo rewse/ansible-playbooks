@@ -151,9 +151,11 @@
             - sensor.storage_humidity
             - sensor.balcony_humidity
             - sensor.balcony_temperature
+            - switch.enteance_zulu_power
             - switch.living_room_dimming_downlights
             - switch.living_room_downlights
             - switch.living_room_floor_heating
+            - switch.living_room_footlight
             - switch.living_room_humidifier
             - switch.study_floor_heating
       lovelace:
@@ -164,6 +166,7 @@
       speedtestdotnet:
         scan_interval:
           hours: 1
+      tplink:
   tags: [homeassistant]
 
 - name: Copy dashboards.yaml
