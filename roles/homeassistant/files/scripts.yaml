@@ -9,3 +9,14 @@ toggle_x2_living_room_humidifier:
     entity_id: switch.living_room_humidifier
   mode: single
   icon: mdi:air-humidifier
+toggle_all_floor_heatings:
+  alias: Toogle All Floor Heatings
+  sequence:
+  - service: switch.toggle
+    data: {}
+    entity_id: switch.living_room_floor_heating
+  - service: switch.toggle
+    data: {}
+    entity_id: switch.study_floor_heating
+  mode: single
+  icon: mdi:grid
