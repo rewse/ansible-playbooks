@@ -112,28 +112,28 @@ cards:
   - type: vertical-stack
     cards:
       - type: entity
-        name: Washroom Temperature
-        entity: sensor.washroom_sensor_temperature
+        name: Bathroom Temperature
+        entity: sensor.bathroom_sensor_temperature
       - type: history-graph
         entities:
-          - entity: sensor.washroom_sensor_temperature
+          - entity: sensor.bathroom_sensor_temperature
         hours_to_show: 48
         refresh_interval: 300
       - type: history-graph
         entities:
-          - entity: sensor.washroom_sensor_light_level
+          - entity: sensor.bathroom_sensor_light_level
         hours_to_show: 48
         refresh_interval: 300
       - type: entities
-        title: Washroom Lights
+        title: Bathroom Lights
         entities:
-          - entity: light.washroom_entrance_light
-          - entity: light.washroom_left_light
-          - entity: light.washroom_right_light
+          - entity: light.bathroom_entrance_light
+          - entity: light.bathroom_left_light
+          - entity: light.bathroom_right_light
         state_color: false
       - type: entity
-        name: Washroom Motion Sensor
-        entity: binary_sensor.washroom_sensor_motion
+        name: Bathroom Motion Sensor
+        entity: binary_sensor.bathroom_sensor_motion
   - type: vertical-stack
     cards:
       - type: horizontal-stack
@@ -159,7 +159,7 @@ cards:
     entities:
       - light.living_room
       - light.bedroom
-      - light.washroom
+      - light.bathroom
   - type: entities
     title: Automations
     entities:
