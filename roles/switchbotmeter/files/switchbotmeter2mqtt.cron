@@ -3,5 +3,5 @@ PATH=/usr/local/sbin:/usr/local/bin:/sbin:/bin:/usr/sbin:/usr/bin
 # 800 times / 4 devices / 24 hours = 8.33 times/hour
 01-59/5 * * * * root switchbotmeter2mqtt F5DAB9477E91 # Living Room
 02-59/5 * * * * root switchbotmeter2mqtt F980AECF8644 # Bedroom
-03-59/5 * * * * root switchbotmeter2mqtt FD13F5CA5563 # Storeroom
+03-59/5 * * * * root switchbotmeter2mqtt FD13F5CA5563 # Storage
 04-59/5 * * * * root switchbotmeter2mqtt EDE4EAA09EA3 # Balcony

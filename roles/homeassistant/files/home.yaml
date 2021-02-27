@@ -94,19 +94,19 @@ cards:
       - type: horizontal-stack
         cards:
           - type: entity
-            name: Storeroom Temperature
-            entity: sensor.storeroom_temperature
+            name: Storage Temperature
+            entity: sensor.storage_temperature
           - type: entity
-            name: Storeroom Humidity
-            entity: sensor.storeroom_humidity
+            name: Storage Humidity
+            entity: sensor.storage_humidity
       - type: history-graph
         entities:
-          - entity: sensor.storeroom_temperature
+          - entity: sensor.storage_temperature
         hours_to_show: 48
         refresh_interval: 300
       - type: history-graph
         entities:
-          - entity: sensor.storeroom_humidity
+          - entity: sensor.storage_humidity
         hours_to_show: 48
         refresh_interval: 300
   - type: vertical-stack
