@@ -1,3 +1,14 @@
+restart_zulu:
+  alias: Restart zulu
+  sequence:
+    - service: switch.turn_off
+      data: {}
+      entity_id: switch.enteance_zulu_power
+    - service: switch.turn_on
+      data: {}
+      entity_id: switch.enteance_zulu_power
+  mode: single
+  icon: mdi:power-plug
 toggle_x2_living_room_humidifier:
   alias: Toogle x2 Living Room Humidifier
   sequence:
