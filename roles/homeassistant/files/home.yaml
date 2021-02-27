@@ -40,8 +40,8 @@ cards:
       - type: entities
         title: Living Room Lights
         entities:
-          - entity: light.tv_back_light
-          - entity: light.livng_room_entrance_light
+          - entity: light.living_room_tv_light
+          - entity: light.living_room_entrance_light
         state_color: false
       - type: horizontal-stack
         cards:
