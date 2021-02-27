@@ -32,7 +32,7 @@
     - topic: switchbotmeter/F980AECF8644/status
   device_class: humidity
 - platform: mqtt
-  name: Storeroom Temperature
+  name: Storage Temperature
   state_topic: switchbotmeter/FD13F5CA5563
   value_template: "{{ value_json.temperature }}"
   unit_of_measurement: °C
@@ -40,7 +40,7 @@
     - topic: switchbotmeter/FD13F5CA5563/status
   device_class: temperature
 - platform: mqtt
-  name: Storeroom Humidity
+  name: Storage Humidity
   state_topic: switchbotmeter/FD13F5CA5563
   value_template: "{{ value_json.humidity }}"
   unit_of_measurement: "%"

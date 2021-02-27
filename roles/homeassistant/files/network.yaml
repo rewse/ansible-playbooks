@@ -14,7 +14,7 @@ views:
           - entity: binary_sensor.xray_living
             icon: mdi:router-wireless
             secondary_info: last-changed
-          - entity: binary_sensor.xray_store
+          - entity: binary_sensor.xray_storage
             icon: mdi:router-wireless
             secondary_info: last-changed
       - type: entities
@@ -50,7 +50,7 @@ views:
           - entity: binary_sensor.catloghome_living
             icon: mdi:cat
             secondary_info: last-changed
-          - entity: binary_sensor.catloghome_store
+          - entity: binary_sensor.catloghome_storage
             icon: mdi:cat
             secondary_info: last-changed
       - type: entities

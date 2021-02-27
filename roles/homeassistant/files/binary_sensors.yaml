@@ -18,7 +18,7 @@
   name: catloghome-living
 - platform: ping
   host: 192.168.0.7
-  name: catloghome-store
+  name: catloghome-storage
 - platform: ping
   host: 192.168.0.100
   name: guppy
@@ -39,7 +39,7 @@
   name: xray-living
 - platform: ping
   host: 192.168.0.170
-  name: xray-store
+  name: xray-storage
 - platform: ping
   host: 192.168.0.180
   name: tango
