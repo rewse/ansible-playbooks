@@ -48,18 +48,24 @@ cards:
       - type: horizontal-stack
         cards:
           - type: button
-            name: Humidifier
+            name: Humidifier On
+            tap_action:
+              action: toggle
+            entity: script.toggle_x2_living_room_humidifier
+            icon_height: 48px
+          - type: button
+            name: Humidifier Off
             tap_action:
               action: toggle
             entity: switch.living_room_humidifier
-            icon: 'mdi:air-humidifier'
+            icon: 'mdi:air-humidifier-off'
             icon_height: 48px
-          - type: button
-            name: Floor Heating
-            tap_action:
-              action: toggle
+      - type: button
+        name: Floor Heating
+        tap_action:
+          action: toggle
         entity: script.toggle_all_floor_heatings
-            icon_height: 48px
+        icon_height: 48px
       - type: entities
         title: Living Room Motion Sensors
         entities:
