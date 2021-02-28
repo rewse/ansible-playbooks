@@ -175,6 +175,7 @@
             - sensor.balcony_humidity
             - sensor.balcony_temperature
             - switch.entrance_zulu_power
+            - switch.living_room_ac_cleaner
             - switch.living_room_dimming_downlights
             - switch.living_room_downlights
             - switch.living_room_floor_heating
