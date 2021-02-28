@@ -30,12 +30,26 @@ cards:
         hours_to_show: 48
         refresh_interval: 300
       - type: entities
-        title: Living Room Downlights
+        title: Living Room Appliances
         entities:
-          - name: Full
-            entity: switch.living_room_downlights
-          - name: Dimmer
-            entity: switch.living_room_dimming_downlights
+          - entity: switch.living_room_downlights
+            name: Downlights
+            icon: 'mdi:brightness-5'
+          - entity: switch.living_room_dimming_downlights
+            name: Dimmer Downlights
+            icon: 'mdi:brightness-6'
+          - entity: switch.living_room_ceiling_fan
+            name: Ceiling Fan
+            icon: 'mdi:fan'
+            secondary_info: last-changed
+          - entity: switch.living_room_humidifier
+            name: Humidifier
+            icon: 'mdi:air-humidifier'
+            secondary_info: last-changed
+          - entity: script.toggle_all_floor_heatings
+            name: Floor Heating
+            icon: 'mdi:grid'
+            secondary_info: last-updated
         show_header_toggle: false
       - type: entities
         title: Living Room Lights
@@ -45,27 +59,6 @@ cards:
           - entity: light.living_room_entrance_light
             name: Entrance Light
         state_color: false
-      - type: horizontal-stack
-        cards:
-          - type: button
-            name: Humidifier On
-            tap_action:
-              action: toggle
-            entity: script.toggle_x2_living_room_humidifier
-            icon_height: 48px
-          - type: button
-            name: Humidifier Off
-            tap_action:
-              action: toggle
-            entity: switch.living_room_humidifier
-            icon: 'mdi:air-humidifier-off'
-            icon_height: 48px
-      - type: button
-        name: Floor Heating
-        tap_action:
-          action: toggle
-        entity: script.toggle_all_floor_heatings
-        icon_height: 48px
       - type: entities
         title: Living Room Motion Sensors
         entities:
