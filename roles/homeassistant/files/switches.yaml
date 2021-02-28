@@ -1,5 +1,9 @@
 - platform: command_line
   switches:
+    living_room_ac_cleaner:
+      command_on: "/config/bin/remo signal e5286537-2c60-46ab-8fa5-3f695b9661ec"
+      command_off: "/config/bin/remo signal e5286537-2c60-46ab-8fa5-3f695b9661ec"
+      friendly_name: "Living Room AC Cleaner"
     living_room_ceiling_fan:
       command_on: "curl -X POST https://maker.ifttt.com/trigger/turnon_living_room_ceiling_fan/with/key/bAubKw2GXOA8tPrFMH6pvd"
       command_off: "curl -X POST https://maker.ifttt.com/trigger/turnoff_living_room_ceiling_fan/with/key/bAubKw2GXOA8tPrFMH6pvd"
