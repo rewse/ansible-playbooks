@@ -160,6 +160,9 @@ cards:
           - entity: sensor.balcony_humidity
         hours_to_show: 48
         refresh_interval: 300
+  - type: picture-entity
+    name: Cat Cage
+    entity: camera.guppy_cat_cage
   - type: entities
     title: All Lights
     entities:
