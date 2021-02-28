@@ -56,7 +56,7 @@ cards:
             name: Floor Heating
             tap_action:
               action: toggle
-            entity: group.living_room_floor_heating
+        entity: script.toggle_all_floor_heatings
             icon_height: 48px
       - type: entities
         title: Living Room Motion Sensors
