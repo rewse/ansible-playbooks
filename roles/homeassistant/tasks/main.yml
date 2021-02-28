@@ -71,10 +71,24 @@
     dest: /srv/homeassistant
   tags: [homeassistant]
 
-- name: Config notify
+- name: Config media_player
   lineinfile:
     path: /srv/homeassistant/configuration.yaml
     insertafter: '^input_number:'
+    regexp: '^media_player:'
+    line: "media_player: !include media_players.yaml"
+  tags: [homeassistant]
+
+- name: Copy media_players.yaml
+  copy:
+    src: media_players.yaml
+    dest: /srv/homeassistant
+  tags: [homeassistant]
+
+- name: Config notify
+  lineinfile:
+    path: /srv/homeassistant/configuration.yaml
+    insertafter: '^media_player:'
     regexp: '^notify:'
     line: "notify: !include notify.yaml"
   tags: [homeassistant]
@@ -140,6 +154,8 @@
       fastdotcom:
       homekit:
         filter:
+          include_domains:
+            - media_player
           include_entities:
             - script.toggle_x2_living_room_humidifier
             - script.toggle_all_floor_heatings
@@ -151,7 +167,7 @@
             - sensor.storage_humidity
             - sensor.balcony_humidity
             - sensor.balcony_temperature
-            - switch.enteance_zulu_power
+            - switch.entrance_zulu_power
             - switch.living_room_dimming_downlights
             - switch.living_room_downlights
             - switch.living_room_floor_heating
@@ -196,6 +212,12 @@
 - name: Copy network.yaml
   copy:
     src: network.yaml
+    dest: /srv/homeassistant/ui
+  tags: [homeassistant, homeassistant-ui]
+
+- name: Copy mediaplayer.yaml
+  copy:
+    src: mediaplayer.yaml
     dest: /srv/homeassistant/ui
   tags: [homeassistant, homeassistant-ui]
 

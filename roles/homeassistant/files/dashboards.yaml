@@ -4,3 +4,9 @@ lovelace-network:
   title: Network
   icon: mdi:lan
   require_admin: true
+lovelace-mediaplayer:
+  mode: yaml
+  filename: ui/mediaplayer.yaml
+  title: Mediaplayer
+  icon: mdi:monitor-speaker
+  
