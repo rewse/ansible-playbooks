@@ -1,14 +1,19 @@
 #!/usr/bin/env bash
 
-set -euo pipefail
+set -eo pipefail
 trap 'exit 1' 1 2 3 15
 
 readonly token=[% switchbot_token %]
 
 device_id=$1
+repetition=$2
 
 if [ ! "$device_id" ]; then
     read -p "Device ID: " device_id
+fi
+
+if [ ! "$repetition" ]; then
+    repetition=1
 fi
 
 # {{{ press_button()
@@ -17,10 +22,11 @@ press_button() {
     device_id=${device_id//:/}
     device_id=${device_id^^}
 
-    curl -X POST -H """Authorization: $token""" \
-        -H "Content-Type: application/json" -d '{"command": "press"}' \
-        https://api.switch-bot.com/v1.0/devices/$device_id/commands \
-        > /dev/null 2>&1
+    for i in $(seq 1 $repetition); do
+        curl -X POST -H """Authorization: $token""" \
+            -H "Content-Type: application/json" -d '{"command": "press"}' \
+            https://api.switch-bot.com/v1.0/devices/$device_id/commands
+    done
 
     retval=$?
 }

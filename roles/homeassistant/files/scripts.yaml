@@ -9,17 +9,6 @@ restart_zulu:
       entity_id: switch.enteance_zulu_power
   mode: single
   icon: mdi:power-plug
-toggle_x2_living_room_humidifier:
-  alias: Toogle x2 Living Room Humidifier
-  sequence:
-  - service: switch.toggle
-    data: {}
-    entity_id: switch.living_room_humidifier
-  - service: switch.toggle
-    data: {}
-    entity_id: switch.living_room_humidifier
-  mode: single
-  icon: mdi:air-humidifier
 toggle_all_floor_heatings:
   alias: Toogle All Floor Heatings
   sequence:
