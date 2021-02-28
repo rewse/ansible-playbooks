@@ -72,7 +72,7 @@ views:
             icon: mdi:laptop
             secondary_info: last-changed
       - type: entity
-        entity: sensor.dns_amazon_com
+        entity: sensor.dns_hass_rewse_jp
         icon: 'mdi:dns'
       - type: vertical-stack
         cards:
