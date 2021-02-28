@@ -58,6 +58,8 @@ cards:
             name: TV Light
           - entity: light.living_room_entrance_light
             name: Entrance Light
+          - entity: switch.living_room_footlight
+            name: Footlight
       - type: thermostat
         entity: climate.nature_remo_living_room_ac
       - type: entities
