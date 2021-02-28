@@ -1,6 +1,6 @@
 - platform: dnsip
-  name: DNS amazon.com
-  hostname: amazon.com
+  name: DNS hass.rewse.jp
+  hostname: hass.rewse.jp
   resolver: 192.168.0.1
 - platform: mqtt
   name: Living Room Temperature
