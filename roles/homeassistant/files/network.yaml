@@ -110,6 +110,7 @@ views:
           - entity: automation.alarm_dns_is_down
             icon: 'mdi:dns'
             name: DNS
+            secondary_info: last-triggered
           - entity: automation.alarm_network_devices_are_offline
             icon: 'mdi:switch'
             name: Network Devices
