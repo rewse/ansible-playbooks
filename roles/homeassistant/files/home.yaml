@@ -41,7 +41,9 @@ cards:
         title: Living Room Lights
         entities:
           - entity: light.living_room_tv_light
+            name: TV Light
           - entity: light.living_room_entrance_light
+            name: Entrance Light
         state_color: false
       - type: horizontal-stack
         cards:
@@ -87,6 +89,7 @@ cards:
         title: Bedroom Lights
         entities:
           - entity: light.bedroom_light
+            name: Light
         state_color: false
         show_header_toggle: false
   - type: vertical-stack
@@ -128,8 +131,11 @@ cards:
         title: Bathroom Lights
         entities:
           - entity: light.bathroom_entrance_light
+            name: Entrance Light
           - entity: light.bathroom_left_light
+            name: Left Light
           - entity: light.bathroom_right_light
+            name: Right Light
         state_color: false
       - type: entity
         name: Bathroom Motion Sensor
