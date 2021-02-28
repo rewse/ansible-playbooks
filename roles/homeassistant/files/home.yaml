@@ -58,7 +58,8 @@ cards:
             name: TV Light
           - entity: light.living_room_entrance_light
             name: Entrance Light
-        state_color: false
+      - type: thermostat
+        entity: climate.nature_remo_living_room_ac
       - type: entities
         title: Living Room Motion Sensors
         entities:

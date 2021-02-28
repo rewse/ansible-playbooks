@@ -1,6 +1,6 @@
 #!/usr/bin/env bash
 
-set -euo pipefail
+set -eo pipefail
 trap 'exit 1' 1 2 3 15
 
 readonly token=[% remo_token %]
@@ -17,7 +17,32 @@ fi
 send_signal() {
     curl -X POST -H """Authorization: Bearer $token""" \
         https://api.nature.global/1/signals/$device_id/send
-        > /dev/null 2>&1
+
+    retval=$?
+}
+
+# }}}
+# {{{ send_ac
+
+send_ac() {
+    mode=$1
+    temp=$2
+    vol=$3
+
+    curl -X POST -H """Authorization: Bearer $token""" \
+        -d "operation_mode=$mode&temperature=$temp&air_volume=$vol" \
+        https://api.nature.global/1/appliances/$device_id/aircon_settings
+
+    retval=$?
+}
+
+# }}}
+# {{{ send_ac_off
+
+send_ac_off() {
+    curl -X POST -H """Authorization: Bearer $token""" \
+        -d "button=power-off" \
+        https://api.nature.global/1/appliances/$device_id/aircon_settings
 
     retval=$?
 }
@@ -27,8 +52,16 @@ send_signal() {
 
 if [ "$category" == "signal" ]; then
     send_signal
+elif [ "$category" == "ac-auto" ]; then
+    send_ac auto -1 auto
+elif [ "$category" == "ac-cool" ]; then
+    send_ac cool 26 auto
+elif [ "$category" == "ac-dry" ]; then
+    send_ac dry -1
+elif [ "$category" == "ac-off" ]; then
+    send_ac_off
 else
-    echo "<ERROR> $category is not supported. Only siganl is supported." >&2
+    echo "<ERROR> $category is not supported. Only siganl, ac-auto, ac-cool, ac-dry is supported." >&2
     exit 1
 fi
 
