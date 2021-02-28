@@ -141,6 +141,19 @@
     dest: /srv/homeassistant/zones.yaml
   tags: [homeassistant]
 
+- name: Create custom_components/nature_remo
+  file:
+    path: /srv/homeassistant/custom_components
+    state: directory
+  tags: [homeassistant]
+
+- name: Clone hass-nature-remo.git
+  git:
+    repo: https://github.com/yutoyazaki/hass-nature-remo.git
+    dest: /srv/homeassistant/custom_components/nature_remo
+    force: yes
+  tags: [homeassistant]
+
 - name: Modify configuration.yaml
   blockinfile:
     path: /srv/homeassistant/configuration.yaml
@@ -151,7 +164,7 @@
           include_domains:
             - media_player
           include_entities:
-            - script.toggle_x2_living_room_humidifier
+            - climate.nature_remo_living_room_ac
             - script.toggle_all_floor_heatings
             - sensor.living_room_humidity
             - sensor.living_room_temperature
@@ -173,6 +186,8 @@
         dashboards: !include dashboards.yaml
       mqtt:
         broker: localhost
+      nature_remo:
+        access_token: "{{ remo_token }}"
       recorder:
         purge_keep_days: 450
       speedtestdotnet:

@@ -11,3 +11,4 @@ latlng:
     name: "{{ vault_latlng.s.name }}"
     lat: "{{ vault_latlng.s.lat }}"
     lng: "{{ vault_latlng.s.lng }}"
+remo_token: "{{ vault_remo_token }}"
