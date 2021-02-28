@@ -181,6 +181,7 @@
             - switch.living_room_floor_heating
             - switch.living_room_footlight
             - switch.living_room_humidifier
+            - switch.living_room_ceiling_fan
             - switch.study_floor_heating
       lovelace:
         mode: yaml
