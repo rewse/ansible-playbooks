@@ -7,6 +7,4 @@
     - docker
     - homeassistant
     - mosquitto
-    - remo
-    - switchbot
     - switchbotmeter
