@@ -1,0 +1,75 @@
+#!/usr/bin/env bash
+
+trap 'my_exit 1' 1 2 3 15
+
+readonly email=[% cyberhome.email %]
+readonly password=[% cyberhome.password %]
+readonly tmpfile=$(mktemp --tmpdir enecoq2mqtt.XXXXXXXXXX)
+
+# {{{ my_exit()
+
+my_exit() {
+    rm -f $tmpfile
+    echo $1
+    exit $1
+}
+
+# }}}
+# {{{ send_enecoq()
+
+send_enecoq() {
+    csv=$(/usr/local/bin/enecoq $email $password)
+
+    retval=$?
+
+    if [ "$retval" -eq 0 ]; then
+        mosquitto_pub -r -t enecoq/fee/state \
+            -u pub_client -P [% mosquitto_password %] \
+            -h hass.rewse.jp -p 1883 \
+            -m online
+    else
+        mosquitto_pub -r -t enecoq/fee/state \
+            -u pub_client -P [% mosquitto_password %] \
+            -h hass.rewse.jp -p 1883 \
+            -m offline
+
+        my_exit $retval
+    fi
+
+    if [ "$(echo $csv | grep -v Insuff | grep -v None)" ]; then
+        datetime=$(date --iso-8601=seconds)
+        low=$(echo $csv | awk -F, '{print $1}')
+        mid=$(echo $csv | awk -F, '{print $2}')
+        high=$(echo $csv | awk -F, '{print $3}')
+        total=$(echo $low + $mid + $high | bc)
+
+        json=$(cat <<!
+{
+    "datetime": "$datetime",
+    "low": "$low",
+    "mid": "$mid",
+    "high": "$high",
+    "total": "$total"
+}
+!
+        )
+
+        mosquitto_pub -r -t enecoq/fee \
+            -u pub_client -P [% mosquitto_password %] \
+            -h hass.rewse.jp -p 1883 \
+            -m "$json"
+
+        retval=$?
+    else
+        retval=-1
+    fi
+}
+
+# }}}
+# {{{ Main
+
+send_enecoq
+
+my_exit $retval
+
+# }}}
