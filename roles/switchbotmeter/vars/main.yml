@@ -1,2 +1,3 @@
 ---
+mosquitto_password: "[% vault_mosquitto_password %]"
 switchbot_token: "[% vault_switchbot_token %]"

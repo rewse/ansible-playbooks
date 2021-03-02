@@ -5,3 +5,24 @@
       - mosquitto
       - mosquitto-clients
   tags: [mosquitto, package]
+
+- name: Create pwfile
+  file:
+    name: /etc/mosquitto/pwfile
+    state: touch
+  tags: [mosquitto]
+
+- name: Create pub_client user
+  command: mosquitto_passwd -b /etc/mosquitto/pwfile pub_client {{ mosquitto_password }}
+  tags: [mosquitto]
+
+- name: Create sub_client user
+  command: mosquitto_passwd -b /etc/mosquitto/pwfile sub_client {{ mosquitto_password }}
+  tags: [mosquitto]
+
+- name: Copy password.conf
+  copy:
+    src: password.conf
+    dest: /etc/mosquitto/conf.d
+  notify: Restart mosquitto
+  tags: [mosquitto]
