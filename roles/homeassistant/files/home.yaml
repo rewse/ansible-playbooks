@@ -162,6 +162,9 @@ cards:
           - entity: sensor.balcony_humidity
         hours_to_show: 48
         refresh_interval: 300
+      - type: weather-forecast
+        entity: weather.home
+        show_forecast: false
   - type: picture-entity
     name: Cat Cage
     entity: camera.guppy_cat_cage
