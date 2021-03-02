@@ -43,12 +43,14 @@
     insertafter: '^automation:'
     regexp: '^binary_sensor:'
     line: "binary_sensor: !include binary_sensors.yaml"
+  notify: Restart homeassistant container
   tags: [homeassistant]
 
 - name: Copy binary_sensors.yaml
   copy:
     src: binary_sensors.yaml
     dest: /srv/homeassistant
+  notify: Restart homeassistant container
   tags: [homeassistant]
 
 - name: Config input_number
@@ -57,12 +59,14 @@
     insertafter: '^binary_sesnsor:'
     regexp: '^input_number:'
     line: "input_number: !include input_numbers.yaml"
+  notify: Restart homeassistant container
   tags: [homeassistant]
 
 - name: Copy input_numbers.yaml
   copy:
     src: input_numbers.yaml
     dest: /srv/homeassistant
+  notify: Restart homeassistant container
   tags: [homeassistant]
 
 - name: Config media_player
@@ -71,12 +75,14 @@
     insertafter: '^input_number:'
     regexp: '^media_player:'
     line: "media_player: !include media_players.yaml"
+  notify: Restart homeassistant container
   tags: [homeassistant]
 
 - name: Copy media_players.yaml
   copy:
     src: media_players.yaml
     dest: /srv/homeassistant
+  notify: Restart homeassistant container
   tags: [homeassistant]
 
 - name: Config notify
@@ -85,18 +91,21 @@
     insertafter: '^media_player:'
     regexp: '^notify:'
     line: "notify: !include notify.yaml"
+  notify: Restart homeassistant container
   tags: [homeassistant]
 
 - name: Copy notify.yaml
   copy:
     src: notify.yaml
     dest: /srv/homeassistant
+  notify: Restart homeassistant container
   tags: [homeassistant]
 
 - name: Copy scripts.yaml
   copy:
     src: scripts.yaml
     dest: /srv/homeassistant
+  notify: Restart homeassistant container
   tags: [homeassistant]
 
 - name: Config sensor
@@ -105,12 +114,14 @@
     insertafter: '^scene:'
     regexp: '^sensor:'
     line: "sensor: !include sensors.yaml"
+  notify: Restart homeassistant container
   tags: [homeassistant]
 
 - name: Copy sensors.yaml
   copy:
     src: sensors.yaml
     dest: /srv/homeassistant
+  notify: Restart homeassistant container
   tags: [homeassistant]
 
 - name: Config switch
@@ -119,12 +130,14 @@
     insertafter: '^sensor:'
     regexp: '^switch:'
     line: "switch: !include switches.yaml"
+  notify: Restart homeassistant container
   tags: [homeassistant]
 
 - name: Copy switches.yaml
   copy:
     src: switches.yaml
     dest: /srv/homeassistant
+  notify: Restart homeassistant container
   tags: [homeassistant]
 
 - name: Config zone
@@ -133,12 +146,14 @@
     insertafter: '^sensor:'
     regexp: '^zone:'
     line: "zone: !include zones.yaml"
+  notify: Restart homeassistant container
   tags: [homeassistant]
 
 - name: Copy zones.yaml
   template:
     src: zones.yaml.j2
     dest: /srv/homeassistant/zones.yaml
+  notify: Restart homeassistant container
   tags: [homeassistant]
 
 - name: Create custom_components/nature_remo
@@ -152,6 +167,7 @@
     repo: https://github.com/yutoyazaki/hass-nature-remo.git
     dest: /srv/homeassistant/custom_components/nature_remo
     force: yes
+  notify: Restart homeassistant container
   tags: [homeassistant]
 
 - name: Modify configuration.yaml
@@ -198,6 +214,7 @@
         scan_interval:
           hours: 1
       tplink:
+  notify: Restart homeassistant container
   tags: [homeassistant]
 
 - name: Copy dashboards.yaml
