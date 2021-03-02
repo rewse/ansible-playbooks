@@ -4,6 +4,7 @@
   resolver: 192.168.0.1
 - platform: mqtt
   name: Living Room Temperature
+  unique_id: sensor.mqtt.living_room_temperature
   state_topic: switchbotmeter/F5DAB9477E91
   value_template: "{{ value_json.temperature }}"
   unit_of_measurement: °C
@@ -12,6 +13,7 @@
   device_class: temperature
 - platform: mqtt
   name: Living Room Humidity
+  unique_id: sensor.mqtt.living_room_humidity
   state_topic: switchbotmeter/F5DAB9477E91
   value_template: "{{ value_json.humidity }}"
   unit_of_measurement: "%"
@@ -20,6 +22,7 @@
   device_class: humidity
 - platform: mqtt
   name: Bedroom Temperature
+  unique_id: sensor.mqtt.bedroom_temperature
   state_topic: switchbotmeter/F980AECF8644
   value_template: "{{ value_json.temperature }}"
   unit_of_measurement: °C
@@ -28,6 +31,7 @@
   device_class: temperature
 - platform: mqtt
   name: Bedroom Humidity
+  unique_id: sensor.mqtt.bedroom_humidity
   state_topic: switchbotmeter/F980AECF8644
   value_template: "{{ value_json.humidity }}"
   unit_of_measurement: "%"
@@ -36,6 +40,7 @@
   device_class: humidity
 - platform: mqtt
   name: Storage Temperature
+  unique_id: sensor.mqtt.storage_temperature
   state_topic: switchbotmeter/FD13F5CA5563
   value_template: "{{ value_json.temperature }}"
   unit_of_measurement: °C
@@ -44,6 +49,7 @@
   device_class: temperature
 - platform: mqtt
   name: Storage Humidity
+  unique_id: sensor.mqtt.storage_humidity
   state_topic: switchbotmeter/FD13F5CA5563
   value_template: "{{ value_json.humidity }}"
   unit_of_measurement: "%"
@@ -52,6 +58,7 @@
   device_class: humidity
 - platform: mqtt
   name: Balcony Temperature
+  unique_id: sensor.mqtt.balcony_temperature
   state_topic: switchbotmeter/EDE4EAA09EA3
   value_template: "{{ value_json.temperature }}"
   unit_of_measurement: °C
@@ -60,6 +67,7 @@
   device_class: temperature
 - platform: mqtt
   name: Balcony Humidity
+  unique_id: sensor.mqtt.balcony_humidity
   state_topic: switchbotmeter/EDE4EAA09EA3
   value_template: "{{ value_json.humidity }}"
   unit_of_measurement: "%"
@@ -67,3 +75,29 @@
     - topic: switchbotmeter/EDE4EAA09EA3/status
   device_class: humidity
 - platform: season
+- platform: template
+  sensors:
+    living_room_wbgt:
+      friendly_name: Living Room WBGT
+      unique_id: sensor.template.living_room_wbgt
+      unit_of_measurement: °C
+      value_template: "{{ ((states('sensor.living_room_temperature') | float - 30.5) * 0.90739 + (states('sensor.living_room_humidity') | float - 60.0) * 0.14775 + (states('sensor.living_room_temperature') | float - 30.5) * (states('sensor.living_room_humidity') | float - 60.0) * 0.003655 + 27.77) | round(1) }}"
+      icon_template: mdi:thermometer-lines
+    bedroom_room_wbgt:
+      friendly_name: Bedroom WBGT
+      unique_id: sensor.template.bedroom_wbgt
+      unit_of_measurement: °C
+      value_template: "{{ ((states('sensor.bedroom_temperature') | float - 30.5) * 0.90739 + (states('sensor.bedroom_humidity') | float - 60.0) * 0.14775 + (states('sensor.bedroom_temperature') | float - 30.5) * (states('sensor.bedroom_humidity') | float - 60.0) * 0.003655 + 27.77) | round(1) }}"
+      icon_template: mdi:thermometer-lines
+    storage_room_wbgt:
+      friendly_name: Storage WBGT
+      unique_id: sensor.template.storage_wbgt
+      unit_of_measurement: °C
+      value_template: "{{ ((states('sensor.storage_temperature') | float - 30.5) * 0.90739 + (states('sensor.storage_humidity') | float - 60.0) * 0.14775 + (states('sensor.storage_temperature') | float - 30.5) * (states('sensor.storage_humidity') | float - 60.0) * 0.003655 + 27.77) | round(1) }}"
+      icon_template: mdi:thermometer-lines
+    balcony_room_wbgt:
+      friendly_name: Balcony WBGT
+      unique_id: sensor.template.balcony_wbgt
+      unit_of_measurement: °C
+      value_template: "{{ ((states('sensor.balcony_temperature') | float - 30.5) * 0.90739 + (states('sensor.balcony_humidity') | float - 60.0) * 0.14775 + (states('sensor.balcony_temperature') | float - 30.5) * (states('sensor.balcony_humidity') | float - 60.0) * 0.003655 + 27.77) | round(1) }}"
+      icon_template: mdi:thermometer-lines
