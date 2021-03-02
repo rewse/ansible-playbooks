@@ -41,15 +41,12 @@ cards:
           - entity: switch.living_room_ceiling_fan
             name: Ceiling Fan
             icon: 'mdi:fan'
-            secondary_info: last-changed
           - entity: switch.living_room_humidifier
             name: Humidifier
             icon: 'mdi:air-humidifier'
-            secondary_info: last-changed
-          - entity: script.toggle_all_floor_heatings
-            name: Floor Heating
+          - entity: group.floor_heatings
+            name: Floor Heatings
             icon: 'mdi:grid'
-            secondary_info: last-updated
         show_header_toggle: false
       - type: entities
         title: Living Room Lights
