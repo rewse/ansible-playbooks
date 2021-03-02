@@ -165,6 +165,11 @@ cards:
       - type: weather-forecast
         entity: weather.home
         show_forecast: false
+  - type: sensor
+    name: enecoQ Fee
+    entity: sensor.enecoq_fee_total
+    graph: line
+    hours_to_show: 48
   - type: picture-entity
     name: Cat Cage
     entity: camera.guppy_cat_cage
