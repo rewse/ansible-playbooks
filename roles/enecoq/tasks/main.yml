@@ -1,0 +1,37 @@
+---
+- name: Install additional packages
+  apt:
+    name:
+      - mosquitto-clients
+      - python3-bs4
+      - python3-selenium
+  tags: [enecoq, package]
+
+- name: Clone enecoq.git
+  git:
+    repo: https://github.com/rewse/enecoq.git
+    dest: /srv/git/enecoq
+  tags: [enecoq]
+
+- name: Copy enecoq
+  copy:
+    src: /srv/git/enecoq/enecoq
+    dest: /usr/local/bin/
+    mode: 0755
+    remote_src: yes
+  tags: [enecoq]
+
+- name: Copy enecoq2mqtt
+  template:
+    src: enecoq2mqtt.j2
+    dest: /usr/local/bin/enecoq2mqtt
+    mode: 0755
+    variable_start_string: "[%"
+    variable_end_string: "%]"
+  tags: [enecoq]
+
+- name: Copy enecoq2mqtt.cron
+  copy:
+    src: enecoq2mqtt.cron
+    dest: /etc/cron.d/enecoq2mqtt
+  tags: [enecoq]
