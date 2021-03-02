@@ -8,3 +8,9 @@
   systemd:
     name: apache2
     state: restarted
+
+- name: Restart homeassistant container
+  community.docker.docker_compose:
+    project_src: /etc
+    restarted: yes
+  tags: [homeassistant]
