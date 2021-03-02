@@ -134,9 +134,9 @@
   tags: [homeassistant]
 
 - name: Copy switches.yaml
-  copy:
-    src: switches.yaml
-    dest: /srv/homeassistant
+  template:
+    src: switches.yaml.j2
+    dest: /srv/homeassistant/switches.yaml
   notify: Restart homeassistant container
   tags: [homeassistant]
 
