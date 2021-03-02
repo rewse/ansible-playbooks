@@ -1,5 +1,0 @@
----
-huebridge:
-  ip: 192.168.0.150
-  userid: "[% vault_huebridge_userid %]"
-zabbix_server_name: zabbix.rewse.jp
