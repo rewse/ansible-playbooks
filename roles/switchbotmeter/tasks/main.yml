@@ -47,8 +47,8 @@
 
 - name: Copy switchbotmeter2mqtt
   template:
-    src: switchbotmeter2mqtt
-    dest: /usr/local/sbin
+    src: switchbotmeter2mqtt.j2
+    dest: /usr/local/sbin/switchbotmeter2mqtt
     mode: 0755
     variable_start_string: "[%"
     variable_end_string: "%]"
