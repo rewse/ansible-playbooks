@@ -44,14 +44,17 @@ sendto_mqtt() {
         message=$(echo $json | jq -r .message)
     fi
 
-    if [ "$message" != "success" ]; then
+    mosquitto_pub -r -t switchbotmeter/$upper_device_id \
+    -u pub_client -P [% mosquitto_password %] -m "$json"
+
+    if [ "$message" = "success" ]; then
         message=online
-    else
+    elif [ "$message" != "online" ]; then
         message=offline
     fi
 
-    mosquitto_pub -r -t switchbotmeter/$upper_device_id -m "$json"
-    mosquitto_pub -r -t switchbotmeter/$upper_device_id/status -m $message
+    mosquitto_pub -r -t switchbotmeter/$upper_device_id/status \
+    -u pub_client -P [% mosquitto_password %] -m $message
 }
 
 # }}}
