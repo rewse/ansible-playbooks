@@ -74,6 +74,42 @@
   availability:
     - topic: switchbotmeter/EDE4EAA09EA3/status
   device_class: humidity
+- platform: mqtt
+  name: enecoQ Fee Low
+  unique_id: sensor.mqtt.enecoq_fee_low
+  state_topic: enecoq/fee
+  value_template: "{{ value_json.low }}"
+  unit_of_measurement: JPY/h
+  availability:
+    - topic: enecoq/fee/state
+  icon: mdi:transmission-tower
+- platform: mqtt
+  name: enecoQ Fee Mid
+  unique_id: sensor.mqtt.enecoq_fee_mid
+  state_topic: enecoq/fee
+  value_template: "{{ value_json.mid }}"
+  unit_of_measurement: JPY/h
+  availability:
+    - topic: enecoq/fee/state
+  icon: mdi:transmission-tower
+- platform: mqtt
+  name: enecoQ Fee High
+  unique_id: sensor.mqtt.enecoq_fee_high
+  state_topic: enecoq/fee
+  value_template: "{{ value_json.high }}"
+  unit_of_measurement: JPY/h
+  availability:
+    - topic: enecoq/fee/state
+  icon: mdi:transmission-tower
+- platform: mqtt
+  name: enecoQ Fee Total
+  unique_id: sensor.mqtt.enecoq_fee_total
+  state_topic: enecoq/fee
+  value_template: "{{ value_json.total }}"
+  unit_of_measurement: JPY/h
+  availability:
+    - topic: enecoq/fee/state
+  icon: mdi:transmission-tower
 - platform: season
 - platform: template
   sensors:
