@@ -11,4 +11,5 @@ latlng:
     name: "{{ vault_latlng.s.name }}"
     lat: "{{ vault_latlng.s.lat }}"
     lng: "{{ vault_latlng.s.lng }}"
+mosquitto_password: "{{ vault_mosquitto_password }}"
 remo_token: "{{ vault_remo_token }}"

@@ -46,10 +46,12 @@
   tags: [switchbotmeter]
 
 - name: Copy switchbotmeter2mqtt
-  copy:
+  template:
     src: switchbotmeter2mqtt
     dest: /usr/local/sbin
     mode: 0755
+    variable_start_string: "[%"
+    variable_end_string: "%]"
   tags: [switchbotmeter]
 
 - name: Copy switchbotmeter2mqtt.cron

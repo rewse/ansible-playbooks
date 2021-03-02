@@ -188,6 +188,8 @@
         dashboards: !include dashboards.yaml
       mqtt:
         broker: localhost
+        username: sub_client
+        password: {{ mosquitto_password }}
       nature_remo:
         access_token: "{{ remo_token }}"
       recorder:
