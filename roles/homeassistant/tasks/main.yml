@@ -53,10 +53,26 @@
   notify: Restart homeassistant container
   tags: [homeassistant]
 
-- name: Config input_number
+- name: Config group
   lineinfile:
     path: /srv/homeassistant/configuration.yaml
     insertafter: '^binary_sesnsor:'
+    regexp: '^group:'
+    line: "group: !include groups.yaml"
+  notify: Restart homeassistant container
+  tags: [homeassistant]
+
+- name: Copy groups.yaml
+  copy:
+    src: groups.yaml
+    dest: /srv/homeassistant
+  notify: Restart homeassistant container
+  tags: [homeassistant]
+
+- name: Config input_number
+  lineinfile:
+    path: /srv/homeassistant/configuration.yaml
+    insertafter: '^group:'
     regexp: '^input_number:'
     line: "input_number: !include input_numbers.yaml"
   notify: Restart homeassistant container
