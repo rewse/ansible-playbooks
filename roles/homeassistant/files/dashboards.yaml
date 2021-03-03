@@ -1,7 +1,6 @@
-lovelace-network:
+lovelace-machines:
   mode: yaml
-  filename: ui/network.yaml
-  title: Network
+  filename: ui/machines.yaml
+  title: Machines
   icon: mdi:lan
   require_admin: true
-  
