@@ -69,10 +69,26 @@
   notify: Restart homeassistant container
   tags: [homeassistant]
 
-- name: Config input_number
+- name: Config input_datetime
   lineinfile:
     path: /srv/homeassistant/configuration.yaml
     insertafter: '^group:'
+    regexp: '^input_datetime'
+    line: "input_datetime: !include input_datetimes.yaml"
+  notify: Restart homeassistant container
+  tags: [homeassistant]
+
+- name: Copy input_datetimes.yaml
+  copy:
+    src: input_datetimes.yaml
+    dest: /srv/homeassistant
+  notify: Restart homeassistant container
+  tags: [homeassistant]
+
+- name: Config input_number
+  lineinfile:
+    path: /srv/homeassistant/configuration.yaml
+    insertafter: '^input_datetime:'
     regexp: '^input_number:'
     line: "input_number: !include input_numbers.yaml"
   notify: Restart homeassistant container
