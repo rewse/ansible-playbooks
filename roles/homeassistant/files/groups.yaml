@@ -1,4 +1,4 @@
-floor_heatings:
+living_area_floor_heatings:
   name: Floor Heatings
   entities:
     - switch.living_room_floor_heating
