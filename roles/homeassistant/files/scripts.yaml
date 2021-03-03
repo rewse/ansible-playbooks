@@ -3,9 +3,14 @@ restart_zulu:
   sequence:
     - service: switch.turn_off
       data: {}
-      entity_id: switch.enteance_zulu_power
+      entity_id: switch.entrance_zulu_power
+    - delay:
+        hours: 0
+        minutes: 0
+        seconds: 3
+        milliseconds: 0
     - service: switch.turn_on
       data: {}
-      entity_id: switch.enteance_zulu_power
+      entity_id: switch.entrance_zulu_power
   mode: single
-  icon: mdi:power-plug
+  icon: 'mdi:power-plug'
