@@ -19,7 +19,7 @@ sendto_mqtt() {
     lower_device_id=${upper_device_id:0:2}:${upper_device_id:2:2}:${upper_device_id:4:2}:${upper_device_id:6:2}:${upper_device_id:8:2}:${upper_device_id:10:2}
     lower_device_id=${lower_device_id,,}
 
-    rset=$(switchbotmeter-ble $lower_device_id Humiture | grep Meter)
+    rset=$(switchbotmeter-ble $lower_device_id Humiture 2> /dev/null | grep Meter)
 
     retval=$?
 
