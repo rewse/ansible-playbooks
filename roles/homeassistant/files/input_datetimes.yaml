@@ -1,0 +1,16 @@
+bedroom_curtains_opened_time_weekday:
+  name: Bedroom Curtains Opened Time for Weekday
+  has_time: true
+  icon: mdi:window-shutter-open
+bedroom_curtains_opened_time:
+  name: Bedroom Curtains Opened Time
+  has_time: true
+  icon: mdi:window-shutter-alert
+living_room_turndown_time:
+  name: Living Room Turn down Time
+  has_time: true
+  icon: mdi:brightness-6
+living_room_turndown_more_time:
+  name: Living Room Turn down More Time
+  has_time: true
+  icon: mdi:brightness-4
