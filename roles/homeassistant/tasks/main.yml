@@ -273,15 +273,9 @@
     dest: /srv/homeassistant/ui
   tags: [homeassistant, homeassistant-ui]
 
-- name: Copy network.yaml
+- name: Copy machines.yaml
   copy:
-    src: network.yaml
-    dest: /srv/homeassistant/ui
-  tags: [homeassistant, homeassistant-ui]
-
-- name: Copy mediaplayer.yaml
-  copy:
-    src: mediaplayer.yaml
+    src: machines.yaml
     dest: /srv/homeassistant/ui
   tags: [homeassistant, homeassistant-ui]
 
