@@ -1,0 +1,6 @@
+---
+- hosts: raspberrypi
+  become: yes
+  remote_user: ubuntu
+  roles:
+    - zabbix/agent/raspberrypi

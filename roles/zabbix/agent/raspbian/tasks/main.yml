@@ -1,7 +1,0 @@
----
-- name: Copy raspbian.conf
-  copy:
-    src: raspbian.conf
-    dest: /etc/zabbix/zabbix_agentd.d
-  notify: Restart zabbix-agent
-  tags: [zabbix-agent-raspbian]
