@@ -1,4 +1,13 @@
 ---
+- name: Set listen port
+  lineinfile:
+    dest: /etc/zabbix/zabbix_agentd.conf
+    insertafter: "^# ListenPort="
+    regexp: "^ListenPort="
+    line: "ListenPort={{ zabbix_agent_port }}"
+  notify: Restart zabbix-agent
+  tags: [zabbix-agent-raspberrypi]
+
 - name: Copy raspberrypi.conf
   copy:
     src: raspberrypi.conf
