@@ -1,6 +1,0 @@
----
-- hosts: raspbian
-  become: yes
-  remote_user: ubuntu
-  roles:
-    - zabbix/agent/raspbian
