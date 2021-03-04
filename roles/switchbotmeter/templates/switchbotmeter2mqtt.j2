@@ -45,7 +45,8 @@ sendto_mqtt() {
     fi
 
     mosquitto_pub -r -t switchbotmeter/$upper_device_id \
-    -u pub_client -P [% mosquitto_password %] -m "$json"
+        -u pub_client -P [% mosquitto_password %] -h hass.rewse.jp \
+        -m "$json"
 
     if [ "$message" = "success" ]; then
         message=online
@@ -54,7 +55,8 @@ sendto_mqtt() {
     fi
 
     mosquitto_pub -r -t switchbotmeter/$upper_device_id/status \
-    -u pub_client -P [% mosquitto_password %] -m $message
+        -u pub_client -P [% mosquitto_password %] -h hass.rewse.jp \
+        -m $message
 }
 
 # }}}
