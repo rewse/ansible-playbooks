@@ -1,0 +1,2 @@
+---
+xray_password: "{{ vault_xray_password }}"
