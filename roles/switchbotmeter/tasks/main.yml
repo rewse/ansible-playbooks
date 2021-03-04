@@ -4,6 +4,7 @@
     name:
       - bluez
       - jq
+      - libbluetooth-dev
       - libboost-python-dev
       - libboost-thread-dev
       - libglib2.0-dev
