@@ -288,7 +288,7 @@
   copy:
     src: index.html
     dest: /srv/www/html
-  tags: [homeassistant]
+  tags: [homeassistant, homeassistant-apache]
 
 - name: Enable proxy
   community.general.apache2_module:
@@ -298,17 +298,17 @@
     - proxy_http
     - proxy_wstunnel
   notify: Restart apache
-  tags: [apache]
+  tags: [homeassistant, homeassistant-apache]
 
 - name: Copy hass.rewse.jp.conf
   copy:
     src: hass.rewse.jp.conf
     dest: /etc/apache2/sites-available
   notify: Reload apache
-  tags: [homeassistant]
+  tags: [homeassistant, homeassistant-apache]
 
 - name: Enable hass.rewse.jp
   command: a2ensite hass.rewse.jp
   notify: Reload apache
-  tags: [apache]
+  tags: [homeassistant, homeassistant-apache]
   
