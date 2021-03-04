@@ -1,0 +1,19 @@
+---
+- name: Copy netplan/99-config.yaml
+  template:
+    src: 99-config.yaml.j2
+    dest: /etc/netplan/99-config.yaml
+  tags: [raspberrypi]
+
+- name: Apply netplan
+  command: netplan apply
+  tags: [raspberrypi]
+
+- name: Change SSH port
+  lineinfile:
+    dest: /etc/ssh/sshd_config
+    insertafter: "^#Port "
+    regexp: "^Port "
+    line: Port {{ sshd_port }}
+  notify: Restart sshd
+  tags: [raspberrypi]
