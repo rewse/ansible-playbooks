@@ -44,7 +44,7 @@ cards:
           - entity: switch.living_room_humidifier
             name: Humidifier
             icon: 'mdi:air-humidifier'
-          - entity: group.livng_area_floor_heatings
+          - entity: group.living_area_floor_heatings
             name: Floor Heatings
             icon: 'mdi:grid'
         show_header_toggle: false
