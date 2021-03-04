@@ -3,8 +3,4 @@
   become: yes
   remote_user: ubuntu
   roles:
-    - apache
-    - docker
-    # - homeassistant
-    - mosquitto
-    # - switchbotmeter
+    - switchbotmeter
