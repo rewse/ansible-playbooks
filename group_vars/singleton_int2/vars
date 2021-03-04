@@ -1,3 +1,4 @@
 ---
 local_ip: 192.168.0.140
 sshd_port: 55022
+zabbix_agent_port: 55050
