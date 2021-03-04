@@ -6,18 +6,14 @@
       - mosquitto-clients
   tags: [mosquitto, package]
 
-- name: Create pwfile
-  file:
-    name: /etc/mosquitto/pwfile
-    state: touch
+- name: Copy pwfile
+  template:
+    src: pwfile.j2
+    dest: /etc/mosquitto/pwfile
   tags: [mosquitto]
 
-- name: Create pub_client user
-  command: mosquitto_passwd -b /etc/mosquitto/pwfile pub_client {{ mosquitto_password }}
-  tags: [mosquitto]
-
-- name: Create sub_client user
-  command: mosquitto_passwd -b /etc/mosquitto/pwfile sub_client {{ mosquitto_password }}
+- name: Convert pwfile
+  command: mosquitto_passwd -U pwfile
   tags: [mosquitto]
 
 - name: Copy password.conf
