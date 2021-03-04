@@ -1,0 +1,10 @@
+---
+- hosts: singleton_int2
+  become: yes
+  remote_user: ubuntu
+  roles:
+    - apache
+    - docker
+    # - homeassistant
+    - mosquitto
+    # - switchbotmeter
