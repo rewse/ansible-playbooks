@@ -10,10 +10,8 @@
   tags: [raspberrypi]
 
 - name: Change SSH port
-  lineinfile:
-    dest: /etc/ssh/sshd_config
-    insertafter: "^#Port "
-    regexp: "^Port "
-    line: Port {{ sshd_port }}
+  template:
+    src: port.conf.j2
+    dest: /etc/ssh/sshd_config.d/port.conf
   notify: Restart sshd
   tags: [raspberrypi]
