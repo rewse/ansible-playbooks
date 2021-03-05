@@ -20,36 +20,32 @@
     deb: https://cdn.mysql.com//Downloads/Connector-J/mysql-connector-java_{{ mysql_connector_version }}_all.deb
   tags: [database-client, package, mysql]
 
-- name: Copy oracle-instantclient
-  copy:
-    src: oracle-instantclient{{ oracle_instantclient_version }}-{{ item }}-{{ oracle_instantclient_version }}.0.0.0-1.x86_64.rpm
-    dest: /usr/local/src
+- name: Copy instantclient
+  unarchive:
+    src: https://download.oracle.com/otn_software/linux/instantclient/{{ oracle_instantclient_major_version }}{{ oracle_instantclient_minor_version }}000/instantclient-{{ item }}-linux.x64-{{ oracle_instantclient_major_version }}.{{ oracle_instantclient_minor_version }}.0.0.0.zip
+    dest: /srv
+    remote_src: yes
   with_items:
     - basic
     - sqlplus
     - tools
   tags: [database-client, oracle]
 
-- name: Convert oracle-instantclient
-  command: alien /usr/local/src/oracle-instantclient{{ oracle_instantclient_version }}-{{ item }}-{{ oracle_instantclient_version }}.0.0.0-1.x86_64.rpm
-  with_items:
-    - basic
-    - sqlplus
-    - tools
+- name: Add /srv/instantclient to PATH
+  template:
+    src: oracle-instantclient.sh.j2
+    dest: /etc/profile.d/oracle-instantclient.sh
   tags: [database-client, oracle]
 
-- name: Install oracle-instantclient
-  apt:
-    deb: /usr/local/src/oracle-instantclient{{ oracle_instantclient_version }}-{{ item }}_{{ oracle_instantclient_version }}.0.0.0-2_amd64.deb
-  with_items:
-    - basic
-    - sqlplus
-    - tools
+- name: Add /srv/instantclient to ld.so
+  template:
+    src: oracle-instantclient.conf.j2
+    dest: /etc/ld.so.conf.d/oracle-instantclient.conf
   tags: [database-client, oracle]
 
 - name: Create symlink for ojdbc.jar
   file:
-    src: /usr/lib/oracle/{{ oracle_instantclient_version }}/client64/lib/ojdbc8.jar
+    src: /srv/instantclient_{{ oracle_instantclient_major_version }}_{{ oracle_instantclient_minor_version }}/ojdbc8.jar
     dest: /usr/share/java/ojdbc8.jar
     state: link
   tags: [database-client, oracle]
