@@ -4,5 +4,5 @@
 - import_playbook: raspberrypi.yml
 - import_playbook: singleton_ext.yml
 - import_playbook: singleton_int1.yml
-# - import_playbook: singleton_int2.yml
+- import_playbook: singleton_int2.yml
 - import_playbook: servers.yml

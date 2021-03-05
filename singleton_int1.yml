@@ -3,6 +3,7 @@
   become: yes
   remote_user: ubuntu
   roles:
+    - dhcpd
     - apache
     - docker
     - homeassistant
