@@ -22,15 +22,15 @@ max-lease-time 3600;
 subnet 192.168.0.0 netmask 255.255.255.0 {
     pool {
         failover peer "fox-hotel";
-        range 192.168.0.33 192.168.0.96;
+        range 192.168.0.150 192.168.0.254;
 
         option routers 192.168.0.1;
         option subnet-mask 255.255.255.0;
         option broadcast-address 192.168.0.255;
-        option domain-name-servers 192.168.0.1, 8.8.8.8;
+        option domain-name-servers 192.168.0.30, 192.168.0.40, 1.1.1.1, 8.8.8.8;
         option ntp-servers ntp.nict.jp, ntp.jst.mfeed.ad.jp;
         option domain-name "rewse.jp";
-    }
 
-    include "/etc/dhcp/fixed-addresses.conf";
+        include "/etc/dhcp/fixed-addresses.conf";
+    }
 }

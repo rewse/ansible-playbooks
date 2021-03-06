@@ -1,6 +1,6 @@
 ---
 ifttt_key: "{{ vault_ifttt_key }}"
-nfs_server: 192.168.0.100
+nfs_server: guppy.rewse.jp
 latlng:
   home:
     lat: "{{ vault_latlng.home.lat }}"
