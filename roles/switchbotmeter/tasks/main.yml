@@ -60,3 +60,30 @@
     src: switchbotmeter2mqtt.cron
     dest: /etc/cron.d/switchbotmeter2mqtt
   tags: [switchbotmeter]
+
+- name: Create a link /etc/firmware
+  file:
+    src: /lib/firmware
+    dest: /etc/firmware
+    state: link
+  tags: [switchbotmeter]
+
+- name: Copy fix-hciattach
+  copy:
+    src: fix-hciattach
+    dest: /usr/local/lib
+    mode: 0755
+  tags: [switchbotmeter]
+
+- name: Copy fix-hciattach.service
+  copy:
+    src: fix-hciattach.service
+    dest: /etc/systemd/system
+  tags: [switchbotmeter]
+
+# - name: Start fix-hciattach.service
+#   systemd:
+#     name: fix-hciattach
+#     state: started
+#     daemon_reload: yes
+#     enabled: yes
