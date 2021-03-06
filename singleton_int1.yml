@@ -4,6 +4,7 @@
   remote_user: ubuntu
   roles:
     - dhcpd
+    - resolved
     - apache
     - docker
     - homeassistant
