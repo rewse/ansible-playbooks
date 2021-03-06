@@ -21,6 +21,14 @@
     - topic: switchbotmeter/F5DAB9477E91/status
   device_class: humidity
 - platform: mqtt
+  name: Living Room Humiture Method
+  unique_id: sensor.mqtt.living_room_humiture_method
+  state_topic: switchbotmeter/F5DAB9477E91
+  value_template: "{{ value_json.method }}"
+  availability:
+    - topic: switchbotmeter/F5DAB9477E91/status
+  icon: mdi:routes
+- platform: mqtt
   name: Bedroom Temperature
   unique_id: sensor.mqtt.bedroom_temperature
   state_topic: switchbotmeter/F980AECF8644
@@ -38,6 +46,14 @@
   availability:
     - topic: switchbotmeter/F980AECF8644/status
   device_class: humidity
+- platform: mqtt
+  name: Bedroom Humiture Method
+  unique_id: sensor.mqtt.bedroom_humiture_method
+  state_topic: switchbotmeter/F980AECF8644
+  value_template: "{{ value_json.method }}"
+  availability:
+    - topic: switchbotmeter/F980AECF8644/status
+  icon: mdi:routes
 - platform: mqtt
   name: Storage Temperature
   unique_id: sensor.mqtt.storage_temperature
@@ -57,6 +73,14 @@
     - topic: switchbotmeter/FD13F5CA5563/status
   device_class: humidity
 - platform: mqtt
+  name: Storage Humiture Method
+  unique_id: sensor.mqtt.storage_humiture_method
+  state_topic: switchbotmeter/FD13F5CA5563
+  value_template: "{{ value_json.method }}"
+  availability:
+    - topic: switchbotmeter/FD13F5CA5563/status
+  icon: mdi:routes
+- platform: mqtt
   name: Balcony Temperature
   unique_id: sensor.mqtt.balcony_temperature
   state_topic: switchbotmeter/EDE4EAA09EA3
@@ -74,6 +98,14 @@
   availability:
     - topic: switchbotmeter/EDE4EAA09EA3/status
   device_class: humidity
+- platform: mqtt
+  name: Balcony Humiture Method
+  unique_id: sensor.mqtt.balcony_humiture_method
+  state_topic: switchbotmeter/EDE4EAA09EA3
+  value_template: "{{ value_json.method }}"
+  availability:
+    - topic: switchbotmeter/EDE4EAA09EA3/status
+  icon: mdi:routes
 - platform: mqtt
   name: enecoQ Fee Low
   unique_id: sensor.mqtt.enecoq_fee_low
