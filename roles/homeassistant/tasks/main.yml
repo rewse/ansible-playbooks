@@ -37,6 +37,19 @@
           network_mode: host
   tags: [homeassistant]
 
+- name: Create certs dir
+  file:
+    path: /srv/homeassistant/certs
+    state: directory
+  tags: [homeassistant]
+
+- name: Copy DST_Root_CA_X3.pem
+  copy:
+    src: /etc/ssl/certs/DST_Root_CA_X3.pem
+    dest: /srv/homeassistant/certs
+    remote_src: yes
+  tags: [homeassistant]
+
 - name: Config binary_sensor
   lineinfile:
     path: /srv/homeassistant/configuration.yaml
@@ -235,9 +248,11 @@
         mode: yaml
         dashboards: !include dashboards.yaml
       mqtt:
-        broker: localhost
+        broker: hass.rewse.jp
+        port: 8883
         username: sub_client
         password: {{ mosquitto_password }}
+        certificate: /config/certs/DST_Root_CA_X3.pem
       nature_remo:
         access_token: "{{ remo_token }}"
       recorder:

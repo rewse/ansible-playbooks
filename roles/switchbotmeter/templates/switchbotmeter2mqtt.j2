@@ -45,7 +45,9 @@ sendto_mqtt() {
     fi
 
     mosquitto_pub -r -t switchbotmeter/$upper_device_id \
-        -u pub_client -P [% mosquitto_password %] -h hass.rewse.jp \
+        -u pub_client -P [% mosquitto_password %] \
+        -h hass.rewse.jp -p 8883 \
+        --cafile /etc/ssl/certs/DST_Root_CA_X3.pem \
         -m "$json"
 
     if [ "$message" = "success" ]; then
@@ -55,7 +57,9 @@ sendto_mqtt() {
     fi
 
     mosquitto_pub -r -t switchbotmeter/$upper_device_id/status \
-        -u pub_client -P [% mosquitto_password %] -h hass.rewse.jp \
+        -u pub_client -P [% mosquitto_password %] \
+        -h hass.rewse.jp -p 8883 \
+        --cafile /etc/ssl/certs/DST_Root_CA_X3.pem \
         -m $message
 }
 
