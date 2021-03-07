@@ -37,19 +37,6 @@
           network_mode: host
   tags: [homeassistant]
 
-- name: Create certs dir
-  file:
-    path: /srv/homeassistant/certs
-    state: directory
-  tags: [homeassistant]
-
-- name: Copy DST_Root_CA_X3.pem
-  copy:
-    src: /etc/ssl/certs/DST_Root_CA_X3.pem
-    dest: /srv/homeassistant/certs
-    remote_src: yes
-  tags: [homeassistant]
-
 - name: Config binary_sensor
   lineinfile:
     path: /srv/homeassistant/configuration.yaml
@@ -199,6 +186,19 @@
     src: zones.yaml.j2
     dest: /srv/homeassistant/zones.yaml
   notify: Restart homeassistant container
+  tags: [homeassistant]
+
+- name: Create certs dir
+  file:
+    path: /srv/homeassistant/certs
+    state: directory
+  tags: [homeassistant]
+
+- name: Copy DST_Root_CA_X3.pem
+  copy:
+    src: /etc/ssl/certs/DST_Root_CA_X3.pem
+    dest: /srv/homeassistant/certs
+    remote_src: yes
   tags: [homeassistant]
 
 - name: Create custom_components/nature_remo
