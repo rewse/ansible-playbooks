@@ -5,6 +5,7 @@
   roles:
     - dhcpd
     - resolved
+    - syslogd
     - apache
     - docker
     - homeassistant

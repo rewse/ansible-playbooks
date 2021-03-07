@@ -1,0 +1,14 @@
+---
+- name: Copy 10-remote.conf
+  copy:
+    src: 10-remote.conf
+    dest: /etc/rsyslog.d
+  notify: Restart rsyslog
+  tags: [syslogd]
+
+- name: Copy remote for logrotate
+  copy:
+    src: remote
+    dest: /etc/logrotate.d
+  notify: Restart logrotate
+  tags: [syslogd]
