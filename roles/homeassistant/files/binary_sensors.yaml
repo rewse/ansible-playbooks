@@ -14,9 +14,6 @@
   host: guppy.rewse.jp
   name: guppy
 - platform: ping
-  host: fox.rewse.jp
-  name: fox
-- platform: ping
   host: hotel.rewse.jp
   name: hotel
 - platform: ping
