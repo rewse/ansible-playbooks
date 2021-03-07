@@ -13,7 +13,7 @@
   tags: [mosquitto]
 
 - name: Convert pwfile
-  command: mosquitto_passwd -U pwfile
+  command: mosquitto_passwd -U /etc/mosquitto/pwfile
   tags: [mosquitto]
 
 - name: Copy password.conf
