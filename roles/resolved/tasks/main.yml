@@ -13,6 +13,15 @@
   notify: Restart unbound
   tags: [resolved]
 
+- name: Add num-threads
+  lineinfile:
+    path: /etc/unbound/unbound.conf.d/unbound.conf
+    insertafter: '.*# num-threads: 1'
+    regexp: '.*num-threads: '
+    line: "    num-threads: 4"
+  notify: Restart unbound
+  tags: [resolved]
+
 - name: Add interface
   lineinfile:
     path: /etc/unbound/unbound.conf.d/unbound.conf
@@ -68,7 +77,7 @@
   lineinfile:
     path: /etc/systemd/resolved.conf
     insertafter: '#DNSStubListener=yes'
-    regexp: 'DNSStubListener=no'
+    regexp: '^DNSStubListener='
     line: 'DNSStubListener=no'
   notify: Restart systemd-resolved
   tags: [resolved]
