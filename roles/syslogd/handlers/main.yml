@@ -1,0 +1,10 @@
+---
+- name: Restart logrotate
+  systemd:
+    name: logrotate
+    state: restarted
+
+- name: Restart rsyslog
+  systemd:
+    name: rsyslog
+    state: restarted
