@@ -22,3 +22,10 @@
     dest: /etc/mosquitto/conf.d
   notify: Restart mosquitto
   tags: [mosquitto]
+
+- name: Copy ssl.conf
+  copy:
+    src: ssl.conf
+    dest: /etc/mosquitto/conf.d
+  notify: Restart mosquitto
+  tags: [mosquitto]

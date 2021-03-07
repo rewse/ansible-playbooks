@@ -25,12 +25,14 @@ send_enecoq() {
     if [ "$retval" -eq 0 ]; then
         mosquitto_pub -r -t enecoq/fee/state \
             -u pub_client -P [% mosquitto_password %] \
-            -h hass.rewse.jp -p 1883 \
+            -h hass.rewse.jp -p 8883 \
+            --cafile /etc/ssl/certs/DST_Root_CA_X3.pem \
             -m online
     else
         mosquitto_pub -r -t enecoq/fee/state \
             -u pub_client -P [% mosquitto_password %] \
-            -h hass.rewse.jp -p 1883 \
+            -h hass.rewse.jp -p 8883 \
+            --cafile /etc/ssl/certs/DST_Root_CA_X3.pem \
             -m offline
 
         my_exit $retval
@@ -56,7 +58,8 @@ send_enecoq() {
 
         mosquitto_pub -r -t enecoq/fee \
             -u pub_client -P [% mosquitto_password %] \
-            -h hass.rewse.jp -p 1883 \
+            -h hass.rewse.jp -p 8883 \
+            --cafile /etc/ssl/certs/DST_Root_CA_X3.pem \
             -m "$json"
 
         retval=$?
