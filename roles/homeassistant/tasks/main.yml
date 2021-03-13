@@ -248,6 +248,16 @@
   blockinfile:
     path: /srv/homeassistant/configuration.yaml
     block: |
+      homeassistant:
+        name: Home
+        latitude: {{ latlng.home.lat }}
+        longitude: {{ latlng.home.lat }}
+        elevation: 40
+        unit_system: metric
+        temperature_unit: C
+        time_zone: Asia/Tokyo
+        external_url: https://hass.rewse.jp/
+        internal_url: https://hass.rewse.jp/
       fastdotcom:
       homekit:
         filter:
