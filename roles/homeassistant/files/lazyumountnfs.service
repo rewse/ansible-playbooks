@@ -1,0 +1,11 @@
+[Unit]
+Description=Unmount all NFS lazily
+Documentation=https://qiita.com/ch7821/items/345ea842ca73c9063ed3
+Before=shutdown.target
+After=docker.service
+
+[Service]
+ExecStart=/usr/bin/umount -lat nfs
+
+[Install]
+WantedBy=shutdown.target
