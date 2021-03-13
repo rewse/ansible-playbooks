@@ -49,3 +49,5 @@
 - platform: ping
   host: aventage.rewse.jp
   name: aventage
+- platform: workday
+  country: JP
