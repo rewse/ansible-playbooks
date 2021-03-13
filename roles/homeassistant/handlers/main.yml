@@ -14,8 +14,9 @@
     name: autofs
     state: restarted
 
-- name: Restart homeassistant container
-  community.docker.docker_compose:
-    project_src: /etc
-    restarted: yes
-  tags: [homeassistant]
+- name: Restart homeassistant
+  uri:
+    url: https://hass.rewse.jp/api/services/homeassistant/restart
+    method: POST
+    headers:
+      Authorization: Bearer {{ homeassistant_token }}
