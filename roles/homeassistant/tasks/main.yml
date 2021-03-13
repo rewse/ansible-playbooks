@@ -6,28 +6,28 @@
       - nfs-common
       - autofs
       - python3-certbot-apache
-  tags: [homeassistant, nfs, package]
+  tags: [homeassistant, homeassistant-nfs, package]
 
 - name: Copy nfs.autofs
   copy:
     src: nfs.autofs
     dest: /etc/auto.master.d
   notify: Restart autofs
-  tags: [homeassistant, nfs]
+  tags: [homeassistant, homeassistant-nfs]
 
 - name: Copy auto.nfs
   template:
     src: auto.nfs.j2
     dest: /etc/auto.master.d/auto.nfs
   notify: Restart autofs
-  tags: [homeassistant, nfs]
+  tags: [homeassistant, homeassistant-nfs]
 
 - name: Copy autofs.service
   copy:
     src: /usr/lib/systemd/system/autofs.service
     dest: /etc/systemd/system
     remote_src: yes
-  tags: [homeassistant, nfs]
+  tags: [homeassistant, homeassistant-nfs]
 
 - name: Modify autofs.service
   lineinfile:
@@ -35,13 +35,13 @@
     insertbefore: '^After='
     regexp: '^Before='
     line: "Before=docker.service"
-  tags: [homeassistant, nfs]
+  tags: [homeassistant, homeassistant-nfs]
 
 - name: Copy lazyumountnfs.service
   copy:
     src: lazyumountnfs.service
     dest: /etc/systemd/system
-  tags: [homeassistant, nfs]
+  tags: [homeassistant, homeassistant-nfs]
 
 - name: Enable lazyumountnfs.service
   systemd:
@@ -49,7 +49,7 @@
     state: stopped
     daemon_reload: yes
     enabled: yes
-  tags: [homeassistant, nfs]
+  tags: [homeassistant, homeassistant-nfs]
 
 - name: Add to docker-compose.yml
   blockinfile:
