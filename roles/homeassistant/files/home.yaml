@@ -162,11 +162,15 @@ cards:
       - type: weather-forecast
         entity: weather.home
         show_forecast: false
-  - type: sensor
+  - type: gauge
     name: enecoQ Fee
     entity: sensor.enecoq_fee_total
-    graph: line
-    hours_to_show: 48
+    max: 70
+    severity:
+      green: 0
+      yellow: 9.8
+      red: 41.77
+    icon: mdi:transmission-tower
   - type: picture-entity
     name: Cat Cage
     entity: camera.guppy_cat_cage
