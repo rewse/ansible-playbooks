@@ -4,23 +4,52 @@
     name:
       - certbot
       - nfs-common
+      - autofs
       - python3-certbot-apache
-  tags: [homeassistant]
+  tags: [homeassistant, nfs, package]
 
-- name: Create a mount point
-  file:
-    path: /srv/homeassistant
-    state: directory
-  tags: [homeassistant]
+- name: Copy nfs.autofs
+  copy:
+    src: nfs.autofs
+    dest: /etc/auto.master.d
+  notify: Restart autofs
+  tags: [homeassistant, nfs]
 
-- name: Config mount point
-  ansible.posix.mount:
-    src: "{{ nfs_server }}:/volume1/homeassistant"
-    path: /srv/homeassistant
-    opts: nfsvers=3,soft
-    state: mounted
-    fstype: nfs
-  tags: [homeassistant]
+- name: Copy auto.nfs
+  template:
+    src: auto.nfs.j2
+    dest: /etc/auto.master.d/auto.nfs
+  notify: Restart autofs
+  tags: [homeassistant, nfs]
+
+- name: Copy autofs.service
+  copy:
+    src: /usr/lib/systemd/system/autofs.service
+    dest: /etc/systemd/system
+    remote_src: yes
+  tags: [homeassistant, nfs]
+
+- name: Modify autofs.service
+  lineinfile:
+    path: /etc/systemd/system/autofs.service
+    insertbefore: '^After='
+    regexp: '^Before='
+    line: "Before=docker.service"
+  tags: [homeassistant, nfs]
+
+- name: Copy lazyumountnfs.service
+  copy:
+    src: lazyumountnfs.service
+    dest: /etc/systemd/system
+  tags: [homeassistant, nfs]
+
+- name: Enable lazyumountnfs.service
+  systemd:
+    name: lazyumountnfs
+    state: stopped
+    daemon_reload: yes
+    enabled: yes
+  tags: [homeassistant, nfs]
 
 - name: Add to docker-compose.yml
   blockinfile:
@@ -299,9 +328,9 @@
     project_src: /etc
   tags: [homeassistant]
 
-- name: Copy index.html
+- name: Copy index.php
   copy:
-    src: index.html
+    src: index.php
     dest: /srv/www/html
   tags: [homeassistant, homeassistant-apache]
 
