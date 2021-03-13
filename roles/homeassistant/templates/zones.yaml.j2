@@ -1,15 +1,15 @@
 - name: Home
-  latitude: {{ latlng.home.lat }}
-  longitude: {{ latlng.home.lng }}
+  latitude: !secret latlng_home_lat
+  longitude: !secret latlng_home_lng
   radius: 250
   icon: mdi:home
 - name: Office
-  latitude: {{ latlng.office.lat }}
-  longitude: {{ latlng.office.lng }}
+  latitude: !secret latlng_office_lat
+  longitude: !secret latlng_office_lng
   radius: 100
   icon: mdi:office-building
-- name: {{ latlng.s.name }}
-  latitude: {{ latlng.s.lat }}
-  longitude: {{ latlng.s.lng }}
+- name: !secret latlng_s_name
+  latitude: !secret latlng_s_lat
+  longitude: !secret latlng_s_lng
   radius: 100
   icon: mdi:leaf
