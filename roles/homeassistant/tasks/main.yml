@@ -66,6 +66,13 @@
           network_mode: host
   tags: [homeassistant]
 
+- name: Copy secrets.yaml
+  template:
+    src: secrets.yaml.j2
+    dest: /srv/homeassistant/secrets.yaml
+  notify: Restart homeassistant
+  tags: [homeassistant]
+
 - name: Config binary_sensor
   lineinfile:
     path: /srv/homeassistant/configuration.yaml
@@ -283,8 +290,8 @@
     block: |
       homeassistant:
         name: Home
-        latitude: {{ latlng.home.lat }}
-        longitude: {{ latlng.home.lat }}
+        latitude: !secret latlng_home_lat
+        longitude: !secret latlng_home_lat
         elevation: 40
         unit_system: metric
         temperature_unit: C
@@ -317,7 +324,7 @@
             - switch.living_room_ceiling_fan
             - switch.study_floor_heating
       ifttt:
-        key: {{ ifttt_key }}
+        key: !secret ifttt_key
       lovelace:
         mode: yaml
         dashboards: !include dashboards.yaml
@@ -325,10 +332,10 @@
         broker: hass.rewse.jp
         port: 8883
         username: sub_client
-        password: {{ mosquitto_password }}
+        password: !secret mosquitto_password
         certificate: /config/certs/DST_Root_CA_X3.pem
       nature_remo:
-        access_token: "{{ remo_token }}"
+        access_token: !secret remo_token
       recorder:
         purge_keep_days: 450
       speedtestdotnet:
