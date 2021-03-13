@@ -38,7 +38,7 @@ cards:
           - entity: switch.living_room_dimming_downlights
             name: Dimmer Downlights
             icon: 'mdi:brightness-6'
-          - entity: switch.living_room_ceiling_fan
+          - entity: fan.living_room_ceiling_fans
             name: Ceiling Fan
             icon: 'mdi:fan'
           - entity: switch.living_room_humidifier

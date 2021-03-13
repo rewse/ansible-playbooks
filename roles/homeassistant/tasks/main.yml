@@ -82,10 +82,26 @@
   notify: Restart homeassistant container
   tags: [homeassistant]
 
+- name: Config fan
+  lineinfile:
+    path: /srv/homeassistant/configuration.yaml
+    insertafter: '^binary_sensor:'
+    regexp: '^fan:'
+    line: "fan: !include fans.yaml"
+  notify: Restart homeassistant container
+  tags: [homeassistant]
+
+- name: Copy fans.yaml
+  copy:
+    src: fans.yaml
+    dest: /srv/homeassistant
+  notify: Restart homeassistant container
+  tags: [homeassistant]
+
 - name: Config group
   lineinfile:
     path: /srv/homeassistant/configuration.yaml
-    insertafter: '^binary_sesnsor:'
+    insertafter: '^fan:'
     regexp: '^group:'
     line: "group: !include groups.yaml"
   notify: Restart homeassistant container
@@ -98,11 +114,27 @@
   notify: Restart homeassistant container
   tags: [homeassistant]
 
-- name: Config input_datetime
+- name: Config input_boolean
   lineinfile:
     path: /srv/homeassistant/configuration.yaml
     insertafter: '^group:'
-    regexp: '^input_datetime'
+    regexp: '^input_boolean:'
+    line: "input_boolean: !include input_booleans.yaml"
+  notify: Restart homeassistant container
+  tags: [homeassistant]
+
+- name: Copy input_booleans.yaml
+  copy:
+    src: input_booleans.yaml
+    dest: /srv/homeassistant
+  notify: Restart homeassistant container
+  tags: [homeassistant]
+
+- name: Config input_datetime
+  lineinfile:
+    path: /srv/homeassistant/configuration.yaml
+    insertafter: '^input_booleans:'
+    regexp: '^input_datetime:'
     line: "input_datetime: !include input_datetimes.yaml"
   notify: Restart homeassistant container
   tags: [homeassistant]
@@ -283,6 +315,8 @@
             - switch.living_room_humidifier
             - switch.living_room_ceiling_fan
             - switch.study_floor_heating
+      ifttt:
+        key: {{ ifttt_key }}
       lovelace:
         mode: yaml
         dashboards: !include dashboards.yaml
