@@ -3,5 +3,4 @@
   become: yes
   remote_user: ubuntu
   roles:
-    - dhcpd
-    - resolved
+    - switchbotmeter
