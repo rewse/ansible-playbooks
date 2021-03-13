@@ -1,0 +1,20 @@
+- platform: template
+  fans:
+    living_room_ceiling_fans:
+      unique_id: living_room_ceiling_fans
+      friendly_name: Living Room Ceiling Fans
+      value_template: '{{ states("input_boolean.living_room_ceiling_fans_state") }}'
+      turn_on:
+        - service: ifttt.trigger
+          data: 
+            event: turnon_living_room_ceiling_fan
+        - service: input_boolean.turn_on
+          target:
+            entity_id: input_boolean.living_room_ceiling_fans_state
+      turn_off:
+        - service: ifttt.trigger
+          data:
+            event: turnoff_living_room_ceiling_fan
+        - service: input_boolean.turn_off
+          target:
+            entity_id: input_boolean.living_room_ceiling_fans_state
