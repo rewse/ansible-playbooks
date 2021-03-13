@@ -16,6 +16,11 @@
 
 - name: Restart homeassistant
   uri:
+    url: https://hass.rewse.jp/api/services/homeassistant/check_config
+    method: POST
+    headers:
+      Authorization: Bearer {{ homeassistant_token }}
+  uri:
     url: https://hass.rewse.jp/api/services/homeassistant/restart
     method: POST
     headers:
