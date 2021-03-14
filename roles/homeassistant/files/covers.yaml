@@ -1,0 +1,23 @@
+- platform: template
+  covers:
+    bedroom_curtains:
+      device_class: curtain
+      friendly_name: Bedroom Curtains
+      open_cover:
+        service: switch.turn_on
+        entity_id: switch.bedroom_curtains
+      close_cover:
+        service: switch.turn_off
+        entity_id: switch.bedroom_curtains
+      value_template: >
+        {% if states("sensor.bedroom_curtains_position") | int < 50 %}
+          opening
+        {% else %}
+          closed
+        {% endif %}
+      icon_template: >
+        {% if states("sensor.bedroom_curtains_position") | int < 50 %}
+          mdi:window-shutter-open
+        {% else %}
+          mdi:window-shutter
+        {% endif %}
