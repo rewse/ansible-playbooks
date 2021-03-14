@@ -1,0 +1,105 @@
+- platform: template
+  switches:
+    bedroom_curtains:
+      unique_id: bedroom_curtains
+      friendly_name: Bedroom Curtains
+      turn_on: # open
+        service: rest_command.control_switchbot_device
+        data:
+          device_id: E9A417DB5E33
+          command: turnOn
+      turn_off: # close
+        service: rest_command.control_switchbot_device
+        data:
+          device_id: E9A417DB5E33
+          command: turnOff
+      value_template: >
+        {% if state_attr("sensor.bedroom_curtains_position", "slidePosition") < 50 %}
+          on
+        {% else %}
+          off
+        {% endif %}
+      icon_template: >
+        {% if state_attr("sensor.bedroom_curtains_position", "slidePosition") < 50 %}
+          mdi:window-shutter-open
+        {% else %}
+          mdi:window-shutter
+        {% endif %}
+    living_room_humidifier:
+      unique_id: living_rrom_humidifier
+      friendly_name: Living Room Humidifier
+      turn_on:
+        service: rest_command.control_switchbot_device
+        data:
+          device_id: C12F0898BAC5
+          command: press
+      turn_off:
+        service: rest_command.control_switchbot_device
+        data:
+          device_id: C12F0898BAC5
+          command: press
+      icon_template: mdi:air-humidifier
+    living_room_floor_heating:
+      unique_id: living_room_floor_heating
+      friendly_name: "Living Room Floor Heating"
+      turn_on:
+        service: rest_command.control_switchbot_device
+        data:
+          device_id: E55CF11F894A
+          command: press
+      turn_off:
+        service: rest_command.control_switchbot_device
+        data:
+          device_id: E55CF11F894A
+          command: press
+      icon_template: mdi:grid
+    study_floor_heating:
+      unique_id: study_floor_heating
+      friendly_name: "Study Floor Heating"
+      turn_on:
+        service: rest_command.control_switchbot_device
+        data:
+          device_id: D0ECA7E7803F
+          command: press
+      turn_off:
+        service: rest_command.control_switchbot_device
+        data:
+          device_id: D0ECA7E7803F
+          command: press
+      icon_template: mdi:grid
+    living_room_downlights:
+      unique_id: living_room_downlights
+      friendly_name: "Living Room Downlights"
+      turn_on:
+        service: rest_command.control_remo_device
+        data:
+          signal_id: 917b6ba4-5cff-4e91-88f4-cccc7fe1c5eb
+      turn_off:
+        service: rest_command.control_remo_device
+        data:
+          signal_id: 281417a3-3a19-4a0a-b9fa-9f19d0d3f654
+      icon_template: mdi:brightness-5
+    living_room_dimming_downlights:
+      unique_id: living_room_dimming_downlights
+      friendly_name: "Living Room Dimming Downlights"
+      turn_on:
+        service: rest_command.control_remo_device
+        data:
+          signal_id: 4975ccd8-2cfd-42e1-98a2-6e1b29017f70
+      turn_off:
+        service: rest_command.control_remo_device
+        data:
+          signal_id: d5f4b519-15a5-4b5e-90a7-0acd736108df
+      icon_template: mdi:brightness-6
+    living_room_ac_cleaner:
+      unique_id: living_room_ac_cleaner
+      friendly_name: "Living Room AC Cleaner"
+      turn_on:
+        service: rest_command.control_remo_device
+        data:
+          signal_id: e5286537-2c60-46ab-8fa5-3f695b9661ec
+      turn_off:
+        service: rest_command.turnoff_remo_ac
+        data:
+          signal_id: 7f2794cf-eb73-45ea-a08e-c8b8adcab62c
+      icon_template: mdi:spray-bottle
