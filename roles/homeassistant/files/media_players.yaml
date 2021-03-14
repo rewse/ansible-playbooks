@@ -1,4 +1,6 @@
 - platform: androidtv
+  name: firetv
+  host: firetv.rewse.jp
 - platform: yamaha
   name: aventage
   host: aventage.rewse.jp
