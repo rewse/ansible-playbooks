@@ -105,10 +105,26 @@
   notify: Restart homeassistant
   tags: [homeassistant]
 
-- name: Config fan
+- name: Config cover
   lineinfile:
     path: /srv/homeassistant/configuration.yaml
     insertafter: '^climate:'
+    regexp: '^cover:'
+    line: "cover: !include covers.yaml"
+  notify: Restart homeassistant
+  tags: [homeassistant]
+
+- name: Copy covers.yaml
+  copy:
+    src: covers.yaml
+    dest: /srv/homeassistant
+  notify: Restart homeassistant
+  tags: [homeassistant]
+
+- name: Config fan
+  lineinfile:
+    path: /srv/homeassistant/configuration.yaml
+    insertafter: '^cover:'
     regexp: '^fan:'
     line: "fan: !include fans.yaml"
   notify: Restart homeassistant
