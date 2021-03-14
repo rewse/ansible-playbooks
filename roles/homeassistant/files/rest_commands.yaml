@@ -1,0 +1,18 @@
+control_switchbot_device:
+  url: https://api.switch-bot.com/v1.0/devices/{{ device_id }}/commands
+  method: post
+  content_type: application/json
+  headers:
+    Authorization: !secret switchbot_token
+  payload: '{"command": "{{ command }}"}'
+control_remo_device:
+  url: https://api.nature.global/1/signals/{{ signal_id }}/send
+  method: post
+  headers:
+    Authorization: !secret remo_token_bearer
+turnoff_remo_ac:
+  url: https://api.nature.global/1/appliances/{{ signal_id }}/aircon_settings
+  method: post
+  headers:
+    Authorization: !secret remo_token_bearer
+  payload: "button=power-off"
