@@ -1,0 +1,22 @@
+- platform: switch
+  name: Living Room Downlights
+  entity_id: switch.living_room_downlights
+- platform: switch
+  name: Living Room Dimming Downlights
+  entity_id: switch.living_room_dimming_downlights
+- platform: switch
+  name: Living Room Footlight
+  entity_id: switch.living_room_footlight
+- platform: group
+  name: Living Room Lights
+  entities:
+    - light.living_room_downlights
+    - light.living_room_entrance_light
+    - light.living_room_tv_light
+    - light.living_room_footlight
+- platform: group
+  name: Bathroom Lights
+  entities:
+    - light.bathroom_entrance_light
+    - light.bathroom_left_light
+    - light.bathroom_right_light

@@ -169,10 +169,26 @@
   notify: Restart homeassistant
   tags: [homeassistant]
 
-- name: Config media_player
+- name: Config light
   lineinfile:
     path: /srv/homeassistant/configuration.yaml
     insertafter: '^input_number:'
+    regexp: '^light:'
+    line: "light: !include lights.yaml"
+  notify: Restart homeassistant
+  tags: [homeassistant]
+
+- name: Copy lights.yaml
+  copy:
+    src: lights.yaml
+    dest: /srv/homeassistant
+  notify: Restart homeassistant
+  tags: [homeassistant]
+
+- name: Config media_player
+  lineinfile:
+    path: /srv/homeassistant/configuration.yaml
+    insertafter: '^light:'
     regexp: '^media_player:'
     line: "media_player: !include media_players.yaml"
   notify: Restart homeassistant
