@@ -200,6 +200,21 @@
     dest: /srv/homeassistant
   notify: Restart homeassistant
   tags: [homeassistant]
+
+- name: Config rest_command
+  lineinfile:
+    path: /srv/homeassistant/configuration.yaml
+    insertafter: '^nofity:'
+    regexp: '^rest_command:'
+    line: "rest_command: !include rest_commands.yaml"
+  notify: Restart homeassistant
+  tags: [homeassistant]
+
+- name: Copy rest_commands.yaml
+  copy:
+    src: rest_commands.yaml
+    dest: /srv/homeassistant
+  notify: Restart homeassistant
   tags: [homeassistant]
 
 - name: Copy scripts.yaml
@@ -235,9 +250,9 @@
   tags: [homeassistant]
 
 - name: Copy switches.yaml
-  template:
-    src: switches.yaml.j2
-    dest: /srv/homeassistant/switches.yaml
+  copy:
+    src: switches.yaml
+    dest: /srv/homeassistant
   notify: Restart homeassistant
   tags: [homeassistant]
 
@@ -291,7 +306,7 @@
       homeassistant:
         name: Home
         latitude: !secret latlng_home_lat
-        longitude: !secret latlng_home_lat
+        longitude: !secret latlng_home_lng
         elevation: 40
         unit_system: metric
         temperature_unit: C
@@ -342,6 +357,10 @@
         scan_interval:
           hours: 1
       tplink:
+        discovery: false
+        switch:
+          - host: kasaplug-liv.rewse.jp
+          - host: kasaplug-ent.rewse.jp
   notify: Restart homeassistant
   tags: [homeassistant]
 
