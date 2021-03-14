@@ -1,53 +1,56 @@
 - platform: ping
-  host: zulu.rewse.jp
   name: zulu
+  host: zulu.rewse.jp
 - platform: ping
-  host: tango.rewse.jp
   name: tango
+  host: tango.rewse.jp
 - platform: ping
-  host: xray-liv.rewse.jp
   name: xray-liv
+  host: xray-liv.rewse.jp
 - platform: ping
-  host: xray-sto.rewse.jp
   name: xray-sto
+  host: xray-sto.rewse.jp
 - platform: ping
-  host: guppy.rewse.jp
   name: guppy
+  host: guppy.rewse.jp
 - platform: ping
-  host: fox.rewse.jp
   name: fox
+  host: fox.rewse.jp
 - platform: ping
-  host: hotel.rewse.jp
   name: hotel
+  host: hotel.rewse.jp
 - platform: ping
-  host: justio.rewse.jp
   name: justio
+  host: justio.rewse.jp
 - platform: ping
-  host: colorio.rewse.jp
-  name: colorio
-- platform: ping
-  host: remo.rewse.jp
   name: remo
+  host: remo.rewse.jp
 - platform: ping
-  host: wfirex.rewse.jp
   name: wfirex
+  host: wfirex.rewse.jp
 - platform: ping
-  host: switchbothub.rewse.jp
   name: switchbothub
+  host: switchbothub.rewse.jp
 - platform: ping
-  host: huebridge.rewse.jp
   name: huebridge
+  host: huebridge.rewse.jp
 - platform: ping
-  host: tapo.rewse.jp
   name: tapo
+  host: tapo.rewse.jp
 - platform: ping
-  host: catloghome-liv.rewse.jp
   name: catloghome-liv
+  host: catloghome-liv.rewse.jp
 - platform: ping
-  host: catloghome-bed.rewse.jp
   name: catloghome-bed
+  host: catloghome-bed.rewse.jp
 - platform: ping
-  host: aventage.rewse.jp
   name: aventage
+  host: aventage.rewse.jp
+- platform: ping
+  name: kasaplug-liv
+  host: kasaplug-liv.rewse.jp
+- platform: ping
+  name: kasaplug-ent
+  host: kasaplug-ent.rewse.jp
 - platform: workday
   country: JP
