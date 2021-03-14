@@ -14,13 +14,13 @@
           device_id: E9A417DB5E33
           command: turnOff
       value_template: >
-        {% if state_attr("sensor.bedroom_curtains_position", "slidePosition") < 50 %}
+        {% if states("sensor.bedroom_curtains_position") | int < 50 %}
           on
         {% else %}
           off
         {% endif %}
       icon_template: >
-        {% if state_attr("sensor.bedroom_curtains_position", "slidePosition") < 50 %}
+        {% if states("sensor.bedroom_curtains_position") | int < 50 %}
           mdi:window-shutter-open
         {% else %}
           mdi:window-shutter
