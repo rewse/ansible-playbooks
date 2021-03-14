@@ -73,16 +73,16 @@
     - topic: switchbotmeter/FD13F5CA5563/status
   device_class: humidity
 - platform: mqtt
-  name: Storage Humiture Method
   unique_id: sensor.mqtt.storage_humiture_method
+  name: Storage Humiture Method
   state_topic: switchbotmeter/FD13F5CA5563
   value_template: "{{ value_json.method }}"
   availability:
     - topic: switchbotmeter/FD13F5CA5563/status
   icon: mdi:routes
 - platform: mqtt
-  name: Balcony Temperature
   unique_id: sensor.mqtt.balcony_temperature
+  name: Balcony Temperature
   state_topic: switchbotmeter/EDE4EAA09EA3
   value_template: "{{ value_json.temperature }}"
   unit_of_measurement: °C
@@ -90,8 +90,8 @@
     - topic: switchbotmeter/EDE4EAA09EA3/status
   device_class: temperature
 - platform: mqtt
-  name: Balcony Humidity
   unique_id: sensor.mqtt.balcony_humidity
+  name: Balcony Humidity
   state_topic: switchbotmeter/EDE4EAA09EA3
   value_template: "{{ value_json.humidity }}"
   unit_of_measurement: "%"
@@ -99,16 +99,16 @@
     - topic: switchbotmeter/EDE4EAA09EA3/status
   device_class: humidity
 - platform: mqtt
-  name: Balcony Humiture Method
   unique_id: sensor.mqtt.balcony_humiture_method
+  name: Balcony Humiture Method
   state_topic: switchbotmeter/EDE4EAA09EA3
   value_template: "{{ value_json.method }}"
   availability:
     - topic: switchbotmeter/EDE4EAA09EA3/status
   icon: mdi:routes
 - platform: mqtt
-  name: enecoQ Fee Low
   unique_id: sensor.mqtt.enecoq_fee_low
+  name: enecoQ Fee Low
   state_topic: enecoq/fee
   value_template: "{{ value_json.low }}"
   unit_of_measurement: JPY/h
@@ -116,8 +116,8 @@
     - topic: enecoq/fee/state
   icon: mdi:transmission-tower
 - platform: mqtt
-  name: enecoQ Fee Mid
   unique_id: sensor.mqtt.enecoq_fee_mid
+  name: enecoQ Fee Mid
   state_topic: enecoq/fee
   value_template: "{{ value_json.mid }}"
   unit_of_measurement: JPY/h
@@ -125,8 +125,8 @@
     - topic: enecoq/fee/state
   icon: mdi:transmission-tower
 - platform: mqtt
-  name: enecoQ Fee High
   unique_id: sensor.mqtt.enecoq_fee_high
+  name: enecoQ Fee High
   state_topic: enecoq/fee
   value_template: "{{ value_json.high }}"
   unit_of_measurement: JPY/h
@@ -134,8 +134,8 @@
     - topic: enecoq/fee/state
   icon: mdi:transmission-tower
 - platform: mqtt
-  name: enecoQ Fee Total
   unique_id: sensor.mqtt.enecoq_fee_total
+  name: enecoQ Fee Total
   state_topic: enecoq/fee
   value_template: "{{ value_json.total }}"
   unit_of_measurement: JPY/h
@@ -163,26 +163,26 @@
 - platform: template
   sensors:
     living_room_wbgt:
-      friendly_name: Living Room WBGT
       unique_id: sensor.template.living_room_wbgt
+      friendly_name: Living Room WBGT
       unit_of_measurement: °C
       value_template: "{{ ((states('sensor.living_room_temperature') | float - 30.5) * 0.90739 + (states('sensor.living_room_humidity') | float - 60.0) * 0.14775 + (states('sensor.living_room_temperature') | float - 30.5) * (states('sensor.living_room_humidity') | float - 60.0) * 0.003655 + 27.77) | round(1) }}"
       icon_template: mdi:thermometer-lines
     bedroom_room_wbgt:
-      friendly_name: Bedroom WBGT
       unique_id: sensor.template.bedroom_wbgt
+      friendly_name: Bedroom WBGT
       unit_of_measurement: °C
       value_template: "{{ ((states('sensor.bedroom_temperature') | float - 30.5) * 0.90739 + (states('sensor.bedroom_humidity') | float - 60.0) * 0.14775 + (states('sensor.bedroom_temperature') | float - 30.5) * (states('sensor.bedroom_humidity') | float - 60.0) * 0.003655 + 27.77) | round(1) }}"
       icon_template: mdi:thermometer-lines
     storage_room_wbgt:
-      friendly_name: Storage WBGT
       unique_id: sensor.template.storage_wbgt
+      friendly_name: Storage WBGT
       unit_of_measurement: °C
       value_template: "{{ ((states('sensor.storage_temperature') | float - 30.5) * 0.90739 + (states('sensor.storage_humidity') | float - 60.0) * 0.14775 + (states('sensor.storage_temperature') | float - 30.5) * (states('sensor.storage_humidity') | float - 60.0) * 0.003655 + 27.77) | round(1) }}"
       icon_template: mdi:thermometer-lines
     balcony_room_wbgt:
-      friendly_name: Balcony WBGT
       unique_id: sensor.template.balcony_wbgt
+      friendly_name: Balcony WBGT
       unit_of_measurement: °C
       value_template: "{{ ((states('sensor.balcony_temperature') | float - 30.5) * 0.90739 + (states('sensor.balcony_humidity') | float - 60.0) * 0.14775 + (states('sensor.balcony_temperature') | float - 30.5) * (states('sensor.balcony_humidity') | float - 60.0) * 0.003655 + 27.77) | round(1) }}"
       icon_template: mdi:thermometer-lines
