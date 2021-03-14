@@ -89,10 +89,26 @@
   notify: Restart homeassistant
   tags: [homeassistant]
 
-- name: Config fan
+- name: Config climate
   lineinfile:
     path: /srv/homeassistant/configuration.yaml
     insertafter: '^binary_sensor:'
+    regexp: '^climate:'
+    line: "climate: !include climates.yaml"
+  notify: Restart homeassistant
+  tags: [homeassistant]
+
+- name: Copy climates.yaml
+  copy:
+    src: climates.yaml
+    dest: /srv/homeassistant
+  notify: Restart homeassistant
+  tags: [homeassistant]
+
+- name: Config fan
+  lineinfile:
+    path: /srv/homeassistant/configuration.yaml
+    insertafter: '^climate:'
     regexp: '^fan:'
     line: "fan: !include fans.yaml"
   notify: Restart homeassistant
