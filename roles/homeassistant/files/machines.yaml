@@ -11,10 +11,10 @@ views:
           - entity: binary_sensor.tango
             icon: mdi:switch
             secondary_info: last-changed
-          - entity: binary_sensor.xray_living
+          - entity: binary_sensor.xray_liv
             icon: mdi:router-wireless
             secondary_info: last-changed
-          - entity: binary_sensor.xray_storage
+          - entity: binary_sensor.xray_sto
             icon: mdi:router-wireless
             secondary_info: last-changed
       - type: entities
@@ -35,9 +35,6 @@ views:
           - entity: binary_sensor.guppy
             icon: mdi:nas
             secondary_info: last-changed
-          - entity: binary_sensor.colorio
-            icon: mdi:printer
-            secondary_info: last-changed
           - entity: binary_sensor.justio
             icon: mdi:printer
             secondary_info: last-changed
@@ -47,11 +44,17 @@ views:
           - entity: binary_sensor.tapo
             icon: mdi:cctv
             secondary_info: last-changed
-          - entity: binary_sensor.catloghome_living
+          - entity: binary_sensor.catloghome_liv
             icon: mdi:cat
             secondary_info: last-changed
-          - entity: binary_sensor.catloghome_storage
+          - entity: binary_sensor.catloghome_bed
             icon: mdi:cat
+            secondary_info: last-changed
+          - entity: binary_sensor.kasaplug_liv
+            icon: mdi:power-socket-us
+            secondary_info: last-changed
+          - entity: binary_sensor.kasaplug_ent
+            icon: mdi:power-socket-us
             secondary_info: last-changed
       - type: entities
         title: Clients
