@@ -1,0 +1,5 @@
+- platform: switch_humidifier
+  name: Living Room Humidifier
+  switch_id: switch.living_room_humidifier
+  sensor_id: sensor.living_room_humidity
+  type: humidifier
