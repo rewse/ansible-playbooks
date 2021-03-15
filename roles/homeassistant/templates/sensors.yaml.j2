@@ -1,3 +1,6 @@
+- platform: command_line
+  name: REGZA Channel
+  command: curl --digest --user '[% regza.username %]:[% regza.password %]' http://regza.rewse.jp/v2/remote/play/status | jq -r .epg_info_current.channel_name
 - platform: dnsip
   name: DNS hass.rewse.jp
   hostname: hass.rewse.jp
