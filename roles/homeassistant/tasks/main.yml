@@ -169,6 +169,22 @@
   notify: Restart homeassistant
   tags: [homeassistant]
 
+- name: Config homekit
+  lineinfile:
+    path: /srv/homeassistant/configuration.yaml
+    insertafter: '^input_boolean:'
+    regexp: '^homekit:'
+    line: "homekit: !include homekit.yaml"
+  notify: Restart homeassistant
+  tags: [homeassistant]
+
+- name: Copy homekit.yaml
+  copy:
+    src: homekit.yaml
+    dest: /srv/homeassistant
+  notify: Restart homeassistant
+  tags: [homeassistant]
+
 - name: Config input_datetime
   lineinfile:
     path: /srv/homeassistant/configuration.yaml
