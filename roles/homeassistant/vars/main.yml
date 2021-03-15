@@ -14,5 +14,8 @@ latlng:
     lng: "{{ vault_latlng.s.lng }}"
 mosquitto_password: "{{ vault_mosquitto_password }}"
 nfs_server: guppy.rewse.jp
+regza:
+  username: "[% vault_regza.username %]"
+  password: "[% vault_regza.password %]"
 remo_token: "{{ vault_remo_token }}"
 switchbot_token: "{{ vault_switchbot_token }}"

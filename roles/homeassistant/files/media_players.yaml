@@ -1,6 +1,24 @@
 - platform: androidtv
   name: firetv
   host: firetv.rewse.jp
+- platform: universal
+  name: regza
+  commands:
+    turn_on:
+      service: shell_command.control_regza_toggle
+    turn_off:
+      service: shell_command.control_regza_toggle
+    volume_up:
+      service: shell_command.control_regza_volume_up
+    volume_volume_down:
+      service: shell_command.control_regza_volume_down
+    volume_mute:
+      service: shell_command.control_regza_volume_mute
+  attributes:
+      is_volume_muted: binary_sensor.regza_volume_muted
+      state: binary_sensor.regza_state
+      source: sensor.regza_channel
+  device_class: tv
 - platform: yamaha
   name: aventage
   host: aventage.rewse.jp
