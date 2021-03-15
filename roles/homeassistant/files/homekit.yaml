@@ -1,0 +1,32 @@
+  - filter:
+      include_domains:
+        - media_player
+      include_entities:
+        - climate.living_area_floor_heating
+        - cover.bedroom_curtains
+        - fan.living_room_ceiling_fans
+        - light.living_room_dimming_downlights
+        - light.living_room_downlights
+        - light.living_room_footlight
+        - switch.living_room_ac_cleaner
+        - switch.living_room_humidifier
+        - sensor.living_room_humidity
+        - sensor.living_room_temperature
+        - sensor.bedroom_humidity
+        - sensor.bedroom_temperature
+        - sensor.storage_humidity
+        - sensor.storage_temperature
+        - sensor.balcony_humidity
+        - sensor.balcony_temperature
+    entity_config:
+      media_player.appletv:
+        feature_list:
+          - feature: on_off
+          - feature: play_pause
+      media_player.heargo2:
+        feature_list:
+          - feature: on_off
+      media_player.stw2000:
+        feature_list:
+          - feature: on_off
+          - feature: play_pause
