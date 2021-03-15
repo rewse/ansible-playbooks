@@ -185,10 +185,26 @@
   notify: Restart homeassistant
   tags: [homeassistant]
 
+- name: Config humidifier
+  lineinfile:
+    path: /srv/homeassistant/configuration.yaml
+    insertafter: '^homekit:'
+    regexp: '^humidifier:'
+    line: "humidifier: !include humidifiers.yaml"
+  notify: Restart homeassistant
+  tags: [homeassistant]
+
+- name: Copy humidifiers.yaml
+  copy:
+    src: humidifiers.yaml
+    dest: /srv/homeassistant
+  notify: Restart homeassistant
+  tags: [homeassistant]
+
 - name: Config input_datetime
   lineinfile:
     path: /srv/homeassistant/configuration.yaml
-    insertafter: '^input_booleans:'
+    insertafter: '^humidifier:'
     regexp: '^input_datetime:'
     line: "input_datetime: !include input_datetimes.yaml"
   notify: Restart homeassistant
@@ -351,7 +367,7 @@
 
 - name: Create custom_components/nature_remo
   file:
-    path: /srv/homeassistant/custom_components
+    path: /srv/homeassistant/custom_components/nature_remo
     state: directory
   tags: [homeassistant]
 
@@ -360,6 +376,31 @@
     repo: https://github.com/yutoyazaki/hass-nature-remo.git
     dest: /srv/homeassistant/custom_components/nature_remo
     force: yes
+  notify: Restart homeassistant
+  tags: [homeassistant]
+
+- name: Create custom_components/switch_humidifier
+  file:
+    path: /srv/homeassistant/custom_components/switch_humidifier
+    state: directory
+  tags: [homeassistant]
+
+- name: Clone home-assistant-custom-components-switch-humidifier.git
+  git:
+    repo: https://github.com/adrianByv/home-assistant-custom-components-switch-humidifier.git
+    dest: /srv/git/switch_humidifier
+    force: yes
+  tags: [homeassistant]
+
+- name: Copy switch_humidifier
+  copy:
+    src: /srv/git/switch_humidifier/custom_components/switch_humidifier/{{ item }}
+    dest: /srv/homeassistant/custom_components/switch_humidifier
+    remote_src: yes
+  with_items:
+    - __init__.py
+    - humidifier.py
+    - manifest.json
   notify: Restart homeassistant
   tags: [homeassistant]
 
@@ -378,30 +419,6 @@
         external_url: https://hass.rewse.jp/
         internal_url: https://hass.rewse.jp/
       fastdotcom:
-      homekit:
-        filter:
-          include_domains:
-            - media_player
-          include_entities:
-            - climate.nature_remo_living_room_ac
-            - script.toggle_all_floor_heatings
-            - sensor.living_room_humidity
-            - sensor.living_room_temperature
-            - sensor.bedroom_humidity
-            - sensor.bedroom_temperature
-            - sensor.storage_temperature
-            - sensor.storage_humidity
-            - sensor.balcony_humidity
-            - sensor.balcony_temperature
-            - switch.entrance_zulu_power
-            - switch.living_room_ac_cleaner
-            - switch.living_room_dimming_downlights
-            - switch.living_room_downlights
-            - switch.living_room_floor_heating
-            - switch.living_room_footlight
-            - switch.living_room_humidifier
-            - switch.living_room_ceiling_fan
-            - switch.study_floor_heating
       ifttt:
         key: !secret ifttt_key
       lovelace:
