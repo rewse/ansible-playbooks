@@ -1,8 +1,9 @@
 - platform: template
   covers:
     bedroom_curtains:
-      device_class: curtain
+      unique_id: bedroom_curtains_1
       friendly_name: Bedroom Curtains
+      device_class: curtain
       open_cover:
         service: switch.turn_on
         entity_id: switch.bedroom_curtains
