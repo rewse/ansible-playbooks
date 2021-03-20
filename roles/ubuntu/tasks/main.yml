@@ -4,6 +4,18 @@
     name: Asia/Tokyo
   tags: [ubuntu, time]
 
+- name: Add an apt key
+  apt_key:
+    keyserver: keyserver.ubuntu.com
+    id: C99B11DEB97541F0
+  tags: [ubuntu, package]
+
+- name: Add a repository for GitHub
+  # Do not use apt_repository due to "Invalid repository string: 
+  # https://cli.github.com/packages"
+  command: apt-add-repository https://cli.github.com/packages
+  tags: [ubuntu, package]
+
 - name: Update all packages
   apt:
     name: '*'
@@ -20,6 +32,7 @@
       - dphys-swapfile
       - dnsutils
       - etckeeper
+      - gh
       - git
       - irqbalance
       - libsasl2-modules
