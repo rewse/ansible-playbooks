@@ -38,7 +38,18 @@
         data:
           device_id: C12F0898BAC5
           command: press
-      icon_template: mdi:air-humidifier
+      value_template: >
+        {% if states("sensor.living_room_humidifier_plug_current") | int > 100 %}
+          on
+        {% else %}
+          off
+        {% endif %}
+      icon_template: >
+        {% if states("sensor.living_room_humidifier_plug_current") | int > 100 %}
+          mdi:air-humidifier
+        {% else %}
+          mdi:air-humidifier-off
+        {% endif %}
     living_room_floor_heating:
       unique_id: living_room_floor_heating
       friendly_name: "Living Room Floor Heating"
