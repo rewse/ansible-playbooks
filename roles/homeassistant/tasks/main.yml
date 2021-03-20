@@ -437,9 +437,9 @@
           - 192.168.0.0/24
       ifttt:
         key: !secret ifttt_key
-      lovelace:
-        mode: yaml
-        dashboards: !include dashboards.yaml
+      # lovelace:
+      #   mode: yaml
+      #   dashboards: !include dashboards.yaml
       mqtt:
         broker: hass.rewse.jp
         port: 8883
