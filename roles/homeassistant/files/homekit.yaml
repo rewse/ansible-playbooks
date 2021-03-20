@@ -1,6 +1,4 @@
   - filter:
-      include_domains:
-        - media_player
       include_entities:
         - climate.living_area_floor_heating
         - cover.bedroom_curtains
@@ -8,6 +6,10 @@
         - light.living_room_dimming_downlights
         - light.living_room_downlights
         - light.living_room_footlight
+        - media_player.aventage
+        - media_player.heargo2
+        - media_player.regza
+        - media_player.stw2000
         - switch.living_room_ac_cleaner
         - switch.living_room_humidifier
         - sensor.living_room_humidity
@@ -19,11 +21,10 @@
         - sensor.balcony_humidity
         - sensor.balcony_temperature
     entity_config:
-      media_player.appletv:
+      media_player.heargo2:
         feature_list:
           - feature: on_off
-          - feature: play_pause
-      media_player.heargo2:
+      media_player.regza:
         feature_list:
           - feature: on_off
       media_player.stw2000:
