@@ -34,3 +34,9 @@ living_room_humidifier_turnedon_threshold:
   max: 44
   unit_of_measurement: "%"
   icon: mdi:water-percent-alert
+living_room_humidifier_turnedoff_threshold:
+  name: Living Room Humidifier Turned off Threshold
+  min: 46
+  max: 54
+  unit_of_measurement: "%"
+  icon: mdi:water-percent-alert
