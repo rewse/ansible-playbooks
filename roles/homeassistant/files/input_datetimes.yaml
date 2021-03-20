@@ -6,11 +6,15 @@ bedroom_curtains_opened_time:
   name: Bedroom Curtains Opened Time
   has_time: true
   icon: mdi:window-shutter-alert
-living_room_turndown_time:
-  name: Living Room Turn down Time
+bedroom_turneddown_time:
+  name: Bedroom Turned down Time
   has_time: true
   icon: mdi:brightness-6
-living_room_turndown_more_time:
-  name: Living Room Turn down More Time
+living_room_turneddown_time:
+  name: Living Room Turned down Time
+  has_time: true
+  icon: mdi:brightness-6
+living_room_turneddown_more_time:
+  name: Living Room Turned down More Time
   has_time: true
   icon: mdi:brightness-4
