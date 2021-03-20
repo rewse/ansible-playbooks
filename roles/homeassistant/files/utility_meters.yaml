@@ -1,0 +1,3 @@
+japan_coronavirus_new:
+  source: sensor.japan_coronavirus_confirmed
+  cycle: daily
