@@ -6,12 +6,12 @@
       turn_on: # open
         service: rest_command.control_switchbot_device
         data:
-          device_id: E9A417DB5E33
+          device_id: EAED0CCBC1A2
           command: turnOn
       turn_off: # close
         service: rest_command.control_switchbot_device
         data:
-          device_id: E9A417DB5E33
+          device_id: EAED0CCBC1A2
           command: turnOff
       value_template: >
         {% if states("sensor.bedroom_curtains_position") | int < 50 %}
