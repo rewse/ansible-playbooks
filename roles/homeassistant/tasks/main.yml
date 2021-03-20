@@ -235,10 +235,26 @@
   notify: Restart homeassistant
   tags: [homeassistant]
 
-- name: Config media_player
+- name: Config localtuya
   lineinfile:
     path: /srv/homeassistant/configuration.yaml
     insertafter: '^light:'
+    regexp: '^localtuya:'
+    line: "localtuya: !include localtuyas.yaml"
+  notify: Restart homeassistant
+  tags: [homeassistant]
+
+- name: Copy localtuyas.yaml
+  copy:
+    src: localtuyas.yaml
+    dest: /srv/homeassistant
+  notify: Restart homeassistant
+  tags: [homeassistant]
+
+- name: Config media_player
+  lineinfile:
+    path: /srv/homeassistant/configuration.yaml
+    insertafter: '^localtuya:'
     regexp: '^media_player:'
     line: "media_player: !include media_players.yaml"
   notify: Restart homeassistant
@@ -383,6 +399,20 @@
     dest: /srv/homeassistant/custom_components/nature_remo
     force: yes
   notify: Restart homeassistant
+  tags: [homeassistant]
+
+- name: Clone localtuya.git
+  git:
+    repo: https://github.com/rospogrigio/localtuya.git
+    dest: /srv/git/localtuya
+    force: yes
+  tags: [homeassistant]
+
+- name: Copy localtuya.git
+  copy:
+    src: /srv/git/localtuya/custom_components/localtuya
+    dest: /srv/homeassistant/custom_components
+    remote_src: yes
   tags: [homeassistant]
 
 - name: Modify configuration.yaml
