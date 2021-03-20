@@ -1,6 +1,6 @@
   - filter:
       include_entities:
-        - climate.living_area_floor_heating
+        - climate.living_room_ac
         - cover.bedroom_curtains
         - fan.living_room_ceiling_fans
         - light.living_room_dimming_downlights
@@ -11,7 +11,9 @@
         - media_player.regza
         - media_player.stw2000
         - switch.living_room_ac_cleaner
+        - switch.living_room_floor_heating
         - switch.living_room_humidifier
+        - switch.study_floor_heating
         - sensor.living_room_humidity
         - sensor.living_room_temperature
         - sensor.bedroom_humidity
