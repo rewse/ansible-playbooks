@@ -58,7 +58,7 @@ cards:
           - entity: switch.living_room_footlight
             name: Footlight
       - type: thermostat
-        entity: climate.nature_remo_living_room_ac
+        entity: climate.living_room_ac
       - type: entities
         title: Living Room Motion Sensors
         entities:
