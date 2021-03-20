@@ -35,11 +35,20 @@ views:
           - entity: binary_sensor.guppy
             icon: mdi:nas
             secondary_info: last-changed
+          - entity: binary_sensor.fox
+            icon: mdi:raspberry-pi
+            secondary_info: last-changed
+          - entity: binary_sensor.hotel
+            icon: mdi:raspberry-pi
+            secondary_info: last-changed
           - entity: binary_sensor.justio
             icon: mdi:printer
             secondary_info: last-changed
           - entity: binary_sensor.aventage
             icon: mdi:audio-video
+            secondary_info: last-changed
+          - entity: binary_sensor.regza
+            icon: mdi:television
             secondary_info: last-changed
           - entity: binary_sensor.tapo
             icon: mdi:cctv
@@ -49,6 +58,9 @@ views:
             secondary_info: last-changed
           - entity: binary_sensor.catloghome_bed
             icon: mdi:cat
+            secondary_info: last-changed
+          - entity: binary_sensor.tuyaplug
+            icon: mdi:power-socket-us
             secondary_info: last-changed
           - entity: binary_sensor.kasaplug_liv
             icon: mdi:power-socket-us
