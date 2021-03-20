@@ -163,6 +163,9 @@
     - slidePosition
   scan_interval: 1200
 - platform: season
+- platform: seventeentrack
+  username: !secret seventeentrack_username
+  password: !secret seventeentrack_password
 - platform: template
   sensors:
     living_room_wbgt:
@@ -189,9 +192,3 @@
       unit_of_measurement: °C
       value_template: "{{ ((states('sensor.balcony_temperature') | float - 30.5) * 0.90739 + (states('sensor.balcony_humidity') | float - 60.0) * 0.14775 + (states('sensor.balcony_temperature') | float - 30.5) * (states('sensor.balcony_humidity') | float - 60.0) * 0.003655 + 27.77) | round(1) }}"
       icon_template: mdi:thermometer-lines
-    weather_pressure:
-      unique_id: weather_pressure
-      friendly_name: Weather Pressure
-      value_template: "{{ state_attr('weather.home', 'pressure') }}"
-      unit_of_measurement: hPa
-      device_class: pressure
