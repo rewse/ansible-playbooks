@@ -52,7 +52,7 @@
         {% endif %}
     living_room_floor_heating:
       unique_id: living_room_floor_heating
-      friendly_name: "Living Room Floor Heating"
+      friendly_name: Living Room Floor Heating
       turn_on:
         service: rest_command.control_switchbot_device
         data:
@@ -66,7 +66,7 @@
       icon_template: mdi:grid
     study_floor_heating:
       unique_id: study_floor_heating
-      friendly_name: "Study Floor Heating"
+      friendly_name: Study Floor Heating
       turn_on:
         service: rest_command.control_switchbot_device
         data:
@@ -80,7 +80,7 @@
       icon_template: mdi:grid
     living_room_downlights:
       unique_id: living_room_downlights
-      friendly_name: "Living Room Downlights"
+      friendly_name: Living Room Downlights
       turn_on:
         service: rest_command.control_remo_device
         data:
@@ -92,7 +92,7 @@
       icon_template: mdi:brightness-5
     living_room_dimming_downlights:
       unique_id: living_room_dimming_downlights
-      friendly_name: "Living Room Dimming Downlights"
+      friendly_name: Living Room Dimming Downlights
       turn_on:
         service: rest_command.control_remo_device
         data:
