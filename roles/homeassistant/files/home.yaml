@@ -146,6 +146,8 @@ cards:
         entities:
           - entity: switch.bedroom_curtains
             name: Curtains
+      - type: thermostat
+        entity: climate.bedroom_ac
       - type: entities
         title: Bedroom Lights
         entities:

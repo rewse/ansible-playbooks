@@ -1,6 +1,7 @@
   - filter:
       include_entities:
         - camera.guppy_cat_cage
+        - climate.bedroom_ac
         - climate.living_room_ac
         - cover.bedroom_curtains
         - fan.living_room_ceiling_fans
