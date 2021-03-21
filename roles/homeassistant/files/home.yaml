@@ -49,6 +49,7 @@ cards:
           - value: above_horizon
           - value: below_horizon
       - type: custom:mini-graph-card
+        name: Living Room Light Level
         entities:
           - entity: sensor.living_room_sensor_light_level
           - entity: sun.sun
@@ -174,6 +175,7 @@ cards:
           - value: above_horizon
           - value: below_horizon
       - type: custom:mini-graph-card
+        name: Bathroom Light Level
         entities:
           - entity: sensor.bathroom_sensor_light_level
           - entity: sun.sun
