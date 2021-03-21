@@ -1,188 +1,318 @@
+title: Overview
 path: home
-title: Home
 icon: 'mdi:home'
-panel: false
 badges: []
 cards:
   - type: vertical-stack
     cards:
-      - type: horizontal-stack
-        cards:
-          - type: entity
-            name: Living Room Temperature
-            entity: sensor.living_room_temperature
-          - type: entity
-            name: Living Room Humidity
-            entity: sensor.living_room_humidity
-      - type: history-graph
+      - type: custom:mini-graph-card
         entities:
           - entity: sensor.living_room_temperature
+          - entity: sensor.living_room_wbgt
+            show_state: true
+            show_fill: false
+          - entity: sun.sun
+            color: gray
+            show_line: false
+            show_points: false
+            y_axis: secondary
         hours_to_show: 48
-        refresh_interval: 300
-      - type: history-graph
+        points_per_hour: 4
+        animate: true
+        cache: false
+        height: 200
+        hour24: true
+        show:
+          legend: false
+          labels_secondary: false
+        state_map:
+          - value: above_horizon
+          - value: below_horizon
+      - type: custom:mini-graph-card
         entities:
           - entity: sensor.living_room_humidity
+          - entity: sun.sun
+            color: gray
+            show_line: false
+            show_points: false
+            y_axis: secondary
         hours_to_show: 48
-        refresh_interval: 300
-      - type: history-graph
+        points_per_hour: 4
+        animate: true
+        cache: false
+        height: 200
+        hour24: true
+        show:
+          legend: false
+          labels_secondary: false
+        state_map:
+          - value: above_horizon
+          - value: below_horizon
+      - type: custom:mini-graph-card
         entities:
           - entity: sensor.living_room_sensor_light_level
+          - entity: sun.sun
+            color: gray
+            show_line: false
+            show_points: false
+            y_axis: secondary
         hours_to_show: 48
-        refresh_interval: 300
+        points_per_hour: 4
+        animate: true
+        cache: false
+        height: 200
+        hour24: true
+        show:
+          legend: false
+          labels_secondary: false
+        state_map:
+          - value: above_horizon
+          - value: below_horizon
       - type: entities
-        title: Living Room Appliances
         entities:
           - entity: switch.living_room_downlights
             name: Downlights
-            icon: 'mdi:brightness-5'
           - entity: switch.living_room_dimming_downlights
-            name: Dimmer Downlights
-            icon: 'mdi:brightness-6'
+            name: Dimming Lights
           - entity: fan.living_room_ceiling_fans
             name: Ceiling Fan
-            icon: 'mdi:fan'
           - entity: switch.living_room_humidifier
             name: Humidifier
-            icon: 'mdi:air-humidifier'
           - entity: group.living_area_floor_heatings
-            name: Floor Heatings
-            icon: 'mdi:grid'
+            name: Floor Heating
+        title: Living Room Appliances
+        state_color: false
         show_header_toggle: false
+      - type: thermostat
+        entity: climate.living_room_ac
       - type: entities
-        title: Living Room Lights
         entities:
           - entity: light.living_room_tv_light
             name: TV Light
           - entity: light.living_room_entrance_light
             name: Entrance Light
-          - entity: switch.living_room_footlight
+          - entity: light.living_room_footlight
             name: Footlight
-      - type: thermostat
-        entity: climate.living_room_ac
-      - type: entities
-        title: Living Room Motion Sensors
-        entities:
-          - entity: binary_sensor.living_room_sensor_motion
-          - entity: binary_sensor.study_sensor_motion
+        title: Living Room Lights
+        state_color: false
   - type: vertical-stack
     cards:
-      - type: horizontal-stack
-        cards:
-          - type: entity
-            name: Bedroom Temperature
-            entity: sensor.bedroom_temperature
-          - type: entity
-            name: Bedroom Humidity
-            entity: sensor.bedroom_humidity
-      - type: history-graph
+      - type: custom:mini-graph-card
         entities:
           - entity: sensor.bedroom_temperature
+          - entity: sensor.bedroom_wbgt
+            show_state: true
+            show_fill: false
+          - entity: sun.sun
+            color: gray
+            show_line: false
+            show_points: false
+            y_axis: secondary
         hours_to_show: 48
-        refresh_interval: 300
-      - type: history-graph
+        points_per_hour: 4
+        animate: true
+        cache: false
+        height: 200
+        hour24: true
+        show:
+          legend: false
+          labels_secondary: false
+        state_map:
+          - value: above_horizon
+          - value: below_horizon
+      - type: custom:mini-graph-card
         entities:
           - entity: sensor.bedroom_humidity
+          - entity: sun.sun
+            color: gray
+            show_line: false
+            show_points: false
+            y_axis: secondary
         hours_to_show: 48
-        refresh_interval: 300
+        points_per_hour: 4
+        animate: true
+        cache: false
+        height: 200
+        hour24: true
+        show:
+          legend: false
+          labels_secondary: false
+        state_map:
+          - value: above_horizon
+          - value: below_horizon
       - type: entities
-        title: Bedroom Lights
         entities:
           - entity: light.bedroom_light
             name: Light
-        state_color: false
+        title: Bedroom Lights
         show_header_toggle: false
   - type: vertical-stack
     cards:
-      - type: horizontal-stack
-        cards:
-          - type: entity
-            name: Storage Temperature
-            entity: sensor.storage_temperature
-          - type: entity
-            name: Storage Humidity
-            entity: sensor.storage_humidity
-      - type: history-graph
+      - type: custom:mini-graph-card
         entities:
-          - entity: sensor.storage_temperature
+          - entity: sensor.bathroom_temperature
+          - entity: sun.sun
+            color: gray
+            show_line: false
+            show_points: false
+            y_axis: secondary
         hours_to_show: 48
-        refresh_interval: 300
-      - type: history-graph
-        entities:
-          - entity: sensor.storage_humidity
-        hours_to_show: 48
-        refresh_interval: 300
-  - type: vertical-stack
-    cards:
-      - type: entity
-        name: Bathroom Temperature
-        entity: sensor.bathroom_sensor_temperature
-      - type: history-graph
-        entities:
-          - entity: sensor.bathroom_sensor_temperature
-        hours_to_show: 48
-        refresh_interval: 300
-      - type: history-graph
+        points_per_hour: 4
+        animate: true
+        cache: false
+        height: 200
+        hour24: true
+        show:
+          legend: false
+          labels_secondary: false
+        state_map:
+          - value: above_horizon
+          - value: below_horizon
+      - type: custom:mini-graph-card
         entities:
           - entity: sensor.bathroom_sensor_light_level
+          - entity: sun.sun
+            color: gray
+            show_line: false
+            show_points: false
+            y_axis: secondary
         hours_to_show: 48
-        refresh_interval: 300
+        points_per_hour: 4
+        animate: true
+        cache: false
+        height: 200
+        hour24: true
+        show:
+          legend: false
+          labels_secondary: false
+        state_map:
+          - value: above_horizon
+          - value: below_horizon
       - type: entities
-        title: Bathroom Lights
         entities:
-          - entity: light.bathroom_entrance_light
-            name: Entrance Light
-          - entity: light.bathroom_left_light
-            name: Left Light
-          - entity: light.bathroom_right_light
-            name: Right Light
-        state_color: false
-      - type: entity
-        name: Bathroom Motion Sensor
-        entity: binary_sensor.bathroom_sensor_motion
+          - entity: light.bathroom_lights
+            name: Lights
+            icon: 'mdi:wall-sconce-flat'
+        title: Bathroom Lights
   - type: vertical-stack
     cards:
-      - type: horizontal-stack
-        cards:
-          - type: entity
-            name: Balcony Temperature
-            entity: sensor.balcony_temperature
-          - type: entity
-            name: Balcony Humidity
-            entity: sensor.balcony_humidity
-      - type: history-graph
+      - type: custom:mini-graph-card
         entities:
           - entity: sensor.balcony_temperature
+          - entity: sensor.balcony_wbgt
+            show_state: true
+            show_fill: false
+          - entity: sun.sun
+            color: gray
+            show_line: false
+            show_points: false
+            y_axis: secondary
         hours_to_show: 48
-        refresh_interval: 300
-      - type: history-graph
+        points_per_hour: 4
+        animate: true
+        cache: false
+        height: 200
+        hour24: true
+        show:
+          legend: false
+          labels_secondary: false
+        state_map:
+          - value: above_horizon
+          - value: below_horizon
+      - type: custom:mini-graph-card
         entities:
           - entity: sensor.balcony_humidity
+          - entity: sun.sun
+            color: gray
+            show_line: false
+            show_points: false
+            y_axis: secondary
         hours_to_show: 48
-        refresh_interval: 300
+        points_per_hour: 4
+        animate: true
+        cache: false
+        height: 200
+        hour24: true
+        show:
+          legend: false
+          labels_secondary: false
+        state_map:
+          - value: above_horizon
+          - value: below_horizon
+  - type: entities
+    entities:
+      - entity: automation.turn_on_living_room_ceiling_fan
+      - entity: automation.turn_on_living_room_floor_heating
+      - entity: automation.turn_on_living_room_humidifier
+      - entity: automation.turn_off_living_room_humidifier
+      - entity: automation.turn_on_living_room_ac_cleaner
+      - entity: automation.open_bedroom_curtains_weekday
+      - entity: automation.turn_on_living_room_downlights
+      - entity: automation.turn_down_living_room
+      - entity: automation.turn_down_living_room_more
+      - entity: automation.turn_off_living_room_extra_lights
+      - entity: automation.turn_down_bedoom
+    title: Automations
+  - type: custom:mini-graph-card
+    entities:
+      - entity: sensor.enecoq_fee_total
+        name: enecoQ Fee
+      - entity: sun.sun
+        color: gray
+        show_line: false
+        show_points: false
+        y_axis: secondary
+    hours_to_show: 48
+    points_per_hour: 4
+    animate: true
+    cache: false
+    height: 200
+    hour24: true
+    show:
+      legend: false
+      labels_secondary: false
+    color_thresholds:
+      - value: 0
+        color: "#00cc00"
+      - value: 9.8
+        color: "#cccc00"
+      - value: 41.77
+        color: "#cc0000"
+    state_map:
+      - value: above_horizon
+      - value: below_horizon
+  - type: picture-entity
+    entity: camera.guppy_cat_cage
+    image: 'https://demo.home-assistant.io/stub_config/bedroom.png'
+    name: Cat Cage Camera
+  - type: conditional
+    conditions:
+      - entity: sensor.seventeentrack_packages_in_transit
+        state_not: '0'
+    card:
+      type: markdown
+      title: Packages in Transit
+      content: >-
+        {% for package in
+        states.sensor.seventeentrack_packages_in_transit.attributes.packages
+        %}
+          **{{ package.friendly_name }}:** {{ package.info_text }}
+        {% endfor %}
+  - type: vertical-stack
+    cards:
       - type: weather-forecast
         entity: weather.home
+        secondary_info_attribute: humidity
         show_forecast: false
-  - type: gauge
-    name: enecoQ Fee
-    entity: sensor.enecoq_fee_total
-    max: 70
-    severity:
-      green: 0
-      yellow: 9.8
-      red: 41.77
-    icon: mdi:transmission-tower
-  - type: picture-entity
-    name: Cat Cage
-    entity: camera.guppy_cat_cage
-  - type: entities
-    title: Automations
-    entities:
-      - entity: automation.turn_on_living_room_downlights
-        name: Living Room Downlights
-        secondary_info: last-triggered
-      - entity: automation.turn_on_living_room_floor_heating
-        name: Living Room Floor Heating
-        secondary_info: last-triggered
-      - entity: automation.turn_on_living_room_humidifier
-        name: Living Room Humidifier
-        secondary_info: last-triggered
+      - type: entities
+        entities:
+          - entity: sensor.home_realfeel_temperature
+            name: RealFeel Temperature
+          - entity: sensor.home_precipitation
+            name: Precipitation
+          - entity: sensor.home_pressure_tendency
+            name: Pressure Tendency
+          - entity: sensor.home_wind
+            name: Wind
+          - entity: sensor.home_uv_index
+            name: UV Index

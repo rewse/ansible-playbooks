@@ -432,6 +432,19 @@
   notify: Restart homeassistant
   tags: [homeassistant]
 
+- name: Create www dir
+  file:
+    path: /srv/homeassistant/www
+    state: directory
+  tags: [homeassistant]
+
+- name: Copy Lovelace Mini Graph Card
+  get_url:
+    url: https://github.com/kalkih/mini-graph-card/releases/download/v0.10.0/mini-graph-card-bundle.js
+    dest: /srv/homeassistant/www
+  notify: Restart homeassistant
+  tags: [homeassistant]
+
 - name: Modify configuration.yaml
   blockinfile:
     path: /srv/homeassistant/configuration.yaml
@@ -454,9 +467,12 @@
           - 192.168.0.0/24
       ifttt:
         key: !secret ifttt_key
-      # lovelace:
-      #   mode: yaml
-      #   dashboards: !include dashboards.yaml
+      lovelace:
+        mode: yaml
+        dashboards: !include dashboards.yaml
+        resources:
+          - url: /local/mini-graph-card-bundle.js
+            type: module
       mqtt:
         broker: hass.rewse.jp
         port: 8883
