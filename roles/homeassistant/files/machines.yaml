@@ -20,7 +20,10 @@ views:
       - type: entities
         title: Servers
         entities:
-          - entity: binary_sensor.remo
+          - entity: binary_sensor.remo_liv
+            icon: mdi:access-point-network
+            secondary_info: last-changed
+          - entity: binary_sensor.remo_bed
             icon: mdi:access-point-network
             secondary_info: last-changed
           - entity: binary_sensor.wfirex
