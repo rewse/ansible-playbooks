@@ -445,6 +445,13 @@
   notify: Restart homeassistant
   tags: [homeassistant]
 
+- name: Copy Lovelace Mini Media Player
+  get_url:
+    url: https://github.com/kalkih/mini-media-player/releases/download/v1.12.0/mini-media-player-bundle.js
+    dest: /srv/homeassistant/www
+  notify: Restart homeassistant
+  tags: [homeassistant]
+
 - name: Modify configuration.yaml
   blockinfile:
     path: /srv/homeassistant/configuration.yaml
@@ -471,7 +478,9 @@
         mode: yaml
         dashboards: !include dashboards.yaml
         resources:
-          - url: /local/mini-graph-card-bundle.js
+          - url: /local/mini-graph-card-bundle.js?v=0.10.0
+            type: module
+          - url: /local/mini-media-player-bundle.js?v=1.12.0
             type: module
       mqtt:
         broker: hass.rewse.jp
