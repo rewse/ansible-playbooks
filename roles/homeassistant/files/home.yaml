@@ -281,6 +281,25 @@ cards:
     state_map:
       - value: above_horizon
       - value: below_horizon
+  - type: vertical-stack
+    cards:
+      - type: custom:simple-weather-card
+        entity: weather.home
+        name: " "
+        primary_info: humidity
+        secondary_info: pressure
+      - type: entities
+        entities:
+          - entity: sensor.home_realfeel_temperature
+            name: RealFeel Temperature
+          - entity: sensor.home_precipitation
+            name: Precipitation
+          - entity: sensor.home_pressure_tendency
+            name: Pressure Tendency
+          - entity: sensor.home_wind
+            name: Wind
+          - entity: sensor.home_uv_index
+            name: UV Index
   - type: picture-entity
     entity: camera.guppy_cat_cage
     image: 'https://demo.home-assistant.io/stub_config/bedroom.png'
@@ -298,21 +317,3 @@ cards:
         %}
           **{{ package.friendly_name }}:** {{ package.info_text }}
         {% endfor %}
-  - type: vertical-stack
-    cards:
-      - type: weather-forecast
-        entity: weather.home
-        secondary_info_attribute: humidity
-        show_forecast: false
-      - type: entities
-        entities:
-          - entity: sensor.home_realfeel_temperature
-            name: RealFeel Temperature
-          - entity: sensor.home_precipitation
-            name: Precipitation
-          - entity: sensor.home_pressure_tendency
-            name: Pressure Tendency
-          - entity: sensor.home_wind
-            name: Wind
-          - entity: sensor.home_uv_index
-            name: UV Index
