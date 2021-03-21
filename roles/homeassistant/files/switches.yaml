@@ -1,5 +1,17 @@
 - platform: template
   switches:
+    bedroom_ac_cleaner:
+      unique_id: bedroom_ac_cleaner
+      friendly_name: Bedroom AC Cleaner
+      turn_on:
+        service: rest_command.control_remo_device
+        data:
+          signal_id: 394621f7-eee7-4b0d-bdea-1510724e885d
+      turn_off:
+        service: rest_command.control_remo_device
+        data:
+          signal_id: c19cf586-6b90-40d7-b5cc-b3c207778465
+      icon_template: mdi:broom
     bedroom_curtains:
       unique_id: bedroom_curtains
       friendly_name: Bedroom Curtains
@@ -25,6 +37,18 @@
         {% else %}
           mdi:window-shutter
         {% endif %}
+    living_room_ac_cleaner:
+      unique_id: living_room_ac_cleaner
+      friendly_name: Living Room AC Cleaner
+      turn_on:
+        service: rest_command.control_remo_device
+        data:
+          signal_id: e5286537-2c60-46ab-8fa5-3f695b9661ec
+      turn_off:
+        service: rest_command.control_remo_device
+        data:
+          signal_id: 70d5445a-3988-404b-82da-6793a1419425
+      icon_template: mdi:broom
     living_room_humidifier:
       unique_id: living_room_humidifier
       friendly_name: Living Room Humidifier
@@ -102,15 +126,3 @@
         data:
           signal_id: d5f4b519-15a5-4b5e-90a7-0acd736108df
       icon_template: mdi:brightness-6
-    living_room_ac_cleaner:
-      unique_id: living_room_ac_cleaner
-      friendly_name: "Living Room AC Cleaner"
-      turn_on:
-        service: rest_command.control_remo_device
-        data:
-          signal_id: e5286537-2c60-46ab-8fa5-3f695b9661ec
-      turn_off:
-        service: rest_command.turnoff_remo_ac
-        data:
-          signal_id: 7f2794cf-eb73-45ea-a08e-c8b8adcab62c
-      icon_template: mdi:spray-bottle

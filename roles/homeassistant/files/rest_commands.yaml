@@ -10,9 +10,3 @@ control_remo_device:
   method: post
   headers:
     Authorization: !secret remo_token_bearer
-turnoff_remo_ac:
-  url: https://api.nature.global/1/appliances/{{ signal_id }}/aircon_settings
-  method: post
-  headers:
-    Authorization: !secret remo_token_bearer
-  payload: "button=power-off"
