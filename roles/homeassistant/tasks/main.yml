@@ -429,6 +429,7 @@
     src: /srv/git/localtuya/custom_components/localtuya
     dest: /srv/homeassistant/custom_components
     remote_src: yes
+  notify: Restart homeassistant
   tags: [homeassistant]
 
 - name: Modify configuration.yaml
