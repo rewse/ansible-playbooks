@@ -12,6 +12,7 @@
         - media_player.heargo2
         - media_player.regza
         - media_player.stw2000
+        - switch.bedroom_ac_cleaner
         - switch.living_room_ac_cleaner
         - switch.living_room_floor_heating
         - switch.living_room_humidifier
