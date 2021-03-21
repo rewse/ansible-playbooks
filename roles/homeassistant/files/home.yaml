@@ -70,8 +70,6 @@ cards:
           - value: below_horizon
       - type: entities
         entities:
-          - entity: switch.living_room_downlights
-            name: Downlights
           - entity: switch.living_room_dimming_downlights
             name: Dimming Lights
           - entity: fan.living_room_ceiling_fans
@@ -87,6 +85,8 @@ cards:
         entity: climate.living_room_ac
       - type: entities
         entities:
+          - entity: switch.living_room_downlights
+            name: Downlights
           - entity: light.living_room_tv_light
             name: TV Light
           - entity: light.living_room_entrance_light
