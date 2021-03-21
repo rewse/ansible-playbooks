@@ -9,6 +9,7 @@
         - light.living_room_downlights
         - light.living_room_footlight
         - media_player.aventage
+        - media_player.firetv
         - media_player.heargo2
         - media_player.regza
         - media_player.stw2000
@@ -26,6 +27,10 @@
         - sensor.balcony_humidity
         - sensor.balcony_temperature
     entity_config:
+      media_player.firetv:
+        feature_list:
+          - feature: on_off
+          - feature: play_pause
       media_player.heargo2:
         feature_list:
           - feature: on_off
