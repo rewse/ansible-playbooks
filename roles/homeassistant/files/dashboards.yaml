@@ -1,3 +1,8 @@
+lovelace-controls:
+  mode: yaml
+  filename: ui/controls.yaml
+  title: Controls
+  icon: mdi:tune-vertical
 lovelace-machines:
   mode: yaml
   filename: ui/machines.yaml

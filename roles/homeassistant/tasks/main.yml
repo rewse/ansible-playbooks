@@ -536,6 +536,12 @@
     dest: /srv/homeassistant/ui
   tags: [homeassistant, homeassistant-ui]
 
+- name: Copy controls.yaml
+  copy:
+    src: controls.yaml
+    dest: /srv/homeassistant/ui
+  tags: [homeassistant, homeassistant-ui]
+
 - name: Copy machines.yaml
   copy:
     src: machines.yaml

@@ -1,0 +1,157 @@
+title: Controls
+views:
+  - path: livingroom
+    title: Living Room
+    icon: 'mdi:sofa-single'
+    badges: []
+    cards:
+      - type: entities
+        title: Living Room Appliances
+        entities:
+          - entity: switch.living_room_dimming_downlights
+            name: Dimming Downlights
+          - entity: fan.living_room_ceiling_fans
+            name: Ceiling Fan
+          - entity: switch.living_room_humidifier
+            name: Humidifier
+          - entity: group.living_area_floor_heatings
+            name: Floor Heating
+        show_header_toggle: false
+      - type: thermostat
+        entity: climate.living_room_ac
+      - type: entities
+        title: Living Room Lights
+        entities:
+          - entity: switch.living_room_downlights
+            name: Downlights
+          - entity: light.living_room_tv_light
+            name: TV Light
+          - entity: light.living_room_entrance_light
+            name: Entrance Light
+          - entity: switch.living_room_footlight
+            name: Footlight
+      - type: entities
+        title: Living Room Automations
+        entities:
+          - entity: automation.turn_on_living_room_ceiling_fan
+            name: Turn on Ceiling Fan
+            secondary_info: last-triggered
+          - entity: automation.turn_on_living_area_floor_heating
+            name: Turn on Floor Heatings
+            secondary_info: last-triggered
+          - entity: input_number.living_room_floor_heating_turnedon_threshold
+            name: Floor Heatings Threshold
+          - entity: automation.turn_on_living_room_humidifier
+            name: Turn on Humidifier
+            secondary_info: last-triggered
+          - entity: input_number.living_room_humidifier_turnedon_threshold
+            name: Turned on Humidifier Threshold
+          - entity: automation.turn_off_living_room_humidifier
+            secondary_info: last-triggered
+          - entity: input_number.living_room_humidifier_turnedoff_threshold
+            name: Turned off Humidifier Threshold
+          - entity: automation.turn_on_living_room_ac_cleaner
+            name: Turn on AC Cleaner
+            secondary_info: last-triggered
+          - entity: automation.turn_on_living_room_downlights
+            name: Turn on Downlights
+            secondary_info: last-triggered
+          - entity: input_number.living_room_downlights_turnedon_threshold
+            name: Downlights Threshold
+          - entity: automation.turn_down_living_room
+            name: Turn down
+            secondary_info: last-triggered
+          - entity: input_datetime.living_room_turneddown_time
+            name: Turned down Time
+          - entity: automation.turn_down_living_room_more
+            name: Turn down More
+            secondary_info: last-triggered
+          - entity: input_datetime.living_room_turneddown_more_time
+            name: Turned down More Time
+          - entity: automation.turn_off_living_room_extra_lights
+            secondary_info: last-triggered
+        show_header_toggle: false
+        state_color: false
+      - type: vertical-stack
+        cards:
+          - type: custom:mini-media-player
+            entity: media_player.aventage
+            artwork: material
+            hide:
+              controls: true
+              power_state: false
+          - type: custom:mini-media-player
+            entity: media_player.regza
+            artwork: material
+            hide:
+              power_state: false
+          - type: custom:mini-media-player
+            entity: media_player.appletv
+            artwork: material
+            hide:
+              volume: true
+              power_state: false
+          - type: custom:mini-media-player
+            entity: media_player.firetv
+            artwork: material
+            hide:
+              power_state: false
+          - type: custom:mini-media-player
+            entity: media_player.heargo2
+            artwork: material
+            hide:
+              controls: true
+              mute: true
+              power_state: false
+          - type: custom:mini-media-player
+            entity: media_player.stw2000
+            artwork: material
+            hide:
+              power_state: false
+  - path: bedroom
+    title: Bedroom
+    icon: 'mdi:bed'
+    badges: []
+    cards:
+      - type: entities
+        title: Bedroom Appliances
+        entities:
+          - entity: switch.bedroom_curtains
+            name: Curtains
+      - type: thermostat
+        entity: climate.bedroom_ac
+      - type: entities
+        title: Bedroom Lights
+        entities:
+          - entity: light.bedroom_light
+            name: Light
+      - type: entities
+        entities:
+          - entity: automation.open_bedroom_curtains_weekday
+            name: Open Curtains for Workday
+          - entity: input_datetime.bedroom_curtains_opened_time_workday
+            name: Curtains Opened Time for Workday
+          - entity: automation.open_bedroom_curtains_temporarily
+            name: Open Curtains Temporarily
+          - entity: input_datetime.bedroom_curtains_opened_time
+            name: Curtains Opened Time Temporarily
+          - entity: automation.turn_down_bedoom
+            name: Turn down
+          - entity: input_datetime.bedroom_turneddown_time
+            name: Turned down Time
+        title: Bedroom Automations
+        show_header_toggle: false
+  - path: bathroom
+    title: Bedroom
+    icon: 'mdi:shower'
+    badges: []
+    cards:
+      - type: entities
+        entities:
+          - entity: light.bathroom_entrance_light
+            name: Entrance Light
+          - entity: light.bathroom_left_light
+            name: Left Light
+          - entity: light.bathroom_right_light
+            name: Right Light
+        title: Bathroom Lights
