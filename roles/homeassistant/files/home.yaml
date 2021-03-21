@@ -141,10 +141,15 @@ cards:
           - value: above_horizon
           - value: below_horizon
       - type: entities
+        title: Bedroom Appliances
+        entities:
+          - entity: switch.bedroom_curtains
+            name: Curtains
+      - type: entities
+        title: Bedroom Lights
         entities:
           - entity: light.bedroom_light
             name: Light
-        title: Bedroom Lights
         show_header_toggle: false
   - type: vertical-stack
     cards:
