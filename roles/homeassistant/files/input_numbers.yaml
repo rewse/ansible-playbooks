@@ -18,8 +18,8 @@ living_room_ac_forcibly_turnedon_threshold:
   icon: mdi:thermometer-alert
 living_room_downlights_turnedon_threshold:
   name: Living Room Downlights Turned on Threshold
-  min: 19
-  max: 23
+  min: 17
+  max: 25
   unit_of_measurement: lx
   icon: mdi:weather-sunset-down
 living_room_floor_heating_turnedon_threshold:
