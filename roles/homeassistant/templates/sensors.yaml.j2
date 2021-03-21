@@ -174,19 +174,19 @@
       unit_of_measurement: °C
       value_template: "{{ ((states('sensor.living_room_temperature') | float - 30.5) * 0.90739 + (states('sensor.living_room_humidity') | float - 60.0) * 0.14775 + (states('sensor.living_room_temperature') | float - 30.5) * (states('sensor.living_room_humidity') | float - 60.0) * 0.003655 + 27.77) | round(1) }}"
       icon_template: mdi:thermometer-lines
-    bedroom_room_wbgt:
+    bedroom_wbgt:
       unique_id: sensor.template.bedroom_wbgt
       friendly_name: Bedroom WBGT
       unit_of_measurement: °C
       value_template: "{{ ((states('sensor.bedroom_temperature') | float - 30.5) * 0.90739 + (states('sensor.bedroom_humidity') | float - 60.0) * 0.14775 + (states('sensor.bedroom_temperature') | float - 30.5) * (states('sensor.bedroom_humidity') | float - 60.0) * 0.003655 + 27.77) | round(1) }}"
       icon_template: mdi:thermometer-lines
-    storage_room_wbgt:
+    storage_wbgt:
       unique_id: sensor.template.storage_wbgt
       friendly_name: Storage WBGT
       unit_of_measurement: °C
       value_template: "{{ ((states('sensor.storage_temperature') | float - 30.5) * 0.90739 + (states('sensor.storage_humidity') | float - 60.0) * 0.14775 + (states('sensor.storage_temperature') | float - 30.5) * (states('sensor.storage_humidity') | float - 60.0) * 0.003655 + 27.77) | round(1) }}"
       icon_template: mdi:thermometer-lines
-    balcony_room_wbgt:
+    balcony_wbgt:
       unique_id: sensor.template.balcony_wbgt
       friendly_name: Balcony WBGT
       unit_of_measurement: °C
