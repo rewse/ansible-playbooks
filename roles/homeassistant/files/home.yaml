@@ -247,7 +247,7 @@ cards:
   - type: entities
     entities:
       - entity: automation.turn_on_living_room_ceiling_fan
-      - entity: automation.turn_on_living_room_floor_heating
+      - entity: automation.turn_on_living_area_floor_heating
       - entity: automation.turn_on_living_room_humidifier
       - entity: automation.turn_off_living_room_humidifier
       - entity: automation.turn_on_living_room_ac_cleaner
