@@ -1,6 +1,5 @@
   - filter:
       include_entities:
-        - camera.guppy_cat_cage
         - climate.bedroom_ac
         - climate.living_room_ac
         - cover.bedroom_curtains
@@ -11,7 +10,6 @@
         - media_player.aventage
         - media_player.firetv
         - media_player.heargo2
-        - media_player.regza
         - media_player.stw2000
         - switch.bedroom_ac_cleaner
         - switch.living_room_ac_cleaner
@@ -32,9 +30,6 @@
           - feature: on_off
           - feature: play_pause
       media_player.heargo2:
-        feature_list:
-          - feature: on_off
-      media_player.regza:
         feature_list:
           - feature: on_off
       media_player.stw2000:
