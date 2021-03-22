@@ -107,6 +107,7 @@ views:
             entity: media_player.stw2000
             artwork: material
             hide:
+              volume: true
               power_state: false
   - path: bedroom
     title: Bedroom
