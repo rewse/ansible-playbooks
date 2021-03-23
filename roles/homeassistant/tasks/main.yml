@@ -553,12 +553,6 @@
     project_src: /etc
   tags: [homeassistant]
 
-- name: Copy index.php
-  copy:
-    src: index.php
-    dest: /srv/www/html
-  tags: [homeassistant, homeassistant-apache]
-
 - name: Enable proxy
   community.general.apache2_module:
     name: "{{ item }}"
