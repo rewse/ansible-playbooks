@@ -28,7 +28,7 @@
       value_template: >
         {% if states("sensor.bedroom_curtains_position") | int < 50 %}
           on
-        {% else %}
+        {% elif states("sensor.bedroom_curtains_position") | int >= 50 %}
           off
         {% endif %}
       icon_template: >
