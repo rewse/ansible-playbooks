@@ -63,16 +63,18 @@
           device_id: C12F0898BAC5
           command: press
       value_template: >
-        {% if states("sensor.living_room_humidifier_plug_current") | int > 100 %}
+        {% if states("sensor.living_room_humidifier_plug_current") | int > 200 %}
           on
-        {% else %}
+        {% elif states("sensor.living_room_humidifier_plug_current") | int <= 200 %}
           off
         {% endif %}
       icon_template: >
-        {% if states("sensor.living_room_humidifier_plug_current") | int > 100 %}
+        {% if states("sensor.living_room_humidifier_plug_current") | int > 200 %}
           mdi:air-humidifier
-        {% else %}
+        {% elif states("sensor.living_room_humidifier_plug_current") | int <= 200 %}
           mdi:air-humidifier-off
+        {% else %}
+          mdi:air-humidifier
         {% endif %}
     living_room_floor_heating:
       unique_id: living_room_floor_heating
