@@ -536,6 +536,24 @@
     dest: /srv/homeassistant/ui
   tags: [homeassistant, homeassistant-ui]
 
+- name: Copy livingroom.yaml
+  copy:
+    src: livingroom.yaml
+    dest: /srv/homeassistant/ui
+  tags: [homeassistant, homeassistant-ui]
+
+- name: Copy bedroom.yaml
+  copy:
+    src: bedroom.yaml
+    dest: /srv/homeassistant/ui
+  tags: [homeassistant, homeassistant-ui]
+
+- name: Copy bathroom.yaml
+  copy:
+    src: bathroom.yaml
+    dest: /srv/homeassistant/ui
+  tags: [homeassistant, homeassistant-ui]
+
 - name: Copy controls.yaml
   copy:
     src: controls.yaml
