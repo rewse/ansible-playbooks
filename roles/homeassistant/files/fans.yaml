@@ -1,7 +1,7 @@
 - platform: template
   fans:
     living_room_ceiling_fans:
-      unique_id: living_room_ceiling_fans
+      unique_id: fan.template.living_room_ceiling_fans
       friendly_name: Living Room Ceiling Fans
       value_template: '{{ states("input_boolean.living_room_ceiling_fans_state") }}'
       turn_on:
