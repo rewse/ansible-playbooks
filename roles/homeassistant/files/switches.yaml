@@ -1,7 +1,7 @@
 - platform: template
   switches:
     bedroom_ac_cleaner:
-      unique_id: bedroom_ac_cleaner
+      unique_id: switch.template.bedroom_ac_cleaner
       friendly_name: Bedroom AC Cleaner
       turn_on:
         service: rest_command.control_remo_device
@@ -13,7 +13,7 @@
           signal_id: c19cf586-6b90-40d7-b5cc-b3c207778465
       icon_template: mdi:broom
     bedroom_curtains:
-      unique_id: bedroom_curtains
+      unique_id: switch.template.bedroom_curtains
       friendly_name: Bedroom Curtains
       turn_on: # open
         service: rest_command.control_switchbot_device
@@ -38,7 +38,7 @@
           mdi:window-shutter
         {% endif %}
     living_room_ac_cleaner:
-      unique_id: living_room_ac_cleaner
+      unique_id: switch.template.living_room_ac_cleaner
       friendly_name: Living Room AC Cleaner
       turn_on:
         service: rest_command.control_remo_device
@@ -50,7 +50,7 @@
           signal_id: 70d5445a-3988-404b-82da-6793a1419425
       icon_template: mdi:broom
     living_room_humidifier:
-      unique_id: living_room_humidifier
+      unique_id: switch.template.living_room_humidifier
       friendly_name: Living Room Humidifier
       turn_on:
         service: rest_command.control_switchbot_device
@@ -77,7 +77,7 @@
           mdi:air-humidifier
         {% endif %}
     living_room_floor_heating:
-      unique_id: living_room_floor_heating
+      unique_id: switch.template.living_room_floor_heating
       friendly_name: Living Room Floor Heating
       turn_on:
         service: rest_command.control_switchbot_device
@@ -91,7 +91,7 @@
           command: press
       icon_template: mdi:grid
     study_floor_heating:
-      unique_id: study_floor_heating
+      unique_id: switch.template.study_floor_heating
       friendly_name: Study Floor Heating
       turn_on:
         service: rest_command.control_switchbot_device
@@ -105,7 +105,7 @@
           command: press
       icon_template: mdi:grid
     living_room_downlights:
-      unique_id: living_room_downlights
+      unique_id: switch.template.living_room_downlights
       friendly_name: Living Room Downlights
       turn_on:
         service: rest_command.control_remo_device
@@ -117,7 +117,7 @@
           signal_id: 281417a3-3a19-4a0a-b9fa-9f19d0d3f654
       icon_template: mdi:brightness-5
     living_room_dimming_downlights:
-      unique_id: living_room_dimming_downlights
+      unique_id: switch.template.living_room_dimming_downlights
       friendly_name: Living Room Dimming Downlights
       turn_on:
         service: rest_command.control_remo_device
