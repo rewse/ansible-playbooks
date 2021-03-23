@@ -358,26 +358,10 @@
   notify: Restart homeassistant
   tags: [homeassistant]
 
-- name: Config utility_meter
-  lineinfile:
-    path: /srv/homeassistant/configuration.yaml
-    insertafter: '^switch:'
-    regexp: '^utility_meter:'
-    line: "utility_meter: !include utility_meters.yaml"
-  notify: Restart homeassistant
-  tags: [homeassistant]
-
-- name: Copy utility_meters.yaml
-  copy:
-    src: utility_meters.yaml
-    dest: /srv/homeassistant
-  notify: Restart homeassistant
-  tags: [homeassistant]
-
 - name: Config zone
   lineinfile:
     path: /srv/homeassistant/configuration.yaml
-    insertafter: '^utility_meter:'
+    insertafter: '^switch:'
     regexp: '^zone:'
     line: "zone: !include zones.yaml"
   notify: Restart homeassistant
