@@ -1,0 +1,33 @@
+path: bedroom
+title: Bedroom
+icon: 'mdi:bed'
+badges: []
+cards:
+  - type: entities
+    title: Bedroom Appliances
+    entities:
+      - entity: switch.bedroom_curtains
+        name: Curtains
+  - type: thermostat
+    entity: climate.bedroom_ac
+  - type: entities
+    title: Bedroom Lights
+    entities:
+      - entity: light.bedroom_light
+        name: Light
+  - type: entities
+    entities:
+      - entity: automation.open_bedroom_curtains_weekday
+        name: Open Curtains for Workday
+      - entity: input_datetime.bedroom_curtains_opened_time_workday
+        name: Curtains Opened Time for Workday
+      - entity: automation.open_bedroom_curtains_temporarily
+        name: Open Curtains Temporarily
+      - entity: input_datetime.bedroom_curtains_opened_time
+        name: Curtains Opened Time Temporarily
+      - entity: automation.turn_down_bedoom
+        name: Turn down
+      - entity: input_datetime.bedroom_turneddown_time
+        name: Turned down Time
+    title: Bedroom Automations
+    show_header_toggle: false
