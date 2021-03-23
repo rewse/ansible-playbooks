@@ -1,7 +1,7 @@
 - platform: template
   covers:
     bedroom_curtains:
-      unique_id: bedroom_curtains_1
+      unique_id: cover_bedroom_curtains
       friendly_name: Bedroom Curtains
       device_class: curtain
       open_cover:
@@ -13,7 +13,7 @@
       value_template: >
         {% if states("sensor.bedroom_curtains_position") | int < 50 %}
           opening
-        {% else %}
+        {% elif states("sensor.bedroom_curtains_position") | int >= 50 %}
           closed
         {% endif %}
       icon_template: >
