@@ -71,24 +71,6 @@ views:
           - entity: binary_sensor.kasaplug_ent
             icon: mdi:power-socket-us
             secondary_info: last-changed
-      - type: entities
-        title: Clients
-        entities:
-          - entity: device_tracker.bio
-            icon: mdi:cellphone
-            secondary_info: last-changed
-          - entity: device_tracker.desert
-            icon: mdi:tablet
-            secondary_info: last-changed
-          - entity: device_tracker.global
-            icon: mdi:cellphone
-            secondary_info: last-changed
-          - entity: device_tracker.youth
-            icon: mdi:desktop-classic
-            secondary_info: last-changed
-          - entity: device_tracker.e0b55fe8e384
-            icon: mdi:laptop
-            secondary_info: last-changed
       - type: entity
         entity: sensor.dns_hass_rewse_jp
         icon: 'mdi:dns'
