@@ -483,8 +483,6 @@
         certificate: /config/certs/DST_Root_CA_X3.pem
       nature_remo:
         access_token: !secret remo_token
-      recorder:
-        purge_keep_days: 450
       speedtestdotnet:
         scan_interval:
           hours: 1
