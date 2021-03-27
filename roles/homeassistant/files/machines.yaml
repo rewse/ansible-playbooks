@@ -1,7 +1,7 @@
-title: Network
+title: Machines
 views:
-  - path: network
-    title: Network
+  - path: machines
+    title: machines
     icon: mdi:lan
     badges: []
     cards:
