@@ -443,6 +443,21 @@
   notify: Restart homeassistant
   tags: [homeassistant]
 
+- name: Download XiaomiGateway3
+  unarchive:
+    src: https://github.com/AlexxIT/XiaomiGateway3/archive/refs/tags/v1.0.1.zip
+    dest: /tmp
+    remote_src: yes
+  tags: [homeassistant]
+
+- name: Copy XiaomiGateway3
+  copy:
+    src: /tmp/XiaomiGateway3-1.0.1/custom_components/xiaomi_gateway3
+    dest: /srv/homeassistant/custom_components
+    remote_src: yes
+  notify: Restart homeassistant
+  tags: [homeassistant]
+
 - name: Modify configuration.yaml
   blockinfile:
     path: /srv/homeassistant/configuration.yaml
