@@ -6,110 +6,6 @@
   hostname: hass.rewse.jp
   resolver: 192.168.0.1
 - platform: mqtt
-  name: Living Room Temperature
-  unique_id: sensor.mqtt.living_room_temperature
-  state_topic: switchbotmeter/F5DAB9477E91
-  value_template: "{{ value_json.temperature }}"
-  unit_of_measurement: °C
-  availability:
-    - topic: switchbotmeter/F5DAB9477E91/status
-  device_class: temperature
-- platform: mqtt
-  name: Living Room Humidity
-  unique_id: sensor.mqtt.living_room_humidity
-  state_topic: switchbotmeter/F5DAB9477E91
-  value_template: "{{ value_json.humidity }}"
-  unit_of_measurement: "%"
-  availability:
-    - topic: switchbotmeter/F5DAB9477E91/status
-  device_class: humidity
-- platform: mqtt
-  name: Living Room Humiture Method
-  unique_id: sensor.mqtt.living_room_humiture_method
-  state_topic: switchbotmeter/F5DAB9477E91
-  value_template: "{{ value_json.method }}"
-  availability:
-    - topic: switchbotmeter/F5DAB9477E91/status
-  icon: mdi:routes
-- platform: mqtt
-  name: Bedroom Temperature
-  unique_id: sensor.mqtt.bedroom_temperature
-  state_topic: switchbotmeter/F980AECF8644
-  value_template: "{{ value_json.temperature }}"
-  unit_of_measurement: °C
-  availability:
-    - topic: switchbotmeter/F980AECF8644/status
-  device_class: temperature
-- platform: mqtt
-  name: Bedroom Humidity
-  unique_id: sensor.mqtt.bedroom_humidity
-  state_topic: switchbotmeter/F980AECF8644
-  value_template: "{{ value_json.humidity }}"
-  unit_of_measurement: "%"
-  availability:
-    - topic: switchbotmeter/F980AECF8644/status
-  device_class: humidity
-- platform: mqtt
-  name: Bedroom Humiture Method
-  unique_id: sensor.mqtt.bedroom_humiture_method
-  state_topic: switchbotmeter/F980AECF8644
-  value_template: "{{ value_json.method }}"
-  availability:
-    - topic: switchbotmeter/F980AECF8644/status
-  icon: mdi:routes
-- platform: mqtt
-  name: Storage Temperature
-  unique_id: sensor.mqtt.storage_temperature
-  state_topic: switchbotmeter/FD13F5CA5563
-  value_template: "{{ value_json.temperature }}"
-  unit_of_measurement: °C
-  availability:
-    - topic: switchbotmeter/FD13F5CA5563/status
-  device_class: temperature
-- platform: mqtt
-  name: Storage Humidity
-  unique_id: sensor.mqtt.storage_humidity
-  state_topic: switchbotmeter/FD13F5CA5563
-  value_template: "{{ value_json.humidity }}"
-  unit_of_measurement: "%"
-  availability:
-    - topic: switchbotmeter/FD13F5CA5563/status
-  device_class: humidity
-- platform: mqtt
-  unique_id: sensor.mqtt.storage_humiture_method
-  name: Storage Humiture Method
-  state_topic: switchbotmeter/FD13F5CA5563
-  value_template: "{{ value_json.method }}"
-  availability:
-    - topic: switchbotmeter/FD13F5CA5563/status
-  icon: mdi:routes
-- platform: mqtt
-  unique_id: sensor.mqtt.balcony_temperature
-  name: Balcony Temperature
-  state_topic: switchbotmeter/EDE4EAA09EA3
-  value_template: "{{ value_json.temperature }}"
-  unit_of_measurement: °C
-  availability:
-    - topic: switchbotmeter/EDE4EAA09EA3/status
-  device_class: temperature
-- platform: mqtt
-  unique_id: sensor.mqtt.balcony_humidity
-  name: Balcony Humidity
-  state_topic: switchbotmeter/EDE4EAA09EA3
-  value_template: "{{ value_json.humidity }}"
-  unit_of_measurement: "%"
-  availability:
-    - topic: switchbotmeter/EDE4EAA09EA3/status
-  device_class: humidity
-- platform: mqtt
-  unique_id: sensor.mqtt.balcony_humiture_method
-  name: Balcony Humiture Method
-  state_topic: switchbotmeter/EDE4EAA09EA3
-  value_template: "{{ value_json.method }}"
-  availability:
-    - topic: switchbotmeter/EDE4EAA09EA3/status
-  icon: mdi:routes
-- platform: mqtt
   unique_id: sensor.mqtt.enecoq_fee_low
   name: enecoQ Fee Low
   state_topic: enecoq/fee
@@ -172,23 +68,17 @@
       unique_id: sensor.template.living_room_wbgt
       friendly_name: Living Room WBGT
       unit_of_measurement: °C
-      value_template: "{{ ((states('sensor.living_room_temperature') | float - 30.5) * 0.90739 + (states('sensor.living_room_humidity') | float - 60.0) * 0.14775 + (states('sensor.living_room_temperature') | float - 30.5) * (states('sensor.living_room_humidity') | float - 60.0) * 0.003655 + 27.77) | round(1) }}"
+      value_template: "{{ ((states('sensor.0x158d0002b965e7_temperature') | float - 30.5) * 0.90739 + (states('sensor.0x158d0002b965e7_humidity') | float - 60.0) * 0.14775 + (states('sensor.0x158d0002b965e7_temperature') | float - 30.5) * (states('sensor.0x158d0002b965e7_humidity') | float - 60.0) * 0.003655 + 27.77) | round(2) }}"
       icon_template: mdi:thermometer-lines
     bedroom_wbgt:
       unique_id: sensor.template.bedroom_wbgt
       friendly_name: Bedroom WBGT
       unit_of_measurement: °C
-      value_template: "{{ ((states('sensor.bedroom_temperature') | float - 30.5) * 0.90739 + (states('sensor.bedroom_humidity') | float - 60.0) * 0.14775 + (states('sensor.bedroom_temperature') | float - 30.5) * (states('sensor.bedroom_humidity') | float - 60.0) * 0.003655 + 27.77) | round(1) }}"
-      icon_template: mdi:thermometer-lines
-    storage_wbgt:
-      unique_id: sensor.template.storage_wbgt
-      friendly_name: Storage WBGT
-      unit_of_measurement: °C
-      value_template: "{{ ((states('sensor.storage_temperature') | float - 30.5) * 0.90739 + (states('sensor.storage_humidity') | float - 60.0) * 0.14775 + (states('sensor.storage_temperature') | float - 30.5) * (states('sensor.storage_humidity') | float - 60.0) * 0.003655 + 27.77) | round(1) }}"
+      value_template: "{{ ((states('sensor.0x158d00041da691_temperature') | float - 30.5) * 0.90739 + (states('sensor.0x158d00041da691_humidity') | float - 60.0) * 0.14775 + (states('sensor.0x158d00041da691_temperature') | float - 30.5) * (states('sensor.0x158d00041da691_humidity') | float - 60.0) * 0.003655 + 27.77) | round(2) }}"
       icon_template: mdi:thermometer-lines
     balcony_wbgt:
       unique_id: sensor.template.balcony_wbgt
       friendly_name: Balcony WBGT
       unit_of_measurement: °C
-      value_template: "{{ ((states('sensor.balcony_temperature') | float - 30.5) * 0.90739 + (states('sensor.balcony_humidity') | float - 60.0) * 0.14775 + (states('sensor.balcony_temperature') | float - 30.5) * (states('sensor.balcony_humidity') | float - 60.0) * 0.003655 + 27.77) | round(1) }}"
+      value_template: "{{ ((states('sensor.0x158d0003cd3c39_temperature') | float - 30.5) * 0.90739 + (states('sensor.0x158d0003cd3c39_humidity') | float - 60.0) * 0.14775 + (states('sensor.0x158d0003cd3c39_temperature') | float - 30.5) * (states('sensor.0x158d0003cd3c39_humidity') | float - 60.0) * 0.003655 + 27.77) | round(2) }}"
       icon_template: mdi:thermometer-lines
