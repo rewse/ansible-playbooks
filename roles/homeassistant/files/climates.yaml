@@ -1,5 +1,5 @@
 - platform: generic_thermostat
   name: Living Area Floor Heating
   heater: group.living_area_floor_heatings
-  target_sensor: sensor.living_room_temperature
+  target_sensor: sensor.0x158d0002b965e7_temperature
   target_temp: 25

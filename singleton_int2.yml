@@ -1,6 +1,0 @@
----
-- hosts: singleton_int2
-  become: yes
-  remote_user: ubuntu
-  roles:
-    - switchbotmeter

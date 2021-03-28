@@ -16,14 +16,6 @@
         - switch.living_room_floor_heating
         - switch.living_room_humidifier
         - switch.study_floor_heating
-        - sensor.living_room_humidity
-        - sensor.living_room_temperature
-        - sensor.bedroom_humidity
-        - sensor.bedroom_temperature
-        - sensor.storage_humidity
-        - sensor.storage_temperature
-        - sensor.balcony_humidity
-        - sensor.balcony_temperature
     entity_config:
       media_player.firetv:
         feature_list:

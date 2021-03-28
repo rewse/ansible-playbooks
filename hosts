@@ -8,7 +8,7 @@ youth.local
 bravo.rewse.jp
 charlie.rewse.jp
 fox.rewse.jp
-hotel.rewse.jp
+#hotel.rewse.jp
 
 [ec2]
 bravo.rewse.jp
@@ -16,16 +16,13 @@ charlie.rewse.jp
 
 [raspberrypi]
 fox.rewse.jp
-hotel.rewse.jp
+#hotel.rewse.jp
 
 [singleton_ext]
 bravo.rewse.jp
 
-[singleton_int1]
+[singleton_int]
 fox.rewse.jp
-
-[singleton_int2]
-hotel.rewse.jp
 
 [servers]
 charlie.rewse.jp
