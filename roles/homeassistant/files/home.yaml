@@ -343,6 +343,18 @@ cards:
       - entity: binary_sensor.bathroom_sensor_motion
         name: Bathroom Motion
         secondary_info: last-changed
+  - type: entities
+    title: Window Sensors
+    entities:
+      - entity: binary_sensor.0x158d0001dff2df_contact
+        name: Living Room Window
+        secondary_info: last-changed
+      - entity: binary_sensor.0x158d0003cc15bc_contact
+        name: Study Window
+        secondary_info: last-changed
+      - entity: binary_sensor.0x158d0003ceb0f6_contact
+        name: Bedroom Window
+        secondary_info: last-changed
   - type: conditional
     conditions:
       - entity: sensor.seventeentrack_packages_in_transit
