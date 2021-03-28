@@ -37,16 +37,16 @@ cards:
       - entity: automation.turn_on_living_area_floor_heating
         name: Turn on Floor Heatings
         secondary_info: last-triggered
-      - entity: input_number.living_room_floor_heating_turnedon_threshold
+      - entity: input_number.living_room_floor_heating_turned_on_threshold
         name: Floor Heatings Threshold
       - entity: automation.turn_on_living_room_humidifier
         name: Turn on Humidifier
         secondary_info: last-triggered
-      - entity: input_number.living_room_humidifier_turnedon_threshold
+      - entity: input_number.living_room_humidifier_turned_on_threshold
         name: Turned on Humidifier Threshold
       - entity: automation.turn_off_living_room_humidifier
         secondary_info: last-triggered
-      - entity: input_number.living_room_humidifier_turnedoff_threshold
+      - entity: input_number.living_room_humidifier_turned_off_threshold
         name: Turned off Humidifier Threshold
       - entity: automation.turn_on_living_room_ac_cleaner
         name: Turn on AC Cleaner
@@ -54,17 +54,17 @@ cards:
       - entity: automation.turn_on_living_room_downlights
         name: Turn on Downlights
         secondary_info: last-triggered
-      - entity: input_number.living_room_downlights_turnedon_threshold
+      - entity: input_number.living_room_downlights_turned_on_threshold
         name: Downlights Threshold
       - entity: automation.turn_down_living_room
         name: Turn down
         secondary_info: last-triggered
-      - entity: input_datetime.living_room_turneddown_time
+      - entity: input_datetime.living_room_turned_down_time
         name: Turned down Time
       - entity: automation.turn_down_living_room_more
         name: Turn down More
         secondary_info: last-triggered
-      - entity: input_datetime.living_room_turneddown_more_time
+      - entity: input_datetime.living_room_turned_down_more_time
         name: Turned down More Time
       - entity: automation.turn_off_living_room_extra_lights
         secondary_info: last-triggered
@@ -114,4 +114,4 @@ cards:
     states:
       - arm_home
       - arm_away
-    entity: alarm_control_panel.0xbc33acfffe07698a_alarm
+    entity: alarm_control_panel.xiaomi_gateway

@@ -8,7 +8,7 @@ cards:
       - type: custom:mini-graph-card
         name: Living Room Temperature
         entities:
-          - entity: sensor.0x158d0002b965e7_temperature
+          - entity: sensor.living_room_temperature
           - entity: sensor.living_room_wbgt
             show_state: true
             show_fill: false
@@ -51,7 +51,7 @@ cards:
       - type: custom:mini-graph-card
         name: Living Room Light Level
         entities:
-          - entity: sensor.living_room_sensor_light_level
+          - entity: sensor.living_room_light_level
           - entity: sun.sun
             color: gray
             show_line: false
@@ -100,7 +100,7 @@ cards:
       - type: custom:mini-graph-card
         name: Bedroom Temperature
         entities:
-          - entity: sensor.0x158d00041da691_temperature
+          - entity: sensor.bedroom_temperature
           - entity: sensor.bedroom_wbgt
             show_state: true
             show_fill: false
@@ -123,7 +123,7 @@ cards:
       - type: custom:mini-graph-card
         name: Bedroom Humidity
         entities:
-          - entity: sensor.0x158d00041da691_humidity
+          - entity: sensor.bedroom_humidity
           - entity: sun.sun
             color: gray
             show_line: false
@@ -157,7 +157,7 @@ cards:
     cards:
       - type: custom:mini-graph-card
         entities:
-          - entity: sensor.bathroom_sensor_temperature
+          - entity: sensor.bathroom_motion_sensor_temperature
             name: Bathroom Temperature
           - entity: sun.sun
             color: gray
@@ -178,7 +178,7 @@ cards:
       - type: custom:mini-graph-card
         name: Bathroom Light Level
         entities:
-          - entity: sensor.bathroom_sensor_light_level
+          - entity: sensor.bathroom_light_level
           - entity: sun.sun
             color: gray
             show_line: false
@@ -206,7 +206,7 @@ cards:
       - type: custom:mini-graph-card
         name: Balcony Temperature
         entities:
-          - entity: sensor.0x158d0003cd3c39_temperature
+          - entity: sensor.balcony_temperature
           - entity: sensor.balcony_wbgt
             show_state: true
             show_fill: false
@@ -229,7 +229,7 @@ cards:
       - type: custom:mini-graph-card
         name: Balcony Humidity
         entities:
-          - entity: sensor.0x158d0003cd3c39_humidity
+          - entity: sensor.balcony_humidity
           - entity: sun.sun
             color: gray
             show_line: false
@@ -249,7 +249,7 @@ cards:
       - type: custom:mini-graph-card
         name: Balcony Pressure
         entities:
-          - entity: sensor.0x158d0003cd3c39_pressure
+          - entity: sensor.balcony_pressure
           - entity: sun.sun
             color: gray
             show_line: false
@@ -274,12 +274,12 @@ cards:
       - entity: automation.turn_on_living_room_humidifier
       - entity: automation.turn_off_living_room_humidifier
       - entity: automation.turn_on_living_room_ac_cleaner
-      - entity: automation.open_bedroom_curtains_weekday
+      - entity: automation.open_bedroom_curtains_workday
       - entity: automation.turn_on_living_room_downlights
       - entity: automation.turn_down_living_room
       - entity: automation.turn_down_living_room_more
       - entity: automation.turn_off_living_room_extra_lights
-      - entity: automation.turn_down_bedoom
+      - entity: automation.turn_down_bedroom
       - entity: automation.turn_off_xiaomi_alarm
   - type: custom:mini-graph-card
     entities:
@@ -334,26 +334,20 @@ cards:
   - type: entities
     title: Motion Sensors
     entities:
-      - entity: binary_sensor.living_room_sensor_motion
-        name: Living Room Motion
+      - entity: binary_sensor.living_room_motion
         secondary_info: last-changed
-      - entity: binary_sensor.study_sensor_motion
-        name: Study Motion
+      - entity: binary_sensor.study_motion
         secondary_info: last-changed
-      - entity: binary_sensor.bathroom_sensor_motion
-        name: Bathroom Motion
+      - entity: binary_sensor.bathroom_motion
         secondary_info: last-changed
   - type: entities
     title: Window Sensors
     entities:
-      - entity: binary_sensor.0x158d0001dff2df_contact
-        name: Living Room Window
+      - entity: binary_sensor.living_room_window
         secondary_info: last-changed
-      - entity: binary_sensor.0x158d0003cc15bc_contact
-        name: Study Window
+      - entity: binary_sensor.study_window
         secondary_info: last-changed
-      - entity: binary_sensor.0x158d0003ceb0f6_contact
-        name: Bedroom Window
+      - entity: binary_sensor.bedroom_window
         secondary_info: last-changed
   - type: conditional
     conditions:
