@@ -331,6 +331,18 @@ cards:
     entity: camera.guppy_cat_cage
     image: 'https://demo.home-assistant.io/stub_config/bedroom.png'
     name: Cat Cage Camera
+  - type: entities
+    title: Motion Sensors
+    entities:
+      - entity: binary_sensor.living_room_sensor_motion
+        name: Living Room Motion
+        secondary_info: last-changed
+      - entity: binary_sensor.study_sensor_motion
+        name: Study Motion
+        secondary_info: last-changed
+      - entity: binary_sensor.bathroom_sensor_motion
+        name: Bathroom Motion
+        secondary_info: last-changed
   - type: conditional
     conditions:
       - entity: sensor.seventeentrack_packages_in_transit
