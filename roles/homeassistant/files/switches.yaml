@@ -6,11 +6,11 @@
       turn_on:
         service: rest_command.control_remo_device
         data:
-          signal_id: 394621f7-eee7-4b0d-bdea-1510724e885d
+          signal_id: 7a7700f7-bee8-4227-bad0-9fafade1cfcb
       turn_off:
         service: rest_command.control_remo_device
         data:
-          signal_id: c19cf586-6b90-40d7-b5cc-b3c207778465
+          signal_id: 752e4cd3-b940-43e7-92b1-80c455612c96
       icon_template: mdi:broom
     bedroom_curtains:
       unique_id: switch.template.bedroom_curtains
