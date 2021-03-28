@@ -35,6 +35,9 @@ views:
           - entity: binary_sensor.huebridge
             icon: mdi:access-point-network
             secondary_info: last-changed
+          - entity: binary_sensor.xiaomigateway
+            icon: mdi:access-point-network
+            secondary_info: last-changed
           - entity: binary_sensor.guppy
             icon: mdi:nas
             secondary_info: last-changed
