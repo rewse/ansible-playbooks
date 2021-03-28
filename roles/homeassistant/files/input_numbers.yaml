@@ -1,40 +1,40 @@
-living_room_ac_turnedoff_threshold:
+living_room_ac_turned_off_threshold:
   name: Living Room AC Turned off Threshold
   min: 19
   max: 27
   unit_of_measurement: °C
   icon: mdi:thermometer-chevron-down
-living_room_ac_turnedon_threshold:
+living_room_ac_turned_on_threshold:
   name: Living Room AC Turned on Threshold
   min: 24
   max: 32
   unit_of_measurement: °C
   icon: mdi:thermometer-chevron-up
-living_room_ac_forcibly_turnedon_threshold:
+living_room_ac_forcibly_turned_on_threshold:
   name: Living Room AC Forcibly Turned on Threshold
   min: 27
   max: 35
   unit_of_measurement: °C
   icon: mdi:thermometer-alert
-living_room_downlights_turnedon_threshold:
+living_room_downlights_turned_on_threshold:
   name: Living Room Downlights Turned on Threshold
   min: 17
   max: 25
   unit_of_measurement: lx
   icon: mdi:weather-sunset-down
-living_room_floor_heating_turnedon_threshold:
+living_room_floor_heating_turned_on_threshold:
   name: Living Room Floor Heating Turned on Threshold
   min: 19
   max: 27
   unit_of_measurement: °C
   icon: mdi:thermometer-chevron-down
-living_room_humidifier_turnedon_threshold:
+living_room_humidifier_turned_on_threshold:
   name: Living Room Humidifier Turned on Threshold
   min: 36
   max: 44
   unit_of_measurement: "%"
   icon: mdi:water-percent-alert
-living_room_humidifier_turnedoff_threshold:
+living_room_humidifier_turned_off_threshold:
   name: Living Room Humidifier Turned off Threshold
   min: 46
   max: 54
