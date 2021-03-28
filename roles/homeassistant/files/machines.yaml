@@ -41,9 +41,6 @@ views:
           - entity: binary_sensor.fox
             icon: mdi:raspberry-pi
             secondary_info: last-changed
-          - entity: binary_sensor.hotel
-            icon: mdi:raspberry-pi
-            secondary_info: last-changed
           - entity: binary_sensor.justio
             icon: mdi:printer
             secondary_info: last-changed

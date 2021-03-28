@@ -6,8 +6,9 @@ cards:
   - type: vertical-stack
     cards:
       - type: custom:mini-graph-card
+        name: Living Room Temperature
         entities:
-          - entity: sensor.living_room_temperature
+          - entity: sensor.0x158d0002b965e7_temperature
           - entity: sensor.living_room_wbgt
             show_state: true
             show_fill: false
@@ -28,8 +29,9 @@ cards:
           - value: above_horizon
           - value: below_horizon
       - type: custom:mini-graph-card
+        name: Living Room Humidity
         entities:
-          - entity: sensor.living_room_humidity
+          - entity: sensor.0x158d0002b965e7_humidity
           - entity: sun.sun
             color: gray
             show_line: false
@@ -96,8 +98,9 @@ cards:
   - type: vertical-stack
     cards:
       - type: custom:mini-graph-card
+        name: Bedroom Temperature
         entities:
-          - entity: sensor.bedroom_temperature
+          - entity: sensor.0x158d00041da691_temperature
           - entity: sensor.bedroom_wbgt
             show_state: true
             show_fill: false
@@ -118,8 +121,9 @@ cards:
           - value: above_horizon
           - value: below_horizon
       - type: custom:mini-graph-card
+        name: Bedroom Humidity
         entities:
-          - entity: sensor.bedroom_humidity
+          - entity: sensor.0x158d00041da691_humidity
           - entity: sun.sun
             color: gray
             show_line: false
@@ -200,8 +204,9 @@ cards:
   - type: vertical-stack
     cards:
       - type: custom:mini-graph-card
+        name: Balcony Temperature
         entities:
-          - entity: sensor.balcony_temperature
+          - entity: sensor.0x158d0003cd3c39_temperature
           - entity: sensor.balcony_wbgt
             show_state: true
             show_fill: false
@@ -222,8 +227,29 @@ cards:
           - value: above_horizon
           - value: below_horizon
       - type: custom:mini-graph-card
+        name: Balcony Humidity
         entities:
-          - entity: sensor.balcony_humidity
+          - entity: sensor.0x158d0003cd3c39_humidity
+          - entity: sun.sun
+            color: gray
+            show_line: false
+            show_points: false
+            y_axis: secondary
+        hours_to_show: 48
+        points_per_hour: 4
+        animate: true
+        height: 200
+        hour24: true
+        show:
+          legend: false
+          labels_secondary: false
+        state_map:
+          - value: above_horizon
+          - value: below_horizon
+      - type: custom:mini-graph-card
+        name: Balcony Pressure
+        entities:
+          - entity: sensor.0x158d0003cd3c39_pressure
           - entity: sun.sun
             color: gray
             show_line: false
