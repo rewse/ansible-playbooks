@@ -68,6 +68,8 @@ cards:
         name: Turned down More Time
       - entity: automation.turn_off_living_room_extra_lights
         secondary_info: last-triggered
+      - entity: automation.turn_off_xiaomi_alarm
+        secondary_info: last-triggered
     show_header_toggle: false
     state_color: false
   - type: vertical-stack
@@ -107,3 +109,9 @@ cards:
         hide:
           volume: true
           power_state: false
+  - type: alarm-panel
+    name: Xiami Alarm
+    states:
+      - arm_home
+      - arm_away
+    entity: alarm_control_panel.0xbc33acfffe07698a_alarm

@@ -267,6 +267,7 @@ cards:
           - value: above_horizon
           - value: below_horizon
   - type: entities
+    title: Automations
     entities:
       - entity: automation.turn_on_living_room_ceiling_fan
       - entity: automation.turn_on_living_area_floor_heating
@@ -279,7 +280,7 @@ cards:
       - entity: automation.turn_down_living_room_more
       - entity: automation.turn_off_living_room_extra_lights
       - entity: automation.turn_down_bedoom
-    title: Automations
+      - entity: automation.turn_off_xiaomi_alarm
   - type: custom:mini-graph-card
     entities:
       - entity: sensor.enecoq_fee_total
