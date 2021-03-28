@@ -68,17 +68,17 @@
       unique_id: sensor.template.living_room_wbgt
       friendly_name: Living Room WBGT
       unit_of_measurement: °C
-      value_template: "{{ ((states('sensor.0x158d0002b965e7_temperature') | float - 30.5) * 0.90739 + (states('sensor.0x158d0002b965e7_humidity') | float - 60.0) * 0.14775 + (states('sensor.0x158d0002b965e7_temperature') | float - 30.5) * (states('sensor.0x158d0002b965e7_humidity') | float - 60.0) * 0.003655 + 27.77) | round(2) }}"
+      value_template: "{{ ((states('sensor.living_room_temperature') | float - 30.5) * 0.90739 + (states('sensor.living_room_humidity') | float - 60.0) * 0.14775 + (states('sensor.living_room_temperature') | float - 30.5) * (states('sensor.living_room_humidity') | float - 60.0) * 0.003655 + 27.77) | round(2) }}"
       icon_template: mdi:thermometer-lines
     bedroom_wbgt:
       unique_id: sensor.template.bedroom_wbgt
       friendly_name: Bedroom WBGT
       unit_of_measurement: °C
-      value_template: "{{ ((states('sensor.0x158d00041da691_temperature') | float - 30.5) * 0.90739 + (states('sensor.0x158d00041da691_humidity') | float - 60.0) * 0.14775 + (states('sensor.0x158d00041da691_temperature') | float - 30.5) * (states('sensor.0x158d00041da691_humidity') | float - 60.0) * 0.003655 + 27.77) | round(2) }}"
+      value_template: "{{ ((states('sensor.bedroom_temperature') | float - 30.5) * 0.90739 + (states('sensor.bedroom_humidity') | float - 60.0) * 0.14775 + (states('sensor.bedroom_temperature') | float - 30.5) * (states('sensor.bedroom_humidity') | float - 60.0) * 0.003655 + 27.77) | round(2) }}"
       icon_template: mdi:thermometer-lines
     balcony_wbgt:
       unique_id: sensor.template.balcony_wbgt
       friendly_name: Balcony WBGT
       unit_of_measurement: °C
-      value_template: "{{ ((states('sensor.0x158d0003cd3c39_temperature') | float - 30.5) * 0.90739 + (states('sensor.0x158d0003cd3c39_humidity') | float - 60.0) * 0.14775 + (states('sensor.0x158d0003cd3c39_temperature') | float - 30.5) * (states('sensor.0x158d0003cd3c39_humidity') | float - 60.0) * 0.003655 + 27.77) | round(2) }}"
+      value_template: "{{ ((states('sensor.balcony_temperature') | float - 30.5) * 0.90739 + (states('sensor.balcony_humidity') | float - 60.0) * 0.14775 + (states('sensor.balcony_temperature') | float - 30.5) * (states('sensor.balcony_humidity') | float - 60.0) * 0.003655 + 27.77) | round(2) }}"
       icon_template: mdi:thermometer-lines

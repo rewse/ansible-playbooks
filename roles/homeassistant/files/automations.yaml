@@ -443,30 +443,30 @@
     - type: motion
       platform: device
       device_id: 56a0fc235acbf9c9f708708a9682ab66
-      entity_id: binary_sensor.living_room_sensor_motion
+      entity_id: binary_sensor.living_room_motion
       domain: binary_sensor
     - type: motion
       platform: device
       device_id: 40a395e27caf6e3dbf69e07fa01f780d
-      entity_id: binary_sensor.study_sensor_motion
+      entity_id: binary_sensor.study_motion
       domain: binary_sensor
   condition:
     - condition: numeric_state
-      entity_id: sensor.0x158d0002b965e7_humidity
+      entity_id: sensor.living_room_humidity
       above: input_number.living_room_humidifier_turned_off_threshold
     - condition: state
       entity_id: switch.living_room_humidifier
       state: "on"
     - condition: state
-      entity_id: binary_sensor.0x158d0001dff2df_contact
+      entity_id: binary_sensor.living_room_window
       state: "off"
       for: 00:30:00
     - condition: state
-      entity_id: binary_sensor.0x158d0003cc15bc_contact
+      entity_id: binary_sensor.study_window
       state: "off"
       for: 00:30:00
     - condition: state
-      entity_id: binary_sensor.0x158d0003ceb0f6_contact
+      entity_id: binary_sensor.bedroom_window
       state: "off"
       for: 00:30:00
   action:
@@ -493,7 +493,7 @@
     - type: motion
       platform: device
       device_id: 56a0fc235acbf9c9f708708a9682ab66
-      entity_id: binary_sensor.living_room_sensor_motion
+      entity_id: binary_sensor.living_room_motion
       domain: binary_sensor
   condition:
     - condition: state
@@ -502,7 +502,7 @@
     - condition: device
       device_id: 2dbeaa9973ca3eb4a05ec29c8eb8969d
       domain: alarm_control_panel
-      entity_id: alarm_control_panel.0xbc33acfffe07698a_alarm
+      entity_id: alarm_control_panel.xiaomi_gateway
       type: is_armed_away
   action:
     - service: alarm_control_panel.alarm_disarm
@@ -529,16 +529,16 @@
     - type: motion
       platform: device
       device_id: 56a0fc235acbf9c9f708708a9682ab66
-      entity_id: binary_sensor.living_room_sensor_motion
+      entity_id: binary_sensor.living_room_motion
       domain: binary_sensor
     - type: motion
       platform: device
       device_id: 40a395e27caf6e3dbf69e07fa01f780d
-      entity_id: binary_sensor.study_sensor_motion
+      entity_id: binary_sensor.study_motion
       domain: binary_sensor
   condition:
     - condition: numeric_state
-      entity_id: sensor.0x158d0002b965e7_temperature
+      entity_id: sensor.living_room_temperature
       below: input_number.living_room_floor_heating_turned_on_threshold
     - condition: sun
       after: sunrise
@@ -546,15 +546,15 @@
       entity_id: sensor.season
       state: winter
     - condition: state
-      entity_id: binary_sensor.0x158d0001dff2df_contact
+      entity_id: binary_sensor.living_room_window
       state: "off"
       for: 00:30:00
     - condition: state
-      entity_id: binary_sensor.0x158d0003cc15bc_contact
+      entity_id: binary_sensor.study_window
       state: "off"
       for: 00:30:00
     - condition: state
-      entity_id: binary_sensor.0x158d0003ceb0f6_contact
+      entity_id: binary_sensor.bedroom_window
       state: "off"
       for: 00:30:00
   action:
@@ -614,16 +614,16 @@
     - type: motion
       platform: device
       device_id: 56a0fc235acbf9c9f708708a9682ab66
-      entity_id: binary_sensor.living_room_sensor_motion
+      entity_id: binary_sensor.living_room_motion
       domain: binary_sensor
     - type: motion
       platform: device
       device_id: 40a395e27caf6e3dbf69e07fa01f780d
-      entity_id: binary_sensor.study_sensor_motion
+      entity_id: binary_sensor.study_motion
       domain: binary_sensor
   condition:
     - condition: numeric_state
-      entity_id: sensor.living_room_sensor_light_level
+      entity_id: sensor.living_room_light_level
       below: input_number.living_room_downlights_turned_on_threshold
     - condition: state
       entity_id: sun.sun
@@ -652,16 +652,16 @@
     - type: motion
       platform: device
       device_id: 56a0fc235acbf9c9f708708a9682ab66
-      entity_id: binary_sensor.living_room_sensor_motion
+      entity_id: binary_sensor.living_room_motion
       domain: binary_sensor
     - type: motion
       platform: device
       device_id: 40a395e27caf6e3dbf69e07fa01f780d
-      entity_id: binary_sensor.study_sensor_motion
+      entity_id: binary_sensor.study_motion
       domain: binary_sensor
   condition:
     - condition: numeric_state
-      entity_id: sensor.0x158d0002b965e7_humidity
+      entity_id: sensor.living_room_humidity
       below: input_number.living_room_humidifier_turned_on_threshold
     - condition: state
       entity_id: switch.living_room_humidifier
@@ -669,15 +669,15 @@
     - condition: sun
       after: sunrise
     - condition: state
-      entity_id: binary_sensor.0x158d0001dff2df_contact
+      entity_id: binary_sensor.living_room_window
       state: "off"
       for: 00:30:00
     - condition: state
-      entity_id: binary_sensor.0x158d0003cc15bc_contact
+      entity_id: binary_sensor.study_window
       state: "off"
       for: 00:30:00
     - condition: state
-      entity_id: binary_sensor.0x158d0003ceb0f6_contact
+      entity_id: binary_sensor.bedroom_window
       state: "off"
       for: 00:30:00
   action:

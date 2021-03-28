@@ -17,17 +17,20 @@ cards:
         name: Light
   - type: entities
     entities:
-      - entity: automation.open_bedroom_curtains_weekday
+      - entity: automation.open_bedroom_curtains_workday
         name: Open Curtains for Workday
+        secondary_info: last-triggered
       - entity: input_datetime.bedroom_curtains_opened_time_workday
         name: Curtains Opened Time for Workday
       - entity: automation.open_bedroom_curtains_temporarily
         name: Open Curtains Temporarily
+        secondary_info: last-triggered
       - entity: input_datetime.bedroom_curtains_opened_time
         name: Curtains Opened Time Temporarily
-      - entity: automation.turn_down_bedoom
+      - entity: automation.turn_down_bedroom
         name: Turn down
-      - entity: input_datetime.bedroom_turneddown_time
+        secondary_info: last-triggered
+      - entity: input_datetime.bedroom_turned_down_time
         name: Turned down Time
     title: Bedroom Automations
     show_header_toggle: false
