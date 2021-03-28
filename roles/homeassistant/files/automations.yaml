@@ -1,0 +1,699 @@
+- id: automation.alarm_dns_is_down
+  alias: "ALARM: DNS is Down"
+  trigger:
+    - platform: state
+      entity_id: sensor.dns_hass_rewse_jp
+      to: unknown
+  action:
+    - service: notify.all_devices
+      data:
+        message: "⚠️ ALARM: DNS is Down"
+        data:
+          push:
+            thread-id: machine-notification-group
+          url: /lovelace-machines/machines
+    - delay:
+        hours: 0
+        minutes: 0
+        seconds: 10
+        milliseconds: 0
+    - service: script.restart_zulu
+  mode: single
+- id: automation.alarm_internet_speed_is_too_slow
+  alias: "ALARM: Internet Speed is Too Slow"
+  trigger:
+    - platform: numeric_state
+      entity_id: sensor.fast_com_download
+      below: 1
+  condition:
+    - condition: numeric_state
+      entity_id: sensor.speedtest_download
+      below: 1
+  action:
+    - service: notify.all_devices
+      data:
+        message: "⚠️ ALARM: Internet Speed is Too Slow"
+        data:
+          push:
+            thread-id: machine-notification-group
+          url: /lovelace-machines/machines
+    - delay:
+        hours: 0
+        minutes: 0
+        seconds: 10
+        milliseconds: 0
+    - service: script.restart_zulu
+  mode: single
+- id: automation.alarm_zulu_is_offline
+  alias: "ALARM: zulu is Offline"
+  trigger:
+    - platform: state
+      entity_id: binary_sensor.zulu
+      to: "off"
+      for: "00:16:00"
+  action:
+    - service: notify.all_devices
+      data:
+        message: "⚠️ ALARM: zulu is offline"
+        data:
+          push:
+            thread-id: machine-notification-group
+          url: /lovelace-machines/machines
+  mode: single
+- id: automation.alarm_xray_liv_is_offline
+  alias: "ALARM: xray-liv is Offline"
+  trigger:
+    - platform: state
+      entity_id: binary_sensor.xray_liv
+      to: "off"
+      for: "00:16:00"
+  action:
+    - service: notify.all_devices
+      data:
+        message: "⚠️ ALARM: xray-liv is Offline"
+        data:
+          push:
+            thread-id: machine-notification-group
+          url: /lovelace-machines/machines
+  mode: single
+- id: automation.alarm_xray_sto_is_offline
+  alias: "ALARM: xray-sto is Offline"
+  trigger:
+    - platform: state
+      entity_id: binary_sensor.xray_sto
+      to: "off"
+      for: "00:16:00"
+  action:
+    - service: notify.all_devices
+      data:
+        message: "⚠️ ALARM: xray-sto is Offline"
+        data:
+          push:
+            thread-id: machine-notification-group
+          url: /lovelace-machines/machines
+  mode: single
+- id: automation.alarm_aventage_is_offline
+  alias: "ALARM: aventage is Offline"
+  trigger:
+    - platform: state
+      entity_id: binary_sensor.aventage
+      to: "off"
+      for: "00:16:00"
+  action:
+    - service: notify.all_devices
+      data:
+        message: "⚠️ ALARM: aventage is Offline"
+        data:
+          push:
+            thread-id: machine-notification-group
+          url: /lovelace-machines/machines
+  mode: single
+- id: automation.alarm_catloghome_bed_is_offline
+  alias: "ALARM: catloghome-bed is Offline"
+  trigger:
+    - platform: state
+      entity_id: binary_sensor.catloghome_bed
+      to: "off"
+      for: "00:16:00"
+  action:
+    - service: notify.all_devices
+      data:
+        message: "⚠️ ALARM: catloghome-bed is Offline"
+        data:
+          push:
+            thread-id: machine-notification-group
+          url: /lovelace-machines/machines
+  mode: single
+- id: automation.alarm_catloghome_liv_is_offline
+  alias: "ALARM: catloghome-liv is Offline"
+  trigger:
+    - platform: state
+      entity_id: binary_sensor.catloghome_liv
+      to: "off"
+      for: "00:16:00"
+  action:
+    - service: notify.all_devices
+      data:
+        message: "⚠️ ALARM: catloghome-liv is Offline"
+        data:
+          push:
+            thread-id: machine-notification-group
+          url: /lovelace-machines/machines
+  mode: single
+- id: automation.alarm_fox_is_offline
+  alias: "ALARM: fox is Offline"
+  trigger:
+    - platform: state
+      entity_id: binary_sensor.fox
+      to: "off"
+      for: "00:16:00"
+  action:
+    - service: notify.all_devices
+      data:
+        message: "⚠️ ALARM: fox is Offline"
+        data:
+          push:
+            thread-id: machine-notification-group
+          url: /lovelace-machines/machines
+  mode: single
+- id: automation.alarm_guppy_is_offline
+  alias: "ALARM: guppy is Offline"
+  trigger:
+    - platform: state
+      entity_id: binary_sensor.guppy
+      to: "off"
+      for: "00:16:00"
+  action:
+    - service: notify.all_devices
+      data:
+        message: "⚠️ ALARM: guppy is Offline"
+        data:
+          push:
+            thread-id: machine-notification-group
+          url: /lovelace-machines/machines
+  mode: single
+- id: automation.alarm_huebridge_is_offline
+  alias: "ALARM: huebridge is Offline"
+  trigger:
+    - platform: state
+      entity_id: binary_sensor.huebridge
+      to: "off"
+      for: "00:16:00"
+  action:
+    - service: notify.all_devices
+      data:
+        message: "⚠️ ALARM: huebridge is Offline"
+        data:
+          push:
+            thread-id: machine-notification-group
+          url: /lovelace-machines/machines
+  mode: single
+- id: automation.alarm_justio_is_offline
+  alias: "ALARM: justio is Offline"
+  trigger:
+    - platform: state
+      entity_id: binary_sensor.justio
+      to: "off"
+      for: "00:16:00"
+  action:
+    - service: notify.all_devices
+      data:
+        message: "⚠️ ALARM: justio is Offline"
+        data:
+          push:
+            thread-id: machine-notification-group
+          url: /lovelace-machines/machines
+  mode: single
+- id: automation.alarm_kasaplug_ent_is_offline
+  alias: "ALARM: kasaplug-ent is Offline"
+  trigger:
+    - platform: state
+      entity_id: binary_sensor.kasaplug_ent
+      to: "off"
+      for: "00:16:00"
+  action:
+    - service: notify.all_devices
+      data:
+        message: "⚠️ ALARM: kasaplug-ent is Offline"
+        data:
+          push:
+            thread-id: machine-notification-group
+          url: /lovelace-machines/machines
+  mode: single
+- id: automation.alarm_kasaplug_liv_is_offline
+  alias: "ALARM: kasaplug-liv is Offline"
+  trigger:
+    - platform: state
+      entity_id: binary_sensor.kasaplug_liv
+      to: "off"
+      for: "00:16:00"
+  action:
+    - service: notify.all_devices
+      data:
+        message: "⚠️ ALARM: kasaplug-liv is Offline"
+        data:
+          push:
+            thread-id: machine-notification-group
+          url: /lovelace-machines/machines
+  mode: single
+- id: automation.alarm_regza_is_offline
+  alias: "ALARM: regza is Offline"
+  trigger:
+    - platform: state
+      entity_id: binary_sensor.regza
+      to: "off"
+      for: "00:16:00"
+  action:
+    - service: notify.all_devices
+      data:
+        message: "⚠️ ALARM: regza is Offline"
+        data:
+          push:
+            thread-id: machine-notification-group
+          url: /lovelace-machines/machines
+  mode: single
+- id: automation.alarm_remo_bed_is_offline
+  alias: "ALARM: remo-bed is Offline"
+  trigger:
+    - platform: state
+      entity_id: binary_sensor.remo_bed
+      to: "off"
+      for: "00:16:00"
+  action:
+    - service: notify.all_devices
+      data:
+        message: "⚠️ ALARM: remo-bed is Offline"
+        data:
+          push:
+            thread-id: machine-notification-group
+          url: /lovelace-machines/machines
+  mode: single
+- id: automation.alarm_remo_liv_is_offline
+  alias: "ALARM: remo-liv is Offline"
+  trigger:
+    - platform: state
+      entity_id: binary_sensor.remo_liv
+      to: "off"
+      for: "00:16:00"
+  action:
+    - service: notify.all_devices
+      data:
+        message: "⚠️ ALARM: remo-liv is Offline"
+        data:
+          push:
+            thread-id: machine-notification-group
+          url: /lovelace-machines/machines
+  mode: single
+- id: automation.alarm_switchbothub_is_offline
+  alias: "ALARM: switchbothub is Offline"
+  trigger:
+    - platform: state
+      entity_id: binary_sensor.switchbothub
+      to: "off"
+      for: "00:16:00"
+  action:
+    - service: notify.all_devices
+      data:
+        message: "⚠️ ALARM: switchbothub is Offline"
+        data:
+          push:
+            thread-id: machine-notification-group
+          url: /lovelace-machines/machines
+  mode: single
+- id: automation.alarm_tapo_is_offline
+  alias: "ALARM: tapo is Offline"
+  trigger:
+    - platform: state
+      entity_id: binary_sensor.tapo
+      to: "off"
+      for: "00:16:00"
+  action:
+    - service: notify.all_devices
+      data:
+        message: "⚠️ ALARM: tapo is Offline"
+        data:
+          push:
+            thread-id: machine-notification-group
+          url: /lovelace-machines/machines
+  mode: single
+- id: automation.alarm_tuyaplug_is_offline
+  alias: "ALARM: tuyaplug is Offline"
+  trigger:
+    - platform: state
+      entity_id: binary_sensor.tuyaplug
+      to: "off"
+      for: "00:16:00"
+  action:
+    - service: notify.all_devices
+      data:
+        message: "⚠️ ALARM: tuyaplug is Offline"
+        data:
+          push:
+            thread-id: machine-notification-group
+          url: /lovelace-machines/machines
+  mode: single
+- id: automation.alarm_wfirex_is_offline
+  alias: "ALARM: wfirex is Offline"
+  trigger:
+    - platform: state
+      entity_id: binary_sensor.wfirex
+      to: "off"
+      for: "00:16:00"
+  action:
+    - service: notify.all_devices
+      data:
+        message: "⚠️ ALARM: wfirex is Offline"
+        data:
+          push:
+            thread-id: machine-notification-group
+          url: /lovelace-machines/machines
+  mode: single
+- id: automation.alarm_xiaomigateway_is_offline
+  alias: "ALARM: xiaomigateway is Offline"
+  trigger:
+    - platform: state
+      entity_id: binary_sensor.xiaomigateway
+      to: "off"
+      for: "00:16:00"
+  action:
+    - service: notify.all_devices
+      data:
+        message: "⚠️ ALARM: xiaomigateway is Offline"
+        data:
+          push:
+            thread-id: machine-notification-group
+          url: /lovelace-machines/machines
+  mode: single
+- id: automation.open_bedroom_curtains_temporarily
+  alias: Open Bedroom Curtains Temporarily
+  description: Open the curtains in the bedroom temporarily
+  trigger:
+    - platform: time
+      at: input_datetime.bedroom_curtains_opened_time
+  action:
+    - service: switch.turn_on
+      entity_id: switch.bedroom_curtains
+  mode: single
+- id: automation.open_bedroom_curtains_workday
+  alias: Open Bedroom Curtains Workday
+  description: Open the curtains in the bedroom every workday
+  trigger:
+    - platform: time
+      at: input_datetime.bedroom_curtains_opened_time_workday
+  condition:
+    - condition: state
+      entity_id: binary_sensor.workday_sensor
+      state: 'on'
+  action:
+    - service: switch.turn_on
+      entity_id: switch.bedroom_curtains
+  mode: single
+- id: automation.turn_down_bedroom
+  alias: Turn down Bedroom
+  description: Turn down the bedroom
+  trigger:
+    - platform: time
+      at: input_datetime.bedroom_turned_down_time
+  action:
+  - service: switch.turn_off
+    entity_id: switch.bedroom_curtains
+  mode: single
+- id: automation.turn_down_living_room
+  alias: Turn down Living Room
+  description: Turn down the living room
+  trigger:
+    - platform: time
+      at: input_datetime.living_room_turned_down_time
+  action:
+    - service: scene.turn_on
+      entity_id: scene.living_room_turned_down
+    - service: switch.turn_on
+      entity_id: switch.living_room_dimming_downlights
+  mode: single
+- id: automation.turn_down_living_room_more
+  alias: Turn down Living Room More
+  description: Turn down the living room more
+  trigger:
+    - platform: time
+      at: input_datetime.living_room_turned_down_more_time
+  action:
+    - service: scene.turn_on
+      entity_id: scene.living_room_turned_down_more
+    - service: switch.turn_off
+      entity_id: switch.living_room_dimming_downlights
+  mode: single
+- id: automation.turn_off_living_room_extra_lights
+  alias: Turn off Living Room Extra Lights
+  description: Turn off the extra lights in the living room
+  trigger:
+    - platform: sun
+      event: sunrise
+  action:
+    - service: light.turn_off
+      target:
+        entity_id:
+        - light.living_room_tv_light
+        - light.living_room_entrance_light
+        - light.living_room_footlight
+  mode: single
+- id: automation.turn_off_living_room_humidifier
+  alias: Turn off Living Room Humidifier
+  description: Turn off the humidifier on the living room when the humidity is too high
+  trigger:
+    - type: motion
+      platform: device
+      device_id: 56a0fc235acbf9c9f708708a9682ab66
+      entity_id: binary_sensor.living_room_sensor_motion
+      domain: binary_sensor
+    - type: motion
+      platform: device
+      device_id: 40a395e27caf6e3dbf69e07fa01f780d
+      entity_id: binary_sensor.study_sensor_motion
+      domain: binary_sensor
+  condition:
+    - condition: numeric_state
+      entity_id: sensor.0x158d0002b965e7_humidity
+      above: input_number.living_room_humidifier_turned_off_threshold
+    - condition: state
+      entity_id: switch.living_room_humidifier
+      state: "on"
+    - condition: state
+      entity_id: binary_sensor.0x158d0001dff2df_contact
+      state: "off"
+      for: 00:30:00
+    - condition: state
+      entity_id: binary_sensor.0x158d0003cc15bc_contact
+      state: "off"
+      for: 00:30:00
+    - condition: state
+      entity_id: binary_sensor.0x158d0003ceb0f6_contact
+      state: "off"
+      for: 00:30:00
+  action:
+    - service: switch.turn_off
+      entity_id: switch.living_room_humidifier
+    - service: notify.all_devices
+      data:
+        message: Turned off the humidifier in the living room because the humidity was too high
+        title: Turned off Living Room Humidifier
+        data:
+          push:
+            thread-id: home-notification-group
+          url: /lovelace/home
+    - delay:
+        hours: 1
+        minutes: 0
+        seconds: 0
+        milliseconds: 0
+  mode: single
+- id: automation.turn_off_xiaomi_alarm
+  alias: Turn off Xiaomi Alarm
+  description: Turn off Xiaomi Alarm when bio connects to xray
+  trigger:
+    - type: motion
+      platform: device
+      device_id: 56a0fc235acbf9c9f708708a9682ab66
+      entity_id: binary_sensor.living_room_sensor_motion
+      domain: binary_sensor
+  condition:
+    - condition: state
+      entity_id: sensor.bio_ssid
+      state: xray
+    - condition: device
+      device_id: 2dbeaa9973ca3eb4a05ec29c8eb8969d
+      domain: alarm_control_panel
+      entity_id: alarm_control_panel.0xbc33acfffe07698a_alarm
+      type: is_armed_away
+  action:
+    - service: alarm_control_panel.alarm_disarm
+      target:
+        device_id: 2dbeaa9973ca3eb4a05ec29c8eb8969d
+    - service: notify.all_devices
+      data:
+        message: Turned off Xiaomi Alarm because bio’s SSID is xray
+        title: Turned off Xiaomi Alarm
+        data:
+          push:
+            thread-id: home-notification-group
+          url: /lovelace/home
+    - delay:
+        hours: 0
+        minutes: 10
+        seconds: 0
+        milliseconds: 0
+  mode: single
+- id: automation.turn_on_living_area_floor_heating
+  alias: Turn on Living Area Floor Heating
+  description: Turn on the floor heating in the living area when the temperature is too low
+  trigger:
+    - type: motion
+      platform: device
+      device_id: 56a0fc235acbf9c9f708708a9682ab66
+      entity_id: binary_sensor.living_room_sensor_motion
+      domain: binary_sensor
+    - type: motion
+      platform: device
+      device_id: 40a395e27caf6e3dbf69e07fa01f780d
+      entity_id: binary_sensor.study_sensor_motion
+      domain: binary_sensor
+  condition:
+    - condition: numeric_state
+      entity_id: sensor.0x158d0002b965e7_temperature
+      below: input_number.living_room_floor_heating_turned_on_threshold
+    - condition: sun
+      after: sunrise
+    - condition: state
+      entity_id: sensor.season
+      state: winter
+    - condition: state
+      entity_id: binary_sensor.0x158d0001dff2df_contact
+      state: "off"
+      for: 00:30:00
+    - condition: state
+      entity_id: binary_sensor.0x158d0003cc15bc_contact
+      state: "off"
+      for: 00:30:00
+    - condition: state
+      entity_id: binary_sensor.0x158d0003ceb0f6_contact
+      state: "off"
+      for: 00:30:00
+  action:
+    - service: switch.toggle
+      entity_id: switch.living_room_floor_heating
+    - service: switch.toggle
+      entity_id: switch.study_floor_heating
+    - service: notify.all_devices
+      data:
+        title: Turned on Living Area Floor Heating
+        message: Turned on the floor heating in the living area because the temperature was too low
+        data:
+          push:
+            thread-id: home-notification-group
+          url: /lovelace/home
+    - delay:
+        hours: 1
+        minutes: 0
+        seconds: 0
+        milliseconds: 0
+  mode: single
+- id: automation.turn_on_living_room_ac_cleaner
+  alias: Turn on Living Room AC Cleaner
+  description: Turn on the AC cleaner in the living room
+  trigger:
+    - platform: time
+      at: 04:00:00
+  condition:
+    - condition: time
+      weekday:
+      - tue
+  action:
+    - service: switch.turn_on
+      entity_id: switch.living_room_ac_cleaner
+    - service: notify.all_devices
+      data:
+        message: Turn on the AC cleaner in the living room
+        data:
+          push:
+            thread-id: home-notification-group
+          url: /lovelace/home
+  mode: single
+- id: automation.turn_on_living_room_ceiling_fan
+  alias: Turn on Living Room Ceiling Fan
+  description: Turn on the ceiling fan in the living room
+  trigger:
+    - platform: sun
+      event: sunrise
+  action:
+    - service: fan.turn_on
+      entity_id: fan.living_room_ceiling_fans
+  mode: single
+- id: automation.turn_on_living_room_downlights
+  alias: Turn on Living Room Downlights
+  description: Turn on the downlights in living room when the light level is too low
+  trigger:
+    - type: motion
+      platform: device
+      device_id: 56a0fc235acbf9c9f708708a9682ab66
+      entity_id: binary_sensor.living_room_sensor_motion
+      domain: binary_sensor
+    - type: motion
+      platform: device
+      device_id: 40a395e27caf6e3dbf69e07fa01f780d
+      entity_id: binary_sensor.study_sensor_motion
+      domain: binary_sensor
+  condition:
+    - condition: numeric_state
+      entity_id: sensor.living_room_sensor_light_level
+      below: input_number.living_room_downlights_turned_on_threshold
+    - condition: state
+      entity_id: sun.sun
+      state: above_horizon
+  action:
+    - service: switch.turn_on
+      entity_id: switch.living_room_downlights
+    - service: notify.all_devices
+      data:
+        title: Turned on Living Room Downlights
+        message: Turned on the downlights in living room because the light level was too low
+        data:
+          push:
+            thread-id: home-notification-group
+          url: /lovelace/home
+    - delay:
+        hours: 1
+        minutes: 0
+        seconds: 0
+        milliseconds: 0
+  mode: single
+- id: automation.turn_on_living_room_humidifier
+  alias: Turn on Living Room Humidifier
+  description: Turn on the humidifier on the living room when the humidity is too low
+  trigger:
+    - type: motion
+      platform: device
+      device_id: 56a0fc235acbf9c9f708708a9682ab66
+      entity_id: binary_sensor.living_room_sensor_motion
+      domain: binary_sensor
+    - type: motion
+      platform: device
+      device_id: 40a395e27caf6e3dbf69e07fa01f780d
+      entity_id: binary_sensor.study_sensor_motion
+      domain: binary_sensor
+  condition:
+    - condition: numeric_state
+      entity_id: sensor.0x158d0002b965e7_humidity
+      below: input_number.living_room_humidifier_turned_on_threshold
+    - condition: state
+      entity_id: switch.living_room_humidifier
+      state: "off"
+    - condition: sun
+      after: sunrise
+    - condition: state
+      entity_id: binary_sensor.0x158d0001dff2df_contact
+      state: "off"
+      for: 00:30:00
+    - condition: state
+      entity_id: binary_sensor.0x158d0003cc15bc_contact
+      state: "off"
+      for: 00:30:00
+    - condition: state
+      entity_id: binary_sensor.0x158d0003ceb0f6_contact
+      state: "off"
+      for: 00:30:00
+  action:
+    - service: switch.turn_on
+      entity_id: switch.living_room_humidifier
+    - service: notify.all_devices
+      data:
+        title: Turned on Living Room Humidifier
+        message: Turned on the humidifier in the living room because the humidity was too low
+        data:
+          push:
+            thread-id: home-notification-group
+          url: /lovelace/home
+    - delay:
+        hours: 1
+        minutes: 0
+        seconds: 0
+        milliseconds: 0
+  mode: single
