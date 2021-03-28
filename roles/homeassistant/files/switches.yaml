@@ -81,7 +81,16 @@
         data:
           device_id: E55CF11F894A
           command: press
-      icon_template: mdi:grid
+      value_template: >
+        {{ (states('sensor.0x158d0002b965ce_temperature') | float - states('sensor.0x158d0002b965e7_temperature') | float) > 1 }}
+      icon_template: >
+        {% if (states('sensor.0x158d0002b965ce_temperature') | float - states('sensor.0x158d0002b965e7_temperature') | float) > 1 %}
+          mdi:grid
+        {% elif (states('sensor.0x158d0002b965ce_temperature') | float - states('sensor.0x158d0002b965e7_temperature') | float) <= 1 %}
+          mdi:grid-off
+        {% else %}
+          mdi:grid
+        {% endif %}
     study_floor_heating:
       unique_id: switch.template.study_floor_heating
       friendly_name: Study Floor Heating
@@ -95,7 +104,16 @@
         data:
           device_id: D0ECA7E7803F
           command: press
-      icon_template: mdi:grid
+      value_template: >
+        {{ (states('sensor.0x158d0002b965ce_temperature') | float - states('sensor.0x158d0002b965e7_temperature') | float) > 1 }}
+      icon_template: >
+        {% if (states('sensor.0x158d0002b965ce_temperature') | float - states('sensor.0x158d0002b965e7_temperature') | float) > 1 %}
+          mdi:grid
+        {% elif (states('sensor.0x158d0002b965ce_temperature') | float - states('sensor.0x158d0002b965e7_temperature') | float) <= 1 %}
+          mdi:grid-off
+        {% else %}
+          mdi:grid
+        {% endif %}
     living_room_downlights:
       unique_id: switch.template.living_room_downlights
       friendly_name: Living Room Downlights
