@@ -111,14 +111,6 @@ views:
             icon: 'mdi:dns'
             name: DNS
             secondary_info: last-triggered
-          - entity: automation.alarm_network_devices_are_offline
-            icon: 'mdi:switch'
-            name: Network Devices
-            secondary_info: last-triggered
-          - entity: automation.alarm_servers_are_offline
-            icon: 'mdi:nas'
-            name: Servers
-            secondary_info: last-triggered
           - entity: automation.alarm_internet_speed_is_too_slow
             icon: 'mdi:speedometer-slow'
             name: Internet

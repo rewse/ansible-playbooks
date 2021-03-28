@@ -73,6 +73,12 @@
   notify: Restart homeassistant
   tags: [homeassistant]
 
+- name: Copy automations.yaml
+  copy:
+    src: automations.yaml
+    dest: /srv/homeassistant
+  tags: [homeassistant, homeassistant-automations]
+
 - name: Config binary_sensor
   lineinfile:
     path: /srv/homeassistant/configuration.yaml
