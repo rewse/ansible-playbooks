@@ -504,6 +504,8 @@
         certificate: /config/certs/DST_Root_CA_X3.pem
       nature_remo:
         access_token: !secret remo_token
+      recorder:
+        db_url: !secret postgres_connstr
       speedtestdotnet:
         scan_interval:
           hours: 1
