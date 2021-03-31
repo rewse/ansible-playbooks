@@ -31,7 +31,7 @@ cards:
       - type: custom:mini-graph-card
         name: Living Room Humidity
         entities:
-          - entity: sensor.0x158d0002b965e7_humidity
+          - entity: sensor.living_room_humidity
           - entity: sun.sun
             color: gray
             show_line: false
