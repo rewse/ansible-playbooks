@@ -14,6 +14,11 @@ latlng:
     lng: "{{ vault_latlng.s.lng }}"
 mosquitto_password: "{{ vault_mosquitto_password }}"
 nfs_server: guppy.rewse.jp
+postgres:
+  username: "{{ vault_postgres.username }}"
+  password: "{{ vault_postgres.password }}"
+  hostname: homeassistant-db.rewse.jp
+  db: homeassistant
 regza:
   username: "[% vault_regza.username %]"
   password: "[% vault_regza.password %]"
