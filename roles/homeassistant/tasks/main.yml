@@ -565,13 +565,7 @@
 - name: Copy bathroom.yaml
   copy:
     src: bathroom.yaml
-    dest: /srv/homeassistant/ui
-  tags: [homeassistant, homeassistant-ui]
-
-- name: Copy controls.yaml
-  copy:
-    src: controls.yaml
-    dest: /srv/homeassistant/ui
+    dest: /etc/homeassistant/ui
   tags: [homeassistant, homeassistant-ui]
 
 - name: Copy machines.yaml
