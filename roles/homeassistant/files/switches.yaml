@@ -1,8 +1,8 @@
 - platform: template
   switches:
-    bedroom_ac_cleaner:
-      unique_id: switch.template.bedroom_ac_cleaner
-      friendly_name: Bedroom AC Cleaner
+    bedroom_hvac_cleaner:
+      unique_id: switch.template.bedroom_hvac_cleaner
+      friendly_name: Bedroom HVAC Cleaner
       turn_on:
         service: rest_command.control_remo_device
         data:
@@ -33,9 +33,9 @@
         {% else %}
           mdi:window-shutter
         {% endif %}
-    living_room_ac_cleaner:
-      unique_id: switch.template.living_room_ac_cleaner
-      friendly_name: Living Room AC Cleaner
+    living_room_hvac_cleaner:
+      unique_id: switch.template.living_room_hvac_cleaner
+      friendly_name: Living Room HVAC Cleaner
       turn_on:
         service: rest_command.control_remo_device
         data:
