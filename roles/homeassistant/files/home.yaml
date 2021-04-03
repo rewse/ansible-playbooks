@@ -81,8 +81,26 @@ cards:
         title: Living Room Appliances
         state_color: false
         show_header_toggle: false
-      - type: thermostat
+      - type: "custom:simple-thermostat"
         entity: climate.living_room_hvac
+        decimals: 0
+        step_layout: row
+        step_size: 1
+        hide:
+          temperature: true
+          state: false
+        control:
+          _names: false
+          _headings: false
+          hvac:
+            _name: false
+        card_mod:
+          style: |
+            ha-card {
+              --st-font-size-xl: 36px;
+              --st-mode-active-background: #dff4fd;
+              --st-mode-background: #ffffff;
+            }
       - type: entities
         entities:
           - entity: switch.living_room_downlights
@@ -145,8 +163,25 @@ cards:
         entities:
           - entity: switch.bedroom_curtains
             name: Curtains
-      - type: thermostat
+      - type: "custom:simple-thermostat"
         entity: climate.bedroom_hvac
+        decimals: 0
+        step_layout: row
+        step_size: 1
+        hide:
+          temperature: true
+        control:
+          _names: false
+          _headings: false
+          hvac:
+            _name: false
+        card_mod:
+          style: |
+            ha-card {
+              --st-font-size-xl: 36px;
+              --st-mode-active-background: #dff4fd;
+              --st-mode-background: #ffffff;
+            }
       - type: entities
         title: Bedroom Lights
         entities:

@@ -383,6 +383,21 @@
     state: directory
   tags: [homeassistant]
 
+- name: Download Lovelace Card Mod
+  unarchive:
+    src: https://github.com/thomasloven/lovelace-card-mod/archive/refs/tags/{{ card_mod_version }}.tar.gz
+    dest: /tmp
+    remote_src: yes
+  tags: [homeassistant]
+
+- name: Copy Lovelace Card Mod
+  copy:
+    src: /tmp/lovelace-card-mod-{{ card_mod_version }}/card-mod.js
+    dest: /etc/homeassistant/www
+    remote_src: yes
+  notify: Restart homeassistant
+  tags: [homeassistant]
+
 - name: Copy Lovelace Mini Graph Card
   get_url:
     url: https://github.com/kalkih/mini-graph-card/releases/download/v0.10.0/mini-graph-card-bundle.js
@@ -393,6 +408,13 @@
 - name: Copy Lovelace Mini Media Player
   get_url:
     url: https://github.com/kalkih/mini-media-player/releases/download/v1.12.0/mini-media-player-bundle.js
+    dest: /etc/homeassistant/www
+  notify: Restart homeassistant
+  tags: [homeassistant]
+
+- name: Copy Lovelace Simple Thermostat Card
+  get_url:
+    url: https://github.com/nervetattoo/simple-thermostat/releases/download/v1.0.2/simple-thermostat.js
     dest: /etc/homeassistant/www
   notify: Restart homeassistant
   tags: [homeassistant]
@@ -452,9 +474,13 @@
         mode: yaml
         dashboards: !include dashboards.yaml
         resources:
+          - url: /local/card-mod.js
+            type: module
           - url: /local/mini-graph-card-bundle.js?v=0.10.0
             type: module
           - url: /local/mini-media-player-bundle.js?v=1.12.0
+            type: module
+          - url: /local/simple-thermostat.js?v=1
             type: module
           - url: /local/simple-weather-card-bundle.js?v=0.8.1
             type: module
