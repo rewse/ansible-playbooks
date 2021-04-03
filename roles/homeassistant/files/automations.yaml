@@ -465,10 +465,6 @@
       entity_id: binary_sensor.study_window
       state: "off"
       for: 00:30:00
-    - condition: state
-      entity_id: binary_sensor.bedroom_window
-      state: "off"
-      for: 00:30:00
   action:
     - service: switch.turn_off
       entity_id: switch.living_room_humidifier
@@ -674,10 +670,6 @@
       for: 00:30:00
     - condition: state
       entity_id: binary_sensor.study_window
-      state: "off"
-      for: 00:30:00
-    - condition: state
-      entity_id: binary_sensor.bedroom_window
       state: "off"
       for: 00:30:00
   action:
