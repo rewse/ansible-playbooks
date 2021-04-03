@@ -15,8 +15,25 @@ cards:
       - entity: group.living_area_floor_heatings
         name: Floor Heating
     show_header_toggle: false
-  - type: thermostat
-    entity: climate.living_room_ac
+  - type: "custom:simple-thermostat"
+    entity: climate.living_room_hvac
+    decimals: 0
+    step_layout: row
+    step_size: 1
+    hide:
+      temperature: true
+    control:
+      _names: false
+      _headings: false
+      hvac:
+        _name: false
+    card_mod:
+      style: |
+        ha-card {
+          --st-font-size-xl: 36px;
+          --st-mode-active-background: #dff4fd;
+          --st-mode-background: #ffffff;
+        }
   - type: entities
     title: Living Room Lights
     entities:
