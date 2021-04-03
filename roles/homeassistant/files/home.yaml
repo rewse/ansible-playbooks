@@ -82,7 +82,7 @@ cards:
         state_color: false
         show_header_toggle: false
       - type: thermostat
-        entity: climate.living_room_ac
+        entity: climate.living_room_hvac
       - type: entities
         entities:
           - entity: switch.living_room_downlights
@@ -146,7 +146,7 @@ cards:
           - entity: switch.bedroom_curtains
             name: Curtains
       - type: thermostat
-        entity: climate.bedroom_ac
+        entity: climate.bedroom_hvac
       - type: entities
         title: Bedroom Lights
         entities:
