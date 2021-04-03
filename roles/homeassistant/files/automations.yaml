@@ -572,9 +572,9 @@
         seconds: 0
         milliseconds: 0
   mode: single
-- id: automation.turn_on_living_room_ac_cleaner
-  alias: Turn on Living Room AC Cleaner
-  description: Turn on the AC cleaner in the living room
+- id: automation.turn_on_living_room_hvac_cleaner
+  alias: Turn on Living Room HVAC Cleaner
+  description: Turn on the HVAC cleaner in the living room
   trigger:
     - platform: time
       at: 04:00:00

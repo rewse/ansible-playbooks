@@ -1,7 +1,7 @@
   - filter:
       include_entities:
-        - climate.bedroom_ac
-        - climate.living_room_ac
+        - climate.bedroom_hvac
+        - climate.living_room_hvac
         - cover.bedroom_curtains
         - fan.living_room_ceiling_fans
         - light.living_room_dimming_downlights
@@ -11,8 +11,8 @@
         - media_player.firetv
         - media_player.heargo2
         - media_player.stw2000
-        - switch.bedroom_ac_cleaner
-        - switch.living_room_ac_cleaner
+        - switch.bedroom_hvac_cleaner
+        - switch.living_room_hvac_cleaner
         - switch.living_room_floor_heating
         - switch.living_room_humidifier
         - switch.study_floor_heating
