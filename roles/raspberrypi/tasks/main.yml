@@ -1,4 +1,17 @@
 ---
+- name: Install packages with pip3
+  pip:
+    name:
+      - pydaikin
+    executable: pip3
+  tags: [raspberrypi, package]
+
+- name: Copy environment
+  copy:
+    src: environment
+    dest: /etc
+  tags: [raspberrypi]
+
 - name: Copy netplan/99-config.yaml
   template:
     src: 99-config.yaml.j2
