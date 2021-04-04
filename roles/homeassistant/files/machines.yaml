@@ -308,6 +308,26 @@ views:
               legend: false
               labels_secondary: false
       - type: entities
+        title: Batteries
+        entities:
+          - entity: sensor.living_room_floor_thermometer_battery
+            name: Living Room Floor Thermometer
+          - entity: sensor.living_room_light_switch_battery_level
+            name: Living Room Light Switch
+          - entity: sensor.living_room_thermometer_battery
+            name: Living Room Thermometer
+          - entity: sensor.living_room_window_battery
+            name: Living Room Window
+          - entity: sensor.study_window_battery
+            name: Study Window
+          - entity: sensor.bedroom_light_switch_battery_level
+            name: Bedroom Light Switch
+          - entity: sensor.bedroom_thermometer_battery
+            name: Bedroom Thermometer
+          - entity: sensor.bedroom_window_sensor_battery
+            name: Bedroom Window
+          - entity: sensor.balcony_thermometer_battery
+            name: Balcony Thermometer
         title: Offline Alarm
         entities:
           - entity: automation.alarm_dns_is_down
