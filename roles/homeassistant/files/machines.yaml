@@ -328,6 +328,27 @@ views:
             name: Bedroom Window
           - entity: sensor.balcony_thermometer_battery
             name: Balcony Thermometer
+      - type: entities
+        title: Storages
+        entities:
+          - entity: sensor.youth_storage
+            name: youth
+            icon: 'mdi:harddisk'
+          - entity: sensor.e0b55fe8e384_storage
+            name: e0b55fe8e384
+            icon: 'mdi:harddisk'
+          - entity: sensor.bio_storage
+            name: bio
+            icon: 'mdi:harddisk'
+          - entity: sensor.desert_storage
+            name: desert
+            icon: 'mdi:harddisk'
+          - entity: sensor.global_internal_storage
+            name: global Internal
+          - entity: sensor.guppy_volume_1_volume_used
+            name: guppy Volume 1
+            icon: 'mdi:harddisk'
+      - type: entities
         title: Offline Alarm
         entities:
           - entity: automation.alarm_dns_is_down
