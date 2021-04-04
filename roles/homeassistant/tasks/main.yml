@@ -122,7 +122,7 @@
     insertafter: '^group:'
     regexp: '^input_boolean:'
     line: "input_boolean: !include input_booleans.yaml"
-    notify: Restart homeassistant
+  notify: Restart homeassistant
   tags: [homeassistant, homeassistant-input-booleans]
 
 - name: Copy input_booleans.yaml
@@ -179,10 +179,26 @@
   notify: Restart homeassistant
   tags: [homeassistant]
 
-- name: Config light
+- name: Config ios
   lineinfile:
     path: /etc/homeassistant/configuration.yaml
     insertafter: '^input_number:'
+    regexp: '^ios:'
+    line: "ios: !include ios.yaml"
+  notify: Restart homeassistant
+  tags: [homeassistant]
+
+- name: Copy ios.yaml
+  copy:
+    src: ios.yaml
+    dest: /etc/homeassistant
+  notify: Restart homeassistant
+  tags: [homeassistant]
+
+- name: Config light
+  lineinfile:
+    path: /etc/homeassistant/configuration.yaml
+    insertafter: '^ios:'
     regexp: '^light:'
     line: "light: !include lights.yaml"
   notify: Restart homeassistant
