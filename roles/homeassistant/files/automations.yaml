@@ -364,6 +364,30 @@
             thread-id: machine-notification-group
           url: /lovelace-machines/machines
   mode: single
+- id: automation.away_home
+  alias: Away Home
+  description: Away home when iOS action fires
+  trigger:
+    - platform: event
+      event_type: ios.action_fired
+      event_data:
+        actionName: away_home
+  action:
+    - service: script.away_home
+    - service: notify.all_devices
+      data:
+        message: Away home when iOS action fired
+        title: Away Home
+        data:
+          push:
+            thread-id: home-notification-group
+          url: /lovelace/home
+    - delay:
+        hours: 0
+        minutes: 10
+        seconds: 0
+        milliseconds: 0
+  mode: single
 - id: automation.open_bedroom_curtains_temporarily
   alias: Open Bedroom Curtains Temporarily
   description: Open the curtains in the bedroom temporarily
