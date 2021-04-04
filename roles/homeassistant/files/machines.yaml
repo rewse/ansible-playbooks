@@ -164,6 +164,17 @@ views:
             show:
               status: false
           - type: custom:uptime-card
+            name: daikinhvac ping
+            entity: binary_sensor.daikinhvac
+            icon: mdi:thermostat
+            hours_to_show: 168
+            bar:
+              spacing: 4
+              height: 10
+              round: 4
+            show:
+              status: false
+          - type: custom:uptime-card
             name: tapo ping
             entity: binary_sensor.tapo
             icon: mdi:cctv
