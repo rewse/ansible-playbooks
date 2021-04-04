@@ -130,7 +130,7 @@ cards:
           power_state: false
   - type: alarm-panel
     name: Xiami Alarm
+    entity: alarm_control_panel.xiaomi_gateway
     states:
       - arm_home
       - arm_away
-    entity: alarm_control_panel.xiaomi_gateway
