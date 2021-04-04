@@ -486,15 +486,10 @@
   alias: Turn off Xiaomi Alarm
   description: Turn off Xiaomi Alarm when bio connects to xray
   trigger:
-    - type: motion
-      platform: device
-      device_id: 56a0fc235acbf9c9f708708a9682ab66
-      entity_id: binary_sensor.living_room_motion
-      domain: binary_sensor
-  condition:
-    - condition: state
+    - platform: state
       entity_id: sensor.bio_ssid
-      state: xray
+      to: xray
+  condition:
     - condition: device
       device_id: 2dbeaa9973ca3eb4a05ec29c8eb8969d
       domain: alarm_control_panel
