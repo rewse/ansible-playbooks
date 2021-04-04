@@ -1,4 +1,12 @@
 actions:
+  - name: away_home
+    background_color: "#736d71"
+    label:
+      text: Away Home
+      color: "#ffffff"
+    icon:
+      icon: mdi:home-export-outline
+      color: "#ffffff"
   - name: turn_off_living_room_lights
     background_color: "#202f55"
     label:
