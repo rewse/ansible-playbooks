@@ -482,6 +482,62 @@
         seconds: 0
         milliseconds: 0
   mode: single
+- id: automation.turn_off_living_room_lights
+  alias: Turn off Living Room Lights
+  description: Turn off the living room lights when iOS action fires
+  trigger:
+    - platform: event
+      event_type: ios.action_fired
+      event_data:
+        actionName: turn_off_living_room_lights
+  condition:
+    - condition: state
+      entity_id: sensor.bio_ssid
+      state: xray
+  action:
+    - service: light.turn_off
+      target:
+        entity_id: light.living_room_lights
+    - service: notify.all_devices
+      data:
+        message: Turned off the living room lights when iOS action fired
+        title: Turned off Living Room Lights
+        data:
+          push:
+            thread-id: home-notification-group
+          url: /lovelace/home
+    - delay:
+        hours: 0
+        minutes: 10
+        seconds: 0
+        milliseconds: 0
+  mode: single
+- id: automation.turn_off_living_room_lights_appliances
+  alias: Turn off Living Room Lights & Appliances
+  description: Turn off the living room lights & appliances when iOS action fires
+  trigger:
+    - platform: event
+      event_type: ios.action_fired
+      event_data:
+        actionName: turn_off_living_room_lights_appliances
+  condition:
+    - condition: state
+      entity_id: sensor.bio_ssid
+      state: xray
+  action:
+    - service: light.turn_off
+      target:
+        entity_id: light.living_room_lights
+    - service: fan.turn_off
+      target:
+        entity_id: fan.living_room_ceiling_fans
+    - condition: state
+      entity_id: switch.living_room_humidifier
+      state: 'on' 
+    - service: switch.turn_off
+      target:
+        entity_id: switch.living_room_humidifier
+  mode: single
 - id: automation.turn_off_xiaomi_alarm
   alias: Turn off Xiaomi Alarm
   description: Turn off Xiaomi Alarm when bio connects to xray
