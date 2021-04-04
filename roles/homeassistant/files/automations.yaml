@@ -513,6 +513,33 @@
         seconds: 0
         milliseconds: 0
   mode: single
+- id: automation.turn_on_all_automations
+  alias: Turn on All Automations
+  description: Turn on all automations when bio connects to xray
+  mode: single
+  trigger:
+    - platform: state
+      entity_id: sensor.bio_ssid
+      to: xray
+  condition:
+    - condition: state
+      entity_id: input_boolean.all_automations_state
+      state: 'off'
+  action:
+    - service: script.into_home
+    - service: notify.all_devices
+      data:
+        message: Turn on all automations when bio connects to xray
+        title: Turned on All Automations
+        data:
+          push:
+            thread-id: home-notification-group
+          url: /lovelace/home
+    - delay:
+        hours: 0
+        minutes: 10
+        seconds: 0
+        milliseconds: 0
 - id: automation.turn_on_living_area_floor_heating
   alias: Turn on Living Area Floor Heating
   description: Turn on the floor heating in the living area when the temperature is too low

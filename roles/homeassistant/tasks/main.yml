@@ -122,15 +122,14 @@
     insertafter: '^group:'
     regexp: '^input_boolean:'
     line: "input_boolean: !include input_booleans.yaml"
-  notify: Restart homeassistant
-  tags: [homeassistant]
+    notify: Restart homeassistant
+  tags: [homeassistant, homeassistant-input-booleans]
 
 - name: Copy input_booleans.yaml
   copy:
     src: input_booleans.yaml
     dest: /etc/homeassistant
-  notify: Restart homeassistant
-  tags: [homeassistant]
+  tags: [homeassistant, homeassistant-input-booleans]
 
 - name: Config homekit
   lineinfile:
@@ -264,8 +263,7 @@
   copy:
     src: scripts.yaml
     dest: /etc/homeassistant
-  notify: Restart homeassistant
-  tags: [homeassistant]
+  tags: [homeassistant, homeassistant-scripts]
 
 - name: Config sensor
   lineinfile:

@@ -316,6 +316,7 @@ cards:
       - entity: automation.turn_off_living_room_extra_lights
       - entity: automation.turn_down_bedroom
       - entity: automation.turn_off_xiaomi_alarm
+      - entity: automation.turn_on_all_automations
   - type: custom:mini-graph-card
     entities:
       - entity: sensor.enecoq_fee_total

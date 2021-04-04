@@ -1,3 +1,7 @@
+all_automations_state:
+  name: All Automations State
+  initial: on
+  icon: mdi:robot
 living_room_ceiling_fans_state:
   name: Living Room Ceiling Fans State
   initial: on
