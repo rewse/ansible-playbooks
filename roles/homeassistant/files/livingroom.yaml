@@ -48,6 +48,9 @@ cards:
   - type: entities
     title: Living Room Automations
     entities:
+      - entity: automation.turn_on_living_room_hvac_cleaner
+        name: Turn on AC Cleaner
+        secondary_info: last-triggered
       - entity: automation.turn_on_living_room_ceiling_fan
         name: Turn on Ceiling Fan
         secondary_info: last-triggered
@@ -65,9 +68,6 @@ cards:
         secondary_info: last-triggered
       - entity: input_number.living_room_humidifier_turned_off_threshold
         name: Turned off Humidifier Threshold
-      - entity: automation.turn_on_living_room_hvac_cleaner
-        name: Turn on AC Cleaner
-        secondary_info: last-triggered
       - entity: automation.turn_on_living_room_downlights
         name: Turn on Downlights
         secondary_info: last-triggered
@@ -85,9 +85,10 @@ cards:
         name: Turned down More Time
       - entity: automation.turn_off_living_room_extra_lights
         secondary_info: last-triggered
+      - entity: automation.turn_on_all_automations
+        secondary_info: last-triggered
       - entity: automation.turn_off_xiaomi_alarm
         secondary_info: last-triggered
-      - entity: automation.turn_on_all_automations
     show_header_toggle: false
     state_color: false
   - type: vertical-stack

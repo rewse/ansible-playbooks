@@ -304,19 +304,19 @@ cards:
   - type: entities
     title: Automations
     entities:
+      - entity: automation.turn_on_living_room_hvac_cleaner
       - entity: automation.turn_on_living_room_ceiling_fan
       - entity: automation.turn_on_living_area_floor_heating
       - entity: automation.turn_on_living_room_humidifier
       - entity: automation.turn_off_living_room_humidifier
-      - entity: automation.turn_on_living_room_hvac_cleaner
-      - entity: automation.open_bedroom_curtains_workday
       - entity: automation.turn_on_living_room_downlights
       - entity: automation.turn_down_living_room
       - entity: automation.turn_down_living_room_more
       - entity: automation.turn_off_living_room_extra_lights
+      - entity: automation.open_bedroom_curtains_workday
       - entity: automation.turn_down_bedroom
-      - entity: automation.turn_off_xiaomi_alarm
       - entity: automation.turn_on_all_automations
+      - entity: automation.turn_off_xiaomi_alarm
   - type: custom:mini-graph-card
     entities:
       - entity: sensor.enecoq_fee_total
