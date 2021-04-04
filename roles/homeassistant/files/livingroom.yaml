@@ -65,7 +65,7 @@ cards:
         secondary_info: last-triggered
       - entity: input_number.living_room_humidifier_turned_off_threshold
         name: Turned off Humidifier Threshold
-      - entity: automation.turn_on_living_room_ac_cleaner
+      - entity: automation.turn_on_living_room_hvac_cleaner
         name: Turn on AC Cleaner
         secondary_info: last-triggered
       - entity: automation.turn_on_living_room_downlights
