@@ -140,6 +140,22 @@
             thread-id: machine-notification-group
           url: /lovelace-machines/machines
   mode: single
+- id: automation.alarm_daikinhvac_is_offline
+  alias: "ALARM: daikinhvac is Offline"
+  trigger:
+    - platform: state
+      entity_id: binary_sensor.daikinhvac
+      to: "off"
+      for: "00:16:00"
+  action:
+    - service: notify.all_devices
+      data:
+        message: "⚠️ ALARM: daikinhvac is Offline"
+        data:
+          push:
+            thread-id: machine-notification-group
+          url: /lovelace-machines/machines
+  mode: single
 - id: automation.alarm_fox_is_offline
   alias: "ALARM: fox is Offline"
   trigger:
