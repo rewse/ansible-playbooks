@@ -32,7 +32,7 @@ cards:
         ha-card {
           --st-font-size-xl: 36px;
           --st-mode-active-background: #dff4fd;
-          --st-mode-background: #ffffff;
+          --st-mode-background: transparent;
         }
   - type: entities
     title: Living Room Lights
