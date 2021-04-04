@@ -317,6 +317,7 @@ cards:
       - entity: automation.turn_down_bedroom
       - entity: automation.turn_on_all_automations
       - entity: automation.turn_off_xiaomi_alarm
+    show_header_toggle: false
   - type: custom:mini-graph-card
     entities:
       - entity: sensor.enecoq_fee_total
@@ -385,6 +386,14 @@ cards:
         secondary_info: last-changed
       - entity: binary_sensor.bedroom_window
         secondary_info: last-changed
+  - type: button
+    tap_action:
+      action: toggle
+    entity: switch.in_home
+    show_state: false
+    show_icon: true
+    icon_height: 48px
+    state_color: false
   - type: alarm-panel
     name: Xiami Alarm
     entity: alarm_control_panel.xiaomi_gateway

@@ -17,7 +17,7 @@ away_home:
           - automation.turn_on_living_room_humidifier
     - service: input_boolean.turn_off
       target:
-        entity_id: input_boolean.all_automations_state
+        entity_id: input_boolean.in_home_state
   mode: restart
   icon: mdi:home-export-outline
 into_home:
@@ -39,7 +39,7 @@ into_home:
           - automation.turn_on_living_room_humidifier
     - service: input_boolean.turn_on
       target:
-        entity_id: input_boolean.all_automations_state
+        entity_id: input_boolean.in_home_state
   mode: restart
   icon: mdi:home-account
 restart_zulu:
