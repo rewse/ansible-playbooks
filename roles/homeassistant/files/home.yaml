@@ -84,6 +84,7 @@ cards:
       - type: "custom:simple-thermostat"
         entity: climate.living_room_hvac
         decimals: 0
+        fallback: --
         step_layout: row
         step_size: 1
         hide:
@@ -166,6 +167,7 @@ cards:
       - type: "custom:simple-thermostat"
         entity: climate.bedroom_hvac
         decimals: 0
+        fallback: --
         step_layout: row
         step_size: 1
         hide:
