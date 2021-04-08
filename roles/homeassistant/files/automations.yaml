@@ -538,6 +538,32 @@
         seconds: 0
         milliseconds: 0
   mode: single
+- id: automation.turn_off_living_room_hvac_with_fan_mode
+  alias: Turn off Living Room HVAC with Fan Mode
+  description: Turn off HVAC in the living room with fan mode
+  mode: single
+  trigger:
+    - platform: time
+      at: '5:30'
+  condition:
+    - condition: state
+      entity_id: input_boolean.need_to_dry_living_room_hvac
+      state: 'on'
+  action:
+    - service: climate.turn_off
+      target:
+        entity_id: climate.living_room_hvac
+    - service: notify.all_devices
+      data:
+        title: Turned off Living Room HVAC with Fan Mode
+        message: Turn off the HVAC in the living room with fan mode
+        data:
+          push:
+            thread-id: home-notification-group
+          url: /lovelace/home
+    - service: input_boolean.turn_off
+      target:
+        entity_id: input_boolean.need_to_dry_living_room_hvac
 - id: automation.turn_off_living_room_lights
   alias: Turn off Living Room Lights
   description: Turn off the living room lights when iOS action fires
@@ -652,6 +678,30 @@
         minutes: 10
         seconds: 0
         milliseconds: 0
+- id: automation.turn_on_need_to_dry_living_room_hvac
+  alias: Turn on need_to_dry_living_room_hvac
+  description: >-
+    Turn on need_to_dry_living_room_hvac when Living Room HVAC is used in 1
+    hour
+  trigger:
+    - platform: state
+      entity_id: climate.living_room_hvac
+      to: dry
+      for: '01:00:00'
+    - platform: state
+      entity_id: climate.living_room_hvac
+      to: cool
+      for: '01:00:00'
+    - platform: state
+      entity_id: climate.living_room_hvac
+      to: heat_cool
+      for: '01:00:00'
+  condition: []
+  action:
+    - service: input_boolean.turn_on
+      target:
+        entity_id: input_boolean.need_to_dray_living_room_hvac
+  mode: single
 - id: automation.turn_on_living_area_floor_heating
   alias: Turn on Living Area Floor Heating
   description: Turn on the floor heating in the living area when the temperature is too low
@@ -721,12 +771,38 @@
       entity_id: switch.living_room_ac_cleaner
     - service: notify.all_devices
       data:
+        title: Turned on Living Room HVAC Cleaner
         message: Turn on the AC cleaner in the living room
         data:
           push:
             thread-id: home-notification-group
           url: /lovelace/home
   mode: single
+- id: automation.turn_on_living_room_hvac_with_fan_mode
+  alias: Turn on Living Room HVAC with Fan Mode
+  description: Turn on HVAC in the living room with fan mode
+  mode: single
+  trigger:
+    - platform: time
+      at: '4:30'
+  condition:
+    - condition: state
+      entity_id: input_boolean.need_to_dry_living_room_hvac
+      state: 'on'
+  action:
+    - service: climate.set_hvac_mode
+      target:
+        entity_id: climate.living_room_hvac
+      data:
+        hvac_mode: fan_only
+    - service: notify.all_devices
+      data:
+        title: Turned on Living Room HVAC with Fan Mode
+        message: Turn on the HVAC in the living room with fan mode
+        data:
+          push:
+            thread-id: home-notification-group
+          url: /lovelace/home
 - id: automation.turn_on_living_room_ceiling_fan
   alias: Turn on Living Room Ceiling Fan
   description: Turn on the ceiling fan in the living room
