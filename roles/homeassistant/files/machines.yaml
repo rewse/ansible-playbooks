@@ -5,319 +5,37 @@ views:
     icon: mdi:lan
     badges: []
     cards:
-      - type: vertical-stack
-        cards:
-          - type: custom:uptime-card
-            name: zulu ping
-            entity: binary_sensor.zulu
-            icon: mdi:router-network
-            hours_to_show: 168
-            bar:
-              spacing: 4
-              height: 10
-              round: 4
-            show:
-              status: false
-          - type: custom:uptime-card
-            name: xray-liv ping
-            entity: binary_sensor.xray_liv
-            icon: mdi:access-point-network
-            hours_to_show: 168
-            bar:
-              spacing: 4
-              height: 10
-              round: 4
-            show:
-              status: false
-          - type: custom:uptime-card
-            name: xray-sto ping
-            entity: binary_sensor.xray_sto
-            icon: mdi:access-point-network
-            hours_to_show: 168
-            bar:
-              spacing: 4
-              height: 10
-              round: 4
-            show:
-              status: false
-      - type: vertical-stack
-        cards:
-          - type: custom:uptime-card
-            name: remo-liv ping
-            entity: binary_sensor.remo_liv
-            icon: mdi:access-point-network
-            hours_to_show: 168
-            bar:
-              spacing: 4
-              height: 10
-              round: 4
-            show:
-              status: false
-          - type: custom:uptime-card
-            name: remo-bed ping
-            entity: binary_sensor.remo_bed
-            icon: mdi:access-point-network
-            hours_to_show: 168
-            bar:
-              spacing: 4
-              height: 10
-              round: 4
-            show:
-              status: false
-          - type: custom:uptime-card
-            name: wfirex ping
-            entity: binary_sensor.wfirex
-            icon: mdi:access-point-network
-            hours_to_show: 168
-            bar:
-              spacing: 4
-              height: 10
-              round: 4
-            show:
-              status: false
-          - type: custom:uptime-card
-            name: switchbothub ping
-            entity: binary_sensor.switchbothub
-            icon: mdi:access-point-network
-            hours_to_show: 168
-            bar:
-              spacing: 4
-              height: 10
-              round: 4
-            show:
-              status: false
-          - type: custom:uptime-card
-            name: huebridge ping
-            entity: binary_sensor.huebridge
-            icon: mdi:access-point-network
-            hours_to_show: 168
-            bar:
-              spacing: 4
-              height: 10
-              round: 4
-            show:
-              status: false
-          - type: custom:uptime-card
-            name: xiaomigateway ping
-            entity: binary_sensor.xiaomigateway
-            icon: mdi:access-point-network
-            hours_to_show: 168
-            bar:
-              spacing: 4
-              height: 10
-              round: 4
-            show:
-              status: false
-          - type: custom:uptime-card
-            name: guppy ping
-            entity: binary_sensor.guppy
-            icon: mdi:nas
-            hours_to_show: 168
-            bar:
-              spacing: 4
-              height: 10
-              round: 4
-            show:
-              status: false
-          - type: custom:uptime-card
-            name: fox ping
-            entity: binary_sensor.fox
-            icon: mdi:raspberry-pi
-            hours_to_show: 168
-            bar:
-              spacing: 4
-              height: 10
-              round: 4
-            show:
-              status: false
-          - type: custom:uptime-card
-            name: justio ping
-            entity: binary_sensor.justio
-            icon: mdi:printer
-            hours_to_show: 168
-            bar:
-              spacing: 4
-              height: 10
-              round: 4
-            show:
-              status: false
-          - type: custom:uptime-card
-            name: aventage ping
-            entity: binary_sensor.aventage
-            icon: mdi:audio-video
-            hours_to_show: 168
-            bar:
-              spacing: 4
-              height: 10
-              round: 4
-            show:
-              status: false
-          - type: custom:uptime-card
-            name: regza ping
-            entity: binary_sensor.regza
-            icon: mdi:television
-            hours_to_show: 168
-            bar:
-              spacing: 4
-              height: 10
-              round: 4
-            show:
-              status: false
-          - type: custom:uptime-card
-            name: daikinhvac ping
-            entity: binary_sensor.daikinhvac
-            icon: mdi:thermostat
-            hours_to_show: 168
-            bar:
-              spacing: 4
-              height: 10
-              round: 4
-            show:
-              status: false
-          - type: custom:uptime-card
-            name: tapo ping
-            entity: binary_sensor.tapo
-            icon: mdi:cctv
-            hours_to_show: 168
-            bar:
-              spacing: 4
-              height: 10
-              round: 4
-            show:
-              status: false
-          - type: custom:uptime-card
-            name: catloghome-liv ping
-            entity: binary_sensor.catloghome_liv
-            icon: mdi:cat
-            hours_to_show: 168
-            bar:
-              spacing: 4
-              height: 10
-              round: 4
-            show:
-              status: false
-          - type: custom:uptime-card
-            name: catloghome-bed ping
-            entity: binary_sensor.catloghome_bed
-            icon: mdi:cat
-            hours_to_show: 168
-            bar:
-              spacing: 4
-              height: 10
-              round: 4
-            show:
-              status: false
-          - type: custom:uptime-card
-            name: tuyaplug ping
-            entity: binary_sensor.tuyaplug
-            icon: mdi:power-socket-us
-            hours_to_show: 168
-            bar:
-              spacing: 4
-              height: 10
-              round: 4
-            show:
-              status: false
-          - type: custom:uptime-card
-            name: kasaplug-liv ping
-            entity: binary_sensor.kasaplug_liv
-            icon: mdi:power-socket-us
-            hours_to_show: 168
-            bar:
-              spacing: 4
-              height: 10
-              round: 4
-            show:
-              status: false
-          - type: custom:uptime-card
-            name: kasaplug-ent ping
-            entity: binary_sensor.kasaplug_ent
-            icon: mdi:power-socket-us
-            hours_to_show: 168
-            bar:
-              spacing: 4
-              height: 10
-              round: 4
-            show:
-              status: false
-      - type: custom:uptime-card
-        name: DNS hass.rewse.jp
-        entity: sensor.dns_hass_rewse_jp
-        ok: 124.213.127.141
-        icon: mdi:dns
+      - type: history-graph
+        title: Ping Network Devices
+        entities:
+          - entity: binary_sensor.zulu
+          - entity: binary_sensor.tango
+          - entity: binary_sensor.xray_liv
+          - entity: binary_sensor.xray_sto
         hours_to_show: 168
-        bar:
-          spacing: 4
-          height: 10
-          round: 4
-        show:
-          status: false
-      - type: vertical-stack
-        cards:
-          - type: custom:mini-graph-card
-            entities:
-              - entity: sensor.fast_com_download
-              - entity: sun.sun
-                color: gray
-                show_line: false
-                show_points: false
-                y_axis: secondary
-            hours_to_show: 48
-            points_per_hour: 1
-            animate: true
-            height: 200
-            hour24: true
-            show:
-              legend: false
-              labels_secondary: false
-          - type: custom:mini-graph-card
-            entities:
-              - entity: sensor.speedtest_download
-              - entity: sun.sun
-                color: gray
-                show_line: false
-                show_points: false
-                y_axis: secondary
-            hours_to_show: 48
-            points_per_hour: 1
-            animate: true
-            height: 200
-            hour24: true
-            show:
-              legend: false
-              labels_secondary: false
-          - type: custom:mini-graph-card
-            entities:
-              - entity: sensor.speedtest_upload
-              - entity: sun.sun
-                color: gray
-                show_line: false
-                show_points: false
-                y_axis: secondary
-            hours_to_show: 48
-            points_per_hour: 1
-            animate: true
-            height: 200
-            hour24: true
-            show:
-              legend: false
-              labels_secondary: false
-          - type: custom:mini-graph-card
-            entities:
-              - entity: sensor.speedtest_ping
-              - entity: sun.sun
-                color: gray
-                show_line: false
-                show_points: false
-                y_axis: secondary
-            hours_to_show: 48
-            points_per_hour: 1
-            animate: true
-            height: 200
-            hour24: true
-            show:
-              legend: false
-              labels_secondary: false
+      - type: history-graph
+        title: Ping Devices
+        entities:
+          - entity: binary_sensor.remo_liv
+          - entity: binary_sensor.remo_bed
+          - entity: binary_sensor.wfirex
+          - entity: binary_sensor.switchbothub
+          - entity: binary_sensor.huebridge
+          - entity: binary_sensor.xiaomigateway
+          - entity: binary_sensor.guppy
+          - entity: binary_sensor.fox
+          - entity: binary_sensor.justio
+          - entity: binary_sensor.aventage
+          - entity: binary_sensor.regza
+          - entity: binary_sensor.daikinhvac
+          - entity: binary_sensor.tapo
+          - entity: binary_sensor.catloghome_liv
+          - entity: binary_sensor.catloghome_bed
+          - entity: binary_sensor.tuyaplug
+          - entity: binary_sensor.kasaplug_liv
+          - entity: binary_sensor.kasaplug_ent
+          - entity: binary_sensor.jq300
+        hours_to_show: 168
       - type: entities
         title: Batteries
         entities:
@@ -359,6 +77,9 @@ views:
           - entity: sensor.guppy_volume_1_volume_used
             name: guppy Volume 1
             icon: 'mdi:harddisk'
+      - type: entity
+        entity: sensor.dns_hass_rewse_jp
+        icon: 'mdi:dns'
       - type: entities
         title: Offline Alarm
         entities:
