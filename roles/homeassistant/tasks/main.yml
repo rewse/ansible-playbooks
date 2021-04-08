@@ -362,6 +362,20 @@
     remote_src: yes
   tags: [homeassistant]
 
+- name: Create custom_components/jq300
+  file:
+    path: /etc/homeassistant/custom_components/jq300
+    state: directory
+  tags: [homeassistant]
+
+- name: Download ha-jq300
+  unarchive:
+    src: https://github.com/Limych/ha-jq300/releases/download/{{ jq300_version }}/jq300.zip
+    dest: /etc/homeassistant/custom_components/jq300
+    remote_src: yes
+  notify: Restart homeassistant
+  tags: [homeassistant]
+
 - name: Create custom_components/nature_remo
   file:
     path: /etc/homeassistant/custom_components/nature_remo
@@ -484,6 +498,9 @@
           - 192.168.0.0/24
       ifttt:
         key: !secret ifttt_key
+      jq300:
+        username: !secret jq300_username
+        password: !secret jq300_password
       lovelace:
         mode: yaml
         dashboards: !include dashboards.yaml
