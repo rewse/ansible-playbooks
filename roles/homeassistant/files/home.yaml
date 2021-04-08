@@ -389,7 +389,7 @@ cards:
   - type: button
     tap_action:
       action: toggle
-    entity: switch.in_home
+    entity: switch.at_home
     show_state: false
     show_icon: true
     icon_height: 48px
