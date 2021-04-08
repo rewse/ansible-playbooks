@@ -1,16 +1,16 @@
 - platform: template
   switches:
-    in_home:
-      unique_id: switch.in_home
-      friendly_name: In-Home
+    at_home:
+      unique_id: switch.at_home
+      friendly_name: At Home
       value_template: >
-        {{ is_state("input_boolean.in_home_state", "on") }}
+        {{ is_state("input_boolean.at_home_state", "on") }}
       turn_on:
         service: script.into_home
       turn_off:
         service: script.away_home
       icon_template: >
-        {% if is_state("input_boolean.in_home_state", "on") %}
+        {% if is_state("input_boolean.at_home_state", "on") %}
           mdi:home-account
         {% else %}
           mdi:home-export-outline

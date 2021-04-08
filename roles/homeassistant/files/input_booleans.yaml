@@ -1,5 +1,5 @@
-in_home_state:
-  name: In-Home State
+at_home_state:
+  name: At Home State
   initial: on
   icon: mdi:home-account
 living_room_ceiling_fans_state:
