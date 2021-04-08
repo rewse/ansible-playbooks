@@ -370,7 +370,7 @@
 
 - name: Download ha-jq300
   unarchive:
-    src: https://github.com/Limych/ha-jq300/releases/download/{{ jq300_version }}/jq300.zip
+    src: https://github.com/Limych/ha-jq300/releases/download/{{ jq300.version }}/jq300.zip
     dest: /etc/homeassistant/custom_components/jq300
     remote_src: yes
   notify: Restart homeassistant
@@ -382,24 +382,39 @@
     state: directory
   tags: [homeassistant]
 
-- name: Clone hass-nature-remo.git
-  git:
-    repo: https://github.com/yutoyazaki/hass-nature-remo.git
+- name: Download hass-nature-remo
+  unarchive:
+    src: https://github.com/yutoyazaki/hass-nature-remo/archive/refs/tags/v{{ nature_remo_version }}.zip
     dest: /etc/homeassistant/custom_components/nature_remo
-    force: yes
+    remote_src: yes
   notify: Restart homeassistant
   tags: [homeassistant]
 
-- name: Clone localtuya.git
-  git:
-    repo: https://github.com/rospogrigio/localtuya.git
-    dest: /srv/git/localtuya
-    force: yes
+- name: Download localtuya
+  unarchive:
+    src: https://github.com/rospogrigio/localtuya/archive/refs/tags/v{{ localtuya_version }}.zip
+    dest: /tmp
+    remote_src: yes
   tags: [homeassistant]
 
-- name: Copy localtuya.git
+- name: Copy localtuya
   copy:
-    src: /srv/git/localtuya/custom_components/localtuya
+    src: /tmp/localtuya-{{ localtuya_version }}/custom_components/localtuya
+    dest: /etc/homeassistant/custom_components
+    remote_src: yes
+  notify: Restart homeassistant
+  tags: [homeassistant]
+
+- name: Download XiaomiGateway3
+  unarchive:
+    src: https://github.com/AlexxIT/XiaomiGateway3/archive/refs/tags/v{{ xiaomi_gateway3_version }}.zip
+    dest: /tmp
+    remote_src: yes
+  tags: [homeassistant]
+
+- name: Copy XiaomiGateway3
+  copy:
+    src: /tmp/XiaomiGateway3-{{ xiaomi_gateway3_version }}/custom_components/xiaomi_gateway3
     dest: /etc/homeassistant/custom_components
     remote_src: yes
   notify: Restart homeassistant
@@ -428,51 +443,36 @@
 
 - name: Copy Lovelace Mini Graph Card
   get_url:
-    url: https://github.com/kalkih/mini-graph-card/releases/download/v0.10.0/mini-graph-card-bundle.js
+    url: https://github.com/kalkih/mini-graph-card/releases/download/v{{ mini_graph_card_version }}/mini-graph-card-bundle.js
     dest: /etc/homeassistant/www
   notify: Restart homeassistant
   tags: [homeassistant]
 
 - name: Copy Lovelace Mini Media Player
   get_url:
-    url: https://github.com/kalkih/mini-media-player/releases/download/v1.12.0/mini-media-player-bundle.js
-    dest: /etc/homeassistant/www
-  notify: Restart homeassistant
-  tags: [homeassistant]
-
-- name: Copy Lovelace Simple Thermostat Card
-  get_url:
-    url: https://github.com/nervetattoo/simple-thermostat/releases/download/v1.0.2/simple-thermostat.js
-    dest: /etc/homeassistant/www
-  notify: Restart homeassistant
-  tags: [homeassistant]
-
-- name: Copy Lovelace Simeple Weather Card
-  get_url:
-    url: https://github.com/kalkih/simple-weather-card/releases/download/v0.8.1/simple-weather-card-bundle.js
+    url: https://github.com/kalkih/mini-media-player/releases/download/v{{ mini_media_player_version }}/mini-media-player-bundle.js
     dest: /etc/homeassistant/www
   notify: Restart homeassistant
   tags: [homeassistant]
 
 - name: Copy Lovelace Uptime Card
   get_url:
-    url: https://github.com/dylandoamaral/uptime-card/releases/download/v0.0.4/uptime-card.js
+    url: https://github.com/dylandoamaral/uptime-card/releases/download/v{{ uptime_card_version }}/uptime-card.js
     dest: /etc/homeassistant/www
   notify: Restart homeassistant
   tags: [homeassistant]
 
-- name: Download XiaomiGateway3
-  unarchive:
-    src: https://github.com/AlexxIT/XiaomiGateway3/archive/refs/tags/v1.0.1.zip
-    dest: /tmp
-    remote_src: yes
+- name: Copy Lovelace Simple Thermostat Card
+  get_url:
+    url: https://github.com/nervetattoo/simple-thermostat/releases/download/v{{ simple_thermostat_version }}/simple-thermostat.js
+    dest: /etc/homeassistant/www
+  notify: Restart homeassistant
   tags: [homeassistant]
 
-- name: Copy XiaomiGateway3
-  copy:
-    src: /tmp/XiaomiGateway3-1.0.1/custom_components/xiaomi_gateway3
-    dest: /etc/homeassistant/custom_components
-    remote_src: yes
+- name: Copy Lovelace Simeple Weather Card
+  get_url:
+    url: https://github.com/kalkih/simple-weather-card/releases/download/v{{ simple_weather_card_version }}/simple-weather-card-bundle.js
+    dest: /etc/homeassistant/www
   notify: Restart homeassistant
   tags: [homeassistant]
 
@@ -507,13 +507,13 @@
         resources:
           - url: /local/card-mod.js
             type: module
-          - url: /local/mini-graph-card-bundle.js?v=0.10.0
+          - url: /local/mini-graph-card-bundle.js?v={{ mini_graph_card_version }}
             type: module
-          - url: /local/mini-media-player-bundle.js?v=1.12.0
+          - url: /local/mini-media-player-bundle.js?v={{ mini_media_player_version }}
             type: module
           - url: /local/simple-thermostat.js?v=1
             type: module
-          - url: /local/simple-weather-card-bundle.js?v=0.8.1
+          - url: /local/simple-weather-card-bundle.js?v={{ simple_weather_card_version }}
             type: module
           - url: /local/uptime-card.js
             type: module

@@ -1,11 +1,11 @@
 ---
 card_mod_version: 3.0.12
 ifttt_key: "{{ vault_ifttt_key }}"
-jq300_version: 0.8.2
 homeassistant_token: "{{ vault_homeassistant_token }}"
 jq300:
   username: "{{ vault_jq300.username }}"
   password: "{{ vault_jq300.password }}"
+  version: 0.8.2
 latlng:
   home:
     lat: "{{ vault_latlng.home.lat }}"
@@ -17,7 +17,11 @@ latlng:
     name: "{{ vault_latlng.s.name }}"
     lat: "{{ vault_latlng.s.lat }}"
     lng: "{{ vault_latlng.s.lng }}"
+localtuya_version: 3.2.2
+mini_graph_card_version: 0.10.0
+mini_media_player_version: 1.12.0
 mosquitto_password: "{{ vault_mosquitto_password }}"
+nature_remo_version: 0.5
 nfs_server: guppy.rewse.jp
 postgres:
   username: "{{ vault_postgres.username }}"
@@ -31,5 +35,9 @@ remo_token: "{{ vault_remo_token }}"
 seventeentrack:
   username: "{{ vault_seventeentrack.username }}"
   password: "{{ vault_seventeentrack.password }}"
+simple_thermostat_version: 1.0.2
+simple_weather_card_version: 0.8.1
 switchbot_token: "{{ vault_switchbot_token }}"
+uptime_card_version: 0.0.4
 tuyaplug_key: "{{ vault_tuyaplug_key }}"
+xiaomi_gateway3_version: 1.0.1
