@@ -220,6 +220,22 @@
             thread-id: machine-notification-group
           url: /lovelace-machines/machines
   mode: single
+- id: automation.alarm_jq300_is_offline
+  alias: "ALARM: jq300 is Offline"
+  trigger:
+    - platform: state
+      entity_id: binary_sensor.jq300
+      to: "off"
+      for: "00:16:00"
+  action:
+    - service: notify.all_devices
+      data:
+        message: "⚠️ ALARM: jq300 is Offline"
+        data:
+          push:
+            thread-id: machine-notification-group
+          url: /lovelace-machines/machines
+  mode: single
 - id: automation.alarm_kasaplug_ent_is_offline
   alias: "ALARM: kasaplug-ent is Offline"
   trigger:
