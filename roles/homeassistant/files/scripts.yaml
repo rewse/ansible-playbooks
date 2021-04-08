@@ -4,7 +4,6 @@ away_home:
     - service: automation.turn_off
       target:
         entity_id:
-          - automation.open_bedroom_curtains_temporarily
           - automation.open_bedroom_curtains_workday
           - automation.turn_down_bedroom
           - automation.turn_down_living_room
@@ -26,7 +25,6 @@ into_home:
     - service: automation.turn_on
       target:
         entity_id:
-          - automation.open_bedroom_curtains_temporarily
           - automation.open_bedroom_curtains_workday
           - automation.turn_down_bedroom
           - automation.turn_down_living_room
@@ -39,7 +37,7 @@ into_home:
           - automation.turn_on_living_room_humidifier
     - service: input_boolean.turn_on
       target:
-        entity_id: input_boolean.in_home_state
+        entity_id: input_boolean.at_home_state
   mode: restart
   icon: mdi:home-account
 restart_zulu:
