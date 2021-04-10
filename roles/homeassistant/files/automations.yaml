@@ -420,6 +420,17 @@
         seconds: 0
         milliseconds: 0
   mode: single
+- id: automation.notify_update_available
+  alias: "Notify Update Available"
+  trigger:
+    - platform: state
+      entity_id: binary_sensor.updater
+      from: "off"
+      to: "on"
+  action:
+    - service: notify.all_devices
+      data:
+        message: "Home Assistant {{ state_attr('binary_sensor.updater', 'newest_version') }} is available."
 - id: automation.open_bedroom_curtains_temporarily
   alias: Open Bedroom Curtains Temporarily
   description: Open the curtains in the bedroom temporarily
