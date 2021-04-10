@@ -1,0 +1,37 @@
+failover peer "fox-hotel" {
+    {{ dhcpd.role }};
+    address {{ local_ip }};
+    port {{ dhcpd.port }};
+
+    peer address {{ dhcpd.peer.ip }};
+    peer port {{ dhcpd.peer.port }};
+
+    max-response-delay 60;
+    max-unacked-updates 10;
+
+    {{ dhcpd.mclt }}
+    {{ dhcpd.split }}
+
+    load balance max seconds 3;
+}
+
+authoritative;
+default-lease-time 3600;
+max-lease-time 3600;
+use-host-decl-names on;
+
+subnet 192.168.0.0 netmask 255.255.255.0 {
+    pool {
+        failover peer "fox-hotel";
+        range 192.168.0.150 192.168.0.254;
+
+        option routers 192.168.0.1;
+        option subnet-mask 255.255.255.0;
+        option broadcast-address 192.168.0.255;
+        option domain-name-servers 192.168.0.130, 192.168.0.140;
+        option ntp-servers ntp.nict.jp, ntp.jst.mfeed.ad.jp;
+        option domain-name "rewse.jp";
+
+        include "/etc/dhcp/fixed-addresses.conf";
+    }
+}

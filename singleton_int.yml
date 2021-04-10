@@ -3,6 +3,8 @@
   become: yes
   remote_user: ubuntu
   roles:
+    - dhcpd
+    - resolved
     - syslogd
     - apache
     - docker
