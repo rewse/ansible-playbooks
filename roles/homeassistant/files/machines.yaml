@@ -12,7 +12,7 @@ views:
           - entity: binary_sensor.tango
           - entity: binary_sensor.xray_liv
           - entity: binary_sensor.xray_sto
-        hours_to_show: 168
+        hours_to_show: 24
       - type: history-graph
         title: Ping Devices
         entities:
@@ -35,7 +35,7 @@ views:
           - entity: binary_sensor.kasaplug_liv
           - entity: binary_sensor.kasaplug_ent
           - entity: binary_sensor.jq300
-        hours_to_show: 168
+        hours_to_show: 24
       - type: entities
         title: Batteries
         entities:
