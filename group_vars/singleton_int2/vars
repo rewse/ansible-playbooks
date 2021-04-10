@@ -1,12 +1,12 @@
 ---
-local_ip: 192.168.0.140
+local_ip: 192.168.0.40
 sshd_port: 55022
 zabbix_agent_port: 15050
 dhcpd:
     role: secondary
     port: 520
     peer:
-        ip: 192.168.0.130
+        ip: 192.168.0.30
         port: 519
     mclt: "# mclt 3600;"
     split: "# split 255;"
