@@ -1,0 +1,12 @@
+---
+local_ip: 192.168.0.130
+sshd_port: 22
+zabbix_agent_port: 10050
+dhcpd:
+    role: primary
+    port: 519
+    peer:
+        ip: 192.168.0.140
+        port: 520
+    mclt: mclt 3600;
+    split: split 256;
