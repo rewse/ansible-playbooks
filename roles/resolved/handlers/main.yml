@@ -1,0 +1,13 @@
+---
+- name: Restart systemd-resolved
+  systemd:
+    name: systemd-resolved
+    state: restarted
+
+- name: Restart unbound
+  systemd:
+    name: "{{ item }}"
+    state: restarted
+  with_items:
+    - unbound
+    - unbound-resolvconf
