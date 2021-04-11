@@ -53,7 +53,7 @@ views:
             name: Bedroom Light Switch
           - entity: sensor.bedroom_thermometer_battery
             name: Bedroom Thermometer
-          - entity: sensor.bedroom_window_sensor_battery
+          - entity: sensor.bedroom_window_battery
             name: Bedroom Window
           - entity: sensor.balcony_thermometer_battery
             name: Balcony Thermometer
