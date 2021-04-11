@@ -1,2 +1,3 @@
 ---
+php_miio_version: 0.2.6
 xray_password: "{{ vault_xray_password }}"
