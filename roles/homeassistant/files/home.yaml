@@ -69,16 +69,18 @@ cards:
           - value: above_horizon
           - value: below_horizon
       - type: entities
+        title: Living Room Appliances
         entities:
           - entity: switch.living_room_dimming_downlights
-            name: Dimming Lights
+            name: Living Room Dimming Lights
+          - entity: switch.study_dimming_downlights
+            name: Study Dimming Lights
           - entity: fan.living_room_ceiling_fans
             name: Ceiling Fan
           - entity: switch.living_room_humidifier
             name: Humidifier
           - entity: group.living_area_floor_heatings
             name: Floor Heating
-        title: Living Room Appliances
         state_color: false
         show_header_toggle: false
       - type: "custom:simple-thermostat"
@@ -103,16 +105,18 @@ cards:
               --st-mode-background: transparent;
             }
       - type: entities
+        title: Living Room Lights
         entities:
           - entity: switch.living_room_downlights
-            name: Downlights
+            name: Living Room Downlights
+          - entity: switch.study_downlights
+            name: Study Downlights
           - entity: light.living_room_tv_light
             name: TV Light
           - entity: light.living_room_entrance_light
             name: Entrance Light
           - entity: light.living_room_footlight
             name: Footlight
-        title: Living Room Lights
         state_color: false
   - type: vertical-stack
     cards:
@@ -311,9 +315,9 @@ cards:
       - entity: automation.turn_on_living_area_floor_heating
       - entity: automation.turn_on_living_room_humidifier
       - entity: automation.turn_off_living_room_humidifier
-      - entity: automation.turn_on_living_room_downlights
-      - entity: automation.turn_down_living_room
-      - entity: automation.turn_down_living_room_more
+      - entity: automation.turn_on_living_area_downlights
+      - entity: automation.turn_down_living_area
+      - entity: automation.turn_down_living_area_more
       - entity: automation.turn_off_living_room_extra_lights
       - entity: automation.open_bedroom_curtains_workday
       - entity: automation.turn_down_bedroom
