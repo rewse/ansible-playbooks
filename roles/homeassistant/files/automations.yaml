@@ -465,29 +465,29 @@
   - service: switch.turn_off
     entity_id: switch.bedroom_curtains
   mode: single
-- id: automation.turn_down_living_room
-  alias: Turn down Living Room
-  description: Turn down the living room
+- id: automation.turn_down_living_area
+  alias: Turn down Living Area
+  description: Turn down the living area
   trigger:
     - platform: time
       at: input_datetime.living_room_turned_down_time
   action:
     - service: scene.turn_on
       entity_id: scene.living_room_turned_down
-    - service: switch.turn_on
-      entity_id: switch.living_room_dimming_downlights
+    - service: light.turn_on
+      entity_id: light.living_area_dimming_downlights
   mode: single
-- id: automation.turn_down_living_room_more
-  alias: Turn down Living Room More
-  description: Turn down the living room more
+- id: automation.turn_down_living_area_more
+  alias: Turn down Living Area More
+  description: Turn down the living area more
   trigger:
     - platform: time
       at: input_datetime.living_room_turned_down_more_time
   action:
     - service: scene.turn_on
       entity_id: scene.living_room_turned_down_more
-    - service: switch.turn_off
-      entity_id: switch.living_room_dimming_downlights
+    - service: light.turn_off
+      entity_id: light.living_area_dimming_downlights
   mode: single
 - id: automation.turn_off_living_room_extra_lights
   alias: Turn off Living Room Extra Lights
@@ -575,9 +575,9 @@
     - service: input_boolean.turn_off
       target:
         entity_id: input_boolean.need_to_dry_living_room_hvac
-- id: automation.turn_off_living_room_lights
-  alias: Turn off Living Room Lights
-  description: Turn off the living room lights when iOS action fires
+- id: automation.turn_off_living_area_lights
+  alias: Turn off Living Area Lights
+  description: Turn off the living area lights when iOS action fires
   trigger:
     - platform: event
       event_type: ios.action_fired
@@ -590,7 +590,7 @@
   action:
     - service: light.turn_off
       target:
-        entity_id: light.living_room_lights
+        entity_id: light.living_area_lights
     - service: notify.all_devices
       data:
         message: Turned off the living room lights when iOS action fired
@@ -620,7 +620,7 @@
   action:
     - service: light.turn_off
       target:
-        entity_id: light.living_room_lights
+        entity_id: light.living_area_lights
     - service: fan.turn_off
       target:
         entity_id: fan.living_room_ceiling_fans
@@ -824,9 +824,9 @@
     - service: fan.turn_on
       entity_id: fan.living_room_ceiling_fans
   mode: single
-- id: automation.turn_on_living_room_downlights
-  alias: Turn on Living Room Downlights
-  description: Turn on the downlights in living room when the light level is too low
+- id: automation.turn_on_living_area_downlights
+  alias: Turn on Living Area Downlights
+  description: Turn on the downlights in living area when the light level is too low
   trigger:
     - type: motion
       platform: device
@@ -846,8 +846,8 @@
       entity_id: sun.sun
       state: above_horizon
   action:
-    - service: switch.turn_on
-      entity_id: switch.living_room_downlights
+    - service: light.turn_on
+      entity_id: light.living_area_downlights
     - service: notify.all_devices
       data:
         title: Turned on Living Room Downlights

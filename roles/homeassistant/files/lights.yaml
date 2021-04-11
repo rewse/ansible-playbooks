@@ -1,12 +1,21 @@
-- platform: switch
-  name: Living Room Downlights
-  entity_id: switch.living_room_downlights
-- platform: switch
-  name: Living Room Dimming Downlights
-  entity_id: switch.living_room_dimming_downlights
-- platform: switch
-  name: Living Room Footlight
-  entity_id: switch.living_room_footlight
+- platform: group
+  name: Living Area Downlights
+  entities:
+    - light.living_room_downlights
+    - light.study_downlights
+- platform: group
+  name: Living Area Dimming Downlights
+  entities:
+    - light.living_room_dimming_downlights
+    - light.study_dimming_downlights
+- platform: group
+  name: Living Area Lights
+  entities:
+    - light.living_room_downlights
+    - light.living_room_entrance_light
+    - light.living_room_tv_light
+    - light.living_room_footlight
+    - light.study_downlights
 - platform: group
   name: Living Room Lights
   entities:
@@ -20,3 +29,18 @@
     - light.bathroom_entrance_light
     - light.bathroom_left_light
     - light.bathroom_right_light
+- platform: switch
+  name: Living Room Downlights
+  entity_id: switch.living_room_downlights
+- platform: switch
+  name: Living Room Dimming Downlights
+  entity_id: switch.living_room_dimming_downlights
+- platform: switch
+  name: Living Room Footlight
+  entity_id: switch.living_room_footlight
+- platform: switch
+  name: Study Downlights
+  entity_id: switch.study_downlights
+- platform: switch
+  name: Study Dimming Downlights
+  entity_id: switch.study_dimming_downlights
