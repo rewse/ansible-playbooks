@@ -3,8 +3,16 @@
   pip:
     name:
       - pydaikin
+      - python-miio
     executable: pip3
   tags: [raspberrypi, package]
+
+- name: Download php-miio
+  unarchive:
+    src: https://github.com/skysilver-lab/php-miio/archive/refs/tags/v.{{ php_miio_version }}.zip
+    dest: /srv
+    remote_src: yes
+  tags: [raspberrypi]
 
 - name: Copy environment
   copy:
