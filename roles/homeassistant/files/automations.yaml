@@ -502,10 +502,10 @@
   description: Turn down the living area
   trigger:
     - platform: time
-      at: input_datetime.living_room_turned_down_time
+      at: input_datetime.living_area_turned_down_time
   action:
     - service: scene.turn_on
-      entity_id: scene.living_room_turned_down
+      entity_id: scene.living_area_turned_down
     - service: light.turn_on
       entity_id: light.living_area_dimming_downlights
   mode: single
@@ -514,10 +514,10 @@
   description: Turn down the living area more
   trigger:
     - platform: time
-      at: input_datetime.living_room_turned_down_more_time
+      at: input_datetime.living_area_turned_down_more_time
   action:
     - service: scene.turn_on
-      entity_id: scene.living_room_turned_down_more
+      entity_id: scene.living_area_turned_down_more
     - service: light.turn_off
       entity_id: light.living_area_dimming_downlights
   mode: single
@@ -873,7 +873,7 @@
   condition:
     - condition: numeric_state
       entity_id: sensor.living_room_light_level
-      below: input_number.living_room_downlights_turned_on_threshold
+      below: input_number.living_area_downlights_turned_on_threshold
     - condition: state
       entity_id: sun.sun
       state: above_horizon

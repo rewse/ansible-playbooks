@@ -69,20 +69,20 @@ cards:
         secondary_info: last-triggered
       - entity: input_number.living_room_humidifier_turned_off_threshold
         name: Turned off Humidifier Threshold
-      - entity: automation.turn_on_living_room_downlights
+      - entity: automation.turn_on_living_area_downlights
         name: Turn on Downlights
         secondary_info: last-triggered
-      - entity: input_number.living_room_downlights_turned_on_threshold
+      - entity: input_number.living_area_downlights_turned_on_threshold
         name: Downlights Threshold
-      - entity: automation.turn_down_living_room
+      - entity: automation.turn_down_living_area
         name: Turn down
         secondary_info: last-triggered
-      - entity: input_datetime.living_room_turned_down_time
+      - entity: input_datetime.living_area_turned_down_time
         name: Turned down Time
-      - entity: automation.turn_down_living_room_more
+      - entity: automation.turn_down_living_area_more
         name: Turn down More
         secondary_info: last-triggered
-      - entity: input_datetime.living_room_turned_down_more_time
+      - entity: input_datetime.living_area_turned_down_more_time
         name: Turned down More Time
       - entity: automation.turn_off_living_room_extra_lights
         secondary_info: last-triggered
