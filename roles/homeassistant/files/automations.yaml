@@ -76,6 +76,22 @@
             thread-id: machine-notification-group
           url: /lovelace-machines/machines
   mode: single
+- id: automation.alarm_tango_is_offline
+  alias: "ALARM: tango is Offline"
+  trigger:
+    - platform: state
+      entity_id: binary_sensor.tango
+      to: "off"
+      for: "00:16:00"
+  action:
+    - service: notify.all_devices
+      data:
+        message: "⚠️ ALARM: tango is offline"
+        data:
+          push:
+            thread-id: machine-notification-group
+          url: /lovelace-machines/machines
+  mode: single
 - id: automation.alarm_xray_liv_is_offline
   alias: "ALARM: xray-liv is Offline"
   trigger:
