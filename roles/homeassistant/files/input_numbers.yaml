@@ -16,8 +16,8 @@ living_room_ac_forcibly_turned_on_threshold:
   max: 35
   unit_of_measurement: °C
   icon: mdi:thermometer-alert
-living_room_downlights_turned_on_threshold:
-  name: Living Room Downlights Turned on Threshold
+living_area_downlights_turned_on_threshold:
+  name: Living Area Downlights Turned on Threshold
   min: 17
   max: 25
   unit_of_measurement: lx

@@ -4,8 +4,8 @@
         - climate.living_room_hvac
         - cover.bedroom_curtains
         - fan.living_room_ceiling_fans
-        - light.living_room_dimming_downlights
-        - light.living_room_downlights
+        - light.living_area_dimming_downlights
+        - light.living_area_downlights
         - light.living_room_footlight
         - media_player.aventage
         - media_player.firetv
