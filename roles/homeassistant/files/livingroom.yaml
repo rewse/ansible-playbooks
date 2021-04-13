@@ -95,28 +95,33 @@ cards:
     cards:
       - type: custom:mini-media-player
         entity: media_player.aventage
+        icon: mdi:audio-video
         artwork: material
         hide:
           controls: true
           power_state: false
       - type: custom:mini-media-player
         entity: media_player.regza
+        icon: mdi:television
         artwork: material
         hide:
           power_state: false
       - type: custom:mini-media-player
         entity: media_player.appletv
+        icon: mdi:apple
         artwork: material
         hide:
           volume: true
           power_state: false
       - type: custom:mini-media-player
         entity: media_player.firetv
+        icon: mdi:fire
         artwork: material
         hide:
           power_state: false
       - type: custom:mini-media-player
         entity: media_player.heargo2
+        icon: mdi:speaker
         artwork: material
         hide:
           controls: true
@@ -124,6 +129,7 @@ cards:
           power_state: false
       - type: custom:mini-media-player
         entity: media_player.stw2000
+        icon: mdi:android
         artwork: material
         hide:
           volume: true
