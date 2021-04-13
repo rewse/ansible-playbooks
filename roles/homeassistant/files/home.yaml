@@ -198,7 +198,7 @@ cards:
     cards:
       - type: custom:mini-graph-card
         entities:
-          - entity: sensor.bathroom_motion_sensor_temperature
+          - entity: sensor.bathroom_temperature
             name: Bathroom Temperature
           - entity: sun.sun
             color: gray
