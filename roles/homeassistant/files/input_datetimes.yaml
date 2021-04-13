@@ -10,11 +10,11 @@ bedroom_turned_down_time:
   name: Bedroom Turned down Time
   has_time: true
   icon: mdi:brightness-6
-living_room_turned_down_time:
-  name: Living Room Turned down Time
+living_area_turned_down_time:
+  name: Living Area Turned down Time
   has_time: true
   icon: mdi:brightness-6
-living_room_turned_down_more_time:
-  name: Living Room Turned down More Time
+living_area_turned_down_more_time:
+  name: Living Area Turned down More Time
   has_time: true
   icon: mdi:brightness-4
