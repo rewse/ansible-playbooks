@@ -60,6 +60,22 @@
             thread-id: machine-notification-group
           url: /lovelace-machines/machines
   mode: single
+- id: automation.alarm_romeo_is_offline
+  alias: "ALARM: romeo is Offline"
+  trigger:
+    - platform: state
+      entity_id: binary_sensor.romeo
+      to: "off"
+      for: "00:16:00"
+  action:
+    - service: notify.all_devices
+      data:
+        message: "⚠️ ALARM: romeo is offline"
+        data:
+          push:
+            thread-id: machine-notification-group
+          url: /lovelace-machines/machines
+  mode: single
 - id: automation.alarm_xray_liv_is_offline
   alias: "ALARM: xray-liv is Offline"
   trigger:

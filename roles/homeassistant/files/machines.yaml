@@ -9,6 +9,7 @@ views:
         title: Ping Network Devices
         entities:
           - entity: binary_sensor.zulu
+          - entity: binary_sensor.romeo
           - entity: binary_sensor.tango
           - entity: binary_sensor.xray_liv
           - entity: binary_sensor.xray_sto
