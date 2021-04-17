@@ -428,6 +428,102 @@
             thread-id: machine-notification-group
           url: /lovelace-machines/machines
   mode: single
+- id: automation.living_room_temperature_difference_is_too_large
+  alias: "ALARM: Living Room Temperature Difference is Too Large"
+  trigger:
+    - platform: time
+      at: '04:31'
+  condition:
+    - condition: numeric_state
+      entity_id: sensor.living_room_temperature_difference
+      above: '1'
+  action:
+    - service: notify.all_devices
+      data:
+        title: "⚠️ ALARM: Living Room Temperature Difference is Too Large"
+        data:
+          url: /lovelace-home/home
+  mode: single
+- id: automation.bedroom_temperature_difference_is_too_large
+  alias: "ALARM: Bedroom Temperature Difference is Too Large"
+  trigger:
+    - platform: time
+      at: '04:31'
+  condition:
+    - condition: numeric_state
+      entity_id: sensor.bedroom_temperature_difference
+      above: '1'
+  action:
+    - service: notify.all_devices
+      data:
+        title: "⚠️ ALARM: Bedroom Temperature Difference is Too Large"
+        data:
+          url: /lovelace-home/home
+  mode: single
+- id: automation.balcony_temperature_difference_is_too_large
+  alias: "ALARM: Balcony Temperature Difference is Too Large"
+  trigger:
+    - platform: time
+      at: '04:31'
+  condition:
+    - condition: numeric_state
+      entity_id: sensor.balcony_temperature_difference
+      above: '1'
+  action:
+    - service: notify.all_devices
+      data:
+        title: "⚠️ ALARM: Balcony Temperature Difference is Too Large"
+        data:
+          url: /lovelace-home/home
+  mode: single
+- id: automation.living_room_humidity_difference_is_too_large
+  alias: "ALARM: Living Room Humidity Difference is Too Large"
+  trigger:
+    - platform: time
+      at: '04:31'
+  condition:
+    - condition: numeric_state
+      entity_id: sensor.living_room_humidity_difference
+      above: '10'
+  action:
+    - service: notify.all_devices
+      data:
+        title: "⚠️ ALARM: Living Room Humidity Difference is Too Large"
+        data:
+          url: /lovelace-home/home
+  mode: single
+- id: automation.bedroom_humidity_difference_is_too_large
+  alias: "ALARM: Bedroom Humidity Difference is Too Large"
+  trigger:
+    - platform: time
+      at: '04:31'
+  condition:
+    - condition: numeric_state
+      entity_id: sensor.bedroom_humidity_difference
+      above: '10'
+  action:
+    - service: notify.all_devices
+      data:
+        title: "⚠️ ALARM: Bedroom Humidity Difference is Too Large"
+        data:
+          url: /lovelace-home/home
+  mode: single
+- id: automation.balcony_humidity_difference_is_too_large
+  alias: "ALARM: Balcony Humidity Difference is Too Large"
+  trigger:
+    - platform: time
+      at: '04:31'
+  condition:
+    - condition: numeric_state
+      entity_id: sensor.balcony_humidity_difference
+      above: '10'
+  action:
+    - service: notify.all_devices
+      data:
+        title: "⚠️ ALARM: Balcony Humidity Difference is Too Large"
+        data:
+          url: /lovelace-home/home
+  mode: single
 - id: automation.away_home
   alias: Away Home
   description: Away home when iOS action fires
