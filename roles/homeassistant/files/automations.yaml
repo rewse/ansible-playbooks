@@ -7,10 +7,8 @@
   action:
     - service: notify.all_devices
       data:
-        message: "⚠️ ALARM: DNS is Down"
+        title: "⚠️ ALARM: DNS is Down"
         data:
-          push:
-            thread-id: machine-notification-group
           url: /lovelace-machines/machines
     - delay:
         hours: 0
@@ -32,10 +30,8 @@
   action:
     - service: notify.all_devices
       data:
-        message: "⚠️ ALARM: Internet Speed is Too Slow"
+        title: "⚠️ ALARM: Internet Speed is Too Slow"
         data:
-          push:
-            thread-id: machine-notification-group
           url: /lovelace-machines/machines
     - delay:
         hours: 0
@@ -50,14 +46,12 @@
     - platform: state
       entity_id: binary_sensor.zulu
       to: "off"
-      for: "00:16:00"
+      for: "00:31:00"
   action:
     - service: notify.all_devices
       data:
-        message: "⚠️ ALARM: zulu is offline"
+        title: "⚠️ ALARM: zulu is offline"
         data:
-          push:
-            thread-id: machine-notification-group
           url: /lovelace-machines/machines
   mode: single
 - id: automation.alarm_romeo_is_offline
@@ -66,14 +60,12 @@
     - platform: state
       entity_id: binary_sensor.romeo
       to: "off"
-      for: "00:16:00"
+      for: "00:31:00"
   action:
     - service: notify.all_devices
       data:
-        message: "⚠️ ALARM: romeo is offline"
+        title: "⚠️ ALARM: romeo is offline"
         data:
-          push:
-            thread-id: machine-notification-group
           url: /lovelace-machines/machines
   mode: single
 - id: automation.alarm_tango_is_offline
@@ -82,14 +74,12 @@
     - platform: state
       entity_id: binary_sensor.tango
       to: "off"
-      for: "00:16:00"
+      for: "00:31:00"
   action:
     - service: notify.all_devices
       data:
-        message: "⚠️ ALARM: tango is offline"
+        title: "⚠️ ALARM: tango is offline"
         data:
-          push:
-            thread-id: machine-notification-group
           url: /lovelace-machines/machines
   mode: single
 - id: automation.alarm_xray_liv_is_offline
@@ -98,14 +88,12 @@
     - platform: state
       entity_id: binary_sensor.xray_liv
       to: "off"
-      for: "00:16:00"
+      for: "00:31:00"
   action:
     - service: notify.all_devices
       data:
-        message: "⚠️ ALARM: xray-liv is Offline"
+        title: "⚠️ ALARM: xray-liv is Offline"
         data:
-          push:
-            thread-id: machine-notification-group
           url: /lovelace-machines/machines
   mode: single
 - id: automation.alarm_xray_sto_is_offline
@@ -114,14 +102,12 @@
     - platform: state
       entity_id: binary_sensor.xray_sto
       to: "off"
-      for: "00:16:00"
+      for: "00:31:00"
   action:
     - service: notify.all_devices
       data:
-        message: "⚠️ ALARM: xray-sto is Offline"
+        title: "⚠️ ALARM: xray-sto is Offline"
         data:
-          push:
-            thread-id: machine-notification-group
           url: /lovelace-machines/machines
   mode: single
 - id: automation.alarm_aventage_is_offline
@@ -130,14 +116,12 @@
     - platform: state
       entity_id: binary_sensor.aventage
       to: "off"
-      for: "00:16:00"
+      for: "00:31:00"
   action:
     - service: notify.all_devices
       data:
-        message: "⚠️ ALARM: aventage is Offline"
+        title: "⚠️ ALARM: aventage is Offline"
         data:
-          push:
-            thread-id: machine-notification-group
           url: /lovelace-machines/machines
   mode: single
 - id: automation.alarm_catloghome_bed_is_offline
@@ -146,14 +130,12 @@
     - platform: state
       entity_id: binary_sensor.catloghome_bed
       to: "off"
-      for: "00:16:00"
+      for: "00:31:00"
   action:
     - service: notify.all_devices
       data:
-        message: "⚠️ ALARM: catloghome-bed is Offline"
+        title: "⚠️ ALARM: catloghome-bed is Offline"
         data:
-          push:
-            thread-id: machine-notification-group
           url: /lovelace-machines/machines
   mode: single
 - id: automation.alarm_catloghome_liv_is_offline
@@ -162,14 +144,12 @@
     - platform: state
       entity_id: binary_sensor.catloghome_liv
       to: "off"
-      for: "00:16:00"
+      for: "00:31:00"
   action:
     - service: notify.all_devices
       data:
-        message: "⚠️ ALARM: catloghome-liv is Offline"
+        title: "⚠️ ALARM: catloghome-liv is Offline"
         data:
-          push:
-            thread-id: machine-notification-group
           url: /lovelace-machines/machines
   mode: single
 - id: automation.alarm_daikinhvac_is_offline
@@ -178,14 +158,12 @@
     - platform: state
       entity_id: binary_sensor.daikinhvac
       to: "off"
-      for: "00:16:00"
+      for: "00:31:00"
   action:
     - service: notify.all_devices
       data:
-        message: "⚠️ ALARM: daikinhvac is Offline"
+        title: "⚠️ ALARM: daikinhvac is Offline"
         data:
-          push:
-            thread-id: machine-notification-group
           url: /lovelace-machines/machines
   mode: single
 - id: automation.alarm_fox_is_offline
@@ -194,14 +172,12 @@
     - platform: state
       entity_id: binary_sensor.fox
       to: "off"
-      for: "00:16:00"
+      for: "00:31:00"
   action:
     - service: notify.all_devices
       data:
-        message: "⚠️ ALARM: fox is Offline"
+        title: "⚠️ ALARM: fox is Offline"
         data:
-          push:
-            thread-id: machine-notification-group
           url: /lovelace-machines/machines
   mode: single
 - id: automation.alarm_guppy_is_offline
@@ -210,14 +186,12 @@
     - platform: state
       entity_id: binary_sensor.guppy
       to: "off"
-      for: "00:16:00"
+      for: "00:31:00"
   action:
     - service: notify.all_devices
       data:
-        message: "⚠️ ALARM: guppy is Offline"
+        title: "⚠️ ALARM: guppy is Offline"
         data:
-          push:
-            thread-id: machine-notification-group
           url: /lovelace-machines/machines
   mode: single
 - id: automation.alarm_huebridge_is_offline
@@ -226,14 +200,12 @@
     - platform: state
       entity_id: binary_sensor.huebridge
       to: "off"
-      for: "00:16:00"
+      for: "00:31:00"
   action:
     - service: notify.all_devices
       data:
-        message: "⚠️ ALARM: huebridge is Offline"
+        title: "⚠️ ALARM: huebridge is Offline"
         data:
-          push:
-            thread-id: machine-notification-group
           url: /lovelace-machines/machines
   mode: single
 - id: automation.alarm_justio_is_offline
@@ -242,14 +214,12 @@
     - platform: state
       entity_id: binary_sensor.justio
       to: "off"
-      for: "00:16:00"
+      for: "00:31:00"
   action:
     - service: notify.all_devices
       data:
-        message: "⚠️ ALARM: justio is Offline"
+        title: "⚠️ ALARM: justio is Offline"
         data:
-          push:
-            thread-id: machine-notification-group
           url: /lovelace-machines/machines
   mode: single
 - id: automation.alarm_jq300_is_offline
@@ -258,14 +228,12 @@
     - platform: state
       entity_id: binary_sensor.jq300
       to: "off"
-      for: "00:16:00"
+      for: "00:31:00"
   action:
     - service: notify.all_devices
       data:
-        message: "⚠️ ALARM: jq300 is Offline"
+        title: "⚠️ ALARM: jq300 is Offline"
         data:
-          push:
-            thread-id: machine-notification-group
           url: /lovelace-machines/machines
   mode: single
 - id: automation.alarm_kasaplug_ent_is_offline
@@ -274,14 +242,12 @@
     - platform: state
       entity_id: binary_sensor.kasaplug_ent
       to: "off"
-      for: "00:16:00"
+      for: "00:31:00"
   action:
     - service: notify.all_devices
       data:
-        message: "⚠️ ALARM: kasaplug-ent is Offline"
+        title: "⚠️ ALARM: kasaplug-ent is Offline"
         data:
-          push:
-            thread-id: machine-notification-group
           url: /lovelace-machines/machines
   mode: single
 - id: automation.alarm_kasaplug_liv_is_offline
@@ -290,14 +256,12 @@
     - platform: state
       entity_id: binary_sensor.kasaplug_liv
       to: "off"
-      for: "00:16:00"
+      for: "00:31:00"
   action:
     - service: notify.all_devices
       data:
-        message: "⚠️ ALARM: kasaplug-liv is Offline"
+        title: "⚠️ ALARM: kasaplug-liv is Offline"
         data:
-          push:
-            thread-id: machine-notification-group
           url: /lovelace-machines/machines
   mode: single
 - id: automation.alarm_regza_is_offline
@@ -306,14 +270,12 @@
     - platform: state
       entity_id: binary_sensor.regza
       to: "off"
-      for: "00:16:00"
+      for: "00:31:00"
   action:
     - service: notify.all_devices
       data:
-        message: "⚠️ ALARM: regza is Offline"
+        title: "⚠️ ALARM: regza is Offline"
         data:
-          push:
-            thread-id: machine-notification-group
           url: /lovelace-machines/machines
   mode: single
 - id: automation.alarm_remo_bed_is_offline
@@ -322,14 +284,12 @@
     - platform: state
       entity_id: binary_sensor.remo_bed
       to: "off"
-      for: "00:16:00"
+      for: "00:31:00"
   action:
     - service: notify.all_devices
       data:
-        message: "⚠️ ALARM: remo-bed is Offline"
+        title: "⚠️ ALARM: remo-bed is Offline"
         data:
-          push:
-            thread-id: machine-notification-group
           url: /lovelace-machines/machines
   mode: single
 - id: automation.alarm_remo_liv_is_offline
@@ -338,14 +298,12 @@
     - platform: state
       entity_id: binary_sensor.remo_liv
       to: "off"
-      for: "00:16:00"
+      for: "00:31:00"
   action:
     - service: notify.all_devices
       data:
-        message: "⚠️ ALARM: remo-liv is Offline"
+        title: "⚠️ ALARM: remo-liv is Offline"
         data:
-          push:
-            thread-id: machine-notification-group
           url: /lovelace-machines/machines
   mode: single
 - id: automation.alarm_switchbothub_is_offline
@@ -354,14 +312,12 @@
     - platform: state
       entity_id: binary_sensor.switchbothub
       to: "off"
-      for: "00:16:00"
+      for: "00:31:00"
   action:
     - service: notify.all_devices
       data:
-        message: "⚠️ ALARM: switchbothub is Offline"
+        title: "⚠️ ALARM: switchbothub is Offline"
         data:
-          push:
-            thread-id: machine-notification-group
           url: /lovelace-machines/machines
   mode: single
 - id: automation.alarm_tapo_is_offline
@@ -370,14 +326,12 @@
     - platform: state
       entity_id: binary_sensor.tapo
       to: "off"
-      for: "00:16:00"
+      for: "00:31:00"
   action:
     - service: notify.all_devices
       data:
-        message: "⚠️ ALARM: tapo is Offline"
+        title: "⚠️ ALARM: tapo is Offline"
         data:
-          push:
-            thread-id: machine-notification-group
           url: /lovelace-machines/machines
   mode: single
 - id: automation.alarm_tuyaplug_is_offline
@@ -386,14 +340,12 @@
     - platform: state
       entity_id: binary_sensor.tuyaplug
       to: "off"
-      for: "00:16:00"
+      for: "00:31:00"
   action:
     - service: notify.all_devices
       data:
-        message: "⚠️ ALARM: tuyaplug is Offline"
+        title: "⚠️ ALARM: tuyaplug is Offline"
         data:
-          push:
-            thread-id: machine-notification-group
           url: /lovelace-machines/machines
   mode: single
 - id: automation.alarm_wfirex_is_offline
@@ -402,14 +354,12 @@
     - platform: state
       entity_id: binary_sensor.wfirex
       to: "off"
-      for: "00:16:00"
+      for: "00:31:00"
   action:
     - service: notify.all_devices
       data:
-        message: "⚠️ ALARM: wfirex is Offline"
+        title: "⚠️ ALARM: wfirex is Offline"
         data:
-          push:
-            thread-id: machine-notification-group
           url: /lovelace-machines/machines
   mode: single
 - id: automation.alarm_xiaomigateway_is_offline
@@ -418,14 +368,12 @@
     - platform: state
       entity_id: binary_sensor.xiaomigateway
       to: "off"
-      for: "00:16:00"
+      for: "00:31:00"
   action:
     - service: notify.all_devices
       data:
-        message: "⚠️ ALARM: xiaomigateway is Offline"
+        title: "⚠️ ALARM: xiaomigateway is Offline"
         data:
-          push:
-            thread-id: machine-notification-group
           url: /lovelace-machines/machines
   mode: single
 - id: automation.living_room_temperature_difference_is_too_large
@@ -539,8 +487,6 @@
         message: Away home when iOS action fired
         title: Away Home
         data:
-          push:
-            thread-id: home-notification-group
           url: /lovelace/home
     - delay:
         hours: 0
@@ -668,8 +614,6 @@
         message: Turned off the humidifier in the living room because the humidity was too high
         title: Turned off Living Room Humidifier
         data:
-          push:
-            thread-id: home-notification-group
           url: /lovelace/home
     - delay:
         hours: 1
@@ -697,8 +641,6 @@
         title: Turned off Living Room HVAC with Fan Mode
         message: Turn off the HVAC in the living room with fan mode
         data:
-          push:
-            thread-id: home-notification-group
           url: /lovelace/home
     - service: input_boolean.turn_off
       target:
@@ -724,8 +666,6 @@
         message: Turned off the living room lights when iOS action fired
         title: Turned off Living Room Lights
         data:
-          push:
-            thread-id: home-notification-group
           url: /lovelace/home
     - delay:
         hours: 0
@@ -781,8 +721,6 @@
         message: Turned off Xiaomi Alarm because bio’s SSID is xray
         title: Turned off Xiaomi Alarm
         data:
-          push:
-            thread-id: home-notification-group
           url: /lovelace/home
     - delay:
         hours: 0
@@ -809,8 +747,6 @@
         message: Turn on all automations when bio connects to xray
         title: Turned on All Automations
         data:
-          push:
-            thread-id: home-notification-group
           url: /lovelace/home
     - delay:
         hours: 0
@@ -886,8 +822,6 @@
         title: Turned on Living Area Floor Heating
         message: Turned on the floor heating in the living area because the temperature was too low
         data:
-          push:
-            thread-id: home-notification-group
           url: /lovelace/home
     - delay:
         hours: 1
@@ -913,8 +847,6 @@
         title: Turned on Living Room HVAC Cleaner
         message: Turn on the AC cleaner in the living room
         data:
-          push:
-            thread-id: home-notification-group
           url: /lovelace/home
   mode: single
 - id: automation.turn_on_living_room_hvac_with_fan_mode
@@ -939,8 +871,6 @@
         title: Turned on Living Room HVAC with Fan Mode
         message: Turn on the HVAC in the living room with fan mode
         data:
-          push:
-            thread-id: home-notification-group
           url: /lovelace/home
 - id: automation.turn_on_living_room_ceiling_fan
   alias: Turn on Living Room Ceiling Fan
@@ -981,8 +911,6 @@
         title: Turned on Living Room Downlights
         message: Turned on the downlights in living room because the light level was too low
         data:
-          push:
-            thread-id: home-notification-group
           url: /lovelace/home
     - delay:
         hours: 1
@@ -1029,8 +957,6 @@
         title: Turned on Living Room Humidifier
         message: Turned on the humidifier in the living room because the humidity was too low
         data:
-          push:
-            thread-id: home-notification-group
           url: /lovelace/home
     - delay:
         hours: 1
