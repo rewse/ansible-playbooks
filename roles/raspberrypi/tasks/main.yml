@@ -1,4 +1,11 @@
 ---
+- name: Install additional packages
+  apt:
+    name:
+      - snmp
+      - snmp-mibs-downloader
+  tags: [raspberrypi, package]
+
 - name: Install packages with pip3
   pip:
     name:
@@ -6,6 +13,26 @@
       - python-miio
     executable: pip3
   tags: [raspberrypi, package]
+
+- name: Enable SNMP mibs
+  lineinfile:
+    dest: /etc/snmp/snmp.conf
+    regexp: "mibs "
+    line: "mibs all"
+  tags: [raspberrypi]
+
+- name: Copy NETGEAR GS108Tv3 MIB
+  unarchive:
+    src: https://www.downloads.netgear.com/files/GDC/GS108Tv3/GS108T_110TP_TPP_V{{ netgear_gs108tv3_version }}_MIBs.zip
+    dest: /usr/share/snmp/mibs
+    remote_src: yes
+  tags: [raspberrypi]
+
+- name: Copy NETGEAR WAC510 MIB
+  get_url:
+    url: https://www.downloads.netgear.com/files/GDC/WAC510/WAC510_V{{ netgear_wac510_version }}.mib
+    dest: /usr/share/snmp/mibs
+  tags: [raspberrypi]
 
 - name: Download php-miio
   unarchive:
