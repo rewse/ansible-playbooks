@@ -1,3 +1,5 @@
 ---
+netgear_gs108tv3_version: 7.0.6.2
+netgear_wac510_version: 9.3.0.5
 php_miio_version: 0.2.6
 xray_password: "{{ vault_xray_password }}"
