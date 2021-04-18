@@ -623,28 +623,26 @@
   mode: single
 - id: automation.turn_off_living_room_hvac_with_fan_mode
   alias: Turn off Living Room HVAC with Fan Mode
-  description: Turn off HVAC in the living room with fan mode
-  mode: single
+  description: Turn off the HVAC in the living room with fan mode
   trigger:
     - platform: time
       at: '5:30'
-  condition:
-    - condition: state
-      entity_id: input_boolean.need_to_dry_living_room_hvac
-      state: 'on'
   action:
     - service: climate.turn_off
       target:
         entity_id: climate.living_room_hvac
+    - service: automation.turn_off
+      target:
+        entity_id:
+          - automation.turn_on_living_room_hvac_with_fan_mode
+          - automation.turn_off_living_room_hvac_with_fan_mode
     - service: notify.all_devices
       data:
         title: Turned off Living Room HVAC with Fan Mode
         message: Turn off the HVAC in the living room with fan mode
         data:
           url: /lovelace/home
-    - service: input_boolean.turn_off
-      target:
-        entity_id: input_boolean.need_to_dry_living_room_hvac
+  mode: single
 - id: automation.turn_off_living_area_lights
   alias: Turn off Living Area Lights
   description: Turn off the living area lights when iOS action fires
@@ -753,11 +751,9 @@
         minutes: 10
         seconds: 0
         milliseconds: 0
-- id: automation.turn_on_need_to_dry_living_room_hvac
-  alias: Turn on need_to_dry_living_room_hvac
-  description: >-
-    Turn on need_to_dry_living_room_hvac when Living Room HVAC is used in 1
-    hour
+- id: automation.plan_to_turn_on_living_room_hvac_with_fan_mode
+  alias: Plan to Turn on Living Room HVAC with Fan Mode
+  description: Plan to turn on the HVAC in the living room with fan mode
   trigger:
     - platform: state
       entity_id: climate.living_room_hvac
@@ -771,11 +767,12 @@
       entity_id: climate.living_room_hvac
       to: heat_cool
       for: '01:00:00'
-  condition: []
   action:
-    - service: input_boolean.turn_on
+    - service: automation.turn_on
       target:
-        entity_id: input_boolean.need_to_dray_living_room_hvac
+        entity_id:
+          - automation.turn_on_living_room_hvac_with_fan_mode
+          - automation.turn_off_living_room_hvac_with_fan_mode
   mode: single
 - id: automation.turn_on_living_area_floor_heating
   alias: Turn on Living Area Floor Heating
@@ -851,15 +848,10 @@
   mode: single
 - id: automation.turn_on_living_room_hvac_with_fan_mode
   alias: Turn on Living Room HVAC with Fan Mode
-  description: Turn on HVAC in the living room with fan mode
-  mode: single
+  description: Turn on the HVAC in the living room with fan mode
   trigger:
     - platform: time
       at: '4:30'
-  condition:
-    - condition: state
-      entity_id: input_boolean.need_to_dry_living_room_hvac
-      state: 'on'
   action:
     - service: climate.set_hvac_mode
       target:
@@ -872,6 +864,7 @@
         message: Turn on the HVAC in the living room with fan mode
         data:
           url: /lovelace/home
+  mode: single
 - id: automation.turn_on_living_room_ceiling_fan
   alias: Turn on Living Room Ceiling Fan
   description: Turn on the ceiling fan in the living room
