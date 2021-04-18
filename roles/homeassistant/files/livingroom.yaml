@@ -6,7 +6,7 @@ cards:
   - type: entities
     title: Living Room Appliances
     entities:
-      - entity: switch.living_room_dimming_downlights
+      - entity: light.living_area_dimming_downlights
         name: Dimming Downlights
       - entity: fan.living_room_ceiling_fans
         name: Ceiling Fan
@@ -38,7 +38,7 @@ cards:
   - type: entities
     title: Living Room Lights
     entities:
-      - entity: switch.living_room_downlights
+      - entity: light.living_area_downlights
         name: Downlights
       - entity: light.living_room_tv_light
         name: TV Light
