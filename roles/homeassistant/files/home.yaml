@@ -236,7 +236,6 @@ cards:
         entities:
           - entity: light.bathroom_lights
             name: Lights
-            icon: 'mdi:wall-sconce-flat'
         title: Bathroom Lights
   - type: vertical-stack
     cards:

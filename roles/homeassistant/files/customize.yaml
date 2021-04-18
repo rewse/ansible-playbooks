@@ -1,0 +1,218 @@
+automation.alarm_aventage_is_offline:
+  icon: mdi:audio-video-off
+automation.alarm_balcony_humidity_difference_is_too_large:
+  icon: mdi:water-percent-alert
+automation.alarm_balcony_temperature_difference_is_too_large:
+  icon: mdi:thermometer-alert
+automation.alarm_bedroom_humidity_difference_is_too_large:
+  icon: mdi:water-percent-alert
+automation.alarm_bedroom_temperature_difference_is_too_large:
+  icon: mdi:thermometer-alert
+automation.alarm_catloghome_bed_is_offline:
+  icon: mdi:cat
+automation.alarm_catloghome_liv_is_offline:
+  icon: mdi:cat
+automation.alarm_daikinhvac_is_offline:
+  icon: mdi:thermostat
+automation.alarm_dns_is_down:
+  icon: mdi:dns
+automation.alarm_fox_is_offline:
+  icon: mdi:raspberry-pi
+automation.alarm_guppy_is_offline:
+  icon: mdi:nas
+automation.alarm_huebridge_is_offline:
+  icon: mdi:network-off-outline
+automation.alarm_internet_speed_is_too_slow:
+  icon: mdi:gauge-low
+automation.alarm_jq300_is_offline:
+  icon: mdi:air-filter
+automation.alarm_justio_is_offline:
+  icon: mdi:printer
+automation.alarm_kasaplug_ent_is_offline:
+  icon: mdi:power-socket-us
+automation.alarm_kasaplug_liv_is_offline:
+  icon: mdi:power-socket-us
+automation.alarm_living_room_humidity_difference_is_too_large:
+  icon: mdi:water-percent-alert
+automation.alarm_living_room_temperature_difference_is_too_large:
+  icon: mdi:thermometer-alert
+automation.alarm_regza_is_offline:
+  icon: mdi:television
+automation.alarm_remo_bed_is_offline:
+  icon: mdi:network-off-outline
+automation.alarm_remo_liv_is_offline:
+  icon: mdi:network-off-outline
+automation.alarm_romeo_is_offline:
+  icon: mdi:router-network
+automation.alarm_switchbothub_is_offline:
+  icon: mdi:network-off-outline
+automation.alarm_tango_is_offline:
+  icon: mdi:switch
+automation.alarm_tapo_is_offline:
+  icon: mdi:video
+automation.alarm_tuyaplug_is_offline:
+  icon: mdi:power-socket-us
+automation.alarm_wfirex_is_offline:
+  icon: mdi:network-off-outline
+automation.alarm_xiaomigateway_is_offline:
+  icon: mdi:network-off-outline
+automation.alarm_xray_liv_is_offline:
+  icon: mdi:access-point-network-off
+automation.alarm_xray_sto_is_offline:
+  icon: mdi:access-point-network-off
+automation.alarm_zulu_is_offline:
+  icon: mdi:router-network
+automation.away_home:
+  icon: mdi:home-export-outline
+automation.notify_update_available:
+  icon: mdi:check-circle
+automation.open_bedroom_curtains_temporarily:
+  icon: mdi:window-shutter-alert
+automation.open_bedroom_curtains_workday:
+  icon: mdi:window-shutter-open
+automation.plan_to_turn_on_living_room_hvac_with_fan_mode:
+  icon: mdi:fan-alert
+automation.turn_down_bedroom:
+  icon: mdi:brightness-6
+automation.turn_down_living_area:
+  icon: mdi:brightness-6
+automation.turn_down_living_area_more:
+  icon: mdi:brightness-4
+automation.turn_off_living_area_lights:
+  icon: mdi:lightbulb-group-off-outline
+automation.turn_off_living_room_extra_lights:
+  icon: mdi:led-strip-variant
+automation.turn_off_living_room_humidifier:
+  icon: mdi:air-humidifier-off
+automation.turn_off_living_room_hvac_with_fan_mode:
+  icon: mdi:fan-off
+automation.turn_off_living_room_lights_appliances:
+  icon: mdi:weather-night
+automation.turn_off_xiaomi_alarm:
+  icon: mdi:shield-home
+automation.turn_on_all_automations:
+  icon: mdi:robot-excited
+automation.turn_on_living_area_downlights:
+  icon: mdi:wall-sconce-flat
+automation.turn_on_living_area_floor_heating:
+  icon: mdi:grid
+automation.turn_on_living_room_ceiling_fan:
+  icon: mdi:fan
+automation.turn_on_living_room_humidifier:
+  icon: mdi:air-humidifier
+automation.turn_on_living_room_hvac_cleaner:
+  icon: mdi:broom
+automation.turn_on_living_room_hvac_with_fan_mode:
+  icon: mdi:fan-alert
+binary_sensor.aventage:
+  icon: mdi:audio-video
+binary_sensor.catloghome_bed:
+  icon: mdi:cat
+binary_sensor.catloghome_liv:
+  icon: mdi:cat
+binary_sensor.daikinhvac:
+  icon: mdi:thermostat
+binary_sensor.fox:
+  icon: mdi:raspberry-pi
+binary_sensor.guppy:
+  icon: mdi:nas
+binary_sensor.huebridge:
+  icon: mdi:network-outline
+binary_sensor.jq300:
+  icon: mdi:network-outline
+binary_sensor.justio:
+  icon: mdi:printer
+binary_sensor.kasaplug_ent:
+  icon: mdi:power-socket-us
+binary_sensor.kasaplug_liv:
+  icon: mdi:power-socket-us
+binary_sensor.regza:
+  icon: mdi:television
+binary_sensor.regza_state:
+  icon: mdi:television
+binary_sensor.regza_volume_muted:
+  icon: mdi:television
+binary_sensor.remo_bed:
+  icon: mdi:network-outline
+binary_sensor.remo_liv:
+  icon: mdi:network-outline
+binary_sensor.romeo:
+  icon: mdi:router-network
+binary_sensor.switchbothub:
+  icon: mdi:network-outline
+binary_sensor.tango:
+  icon: mdi:switch
+binary_sensor.tapo:
+  icon: mdi:video
+binary_sensor.tuyaplug:
+  icon: mdi:power-socket-us
+binary_sensor.wfirex:
+  icon: mdi:network-outline
+binary_sensor.xiaomigateway:
+  icon: mdi:network-outline
+binary_sensor.xray_liv:
+  icon: mdi:access-point-network
+binary_sensor.xray_sto:
+  icon: mdi:access-point-network
+binary_sensor.zulu:
+  icon: mdi:router-network
+climate.living_area_floor_heating:
+  icon: mdi:grid
+light.bathroom_entrance_light:
+  icon: mdi:wall-sconce-flat
+light.bathroom_left_light:
+  icon: mdi:wall-sconce-flat
+light.bathroom_lights:
+  icon: mdi:wall-sconce-flat
+light.bathroom_right_light:
+  icon: mdi:wall-sconce-flat
+light.bedroom_light:
+  icon: mdi:ceiling-light
+light.living_area_dimming_downlights:
+  icon: mdi:brightness-6
+  assumed_state: true
+light.living_area_downlights:
+  icon: mdi:wall-sconce-flat
+  assumed_state: true
+light.living_area_lights:
+  assumed_state: true
+light.living_room_dimming_downlights:
+  icon: mdi:brightness-6
+  assumed_state: true
+light.living_room_downlights:
+  icon: mdi:wall-sconce-flat
+  assumed_state: true
+light.living_room_entrance_light:
+  icon: mdi:wall-sconce-flat
+light.living_room_footlight:
+  icon: mdi:lava-lamp
+light.living_room_lights:
+  assumed_state: true
+light.living_room_tv_light:
+  icon: mdi:led-strip-variant
+light.study_dimming_downlights:
+  icon: mdi:brightness-6
+  assumed_state: true
+light.study_downlights:
+  icon: mdi:wall-sconce-flat
+  assumed_state: true
+media_player.appletv:
+  icon: mdi:apple
+media_player.aventage:
+  icon: mdi:audio-video
+media_player.firetv:
+  icon: mdi:fire
+media_player.heargo2:
+  icon: mdi:speaker
+  device_class: speaker
+media_player.regza:
+  icon: mdi:television
+  device_class: tv
+media_player.stw2000:
+  icon: mdi:android
+sensor.bedroom_curtains_position:
+  icon: mdi:window-shutter-alert
+sensor.dns_hass_rewse_jp:
+  icon: mdi:dns
+sensor.regza_channel:
+  icon: mdi:television
