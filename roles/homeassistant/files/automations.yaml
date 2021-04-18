@@ -738,7 +738,7 @@
       to: xray
   condition:
     - condition: state
-      entity_id: input_boolean.all_automations_state
+      entity_id: input_boolean.at_home_state
       state: 'off'
   action:
     - service: script.into_home
