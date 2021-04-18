@@ -1,4 +1,4 @@
-- host: 192.168.0.9
+- host: tuyaplug.rewse.jp
   friendly_name: Living Room Humidifier Plug
   device_id: 86335701f4cfa2059192
   local_key: !secret tuyaplug_key
