@@ -6,7 +6,3 @@ living_room_ceiling_fans_state:
   name: Living Room Ceiling Fans State
   initial: on
   icon: mdi:fan
-need_to_dry_living_room_hvac:
-  name: Need to Dry Living Room HVAC
-  initial: off
-  icon: mdi:fan
