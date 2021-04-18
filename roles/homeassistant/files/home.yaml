@@ -307,18 +307,31 @@ cards:
     title: Automations
     entities:
       - entity: automation.turn_on_living_room_hvac_cleaner
+        secondary_info: last-triggered
       - entity: automation.turn_on_living_room_ceiling_fan
+        secondary_info: last-triggered
       - entity: automation.turn_on_living_area_floor_heating
+        secondary_info: last-triggered
       - entity: automation.turn_on_living_room_humidifier
+        secondary_info: last-triggered
       - entity: automation.turn_off_living_room_humidifier
+        secondary_info: last-triggered
       - entity: automation.turn_on_living_area_downlights
+        secondary_info: last-triggered
       - entity: automation.turn_down_living_area
+        secondary_info: last-triggered
       - entity: automation.turn_down_living_area_more
+        secondary_info: last-triggered
       - entity: automation.turn_off_living_room_extra_lights
+        secondary_info: last-triggered
       - entity: automation.open_bedroom_curtains_workday
+        secondary_info: last-triggered
       - entity: automation.turn_down_bedroom
+        secondary_info: last-triggered
       - entity: automation.turn_on_all_automations
+        secondary_info: last-triggered
       - entity: automation.turn_off_xiaomi_alarm
+        secondary_info: last-triggered
     show_header_toggle: false
   - type: custom:mini-graph-card
     entities:
