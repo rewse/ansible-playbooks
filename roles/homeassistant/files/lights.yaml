@@ -30,17 +30,55 @@
     - light.bathroom_left_light
     - light.bathroom_right_light
 - platform: switch
-  name: Living Room Downlights
-  entity_id: switch.living_room_downlights
-- platform: switch
-  name: Living Room Dimming Downlights
-  entity_id: switch.living_room_dimming_downlights
-- platform: switch
   name: Living Room Footlight
   entity_id: switch.living_room_footlight
-- platform: switch
-  name: Study Downlights
-  entity_id: switch.study_downlights
-- platform: switch
-  name: Study Dimming Downlights
-  entity_id: switch.study_dimming_downlights
+- platform: template
+  lights:
+    living_room_downlights:
+      unique_id: light.living_room_downlights
+      friendly_name: Living Room Downlights
+      icon_template: mdi:wall-sconce-flat
+      turn_on:
+        service: rest_command.control_remo_device
+        data:
+          signal_id: 917b6ba4-5cff-4e91-88f4-cccc7fe1c5eb
+      turn_off:
+        service: rest_command.control_remo_device
+        data:
+          signal_id: 281417a3-3a19-4a0a-b9fa-9f19d0d3f654
+    living_room_dimming_downlights:
+      unique_id: light.living_room_dimming_downlights
+      friendly_name: Living Room Dimming Downlights
+      icon_template: mdi:brightness-6
+      turn_on:
+        service: rest_command.control_remo_device
+        data:
+          signal_id: 4975ccd8-2cfd-42e1-98a2-6e1b29017f70
+      turn_off:
+        service: rest_command.control_remo_device
+        data:
+          signal_id: d5f4b519-15a5-4b5e-90a7-0acd736108df
+    study_downlights:
+      unique_id: light.study_downlights
+      friendly_name: Study Downlights
+      icon_template: mdi:wall-sconce-flat
+      turn_on:
+        - service: ifttt.trigger
+          data: 
+            event: turn_on_study_downlights
+      turn_off:
+        - service: ifttt.trigger
+          data: 
+            event: turn_off_study_downlights
+    study_dimming_downlights:
+      unique_id: light.study_dimming_downlights
+      friendly_name: Study Dimming Downlights
+      icon_template: mdi:brightness-6
+      turn_on:
+        - service: ifttt.trigger
+          data: 
+            event: turn_on_study_dimming_downlights
+      turn_off:
+        - service: ifttt.trigger
+          data: 
+            event: turn_off_study_dimming_downlights
