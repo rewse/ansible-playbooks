@@ -1,4 +1,7 @@
 ---
+alexa_client:
+  id: "{{ vault_alexa_client.id }}"
+  secret: "{{ vault_alexa_client.secret }}"
 card_mod_version: 3.0.12
 ifttt_key: "{{ vault_ifttt_key }}"
 homeassistant_token: "{{ vault_homeassistant_token }}"

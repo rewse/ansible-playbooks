@@ -1,0 +1,120 @@
+smart_home:
+  locale: ja-JP
+  endpoint: https://api.fe.amazonalexa.com/v3/events
+  client_id: !secret alexa_client_id
+  client_secret: !secret alexa_client_secret
+  filter:
+    include_entities:
+      - alarm_control_panel.xiaomigateway
+      - automation.turn_down_living_area
+      - automation.turn_down_living_area_more
+      - binary_sensor.bathroom_motion
+      - binary_sensor.bedroom_window
+      - binary_sensor.living_room_motion
+      - binary_sensor.living_room_window
+      - binary_sensor.study_motion
+      - binary_sensor.study_window
+      - camera.guppy_cat_cage
+      - climate.bedroom_hvac
+      - climate.living_room_hvac
+      - cover.bedroom_curtains
+      - fan.living_room_ceiling_fans
+      - group.living_area_floor_heatings
+      - light.bathroom_lights
+      - light.bedroom_light
+      - light.living_area_dimming_downlights
+      - light.living_area_downlights
+      - light.living_room_entrance_light
+      - light.living_room_footlight
+      - light.living_room_tv_light
+      - media_player.appletv
+      - media_player.aventage
+      - media_player.heargo2
+      - media_player.stw2000
+      - sensor.balcony_temperature
+      - sensor.bathroom_temperature
+      - sensor.bedroom_temperature
+      - sensor.living_room_temperature
+      - sensor.study_temperature
+      - switch.bedroom_hvac_cleaner
+      - switch.living_room_humidifier
+      - switch.living_room_hvac_cleaner
+  entity_config:
+    alarm_control_panel.xiaomigateway:
+      name: 警報器
+    automation.turn_down_living_area:
+      name: リビングのターンダウン
+      display_categories: SCENE_TRIGGER
+    automation.turn_down_living_area_more:
+      name: リビングのもっとターンダウン
+      display_categories: SCENE_TRIGGER
+    binary_sensor.bathroom_motion:
+      name: 浴室のモーションセンサー
+    binary_sensor.bedroom_window:
+      name: 寝室の窓
+    binary_sensor.living_room_motion:
+      name: リビングのモーションセンサー
+    binary_sensor.living_room_window:
+      name: リビングの窓
+    binary_sensor.study_motion:
+      name: 書斎のモーションセンサー
+    binary_sensor.study_window:
+      name: 書斎の窓
+    camera.guppy_cat_cage:
+      name: ケージのカメラ
+    climate.bedroom_hvac:
+      name: 寝室のエアコン
+    climate.living_room_hvac:
+      name: リビングのエアコン
+    cover.bedroom_curtains:
+      name: 寝室のカーテン
+    fan.living_room_ceiling_fans:
+      name: リビングのシーリングファン
+    group.living_area_floor_heatings:
+      name: リビングの床暖房
+      display_categories: SWITCH
+    light.bathroom_lights:
+      name: 浴室の照明
+    light.bedroom_light:
+      name: 寝室の照明
+    light.living_area_dimming_downlights:
+      name: リビングのダウンライトの調光
+    light.living_area_downlights:
+      name: リビングのダウンライト
+    light.living_room_entrance_light:
+      name: リビングの入り口の照明
+    light.living_room_footlight:
+      name: リビングのフットライト
+    light.living_room_tv_light:
+      name: リビングのテレビの照明
+    media_player.appletv:
+      name: Apple TV
+      display_categories: STREAMING_DEVICE
+    media_player.aventage:
+      name: アンプ
+      display_categories: MUSIC_SYSTEM
+    media_player.heargo2:
+      name: 書斎のスピーカー
+      display_categories: SPEAKER
+    media_player.stw2000:
+      name: auひかり
+      display_categories: STREAMING_DEVICE
+    sensor.balcony_temperature:
+      name: ベランダの温度計
+    sensor.bathroom_temperature:
+      name: 浴室の温度計
+    sensor.bedroom_temperature:
+      name: 寝室の温度計
+    sensor.living_room_temperature:
+      name: リビングの温度計
+    sensor.study_temperature:
+      name: 書斎の温度計
+    switch.bedroom_hvac_cleaner:
+      name: 寝室のエアコンクリーナー
+      display_categories: VACUUM_CLEANER
+    switch.living_room_humidifier:
+      name: リビングの加湿器
+      display_categories: AIR_PURIFIER
+    switch.living_room_hvac_cleaner:
+      name: リビングのエアコンクリーナー
+      display_categories: VACUUM_CLEANER

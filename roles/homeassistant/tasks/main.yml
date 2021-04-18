@@ -34,10 +34,26 @@
     dest: /etc/homeassistant
   tags: [homeassistant, homeassistant-automations]
 
-- name: Config binary_sensor
+- name: Config alexa
   lineinfile:
     path: /etc/homeassistant/configuration.yaml
     insertafter: '^automation:'
+    regexp: '^alexa:'
+    line: "alexa: !include alexa.yaml"
+  notify: Restart homeassistant
+  tags: [homeassistant]
+
+- name: Copy alexa.yaml
+  copy:
+    src: alexa.yaml
+    dest: /etc/homeassistant/alexa.yaml
+  notify: Restart homeassistant
+  tags: [homeassistant]
+
+- name: Config binary_sensor
+  lineinfile:
+    path: /etc/homeassistant/configuration.yaml
+    insertafter: '^alexa:'
     regexp: '^binary_sensor:'
     line: "binary_sensor: !include binary_sensors.yaml"
   notify: Restart homeassistant
