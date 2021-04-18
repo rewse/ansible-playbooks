@@ -506,6 +506,7 @@
         time_zone: Asia/Tokyo
         external_url: https://hass.rewse.jp/
         internal_url: https://hass.rewse.jp/
+        customize: !include customize.yaml
       fastdotcom:
       http:
         use_x_forwarded_for: true
@@ -555,6 +556,13 @@
         switch:
           - host: kasaplug-liv.rewse.jp
           - host: kasaplug-ent.rewse.jp
+  notify: Restart homeassistant
+  tags: [homeassistant]
+
+- name: Copy customize.yaml
+  copy:
+    src: customize.yaml
+    dest: /etc/homeassistant
   notify: Restart homeassistant
   tags: [homeassistant]
 
