@@ -634,17 +634,17 @@
     - service: climate.turn_off
       target:
         entity_id: climate.living_room_hvac
-    - service: automation.turn_off
-      target:
-        entity_id:
-          - automation.turn_on_living_room_hvac_with_fan_mode
-          - automation.turn_off_living_room_hvac_with_fan_mode
     - service: notify.all_devices
       data:
         title: Turned off Living Room HVAC with Fan Mode
         message: Turn off the HVAC in the living room with fan mode
         data:
           url: /lovelace/home
+    - service: automation.turn_off
+      target:
+        entity_id:
+          - automation.turn_on_living_room_hvac_with_fan_mode
+          - automation.turn_off_living_room_hvac_with_fan_mode
   mode: single
 - id: automation.turn_off_living_area_lights
   alias: Turn off Living Area Lights
