@@ -1,0 +1,32 @@
+---
+# - name: Set up SSH
+#   do_it_yourself_rtx_config:
+#     lines:
+#       - login user username password
+#       - sshd host key generate
+#       - sshd service on
+
+- name: Set login
+  rtx_config:
+    lines:
+      - login timer clear
+    save_when:
+      changed
+  tags: [rtx, rtx-login]
+
+- name: Set security
+  rtx_config:
+    lines:
+      - security class 2 on
+    save_when:
+      changed
+  tags: [rtx, rtx-security]
+
+- name: Set console
+  rtx_config:
+    lines:
+      - console character ascii
+      - console prompt romeo
+    save_when:
+      changed
+  tags: [rtx, rtx-console]
