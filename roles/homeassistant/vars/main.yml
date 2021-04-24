@@ -24,6 +24,7 @@ localtuya_version: 3.2.2
 mini_graph_card_version: 0.10.0
 mini_media_player_version: 1.12.1
 mosquitto_password: "{{ vault_mosquitto_password }}"
+mosquitto_pub_password: "[% vault_mosquitto_password %]"
 nature_remo_version: 0.5
 nfs_server: guppy.rewse.jp
 postgres:
