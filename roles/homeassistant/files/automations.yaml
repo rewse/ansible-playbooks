@@ -376,6 +376,78 @@
         data:
           url: /lovelace-machines/machines
   mode: single
+- id: automation.alarm_wifi_xray_liv_2_4ghz_is_offline
+  alias: "ALARM: WiFi xray-liv 2.4GHz is Offline"
+  trigger:
+    - platform: mqtt
+      topic: wifi/9CC9EBDA1D01/status
+      payload: offline
+  condition:
+    - condition: state
+      entity_id: sensor.xray_liv_2_4ghz_channel
+      state: unavailable
+      for: '00:16:00'
+  action:
+    - service: notify.all_devices
+      data:
+        title: "⚠️ ALARM: WiFi xray-liv 2.4GHz is offline"
+        data:
+          url: /lovelace-machines/machines
+  mode: single
+- id: automation.alarm_wifi_xray_liv_5ghz_is_offline
+  alias: "ALARM: WiFi xray-liv 5GHz is Offline"
+  trigger:
+    - platform: mqtt
+      topic: wifi/9CC9EBDA1D11/status
+      payload: offline
+  condition:
+    - condition: state
+      entity_id: sensor.xray_liv_5ghz_channel
+      state: unavailable
+      for: '00:16:00'
+  action:
+    - service: notify.all_devices
+      data:
+        title: "⚠️ ALARM: WiFi xray-liv 5GHz is offline"
+        data:
+          url: /lovelace-machines/machines
+  mode: single
+- id: automation.alarm_wifi_xray_sto_2_4ghz_is_offline
+  alias: "ALARM: WiFi xray-sto 2.4GHz is Offline"
+  trigger:
+    - platform: mqtt
+      topic: wifi/44A56E5B8381/status
+      payload: offline
+  condition:
+    - condition: state
+      entity_id: sensor.xray_sto_2_4ghz_channel
+      state: unavailable
+      for: '00:16:00'
+  action:
+    - service: notify.all_devices
+      data:
+        title: "⚠️ ALARM: WiFi xray-sto 2.4GHz is offline"
+        data:
+          url: /lovelace-machines/machines
+  mode: single
+- id: automation.alarm_wifi_xray_sto_5ghz_is_offline
+  alias: "ALARM: WiFi xray-sto 5GHz is Offline"
+  trigger:
+    - platform: mqtt
+      topic: wifi/44A56E5B8391/status
+      payload: offline
+  condition:
+    - condition: state
+      entity_id: sensor.xray_sto_5ghz_channel
+      state: unavailable
+      for: '00:16:00'
+  action:
+    - service: notify.all_devices
+      data:
+        title: "⚠️ ALARM: WiFi xray-sto 5GHz is offline"
+        data:
+          url: /lovelace-machines/machines
+  mode: single
 - id: automation.living_room_temperature_difference_is_too_large
   alias: "ALARM: Living Room Temperature Difference is Too Large"
   trigger:
