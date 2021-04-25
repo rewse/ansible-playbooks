@@ -9,7 +9,7 @@
 - name: Set login
   rtx_config:
     lines:
-      - login timer clear
+      - login timer 3600
     save_when:
       changed
   tags: [rtx, rtx-login]
@@ -26,7 +26,7 @@
   rtx_config:
     lines:
       - console character ascii
-      - console prompt romeo
+      - console prompt {{ rtx.hostname }}
     save_when:
       changed
   tags: [rtx, rtx-console]
@@ -34,10 +34,10 @@
 - name: Set ip
   rtx_config:
     lines:
-      - ip route default gateway 192.168.1.1
-      - ip keepalive 1 icmp-echo 10 5 192.168.1.1
+      - ip route default gateway {{ default_gateway.ip }}
+      - ip keepalive 1 icmp-echo 10 5 {{ default_gateway.ip }}
       - ip lan1 address dhcp
-      - ip lan2 address 192.168.1.100/24
+      - ip lan2 address {{ lan2.ip }}/{{ lan2.netmask }}
     save_when:
       changed
   tags: [rtx, rtx-ip]
@@ -45,7 +45,7 @@
 - name: Set syslog
   rtx_config:
     lines:
-      - syslog host 192.168.0.30
+      - syslog host {{ syslogd.ip }}
       - syslog execute command on
     save_when:
       changed
@@ -54,7 +54,7 @@
 - name: Set dhcp
   rtx_config:
     lines:
-      - dhcp client hostname lan2 primary rtx1200
+      - dhcp client hostname lan2 primary {{ rtx.hostname }}
     save_when:
       changed
   tags: [rtx, rtx-dhcp]
@@ -62,8 +62,8 @@
 - name: Set dns
   rtx_config:
     lines:
-      - dns server 1.1.1.1 8.8.8.8
-      - dns server select 100 1.1.1.1 8.8.8.8 any .
+      - dns server {{ resolved1.ip }} {{ resolved2.ip }}
+      - dns server select 100 {{ resolved1.ip }} {{ resolved2.ip }} any .
     save_when:
       changed
   tags: [rtx, rtx-dns]
@@ -71,7 +71,7 @@
 - name: Set schedule
   rtx_config:
     lines:
-      - schedule at 100 */* 04:52:16 * ntpdate ntp.nict.jp syslog
+      - schedule at 100 */* 04:52:16 * ntpdate {{ ntpd.fqdn }} syslog
     save_when:
       changed
   tags: [rtx, rtx-schedule]
