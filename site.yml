@@ -6,3 +6,4 @@
 - import_playbook: singleton_int1.yml
 - import_playbook: singleton_int2.yml
 - import_playbook: servers.yml
+- import_playbook: rtx.yml
