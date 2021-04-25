@@ -83,25 +83,25 @@ cards:
         show_header_toggle: false
       - type: "custom:simple-thermostat"
         entity: climate.living_room_hvac
+        layout:
+          step: row
+          mode:
+            names: false
+            headings: false
         decimals: 0
         fallback: --
-        step_layout: row
         step_size: 1
         hide:
           temperature: true
-          state: false
+          state: true
         control:
-          _names: false
-          _headings: false
-          hvac:
-            _name: false
-        card_mod:
-          style: |
-            ha-card {
-              --st-font-size-xl: 36px;
-              --st-mode-active-background: #dff4fd;
-              --st-mode-background: transparent;
-            }
+          hvac: true
+        style: |
+          ha-card {
+            --st-font-size-xl: 36px;
+            --st-mode-active-background: #dff4fd;
+            --st-mode-background: transparent;
+          }
       - type: entities
         title: Living Room Lights
         entities:
@@ -166,24 +166,25 @@ cards:
             name: Curtains
       - type: "custom:simple-thermostat"
         entity: climate.bedroom_hvac
+        layout:
+          step: row
+          mode:
+            names: false
+            headings: false
         decimals: 0
         fallback: --
-        step_layout: row
         step_size: 1
         hide:
           temperature: true
+          state: true
         control:
-          _names: false
-          _headings: false
-          hvac:
-            _name: false
-        card_mod:
-          style: |
-            ha-card {
-              --st-font-size-xl: 36px;
-              --st-mode-active-background: #dff4fd;
-              --st-mode-background: transparent;
-            }
+          hvac: true
+        style: |
+          ha-card {
+            --st-font-size-xl: 36px;
+            --st-mode-active-background: #dff4fd;
+            --st-mode-background: transparent;
+          }
       - type: entities
         title: Bedroom Lights
         entities:
