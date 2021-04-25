@@ -40,10 +40,10 @@ views:
       - type: entities
         title: Wi-Fi
         entities:
-          - entity: sensor.xray_liv_5ghz_channel
           - entity: sensor.xray_liv_2_4ghz_channel
-          - entity: sensor.xray_sto_5ghz_channel
+          - entity: sensor.xray_liv_5ghz_channel
           - entity: sensor.xray_sto_2_4ghz_channel
+          - entity: sensor.xray_sto_5ghz_channel
       - type: entities
         title: Batteries
         entities:
