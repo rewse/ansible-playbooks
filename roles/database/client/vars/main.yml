@@ -1,6 +1,6 @@
 ---
 mysql_apt_config_version: 0.8.16-1
-mysql_connector_version: 8.0.23-1ubuntu20.04
+mysql_connector_version: 8.0.24-1ubuntu20.04
 oracle_instantclient_major_version: 21
 oracle_instantclient_minor_version: 1
 redshiftjdbc_version: 1.2.53.1080
