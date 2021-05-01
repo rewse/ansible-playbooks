@@ -52,15 +52,6 @@
       changed
   tags: [rtx, rtx-syslog]
 
-- name: Set dhcp
-  rtx_config:
-    lines:
-      - dhcp client hostname lan1 primary {{ rtx.hostname }}
-      - dhcp client hostname lan2 primary {{ rtx.hostname }}
-    save_when:
-      changed
-  tags: [rtx, rtx-dhcp]
-
 - name: Set dns
   rtx_config:
     lines:
