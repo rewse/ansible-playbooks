@@ -52,6 +52,14 @@
       changed
   tags: [rtx, rtx-syslog]
 
+- name: Set telnet
+  rtx_config:
+    lines:
+      - telnetd host lan1
+    save_when:
+      changed
+  tags: [rtx, rtx-telnet]
+
 - name: Set dns
   rtx_config:
     lines:
@@ -69,21 +77,28 @@
       changed
   tags: [rtx, rtx-schedule]
 
+- name: Set httpd
+  rtx_config:
+    lines:
+      - httpd host lan1
+    save_when:
+      changed
+  tags: [rtx, rtx-httpd]
+
+- name: Set sshd
+  rtx_config:
+    lines:
+      - sshd host lan1
+    save_when:
+      changed
+  tags: [rtx, rtx-sshd]
+
 - name: Set ip interface secure filter
   rtx_config:
     lines:
       - ip lan1 secure filter in 100000 100001 100002 100003 100004 100005 100006 100007 100099
       - ip lan2 secure filter in 101 102 2001 2002 3001 3002 3003 3004 4001 4002 101003 101020 101021 101022 101023 101024 101025 101030 101032 101080 101081 101082 101083
       - ip lan2 secure filter out 101013 101020 101021 101022 101023 101024 101025 101026 101027 101099 dynamic 101080 101081 101082 101083 101084 101085 101098 101099
-    save_when:
-      changed
-  tags: [rtx, rtx-port]
-
-- name: Set ip interface nat descripter
-  rtx_config:
-    lines:
-      - ip lan2 nat descriptor 1
-      - nat descriptor address outer 1 primary
     save_when:
       changed
   tags: [rtx, rtx-port]
