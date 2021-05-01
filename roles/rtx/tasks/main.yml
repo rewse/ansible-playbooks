@@ -69,12 +69,56 @@
       changed
   tags: [rtx, rtx-schedule]
 
-- name: Get dhcpc
-  rtx_command:
-    commands:
-      - show status dhcpc
-  register: result_get_dhcpc
-  tags: [rtx, rtx-ip, rtx-dhcp]
+- name: Set ip interface secure filter
+  rtx_config:
+    lines:
+      - ip lan1 secure filter in 100000 100001 100002 100003 100004 100005 100006 100007 100099
+      - ip lan2 secure filter in 102 2001 2002 3001 3002 3003 3004 4001 4002 101003 101020 101021 101022 101023 101024 101025 101030 101032 101080 101081 101082 101083
+      - ip lan2 secure filter out 101013 101020 101021 101022 101023 101024 101025 101026 101027 101099 dynamic 101080 101081 101082 101083 101084 101085 101098 101099
+    save_when:
+      changed
+  tags: [rtx, rtx-port]
+
+- name: Set ip interface nat descripter
+  rtx_config:
+    lines:
+      - ip lan2 nat descriptor 1 200
+    save_when:
+      changed
+  tags: [rtx, rtx-port]
+
+- name: Open ports
+  rtx_config:
+    lines:
+      - nat descriptor type 1 masquerade
+      # Synology DSM
+      - nat descriptor masquerade static 1 2001 {{ guppy.ip }} tcp 5000,5010
+      - ip filter 2001 pass * {{ guppy.ip }} tcp * 5000,5001
+      # HTTP
+      - nat descriptor masquerade static 1 2002 {{ guppy.ip }} tcp 80
+      - ip filter 2002 pass * {{ guppy.ip }} tcp * 80
+      # SSH
+      - nat descriptor masquerade static 1 3001 {{ fox.ip }} tcp 22
+      - ip filter 3001 pass * {{ fox.ip }} tcp * 22
+      # Zabbix
+      - nat descriptor masquerade static 1 3002 {{ fox.ip }} tcp 10050
+      - ip filter 3002 pass * {{ fox.ip }} tcp * 10050
+      # HTTPS
+      - nat descriptor masquerade static 1 3003 {{ fox.ip }} tcp 443
+      - ip filter 3003 pass * {{ fox.ip }} tcp * 443
+      # Mosquitto over SSL
+      - nat descriptor masquerade static 1 3004 {{ fox.ip }} tcp 8883
+      - ip filter 3004 pass * {{ fox.ip }} tcp * 8883
+      # SSH
+      - nat descriptor masquerade static 1 4001 {{ hotel.ip }} tcp 55022
+      - ip filter 4001 pass * {{ hotel.ip }} tcp * 55022
+      # Zabbix
+      - nat descriptor masquerade static 1 4002 {{ hotel.ip }} tcp 15050
+      - ip filter 4002 pass * {{ hotel.ip }} tcp * 15050
+    save_when:
+      changed
+  tags: [rtx, rtx-port]
+
 
 - name: Show dhcpc
   debug:
