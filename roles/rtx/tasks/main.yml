@@ -36,7 +36,8 @@
     lines:
       - ip route default gateway {{ default_gateway.ip }}
       - ip keepalive 1 icmp-echo 10 5 {{ default_gateway.ip }}
-      - ip lan1 address dhcp
+      - ip lan1 address {{ lan1.ip }}/{{ lan1.netmask }}
+      - ip lan1 proxyarp on
       - ip lan2 address {{ lan2.ip }}/{{ lan2.netmask }}
     save_when:
       changed
