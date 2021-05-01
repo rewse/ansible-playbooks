@@ -5,6 +5,11 @@ fox:
   ip: 192.168.0.30
 hotel:
   ip: 192.168.0.40
+ipsec:
+  ip: 192.168.0.199
+  username: "{{ vault_ipsec.username }}"
+  password: "{{ vault_ipsec.password }}"
+  pre_shared_key: "{{ vault_ipsec.pre_shared_key }}"
 guppy:
   ip: 192.168.0.20
 lan1:
