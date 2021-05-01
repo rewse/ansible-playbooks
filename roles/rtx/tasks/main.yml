@@ -91,7 +91,9 @@
 - name: Open ports
   rtx_config:
     lines:
+      - ip lan2 nat descriptor 1
       - nat descriptor type 1 masquerade
+      - nat descriptor address outer 1 primary
       # Synology DSM
       - nat descriptor masquerade static 1 2001 {{ guppy.ip }} tcp 5000,5010
       - ip filter 2001 pass * {{ guppy.ip }} tcp * 5000,5001
