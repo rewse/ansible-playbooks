@@ -73,7 +73,7 @@
   rtx_config:
     lines:
       - ip lan1 secure filter in 100000 100001 100002 100003 100004 100005 100006 100007 100099
-      - ip lan2 secure filter in 102 2001 2002 3001 3002 3003 3004 4001 4002 101003 101020 101021 101022 101023 101024 101025 101030 101032 101080 101081 101082 101083
+      - ip lan2 secure filter in 101 102 2001 2002 3001 3002 3003 3004 4001 4002 101003 101020 101021 101022 101023 101024 101025 101030 101032 101080 101081 101082 101083
       - ip lan2 secure filter out 101013 101020 101021 101022 101023 101024 101025 101026 101027 101099 dynamic 101080 101081 101082 101083 101084 101085 101098 101099
     save_when:
       changed
@@ -82,7 +82,8 @@
 - name: Set ip interface nat descripter
   rtx_config:
     lines:
-      - ip lan2 nat descriptor 1 200
+      - ip lan2 nat descriptor 1
+      - nat descriptor address outer 1 primary
     save_when:
       changed
   tags: [rtx, rtx-port]
@@ -119,8 +120,57 @@
       changed
   tags: [rtx, rtx-port]
 
+# Ref: http://www.rtpro.yamaha.co.jp/RT/docs/l2tp_ipsec/
+- name: Set L2TP/IPsec 1
+  rtx_config:
+    parents:
+      - pp select anonymous
+    lines:
+      - pp bind tunnel1
+      - pp auth request mschap-v2
+      - pp auth username {{ ipsec.username }} {{ ipsec.password }}
+      - ppp ipcp ipaddress on
+      - ppp ipcp msext on
+      - ip pp remote address pool {{ ipsec.ip }}
+      - ip pp mtu 1258
+      - pp enable anonymous
+    save_when:
+      changed
+  tags: [rtx, rtx-l2tp]
 
-- name: Show dhcpc
-  debug:
-    msg: "{{ result_get_dhcpc.stdout_lines[0] }}"
-  tags: [rtx, rtx-ip, rtx-dhcp]
+- name: Set L2TP/IPsec 2
+  rtx_config:
+    parents:
+      - tunnel select 1
+    lines:
+      - tunnel encapsulation l2tp
+      - ip tunnel tcp mss limit auto
+      - tunnel enable 1
+      - ipsec tunnel 1
+      - ipsec sa policy 1 1 esp aes-cbc sha-hmac
+      - ipsec ike keepalive use 1 off
+      - ipsec ike local address 1 {{ lan1.ip }}
+      - ipsec ike nat-traversal 1 on
+      - ipsec ike pre-shared-key 1 text {{ ipsec.pre_shared_key }}
+      - ipsec ike remote address 1 any
+      - l2tp tunnel disconnect time off
+      - l2tp keepalive use on 10 3
+      - l2tp keepalive log on
+      - l2tp syslog on
+    save_when:
+      changed
+  tags: [rtx, rtx-l2tp]
+
+- name: Set L2TP/IPsec 3
+  rtx_config:
+    lines:
+      - nat descriptor masquerade static 1 101 {{ lan1.ip }} esp
+      - nat descriptor masquerade static 1 102 {{ lan1.ip }} udp 500,4500
+      - ip filter 101 pass * {{ lan1.ip }} esp
+      - ip filter 102 pass * {{ lan1.ip }} udp 500,1701,4500
+      - ipsec transport 1 1 udp 1701
+      - ipsec auto refresh on
+      - l2tp service on
+    save_when:
+      changed
+  tags: [rtx, rtx-l2tp]
