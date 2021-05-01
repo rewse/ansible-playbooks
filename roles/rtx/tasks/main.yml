@@ -46,7 +46,7 @@
 - name: Set syslog
   rtx_config:
     lines:
-      - syslog host {{ syslogd.ip }}
+      - syslog host {{ fox.ip }}
       - syslog execute command on
     save_when:
       changed
