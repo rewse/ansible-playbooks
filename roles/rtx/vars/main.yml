@@ -1,6 +1,8 @@
 ---
 default_gateway:
   ip: 192.168.1.1
+fox:
+  ip: 192.168.0.30
 lan1:
   ip: 192.168.0.1
   netmask: 24
@@ -15,5 +17,3 @@ resolved2:
   ip: 8.8.8.8
 rtx:
   hostname: romeo
-syslogd:
-  ip: 192.168.0.30
