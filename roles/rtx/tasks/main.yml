@@ -49,47 +49,6 @@
       - telnetd host lan1
   tags: [rtx, rtx-telnet]
 
-- name: Set dhcpd
-  rtx_config:
-    lines:
-      - dhcp service server
-      # RTX1200 cannot set multiple DHCP scopes for the single network.
-      # Ref: http://www.rtpro.yamaha.co.jp/RT/manual/rt-common/dhcp/dhcp_scope.html
-      - dhcp scope 1 192.168.0.4-192.168.0.254/24 except 192.168.0.5-192.168.0.9 192.168.0.11 192.168.0.13-192.168.0.19 192.168.0.21-192.168.0.29 192.168.0.33-192.168.0.39 192.168.0.43-192.168.0.69 192.168.0.73-192.168.0.79 192.168.0.81 192.168.0.83 192.168.0.85 192.168.0.87 192.168.0.89-192.168.0.99 192.168.0.101 192.168.0.103 192.168.0.105 192.168.0.107 192.168.0.109 192.168.0.111-192.168.0.119 192.168.0.127-192.168.0.199 expire 0:05 maxexpire 0:05
-      - dhcp scope bind 1 192.168.0.4 ethernet 9c:c9:eb:0a:ec:f9
-      - dhcp scope bind 1 192.168.0.10 ethernet 9c:c9:eb:da:1d:0f
-      - dhcp scope bind 1 192.168.0.12 ethernet 9c:c9:eb:d9:f2:cf
-      - dhcp scope bind 1 192.168.0.20 ethernet 00:11:32:60:bf:d3
-      - dhcp scope bind 1 192.168.0.30 ethernet ca:23:33:ee:19:83
-      - dhcp scope bind 1 192.168.0.31 ethernet dc:a6:32:ec:3f:01
-      - dhcp scope bind 1 192.168.0.32 ethernet dc:a6:32:ec:3f:02
-      - dhcp scope bind 1 192.168.0.40 ethernet 7a:5e:b0:92:ee:35
-      - dhcp scope bind 1 192.168.0.41 ethernet b8:27:eb:64:56:38
-      - dhcp scope bind 1 192.168.0.42 ethernet b8:27:eb:31:03:6d
-      - dhcp scope bind 1 192.168.0.70 ethernet 18:4f:32:c1:96:85
-      - dhcp scope bind 1 192.168.0.71 ethernet 30:05:5c:b1:e7:d2
-      - dhcp scope bind 1 192.168.0.72 ethernet b0:e8:92:90:31:34
-      - dhcp scope bind 1 192.168.0.80 ethernet 00:a0:de:d3:02:98
-      - dhcp scope bind 1 192.168.0.82 ethernet ec:21:e5:ec:73:a5
-      - dhcp scope bind 1 192.168.0.84 ethernet 38:f7:3d:21:db:ae
-      - dhcp scope bind 1 192.168.0.86 ethernet 44:e4:ee:8b:50:57
-      - dhcp scope bind 1 192.168.0.88 ethernet 70:66:55:b5:ae:e4
-      - dhcp scope bind 1 192.168.0.100 ethernet 84:f3:eb:a2:86:ad
-      - dhcp scope bind 1 192.168.0.102 ethernet a4:cf:12:fd:d4:27
-      - dhcp scope bind 1 192.168.0.104 ethernet 80:c5:f2:77:4e:a4
-      - dhcp scope bind 1 192.168.0.106 ethernet 84:f3:eb:6b:ae:52
-      - dhcp scope bind 1 192.168.0.108 ethernet 00:17:88:7e:e5:22
-      - dhcp scope bind 1 192.168.0.110 ethernet 54:ef:44:24:3e:fb
-      - dhcp scope bind 1 192.168.0.120 ethernet d8:07:b6:ac:04:01
-      - dhcp scope bind 1 192.168.0.121 ethernet 24:68:80:06:ed:79
-      - dhcp scope bind 1 192.168.0.122 ethernet 24:68:80:00:55:3c
-      - dhcp scope bind 1 192.168.0.123 ethernet b0:be:76:2a:31:2b
-      - dhcp scope bind 1 192.168.0.124 ethernet b0:be:76:2a:35:07
-      - dhcp scope bind 1 192.168.0.125 ethernet f4:cf:a2:05:91:92
-      - dhcp scope bind 1 192.168.0.126 ethernet 18:fe:34:96:8c:19
-      - dhcp scope option 1 dns=192.168.0.30,192.168.0.40 domain=rewse.jp
-  tags: [rtx, rtx-dhcpd]
-
 - name: Set dns
   rtx_config:
     lines:
@@ -176,7 +135,7 @@
       - pp auth username {{ ipsec.username }} {{ ipsec.password }}
       - ppp ipcp ipaddress on
       - ppp ipcp msext on
-      - ip pp remote address pool dhcp
+      - ip pp remote address pool {{ ipsec.ip }}
       - ip pp mtu 1258
       - pp enable anonymous
   tags: [rtx, rtx-l2tp]
