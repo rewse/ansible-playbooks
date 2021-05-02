@@ -1,5 +1,5 @@
 ---
-- hosts: servers
+- hosts: servers_ext
   become: yes
   remote_user: ubuntu
   roles:

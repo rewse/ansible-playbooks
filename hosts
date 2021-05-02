@@ -30,5 +30,9 @@ fox.rewse.jp
 [singleton_int2]
 hotel.rewse.jp
 
-[servers]
+[servers_ext]
 charlie.rewse.jp
+
+[servers_int]
+fox.rewse.jp
+hotel.rewse.jp
