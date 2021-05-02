@@ -15,7 +15,7 @@
 - name: Set security
   rtx_config:
     lines:
-      - security class 2 on
+      - security class 2 on off off
   tags: [rtx, rtx-security]
 
 - name: Set console
