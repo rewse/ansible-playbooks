@@ -60,6 +60,9 @@
   rtx_config:
     lines:
       - schedule at 100 */* 04:52:16 * ntpdate {{ ntpd.fqdn }} syslog
+      - schedule at 101 */* 10:52:16 * ntpdate {{ ntpd.fqdn }} syslog
+      - schedule at 102 */* 16:52:16 * ntpdate {{ ntpd.fqdn }} syslog
+      - schedule at 103 */* 22:52:16 * ntpdate {{ ntpd.fqdn }} syslog
   tags: [rtx, rtx-schedule]
 
 - name: Set httpd
@@ -73,6 +76,13 @@
     lines:
       - sshd host lan1
   tags: [rtx, rtx-sshd]
+
+- name: Set sntpd
+  rtx_config:
+    lines:
+      - sntpd service on
+      - sntpd host lan1
+  tags: [rtx, rtx-sntpd]
 
 - name: Set ip interface secure filter
   rtx_config:
