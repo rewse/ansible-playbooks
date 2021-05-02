@@ -5,4 +5,5 @@
 - import_playbook: singleton_ext.yml
 - import_playbook: singleton_int1.yml
 - import_playbook: singleton_int2.yml
-- import_playbook: servers.yml
+- import_playbook: servers_ext.yml
+- import_playbook: servers_int.yml
