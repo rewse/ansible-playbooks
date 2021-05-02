@@ -94,7 +94,7 @@
   rtx_config:
     lines:
       - dns server {{ resolved1.ip }} {{ resolved2.ip }}
-      - dns server select 100 {{ resolved1.ip }} {{ resolved2.ip }} any .
+      - dns private address spoof on
   tags: [rtx, rtx-dns]
 
 - name: Set schedule
