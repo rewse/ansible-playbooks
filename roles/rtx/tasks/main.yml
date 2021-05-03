@@ -90,8 +90,63 @@
   rtx_config:
     lines:
       - ip lan1 secure filter in 100000 100001 100002 100003 100004 100005 100006 100007 100099
-      - ip lan2 secure filter in 101 102 2001 2002 3001 3002 3003 3004 4001 4002 101003 101020 101021 101022 101023 101024 101025 101030 101032 101080 101081 101082 101083
+      # Default ip lan2 secure filter in :
+      # ip lan2 secure filter in 101003 101020 101021 101022 101023 101024 101025 101030 101032 101080 101081 101082 101083
+      - ip lan2 secure filter in 101003 101020 101021 101022 101023 101024 101025 101099
       - ip lan2 secure filter out 101013 101020 101021 101022 101023 101024 101025 101026 101027 101099 dynamic 101080 101081 101082 101083 101084 101085 101098 101099
+  tags: [rtx, rtx-port]
+
+- name: Set the default filters
+  rtx_config:
+    lines:
+      - ip filter 100000 reject * * udp,tcp 135 *
+      - ip filter 100001 reject * * udp,tcp * 135
+      - ip filter 100002 reject * * udp,tcp netbios_ns-netbios_dgm *
+      - ip filter 100003 reject * * udp,tcp * netbios_ns-netbios_dgm
+      - ip filter 100004 reject * * udp,tcp netbios_ssn *
+      - ip filter 100005 reject * * udp,tcp * netbios_ssn
+      - ip filter 100006 reject * * udp,tcp 445 *
+      - ip filter 100007 reject * * udp,tcp * 445
+      - ip filter 100099 pass * * * * *
+      - ip filter 101000 reject 10.0.0.0/8 * * * *
+      - ip filter 101001 reject 172.16.0.0/12 * * * *
+      - ip filter 101002 reject 192.168.0.0/16 * * * *
+      - ip filter 101003 reject 192.168.0.0/24 * * * *
+      - ip filter 101010 reject * 10.0.0.0/8 * * *
+      - ip filter 101011 reject * 172.16.0.0/12 * * *
+      - ip filter 101012 reject * 192.168.0.0/16 * * *
+      - ip filter 101013 reject * 192.168.0.0/24 * * *
+      - ip filter 101020 reject * * udp,tcp 135 *
+      - ip filter 101021 reject * * udp,tcp * 135
+      - ip filter 101022 reject * * udp,tcp netbios_ns-netbios_ssn *
+      - ip filter 101023 reject * * udp,tcp * netbios_ns-netbios_ssn
+      - ip filter 101024 reject * * udp,tcp 445 *
+      - ip filter 101025 reject * * udp,tcp * 445
+      - ip filter 101026 restrict * * tcpfin * www,21,nntp
+      - ip filter 101027 restrict * * tcprst * www,21,nntp
+      - ip filter 101030 pass * 192.168.0.0/24 icmp * *
+      - ip filter 101031 pass * 192.168.0.0/24 established * *
+      - ip filter 101032 pass * 192.168.0.0/24 tcp * ident
+      - ip filter 101033 pass * 192.168.0.0/24 tcp ftpdata *
+      - ip filter 101034 pass * 192.168.0.0/24 tcp,udp * domain
+      - ip filter 101035 pass * 192.168.0.0/24 udp domain *
+      - ip filter 101036 pass * 192.168.0.0/24 udp * ntp
+      - ip filter 101037 pass * 192.168.0.0/24 udp ntp *
+      - ip filter 101080 pass * 192.168.0.1 esp * *
+      - ip filter 101081 pass * 192.168.0.1 udp * 500
+      # Protocol 4 is IP in IP
+      - ip filter 101082 pass * 192.168.0.1 4 * *
+      - ip filter 101083 pass * 192.168.0.1 udp * 4500
+      - ip filter 101099 pass * * * * *
+      - ip filter 500000 restrict * * * * *
+      - ip filter dynamic 101080 * * ftp
+      - ip filter dynamic 101081 * * domain
+      - ip filter dynamic 101082 * * www
+      - ip filter dynamic 101083 * * smtp
+      - ip filter dynamic 101084 * * pop3
+      - ip filter dynamic 101085 * * submission
+      - ip filter dynamic 101098 * * tcp
+      - ip filter dynamic 101099 * * udp
   tags: [rtx, rtx-port]
 
 - name: Open ports
@@ -100,30 +155,22 @@
       - ip lan2 nat descriptor 1
       - nat descriptor type 1 masquerade
       - nat descriptor address outer 1 primary
-      # Synology DSM
+      # guppy: Synology DSM
       - nat descriptor masquerade static 1 2001 {{ guppy.ip }} tcp 5000,5010
-      - ip filter 2001 pass * {{ guppy.ip }} tcp * 5000,5001
-      # HTTP
+      # guppy: HTTP
       - nat descriptor masquerade static 1 2002 {{ guppy.ip }} tcp 80
-      - ip filter 2002 pass * {{ guppy.ip }} tcp * 80
-      # SSH
+      # fox: SSH
       - nat descriptor masquerade static 1 3001 {{ fox.ip }} tcp 22
-      - ip filter 3001 pass * {{ fox.ip }} tcp * 22
-      # Zabbix
+      # fox: Zabbix
       - nat descriptor masquerade static 1 3002 {{ fox.ip }} tcp 10050
-      - ip filter 3002 pass * {{ fox.ip }} tcp * 10050
-      # HTTPS
+      # fox: HTTPS
       - nat descriptor masquerade static 1 3003 {{ fox.ip }} tcp 443
-      - ip filter 3003 pass * {{ fox.ip }} tcp * 443
-      # Mosquitto over SSL
+      # fox: Mosquitto over SSL
       - nat descriptor masquerade static 1 3004 {{ fox.ip }} tcp 8883
-      - ip filter 3004 pass * {{ fox.ip }} tcp * 8883
-      # SSH
+      # hotel: SSH
       - nat descriptor masquerade static 1 4001 {{ hotel.ip }} tcp 55022
-      - ip filter 4001 pass * {{ hotel.ip }} tcp * 55022
-      # Zabbix
+      # hotel: Zabbix
       - nat descriptor masquerade static 1 4002 {{ hotel.ip }} tcp 15050
-      - ip filter 4002 pass * {{ hotel.ip }} tcp * 15050
   tags: [rtx, rtx-port]
 
 # Ref: http://www.rtpro.yamaha.co.jp/RT/docs/l2tp_ipsec/
@@ -168,8 +215,6 @@
     lines:
       - nat descriptor masquerade static 1 101 {{ lan1.ip }} esp
       - nat descriptor masquerade static 1 102 {{ lan1.ip }} udp 500,4500
-      - ip filter 101 pass * {{ lan1.ip }} esp
-      - ip filter 102 pass * {{ lan1.ip }} udp 500,1701,4500
       - ipsec transport 1 1 udp 1701
       - ipsec auto refresh on
       - l2tp service on
