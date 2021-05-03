@@ -1,6 +1,7 @@
 ---
 default_gateway:
   ip: 192.168.1.1
+domain: rewse.jp
 fox:
   ip: 192.168.0.30
 hotel:
