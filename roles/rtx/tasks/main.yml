@@ -53,6 +53,8 @@
   rtx_config:
     lines:
       - dns server {{ resolved1.ip }} {{ resolved2.ip }}
+      - dns domain {{ domain }}
+      - dns syslog resolv on
       - dns private address spoof on
   tags: [rtx, rtx-dns]
 
