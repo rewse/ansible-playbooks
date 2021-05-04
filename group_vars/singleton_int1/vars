@@ -1,12 +1,16 @@
 ---
-local_ip: 192.168.0.30
+local:
+    fqdn: fox.rewse.jp
 sshd_port: 22
 zabbix_agent_port: 10050
 dhcpd:
     role: primary
     port: 519
     peer:
-        ip: 192.168.0.40
+        fqdn: hotel.rewse.jp
         port: 520
     mclt: mclt 3600;
     split: split 256;
+    range6:
+        begin: 240f:78:31e9:1::200
+        end: 240f:78:31e9:1::224
