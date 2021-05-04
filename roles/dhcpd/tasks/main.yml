@@ -17,3 +17,16 @@
     dest: /etc/dhcp
   notify: Restart isc-dhcp-server
   tags: [dhcpd]
+
+- name: Copy dpcpd6.conf
+  template:
+    src: dhcpd6.conf.j2
+    dest: /etc/dhcp/dhcpd6.conf
+  notify: Restart isc-dhcp-server6
+  tags: [dhcpd]
+
+- name: Start dhcpd6
+  systemd:
+    name: isc-dhcp-server6
+    state: started
+    enabled: yes
