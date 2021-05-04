@@ -198,12 +198,9 @@
       # fox: Mosquitto over SSL
       - nat descriptor masquerade static 1 3005 {{ fox.ip }} tcp 8883
       - ipv6 filter 3005 pass * {{ fox.ipv6 }} tcp * 8883
-      # hotel: SSH
-      - nat descriptor masquerade static 1 4001 {{ hotel.ip }} tcp 55022
-      - ipv6 filter 4001 pass * {{ hotel.ipv6 }} tcp * 55022
       # hotel: Zabbix
-      - nat descriptor masquerade static 1 4002 {{ hotel.ip }} tcp 15050
-      - ipv6 filter 4002 pass * {{ hotel.ipv6 }} tcp * 15050
+      - nat descriptor masquerade static 1 4002 {{ hotel.ip }} tcp 14050
+      - ipv6 filter 4002 pass * {{ hotel.ipv6 }} tcp * 14050
   tags: [rtx, rtx-port]
 
 # Ref: http://www.rtpro.yamaha.co.jp/RT/docs/l2tp_ipsec/

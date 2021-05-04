@@ -50,10 +50,3 @@
 - name: Apply netplan
   command: netplan apply
   tags: [raspberrypi]
-
-- name: Change SSH port
-  template:
-    src: port.conf.j2
-    dest: /etc/ssh/sshd_config.d/port.conf
-  notify: Restart sshd
-  tags: [raspberrypi]
