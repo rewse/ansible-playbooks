@@ -36,6 +36,15 @@
       - ip lan2 address {{ lan2.ip }}/{{ lan2.netmask }}
   tags: [rtx, rtx-ip]
 
+- name: Set ipv6
+  rtx_config:
+    lines:
+      - ipv6 prefix 1 ra-prefix@lan2::/64
+      - ipv6 lan1 address {{ lan1.ipv6 }}/64
+      - ipv6 lan1 rtadv send 1 o_flag=on
+      - ipv6 lan2 address auto
+  tags: [rtx, rtx-ipv6]
+
 - name: Set syslog
   rtx_config:
     lines:
@@ -52,7 +61,7 @@
 - name: Set dns
   rtx_config:
     lines:
-      - dns server {{ resolved1.ip }} {{ resolved2.ip }}
+      - dns server {{ resolved1.ip }} {{ resolved2.ip }} {{ resolved1.ipv6 }} {{ resolved2.ipv6 }}
       - dns domain {{ domain }}
       - dns syslog resolv on
       - dns private address spoof on
@@ -94,6 +103,8 @@
       # ip lan2 secure filter in 101003 101020 101021 101022 101023 101024 101025 101030 101032 101080 101081 101082 101083
       - ip lan2 secure filter in 101003 101020 101021 101022 101023 101024 101025 101099
       - ip lan2 secure filter out 101013 101020 101021 101022 101023 101024 101025 101026 101027 101099 dynamic 101080 101081 101082 101083 101084 101085 101098 101099
+      - ipv6 lan2 secure filter in 101 102 2001 2002 3001 3002 3003 3004 3005 4001 4002 101010 101011 101012 102000
+      - ipv6 lan2 secure filter out 103000 dynamic 100100 100101 100102 100103 100104 100105 100106
   tags: [rtx, rtx-port]
 
 - name: Set the default filters
@@ -147,6 +158,18 @@
       - ip filter dynamic 101085 * * submission
       - ip filter dynamic 101098 * * tcp
       - ip filter dynamic 101099 * * udp
+      - ipv6 filter 101010 pass * * icmp6 * *
+      - ipv6 filter 101011 pass * * tcp * ident
+      - ipv6 filter 101012 pass * * udp * 546
+      - ipv6 filter 102000 reject * * * * *
+      - ipv6 filter 103000 pass * * * * *
+      - ipv6 filter dynamic 100100 * * ftp
+      - ipv6 filter dynamic 100101 * * domain
+      - ipv6 filter dynamic 100102 * * www
+      - ipv6 filter dynamic 100103 * * smtp
+      - ipv6 filter dynamic 100104 * * pop3
+      - ipv6 filter dynamic 100105 * * tcp
+      - ipv6 filter dynamic 100106 * * udp
   tags: [rtx, rtx-port]
 
 - name: Open ports
@@ -157,20 +180,30 @@
       - nat descriptor address outer 1 primary
       # guppy: Synology DSM
       - nat descriptor masquerade static 1 2001 {{ guppy.ip }} tcp 5000,5010
+      - ipv6 filter 2001 pass * {{ guppy.ipv6 }} tcp * 5000,5001
       # guppy: HTTP
       - nat descriptor masquerade static 1 2002 {{ guppy.ip }} tcp 80
+      - ipv6 filter 2002 pass * {{ guppy.ipv6 }} tcp * 80
       # fox: SSH
       - nat descriptor masquerade static 1 3001 {{ fox.ip }} tcp 22
+      - ipv6 filter 3001 pass * {{ fox.ipv6 }} tcp * 22
       # fox: Zabbix
       - nat descriptor masquerade static 1 3002 {{ fox.ip }} tcp 10050
+      - ipv6 filter 3002 pass * {{ fox.ipv6 }} tcp * 10050
+      # fox: HTTP
+      - ipv6 filter 3003 pass * {{ fox.ipv6 }} tcp * 80
       # fox: HTTPS
-      - nat descriptor masquerade static 1 3003 {{ fox.ip }} tcp 443
+      - nat descriptor masquerade static 1 3004 {{ fox.ip }} tcp 443
+      - ipv6 filter 3004 pass * {{ fox.ipv6 }} tcp * 443
       # fox: Mosquitto over SSL
-      - nat descriptor masquerade static 1 3004 {{ fox.ip }} tcp 8883
+      - nat descriptor masquerade static 1 3005 {{ fox.ip }} tcp 8883
+      - ipv6 filter 3005 pass * {{ fox.ipv6 }} tcp * 8883
       # hotel: SSH
       - nat descriptor masquerade static 1 4001 {{ hotel.ip }} tcp 55022
+      - ipv6 filter 4001 pass * {{ hotel.ipv6 }} tcp * 55022
       # hotel: Zabbix
       - nat descriptor masquerade static 1 4002 {{ hotel.ip }} tcp 15050
+      - ipv6 filter 4002 pass * {{ hotel.ipv6 }} tcp * 15050
   tags: [rtx, rtx-port]
 
 # Ref: http://www.rtpro.yamaha.co.jp/RT/docs/l2tp_ipsec/
@@ -215,6 +248,8 @@
     lines:
       - nat descriptor masquerade static 1 101 {{ lan1.ip }} esp
       - nat descriptor masquerade static 1 102 {{ lan1.ip }} udp 500,4500
+      - ipv6 filter 101 pass * {{ lan1.ipv6 }} esp
+      - ipv6 filter 102 pass * {{ lan1.ipv6 }} udp 500,1701,4500
       - ipsec transport 1 1 udp 1701
       - ipsec auto refresh on
       - l2tp service on
