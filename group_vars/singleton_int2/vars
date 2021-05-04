@@ -1,8 +1,7 @@
 ---
 local:
     fqdn: hotel.rewse.jp
-sshd_port: 55022
-zabbix_agent_port: 15050
+zabbix_agent_port: 14050
 dhcpd:
     role: secondary
     port: 520
