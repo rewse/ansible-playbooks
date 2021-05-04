@@ -28,12 +28,6 @@
     remote_src: yes
   tags: [raspberrypi]
 
-- name: Copy NETGEAR WAC510 MIB
-  get_url:
-    url: https://www.downloads.netgear.com/files/GDC/WAC510/WAC510_V{{ netgear_wac510_version }}.mib
-    dest: /usr/share/snmp/mibs
-  tags: [raspberrypi]
-
 - name: Download php-miio
   unarchive:
     src: https://github.com/skysilver-lab/php-miio/archive/refs/tags/v.{{ php_miio_version }}.zip
