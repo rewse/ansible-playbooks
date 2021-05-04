@@ -21,16 +21,18 @@ network:
         primary: eth0
         arp-interval: 1000
         arp-ip-targets:
-          - 192.168.0.1
+          - {{ default_gateway }}
       dhcp4: false
       dhcp6: true
       optional: true
       addresses:
-         - {{ local_ip }}/24
-      gateway4: 192.168.0.1
+         - {{ local.ip }}/24
+      gateway4: {{ default_gateway }}
       nameservers:
         search:
           - rewse.jp
         addresses:
-          - 192.168.0.30
-          - 192.168.0.40
+          - {{ resolved1.ip }}
+          - {{ resolved2.ip }}
+          - {{ resolved1.ipv6 }}
+          - {{ resolved2.ipv6 }}
