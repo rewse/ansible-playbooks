@@ -333,7 +333,7 @@
 - name: Config shell_command
   lineinfile:
     path: /etc/homeassistant/configuration.yaml
-    insertafter: '^switch:'
+    insertafter: '^sensor:'
     regexp: '^shell_command:'
     line: "shell_command: !include shell_commands.yaml"
   notify: Restart homeassistant
@@ -351,7 +351,7 @@
 - name: Config switch
   lineinfile:
     path: /etc/homeassistant/configuration.yaml
-    insertafter: '^sensor:'
+    insertafter: '^shell_command:'
     regexp: '^switch:'
     line: "switch: !include switches.yaml"
   notify: Restart homeassistant
@@ -364,10 +364,26 @@
   notify: Restart homeassistant
   tags: [homeassistant]
 
-- name: Config zone
+- name: Config utility_meter
   lineinfile:
     path: /etc/homeassistant/configuration.yaml
     insertafter: '^switch:'
+    regexp: '^utility_meter:'
+    line: "utility_meter: !include utility_meters.yaml"
+  notify: Restart homeassistant
+  tags: [homeassistant]
+
+- name: Copy utility_meters.yaml
+  copy:
+    src: utility_meters.yaml
+    dest: /etc/homeassistant
+  notify: Restart homeassistant
+  tags: [homeassistant]
+
+- name: Config zone
+  lineinfile:
+    path: /etc/homeassistant/configuration.yaml
+    insertafter: '^utility_meter:'
     regexp: '^zone:'
     line: "zone: !include zones.yaml"
   notify: Restart homeassistant
