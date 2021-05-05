@@ -61,7 +61,7 @@
 - name: Set dns
   rtx_config:
     lines:
-      - dns server {{ resolved1.ip }} {{ resolved2.ip }} {{ resolved1.ipv6 }} {{ resolved2.ipv6 }}
+      - dns server {{ fox.ip }} {{ hotel.ip }} {{ fox.ipv6 }} {{ hotel.ipv6 }}
       - dns domain {{ domain }}
       - dns syslog resolv on
       - dns private address spoof on
