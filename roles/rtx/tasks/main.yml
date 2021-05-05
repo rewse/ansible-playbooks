@@ -66,6 +66,12 @@
       - dns private address spoof on
   tags: [rtx, rtx-dns]
 
+- name: Set snmp
+  rtx_config:
+    lines:
+      - snmpv2c host lan1
+  tags: [rtx, rtx-snmp]
+
 - name: Set schedule
   rtx_config:
     lines:
