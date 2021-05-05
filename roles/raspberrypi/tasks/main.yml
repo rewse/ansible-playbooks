@@ -28,6 +28,13 @@
     remote_src: yes
   tags: [raspberrypi]
 
+- name: Copy YAMAHA MIB
+  unarchive:
+    src: http://www.rtpro.yamaha.co.jp/RT/docs/mib/yamaha-private-mib.zip
+    dest: /usr/share/snmp/mibs
+    remote_src: yes
+  tags: [raspberrypi]
+
 - name: Download php-miio
   unarchive:
     src: https://github.com/skysilver-lab/php-miio/archive/refs/tags/v.{{ php_miio_version }}.zip
