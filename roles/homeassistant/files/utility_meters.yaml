@@ -1,0 +1,12 @@
+romeo_lan1_octets_in_mbh:
+  source: sensor.romeo_lan1_octets_in
+  cycle: hourly
+romeo_lan1_octets_out_mbh:
+  source: sensor.romeo_lan1_octets_out
+  cycle: hourly
+romeo_lan2_octets_in_mbh:
+  source: sensor.romeo_lan2_octets_in
+  cycle: hourly
+romeo_lan2_octets_out_mbh:
+  source: sensor.romeo_lan2_octets_out
+  cycle: hourly
