@@ -4,10 +4,10 @@ default_gateway:
 domain: rewse.jp
 fox:
   ip: 192.168.0.30
-  ipv6: 240f:78:31e9:1:c823:33ff:feee:1983
+  ipv6: 240f:78:31e9:1::30
 hotel:
   ip: 192.168.0.40
-  ipv6: 240f:78:31e9:1:c69:dbff:feab:d6f8
+  ipv6: 240f:78:31e9:1::40
 ipsec:
   ip: 192.168.0.199
   username: "{{ vault_ipsec.username }}"
