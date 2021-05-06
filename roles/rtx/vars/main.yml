@@ -27,3 +27,6 @@ ntpd:
   fqdn: ntp.nict.jp
 rtx:
   hostname: romeo
+s2svpn:
+  pre_shared_key1: "{{ vault_s2svpn.pre_shared_key1 }}"
+  pre_shared_key2: "{{ vault_s2svpn.pre_shared_key2 }}"
