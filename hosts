@@ -8,21 +8,21 @@ youth.local
 romeo.rewse.jp
 
 [ubuntu]
-bravo.rewse.jp
-charlie.rewse.jp
+alfa.rewse.jp
+delta.rewse.jp
 fox.rewse.jp
 hotel.rewse.jp
 
 [ec2]
-bravo.rewse.jp
-charlie.rewse.jp
+alfa.rewse.jp
+delta.rewse.jp
 
 [raspberrypi]
 fox.rewse.jp
 hotel.rewse.jp
 
 [singleton_ext]
-bravo.rewse.jp
+alfa.rewse.jp
 
 [singleton_int1]
 fox.rewse.jp
@@ -31,7 +31,7 @@ fox.rewse.jp
 hotel.rewse.jp
 
 [servers_ext]
-charlie.rewse.jp
+delta.rewse.jp
 
 [servers_int]
 fox.rewse.jp
