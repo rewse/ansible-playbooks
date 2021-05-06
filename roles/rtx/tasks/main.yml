@@ -209,11 +209,12 @@
   tags: [rtx, rtx-port]
 
 # Ref: http://www.rtpro.yamaha.co.jp/RT/docs/l2tp_ipsec/
-- name: Set L2TP/IPsec 1
+- name: Set Remote Access VPN 1
   rtx_config:
     parents:
       - pp select anonymous
     lines:
+      - description pp "Remote Access VPN"
       - pp bind tunnel1
       - pp auth request mschap-v2
       - pp auth username {{ ipsec.username }} {{ ipsec.password }}
@@ -224,11 +225,12 @@
       - pp enable anonymous
   tags: [rtx, rtx-l2tp]
 
-- name: Set L2TP/IPsec 2
+- name: Set Remote Access VPN 2
   rtx_config:
     parents:
       - tunnel select 1
     lines:
+      - description tunnel "Remote Access VPN"
       - tunnel encapsulation l2tp
       - ip tunnel tcp mss limit auto
       - tunnel enable 1
@@ -245,7 +247,7 @@
       - l2tp syslog on
   tags: [rtx, rtx-l2tp]
 
-- name: Set L2TP/IPsec 3
+- name: Set Remote Access VPN 3
   rtx_config:
     lines:
       - nat descriptor masquerade static 1 101 {{ lan1.ip }} esp
@@ -256,3 +258,69 @@
       - ipsec auto refresh on
       - l2tp service on
   tags: [rtx, rtx-l2tp]
+
+# Ref: https://docs.aws.amazon.com/ja_jp/vpn/latest/s2svpn/SetUpVPNConnections.html
+# Ref: http://www.rtpro.yamaha.co.jp/RT/docs/cloud_vpn/amazon-vpc_api.html
+- name: Set AWS Site-to-Site VPN 1
+  rtx_config:
+    parents:
+      - tunnel select 10
+    lines:
+      - description tunnel "Amazon Site-to-Site VPN 1"
+      - ipsec tunnel 10
+      - ipsec sa policy 10 10 esp aes-cbc sha-hmac
+      - ipsec ike duration ipsec-sa 10 3600
+      - ipsec ike encryption 10 aes-cbc
+      - ipsec ike group 10 modp1024
+      - ipsec ike hash 10 sha
+      - ipsec ike keepalive use 10 on dpd 10 3
+      - ipsec ike local address 10 {{ lan1.ip }}
+      - ipsec ike local id 10 {{ lan1.ip }}
+      - ipsec ike pfs 10 on
+      - ipsec ike pre-shared-key 10 text {{ s2svpn.pre_shared_key1 }}
+      - ipsec ike remote address 10 54.95.76.157
+      - ipsec ike nat-traversal 10 on
+      - ipsec tunnel outer df-bit clear
+      - ip tunnel address 169.254.249.162/30
+      - ip tunnel remote address 169.254.249.161
+      - ip tunnel tcp mss limit auto
+      - tunnel enable 10
+      - bgp neighbor 10 64512 169.254.249.161 hold-time=30 local-address=169.254.249.162
+  tags: [rtx, rtx-s2svpn]
+
+- name: Set AWS Site-to-Site VPN 2
+  rtx_config:
+    parents:
+      - tunnel select 20
+    lines:
+      - description tunnel "Amazon Site-to-Site VPN 2"
+      - ipsec tunnel 20
+      - ipsec sa policy 20 20 esp aes-cbc sha-hmac
+      - ipsec ike duration ipsec-sa 20 3600
+      - ipsec ike encryption 20 aes-cbc
+      - ipsec ike group 20 modp1024
+      - ipsec ike hash 20 sha
+      - ipsec ike keepalive use 20 on dpd 10 3
+      - ipsec ike local address 20 {{ lan1.ip }}
+      - ipsec ike local id 20 {{ lan1.ip }}
+      - ipsec ike pfs 20 on
+      - ipsec ike pre-shared-key 20 text {{ s2svpn.pre_shared_key2 }}
+      - ipsec ike remote address 20 54.248.99.147
+      - ipsec ike nat-traversal 20 on
+      - ipsec tunnel outer df-bit clear
+      - ip tunnel address 169.254.170.246/30
+      - ip tunnel remote address 169.254.170.245
+      - ip tunnel tcp mss limit auto
+      - tunnel enable 20
+      - bgp neighbor 20 64512 169.254.170.245 hold-time=30 local-address=169.254.170.246
+  tags: [rtx, rtx-s2svpn]
+
+- name: Set AWS Site-to-Site VPN 3
+  rtx_config:
+    lines:
+      - bgp use on
+      - bgp autonomous-system 65000
+      - bgp import filter 1 include 192.168.0.0/24
+      - bgp import 64512 static filter 1
+      - bgp configure refresh
+  tags: [rtx, rtx-s2svpn]
