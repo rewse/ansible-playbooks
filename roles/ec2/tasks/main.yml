@@ -17,3 +17,12 @@
     opts: defaults,discard
     state: mounted
   tags: [ec2, storage]
+
+- name: Add NTP servers
+  lineinfile:
+    dest: /etc/systemd/timesyncd.conf
+    insertafter: '^#NTP='
+    regexp: '^NTP='
+    line: 'NTP=169.254.169.123'
+  notify: Restart systemd-timesyncd
+  tags: [ubuntu, time, systemd-timesyncd]
