@@ -69,7 +69,7 @@
 - name: Set snmp
   rtx_config:
     lines:
-      - snmpv2c host lan1
+      - snmpv2c host any
       - snmpv2c trap community trap
       - snmpv2c trap host {{ delta.ip }}
   tags: [rtx, rtx-snmp]
