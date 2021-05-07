@@ -108,7 +108,7 @@
       # ip lan2 secure filter in 101003 101020 101021 101022 101023 101024 101025 101030 101032 101080 101081 101082 101083
       - ip lan2 secure filter in 101003 101020 101021 101022 101023 101024 101025 101099
       - ip lan2 secure filter out 101013 101020 101021 101022 101023 101024 101025 101026 101027 101099 dynamic 101080 101081 101082 101083 101084 101085 101098 101099
-      - ipv6 lan2 secure filter in 101 102 2001 2002 3001 3002 3003 3004 3005 4001 4002 101010 101011 101012 102000
+      - ipv6 lan2 secure filter in 101 102 2001 2002 3001 3004 101010 101011 101012 102000
       - ipv6 lan2 secure filter out 103000 dynamic 100100 100101 100102 100103 100104 100105 100106
   tags: [rtx, rtx-port]
 
@@ -192,20 +192,11 @@
       # fox: SSH
       - nat descriptor masquerade static 1 3001 {{ fox.ip }} tcp 22
       - ipv6 filter 3001 pass * {{ fox.ipv6 }} tcp * 22
-      # fox: Zabbix
-      - nat descriptor masquerade static 1 3002 {{ fox.ip }} tcp 10050
-      - ipv6 filter 3002 pass * {{ fox.ipv6 }} tcp * 10050
       # fox: HTTP
       - ipv6 filter 3003 pass * {{ fox.ipv6 }} tcp * 80
       # fox: HTTPS
       - nat descriptor masquerade static 1 3004 {{ fox.ip }} tcp 443
       - ipv6 filter 3004 pass * {{ fox.ipv6 }} tcp * 443
-      # fox: Mosquitto over SSL
-      - nat descriptor masquerade static 1 3005 {{ fox.ip }} tcp 8883
-      - ipv6 filter 3005 pass * {{ fox.ipv6 }} tcp * 8883
-      # hotel: Zabbix
-      - nat descriptor masquerade static 1 4002 {{ hotel.ip }} tcp 14050
-      - ipv6 filter 4002 pass * {{ hotel.ipv6 }} tcp * 14050
   tags: [rtx, rtx-port]
 
 # Ref: http://www.rtpro.yamaha.co.jp/RT/docs/l2tp_ipsec/
