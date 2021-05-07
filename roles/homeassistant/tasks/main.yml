@@ -13,7 +13,7 @@
       services:
         homeassistant:
           container_name: homeassistant
-          image: homeassistant/raspberrypi3-homeassistant:stable
+          image: homeassistant/raspberrypi4-homeassistant:stable
           volumes:
             - /etc/homeassistant:/config
             - /etc/localtime:/etc/localtime:ro
