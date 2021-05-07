@@ -78,9 +78,6 @@ views:
           - entity: sensor.guppy_volume_1_volume_used
             name: guppy Volume 1
             icon: 'mdi:harddisk'
-      - type: entity
-        entity: sensor.dns_hass_rewse_jp
-        icon: 'mdi:dns'
       - type: vertical-stack
         cards:
         - type: custom:mini-graph-card
@@ -129,10 +126,6 @@ views:
       - type: entities
         title: Offline Alarm
         entities:
-          - entity: automation.alarm_dns_is_down
-            icon: 'mdi:dns'
-            name: DNS
-            secondary_info: last-triggered
           - entity: automation.alarm_internet_speed_is_too_slow
             icon: 'mdi:speedometer-slow'
             name: Internet

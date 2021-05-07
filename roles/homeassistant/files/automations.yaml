@@ -1,22 +1,3 @@
-- id: automation.alarm_dns_is_down
-  alias: "ALARM: DNS is Down"
-  trigger:
-    - platform: state
-      entity_id: sensor.dns_hass_rewse_jp
-      to: unknown
-  action:
-    - service: notify.all_devices
-      data:
-        title: "⚠️ ALARM: DNS is Down"
-        data:
-          url: /lovelace-machines/machines
-    - delay:
-        hours: 0
-        minutes: 0
-        seconds: 10
-        milliseconds: 0
-    - service: script.restart_zulu
-  mode: single
 - id: automation.alarm_internet_speed_is_too_slow
   alias: "ALARM: Internet Speed is Too Slow"
   trigger:
