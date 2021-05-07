@@ -3,7 +3,6 @@ local:
     fqdn: fox.rewse.jp
     ip: 192.168.0.30
     ipv6: 240f:78:31e9:1::30
-zabbix_agent_port: 10050
 dhcpd:
     role: primary
     port: 519

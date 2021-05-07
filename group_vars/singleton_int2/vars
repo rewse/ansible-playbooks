@@ -3,7 +3,6 @@ local:
     fqdn: hotel.rewse.jp
     ip: 192.168.0.40
     ipv6: 240f:78:31e9:1::40
-zabbix_agent_port: 14050
 dhcpd:
     role: secondary
     port: 520
