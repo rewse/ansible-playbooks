@@ -415,16 +415,3 @@ cards:
     states:
       - arm_home
       - arm_away
-  - type: conditional
-    conditions:
-      - entity: sensor.seventeentrack_packages_in_transit
-        state_not: '0'
-    card:
-      type: markdown
-      title: Packages in Transit
-      content: >-
-        {% for package in states.sensor.seventeentrack_packages_in_transit.attributes.packages %}
-
-        * **{{ package.friendly_name }}:** {{ package.info_text }}
-
-        {% endfor %}
