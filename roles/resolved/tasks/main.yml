@@ -23,11 +23,12 @@
   tags: [resolved]
 
 - name: Add interface
-  lineinfile:
+  blockinfile:
     path: /etc/unbound/unbound.conf.d/unbound.conf
     insertafter: '.*# interface: 2001:DB8::5'
-    regexp: '.*interface: 0.0.0.0$'
-    line: "    interface: 0.0.0.0"
+    block: |2
+          interface: 0.0.0.0
+          interface: {{ local.ipv6 }}
   notify: Restart unbound
   tags: [resolved]
 
