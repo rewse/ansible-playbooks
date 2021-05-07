@@ -1,0 +1,40 @@
+---
+- name: Install packages
+  apt:
+    name:
+      - snmptrapd
+      - snmptt
+    update_cache: yes
+  tags: [snmptrapd]
+
+- name: Copy snmptrapd.conf
+  copy:
+    src: snmptrapd.conf
+    dest: /etc/snmp
+  notify: Restart snmptrapd
+  tags: [snmptrapd]
+
+- name: Set net_snmp_perl_enable
+  lineinfile:
+    dest: /etc/snmp/snmptt.ini
+    regexp: "^net_snmp_perl_enable ="
+    line: "net_snmp_perl_enable = 1"
+  notify: Restart snmptt
+  tags: [snmptrapd]
+
+- name: Set date_time_format
+  lineinfile:
+    dest: /etc/snmp/snmptt.ini
+    regexp: "^date_time_format ="
+    line: "date_time_format = %H:%M:%S %Y/%m/%d"
+  notify: Restart snmptt
+  tags: [snmptrapd]
+
+- name: Add trap format
+  blockinfile:
+    path: /etc/snmp/snmptt.conf
+    block: |
+      EVENT general .* "General event" Normal
+      FORMAT ZBXTRAP $aA $ar
+  notify: Restart snmptt
+  tags: [snmptrapd]
