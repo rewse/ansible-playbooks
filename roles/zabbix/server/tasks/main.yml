@@ -60,6 +60,23 @@
   notify: Restart zabbix-server
   tags: [zabbix-server]
 
+- name: Set StartSNMPTrapper
+  lineinfile:
+    dest: /etc/zabbix/zabbix_server.conf
+    insertafter: "^# StartSNMPTrapper="
+    regexp: "^StartSNMPTrapper="
+    line: "StartSNMPTrapper=1"
+  notify: Restart zabbix-server
+  tags: [zabbix-server]
+
+- name: Set SNMPTrapperFile
+  lineinfile:
+    dest: /etc/zabbix/zabbix_server.conf
+    regexp: "^SNMPTrapperFile="
+    line: "SNMPTrapperFile=/var/log/snmptt/snmptt.log"
+  notify: Restart zabbix-server
+  tags: [zabbix-server]
+
 - name: Set php_value
   lineinfile:
     dest: /etc/zabbix/apache.conf

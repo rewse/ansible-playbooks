@@ -1,0 +1,13 @@
+/var/log/snmptt/snmptt.log
+{
+    rotate 4
+    monthly
+    missingok
+    notifempty
+    compress
+    delaycompress
+    sharedscripts
+    postrotate
+        /usr/lib/rsyslog/rsyslog-rotate
+    endscript
+}
