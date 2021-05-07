@@ -5,3 +5,50 @@
     dest: /etc/zabbix/zabbix_agentd.d
   notify: Restart zabbix-agent
   tags: [zabbix-agent-raspberrypi]
+
+- name: Copy wifi.sh
+  copy:
+    src: wifi.sh
+    dest: /usr/lib/zabbix/agentscripts
+    mode: 0755
+  tags: [zabbix-agent-raspberrypi]
+
+- name: Copy wifi.conf
+  copy:
+    src: wifi.conf
+    dest: /etc/zabbix/zabbix_agentd.d
+  notify: Restart zabbix-agent
+  tags: [zabbix-agent-raspberrypi]
+
+- name: Copy zabbix-agent.service
+  copy:
+    src: /usr/lib/systemd/system/zabbix-agent.service
+    dest: /etc/systemd/system
+    remote_src: yes
+  notify: Restart zabbix-agent
+  tags: [zabbix-agent-raspberrypi]
+
+- name: Change User
+  lineinfile:
+    path: /etc/systemd/system/zabbix-agent.service
+    regexp: '^User='
+    line: "User=root"
+  notify: Restart zabbix-agent
+  tags: [zabbix-agent-raspberrypi]
+
+- name: Change Group
+  lineinfile:
+    path: /etc/systemd/system/zabbix-agent.service
+    regexp: '^Group='
+    line: "Group=root"
+  notify: Restart zabbix-agent
+  tags: [zabbix-agent-raspberrypi]
+
+- name: Allow root
+  lineinfile:
+    path: /etc/zabbix/zabbix_agentd.conf
+    insertafter: '^# AllowRoot='
+    regexp: '^AllowRoot='
+    line: "AllowRoot=1"
+  notify: Restart zabbix-agent
+  tags: [zabbix-agent-raspberrypi]

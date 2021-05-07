@@ -21,21 +21,6 @@
           network_mode: host
   tags: [homeassistant]
 
-- name: Copy wifi2mqtt
-  template:
-    src: wifi2mqtt.j2
-    dest: /usr/local/sbin/wifi2mqtt
-    mode: 0755
-    variable_start_string: "[%"
-    variable_end_string: "%]"
-  tags: [homeassistant]
-
-- name: Copy wifi2mqtt.cron
-  copy:
-    src: wifi2mqtt.cron
-    dest: /etc/cron.d/wifi2mqtt
-  tags: [homeassistant]
-
 - name: Copy secrets.yaml
   template:
     src: secrets.yaml.j2
