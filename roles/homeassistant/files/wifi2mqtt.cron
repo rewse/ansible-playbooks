@@ -1,6 +1,0 @@
-SHELL=/bin/bash
-PATH=/usr/local/sbin:/usr/local/bin:/sbin:/bin:/usr/sbin:/usr/bin
-01-59/5 * * * * root wifi2mqtt 9C:C9:EB:DA:1D:01 # xray-liv 2.4GHz
-02-59/5 * * * * root wifi2mqtt 9C:C9:EB:DA:1D:11 # xray-liv 5GHz
-03-59/5 * * * * root wifi2mqtt 44:A5:6E:5B:83:81 # xray-sto 2.4GHz
-04-59/5 * * * * root wifi2mqtt 44:A5:6E:5B:83:91 # xray-sto 5GHz

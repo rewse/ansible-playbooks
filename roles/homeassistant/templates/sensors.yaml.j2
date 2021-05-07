@@ -42,46 +42,6 @@
   availability:
     - topic: enecoq/fee/state
   icon: mdi:transmission-tower
-# Do no use command_line because it doesn’t work
-- platform: mqtt
-  unique_id: sensor.mqtt.wifi.xray_liv.band2.ch
-  name: xray-liv 2.4GHz Channel
-  state_topic: wifi/9CC9EBDA1D01
-  value_template: "{{ value_json.ch }}"
-  unit_of_measurement: ch
-  availability:
-    - topic: wifi/9CC9EBDA1D01/status
-  icon: mdi:wifi
-# Do no use command_line because it doesn’t work
-- platform: mqtt
-  unique_id: sensor.mqtt.wifi.xray_liv.band5.ch
-  name: xray-liv 5GHz Channel
-  state_topic: wifi/9CC9EBDA1D11
-  value_template: "{{ value_json.ch }}"
-  unit_of_measurement: ch
-  availability:
-    - topic: wifi/9CC9EBDA1D11/status
-  icon: mdi:wifi-star
-# Do no use command_line because it doesn’t work
-- platform: mqtt
-  unique_id: sensor.mqtt.wifi.xray_sto.band2.ch
-  name: xray-sto 2.4GHz Channel
-  state_topic: wifi/44A56E5B8381
-  value_template: "{{ value_json.ch }}"
-  unit_of_measurement: ch
-  availability:
-    - topic: wifi/44A56E5B8381/status
-  icon: mdi:wifi
-# Do no use command_line because it doesn’t work
-- platform: mqtt
-  unique_id: sensor.mqtt.wifi.xray_sto.band5.ch
-  name: xray-sto 5GHz Channel
-  state_topic: wifi/44A56E5B8391
-  value_template: "{{ value_json.ch }}"
-  unit_of_measurement: ch
-  availability:
-    - topic: wifi/44A56E5B8391/status
-  icon: mdi:wifi-star
 - platform: rest
   name: Bedroom Curtains Position
   resource: https://api.switch-bot.com/v1.0/devices/EAED0CCBC1A2/status
