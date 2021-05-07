@@ -1,0 +1,10 @@
+---
+- name: Restart snmptrapd
+  systemd:
+    name: snmptrapd
+    state: restarted
+
+- name: Restart snmptt
+  systemd:
+    name: snmptt
+    state: restarted
