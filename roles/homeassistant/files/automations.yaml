@@ -301,20 +301,6 @@
         data:
           url: /lovelace-machines/machines
   mode: single
-- id: automation.alarm_tapo_is_offline
-  alias: "ALARM: tapo is Offline"
-  trigger:
-    - platform: state
-      entity_id: binary_sensor.tapo
-      to: "off"
-      for: "00:31:00"
-  action:
-    - service: notify.all_devices
-      data:
-        title: "⚠️ ALARM: tapo is Offline"
-        data:
-          url: /lovelace-machines/machines
-  mode: single
 - id: automation.alarm_tuyaplug_is_offline
   alias: "ALARM: tuyaplug is Offline"
   trigger:
@@ -528,20 +514,21 @@
         data:
           url: /lovelace-home/home
   mode: single
-- id: automation.away_home
-  alias: Away Home
-  description: Away home when iOS action fires
+- id: automation.turn_on_ha_alarm
+  alias: Turn on HA Alarm
+  description: Turn on HA Alarm when iOS action fires
   trigger:
     - platform: event
       event_type: ios.action_fired
       event_data:
-        actionName: away_home
+        actionName: turn_on_ha_alarm
   action:
-    - service: script.away_home
+    - service: alarm_control_panel.alarm_arm_away
+      target:
+        entity_id: alarm_control_panel.ha_alarm
     - service: notify.all_devices
       data:
-        message: Away home when iOS action fired
-        title: Away Home
+        title: Now Arming Away
         data:
           url: /lovelace/home
     - delay:
@@ -753,27 +740,25 @@
       target:
         entity_id: switch.living_room_humidifier
   mode: single
-- id: automation.turn_off_xiaomi_alarm
-  alias: Turn off Xiaomi Alarm
-  description: Turn off Xiaomi Alarm when bio connects to xray
+- id: automation.turn_off_ha_alarm
+  alias: Turn off HA Alarm
+  description: Turn off HA Alarm when bio connects to xray
   trigger:
     - platform: state
       entity_id: sensor.bio_ssid
       to: xray
   condition:
-    - condition: device
-      device_id: 2dbeaa9973ca3eb4a05ec29c8eb8969d
-      domain: alarm_control_panel
-      entity_id: alarm_control_panel.xiaomi_gateway
-      type: is_armed_away
+      - condition: state
+        entity_id: alarm_control_panel.ha_alarm
+        state: is_armed_away
   action:
     - service: alarm_control_panel.alarm_disarm
       target:
-        device_id: 2dbeaa9973ca3eb4a05ec29c8eb8969d
+        entity_id: alarm_control_panel.ha_alarm
     - service: notify.all_devices
       data:
-        message: Turned off Xiaomi Alarm because bio’s SSID is xray
-        title: Turned off Xiaomi Alarm
+        title: Turned off HA Alarm
+        message: Turned off HA Alarm because bio’s SSID is xray
         data:
           url: /lovelace/home
     - delay:
@@ -782,31 +767,6 @@
         seconds: 0
         milliseconds: 0
   mode: single
-- id: automation.turn_on_all_automations
-  alias: Turn on All Automations
-  description: Turn on all automations when bio connects to xray
-  mode: single
-  trigger:
-    - platform: state
-      entity_id: sensor.bio_ssid
-      to: xray
-  condition:
-    - condition: state
-      entity_id: input_boolean.at_home_state
-      state: 'off'
-  action:
-    - service: script.into_home
-    - service: notify.all_devices
-      data:
-        message: Turn on all automations when bio connects to xray
-        title: Turned on All Automations
-        data:
-          url: /lovelace/home
-    - delay:
-        hours: 0
-        minutes: 10
-        seconds: 0
-        milliseconds: 0
 - id: automation.plan_to_turn_on_living_room_hvac_with_fan_mode
   alias: Plan to Turn on Living Room HVAC with Fan Mode
   description: Plan to turn on the HVAC in the living room with fan mode
