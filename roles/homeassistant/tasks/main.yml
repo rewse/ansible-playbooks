@@ -349,10 +349,26 @@
   notify: Restart homeassistant
   tags: [homeassistant]
 
-- name: Config zone
+- name: Config template
   lineinfile:
     path: /etc/homeassistant/configuration.yaml
     insertafter: '^switch:'
+    regexp: '^template:'
+    line: "template: !include templates.yaml"
+  notify: Restart homeassistant
+  tags: [homeassistant]
+
+- name: Copy templates.yaml
+  copy:
+    src: templates.yaml
+    dest: /etc/homeassistant
+  notify: Restart homeassistant
+  tags: [homeassistant]
+
+- name: Config zone
+  lineinfile:
+    path: /etc/homeassistant/configuration.yaml
+    insertafter: '^template:'
     regexp: '^zone:'
     line: "zone: !include zones.yaml"
   notify: Restart homeassistant
