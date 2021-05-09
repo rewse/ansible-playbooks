@@ -328,9 +328,7 @@ cards:
         secondary_info: last-triggered
       - entity: automation.turn_down_bedroom
         secondary_info: last-triggered
-      - entity: automation.turn_on_all_automations
-        secondary_info: last-triggered
-      - entity: automation.turn_off_xiaomi_alarm
+      - entity: automation.turn_off_ha_alarm
         secondary_info: last-triggered
     show_header_toggle: false
   - type: custom:mini-graph-card
@@ -379,10 +377,6 @@ cards:
             name: Wind
           - entity: sensor.home_uv_index
             name: UV Index
-  - type: picture-entity
-    entity: camera.guppy_cat_cage
-    image: 'https://demo.home-assistant.io/stub_config/bedroom.png'
-    name: Cat Cage Camera
   - type: entities
     title: Motion Sensors
     entities:
@@ -401,17 +395,7 @@ cards:
         secondary_info: last-changed
       - entity: binary_sensor.bedroom_window
         secondary_info: last-changed
-  - type: button
-    tap_action:
-      action: toggle
-    entity: switch.at_home
-    show_state: false
-    show_icon: true
-    icon_height: 48px
-    state_color: false
   - type: alarm-panel
-    name: Xiami Alarm
-    entity: alarm_control_panel.xiaomigateway
+    entity: alarm_control_panel.ha_alarm
     states:
-      - arm_home
       - arm_away

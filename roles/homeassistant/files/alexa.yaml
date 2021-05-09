@@ -5,7 +5,7 @@ smart_home:
   client_secret: !secret alexa_client_secret
   filter:
     include_entities:
-      - alarm_control_panel.xiaomigateway
+      - alarm_control_panel.ha_alarm
       - automation.turn_down_living_area
       - automation.turn_down_living_area_more
       - binary_sensor.bathroom_motion
@@ -14,7 +14,7 @@ smart_home:
       - binary_sensor.living_room_window
       - binary_sensor.study_motion
       - binary_sensor.study_window
-      - camera.guppy_cat_cage
+      - camera.guppy_study
       - climate.bedroom_hvac
       - climate.living_room_hvac
       - cover.bedroom_curtains
@@ -60,8 +60,8 @@ smart_home:
       name: 書斎のモーションセンサー
     binary_sensor.study_window:
       name: 書斎の窓
-    camera.guppy_cat_cage:
-      name: ケージのカメラ
+    camera.guppy_study:
+      name: 書斎のカメラ
     climate.bedroom_hvac:
       name: 寝室のエアコン
     climate.living_room_hvac:

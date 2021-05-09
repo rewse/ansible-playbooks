@@ -15,6 +15,10 @@ cards:
       - entity: group.living_area_floor_heatings
         name: Floor Heating
     show_header_toggle: false
+  - type: alarm-panel
+    entity: alarm_control_panel.ha_alarm
+    states:
+      - arm_away
   - type: "custom:simple-thermostat"
     entity: climate.living_room_hvac
     layout:
@@ -87,9 +91,7 @@ cards:
         name: Turned down More Time
       - entity: automation.turn_off_living_room_extra_lights
         secondary_info: last-triggered
-      - entity: automation.turn_on_all_automations
-        secondary_info: last-triggered
-      - entity: automation.turn_off_xiaomi_alarm
+      - entity: automation.turn_off_ha_alarm
         secondary_info: last-triggered
     show_header_toggle: false
   - type: vertical-stack
@@ -129,17 +131,6 @@ cards:
         hide:
           volume: true
           power_state: false
-  - type: button
-    tap_action:
-      action: toggle
-    entity: switch.at_home
-    show_state: false
-    show_icon: true
-    icon_height: 48px
-    state_color: false
-  - type: alarm-panel
-    name: Xiami Alarm
-    entity: alarm_control_panel.xiaomigateway
-    states:
-      - arm_home
-      - arm_away
+  - type: picture-entity
+    name: Study Camera
+    entity: camera.guppy_study
