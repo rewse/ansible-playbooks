@@ -694,10 +694,6 @@
       event_type: ios.action_fired
       event_data:
         actionName: turn_off_living_room_lights
-  condition:
-    - condition: state
-      entity_id: sensor.bio_ssid
-      state: xray
   action:
     - service: light.turn_off
       target:
@@ -722,10 +718,6 @@
       event_type: ios.action_fired
       event_data:
         actionName: turn_off_living_room_lights_appliances
-  condition:
-    - condition: state
-      entity_id: sensor.bio_ssid
-      state: xray
   action:
     - service: light.turn_off
       target:
@@ -745,8 +737,8 @@
   description: Turn off HA Alarm when bio connects to xray
   trigger:
     - platform: state
-      entity_id: sensor.bio_ssid
-      to: xray
+      entity_id: sensor.sensor.bio_geocoded_location
+      to: Home
   condition:
       - condition: state
         entity_id: alarm_control_panel.ha_alarm
