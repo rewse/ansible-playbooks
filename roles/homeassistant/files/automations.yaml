@@ -11,7 +11,8 @@
   action:
     - service: notify.all_devices
       data:
-        title: "⚠️ ALARM: Internet Speed is Too Slow"
+        title: "⚠️ ALARM"
+        message: Internet Speed is Too Slow
         data:
           url: /lovelace-machines/machines
     - delay:
@@ -31,7 +32,8 @@
   action:
     - service: notify.all_devices
       data:
-        title: "⚠️ ALARM: zulu is offline"
+        title: "⚠️ ALARM"
+        message: zulu is offline
         data:
           url: /lovelace-machines/machines
   mode: single
@@ -45,7 +47,8 @@
   action:
     - service: notify.all_devices
       data:
-        title: "⚠️ ALARM: romeo is offline"
+        title: "⚠️ ALARM"
+        message: romeo is offline
         data:
           url: /lovelace-machines/machines
   mode: single
@@ -59,7 +62,8 @@
   action:
     - service: notify.all_devices
       data:
-        title: "⚠️ ALARM: tango is offline"
+        title: "⚠️ ALARM"
+        message: tango is offline
         data:
           url: /lovelace-machines/machines
   mode: single
@@ -73,7 +77,8 @@
   action:
     - service: notify.all_devices
       data:
-        title: "⚠️ ALARM: xray-liv is Offline"
+        title: "⚠️ ALARM"
+        message: xray-liv is Offline
         data:
           url: /lovelace-machines/machines
   mode: single
@@ -87,7 +92,8 @@
   action:
     - service: notify.all_devices
       data:
-        title: "⚠️ ALARM: xray-sto is Offline"
+        title: "⚠️ ALARM"
+        message: xray-sto is Offline
         data:
           url: /lovelace-machines/machines
   mode: single
@@ -101,7 +107,8 @@
   action:
     - service: notify.all_devices
       data:
-        title: "⚠️ ALARM: aventage is Offline"
+        title: "⚠️ ALARM"
+        message: aventage is Offline
         data:
           url: /lovelace-machines/machines
   mode: single
@@ -115,7 +122,8 @@
   action:
     - service: notify.all_devices
       data:
-        title: "⚠️ ALARM: catloghome-bed is Offline"
+        title: "⚠️ ALARM"
+        message: ️catloghome-bed is Offline
         data:
           url: /lovelace-machines/machines
   mode: single
@@ -129,7 +137,8 @@
   action:
     - service: notify.all_devices
       data:
-        title: "⚠️ ALARM: catloghome-liv is Offline"
+        title: "⚠️ ALARM"
+        message: catloghome-liv is Offline
         data:
           url: /lovelace-machines/machines
   mode: single
@@ -143,7 +152,8 @@
   action:
     - service: notify.all_devices
       data:
-        title: "⚠️ ALARM: daikinhvac is Offline"
+        title: "⚠️ ALARM"
+        message: daikinhvac is Offline
         data:
           url: /lovelace-machines/machines
   mode: single
@@ -157,7 +167,8 @@
   action:
     - service: notify.all_devices
       data:
-        title: "⚠️ ALARM: fox is Offline"
+        title: "⚠️ ALARM"
+        message: fox is Offline
         data:
           url: /lovelace-machines/machines
   mode: single
@@ -171,7 +182,8 @@
   action:
     - service: notify.all_devices
       data:
-        title: "⚠️ ALARM: guppy is Offline"
+        title: "⚠️ ALARM"
+        message: guppy is Offline
         data:
           url: /lovelace-machines/machines
   mode: single
@@ -185,7 +197,8 @@
   action:
     - service: notify.all_devices
       data:
-        title: "⚠️ ALARM: huebridge is Offline"
+        title: "⚠️ ALARM"
+        message: huebridge is Offline
         data:
           url: /lovelace-machines/machines
   mode: single
@@ -199,7 +212,8 @@
   action:
     - service: notify.all_devices
       data:
-        title: "⚠️ ALARM: justio is Offline"
+        title: "⚠️ ALARM"
+        message: ️justio is Offline
         data:
           url: /lovelace-machines/machines
   mode: single
@@ -213,7 +227,8 @@
   action:
     - service: notify.all_devices
       data:
-        title: "⚠️ ALARM: jq300 is Offline"
+        title: "⚠️ ALARM"
+        message: ️jq300 is Offline
         data:
           url: /lovelace-machines/machines
   mode: single
@@ -227,7 +242,8 @@
   action:
     - service: notify.all_devices
       data:
-        title: "⚠️ ALARM: kasaplug-ent is Offline"
+        title: "⚠️ ALARM"
+        message: ️kasaplug-ent is Offline
         data:
           url: /lovelace-machines/machines
   mode: single
@@ -241,7 +257,8 @@
   action:
     - service: notify.all_devices
       data:
-        title: "⚠️ ALARM: kasaplug-liv is Offline"
+        title: "⚠️ ALARM"
+        message: ️kasaplug-liv is Offline
         data:
           url: /lovelace-machines/machines
   mode: single
@@ -255,7 +272,8 @@
   action:
     - service: notify.all_devices
       data:
-        title: "⚠️ ALARM: regza is Offline"
+        title: "⚠️ ALARM"
+        message: regza is Offline
         data:
           url: /lovelace-machines/machines
   mode: single
@@ -269,7 +287,8 @@
   action:
     - service: notify.all_devices
       data:
-        title: "⚠️ ALARM: remo-bed is Offline"
+        title: "⚠️ ALARM"
+        message: ️remo-bed is Offline
         data:
           url: /lovelace-machines/machines
   mode: single
@@ -283,7 +302,8 @@
   action:
     - service: notify.all_devices
       data:
-        title: "⚠️ ALARM: remo-liv is Offline"
+        title: "⚠️ ALARM"
+        message: remo-liv is Offline
         data:
           url: /lovelace-machines/machines
   mode: single
@@ -297,7 +317,8 @@
   action:
     - service: notify.all_devices
       data:
-        title: "⚠️ ALARM: switchbothub is Offline"
+        title: "⚠️ ALARM"
+        message: ️switchbothub is Offline
         data:
           url: /lovelace-machines/machines
   mode: single
@@ -311,7 +332,8 @@
   action:
     - service: notify.all_devices
       data:
-        title: "⚠️ ALARM: tuyaplug is Offline"
+        title: "⚠️ ALARM"
+        message: ️tuyaplug is Offline
         data:
           url: /lovelace-machines/machines
   mode: single
@@ -325,7 +347,8 @@
   action:
     - service: notify.all_devices
       data:
-        title: "⚠️ ALARM: wfirex is Offline"
+        title: "⚠️ ALARM"
+        message: ️wfirex is Offline
         data:
           url: /lovelace-machines/machines
   mode: single
@@ -356,7 +379,8 @@
   action:
     - service: notify.all_devices
       data:
-        title: "⚠️ ALARM: Living Room Temperature Difference is Too Large"
+        title: "⚠️ ALARM"
+        message: Living Room Temperature Difference is Too Large
         data:
           url: /lovelace-home/home
   mode: single
@@ -372,7 +396,8 @@
   action:
     - service: notify.all_devices
       data:
-        title: "⚠️ ALARM: Bedroom Temperature Difference is Too Large"
+        title: "⚠️ ALARM"
+        message: ️Bedroom Temperature Difference is Too Large
         data:
           url: /lovelace-home/home
   mode: single
@@ -388,7 +413,8 @@
   action:
     - service: notify.all_devices
       data:
-        title: "⚠️ ALARM: Balcony Temperature Difference is Too Large"
+        title: "⚠️ ALARM"
+        message: Balcony Temperature Difference is Too Large
         data:
           url: /lovelace-home/home
   mode: single
@@ -405,7 +431,8 @@
   action:
     - service: notify.all_devices
       data:
-        title: "⚠️ ALARM: Living Room Humidity Difference is Too Large"
+        title: "⚠️ ALARM"
+        message: Living Room Humidity Difference is Too Large
         data:
           url: /lovelace-home/home
   mode: single
@@ -422,7 +449,8 @@
   action:
     - service: notify.all_devices
       data:
-        title: "⚠️ ALARM: Bedroom Humidity Difference is Too Large"
+        title: "⚠️ ALARM"
+        message: ️Bedroom Humidity Difference is Too Large
         data:
           url: /lovelace-home/home
   mode: single
@@ -439,7 +467,8 @@
   action:
     - service: notify.all_devices
       data:
-        title: "⚠️ ALARM: Balcony Humidity Difference is Too Large"
+        title: "⚠️ ALARM"
+        message: ️Balcony Humidity Difference is Too Large
         data:
           url: /lovelace-home/home
   mode: single
@@ -457,7 +486,7 @@
         entity_id: alarm_control_panel.ha_alarm
     - service: notify.all_devices
       data:
-        title: Now Arming Away
+        message: Now Arming Away
         data:
           url: /lovelace/home
     - delay:
@@ -467,7 +496,7 @@
         milliseconds: 0
   mode: single
 - id: automation.notify_update_available
-  alias: "Notify Update Available"
+  alias: Notify Update Available
   trigger:
     - platform: state
       entity_id: binary_sensor.updater
@@ -583,8 +612,7 @@
       entity_id: switch.living_room_humidifier
     - service: notify.all_devices
       data:
-        message: Turned off the humidifier in the living room because the humidity was too high
-        title: Turned off Living Room Humidifier
+        message: "Turned off Living Room Humidifier. Current: {{ states('sensor.living_room_humidity') }}%"
         data:
           url: /lovelace/home
     - delay:
@@ -605,8 +633,7 @@
         entity_id: climate.living_room_hvac
     - service: notify.all_devices
       data:
-        title: Turned off Living Room HVAC with Fan Mode
-        message: Turn off the HVAC in the living room with fan mode
+        message: Turned off Living Room HVAC with Fan Mode
         data:
           url: /lovelace/home
     - service: automation.turn_off
@@ -629,8 +656,7 @@
         entity_id: light.living_area_lights
     - service: notify.all_devices
       data:
-        message: Turned off the living room lights when iOS action fired
-        title: Turned off Living Room Lights
+        message: Turned off Living Room Lights
         data:
           url: /lovelace/home
     - delay:
@@ -678,8 +704,7 @@
         entity_id: alarm_control_panel.ha_alarm
     - service: notify.all_devices
       data:
-        title: Turned off HA Alarm
-        message: Turned off HA Alarm because bio’s SSID is xray
+        message: Turned off HA Alarm
         data:
           url: /lovelace/home
     - delay:
@@ -753,8 +778,7 @@
       entity_id: switch.study_floor_heating
     - service: notify.all_devices
       data:
-        title: Turned on Living Area Floor Heating
-        message: Turned on the floor heating in the living area because the temperature was too low
+        message: "Turned on Living Area Floor Heating. Current: {{ states('sensor.living_room_temperature') }}°C"
         data:
           url: /lovelace/home
     - delay:
@@ -778,8 +802,7 @@
       entity_id: switch.living_room_ac_cleaner
     - service: notify.all_devices
       data:
-        title: Turned on Living Room HVAC Cleaner
-        message: Turn on the AC cleaner in the living room
+        message: Turned on Living Room HVAC Cleaner
         data:
           url: /lovelace/home
   mode: single
@@ -797,8 +820,7 @@
         hvac_mode: fan_only
     - service: notify.all_devices
       data:
-        title: Turned on Living Room HVAC with Fan Mode
-        message: Turn on the HVAC in the living room with fan mode
+        message: Turned on Living Room HVAC with Fan Mode
         data:
           url: /lovelace/home
   mode: single
@@ -838,8 +860,7 @@
       entity_id: light.living_area_downlights
     - service: notify.all_devices
       data:
-        title: Turned on Living Room Downlights
-        message: Turned on the downlights in living room because the light level was too low
+        message: "Turned on Living Room Downlights. Current: {{ states('sensor.living_room_light_level') }}lx"
         data:
           url: /lovelace/home
     - delay:
@@ -884,8 +905,7 @@
       entity_id: switch.living_room_humidifier
     - service: notify.all_devices
       data:
-        title: Turned on Living Room Humidifier
-        message: Turned on the humidifier in the living room because the humidity was too low
+        message: "Turned on Living Room Humidifier. Current: {{ states('sensor.living_room_humidity') }}%"
         data:
           url: /lovelace/home
     - delay:
