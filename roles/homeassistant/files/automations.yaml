@@ -750,7 +750,7 @@
   condition:
       - condition: state
         entity_id: alarm_control_panel.ha_alarm
-        state: is_armed_away
+        state: armed_away
   action:
     - service: alarm_control_panel.alarm_disarm
       target:
