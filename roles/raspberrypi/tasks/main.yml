@@ -2,6 +2,8 @@
 - name: Install additional packages
   apt:
     name:
+      - bluez
+      - pi-bluetooth
       - snmp
       - snmp-mibs-downloader
   tags: [raspberrypi, package]
@@ -13,6 +15,16 @@
       - python-miio
     executable: pip3
   tags: [raspberrypi, package]
+
+- name: Enable bluetooth services
+  systemd:
+    name: "{{ item }}"
+    state: started
+    enabled: yes
+  with_items:
+    - bluetooth
+    - hciuart
+  tags: [raspberrypi]
 
 - name: Enable SNMP mibs
   lineinfile:
