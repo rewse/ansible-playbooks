@@ -41,6 +41,13 @@ views:
           - entity: binary_sensor.xiaomigateway
         hours_to_show: 6
       - type: entities
+        title: Presence
+        entities:
+          - entity: binary_sensor.bio_at_home
+            name: bio
+          - entity: binary_sensor.akikos_iphone8_at_home
+            name: akikos-iphone8
+      - type: entities
         title: Batteries
         entities:
           - entity: sensor.living_room_floor_thermometer_battery
