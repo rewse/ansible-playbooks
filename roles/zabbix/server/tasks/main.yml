@@ -12,6 +12,7 @@
       - zabbix-apache-conf
       - zabbix-get
       - fonts-noto-cjk
+      - mosquitto-clients
     update_cache: yes
   notify: Restart apache
   tags: [zabbix-server, package, zabbix-frontend]
