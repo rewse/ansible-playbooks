@@ -164,6 +164,12 @@ device_tracker.e0b55fe8e384:
   icon: mdi:laptop
 device_tracker.global:
   icon: mdi:cellphone
+device_tracker.ping_akikos_iphone12mini:
+  friendly_name: ping akikos_iphone12mini
+  icon: mdi:cellphone-wireless
+device_tracker.ping_bio:
+  friendly_name: ping bio
+  icon: mdi:cellphone-wireless
 device_tracker.youth:
   icon: mdi:desktop-classic
 light.bathroom_entrance_light:

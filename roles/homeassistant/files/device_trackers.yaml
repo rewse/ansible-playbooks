@@ -1,0 +1,4 @@
+- platform: ping
+  hosts:
+    ping_bio: bio.rewse.jp
+    ping_akikos_iphone12mini: akikos-iphone12mini.rewse.jp
