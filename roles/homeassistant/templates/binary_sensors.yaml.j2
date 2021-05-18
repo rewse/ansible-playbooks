@@ -6,18 +6,6 @@
 - platform: command_line
   name: REGZA Volume Muted
   command: curl --digest --user '[% regza.username %]:[% regza.password %]' http://regza/v2/remote/status/mute | jq -r .mute
-- platform: mqtt
-  name: bio at Home
-  unique_id: binary_sensor.bio_at_home
-  state_topic: wifi/client/bio
-  device_class: presence
-  icon: mdi:cellphone-wireless
-- platform: mqtt
-  name: akikos-iphone8 at Home
-  unique_id: binary_sensor.akikos_iphone8_at_home
-  state_topic: wifi/client/akikos-iphone8
-  device_class: presence
-  icon: mdi:cellphone-wireless
 - platform: ping
   name: zulu
   host: zulu.rewse.jp
