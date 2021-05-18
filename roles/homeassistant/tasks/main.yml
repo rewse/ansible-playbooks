@@ -116,10 +116,26 @@
   notify: Restart homeassistant
   tags: [homeassistant]
 
-- name: Config fan
+- name: Config device_tracker
   lineinfile:
     path: /etc/homeassistant/configuration.yaml
     insertafter: '^cover:'
+    regexp: '^device_tracker:'
+    line: "device_tracker: !include device_trackers.yaml"
+  notify: Restart homeassistant
+  tags: [homeassistant]
+
+- name: Copy device_trackers.yaml
+  copy:
+    src: device_trackers.yaml
+    dest: /etc/homeassistant
+  notify: Restart homeassistant
+  tags: [homeassistant]
+
+- name: Config fan
+  lineinfile:
+    path: /etc/homeassistant/configuration.yaml
+    insertafter: '^device_tracker:'
     regexp: '^fan:'
     line: "fan: !include fans.yaml"
   notify: Restart homeassistant
