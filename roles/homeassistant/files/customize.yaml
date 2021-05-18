@@ -156,6 +156,16 @@ binary_sensor.zulu:
   icon: mdi:router-network
 climate.living_area_floor_heating:
   icon: mdi:grid
+device_tracker.bio:
+  icon: mdi:cellphone
+device_tracker.desert:
+  icon: mdi:tablet
+device_tracker.e0b55fe8e384:
+  icon: mdi:laptop
+device_tracker.global:
+  icon: mdi:cellphone
+device_tracker.youth:
+  icon: mdi:desktop-classic
 light.bathroom_entrance_light:
   icon: mdi:wall-sconce-flat
 light.bathroom_left_light:
