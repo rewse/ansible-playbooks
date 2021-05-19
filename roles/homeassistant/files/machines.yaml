@@ -17,26 +17,36 @@ views:
       - type: history-graph
         title: Ping Devices
         entities:
-          - entity: binary_sensor.remo_liv
-          - entity: binary_sensor.remo_bed
-          - entity: binary_sensor.wfirex
-          - entity: binary_sensor.switchbothub
-          - entity: binary_sensor.huebridge
-          - entity: binary_sensor.xiaomigateway
-          - entity: binary_sensor.guppy
+          - entity: binary_sensor.alfa
+          - entity: binary_sensor.delta
           - entity: binary_sensor.fox
-          - entity: binary_sensor.justio
+          - entity: binary_sensor.guppy
+          - entity: binary_sensor.hotel
           - entity: binary_sensor.aventage
-          - entity: binary_sensor.regza
-          - entity: binary_sensor.daikinhvac
-          - entity: binary_sensor.tapo
-          - entity: binary_sensor.catloghome_liv
           - entity: binary_sensor.catloghome_bed
-          - entity: binary_sensor.tuyaplug
-          - entity: binary_sensor.kasaplug_liv
-          - entity: binary_sensor.kasaplug_ent
+          - entity: binary_sensor.catloghome_liv
+          - entity: binary_sensor.daikinhvac
+          - entity: binary_sensor.huebridge
           - entity: binary_sensor.jq300
+          - entity: binary_sensor.justio
+          - entity: binary_sensor.kasaplug_ent
+          - entity: binary_sensor.kasaplug_liv
+          - entity: binary_sensor.regza
+          - entity: binary_sensor.remo_bed
+          - entity: binary_sensor.remo_liv
+          - entity: binary_sensor.switchbothub
+          - entity: binary_sensor.tapo
+          - entity: binary_sensor.tuyaplug
+          - entity: binary_sensor.wfirex
+          - entity: binary_sensor.xiaomigateway
         hours_to_show: 6
+      - type: entities
+        title: Presence
+        entities:
+          - entity: binary_sensor.bio_at_home
+            name: bio
+          - entity: binary_sensor.akikos_iphone8_at_home
+            name: akikos-iphone8
       - type: entities
         title: Batteries
         entities:
