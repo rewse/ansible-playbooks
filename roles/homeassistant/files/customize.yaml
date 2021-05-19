@@ -1,3 +1,5 @@
+alarm_control_panel.ha_alarm:
+  icon: mdi:shield-home
 automation.alarm_aventage_is_offline:
   icon: mdi:audio-video-off
 automation.alarm_balcony_humidity_difference_is_too_large:
@@ -62,8 +64,6 @@ automation.alarm_xray_sto_is_offline:
   icon: mdi:access-point-network-off
 automation.alarm_zulu_is_offline:
   icon: mdi:router-network
-automation.away_home:
-  icon: mdi:home-export-outline
 automation.notify_update_available:
   icon: mdi:check-circle
 automation.open_bedroom_curtains_temporarily:
@@ -88,10 +88,8 @@ automation.turn_off_living_room_hvac_with_fan_mode:
   icon: mdi:fan-off
 automation.turn_off_living_room_lights_appliances:
   icon: mdi:weather-night
-automation.turn_off_xiaomi_alarm:
+automation.turn_off_ha_alarm:
   icon: mdi:shield-home
-automation.turn_on_all_automations:
-  icon: mdi:robot-excited
 automation.turn_on_living_area_downlights:
   icon: mdi:wall-sconce-flat
 automation.turn_on_living_area_floor_heating:

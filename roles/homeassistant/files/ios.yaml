@@ -1,8 +1,8 @@
 actions:
-  - name: away_home
+  - name: turn_on_ha_alarm
     background_color: "#736d71"
     label:
-      text: Away Home
+      text: Turn on HA Alarm
       color: "#ffffff"
     icon:
       icon: mdi:home-export-outline
