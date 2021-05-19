@@ -1,7 +1,3 @@
-at_home_state:
-  name: At Home State
-  initial: on
-  icon: mdi:home-account
 living_room_ceiling_fans_state:
   name: Living Room Ceiling Fans State
   initial: on

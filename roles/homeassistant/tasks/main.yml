@@ -34,10 +34,26 @@
     dest: /etc/homeassistant
   tags: [homeassistant, homeassistant-automations]
 
-- name: Config alexa
+- name: Config alarm_control_panel
   lineinfile:
     path: /etc/homeassistant/configuration.yaml
     insertafter: '^automation:'
+    regexp: '^alarm_control_panel:'
+    line: "alarm_control_panel: !include alarm_control_panels.yaml"
+  notify: Restart homeassistant
+  tags: [homeassistant]
+
+- name: Copy alarm_control_panels.yaml
+  copy:
+    src: alarm_control_panels.yaml
+    dest: /etc/homeassistant/alarm_control_panels.yaml
+  notify: Restart homeassistant
+  tags: [homeassistant]
+
+- name: Config alexa
+  lineinfile:
+    path: /etc/homeassistant/configuration.yaml
+    insertafter: '^alarm_control_panel:'
     regexp: '^alexa:'
     line: "alexa: !include alexa.yaml"
   notify: Restart homeassistant
@@ -349,10 +365,26 @@
   notify: Restart homeassistant
   tags: [homeassistant]
 
-- name: Config zone
+- name: Config template
   lineinfile:
     path: /etc/homeassistant/configuration.yaml
     insertafter: '^switch:'
+    regexp: '^template:'
+    line: "template: !include templates.yaml"
+  notify: Restart homeassistant
+  tags: [homeassistant]
+
+- name: Copy templates.yaml
+  copy:
+    src: templates.yaml
+    dest: /etc/homeassistant
+  notify: Restart homeassistant
+  tags: [homeassistant]
+
+- name: Config zone
+  lineinfile:
+    path: /etc/homeassistant/configuration.yaml
+    insertafter: '^template:'
     regexp: '^zone:'
     line: "zone: !include zones.yaml"
   notify: Restart homeassistant

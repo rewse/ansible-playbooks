@@ -1,0 +1,53 @@
+- sensor:
+  - name: Living Room WBGT
+    unique_id: sensor.template.living_room_wbgt
+    state: "{{ ((states('sensor.living_room_temperature') | float - 30.5) * 0.90739 + (states('sensor.living_room_humidity') | float - 60.0) * 0.14775 + (states('sensor.living_room_temperature') | float - 30.5) * (states('sensor.living_room_humidity') | float - 60.0) * 0.003655 + 27.77) | round(2) }}"
+    icon: mdi:thermometer-lines
+    device_class: temperature
+  - name: Bedroom WBGT
+    unique_id: sensor.template.bedroom_wbgt
+    state: "{{ ((states('sensor.bedroom_temperature') | float - 30.5) * 0.90739 + (states('sensor.bedroom_humidity') | float - 60.0) * 0.14775 + (states('sensor.bedroom_temperature') | float - 30.5) * (states('sensor.bedroom_humidity') | float - 60.0) * 0.003655 + 27.77) | round(2) }}"
+    icon: mdi:thermometer-lines
+    device_class: temperature
+  - name: Balcony WBGT
+    unique_id: sensor.template.balcony_wbgt
+    unit_of_measurement: °C
+    state: "{{ ((states('sensor.balcony_temperature') | float - 30.5) * 0.90739 + (states('sensor.balcony_humidity') | float - 60.0) * 0.14775 + (states('sensor.balcony_temperature') | float - 30.5) * (states('sensor.balcony_humidity') | float - 60.0) * 0.003655 + 27.77) | round(2) }}"
+    icon: mdi:thermometer-lines
+    device_class: temperature
+  - name: Living Room Temperature Difference
+    unique_id: sensor.living_room_temperature_difference
+    state: "{{ (states('sensor.living_room_temperature') | float - states('sensor.living_room_switchbot_meter_temperature') | float) | round(2) | abs }}"
+    unit_of_measurement: °C
+    icon: mdi:thermometer-alert
+    device_class: temperature
+  - name: Bedroom Temperature Difference
+    unique_id: sensor.bedroom_temperature_difference
+    state: "{{ (states('sensor.bedroom_temperature') | float - states('sensor.bedroom_switchbot_meter_temperature') | float) | round(2) | abs }}"
+    unit_of_measurement: °C
+    icon: mdi:thermometer-alert
+    device_class: temperature
+  - name: Balcony Temperature Difference
+    unique_id: sensor.balcony_temperature_difference
+    state: "{{ (states('sensor.balcony_temperature') | float - states('sensor.balcony_switchbot_meter_temperature') | float) | round(2) | abs }}"
+    unit_of_measurement: °C
+    icon: mdi:thermometer-alert
+    device_class: temperature
+  - name: Living Room Humidity Difference
+    unique_id: sensor.living_room_humidity_difference
+    state: "{{ (states('sensor.living_room_humidity') | float - state_attr('sensor.living_room_switchbot_meter_temperature', 'humidity') | float) | round(2) | abs }}"
+    unit_of_measurement: pt
+    icon: mdi:water-percent-alert
+    device_class: humidity
+  - name: Bedroom Humidity Difference
+    unique_id: sensor.bedroom_humidity_difference
+    state: "{{ (states('sensor.bedroom_humidity') | float - state_attr('sensor.bedroom_switchbot_meter_temperature', 'humidity') | float) | round(2) | abs }}"
+    unit_of_measurement: pt
+    icon: mdi:water-percent-alert
+    device_class: humidity
+  - name: Balcony Humidity Difference
+    unique_id: sensor.balcony_humidity_difference
+    state: "{{ (states('sensor.balcony_humidity') | float - state_attr('sensor.balcony_switchbot_meter_temperature', 'humidity') | float) | round(2) | abs }}"
+    unit_of_measurement: pt
+    icon: mdi:water-percent-alert
+    device_class: humidity
