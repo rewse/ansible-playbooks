@@ -87,6 +87,7 @@
       - alfred
       - amazon-chime
       - amazon-music
+      - amazon-workdocs-drive
       - appcleaner
       - authy
       - bartender
@@ -108,13 +109,14 @@
       - gnucash
       - google-chrome
       - handbrake
+      - hhkb-keymap-tool
+      - home-assistant
       - intel-power-gadget
       - istat-menus
       - iterm2
       - jabra-direct
       - karabiner-elements
       - kindle
-      - krisp
       - logitech-camera-settings
       - logitech-unifying
       - notion
@@ -143,6 +145,7 @@
     - 981430153   # Online
     - 445189367   # PopClip
     - 1449412482  # Reeder 4
+    - 1429033973  # RunCat
     - 425424353   # The Unarchiver
     - 485812721   # Tweetdeck
     - 494803304   # WiFi Explorer
@@ -166,3 +169,4 @@
 #     - https://mypassport.atok.com/                                  # Atok
 #     - https://www.blackmagicdesign.com/jp/products/davinciresolve/  # DaVinci Resolve
 #     - https://www.jpegmini.com/downloads/app                        # JPEGmini
+#     - https://www.ireasoning.com/mibbrowser.shtml                   # MIB Browser
