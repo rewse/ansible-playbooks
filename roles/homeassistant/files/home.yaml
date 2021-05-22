@@ -75,14 +75,12 @@ cards:
             name: IAQ Level
           - entity: sensor.living_room_iaq_index
             name: IAQ Index
-          - entity: binary_sensor.living_room_iaq_alert
-            name: IAQ Alert
-          - entity: sensor.living_room_hcho
-            name: HCHO
-          - entity: sensor.living_room_tvoc
-            name: TVOC
           - entity: sensor.living_room_eco2
             name: eCO2
+          - entity: sensor.living_room_tvoc
+            name: TVOC
+          - entity: sensor.living_room_hcho
+            name: HCHO
           - entity: sensor.living_room_pm25
             name: PM 2.5
       - type: entities
