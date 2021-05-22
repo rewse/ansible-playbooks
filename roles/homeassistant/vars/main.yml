@@ -5,6 +5,7 @@ alexa_client:
 card_mod_version: 3.0.12
 ifttt_key: "{{ vault_ifttt_key }}"
 homeassistant_token: "{{ vault_homeassistant_token }}"
+iaquk_version: 1.5.0
 jq300:
   username: "{{ vault_jq300.username }}"
   password: "{{ vault_jq300.password }}"

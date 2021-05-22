@@ -426,6 +426,20 @@
     remote_src: yes
   tags: [homeassistant]
 
+- name: Create custom_components/iaquk
+  file:
+    path: /etc/homeassistant/custom_components/iaquk
+    state: directory
+  tags: [homeassistant]
+
+- name: Download ha-iqauk
+  unarchive:
+    src: https://github.com/Limych/ha-iaquk/releases/download/{{ iaquk_version }}/iaquk.zip
+    dest: /etc/homeassistant/custom_components/iaquk
+    remote_src: yes
+  notify: Restart homeassistant
+  tags: [homeassistant]
+
 - name: Create custom_components/jq300
   file:
     path: /etc/homeassistant/custom_components/jq300
@@ -564,6 +578,16 @@
           - ::1/128
           - fe80::/10
           - 240f:78:31e9:1::/64
+      iaquk:
+        living_room:
+          name: Living Room
+          sources:
+            temperature: sensor.living_room_temperature
+            humidity: sensor.living_room_humidity
+            co2: sensor.living_room_eco2
+            tvoc: sensor.living_room_tvoc
+            hcho: sensor.living_room_hcho
+            pm: sensor.living_room_pm25
       ifttt:
         key: !secret ifttt_key
       jq300:
