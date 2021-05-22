@@ -22,6 +22,20 @@
         milliseconds: 0
     - service: script.restart_zulu
   mode: single
+- id: automation.alarm_living_room_air_quality_is_poor
+  alias: 'ALARM: Living Room Air Quality is Poor'
+  trigger:
+    - platform: numeric_state
+      entity_id: sensor.living_room_iaq_index
+      below: '38'
+  action:
+    - service: notify.all_devices
+      data:
+        message: Living Room Air Quality is Poor
+        title: "⚠️ ALARM"
+        data:
+          url: /lovelace-home/home
+  mode: single
 - id: automation.alarm_zulu_is_offline
   alias: "ALARM: zulu is Offline"
   trigger:
