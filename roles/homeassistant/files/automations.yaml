@@ -508,6 +508,35 @@
         seconds: 0
         milliseconds: 0
   mode: single
+- id: automation.turn_on_ha_alarm_when_nobody_is_in_home
+  alias: Turn on HA Alarm when Nobody is in Home
+  trigger:
+    - platform: state
+      entity_id: person.shibata_tats
+    - platform: state
+      entity_id: person.shibata_akiko
+  condition:
+    - condition: not
+      conditions:
+        - condition: state
+          entity_id: person.shibata_tats
+          state: home
+        - condition: state
+          entity_id: person.shibata_akiko
+          state: home
+  action:
+    - service: alarm_control_panel.alarm_arm_away
+      target:
+        entity_id: alarm_control_panel.ha_alarm
+    - service: notify.all_devices
+      data:
+        message: Turn on HA Alarm Because Nobody is in Home
+    - delay:
+        hours: 0
+        minutes: 10
+        seconds: 0
+        milliseconds: 0
+  mode: single
 - id: automation.notify_update_available
   alias: Notify Update Available
   trigger:
