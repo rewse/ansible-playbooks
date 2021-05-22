@@ -367,7 +367,7 @@
         data:
           url: /lovelace-machines/machines
   mode: single
-- id: automation.living_room_temperature_difference_is_too_large
+- id: automation.alarm_living_room_temperature_difference_is_too_large
   alias: "ALARM: Living Room Temperature Difference is Too Large"
   trigger:
     - platform: state
@@ -384,7 +384,7 @@
         data:
           url: /lovelace-home/home
   mode: single
-- id: automation.bedroom_temperature_difference_is_too_large
+- id: automation.alarm_bedroom_temperature_difference_is_too_large
   alias: "ALARM: Bedroom Temperature Difference is Too Large"
   trigger:
     - platform: state
@@ -401,7 +401,7 @@
         data:
           url: /lovelace-home/home
   mode: single
-- id: automation.balcony_temperature_difference_is_too_large
+- id: automation.alarm_balcony_temperature_difference_is_too_large
   alias: "ALARM: Balcony Temperature Difference is Too Large"
   trigger:
     - platform: state
@@ -418,7 +418,7 @@
         data:
           url: /lovelace-home/home
   mode: single
-- id: automation.living_room_humidity_difference_is_too_large
+- id: automation.alarm_living_room_humidity_difference_is_too_large
   alias: "ALARM: Living Room Humidity Difference is Too Large"
   trigger:
     - platform: state
@@ -436,7 +436,7 @@
         data:
           url: /lovelace-home/home
   mode: single
-- id: automation.bedroom_humidity_difference_is_too_large
+- id: automation.alarm_bedroom_humidity_difference_is_too_large
   alias: "ALARM: Bedroom Humidity Difference is Too Large"
   trigger:
     - platform: state
@@ -454,7 +454,7 @@
         data:
           url: /lovelace-home/home
   mode: single
-- id: automation.balcony_humidity_difference_is_too_large
+- id: automation.alarm_balcony_humidity_difference_is_too_large
   alias: "ALARM: Balcony Humidity Difference is Too Large"
   trigger:
     - platform: state
@@ -472,9 +472,8 @@
         data:
           url: /lovelace-home/home
   mode: single
-- id: automation.turn_on_ha_alarm
-  alias: Turn on HA Alarm
-  description: Turn on HA Alarm when iOS action fires
+- id: automation.turn_on_ha_alarm_when_ios_action_fires
+  alias: Turn on HA Alarm when iOS Action Fires
   trigger:
     - platform: event
       event_type: ios.action_fired
