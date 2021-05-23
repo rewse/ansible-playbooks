@@ -14,9 +14,9 @@
   tags: [monitor, package]
 
 - name: Copy monitor.service
-  copy:
-    src: monitor.service
-    dest: /etc/systemd/system
+  template:
+    src: monitor.service.j2
+    dest: /etc/systemd/system/monitor.service
   tags: [monitor]
 
 - name: Create a network.target.wants dir
