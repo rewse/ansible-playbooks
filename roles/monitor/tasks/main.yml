@@ -1,0 +1,66 @@
+---
+- name: Install additional packages
+  apt:
+    name:
+      - bluez
+      - bluez-hcidump
+      - pi-bluetooth
+  tags: [monitor, package]
+
+- name: Checkout monitor
+  git:
+    repo: https://github.com/andrewjfreyer/monitor.git
+    dest: /srv/monitor
+  tags: [monitor, package]
+
+- name: Copy monitor.service
+  copy:
+    src: monitor.service
+    dest: /etc/systemd/system
+  tags: [monitor]
+
+- name: Create a network.target.wants dir
+  file:
+    path: /etc/systemd/system/network.target.wants
+    state: directory
+  tags: [monitor]
+
+- name: Create symlinks to monitor
+  file:
+    src: /etc/systemd/system/monitor.service
+    dest: "{{ item }}"
+    state: link
+  with_items:
+    - /etc/systemd/system/multi-user.target.wants/monitor.service
+    - /etc/systemd/system/network.target.wants/monitor.service
+  tags: [monitor]
+
+- name: Copy config files for monitor
+  copy:
+    src: "{{ item }}"
+    dest: /srv/monitor
+  with_items:
+    - address_blacklist
+    - known_beacon_addresses
+    - known_static_addresses
+  notify: Restart monitor
+  tags: [monitor]
+
+- name: Copy mqtt_preferences
+  template:
+    src: mqtt_preferences.j2
+    dest: /srv/monitor/mqtt_preferences
+  notify: Restart monitor
+  tags: [monitor]
+
+- name: Enable bluetooth services
+  systemd:
+    name: "{{ item }}"
+    state: started
+    enabled: yes
+    daemon_reload: yes
+  with_items:
+    - bluetooth
+    - hciuart
+    - monitor
+  tags: [monitor]
