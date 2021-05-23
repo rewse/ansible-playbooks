@@ -3,6 +3,7 @@ local:
     fqdn: fox.rewse.jp
     ip: 192.168.0.30
     ipv6: 240f:78:31e9:1::30
+location: living_room
 dhcpd:
     role: primary
     port: 519

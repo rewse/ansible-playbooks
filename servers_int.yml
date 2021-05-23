@@ -3,5 +3,6 @@
   become: yes
   remote_user: ubuntu
   roles:
+    - monitor
     - resolved
     - syslogd
