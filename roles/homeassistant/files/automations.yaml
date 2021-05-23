@@ -537,6 +537,54 @@
         seconds: 0
         milliseconds: 0
   mode: single
+- id: automation.turn_on_monitor_bio
+  alias: Turn on monitor bio
+  trigger:
+    - platform: numeric_state
+      entity_id: sensor.monitor_bio
+      above: 10
+  action:
+    - service: device_tracker.see
+      data:
+        dev_id: monitor_bio
+        location_name: home
+        source_type: bluetooth
+- id: automation.turn_off_monitor_bio
+  alias: Turn off monitor bio
+  trigger:
+    - platform: numeric_state
+      entity_id: sensor.monitor_bio
+      below: 10
+  action:
+    - service: device_tracker.see
+      data:
+        dev_id: monitor_bio
+        location_name: not_home
+        source_type: bluetooth
+- id: automation.turn_on_monitor_akikos_iphone12mini
+  alias: Turn on monitor akikos-iphone12mini
+  trigger:
+    - platform: numeric_state
+      entity_id: sensor.monitor_akikos_iphone12mini
+      above: 10
+  action:
+    - service: device_tracker.see
+      data:
+        dev_id: monitor_akikos_iphone12mini
+        location_name: home
+        source_type: bluetooth
+- id: automation.turn_off_monitor_akikos_iphone12mini
+  alias: Turn off monitor akikos-iphone12mini
+  trigger:
+    - platform: numeric_state
+      entity_id: sensor.monitor_akikos_iphone12mini
+      below: 10
+  action:
+    - service: device_tracker.see
+      data:
+        dev_id: monitor_akikos_iphone12mini
+        location_name: not_home
+        source_type: bluetooth
 - id: automation.notify_update_available
   alias: Notify Update Available
   trigger:

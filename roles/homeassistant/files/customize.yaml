@@ -230,3 +230,15 @@ sensor.dns_hass_rewse_jp:
   icon: mdi:dns
 sensor.regza_channel:
   icon: mdi:television
+sensor.monitor_akikos_iphone12mini:
+  icon: mdi:cellphone-wireless
+sensor.monitor_bio:
+  icon: mdi:cellphone-wireless
+sensor.monitor_living_room_akikos_iphone12mini:
+  icon: mdi:cellphone-wireless
+sensor.monitor_living_room_bio:
+  icon: mdi:cellphone-wireless
+sensor.monitor_storage_akikos_iphone12mini:
+  icon: mdi:cellphone-wireless
+sensor.monitor_storage_bio:
+  icon: mdi:cellphone-wireless
