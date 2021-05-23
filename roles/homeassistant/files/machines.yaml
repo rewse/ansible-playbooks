@@ -40,14 +40,29 @@ views:
           - entity: binary_sensor.wfirex
           - entity: binary_sensor.xiaomigateway
         hours_to_show: 6
-      - type: history-graph
-        title: Presence
-        entities:
-          - entity: person.shibata_tats
-            name: Tats
-          - entity: person.shibata_akiko
-            name: Akiko
-        hours_to_show: 48
+      - type: vertical-stack
+        cards:
+          - type: history-graph
+            title: Presence
+            entities:
+              - entity: person.shibata_tats
+                name: Tats
+              - entity: device_tracker.ping_bio
+              - entity: device_tracker.monitor_bio
+              - entity: person.shibata_akiko
+                name: Akiko
+              - entity: device_tracker.ping_akikos_iphone12mini
+              - entity: device_tracker.monitor_akikos_iphone12mini
+            hours_to_show: 12
+          - type: entities
+            title: monitor
+            entities:
+              - entity: sensor.monitor_bio
+              - entity: sensor.monitor_living_room_bio
+              - entity: sensor.monitor_storage_bio
+              - entity: sensor.monitor_akikos_iphone12mini
+              - entity: sensor.monitor_living_room_akikos_iphone12mini
+              - entity: sensor.monitor_storage_akikos_iphone12mini
       - type: entities
         title: Batteries
         entities:
