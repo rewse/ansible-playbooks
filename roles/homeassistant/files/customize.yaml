@@ -102,6 +102,10 @@ automation.turn_on_living_room_hvac_cleaner:
   icon: mdi:broom
 automation.turn_on_living_room_hvac_with_fan_mode:
   icon: mdi:fan-alert
+binary_sensor.amazonplug_liv:
+  icon: mdi:power-socket-us
+binary_sensor.amazonplug_stu:
+  icon: mdi:power-socket-us
 binary_sensor.aventage:
   icon: mdi:audio-video
 binary_sensor.catloghome_bed:
@@ -110,6 +114,8 @@ binary_sensor.catloghome_liv:
   icon: mdi:cat
 binary_sensor.daikinhvac:
   icon: mdi:thermostat
+binary_sensor.eufy:
+  icon: mdi:video
 binary_sensor.fox:
   icon: mdi:raspberry-pi
 binary_sensor.guppy:
@@ -142,7 +148,9 @@ binary_sensor.tango:
   icon: mdi:switch
 binary_sensor.tapo:
   icon: mdi:video
-binary_sensor.tuyaplug:
+binary_sensor.tuyaplug_liv:
+  icon: mdi:power-socket-us
+binary_sensor.tuyaplug_bed:
   icon: mdi:power-socket-us
 binary_sensor.wfirex:
   icon: mdi:network-outline

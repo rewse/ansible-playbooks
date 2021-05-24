@@ -22,10 +22,13 @@ views:
           - entity: binary_sensor.fox
           - entity: binary_sensor.guppy
           - entity: binary_sensor.hotel
+          - entity: binary_sensor.amazonplug_liv
+          - entity: binary_sensor.amazonplug_stu
           - entity: binary_sensor.aventage
           - entity: binary_sensor.catloghome_bed
           - entity: binary_sensor.catloghome_liv
           - entity: binary_sensor.daikinhvac
+          - entity: binary_sensor.eufy
           - entity: binary_sensor.huebridge
           - entity: binary_sensor.jq300
           - entity: binary_sensor.justio

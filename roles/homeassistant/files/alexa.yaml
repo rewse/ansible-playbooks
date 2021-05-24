@@ -14,6 +14,7 @@ smart_home:
       - binary_sensor.living_room_window
       - binary_sensor.study_motion
       - binary_sensor.study_window
+      - camera.guppy_living_room
       - camera.guppy_study
       - climate.bedroom_hvac
       - climate.living_room_hvac
@@ -60,6 +61,8 @@ smart_home:
       name: 書斎のモーションセンサー
     binary_sensor.study_window:
       name: 書斎の窓
+    camera.guppy_living_room:
+      name: リビングのカメラ
     camera.guppy_study:
       name: 書斎のカメラ
     climate.bedroom_hvac:
