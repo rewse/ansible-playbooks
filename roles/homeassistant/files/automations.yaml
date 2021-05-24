@@ -27,7 +27,7 @@
   trigger:
     - platform: numeric_state
       entity_id: sensor.living_room_iaq_index
-      below: '38'
+      below: '25'
   action:
     - service: notify.all_devices
       data:
