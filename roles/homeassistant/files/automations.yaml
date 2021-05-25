@@ -37,7 +37,7 @@
           url: /lovelace-home/home
   mode: single
 - id: automation.alarm_living_room_co2_is_too_high
-  alias: "ALARM: CO2 is Too High"
+  alias: "ALARM: Living Room CO2 is Too High"
   trigger:
     - type: motion
       platform: device
@@ -70,6 +70,11 @@
         message: "Living Room CO2 is too high. Current: {{ states('sensor.living_room_eco2') }}ppm"
         data:
           url: /lovelace-home/home
+    - delay:
+        hours: 1
+        minutes: 0
+        seconds: 0
+        milliseconds: 0
   mode: single
 - id: automation.alarm_zulu_is_offline
   alias: "ALARM: zulu is Offline"
