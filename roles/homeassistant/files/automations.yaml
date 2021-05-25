@@ -25,9 +25,30 @@
 - id: automation.alarm_living_room_air_quality_is_poor
   alias: "ALARM: Living Room Air Quality is Poor"
   trigger:
-    - platform: numeric_state
+    - type: motion
+      platform: device
+      device_id: 56a0fc235acbf9c9f708708a9682ab66
+      entity_id: binary_sensor.living_room_motion
+      domain: binary_sensor
+    - type: motion
+      platform: device
+      device_id: 40a395e27caf6e3dbf69e07fa01f780d
+      entity_id: binary_sensor.study_motion
+      domain: binary_sensor
+  condition:
+    - condition: numeric_state
       entity_id: sensor.living_room_iaq_index
       below: "25"
+    - type: is_not_open
+      condition: device
+      device_id: 0a0f7c03555607ac48933b9de5da93a6
+      entity_id: binary_sensor.living_room_window
+      domain: binary_sensor
+    - type: is_not_open
+      condition: device
+      device_id: cca7e061d97ab19596829722642432c3
+      entity_id: binary_sensor.study_window
+      domain: binary_sensor
   action:
     - service: notify.all_devices
       data:
@@ -35,6 +56,11 @@
         title: "⚠️ ALARM"
         data:
           url: /lovelace-home/home
+    - delay:
+        hours: 1
+        minutes: 0
+        seconds: 0
+        milliseconds: 0
   mode: single
 - id: automation.alarm_living_room_co2_is_too_high
   alias: "ALARM: Living Room CO2 is Too High"
