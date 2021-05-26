@@ -50,8 +50,6 @@ automation.alarm_switchbothub_is_offline:
   icon: mdi:network-off-outline
 automation.alarm_tango_is_offline:
   icon: mdi:switch
-automation.alarm_tapo_is_offline:
-  icon: mdi:video
 automation.alarm_tuyaplug_is_offline:
   icon: mdi:power-socket-us
 automation.alarm_wfirex_is_offline:
@@ -102,9 +100,7 @@ automation.turn_on_living_room_hvac_cleaner:
   icon: mdi:broom
 automation.turn_on_living_room_hvac_with_fan_mode:
   icon: mdi:fan-alert
-binary_sensor.amazonplug_liv:
-  icon: mdi:power-socket-us
-binary_sensor.amazonplug_stu:
+binary_sensor.amazonplug:
   icon: mdi:power-socket-us
 binary_sensor.aventage:
   icon: mdi:audio-video
@@ -146,8 +142,6 @@ binary_sensor.switchbothub:
   icon: mdi:network-outline
 binary_sensor.tango:
   icon: mdi:switch
-binary_sensor.tapo:
-  icon: mdi:video
 binary_sensor.tuyaplug_liv:
   icon: mdi:power-socket-us
 binary_sensor.tuyaplug_bed:
