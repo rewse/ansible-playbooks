@@ -134,6 +134,3 @@ cards:
   - type: picture-entity
     name: Living Room Camera
     entity: camera.guppy_living_room
-  - type: picture-entity
-    name: Study Camera
-    entity: camera.guppy_study
