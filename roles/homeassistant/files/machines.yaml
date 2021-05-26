@@ -22,8 +22,7 @@ views:
           - entity: binary_sensor.fox
           - entity: binary_sensor.guppy
           - entity: binary_sensor.hotel
-          - entity: binary_sensor.amazonplug_liv
-          - entity: binary_sensor.amazonplug_stu
+          - entity: binary_sensor.amazonplug
           - entity: binary_sensor.aventage
           - entity: binary_sensor.catloghome_bed
           - entity: binary_sensor.catloghome_liv
@@ -38,7 +37,6 @@ views:
           - entity: binary_sensor.remo_bed
           - entity: binary_sensor.remo_liv
           - entity: binary_sensor.switchbothub
-          - entity: binary_sensor.tapo
           - entity: binary_sensor.tuyaplug_liv
           - entity: binary_sensor.tuyaplug_bed
           - entity: binary_sensor.wfirex
