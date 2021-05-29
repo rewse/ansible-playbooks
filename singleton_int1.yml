@@ -7,4 +7,5 @@
     - apache
     - docker
     - homeassistant
+    - mhz19
     - mosquitto
