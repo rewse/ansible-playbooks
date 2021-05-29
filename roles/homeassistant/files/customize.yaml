@@ -1,5 +1,5 @@
-alarm_control_panel.ha_alarm:
-  icon: mdi:shield-home
+alarm_control_panel.camera_controller:
+  icon: mdi:cctv
 automation.alarm_aventage_is_offline:
   icon: mdi:audio-video-off
 automation.alarm_balcony_humidity_difference_is_too_large:
@@ -86,8 +86,8 @@ automation.turn_off_living_room_hvac_with_fan_mode:
   icon: mdi:fan-off
 automation.turn_off_living_room_lights_appliances:
   icon: mdi:weather-night
-automation.turn_off_ha_alarm:
-  icon: mdi:shield-home
+automation.turn_off_camera_controller:
+  icon: mdi:cctv
 automation.turn_on_living_area_downlights:
   icon: mdi:wall-sconce-flat
 automation.turn_on_living_area_floor_heating:
@@ -111,7 +111,7 @@ binary_sensor.catloghome_liv:
 binary_sensor.daikinhvac:
   icon: mdi:thermostat
 binary_sensor.eufy:
-  icon: mdi:video
+  icon: mdi:cctv
 binary_sensor.fox:
   icon: mdi:raspberry-pi
 binary_sensor.guppy:
@@ -156,6 +156,8 @@ binary_sensor.xray_sto:
   icon: mdi:access-point-network
 binary_sensor.zulu:
   icon: mdi:router-network
+camera.guppy_living_room:
+  icon: mdi:cctv
 climate.living_area_floor_heating:
   icon: mdi:grid
 device_tracker.bio:
