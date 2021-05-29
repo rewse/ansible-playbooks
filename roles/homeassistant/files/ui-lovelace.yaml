@@ -4,3 +4,4 @@ views:
   - !include ui/livingroom.yaml
   - !include ui/bedroom.yaml
   - !include ui/bathroom.yaml
+  - !include ui/entrance.yaml
