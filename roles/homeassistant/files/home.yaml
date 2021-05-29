@@ -343,7 +343,7 @@ cards:
         secondary_info: last-triggered
       - entity: automation.turn_down_bedroom
         secondary_info: last-triggered
-      - entity: automation.turn_off_ha_alarm
+      - entity: automation.turn_off_camera_controller
         secondary_info: last-triggered
     show_header_toggle: false
   - type: custom:mini-graph-card
@@ -411,6 +411,6 @@ cards:
       - entity: binary_sensor.bedroom_window
         secondary_info: last-changed
   - type: alarm-panel
-    entity: alarm_control_panel.ha_alarm
+    entity: alarm_control_panel.camera_controller
     states:
       - arm_away

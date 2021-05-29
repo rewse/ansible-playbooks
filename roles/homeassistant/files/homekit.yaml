@@ -1,6 +1,6 @@
   - filter:
       include_entities:
-        - alarm_control_panel.ha_alarm
+        - alarm_control_panel.camera_controller
         - climate.bedroom_hvac
         - climate.living_room_hvac
         - cover.bedroom_curtains

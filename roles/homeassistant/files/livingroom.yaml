@@ -16,7 +16,7 @@ cards:
         name: Floor Heating
     show_header_toggle: false
   - type: alarm-panel
-    entity: alarm_control_panel.ha_alarm
+    entity: alarm_control_panel.camera_controller
     states:
       - arm_away
   - type: "custom:simple-thermostat"
@@ -91,7 +91,7 @@ cards:
         name: Turned down More Time
       - entity: automation.turn_off_living_room_extra_lights
         secondary_info: last-triggered
-      - entity: automation.turn_off_ha_alarm
+      - entity: automation.turn_off_camera_controller
         secondary_info: last-triggered
     show_header_toggle: false
   - type: vertical-stack
