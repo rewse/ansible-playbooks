@@ -2,20 +2,6 @@
 - platform: command_line
   name: REGZA Channel
   command: curl --digest --user '[% regza.username %]:[% regza.password %]' http://regza.rewse.jp/v2/remote/play/status | jq -r .epg_info_current.channel_name
-- platform: min_max
-  name: monitor bio
-  type: max
-  round_digits: 0
-  entity_ids:
-    - sensor.monitor_living_room_bio
-    - sensor.monitor_storage_bio
-- platform: min_max
-  name: monitor akikos-iphone12mini
-  type: max
-  round_digits: 0
-  entity_ids:
-    - sensor.monitor_living_room_akikos_iphone12mini
-    - sensor.monitor_storage_akikos_iphone12mini
 # Do not use mhz19 integration because it cannot the correct value
 - platform: mqtt
   unique_id: sensor.living_room_co2
@@ -27,27 +13,15 @@
     - topic: mhz19/state
   icon: mdi:molecule-co2
 - platform: mqtt
-  unique_id: sensor.monitor_living_room_bio
-  name: monitor Living Room bio
+  unique_id: sensor.monitor_bio
+  name: monitor bio
   state_topic: monitor/living_room/bio
   value_template: "{{ value_json.confidence }}"
   unit_of_measurement: "%"
 - platform: mqtt
-  unique_id: sensor.monitor_storage_bio
-  name: monitor Storage bio
-  state_topic: monitor/storage/bio
-  value_template: "{{ value_json.confidence }}"
-  unit_of_measurement: "%"
-- platform: mqtt
-  unique_id: sensor.monitor_living_room_akikos_iphone12mini
-  name: monitor Living Room akikos-iphone12mini
+  unique_id: sensor.monitor_akikos_iphone12mini
+  name: monitor akikos-iphone12mini
   state_topic: monitor/living_room/akikos_iphone12mini
-  value_template: "{{ value_json.confidence }}"
-  unit_of_measurement: "%"
-- platform: mqtt
-  unique_id: sensor.monitor_storage_akikos_iphone12mini
-  name: monitor Storage akikos-iphone12mini
-  state_topic: monitor/storage/akikos_iphone12mini
   value_template: "{{ value_json.confidence }}"
   unit_of_measurement: "%"
 - platform: mqtt

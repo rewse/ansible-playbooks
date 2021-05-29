@@ -3,7 +3,7 @@ local:
     fqdn: hotel.rewse.jp
     ip: 192.168.0.40
     ipv6: 240f:78:31e9:1::40
-location: storage
+location: living_room
 dhcpd:
     role: secondary
     port: 520
@@ -15,5 +15,3 @@ dhcpd:
     range6:
         begin: 240f:78:31e9:1::225
         end: 240f:78:31e9:1::248
-monitor:
-    option: -tad
