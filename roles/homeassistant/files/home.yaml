@@ -411,6 +411,11 @@ cards:
       - entity: binary_sensor.bedroom_window
         secondary_info: last-changed
   - type: alarm-panel
+    name: Surveillance
     entity: alarm_control_panel.camera_controller
     states:
       - arm_away
+  - type: alarm-panel
+    entity: alarm_control_panel.entrance_lock
+    states:
+      - arm_home

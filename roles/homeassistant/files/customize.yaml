@@ -1,5 +1,7 @@
 alarm_control_panel.camera_controller:
   icon: mdi:cctv
+alarm_control_panel.entrance_lock:
+  icon: mdi:lock-open
 automation.alarm_aventage_is_offline:
   icon: mdi:audio-video-off
 automation.alarm_balcony_humidity_difference_is_too_large:
