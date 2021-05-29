@@ -3,6 +3,7 @@
   apt:
     name:
       - bluez
+      - mosquitto-clients
       - pi-bluetooth
       - snmp
       - snmp-mibs-downloader
