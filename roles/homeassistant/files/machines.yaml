@@ -60,11 +60,7 @@ views:
             title: monitor
             entities:
               - entity: sensor.monitor_bio
-              - entity: sensor.monitor_living_room_bio
-              - entity: sensor.monitor_storage_bio
               - entity: sensor.monitor_akikos_iphone12mini
-              - entity: sensor.monitor_living_room_akikos_iphone12mini
-              - entity: sensor.monitor_storage_akikos_iphone12mini
       - type: entities
         title: Batteries
         entities:
