@@ -5,7 +5,7 @@ smart_home:
   client_secret: !secret alexa_client_secret
   filter:
     include_entities:
-      - alarm_control_panel.ha_alarm
+      - alarm_control_panel.camera_controller
       - automation.turn_down_living_area
       - automation.turn_down_living_area_more
       - binary_sensor.bathroom_motion

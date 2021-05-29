@@ -1,8 +1,8 @@
 actions:
-  - name: turn_on_ha_alarm
+  - name: turn_on_camera_controller
     background_color: "#736d71"
     label:
-      text: Turn on HA Alarm
+      text: Turn on Camera Controller
       color: "#ffffff"
     icon:
       icon: mdi:home-export-outline
