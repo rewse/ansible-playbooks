@@ -1,0 +1,9 @@
+path: entrance
+title: Entrance
+icon: mdi:door
+badges: []
+cards:
+  - type: alarm-panel
+    entity: alarm_control_panel.entrance_lock
+    states:
+      - arm_home

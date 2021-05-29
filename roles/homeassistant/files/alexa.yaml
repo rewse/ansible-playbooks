@@ -6,6 +6,7 @@ smart_home:
   filter:
     include_entities:
       - alarm_control_panel.camera_controller
+      - alarm_control_panel.entrance_lock
       - automation.turn_down_living_area
       - automation.turn_down_living_area_more
       - binary_sensor.bathroom_motion

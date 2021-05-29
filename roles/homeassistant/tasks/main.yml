@@ -680,6 +680,12 @@
     dest: /etc/homeassistant/ui
   tags: [homeassistant, homeassistant-ui]
 
+- name: Copy entrance.yaml
+  copy:
+    src: entrance.yaml
+    dest: /etc/homeassistant/ui
+  tags: [homeassistant, homeassistant-ui]
+
 - name: Copy machines.yaml
   copy:
     src: machines.yaml
