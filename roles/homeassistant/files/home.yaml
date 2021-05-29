@@ -343,7 +343,7 @@ cards:
         secondary_info: last-triggered
       - entity: automation.turn_down_bedroom
         secondary_info: last-triggered
-      - entity: automation.turn_off_camera_controller
+      - entity: automation.turn_off_surveillance
         secondary_info: last-triggered
     show_header_toggle: false
   - type: custom:mini-graph-card
@@ -412,7 +412,7 @@ cards:
         secondary_info: last-changed
   - type: alarm-panel
     name: Surveillance
-    entity: alarm_control_panel.camera_controller
+    entity: alarm_control_panel.surveillance
     states:
       - arm_away
   - type: alarm-panel
