@@ -567,17 +567,17 @@
         data:
           url: /lovelace-home/home
   mode: single
-- id: automation.turn_on_camera_controller_when_ios_action_fires
-  alias: Turn on Camera Controller when iOS Action Fires
+- id: automation.turn_on_surveillance_when_ios_action_fires
+  alias: Turn on Surveillance when iOS Action Fires
   trigger:
     - platform: event
       event_type: ios.action_fired
       event_data:
-        actionName: turn_on_camera_controller
+        actionName: turn_on_surveillance
   action:
     - service: alarm_control_panel.alarm_arm_away
       target:
-        entity_id: alarm_control_panel.camera_controller
+        entity_id: alarm_control_panel.surveillance
     - service: notify.all_devices
       data:
         message: Now Arming Away
@@ -589,8 +589,8 @@
         seconds: 0
         milliseconds: 0
   mode: single
-- id: automation.turn_on_camera_controller_when_nobody_is_in_home
-  alias: Turn on Camera Controller when Nobody is in Home
+- id: automation.turn_on_surveillance_when_nobody_is_in_home
+  alias: Turn on Surveillance when Nobody is in Home
   trigger:
     - platform: state
       entity_id: person.shibata_tats
@@ -608,10 +608,10 @@
   action:
     - service: alarm_control_panel.alarm_arm_away
       target:
-        entity_id: alarm_control_panel.camera_controller
+        entity_id: alarm_control_panel.surveillance
     - service: notify.all_devices
       data:
-        message: Turn on Camera Controller Because Nobody is in Home
+        message: Turn on Surveillance Because Nobody is in Home
     - delay:
         hours: 0
         minutes: 10
@@ -858,9 +858,9 @@
       target:
         entity_id: switch.living_room_humidifier
   mode: single
-- id: automation.turn_off_camera_controller
-  alias: Turn off Camera Controller
-  description: Turn off Camera Controller when someone is at home
+- id: automation.turn_off_surveillance
+  alias: Turn off Surveillance
+  description: Turn off Surveillance when someone is at home
   trigger:
     - platform: state
       entity_id: person.shibata_tats
@@ -870,15 +870,15 @@
       to: home
   condition:
     - condition: state
-      entity_id: alarm_control_panel.camera_controller
+      entity_id: alarm_control_panel.surveillance
       state: armed_away
   action:
     - service: alarm_control_panel.alarm_disarm
       target:
-        entity_id: alarm_control_panel.camera_controller
+        entity_id: alarm_control_panel.surveillance
     - service: notify.all_devices
       data:
-        message: Turned off Camera Controller
+        message: Turned off Surveillance
         data:
           url: /lovelace/home
     - delay:

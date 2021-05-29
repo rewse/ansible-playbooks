@@ -1,7 +1,7 @@
-alarm_control_panel.camera_controller:
-  icon: mdi:cctv
 alarm_control_panel.entrance_lock:
   icon: mdi:lock-open
+alarm_control_panel.surveillance:
+  icon: mdi:cctv
 automation.alarm_aventage_is_offline:
   icon: mdi:audio-video-off
 automation.alarm_balcony_humidity_difference_is_too_large:
@@ -88,7 +88,7 @@ automation.turn_off_living_room_hvac_with_fan_mode:
   icon: mdi:fan-off
 automation.turn_off_living_room_lights_appliances:
   icon: mdi:weather-night
-automation.turn_off_camera_controller:
+automation.turn_off_surveillance:
   icon: mdi:cctv
 automation.turn_on_living_area_downlights:
   icon: mdi:wall-sconce-flat
