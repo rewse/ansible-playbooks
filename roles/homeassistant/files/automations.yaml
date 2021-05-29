@@ -77,7 +77,7 @@
       domain: binary_sensor
   condition:
     - condition: numeric_state
-      entity_id: sensor.living_room_eco2
+      entity_id: sensor.living_room_co2
       above: "1000"
     - type: is_not_open
       condition: device
@@ -93,7 +93,7 @@
     - service: notify.all_devices
       data:
         title: "⚠️ ALARM"
-        message: "Living Room CO2 is too high. Current: {{ states('sensor.living_room_eco2') }}ppm"
+        message: "Living Room CO2 is too high. Current: {{ states('sensor.living_room_co2') }}ppm"
         data:
           url: /lovelace-home/home
     - delay:
@@ -568,7 +568,7 @@
           url: /lovelace-home/home
   mode: single
 - id: automation.turn_on_surveillance_when_ios_action_fires
-  alias: Turn on Surveillance when iOS Action Fires
+  alias: Turn on surveillance when iOS Action Fires
   trigger:
     - platform: event
       event_type: ios.action_fired
@@ -590,7 +590,7 @@
         milliseconds: 0
   mode: single
 - id: automation.turn_on_surveillance_when_nobody_is_in_home
-  alias: Turn on Surveillance when Nobody is in Home
+  alias: Turn on surveillance when Nobody is in Home
   trigger:
     - platform: state
       entity_id: person.shibata_tats
@@ -751,7 +751,7 @@
   mode: single
 - id: automation.turn_off_living_room_humidifier
   alias: Turn off Living Room Humidifier
-  description: Turn off the humidifier on the living room when the humidity is too high
+  description: Turn off the humidifier in the living room when the humidity is too high
   trigger:
     - type: motion
       platform: device
