@@ -41,8 +41,10 @@ smart_home:
       - switch.living_room_humidifier
       - switch.living_room_hvac_cleaner
   entity_config:
-    alarm_control_panel.xiaomigateway:
-      name: 警報器
+    alarm_control_panel.entrance_lock:
+      name: 玄関の鍵
+    alarm_control_panel.surveillance:
+      name: 監視カメラ
     automation.turn_down_living_area:
       name: リビングのターンダウン
       display_categories: SCENE_TRIGGER
