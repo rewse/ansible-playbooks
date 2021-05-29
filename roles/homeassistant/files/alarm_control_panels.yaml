@@ -1,5 +1,5 @@
 - platform: manual
-  name: Camera Controller
+  name: Surveillance
   code_arm_required: false
   delay_time: 0
   arming_time: 0
