@@ -1,0 +1,63 @@
+---
+# Ref: https://raspberrypi.stackexchange.com/questions/114366/rpi4-serial-port-not-working-on-either-raspberry-os-or-ubuntu/116860
+- name: Copy cmdline.txt
+  copy:
+    src: cmdline.txt
+    dest: /boot/firmware
+  tags: [mhz19]
+
+- name: Disable serial console
+  systemd:
+    name: serial-getty@ttyS0.service
+    state: stopped
+    enabled: no
+  tags: [mhz19]
+
+- name: Copy 98-mhz19.rules
+  copy:
+    src: 98-mhz19.rules
+    dest: /etc/udev/rules.d
+  tags: [mhz19]
+
+- name: Reload udev
+  command: udevadm control --reload-rules
+  tags: [mhz19]
+
+- name: Trigger udev
+  command: udevadm trigger
+  tags: [mhz19]
+
+- name: Change group of devices
+  file:
+    path: "{{ item }}"
+    group: tty
+  with_items:
+    - /dev/serial0
+    - /dev/serial1
+  tags: [mhz19]
+
+- name: Change mode of devices
+  file:
+    path: "{{ item }}"
+    mode: g+r
+  with_items:
+    - /dev/ttyS0
+    - /dev/ttyAMA0
+  tags: [mhz19]
+
+# - name: Reboot
+
+- name: Copy mhz192mqtt
+  template:
+    src: mhz192mqtt.j2
+    dest: /usr/local/sbin/mhz192mqtt
+    mode: 0755
+    variable_start_string: "[%"
+    variable_end_string: "%]"
+  tags: [mhz19]
+
+- name: Copy enecoq2mqtt.cron
+  copy:
+    src: mhz192mqtt.cron
+    dest: /etc/cron.d/mhz192mqtt
+  tags: [mhz19]
