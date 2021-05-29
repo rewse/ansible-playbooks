@@ -51,7 +51,7 @@
   value_template: "{{ value_json.confidence }}"
   unit_of_measurement: "%"
 - platform: mqtt
-  unique_id: sensor.mqtt.enecoq_fee_low
+  unique_id: sensor.enecoq_fee_low
   name: enecoQ Fee Low
   state_topic: enecoq/fee
   value_template: "{{ value_json.low }}"
@@ -60,7 +60,7 @@
     - topic: enecoq/fee/state
   icon: mdi:transmission-tower
 - platform: mqtt
-  unique_id: sensor.mqtt.enecoq_fee_mid
+  unique_id: sensor.enecoq_fee_mid
   name: enecoQ Fee Mid
   state_topic: enecoq/fee
   value_template: "{{ value_json.mid }}"
@@ -69,7 +69,7 @@
     - topic: enecoq/fee/state
   icon: mdi:transmission-tower
 - platform: mqtt
-  unique_id: sensor.mqtt.enecoq_fee_high
+  unique_id: sensor.enecoq_fee_high
   name: enecoQ Fee High
   state_topic: enecoq/fee
   value_template: "{{ value_json.high }}"
@@ -78,7 +78,7 @@
     - topic: enecoq/fee/state
   icon: mdi:transmission-tower
 - platform: mqtt
-  unique_id: sensor.mqtt.enecoq_fee_total
+  unique_id: sensor.enecoq_fee_total
   name: enecoQ Fee Total
   state_topic: enecoq/fee
   value_template: "{{ value_json.total }}"
