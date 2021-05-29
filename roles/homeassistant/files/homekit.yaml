@@ -13,8 +13,8 @@
         - media_player.firetv
         - media_player.heargo2
         - media_player.stw2000
+        - sensor.living_room_co2
         - sensor.living_room_pm25
-        - sensor.living_room_eco2
         - switch.bedroom_hvac_cleaner
         - switch.living_room_hvac_cleaner
         - switch.living_room_floor_heating

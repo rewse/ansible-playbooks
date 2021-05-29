@@ -16,6 +16,16 @@
   entity_ids:
     - sensor.monitor_living_room_akikos_iphone12mini
     - sensor.monitor_storage_akikos_iphone12mini
+# Do not use mhz19 integration because it cannot the correct value
+- platform: mqtt
+  unique_id: sensor.living_room_co2
+  name: Living Room CO2
+  state_topic: mhz19/co2
+  value_template: "{{ value_json.co2 }}"
+  unit_of_measurement: ppm
+  availability:
+    - topic: mhz19/state
+  icon: mdi:molecule-co2
 - platform: mqtt
   unique_id: sensor.monitor_living_room_bio
   name: monitor Living Room bio
