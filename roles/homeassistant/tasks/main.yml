@@ -453,18 +453,19 @@
     insertafter: "import logging"
     regexp: "import base64"
     line: "import base64"
-  tags: [homeassistant]
+  tags: [homeassistant, homeassistant-fix]
 
 - name: Replace imap_email_content with base64
   lineinfile:
     dest: /tmp/sensor.py
     regexp: "            return message_text"
     line: "            return base64.b64decode(message_text).decode('utf-8')"
-  tags: [homeassistant]
+  tags: [homeassistant, homeassistant-fix]
 
 - name: Copy imap_emal_content/sensor.py
   command: docker container cp /tmp/sensor.py homeassistant:/usr/src/homeassistant/homeassistant/components/imap_email_content/sensor.py
-  tags: [homeassistant]
+  notify: Restart homeassistant
+  tags: [homeassistant, homeassistant-fix]
 
 - name: Create custom_components/jq300
   file:
