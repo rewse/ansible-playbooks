@@ -21,18 +21,18 @@
           network_mode: host
   tags: [homeassistant]
 
-- name: Copy secrets.yaml
-  template:
-    src: secrets.yaml.j2
-    dest: /etc/homeassistant/secrets.yaml
-  notify: Restart homeassistant
-  tags: [homeassistant]
-
 - name: Copy automations.yaml
   copy:
     src: automations.yaml
     dest: /etc/homeassistant
   tags: [homeassistant, homeassistant-automations]
+
+- name: Copy secrets.yaml
+  template:
+    src: secrets.yaml.j2
+    dest: /etc/homeassistant/secrets.yaml
+  notify: Restart homeassistant
+  tags: [homeassistant, homeassistant-components]
 
 - name: Config alarm_control_panel
   lineinfile:
@@ -41,14 +41,14 @@
     regexp: '^alarm_control_panel:'
     line: "alarm_control_panel: !include alarm_control_panels.yaml"
   notify: Restart homeassistant
-  tags: [homeassistant]
+  tags: [homeassistant, homeassistant-components]
 
 - name: Copy alarm_control_panels.yaml
   copy:
     src: alarm_control_panels.yaml
     dest: /etc/homeassistant/alarm_control_panels.yaml
   notify: Restart homeassistant
-  tags: [homeassistant]
+  tags: [homeassistant, homeassistant-components]
 
 - name: Config alexa
   lineinfile:
@@ -57,14 +57,14 @@
     regexp: '^alexa:'
     line: "alexa: !include alexa.yaml"
   notify: Restart homeassistant
-  tags: [homeassistant]
+  tags: [homeassistant, homeassistant-components]
 
 - name: Copy alexa.yaml
   copy:
     src: alexa.yaml
     dest: /etc/homeassistant/alexa.yaml
   notify: Restart homeassistant
-  tags: [homeassistant]
+  tags: [homeassistant, homeassistant-components]
 
 - name: Config binary_sensor
   lineinfile:
@@ -73,7 +73,7 @@
     regexp: '^binary_sensor:'
     line: "binary_sensor: !include binary_sensors.yaml"
   notify: Restart homeassistant
-  tags: [homeassistant]
+  tags: [homeassistant, homeassistant-components]
 
 - name: Copy binary_sensors.yaml
   template:
@@ -82,7 +82,7 @@
     variable_start_string: "[%"
     variable_end_string: "%]"
   notify: Restart homeassistant
-  tags: [homeassistant]
+  tags: [homeassistant, homeassistant-components]
 
 - name: Config climate
   lineinfile:
@@ -91,14 +91,14 @@
     regexp: '^climate:'
     line: "climate: !include climates.yaml"
   notify: Restart homeassistant
-  tags: [homeassistant]
+  tags: [homeassistant, homeassistant-components]
 
 - name: Copy climates.yaml
   copy:
     src: climates.yaml
     dest: /etc/homeassistant
   notify: Restart homeassistant
-  tags: [homeassistant]
+  tags: [homeassistant, homeassistant-components]
 
 - name: Config cover
   lineinfile:
@@ -107,14 +107,14 @@
     regexp: '^cover:'
     line: "cover: !include covers.yaml"
   notify: Restart homeassistant
-  tags: [homeassistant]
+  tags: [homeassistant, homeassistant-components]
 
 - name: Copy covers.yaml
   copy:
     src: covers.yaml
     dest: /etc/homeassistant
   notify: Restart homeassistant
-  tags: [homeassistant]
+  tags: [homeassistant, homeassistant-components]
 
 - name: Config device_tracker
   lineinfile:
@@ -123,14 +123,14 @@
     regexp: '^device_tracker:'
     line: "device_tracker: !include device_trackers.yaml"
   notify: Restart homeassistant
-  tags: [homeassistant]
+  tags: [homeassistant, homeassistant-components]
 
 - name: Copy device_trackers.yaml
   copy:
     src: device_trackers.yaml
     dest: /etc/homeassistant
   notify: Restart homeassistant
-  tags: [homeassistant]
+  tags: [homeassistant, homeassistant-components]
 
 - name: Config fan
   lineinfile:
@@ -139,14 +139,14 @@
     regexp: '^fan:'
     line: "fan: !include fans.yaml"
   notify: Restart homeassistant
-  tags: [homeassistant]
+  tags: [homeassistant, homeassistant-components]
 
 - name: Copy fans.yaml
   copy:
     src: fans.yaml
     dest: /etc/homeassistant
   notify: Restart homeassistant
-  tags: [homeassistant]
+  tags: [homeassistant, homeassistant-components]
 
 - name: Config group
   lineinfile:
@@ -155,14 +155,14 @@
     regexp: '^group:'
     line: "group: !include groups.yaml"
   notify: Restart homeassistant
-  tags: [homeassistant]
+  tags: [homeassistant, homeassistant-components]
 
 - name: Copy groups.yaml
   copy:
     src: groups.yaml
     dest: /etc/homeassistant
   notify: Restart homeassistant
-  tags: [homeassistant]
+  tags: [homeassistant, homeassistant-components]
 
 - name: Config input_boolean
   lineinfile:
@@ -186,14 +186,14 @@
     regexp: '^homekit:'
     line: "homekit: !include homekit.yaml"
   notify: Restart homeassistant
-  tags: [homeassistant]
+  tags: [homeassistant, homeassistant-components]
 
 - name: Copy homekit.yaml
   copy:
     src: homekit.yaml
     dest: /etc/homeassistant
   notify: Restart homeassistant
-  tags: [homeassistant]
+  tags: [homeassistant, homeassistant-components]
 
 - name: Config input_datetime
   lineinfile:
@@ -202,14 +202,14 @@
     regexp: '^input_datetime:'
     line: "input_datetime: !include input_datetimes.yaml"
   notify: Restart homeassistant
-  tags: [homeassistant]
+  tags: [homeassistant, homeassistant-components]
 
 - name: Copy input_datetimes.yaml
   copy:
     src: input_datetimes.yaml
     dest: /etc/homeassistant
   notify: Restart homeassistant
-  tags: [homeassistant]
+  tags: [homeassistant, homeassistant-components]
 
 - name: Config input_number
   lineinfile:
@@ -218,14 +218,14 @@
     regexp: '^input_number:'
     line: "input_number: !include input_numbers.yaml"
   notify: Restart homeassistant
-  tags: [homeassistant]
+  tags: [homeassistant, homeassistant-components]
 
 - name: Copy input_numbers.yaml
   copy:
     src: input_numbers.yaml
     dest: /etc/homeassistant
   notify: Restart homeassistant
-  tags: [homeassistant]
+  tags: [homeassistant, homeassistant-components]
 
 - name: Config ios
   lineinfile:
@@ -234,14 +234,14 @@
     regexp: '^ios:'
     line: "ios: !include ios.yaml"
   notify: Restart homeassistant
-  tags: [homeassistant]
+  tags: [homeassistant, homeassistant-components]
 
 - name: Copy ios.yaml
   copy:
     src: ios.yaml
     dest: /etc/homeassistant
   notify: Restart homeassistant
-  tags: [homeassistant]
+  tags: [homeassistant, homeassistant-components]
 
 - name: Config light
   lineinfile:
@@ -250,14 +250,14 @@
     regexp: '^light:'
     line: "light: !include lights.yaml"
   notify: Restart homeassistant
-  tags: [homeassistant]
+  tags: [homeassistant, homeassistant-components]
 
 - name: Copy lights.yaml
   copy:
     src: lights.yaml
     dest: /etc/homeassistant
   notify: Restart homeassistant
-  tags: [homeassistant]
+  tags: [homeassistant, homeassistant-components]
 
 - name: Config localtuya
   lineinfile:
@@ -266,14 +266,14 @@
     regexp: '^localtuya:'
     line: "localtuya: !include localtuyas.yaml"
   notify: Restart homeassistant
-  tags: [homeassistant]
+  tags: [homeassistant, homeassistant-components]
 
 - name: Copy localtuyas.yaml
   copy:
     src: localtuyas.yaml
     dest: /etc/homeassistant
   notify: Restart homeassistant
-  tags: [homeassistant]
+  tags: [homeassistant, homeassistant-components]
 
 - name: Config media_player
   lineinfile:
@@ -282,14 +282,14 @@
     regexp: '^media_player:'
     line: "media_player: !include media_players.yaml"
   notify: Restart homeassistant
-  tags: [homeassistant]
+  tags: [homeassistant, homeassistant-components]
 
 - name: Copy media_players.yaml
   copy:
     src: media_players.yaml
     dest: /etc/homeassistant
   notify: Restart homeassistant
-  tags: [homeassistant]
+  tags: [homeassistant, homeassistant-components]
 
 - name: Config notify
   lineinfile:
@@ -298,14 +298,14 @@
     regexp: '^notify:'
     line: "notify: !include notify.yaml"
   notify: Restart homeassistant
-  tags: [homeassistant]
+  tags: [homeassistant, homeassistant-components]
 
 - name: Copy notify.yaml
   copy:
     src: notify.yaml
     dest: /etc/homeassistant
   notify: Restart homeassistant
-  tags: [homeassistant]
+  tags: [homeassistant, homeassistant-components]
 
 - name: Config rest_command
   lineinfile:
@@ -314,20 +314,20 @@
     regexp: '^rest_command:'
     line: "rest_command: !include rest_commands.yaml"
   notify: Restart homeassistant
-  tags: [homeassistant]
+  tags: [homeassistant, homeassistant-components]
 
 - name: Copy rest_commands.yaml
   copy:
     src: rest_commands.yaml
     dest: /etc/homeassistant
   notify: Restart homeassistant
-  tags: [homeassistant]
+  tags: [homeassistant, homeassistant-components]
 
 - name: Copy scripts.yaml
   copy:
     src: scripts.yaml
     dest: /etc/homeassistant
-  tags: [homeassistant, homeassistant-scripts]
+  tags: [homeassistant, homeassistant-components]
 
 - name: Config sensor
   lineinfile:
@@ -336,7 +336,7 @@
     regexp: '^sensor:'
     line: "sensor: !include sensors.yaml"
   notify: Restart homeassistant
-  tags: [homeassistant]
+  tags: [homeassistant, homeassistant-components]
 
 - name: Copy sensors.yaml
   template:
@@ -345,7 +345,7 @@
     variable_start_string: "[%"
     variable_end_string: "%]"
   notify: Restart homeassistant
-  tags: [homeassistant]
+  tags: [homeassistant, homeassistant-components]
 
 - name: Config shell_command
   lineinfile:
@@ -354,7 +354,7 @@
     regexp: '^shell_command:'
     line: "shell_command: !include shell_commands.yaml"
   notify: Restart homeassistant
-  tags: [homeassistant]
+  tags: [homeassistant, homeassistant-components]
 
 - name: Copy shell_commands.yaml.j2
   template:
@@ -363,7 +363,7 @@
     variable_start_string: "[%"
     variable_end_string: "%]"
   notify: Restart homeassistant
-  tags: [homeassistant]
+  tags: [homeassistant, homeassistant-components]
 
 - name: Config switch
   lineinfile:
@@ -372,14 +372,14 @@
     regexp: '^switch:'
     line: "switch: !include switches.yaml"
   notify: Restart homeassistant
-  tags: [homeassistant]
+  tags: [homeassistant, homeassistant-components]
 
 - name: Copy switches.yaml
   copy:
     src: switches.yaml
     dest: /etc/homeassistant
   notify: Restart homeassistant
-  tags: [homeassistant]
+  tags: [homeassistant, homeassistant-components]
 
 - name: Config template
   lineinfile:
@@ -388,14 +388,14 @@
     regexp: '^template:'
     line: "template: !include templates.yaml"
   notify: Restart homeassistant
-  tags: [homeassistant]
+  tags: [homeassistant, homeassistant-components]
 
 - name: Copy templates.yaml
   copy:
     src: templates.yaml
     dest: /etc/homeassistant
   notify: Restart homeassistant
-  tags: [homeassistant]
+  tags: [homeassistant, homeassistant-components]
 
 - name: Config zone
   lineinfile:
@@ -404,14 +404,14 @@
     regexp: '^zone:'
     line: "zone: !include zones.yaml"
   notify: Restart homeassistant
-  tags: [homeassistant]
+  tags: [homeassistant, homeassistant-components]
 
 - name: Copy zones.yaml
   template:
     src: zones.yaml.j2
     dest: /etc/homeassistant/zones.yaml
   notify: Restart homeassistant
-  tags: [homeassistant]
+  tags: [homeassistant, homeassistant-components]
 
 - name: Create certs dir
   file:
@@ -629,14 +629,14 @@
           - host: kasaplug-liv.rewse.jp
           - host: kasaplug-ent.rewse.jp
   notify: Restart homeassistant
-  tags: [homeassistant]
+  tags: [homeassistant, homeassistant-components]
 
 - name: Copy customize.yaml
   copy:
     src: customize.yaml
     dest: /etc/homeassistant
   notify: Restart homeassistant
-  tags: [homeassistant]
+  tags: [homeassistant, homeassistant-components]
 
 - name: Copy dashboards.yaml
   copy:
