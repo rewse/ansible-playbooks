@@ -402,6 +402,21 @@
         data:
           url: /lovelace-machines/machines
   mode: single
+- id: automation.alarm_sesamemodule_is_offline
+  alias: "ALARM: sesamemodule is Offline"
+  trigger:
+    - platform: state
+      entity_id: binary_sensor.sesamemodule
+      to: "off"
+      for: "00:31:00"
+  action:
+    - service: notify.all_devices
+      data:
+        title: "⚠️ ALARM"
+        message: sesamemodule is Offline
+        data:
+          url: /lovelace-machines/machines
+  mode: single
 - id: automation.alarm_switchbothub_is_offline
   alias: "ALARM: switchbothub is Offline"
   trigger:
