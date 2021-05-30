@@ -64,6 +64,8 @@ automation.alarm_xray_sto_is_offline:
   icon: mdi:access-point-network-off
 automation.alarm_zulu_is_offline:
   icon: mdi:router-network
+automation.info_denshobato:
+  icon: mdi:bird
 automation.notify_update_available:
   icon: mdi:check-circle
 automation.open_bedroom_curtains_temporarily:
@@ -244,6 +246,8 @@ media_player.stw2000:
   icon: mdi:android
 sensor.bedroom_curtains_position:
   icon: mdi:window-shutter-alert
+sensor.denshobato:
+  icon: mdi:bird
 sensor.dns_hass_rewse_jp:
   icon: mdi:dns
 sensor.mamorail:

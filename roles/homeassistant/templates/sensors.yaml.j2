@@ -3,6 +3,14 @@
   name: REGZA Channel
   command: curl --digest --user '[% regza.username %]:[% regza.password %]' http://regza.rewse.jp/v2/remote/play/status | jq -r .epg_info_current.channel_name
 - platform: imap_email_content
+  name: Denshobato
+  server: imap.gmail.com
+  username: !secret gmail_address
+  password: !secret gmail_password
+  folder: denshobato
+  senders:
+    - anshin@denshobato.jp
+- platform: imap_email_content
   name: Mamorail
   server: imap.gmail.com
   username: !secret gmail_address
