@@ -66,6 +66,8 @@ automation.alarm_zulu_is_offline:
   icon: mdi:router-network
 automation.info_denshobato:
   icon: mdi:bird
+automation.info_mamorail:
+  icon: mdi:train
 automation.notify_update_available:
   icon: mdi:check-circle
 automation.open_bedroom_curtains_temporarily:
