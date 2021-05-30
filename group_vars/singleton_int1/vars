@@ -15,3 +15,5 @@ dhcpd:
     range6:
         begin: 240f:78:31e9:1::200
         end: 240f:78:31e9:1::224
+monitor:
+    option: -tr
