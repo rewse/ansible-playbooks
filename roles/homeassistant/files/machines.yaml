@@ -36,6 +36,7 @@ views:
           - entity: binary_sensor.regza
           - entity: binary_sensor.remo_bed
           - entity: binary_sensor.remo_liv
+          - entity: binary_sensor.sesamemodule
           - entity: binary_sensor.switchbothub
           - entity: binary_sensor.tuyaplug_liv
           - entity: binary_sensor.tuyaplug_bed
