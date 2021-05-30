@@ -492,6 +492,17 @@
         data:
           url: /lovelace-machines/machines
   mode: single
+- id: automation.info_denshobato
+  alias: "INFO: Denshobato"
+  trigger:
+    - platform: state
+      entity_id: sensor.denshobato
+  action:
+    - service: notify.all_devices
+      data:
+        title: "[% notify_title_k %]"
+        message: "️登下校をお知らせします"
+  mode: single
 - id: automation.info_mamorail
   alias: "INFO: Mamorail"
   trigger:
