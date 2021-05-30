@@ -4,7 +4,7 @@ After=network.target
 
 [Service]
 User=root
-ExecStart=/bin/bash /srv/monitor/monitor.sh &
+ExecStart=/bin/bash /srv/monitor/monitor.sh {{ monitor.option }} &
 WorkingDirectory=/srv/monitor
 Restart=always
 RestartSec=10
