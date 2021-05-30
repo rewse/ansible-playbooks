@@ -234,8 +234,8 @@ sensor.bedroom_curtains_position:
   icon: mdi:window-shutter-alert
 sensor.dns_hass_rewse_jp:
   icon: mdi:dns
-sensor.regza_channel:
-  icon: mdi:television
+sensor.mamorail:
+  icon: mdi:train
 sensor.monitor_akikos_iphone12mini:
   icon: mdi:cellphone-wireless
 sensor.monitor_bio:
@@ -248,3 +248,5 @@ sensor.monitor_storage_akikos_iphone12mini:
   icon: mdi:cellphone-wireless
 sensor.monitor_storage_bio:
   icon: mdi:cellphone-wireless
+sensor.regza_channel:
+  icon: mdi:television

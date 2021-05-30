@@ -21,10 +21,12 @@
           network_mode: host
   tags: [homeassistant]
 
-- name: Copy automations.yaml
-  copy:
-    src: automations.yaml
-    dest: /etc/homeassistant
+- name: Copy automations.yaml.j2
+  template:
+    src: automations.yaml.j2
+    dest: /etc/homeassistant/automations.yaml
+    variable_start_string: "[%"
+    variable_end_string: "%]"
   tags: [homeassistant, homeassistant-automations]
 
 - name: Copy secrets.yaml
@@ -438,6 +440,30 @@
     dest: /etc/homeassistant/custom_components/iaquk
     remote_src: yes
   notify: Restart homeassistant
+  tags: [homeassistant]
+
+- name: Copy imap_emal_content/sensor.py
+  command: docker container cp homeassistant:/usr/src/homeassistant/homeassistant/components/imap_email_content/sensor.py /tmp/sensor.py
+  tags: [homeassistant]
+
+# Ref: https://community.home-assistant.io/t/imap-email-content-character-encoding/22928
+- name: Add base64
+  lineinfile:
+    dest: /tmp/sensor.py
+    insertafter: "import logging"
+    regexp: "import base64"
+    line: "import base64"
+  tags: [homeassistant]
+
+- name: Replace imap_email_content with base64
+  lineinfile:
+    dest: /tmp/sensor.py
+    regexp: "            return message_text"
+    line: "            return base64.b64decode(message_text).decode('utf-8')"
+  tags: [homeassistant]
+
+- name: Copy imap_emal_content/sensor.py
+  command: docker container cp /tmp/sensor.py homeassistant:/usr/src/homeassistant/homeassistant/components/imap_email_content/sensor.py
   tags: [homeassistant]
 
 - name: Create custom_components/jq300
