@@ -9,7 +9,7 @@
       entity_id: sensor.speedtest_download
       below: 1
   action:
-    - service: notify.all_devices
+    - service: notify.tats_devices
       data:
         title: "⚠️ ALARM"
         message: Internet Speed is Too Slow
@@ -50,7 +50,7 @@
       entity_id: binary_sensor.study_window
       domain: binary_sensor
   action:
-    - service: notify.all_devices
+    - service: notify.tats_devices
       data:
         message: "Living Room Air Quality is Poor. Current: {{ states('sensor.living_room_iaq_index') }}IAQI"
         title: "⚠️ ALARM"
@@ -102,6 +102,21 @@
         seconds: 0
         milliseconds: 0
   mode: single
+- id: automation.alarm_suicas_balance_is_not_enough
+  alias: "ALARM: Suica’s Balance is Not Enough"
+  trigger:
+    - platform: state
+      entity_id: sensor.mamorail
+  condition:
+    - condition: numeric_state
+      entity_id: sensor.mamorail_balance
+      below: '1000'
+  action:
+    - service: notify.all_devices
+      data:
+        title: "⚠️ ALARM"
+        message: "️Suica’s balance is not enough. Current: {{ states('sensor.mamorail_balance') }}yen"
+  mode: single
 - id: automation.alarm_zulu_is_offline
   alias: "ALARM: zulu is Offline"
   trigger:
@@ -110,7 +125,7 @@
       to: "off"
       for: "00:31:00"
   action:
-    - service: notify.all_devices
+    - service: notify.tats_devices
       data:
         title: "⚠️ ALARM"
         message: zulu is offline
@@ -125,7 +140,7 @@
       to: "off"
       for: "00:31:00"
   action:
-    - service: notify.all_devices
+    - service: notify.tats_devices
       data:
         title: "⚠️ ALARM"
         message: romeo is offline
@@ -140,7 +155,7 @@
       to: "off"
       for: "00:31:00"
   action:
-    - service: notify.all_devices
+    - service: notify.tats_devices
       data:
         title: "⚠️ ALARM"
         message: tango is offline
@@ -155,7 +170,7 @@
       to: "off"
       for: "00:31:00"
   action:
-    - service: notify.all_devices
+    - service: notify.tats_devices
       data:
         title: "⚠️ ALARM"
         message: xray-liv is Offline
@@ -170,7 +185,7 @@
       to: "off"
       for: "00:31:00"
   action:
-    - service: notify.all_devices
+    - service: notify.tats_devices
       data:
         title: "⚠️ ALARM"
         message: xray-sto is Offline
@@ -185,7 +200,7 @@
       to: "off"
       for: "00:31:00"
   action:
-    - service: notify.all_devices
+    - service: notify.tats_devices
       data:
         title: "⚠️ ALARM"
         message: amazonplug is Offline
@@ -200,7 +215,7 @@
       to: "off"
       for: "00:31:00"
   action:
-    - service: notify.all_devices
+    - service: notify.tats_devices
       data:
         title: "⚠️ ALARM"
         message: aventage is Offline
@@ -215,7 +230,7 @@
       to: "off"
       for: "00:31:00"
   action:
-    - service: notify.all_devices
+    - service: notify.tats_devices
       data:
         title: "⚠️ ALARM"
         message: ️catloghome-bed is Offline
@@ -230,7 +245,7 @@
       to: "off"
       for: "00:31:00"
   action:
-    - service: notify.all_devices
+    - service: notify.tats_devices
       data:
         title: "⚠️ ALARM"
         message: catloghome-liv is Offline
@@ -245,7 +260,7 @@
       to: "off"
       for: "00:31:00"
   action:
-    - service: notify.all_devices
+    - service: notify.tats_devices
       data:
         title: "⚠️ ALARM"
         message: daikinhvac is Offline
@@ -260,7 +275,7 @@
       to: "off"
       for: "00:31:00"
   action:
-    - service: notify.all_devices
+    - service: notify.tats_devices
       data:
         title: "⚠️ ALARM"
         message: fox is Offline
@@ -275,7 +290,7 @@
       to: "off"
       for: "00:31:00"
   action:
-    - service: notify.all_devices
+    - service: notify.tats_devices
       data:
         title: "⚠️ ALARM"
         message: guppy is Offline
@@ -290,7 +305,7 @@
       to: "off"
       for: "00:31:00"
   action:
-    - service: notify.all_devices
+    - service: notify.tats_devices
       data:
         title: "⚠️ ALARM"
         message: huebridge is Offline
@@ -305,7 +320,7 @@
       to: "off"
       for: "00:31:00"
   action:
-    - service: notify.all_devices
+    - service: notify.tats_devices
       data:
         title: "⚠️ ALARM"
         message: ️justio is Offline
@@ -320,7 +335,7 @@
       to: "off"
       for: "00:31:00"
   action:
-    - service: notify.all_devices
+    - service: notify.tats_devices
       data:
         title: "⚠️ ALARM"
         message: ️jq300 is Offline
@@ -335,7 +350,7 @@
       to: "off"
       for: "00:31:00"
   action:
-    - service: notify.all_devices
+    - service: notify.tats_devices
       data:
         title: "⚠️ ALARM"
         message: ️kasaplug-ent is Offline
@@ -350,7 +365,7 @@
       to: "off"
       for: "00:31:00"
   action:
-    - service: notify.all_devices
+    - service: notify.tats_devices
       data:
         title: "⚠️ ALARM"
         message: ️kasaplug-liv is Offline
@@ -365,7 +380,7 @@
       to: "off"
       for: "00:31:00"
   action:
-    - service: notify.all_devices
+    - service: notify.tats_devices
       data:
         title: "⚠️ ALARM"
         message: regza is Offline
@@ -380,7 +395,7 @@
       to: "off"
       for: "00:31:00"
   action:
-    - service: notify.all_devices
+    - service: notify.tats_devices
       data:
         title: "⚠️ ALARM"
         message: ️remo-bed is Offline
@@ -395,7 +410,7 @@
       to: "off"
       for: "00:31:00"
   action:
-    - service: notify.all_devices
+    - service: notify.tats_devices
       data:
         title: "⚠️ ALARM"
         message: remo-liv is Offline
@@ -410,7 +425,7 @@
       to: "off"
       for: "00:31:00"
   action:
-    - service: notify.all_devices
+    - service: notify.tats_devices
       data:
         title: "⚠️ ALARM"
         message: sesamemodule is Offline
@@ -425,7 +440,7 @@
       to: "off"
       for: "00:31:00"
   action:
-    - service: notify.all_devices
+    - service: notify.tats_devices
       data:
         title: "⚠️ ALARM"
         message: ️switchbothub is Offline
@@ -440,7 +455,7 @@
       to: "off"
       for: "00:31:00"
   action:
-    - service: notify.all_devices
+    - service: notify.tats_devices
       data:
         title: "⚠️ ALARM"
         message: ️tuyaplug is Offline
@@ -455,7 +470,7 @@
       to: "off"
       for: "00:31:00"
   action:
-    - service: notify.all_devices
+    - service: notify.tats_devices
       data:
         title: "⚠️ ALARM"
         message: ️wfirex is Offline
@@ -470,13 +485,45 @@
       to: "off"
       for: "00:31:00"
   action:
-    - service: notify.all_devices
+    - service: notify.tats_devices
       data:
         title: "⚠️ ALARM"
         message: ️xiaomigateway is Offline
         data:
           url: /lovelace-machines/machines
   mode: single
+- id: automation.info_mamorail
+  alias: "INFO: Mamorail"
+  trigger:
+    - platform: state
+      entity_id: sensor.mamorail
+  condition:
+    - condition: not
+      conditions:
+        - condition: state
+          entity_id: sensor.mamorail_station
+          state: unavailable
+        - condition: state
+          entity_id: sensor.mamorail_action
+          state: unavailable
+  action:
+    - service: notify.all_devices
+      data:
+        title: "[% notify_title_k %]"
+        message: "️{{ states('sensor.mamorail_station') }}を{{ states('sensor.mamorail_action') }}しました"
+  mode: single
+- id: automation.info_update_available
+  alias: "INFO: Update Available"
+  trigger:
+    - platform: state
+      entity_id: binary_sensor.updater
+      from: "off"
+      to: "on"
+  action:
+    - service: notify.tats_devices
+      data:
+        title: INFO
+        message: "Home Assistant {{ state_attr('binary_sensor.updater', 'newest_version') }} is available."
 - id: automation.alarm_living_room_temperature_difference_is_too_large
   alias: "ALARM: Living Room Temperature Difference is Too Large"
   trigger:
@@ -487,7 +534,7 @@
       entity_id: sensor.living_room_temperature_difference
       above: '1'
   action:
-    - service: notify.all_devices
+    - service: notify.tats_devices
       data:
         title: "⚠️ ALARM"
         message: Living Room Temperature Difference is Too Large
@@ -504,7 +551,7 @@
       entity_id: sensor.bedroom_temperature_difference
       above: '1'
   action:
-    - service: notify.all_devices
+    - service: notify.tats_devices
       data:
         title: "⚠️ ALARM"
         message: ️Bedroom Temperature Difference is Too Large
@@ -521,7 +568,7 @@
       entity_id: sensor.balcony_temperature_difference
       above: '1'
   action:
-    - service: notify.all_devices
+    - service: notify.tats_devices
       data:
         title: "⚠️ ALARM"
         message: Balcony Temperature Difference is Too Large
@@ -539,7 +586,7 @@
       entity_id: sensor.living_room_humidity_difference
       above: '10'
   action:
-    - service: notify.all_devices
+    - service: notify.tats_devices
       data:
         title: "⚠️ ALARM"
         message: Living Room Humidity Difference is Too Large
@@ -557,7 +604,7 @@
       entity_id: sensor.bedroom_humidity_difference
       above: '10'
   action:
-    - service: notify.all_devices
+    - service: notify.tats_devices
       data:
         title: "⚠️ ALARM"
         message: ️Bedroom Humidity Difference is Too Large
@@ -575,7 +622,7 @@
       entity_id: sensor.balcony_humidity_difference
       above: '10'
   action:
-    - service: notify.all_devices
+    - service: notify.tats_devices
       data:
         title: "⚠️ ALARM"
         message: ️Balcony Humidity Difference is Too Large
@@ -593,7 +640,7 @@
     - service: alarm_control_panel.alarm_arm_away
       target:
         entity_id: alarm_control_panel.surveillance
-    - service: notify.all_devices
+    - service: notify.tats_devices
       data:
         message: Now Arming Away
         data:
@@ -626,7 +673,7 @@
         entity_id: alarm_control_panel.surveillance
     - service: notify.all_devices
       data:
-        message: Turn on Surveillance Because Nobody is in Home
+        message: Turn on surveillance because nobody is in home
     - delay:
         hours: 0
         minutes: 10
@@ -681,17 +728,6 @@
         dev_id: monitor_akikos_iphone12mini
         location_name: not_home
         source_type: bluetooth
-- id: automation.notify_update_available
-  alias: Notify Update Available
-  trigger:
-    - platform: state
-      entity_id: binary_sensor.updater
-      from: "off"
-      to: "on"
-  action:
-    - service: notify.all_devices
-      data:
-        message: "Home Assistant {{ state_attr('binary_sensor.updater', 'newest_version') }} is available."
 - id: automation.open_bedroom_curtains_temporarily
   alias: Open Bedroom Curtains Temporarily
   description: Open the curtains in the bedroom temporarily
@@ -796,7 +832,7 @@
   action:
     - service: switch.turn_off
       entity_id: switch.living_room_humidifier
-    - service: notify.all_devices
+    - service: notify.tats_devices
       data:
         message: "Turned off Living Room Humidifier. Current: {{ states('sensor.living_room_humidity') }}%"
         data:
@@ -817,7 +853,7 @@
     - service: climate.turn_off
       target:
         entity_id: climate.living_room_hvac
-    - service: notify.all_devices
+    - service: notify.tats_devices
       data:
         message: Turned off Living Room HVAC with Fan Mode
         data:
@@ -840,7 +876,7 @@
     - service: light.turn_off
       target:
         entity_id: light.living_area_lights
-    - service: notify.all_devices
+    - service: notify.tats_devices
       data:
         message: Turned off Living Room Lights
         data:
@@ -893,7 +929,7 @@
         entity_id: alarm_control_panel.surveillance
     - service: notify.all_devices
       data:
-        message: Turned off Surveillance
+        message: Turned off surveillance
         data:
           url: /lovelace/home
     - delay:
@@ -965,7 +1001,7 @@
       entity_id: switch.living_room_floor_heating
     - service: switch.toggle
       entity_id: switch.study_floor_heating
-    - service: notify.all_devices
+    - service: notify.tats_devices
       data:
         message: "Turned on Living Area Floor Heating. Current: {{ states('sensor.living_room_temperature') }}°C"
         data:
@@ -989,7 +1025,7 @@
   action:
     - service: switch.turn_on
       entity_id: switch.living_room_ac_cleaner
-    - service: notify.all_devices
+    - service: notify.tats_devices
       data:
         message: Turned on Living Room HVAC Cleaner
         data:
@@ -1007,7 +1043,7 @@
         entity_id: climate.living_room_hvac
       data:
         hvac_mode: fan_only
-    - service: notify.all_devices
+    - service: notify.tats_devices
       data:
         message: Turned on Living Room HVAC with Fan Mode
         data:
@@ -1047,7 +1083,7 @@
   action:
     - service: light.turn_on
       entity_id: light.living_area_downlights
-    - service: notify.all_devices
+    - service: notify.tats_devices
       data:
         message: "Turned on Living Room Downlights. Current: {{ states('sensor.living_room_light_level') }}lx"
         data:
@@ -1092,7 +1128,7 @@
   action:
     - service: switch.turn_on
       entity_id: switch.living_room_humidifier
-    - service: notify.all_devices
+    - service: notify.tats_devices
       data:
         message: "Turned on Living Room Humidifier. Current: {{ states('sensor.living_room_humidity') }}%"
         data:
