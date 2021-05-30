@@ -130,6 +130,8 @@ binary_sensor.fox:
   icon: mdi:raspberry-pi
 binary_sensor.guppy:
   icon: mdi:nas
+binary_sensor.hotel:
+  icon: mdi:raspberry-pi
 binary_sensor.huebridge:
   icon: mdi:network-outline
 binary_sensor.jq300:
