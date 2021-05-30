@@ -88,6 +88,10 @@ automation.turn_off_living_room_hvac_with_fan_mode:
   icon: mdi:fan-off
 automation.turn_off_living_room_lights_appliances:
   icon: mdi:weather-night
+automation.turn_off_monitor_akikos_iphone12mini:
+  icon: mdi:cellphone-wireless
+automation.turn_off_monitor_bio:
+  icon: mdi:cellphone-wireless
 automation.turn_off_surveillance:
   icon: mdi:cctv
 automation.turn_on_living_area_downlights:
@@ -102,6 +106,10 @@ automation.turn_on_living_room_hvac_cleaner:
   icon: mdi:broom
 automation.turn_on_living_room_hvac_with_fan_mode:
   icon: mdi:fan-alert
+automation.turn_on_monitor_akikos_iphone12mini:
+  icon: mdi:cellphone-wireless
+automation.turn_on_monitor_bio:
+  icon: mdi:cellphone-wireless
 binary_sensor.amazonplug:
   icon: mdi:power-socket-us
 binary_sensor.aventage:
@@ -170,6 +178,10 @@ device_tracker.e0b55fe8e384:
   icon: mdi:laptop
 device_tracker.global:
   icon: mdi:cellphone
+device_tracker.monitor_akikos_iphone12mini:
+  icon: mdi:cellphone-wireless
+device_tracker.monitor_bio:
+  icon: mdi:cellphone-wireless
 device_tracker.ping_akikos_iphone12mini:
   friendly_name: ping akikos_iphone12mini
   icon: mdi:cellphone-wireless
