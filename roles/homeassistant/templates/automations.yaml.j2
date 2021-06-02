@@ -55,7 +55,7 @@
         message: "Living Room Air Quality is Poor. Current: {{ states('sensor.living_room_iaq_index') }}IAQI"
         title: "⚠️ ALARM"
         data:
-          url: /lovelace-home/home
+          url: /lovelace/home
     - delay:
         hours: 1
         minutes: 0
@@ -95,7 +95,7 @@
         title: "⚠️ ALARM"
         message: "Living Room CO2 is too high. Current: {{ states('sensor.living_room_co2') }}ppm"
         data:
-          url: /lovelace-home/home
+          url: /lovelace/home
     - delay:
         hours: 1
         minutes: 0
@@ -562,7 +562,7 @@
         title: "⚠️ ALARM"
         message: Living Room Temperature Difference is Too Large
         data:
-          url: /lovelace-home/home
+          url: /lovelace/home
   mode: single
 - id: automation.alarm_bedroom_temperature_difference_is_too_large
   alias: "ALARM: Bedroom Temperature Difference is Too Large"
@@ -579,7 +579,7 @@
         title: "⚠️ ALARM"
         message: ️Bedroom Temperature Difference is Too Large
         data:
-          url: /lovelace-home/home
+          url: /lovelace/home
   mode: single
 - id: automation.alarm_balcony_temperature_difference_is_too_large
   alias: "ALARM: Balcony Temperature Difference is Too Large"
@@ -596,7 +596,7 @@
         title: "⚠️ ALARM"
         message: Balcony Temperature Difference is Too Large
         data:
-          url: /lovelace-home/home
+          url: /lovelace/home
   mode: single
 - id: automation.alarm_living_room_humidity_difference_is_too_large
   alias: "ALARM: Living Room Humidity Difference is Too Large"
@@ -614,7 +614,7 @@
         title: "⚠️ ALARM"
         message: Living Room Humidity Difference is Too Large
         data:
-          url: /lovelace-home/home
+          url: /lovelace/home
   mode: single
 - id: automation.alarm_bedroom_humidity_difference_is_too_large
   alias: "ALARM: Bedroom Humidity Difference is Too Large"
@@ -632,7 +632,7 @@
         title: "⚠️ ALARM"
         message: ️Bedroom Humidity Difference is Too Large
         data:
-          url: /lovelace-home/home
+          url: /lovelace/home
   mode: single
 - id: automation.alarm_balcony_humidity_difference_is_too_large
   alias: "ALARM: Balcony Humidity Difference is Too Large"
@@ -650,7 +650,7 @@
         title: "⚠️ ALARM"
         message: ️Balcony Humidity Difference is Too Large
         data:
-          url: /lovelace-home/home
+          url: /lovelace/home
   mode: single
 - id: automation.turn_on_surveillance_when_ios_action_fires
   alias: Turn on surveillance when iOS Action Fires
