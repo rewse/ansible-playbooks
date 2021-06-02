@@ -39,6 +39,7 @@
   state_topic: mhz19/co2
   value_template: "{{ value_json.co2 }}"
   unit_of_measurement: ppm
+  device_class: carbon_dioxide
   availability:
     - topic: mhz19/state
   icon: mdi:molecule-co2
