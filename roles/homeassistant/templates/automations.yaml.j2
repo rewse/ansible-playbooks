@@ -303,6 +303,21 @@
         data:
           url: /lovelace-machines/machines
   mode: single
+- id: automation.alarm_hotel_is_offline
+  alias: "ALARM: hotel is Offline"
+  trigger:
+    - platform: state
+      entity_id: binary_sensor.hotel
+      to: "off"
+      for: "00:31:00"
+  action:
+    - service: notify.tats_devices
+      data:
+        title: "⚠️ ALARM"
+        message: hotel is Offline
+        data:
+          url: /lovelace-machines/machines
+  mode: single
 - id: automation.alarm_huebridge_is_offline
   alias: "ALARM: huebridge is Offline"
   trigger:
