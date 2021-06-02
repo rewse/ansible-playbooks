@@ -4,3 +4,8 @@ lovelace-machines:
   title: Machines
   icon: mdi:lan
   require_admin: true
+lovelace-people:
+  mode: yaml
+  filename: ui/people.yaml
+  title: People
+  icon: mdi:account-circle

@@ -62,8 +62,9 @@
   - name: Mamorail Action
     unique_id: sensor.mamorail_action
     state: "{{ state_attr('sensor.mamorail', 'body') | regex_findall_index('(..*)しました') }}"
-    icon: mdi:train
+    icon: mdi:gate-open
   - name: Mamorail Balance
     unique_id: sensor.mamorail_balance
     state: "{{ state_attr('sensor.mamorail', 'body') | regex_findall_index('チャージ残額は(..*)円です') | regex_replace(',', '') | int }}"
-    icon: mdi:train
+    icon: mdi:credit-card-sync-outline
+    unit_of_measurement: JPY

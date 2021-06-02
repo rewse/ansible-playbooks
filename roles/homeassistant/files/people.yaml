@@ -1,0 +1,18 @@
+title: Machines
+views:
+  - path: people
+    title: People
+    icon: mdi:account-circle
+    badges: []
+    cards:
+      - type: entities
+        title: Mamorail
+        entities:
+          - entity: sensor.mamorail_station
+            name: Station
+          - entity: sensor.mamorail_action
+            name: Action
+          - entity: sensor.mamorail_balance
+            name: Balance
+          - entity: sensor.mamorail_time
+            name: Time

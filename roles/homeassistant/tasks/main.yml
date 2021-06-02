@@ -415,6 +415,13 @@
   notify: Restart homeassistant
   tags: [homeassistant, homeassistant-components]
 
+- name: Copy customize.yaml
+  copy:
+    src: customize.yaml
+    dest: /etc/homeassistant
+  notify: Restart homeassistant
+  tags: [homeassistant, homeassistant-components]
+
 - name: Create certs dir
   file:
     path: /etc/homeassistant/certs
@@ -658,13 +665,6 @@
   notify: Restart homeassistant
   tags: [homeassistant, homeassistant-components]
 
-- name: Copy customize.yaml
-  copy:
-    src: customize.yaml
-    dest: /etc/homeassistant
-  notify: Restart homeassistant
-  tags: [homeassistant, homeassistant-components]
-
 - name: Copy dashboards.yaml
   copy:
     src: dashboards.yaml
@@ -716,6 +716,12 @@
 - name: Copy machines.yaml
   copy:
     src: machines.yaml
+    dest: /etc/homeassistant/ui
+  tags: [homeassistant, homeassistant-ui]
+
+- name: Copy people.yaml
+  copy:
+    src: people.yaml
     dest: /etc/homeassistant/ui
   tags: [homeassistant, homeassistant-ui]
 
