@@ -26,6 +26,8 @@ automation.alarm_fox_is_offline:
   icon: mdi:raspberry-pi
 automation.alarm_guppy_is_offline:
   icon: mdi:nas
+automation.alarm_hotel_is_offline:
+  icon: mdi:raspberry-pi
 automation.alarm_huebridge_is_offline:
   icon: mdi:network-off-outline
 automation.alarm_internet_speed_is_too_slow:
