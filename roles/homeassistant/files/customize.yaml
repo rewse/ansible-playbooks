@@ -2,6 +2,8 @@ alarm_control_panel.entrance_lock:
   icon: mdi:lock-open
 alarm_control_panel.surveillance:
   icon: mdi:cctv
+automation.alarm_amazonplug_is_offline:
+  icon: mdi:power-socket-us
 automation.alarm_aventage_is_offline:
   icon: mdi:audio-video-off
 automation.alarm_balcony_humidity_difference_is_too_large:
@@ -28,6 +30,8 @@ automation.alarm_huebridge_is_offline:
   icon: mdi:network-off-outline
 automation.alarm_internet_speed_is_too_slow:
   icon: mdi:gauge-low
+automation.alarm_co2_is_too_high:
+  icon: mdi:molecule-co2
 automation.alarm_jq300_is_offline:
   icon: mdi:air-filter
 automation.alarm_justio_is_offline:
@@ -36,6 +40,10 @@ automation.alarm_kasaplug_ent_is_offline:
   icon: mdi:power-socket-us
 automation.alarm_kasaplug_liv_is_offline:
   icon: mdi:power-socket-us
+automation.alarm_living_room_air_quality_is_poor:
+  icon: mdi:air-filter
+automation.alarm_living_room_co2_is_too_high:
+  icon: mdi:molecule-co2
 automation.alarm_living_room_humidity_difference_is_too_large:
   icon: mdi:water-percent-alert
 automation.alarm_living_room_temperature_difference_is_too_large:
@@ -48,6 +56,10 @@ automation.alarm_remo_liv_is_offline:
   icon: mdi:network-off-outline
 automation.alarm_romeo_is_offline:
   icon: mdi:router-network
+automation.alarm_sesamemodule_is_offline:
+  icon: mdi:network-off-outline
+automation.alarm_suicas_balance_is_not_enough:
+  icon: mdi:credit-card-off-outline
 automation.alarm_switchbothub_is_offline:
   icon: mdi:network-off-outline
 automation.alarm_tango_is_offline:
@@ -68,6 +80,8 @@ automation.info_denshobato:
   icon: mdi:bird
 automation.info_mamorail:
   icon: mdi:train
+automation.info_update_available:
+  icon: mdi:update
 automation.notify_update_available:
   icon: mdi:check-circle
 automation.open_bedroom_curtains_temporarily:
@@ -114,6 +128,10 @@ automation.turn_on_monitor_akikos_iphone12mini:
   icon: mdi:cellphone-wireless
 automation.turn_on_monitor_bio:
   icon: mdi:cellphone-wireless
+automation.turn_on_surveillance_when_ios_action_fires:
+  icon: mdi:cctv
+automation.turn_on_surveillance_when_nobody_is_in_home:
+  icon: mdi:cctv
 binary_sensor.amazonplug:
   icon: mdi:power-socket-us
 binary_sensor.aventage:
@@ -154,6 +172,8 @@ binary_sensor.remo_liv:
   icon: mdi:network-outline
 binary_sensor.romeo:
   icon: mdi:router-network
+binary_sensor.sesamemodule:
+  icon: mdi:network-outline
 binary_sensor.switchbothub:
   icon: mdi:network-outline
 binary_sensor.tango:
@@ -176,6 +196,8 @@ camera.guppy_living_room:
   icon: mdi:cctv
 climate.living_area_floor_heating:
   icon: mdi:grid
+device_tracker.akikos_iphone_12_mini:
+  icon: mdi:cellphone
 device_tracker.bio:
   icon: mdi:cellphone
 device_tracker.desert:
@@ -248,6 +270,10 @@ media_player.regza:
   device_class: tv
 media_player.stw2000:
   icon: mdi:android
+person.shibata_akiko:
+  icon: mdi:human-female
+person.shibata_tats:
+  icon: mdi:human-male
 sensor.bedroom_curtains_position:
   icon: mdi:window-shutter-alert
 sensor.denshobato:
