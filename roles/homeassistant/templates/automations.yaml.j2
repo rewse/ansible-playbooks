@@ -107,6 +107,10 @@
   trigger:
     - platform: state
       entity_id: sensor.mamorail
+      from: 入場
+    - platform: state
+      entity_id: sensor.mamorail
+      from: 出場
   condition:
     - condition: numeric_state
       entity_id: sensor.mamorail_balance
@@ -116,6 +120,8 @@
       data:
         title: "⚠️ ALARM"
         message: "️Suica’s balance is not enough. Current: {{ states('sensor.mamorail_balance') }}yen"
+        data:
+          url: /lovelace-people/poeple
   mode: single
 - id: automation.alarm_zulu_is_offline
   alias: "ALARM: zulu is Offline"
@@ -508,6 +514,10 @@
   trigger:
     - platform: state
       entity_id: sensor.mamorail
+      from: 入場
+    - platform: state
+      entity_id: sensor.mamorail
+      from: 出場
   condition:
     - condition: not
       conditions:
@@ -521,7 +531,9 @@
     - service: notify.all_devices
       data:
         title: "[% notify_title_k %]"
-        message: "️{{ states('sensor.mamorail_station') }}を{{ states('sensor.mamorail_action') }}しました"
+        message: "️{{ states('sensor.mamorail_station') }}を{{ states('sensor.mamorail_time') }}に{{ states('sensor.mamorail_action') }}しました。残高: {{ states('sensor.mamorail_balance') }}円"
+        data:
+          url: /lovelace-people/people
   mode: single
 - id: automation.info_update_available
   alias: "INFO: Update Available"
