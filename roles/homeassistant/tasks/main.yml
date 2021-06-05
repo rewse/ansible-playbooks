@@ -451,22 +451,13 @@
 
 - name: Copy imap_emal_content/sensor.py
   command: docker container cp homeassistant:/usr/src/homeassistant/homeassistant/components/imap_email_content/sensor.py /tmp/sensor.py
-  tags: [homeassistant]
-
-# Ref: https://community.home-assistant.io/t/imap-email-content-character-encoding/22928
-- name: Add base64
-  lineinfile:
-    dest: /tmp/sensor.py
-    insertafter: "import logging"
-    regexp: "import base64"
-    line: "import base64"
   tags: [homeassistant, homeassistant-fix]
 
-- name: Replace imap_email_content with base64
-  lineinfile:
+# Ref: https://community.home-assistant.io/t/imap-email-content-character-encoding/22928
+- name: Patch imap_emal_content/sensor.py
+  patch:
+    src: sensor.patch
     dest: /tmp/sensor.py
-    regexp: "            return message_text"
-    line: "            return base64.b64decode(message_text).decode('utf-8')"
   tags: [homeassistant, homeassistant-fix]
 
 - name: Copy imap_emal_content/sensor.py
@@ -627,6 +618,8 @@
         password: !secret jq300_password
       logger:
         default: warning
+        logs:
+          homeassistant.components.imap_email_content.sensor: warning
       lovelace:
         mode: yaml
         dashboards: !include dashboards.yaml
