@@ -17,6 +17,13 @@ views:
           - entity: sensor.mamorail_time
             name: Time
       - type: entities
+        title: Denshobato
+        entities:
+          - entity: sensor.denshobato_action
+            name: Action
+          - entity: sensor.denshobato_time
+            name: Time
+      - type: entities
         title: Family
         entities:
           - entity: person.shibata_tats
