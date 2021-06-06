@@ -77,14 +77,18 @@ views:
             name: Living Room Thermometer
           - entity: sensor.living_room_window_battery
             name: Living Room Window
-          - entity: sensor.study_window_battery
-            name: Study Window
+          - entity: sensor.study_window_n_battery
+            name: Study Window N
+          - entity: sensor.study_window_s_battery
+            name: Study Window S
           - entity: sensor.bedroom_light_switch_battery_level
             name: Bedroom Light Switch
           - entity: sensor.bedroom_thermometer_battery
             name: Bedroom Thermometer
-          - entity: sensor.bedroom_window_battery
-            name: Bedroom Window
+          - entity: sensor.bedroom_window_n_battery
+            name: Bedroom Window N
+          - entity: sensor.bedroom_window_s_battery
+            name: Bedroom Window S
           - entity: sensor.balcony_thermometer_battery
             name: Balcony Thermometer
       - type: entities
