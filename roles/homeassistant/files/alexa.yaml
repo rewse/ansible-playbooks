@@ -10,11 +10,14 @@ smart_home:
       - automation.turn_down_living_area
       - automation.turn_down_living_area_more
       - binary_sensor.bathroom_motion
-      - binary_sensor.bedroom_window
+      - binary_sensor.bedroom_window_n
+      - binary_sensor.bedroom_window_s
+      - binary_sensor.entrance_door
       - binary_sensor.living_room_motion
       - binary_sensor.living_room_window
       - binary_sensor.study_motion
-      - binary_sensor.study_window
+      - binary_sensor.study_window_n
+      - binary_sensor.study_window_s
       - camera.guppy_living_room
       - climate.bedroom_hvac
       - climate.living_room_hvac
@@ -53,16 +56,22 @@ smart_home:
       display_categories: SCENE_TRIGGER
     binary_sensor.bathroom_motion:
       name: 浴室のモーションセンサー
-    binary_sensor.bedroom_window:
-      name: 寝室の窓
+    binary_sensor.bedroom_window_n:
+      name: 寝室の北側の窓
+    binary_sensor.bedroom_window_s:
+      name: 寝室の南側のの窓
+    binary_sensor.entrance_door:
+      name: 玄関のドア
     binary_sensor.living_room_motion:
       name: リビングのモーションセンサー
     binary_sensor.living_room_window:
       name: リビングの窓
     binary_sensor.study_motion:
       name: 書斎のモーションセンサー
-    binary_sensor.study_window:
-      name: 書斎の窓
+    binary_sensor.study_window_n:
+      name: 書斎の北側の窓
+    binary_sensor.study_window_s:
+      name: 書斎の南側の窓
     camera.guppy_living_room:
       name: リビングのカメラ
     climate.bedroom_hvac:

@@ -46,8 +46,13 @@
       domain: binary_sensor
     - type: is_not_open
       condition: device
+      device_id: 853682a22dc992e6a13e776fd3ac105b
+      entity_id: binary_sensor.study_window_n
+      domain: binary_sensor
+    - type: is_not_open
+      condition: device
       device_id: cca7e061d97ab19596829722642432c3
-      entity_id: binary_sensor.study_window
+      entity_id: binary_sensor.study_window_s
       domain: binary_sensor
   action:
     - service: notify.tats_devices
@@ -86,8 +91,13 @@
       domain: binary_sensor
     - type: is_not_open
       condition: device
+      device_id: 853682a22dc992e6a13e776fd3ac105b
+      entity_id: binary_sensor.study_window_n
+      domain: binary_sensor
+    - type: is_not_open
+      condition: device
       device_id: cca7e061d97ab19596829722642432c3
-      entity_id: binary_sensor.study_window
+      entity_id: binary_sensor.study_window_s
       domain: binary_sensor
   action:
     - service: notify.all_devices
@@ -861,7 +871,11 @@
       state: "off"
       for: 00:30:00
     - condition: state
-      entity_id: binary_sensor.study_window
+      entity_id: binary_sensor.study_window_n
+      state: "off"
+      for: 00:30:00
+    - condition: state
+      entity_id: binary_sensor.study_window_s
       state: "off"
       for: 00:30:00
   action:
@@ -1024,11 +1038,19 @@
       state: "off"
       for: 00:30:00
     - condition: state
-      entity_id: binary_sensor.study_window
+      entity_id: binary_sensor.study_window_n
       state: "off"
       for: 00:30:00
     - condition: state
-      entity_id: binary_sensor.bedroom_window
+      entity_id: binary_sensor.study_window_s
+      state: "off"
+      for: 00:30:00
+    - condition: state
+      entity_id: binary_sensor.bedroom_window_n
+      state: "off"
+      for: 00:30:00
+    - condition: state
+      entity_id: binary_sensor.bedroom_window_s
       state: "off"
       for: 00:30:00
   action:
@@ -1157,7 +1179,11 @@
       state: "off"
       for: 00:30:00
     - condition: state
-      entity_id: binary_sensor.study_window
+      entity_id: binary_sensor.study_window_n
+      state: "off"
+      for: 00:30:00
+    - condition: state
+      entity_id: binary_sensor.study_window_s
       state: "off"
       for: 00:30:00
   action:
