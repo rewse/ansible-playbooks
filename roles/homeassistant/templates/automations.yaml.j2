@@ -845,6 +845,41 @@
         - light.living_room_entrance_light
         - light.living_room_footlight
   mode: single
+- id: automation.turn_on_living_room_hvac
+  alias: Turn off Living Room HVAC
+  description: Turn off the HVAC in the living room
+  trigger:
+    - type: motion
+      platform: device
+      device_id: 56a0fc235acbf9c9f708708a9682ab66
+      entity_id: binary_sensor.living_room_motion
+      domain: binary_sensor
+    - type: motion
+      platform: device
+      device_id: 40a395e27caf6e3dbf69e07fa01f780d
+      entity_id: binary_sensor.study_motion
+      domain: binary_sensor
+  condition:
+    - condition: numeric_state
+      entity_id: sensor.living_room_wbgt
+      below: input_number.living_room_hvac_cool_turned_off_threshold
+  action:
+    - service: climate.set_hvac_mode
+      target:
+        entity_id: climate.living_room_hvac
+      data:
+        hvac_mode: off
+    - service: notify.tats_devices
+      data:
+        message: "Turned on Living Room HVAC Cool. Current: {{ states('sensor.living_room_temperature') }}°C"
+        data:
+          url: /lovelace/home
+    - delay:
+        hours: 1
+        minutes: 0
+        seconds: 0
+        milliseconds: 0
+  mode: single
 - id: automation.turn_off_living_room_humidifier
   alias: Turn off Living Room Humidifier
   description: Turn off the humidifier in the living room when the humidity is too high
@@ -892,8 +927,8 @@
         seconds: 0
         milliseconds: 0
   mode: single
-- id: automation.turn_off_living_room_hvac_with_fan_mode
-  alias: Turn off Living Room HVAC with Fan Mode
+- id: automation.turn_off_living_room_hvac_fan
+  alias: Turn off Living Room HVAC Fan
   description: Turn off the HVAC in the living room with fan mode
   trigger:
     - platform: time
@@ -904,14 +939,14 @@
         entity_id: climate.living_room_hvac
     - service: notify.tats_devices
       data:
-        message: Turned off Living Room HVAC with Fan Mode
+        message: Turned off Living Room HVAC Fan
         data:
           url: /lovelace/home
     - service: automation.turn_off
       target:
         entity_id:
-          - automation.turn_on_living_room_hvac_with_fan_mode
-          - automation.turn_off_living_room_hvac_with_fan_mode
+          - automation.turn_on_living_room_hvac_fan
+          - automation.turn_off_living_room_hvac_fan
   mode: single
 - id: automation.turn_off_living_area_lights
   alias: Turn off Living Area Lights
@@ -987,8 +1022,8 @@
         seconds: 0
         milliseconds: 0
   mode: single
-- id: automation.plan_to_turn_on_living_room_hvac_with_fan_mode
-  alias: Plan to Turn on Living Room HVAC with Fan Mode
+- id: automation.plan_to_turn_on_living_room_hvac_fan
+  alias: Plan to Turn on Living Room HVAC Fan 
   description: Plan to turn on the HVAC in the living room with fan mode
   trigger:
     - platform: state
@@ -1007,8 +1042,8 @@
     - service: automation.turn_on
       target:
         entity_id:
-          - automation.turn_on_living_room_hvac_with_fan_mode
-          - automation.turn_off_living_room_hvac_with_fan_mode
+          - automation.turn_on_living_room_hvac_fan
+          - automation.turn_off_living_room_hvac_fan
   mode: single
 - id: automation.turn_on_living_area_floor_heating
   alias: Turn on Living Area Floor Heating
@@ -1069,6 +1104,26 @@
         seconds: 0
         milliseconds: 0
   mode: single
+- id: automation.turn_on_bedroom_hvac_cleaner
+  alias: Turn on Bedroom HVAC Cleaner
+  description: Turn on the HVAC cleaner in the bedroom
+  trigger:
+    - platform: time
+      at: '16:00'
+  condition:
+    - condition: time
+      weekday:
+        - sun
+  action:
+    - service: switch.turn_on
+      target:
+        entity_id: switch.bedroom_hvac_cleaner
+    - service: notify.tats_devices
+      data:
+        message: Turned on Bedroom HVAC Cleaner
+        data:
+          url: /lovelace/home
+  mode: single
 - id: automation.turn_on_living_room_hvac_cleaner
   alias: Turn on Living Room HVAC Cleaner
   description: Turn on the HVAC cleaner in the living room
@@ -1081,15 +1136,154 @@
       - tue
   action:
     - service: switch.turn_on
-      entity_id: switch.living_room_ac_cleaner
+      entity_id: switch.living_room_hvac_cleaner
     - service: notify.tats_devices
       data:
         message: Turned on Living Room HVAC Cleaner
         data:
           url: /lovelace/home
   mode: single
-- id: automation.turn_on_living_room_hvac_with_fan_mode
-  alias: Turn on Living Room HVAC with Fan Mode
+- id: automation.turn_on_living_room_hvac_cool
+  alias: Turn on Living Room HVAC Cool
+  description: Turn on the HVAC in the living room with cool mode
+  trigger:
+    - type: motion
+      platform: device
+      device_id: 56a0fc235acbf9c9f708708a9682ab66
+      entity_id: binary_sensor.living_room_motion
+      domain: binary_sensor
+    - type: motion
+      platform: device
+      device_id: 40a395e27caf6e3dbf69e07fa01f780d
+      entity_id: binary_sensor.study_motion
+      domain: binary_sensor
+  condition:
+    - condition: numeric_state
+      entity_id: sensor.living_room_wbgt
+      above: input_number.living_room_hvac_cool_turned_on_threshold
+    - condition: state
+      entity_id: binary_sensor.living_room_window
+      state: "off"
+      for: 00:30:00
+    - condition: state
+      entity_id: binary_sensor.study_window_n
+      state: "off"
+      for: 00:30:00
+    - condition: state
+      entity_id: binary_sensor.study_window_s
+      state: "off"
+      for: 00:30:00
+  action:
+    - service: climate.set_hvac_mode
+      target:
+        entity_id: climate.living_room_hvac
+      data:
+        hvac_mode: cool
+    - service: notify.tats_devices
+      data:
+        message: "Turned on Living Room HVAC Cool. Current: {{ states('sensor.living_room_temperature') }}°C"
+        data:
+          url: /lovelace/home
+    - delay:
+        hours: 1
+        minutes: 0
+        seconds: 0
+        milliseconds: 0
+  mode: single
+- id: automation.turn_on_living_room_hvac_cool_forcibly
+  alias: Turn on Living Room HVAC Cool Forcibly
+  description: Turn on the HVAC in the living room with cool mode forcibly
+  trigger:
+    - platform: time_pattern
+      minutes: '5'
+  condition:
+    - condition: numeric_state
+      entity_id: sensor.living_room_wbgt
+      above: input_number.living_room_hvac_cool_forcibly_turned_on_threshold
+    - condition: state
+      entity_id: binary_sensor.living_room_window
+      state: "off"
+      for: 00:30:00
+    - condition: state
+      entity_id: binary_sensor.study_window_n
+      state: "off"
+      for: 00:30:00
+    - condition: state
+      entity_id: binary_sensor.study_window_s
+      state: "off"
+      for: 00:30:00
+  action:
+    - service: climate.set_hvac_mode
+      target:
+        entity_id: climate.living_room_hvac
+      data:
+        hvac_mode: cool
+    - service: notify.tats_devices
+      data:
+        message: "Turned on Living Room HVAC Cool Forcibly. Current: {{ states('sensor.living_room_temperature') }}°C"
+        data:
+          url: /lovelace/home
+    - delay:
+        hours: 1
+        minutes: 0
+        seconds: 0
+        milliseconds: 0
+  mode: single
+- id: automation.turn_on_living_room_hvac_dry
+  alias: Turn on Living Room HVAC Dry
+  description: Turn on the HVAC in the living room with dry mode
+  trigger:
+    - type: motion
+      platform: device
+      device_id: 56a0fc235acbf9c9f708708a9682ab66
+      entity_id: binary_sensor.living_room_motion
+      domain: binary_sensor
+    - type: motion
+      platform: device
+      device_id: 40a395e27caf6e3dbf69e07fa01f780d
+      entity_id: binary_sensor.study_motion
+      domain: binary_sensor
+  condition:
+    - condition: numeric_state
+      entity_id: sensor.living_room_humidity
+      above: input_number.living_room_hvac_dry_turned_on_threshold
+    - condition: numeric_state
+      entity_id: sensor.living_room_wbgt
+      below: input_number.living_room_hvac_cool_turned_on_threshold
+    - condition: state
+      entity_id: climate.living_room_hvac
+      state: 'off'
+    - condition: state
+      entity_id: binary_sensor.living_room_window
+      state: "off"
+      for: 00:30:00
+    - condition: state
+      entity_id: binary_sensor.study_window_n
+      state: "off"
+      for: 00:30:00
+    - condition: state
+      entity_id: binary_sensor.study_window_s
+      state: "off"
+      for: 00:30:00
+  action:
+    - service: climate.set_hvac_mode
+      target:
+        entity_id: climate.living_room_hvac
+      data:
+        hvac_mode: dry
+    - service: notify.tats_devices
+      data:
+        message: "Turned on Living Room HVAC Dry. Current: {{ states('sensor.living_room_humidifier') }}%"
+        data:
+          url: /lovelace/home
+    - delay:
+        hours: 1
+        minutes: 0
+        seconds: 0
+        milliseconds: 0
+  mode: single
+- id: automation.turn_on_living_room_hvac_fan
+  alias: Turn on Living Room HVAC Fan
   description: Turn on the HVAC in the living room with fan mode
   trigger:
     - platform: time
@@ -1102,7 +1296,7 @@
         hvac_mode: fan_only
     - service: notify.tats_devices
       data:
-        message: Turned on Living Room HVAC with Fan Mode
+        message: Turned on Living Room HVAC Fan
         data:
           url: /lovelace/home
   mode: single
