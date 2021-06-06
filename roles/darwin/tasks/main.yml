@@ -111,7 +111,6 @@
       - google-chrome
       - handbrake
       - hhkb-keymap-tool
-      - home-assistant
       - intel-power-gadget
       - istat-menus
       - iterm2
@@ -139,6 +138,7 @@
     - 417375580   # BetterSnapTool
     - 425264550   # Blackmagic Disk Speed Test
     - 1044629456  # GFXBench Metal
+    - 1099568401  # Home Assistant
     - 539883307   # LINE
     - 1480068668  # Messenger
     - 1504024265  # Micro Sniff
