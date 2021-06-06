@@ -1,21 +1,27 @@
-living_room_ac_turned_off_threshold:
-  name: Living Room AC Turned off Threshold
+living_room_hvac_cool_turned_off_threshold:
+  name: Living Room HVAC Cool Turned off Threshold
   min: 19
   max: 27
   unit_of_measurement: °C
   icon: mdi:thermometer-chevron-down
-living_room_ac_turned_on_threshold:
-  name: Living Room AC Turned on Threshold
+living_room_hvac_cool_turned_on_threshold:
+  name: Living Room HVAC Cool Turned on Threshold
   min: 24
   max: 32
   unit_of_measurement: °C
   icon: mdi:thermometer-chevron-up
-living_room_ac_forcibly_turned_on_threshold:
-  name: Living Room AC Forcibly Turned on Threshold
+living_room_hvac_cool_forcibly_turned_on_threshold:
+  name: Living Room HVAC Cool Forcibly Turned on Threshold
   min: 27
   max: 35
   unit_of_measurement: °C
   icon: mdi:thermometer-alert
+living_room_hvac_dry_turned_on_threshold:
+  name: Living Room HVAC Dry Turned on Threshold
+  min: 56
+  max: 64
+  unit_of_measurement: "%"
+  icon: mdi:water-percent-alert
 living_area_downlights_turned_on_threshold:
   name: Living Area Downlights Turned on Threshold
   min: 17
