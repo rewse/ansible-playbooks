@@ -172,3 +172,33 @@
   unit_of_measurement: °C
   scan_interval: 36000
 - platform: season
+- platform: statistics
+  entity_id: sensor.balcony_humidity_difference
+  name: Average of Balcony Humidity Difference
+  sampling_size: 183600
+  max_age: "51:00:00"
+- platform: statistics
+  entity_id: sensor.balcony_temperature_difference
+  name: Average of Balcony Temperature Difference
+  sampling_size: 183600
+  max_age: "51:00:00"
+- platform: statistics
+  entity_id: sensor.bedroom_humidity_difference
+  name: Average of Bedroom Humidity Difference
+  sampling_size: 183600
+  max_age: "51:00:00"
+- platform: statistics
+  entity_id: sensor.bedroom_temperature_difference
+  name: Average of Bedroom Temperature Difference
+  sampling_size: 183600
+  max_age: "51:00:00"
+- platform: statistics
+  entity_id: sensor.living_room_humidity_difference
+  name: Average of Living Room Humidity Difference
+  sampling_size: 183600
+  max_age: "51:00:00"
+- platform: statistics
+  entity_id: sensor.living_room_temperature_difference
+  name: Average of Living Room Temperature Difference
+  sampling_size: 183600
+  max_age: "51:00:00"

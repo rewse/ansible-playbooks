@@ -292,6 +292,18 @@ sensor.denshobato:
   icon: mdi:bird
 sensor.dns_hass_rewse_jp:
   icon: mdi:dns
+sensor.average_of_balcony_humidity_difference:
+  icon: mdi:water-percent-alert
+sensor.average_of_balcony_temperature_difference:
+  icon: mdi:thermometer-alert
+sensor.average_of_bedroom_humidity_difference:
+  icon: mdi:water-percent-alert
+sensor.average_of_bedroom_temperature_difference:
+  icon: mdi:thermometer-alert
+sensor.average_of_living_room_humidity_difference:
+  icon: mdi:water-percent-alert
+sensor.average_of_living_room_temperature_difference:
+  icon: mdi:thermometer-alert
 sensor.mamorail:
   icon: mdi:train
 sensor.monitor_akikos_iphone12mini:
