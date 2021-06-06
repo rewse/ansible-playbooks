@@ -576,7 +576,8 @@
       entity_id: sensor.living_room_switchbot_meter_temperature
   condition:
     - condition: numeric_state
-      entity_id: sensor.living_room_temperature_difference
+      entity_id: sensor.average_of_living_room_temperature_difference
+      attribute: min_value
       above: '1'
   action:
     - service: notify.tats_devices
@@ -593,7 +594,8 @@
       entity_id: sensor.bedroom_switchbot_meter_temperature
   condition:
     - condition: numeric_state
-      entity_id: sensor.bedroom_temperature_difference
+      entity_id: sensor.average_of_bedroom_temperature_difference
+      attribute: min_value
       above: '1'
   action:
     - service: notify.tats_devices
@@ -610,7 +612,8 @@
       entity_id: sensor.balcony_switchbot_meter_temperature
   condition:
     - condition: numeric_state
-      entity_id: sensor.balcony_temperature_difference
+      entity_id: sensor.average_of_balcony_temperature_difference
+      attribute: min_value
       above: '1'
   action:
     - service: notify.tats_devices
@@ -628,7 +631,8 @@
       attribute: humidity
   condition:
     - condition: numeric_state
-      entity_id: sensor.living_room_humidity_difference
+      entity_id: sensor.average_of_living_room_humidity_difference
+      attribute: min_value
       above: '10'
   action:
     - service: notify.tats_devices
@@ -646,7 +650,8 @@
       attribute: humidity
   condition:
     - condition: numeric_state
-      entity_id: sensor.bedroom_humidity_difference
+      entity_id: sensor.average_of_bedroom_humidity_difference
+      attribute: min_value
       above: '10'
   action:
     - service: notify.tats_devices
@@ -664,7 +669,8 @@
       attribute: humidity
   condition:
     - condition: numeric_state
-      entity_id: sensor.balcony_humidity_difference
+      entity_id: sensor.average_of_balcony_humidity_difference
+      attribute: min_value
       above: '10'
   action:
     - service: notify.tats_devices
