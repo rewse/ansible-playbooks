@@ -90,7 +90,7 @@ automation.open_bedroom_curtains_temporarily:
   icon: mdi:window-shutter-alert
 automation.open_bedroom_curtains_workday:
   icon: mdi:window-shutter-open
-automation.plan_to_turn_on_living_room_hvac_with_fan_mode:
+automation.plan_to_turn_on_living_room_hvac_fan:
   icon: mdi:fan-alert
 automation.turn_down_bedroom:
   icon: mdi:brightness-6
@@ -104,7 +104,9 @@ automation.turn_off_living_room_extra_lights:
   icon: mdi:led-strip-variant
 automation.turn_off_living_room_humidifier:
   icon: mdi:air-humidifier-off
-automation.turn_off_living_room_hvac_with_fan_mode:
+automation.turn_off_living_room_hvac:
+  icon: mdi:thermostat
+automation.turn_off_living_room_hvac_fan:
   icon: mdi:fan-off
 automation.turn_off_living_room_lights_appliances:
   icon: mdi:weather-night
@@ -114,6 +116,8 @@ automation.turn_off_monitor_bio:
   icon: mdi:cellphone-wireless
 automation.turn_off_surveillance:
   icon: mdi:cctv
+automation.turn_on_bedroom_hvac_cleaner:
+  icon: mdi:broom
 automation.turn_on_living_area_downlights:
   icon: mdi:wall-sconce-flat
 automation.turn_on_living_area_floor_heating:
@@ -124,7 +128,13 @@ automation.turn_on_living_room_humidifier:
   icon: mdi:air-humidifier
 automation.turn_on_living_room_hvac_cleaner:
   icon: mdi:broom
-automation.turn_on_living_room_hvac_with_fan_mode:
+automation.turn_on_living_room_hvac_cool:
+  icon: mdi:snowflake
+automation.turn_on_living_room_hvac_cool_forcibly:
+  icon: mdi:snowflake-alert
+automation.turn_on_living_room_hvac_dry:
+  icon: mdi:water-percent-alert
+automation.turn_on_living_room_hvac_fan:
   icon: mdi:fan-alert
 automation.turn_on_monitor_akikos_iphone12mini:
   icon: mdi:cellphone-wireless
