@@ -406,9 +406,15 @@ cards:
     entities:
       - entity: binary_sensor.living_room_window
         secondary_info: last-changed
-      - entity: binary_sensor.study_window
+      - entity: binary_sensor.study_window_n
         secondary_info: last-changed
-      - entity: binary_sensor.bedroom_window
+      - entity: binary_sensor.study_window_s
+        secondary_info: last-changed
+      - entity: binary_sensor.bedroom_window_n
+        secondary_info: last-changed
+      - entity: binary_sensor.bedroom_window_s
+        secondary_info: last-changed
+      - entity: binary_sensor.entrance_door
         secondary_info: last-changed
   - type: alarm-panel
     name: Surveillance
