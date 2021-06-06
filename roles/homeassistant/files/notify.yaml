@@ -7,6 +7,10 @@
     - service: mobile_app_desert
     - service: mobile_app_global
     - service: mobile_app_akikos_iphone_12_mini
+- name: akiko_devices
+  platform: group
+  services:
+    - service: mobile_app_akikos_iphone_12_mini
 - name: tats_devices
   platform: group
   services:
