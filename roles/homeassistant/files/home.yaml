@@ -407,6 +407,10 @@ cards:
         secondary_info: last-changed
       - entity: binary_sensor.study_motion
         secondary_info: last-changed
+      - entity: binary_sensor.bedroom_n_motion
+        secondary_info: last-changed
+      - entity: binary_sensor.bedroom_s_motion
+        secondary_info: last-changed
       - entity: binary_sensor.bathroom_motion
         secondary_info: last-changed
   - type: entities
