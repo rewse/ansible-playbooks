@@ -304,6 +304,8 @@ sensor.average_of_living_room_humidity_difference:
   icon: mdi:water-percent-alert
 sensor.average_of_living_room_temperature_difference:
   icon: mdi:thermometer-alert
+sensor.filtered_bedroom_hvac_plug_current:
+  icon: mdi:current-ac
 sensor.mamorail:
   icon: mdi:train
 sensor.monitor_akikos_iphone12mini:
