@@ -2,6 +2,13 @@
 - platform: command_line
   name: REGZA Channel
   command: curl --digest --user '[% regza.username %]:[% regza.password %]' http://regza.rewse.jp/v2/remote/play/status | jq -r .epg_info_current.channel_name
+- platform: filter
+  name: Filtered Bedroom HVAC Plug Current
+  entity_id: sensor.bedroom_hvac_plug_current
+  filters:
+    - filter: lowpass
+      window_size: 10
+      time_constant: 100
 - platform: imap_email_content
   name: Denshobato
   server: imap.gmail.com
