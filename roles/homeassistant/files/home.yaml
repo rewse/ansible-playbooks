@@ -428,6 +428,13 @@ cards:
         secondary_info: last-changed
       - entity: binary_sensor.entrance_door
         secondary_info: last-changed
+  - type: entities
+    title: Locks
+    entities:
+      - entity: binary_sensor.entrance_lock_top
+        secondary_info: last-changed
+      - entity: binary_sensor.entrance_lock_bottom
+        secondary_info: last-changed
   - type: alarm-panel
     name: Surveillance
     entity: alarm_control_panel.surveillance

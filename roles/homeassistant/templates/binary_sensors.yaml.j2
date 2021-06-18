@@ -96,5 +96,21 @@
 - platform: ping
   name: xiaomigateway
   host: xiaomigateway.rewse.jp
+- platform: rest
+  name: Entrance Lock Top
+  resource: https://app.candyhouse.co/api/sesame2/[% sesame.uuid_top %]
+  headers:
+    x-api-key: !secret sesame_api_key
+  value_template: '{{ value_json.CHSesame2Status | regex_replace("unlocked", "on") | regex_replace("locked", "off")  }}'
+  device_class: lock
+  scan_interval: 600
+- platform: rest
+  name: Entrance Lock Bottom
+  resource: https://app.candyhouse.co/api/sesame2/[% sesame.uuid_bottom %]
+  headers:
+    x-api-key: !secret sesame_api_key
+  value_template: '{{ value_json.CHSesame2Status | regex_replace("unlocked", "on") | regex_replace("locked", "off")  }}'
+  device_class: lock
+  scan_interval: 600
 - platform: workday
   country: JP
