@@ -75,8 +75,6 @@ cards:
         secondary_info: last-triggered
       - entity: input_number.living_room_hvac_dry_turned_on_threshold
         name: Turned on HVAC Dry Thrreshold
-      - entity: automation.turn_off_living_room_hvac
-        name: Turn off HVAC
         secondary_info: last-triggered
       - entity: input_number.living_room_hvac_cool_turned_off_threshold
         name: Turned off HVAC Threshold
