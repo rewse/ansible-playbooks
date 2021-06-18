@@ -45,9 +45,11 @@ regza:
   password: "[% vault_regza.password %]"
 remo_token: "{{ vault_remo_token }}"
 sesame:
-  api_key: "{{ vault_sesame.api_key }}"
+  api_key: "[% vault_sesame.api_key %]"
   uuid_top: "[% vault_sesame.uuid_top %]"
   uuid_bottom: "[% vault_sesame.uuid_bottom %]"
+  secret_top: "[% vault_sesame.secret_top %]"
+  secret_bottom: "[% vault_sesame.secret_bottom %]"
 simple_thermostat_version: 2.4.2
 simple_weather_card_version: 0.8.1
 switchbot_token: "{{ vault_switchbot_token }}"
