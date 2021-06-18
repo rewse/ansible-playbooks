@@ -1,3 +1,7 @@
+control_entrance_lock_top_lock: /config/bin/sesame lock [% sesame.api_key %] [% sesame.uuid_top %] [% sesame.secret_top %]
+control_entrance_lock_top_unlock: /config/bin/sesame unlock [% sesame.api_key %] [% sesame.uuid_top %] [% sesame.secret_top %]
+control_entrance_lock_bottom_lock: /config/bin/sesame lock [% sesame.api_key %] [% sesame.uuid_bottom %] [% sesame.secret_bottom %]
+control_entrance_lock_bottom_unlock: /config/bin/sesame unlock [% sesame.api_key %] [% sesame.uuid_bottom %] [% sesame.secret_bottom %]
 control_regza_toggle: curl --digest --user '[% regza.username %]:[% regza.password %]' http://regza.rewse.jp/remote/remote.htm?key=40BF12
 control_regza_volume_up: curl --digest --user '[% regza.username %]:[% regza.password %]' http://regza.rewse.jp/remote/remote.htm?key=40BF1A
 control_regza_volume_down: curl --digest --user '[% regza.username %]:[% regza.password %]' http://regza.rewse.jp/remote/remote.htm?key=40BF1E
