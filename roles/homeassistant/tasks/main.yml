@@ -277,10 +277,26 @@
   notify: Restart homeassistant
   tags: [homeassistant, homeassistant-components]
 
-- name: Config media_player
+- name: Config lock
   lineinfile:
     path: /etc/homeassistant/configuration.yaml
     insertafter: '^localtuya:'
+    regexp: '^lock:'
+    line: "lock: !include locks.yaml"
+  notify: Restart homeassistant
+  tags: [homeassistant, homeassistant-components]
+
+- name: Copy locks.yaml
+  copy:
+    src: locks.yaml
+    dest: /etc/homeassistant
+  notify: Restart homeassistant
+  tags: [homeassistant, homeassistant-components]
+
+- name: Config media_player
+  lineinfile:
+    path: /etc/homeassistant/configuration.yaml
+    insertafter: '^lock:'
     regexp: '^media_player:'
     line: "media_player: !include media_players.yaml"
   notify: Restart homeassistant
