@@ -10,9 +10,9 @@ cards:
   - type: entities
     title: Locks
     entities:
-      - entity: binary_sensor.entrance_lock_top
+      - entity: sensor.entrance_lock_top_sensor
         name: Lock Top
         secondary_info: last-changed
-      - entity: binary_sensor.entrance_lock_bottom
+      - entity: sensor.entrance_lock_bottom_sensor
         name: Lock Botoom
         secondary_info: last-changed
