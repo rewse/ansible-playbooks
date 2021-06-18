@@ -162,6 +162,32 @@
   unit_of_measurement: °C
   scan_interval: 36000
 - platform: rest
+  name: Entrance Lock Top Sensor
+  resource: https://app.candyhouse.co/api/sesame2/[% sesame.uuid_top %]
+  headers:
+    x-api-key: "[% sesame.api_key %]"
+  value_template: '{{ value_json.CHSesame2Status }}'
+  json_attributes:
+    - batteryPercentage
+    - batteryVoltage
+    - position
+    - CHSesame2Status
+    - timestamp
+  scan_interval: 6000
+- platform: rest
+  name: Entrance Lock Bottom Sensor
+  resource: https://app.candyhouse.co/api/sesame2/[% sesame.uuid_bottom %]
+  headers:
+    x-api-key: "[% sesame.api_key %]"
+  value_template: '{{ value_json.CHSesame2Status }}'
+  json_attributes:
+    - batteryPercentage
+    - batteryVoltage
+    - position
+    - CHSesame2Status
+    - timestamp
+  scan_interval: 6000
+- platform: rest
   name: Balcony SwitchBot Meter Temperature
   resource: https://api.switch-bot.com/v1.0/devices/EDE4EAA09EA3/status
   headers:
