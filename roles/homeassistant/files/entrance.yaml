@@ -7,3 +7,12 @@ cards:
     entity: alarm_control_panel.entrance_lock
     states:
       - arm_home
+  - type: entities
+    title: Locks
+    entities:
+      - entity: binary_sensor.entrance_lock_top
+        name: Lock Top
+        secondary_info: last-changed
+      - entity: binary_sensor.entrance_lock_bottom
+        name: Lock Botoom
+        secondary_info: last-changed
