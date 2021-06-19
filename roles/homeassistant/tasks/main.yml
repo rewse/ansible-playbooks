@@ -249,15 +249,13 @@
     insertafter: '^homekit:'
     regexp: '^input_datetime:'
     line: "input_datetime: !include input_datetimes.yaml"
-  notify: Restart homeassistant
-  tags: [homeassistant, homeassistant-component]
+  tags: [homeassistant, homeassistant-input-datetime]
 
 - name: Copy input_datetimes.yaml
   copy:
     src: input_datetimes.yaml
     dest: /etc/homeassistant
-  notify: Restart homeassistant
-  tags: [homeassistant, homeassistant-component]
+  tags: [homeassistant, homeassistant-input-datetime]
 
 - name: Config input_number
   lineinfile:
@@ -265,15 +263,13 @@
     insertafter: '^input_datetime:'
     regexp: '^input_number:'
     line: "input_number: !include input_numbers.yaml"
-  notify: Restart homeassistant
-  tags: [homeassistant, homeassistant-component]
+  tags: [homeassistant, homeassistant-input-number]
 
 - name: Copy input_numbers.yaml
   copy:
     src: input_numbers.yaml
     dest: /etc/homeassistant
-  notify: Restart homeassistant
-  tags: [homeassistant, homeassistant-component]
+  tags: [homeassistant, homeassistant-input-number]
 
 - name: Config ios
   lineinfile:
