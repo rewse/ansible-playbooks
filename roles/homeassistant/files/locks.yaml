@@ -16,3 +16,14 @@
   unlock:
     service: shell_command.control_entrance_lock_bottom_unlock
   optimistic: true
+- platform: template
+  unique_id: lock.entrance_locks
+  name: Entrance Locks
+  value_template: "{{ is_state('sensor.entrance_lock_top_sensor', 'locked') or is_state('sensor.entrance_lock_top_sensor', 'locked') }}"
+  lock:
+    - service: shell_command.control_entrance_lock_top_lock
+    - service: shell_command.control_entrance_lock_bottom_lock
+  unlock:
+    - service: shell_command.control_entrance_lock_top_unlock
+    - service: shell_command.control_entrance_lock_bottom_unlock
+  optimistic: true
