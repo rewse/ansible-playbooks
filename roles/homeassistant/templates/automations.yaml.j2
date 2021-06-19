@@ -1210,14 +1210,6 @@
       entity_id: binary_sensor.study_window_s
       state: "off"
       for: 00:30:00
-    - condition: state
-      entity_id: binary_sensor.bedroom_window_n
-      state: "off"
-      for: 00:30:00
-    - condition: state
-      entity_id: binary_sensor.bedroom_window_s
-      state: "off"
-      for: 00:30:00
   action:
     - service: switch.toggle
       entity_id: switch.living_room_floor_heating
