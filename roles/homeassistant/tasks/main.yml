@@ -677,9 +677,6 @@
       recorder:
         db_url: !secret postgres_connstr
         purge_keep_days: 450
-      speedtestdotnet:
-        scan_interval:
-          hours: 1
       tplink:
         discovery: false
         switch:
