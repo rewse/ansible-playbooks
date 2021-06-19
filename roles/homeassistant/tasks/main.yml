@@ -77,6 +77,8 @@
   template:
     src: secrets.yaml.j2
     dest: /etc/homeassistant/secrets.yaml
+    variable_start_string: "[%"
+    variable_end_string: "%]"
   notify: Restart homeassistant
   tags: [homeassistant, homeassistant-component]
 
