@@ -14,6 +14,10 @@
     name: autofs
     state: restarted
 
+- name: Restart docker
+  community.docker.docker_compose:
+    project_src: /etc
+
 - name: Restart homeassistant
   uri:
     url: https://hass.rewse.jp/api/services/homeassistant/check_config
