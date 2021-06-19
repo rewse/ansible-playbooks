@@ -1,3 +1,27 @@
+bedroom_hvac_cool_turned_off_threshold:
+  name: Bedroom HVAC Cool Turned off Threshold
+  min: 19
+  max: 27
+  unit_of_measurement: °C
+  icon: mdi:thermometer-chevron-down
+bedroom_hvac_cool_turned_on_threshold:
+  name: Bedroom HVAC Cool Turned on Threshold
+  min: 24
+  max: 32
+  unit_of_measurement: °C
+  icon: mdi:thermometer-chevron-up
+bedroom_hvac_cool_forcibly_turned_on_threshold:
+  name: Bedroom HVAC Cool Forcibly Turned on Threshold
+  min: 27
+  max: 35
+  unit_of_measurement: °C
+  icon: mdi:thermometer-alert
+bedroom_hvac_dry_turned_on_threshold:
+  name: Bedroom HVAC Dry Turned on Threshold
+  min: 56
+  max: 64
+  unit_of_measurement: "%"
+  icon: mdi:water-percent-alert
 living_room_hvac_cool_turned_off_threshold:
   name: Living Room HVAC Cool Turned off Threshold
   min: 19
