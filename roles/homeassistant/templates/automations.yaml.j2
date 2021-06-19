@@ -794,7 +794,7 @@
     - service: alarm_control_panel.alarm_arm_away
       target:
         entity_id: alarm_control_panel.surveillance
-    - service: notify.tats_devices
+    - service: notify.all_devices
       data:
         message: Now Arming Away
         data:
@@ -990,7 +990,7 @@
   action:
     - service: switch.turn_off
       entity_id: switch.living_room_humidifier
-    - service: notify.tats_devices
+    - service: notify.all_devices
       data:
         message: "Turned off Living Room Humidifier. Current: {{ states('sensor.living_room_humidity') }}%"
         data:
@@ -1036,7 +1036,7 @@
         entity_id: climate.living_room_hvac
       data:
         hvac_mode: 'off'
-    - service: notify.tats_devices
+    - service: notify.all_devices
       data:
         message: "Turned off Living Room HVAC. Current: {{ states('sensor.living_room_temperature') }}°C"
         data:
@@ -1215,7 +1215,7 @@
       entity_id: switch.living_room_floor_heating
     - service: switch.toggle
       entity_id: switch.study_floor_heating
-    - service: notify.tats_devices
+    - service: notify.all_devices
       data:
         message: "Turned on Living Area Floor Heating. Current: {{ states('sensor.living_room_temperature') }}°C"
         data:
@@ -1301,7 +1301,7 @@
         entity_id: climate.living_room_hvac
       data:
         hvac_mode: cool
-    - service: notify.tats_devices
+    - service: notify.all_devices
       data:
         message: "Turned on Living Room HVAC Cool. Current: {{ states('sensor.living_room_temperature') }}°C"
         data:
@@ -1340,7 +1340,7 @@
         entity_id: climate.living_room_hvac
       data:
         hvac_mode: cool
-    - service: notify.tats_devices
+    - service: notify.all_devices
       data:
         message: "Turned on Living Room HVAC Cool Forcibly. Current: {{ states('sensor.living_room_temperature') }}°C"
         data:
@@ -1393,7 +1393,7 @@
         entity_id: climate.living_room_hvac
       data:
         hvac_mode: dry
-    - service: notify.tats_devices
+    - service: notify.all_devices
       data:
         message: "Turned on Living Room HVAC Dry. Current: {{ states('sensor.living_room_humidifier') }}%"
         data:
@@ -1505,7 +1505,7 @@
   action:
     - service: switch.turn_on
       entity_id: switch.living_room_humidifier
-    - service: notify.tats_devices
+    - service: notify.all_devices
       data:
         message: "Turned on Living Room Humidifier. Current: {{ states('sensor.living_room_humidity') }}%"
         data:
