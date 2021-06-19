@@ -549,11 +549,35 @@
       value_template: >-
         {{ (as_timestamp(now()) -
         as_timestamp(states('sensor.mamorail_received_date_time'))) < 180 }}
+    - condition: numeric_state
+      entity_id: sensor.mamorail_balance
+      above: 1000
   action:
     - service: notify.all_devices
       data:
         title: "[% notify_title_k %]"
-        message: "️{{ states('sensor.mamorail_station') }}を{{ states('sensor.mamorail_time') }}に{{ states('sensor.mamorail_action') }}しました。残高: {{ states('sensor.mamorail_balance') }}円"
+        message: "{{ states('sensor.mamorail_station') }}を{{ states('sensor.mamorail_time') }}に{{ states('sensor.mamorail_action') }}しました。残高: {{ states('sensor.mamorail_balance') }}円"
+        data:
+          url: /lovelace-people/people
+  mode: single
+- id: automation.info_mamorail_needed_to_charge
+  alias: "INFO: Mamorail Needed to Charge"
+  trigger:
+    - platform: state
+      entity_id: sensor.mamorail
+  condition:
+    - condition: template
+      value_template: >-
+        {{ (as_timestamp(now()) -
+        as_timestamp(states('sensor.mamorail_received_date_time'))) < 180 }}
+    - condition: numeric_state
+      entity_id: sensor.mamorail_balance
+      below: 999
+  action:
+    - service: notify.all_devices
+      data:
+        title: "[% notify_title_k %]"
+        message: "️チャージしてください。{{ states('sensor.mamorail_station') }}を{{ states('sensor.mamorail_time') }}に{{ states('sensor.mamorail_action') }}しました。残高: {{ states('sensor.mamorail_balance') }}円"
         data:
           url: /lovelace-people/people
   mode: single
@@ -956,7 +980,7 @@
       target:
         entity_id: climate.living_room_hvac
       data:
-        hvac_mode: off
+        hvac_mode: "off"
     - service: notify.tats_devices
       data:
         message: "Turned off Living Room HVAC. Current: {{ states('sensor.living_room_temperature') }}°C"
