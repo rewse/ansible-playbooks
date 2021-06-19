@@ -1019,6 +1019,17 @@
     - condition: numeric_state
       entity_id: sensor.living_room_wbgt
       below: input_number.living_room_hvac_cool_turned_off_threshold
+    - condition: or
+      conditions:
+        - condition: state
+          entity_id: climate.living_room_hvac
+          state: heat_cool
+        - condition: state
+          entity_id: climate.living_room_hvac
+          state: cool
+        - condition: state
+          entity_id: climate.living_room_hvac
+          state: dry
   action:
     - service: climate.set_hvac_mode
       target:
