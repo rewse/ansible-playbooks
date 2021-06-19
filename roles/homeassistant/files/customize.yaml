@@ -94,8 +94,10 @@ automation.info_mamorail_needed_to_charge:
   icon: mdi:train
 automation.info_update_available:
   icon: mdi:update
-automation.notify_update_available:
-  icon: mdi:check-circle
+automation.open_entrance_when_ios_action_fails:
+  icon: mdi:lock-remove
+automation.open_entrance_when_ios_action_fires:
+  icon: mdi:lock-open-variant
 automation.open_bedroom_curtains_temporarily:
   icon: mdi:window-shutter-alert
 automation.open_bedroom_curtains_workday:

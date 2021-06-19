@@ -1,4 +1,12 @@
 actions:
+  - name: open_entrance
+    background_color: "#6c2735"
+    label:
+      text: Open Entrance
+      color: "#ffffff"
+    icon:
+      icon: mdi:door
+      color: "#ffffff"
   - name: turn_on_surveillance
     background_color: "#736d71"
     label:
