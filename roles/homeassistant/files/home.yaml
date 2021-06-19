@@ -100,18 +100,17 @@ cards:
           - entity: sensor.living_room_pm25
             name: PM 2.5
       - type: entities
-        title: Living Room Appliances
+        title: Living Room Lights
         entities:
-          - entity: light.living_area_dimming_downlights
-            name: Dimming Lights
-          - entity: fan.living_room_ceiling_fans
-            name: Ceiling Fan
-          - entity: switch.living_room_humidifier
-            name: Humidifier
-          - entity: group.living_area_floor_heatings
-            name: Floor Heating
+          - entity: light.living_area_downlights
+            name: Downlights
+          - entity: light.living_room_tv_light
+            name: TV Light
+          - entity: light.living_room_entrance_light
+            name: Entrance Light
+          - entity: light.living_room_footlight
+            name: Footlight
         state_color: false
-        show_header_toggle: false
       - type: "custom:simple-thermostat"
         entity: climate.living_room_hvac
         layout:
@@ -134,17 +133,18 @@ cards:
             --st-mode-background: transparent;
           }
       - type: entities
-        title: Living Room Lights
+        title: Living Room Appliances
         entities:
-          - entity: light.living_area_downlights
-            name: Downlights
-          - entity: light.living_room_tv_light
-            name: TV Light
-          - entity: light.living_room_entrance_light
-            name: Entrance Light
-          - entity: light.living_room_footlight
-            name: Footlight
+          - entity: light.living_area_dimming_downlights
+            name: Dimming Lights
+          - entity: fan.living_room_ceiling_fans
+            name: Ceiling Fan
+          - entity: group.living_area_floor_heatings
+            name: Floor Heating
+          - entity: switch.living_room_humidifier
+            name: Humidifier
         state_color: false
+        show_header_toggle: false
   - type: vertical-stack
     cards:
       - type: custom:mini-graph-card
@@ -191,10 +191,11 @@ cards:
           - value: above_horizon
           - value: below_horizon
       - type: entities
-        title: Bedroom Appliances
+        title: Bedroom Lights
         entities:
-          - entity: switch.bedroom_curtains
-            name: Curtains
+          - entity: light.bedroom_light
+            name: Light
+        show_header_toggle: false
       - type: "custom:simple-thermostat"
         entity: climate.bedroom_hvac
         layout:
@@ -217,11 +218,10 @@ cards:
             --st-mode-background: transparent;
           }
       - type: entities
-        title: Bedroom Lights
+        title: Bedroom Appliances
         entities:
-          - entity: light.bedroom_light
-            name: Light
-        show_header_toggle: false
+          - entity: switch.bedroom_curtains
+            name: Curtains
   - type: vertical-stack
     cards:
       - type: custom:mini-graph-card
@@ -337,7 +337,7 @@ cards:
   - type: vertical-stack
     cards:
       - type: entities
-        title: Locks
+        title: Entrance Locks
         entities:
           - entity: lock.entrance_locks
             name: Entrance Both
@@ -350,6 +350,7 @@ cards:
             secondary_info: last-changed
       - type: alarm-panel
         entity: alarm_control_panel.entrance_auto_lock
+        title: Entrance Auto-Lock
         states:
           - arm_home
   - type: alarm-panel
@@ -442,9 +443,3 @@ cards:
             name: Wind
           - entity: sensor.home_uv_index
             name: UV Index
-  - type: entities
-    title: Automations
-    entities:
-      - entity: automation.turn_off_surveillance
-        secondary_info: last-triggered
-    show_header_toggle: false
