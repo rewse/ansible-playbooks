@@ -112,27 +112,6 @@
         seconds: 0
         milliseconds: 0
   mode: single
-- id: automation.alarm_suicas_balance_is_not_enough
-  alias: "ALARM: Suica’s Balance is Not Enough"
-  trigger:
-    - platform: state
-      entity_id: sensor.mamorail
-      from: 入場
-    - platform: state
-      entity_id: sensor.mamorail
-      from: 出場
-  condition:
-    - condition: numeric_state
-      entity_id: sensor.mamorail_balance
-      below: '1000'
-  action:
-    - service: notify.all_devices
-      data:
-        title: "⚠️ ALARM"
-        message: "️Suica’s balance is not enough. Current: {{ states('sensor.mamorail_balance') }}yen"
-        data:
-          url: /lovelace-people/poeple
-  mode: single
 - id: automation.alarm_zulu_is_offline
   alias: "ALARM: zulu is Offline"
   trigger:
