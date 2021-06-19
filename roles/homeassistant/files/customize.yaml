@@ -104,6 +104,8 @@ automation.turn_off_living_room_extra_lights:
   icon: mdi:led-strip-variant
 automation.turn_off_living_room_humidifier:
   icon: mdi:air-humidifier-off
+automation.turn_off_living_room_hvac:
+  icon: mdi:thermostat
 automation.turn_off_living_room_hvac_fan:
   icon: mdi:fan-off
 automation.turn_off_living_room_lights_appliances:
