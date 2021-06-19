@@ -82,6 +82,8 @@ automation.info_denshobato:
   icon: mdi:bird
 automation.info_mamorail:
   icon: mdi:train
+automation.info_mamorail_needed_to_charge:
+  icon: mdi:train
 automation.info_update_available:
   icon: mdi:update
 automation.notify_update_available:
