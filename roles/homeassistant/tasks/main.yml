@@ -469,9 +469,9 @@
   tags: [homeassistant, homeassistant-component]
 
 - name: Copy zones.yaml
-  template:
-    src: zones.yaml.j2
-    dest: /etc/homeassistant/zones.yaml
+  copy:
+    src: zones.yaml
+    dest: /etc/homeassistant
   notify: Restart homeassistant
   tags: [homeassistant, homeassistant-component]
 
