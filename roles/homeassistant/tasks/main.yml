@@ -639,7 +639,6 @@
           name: Living Room
           sources:
             co2: sensor.living_room_co2
-            tvoc: sensor.living_room_tvoc
             hcho: sensor.living_room_hcho
             pm: sensor.living_room_pm25
       ifttt:
