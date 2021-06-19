@@ -1,6 +1,6 @@
   - filter:
       include_entities:
-        - alarm_control_panel.entrance_lock
+        - alarm_control_panel.entrance_auto_lock
         - alarm_control_panel.surveillance
         - climate.bedroom_hvac
         - climate.living_room_hvac
@@ -9,6 +9,7 @@
         - light.living_area_dimming_downlights
         - light.living_area_downlights
         - light.living_room_footlight
+        - lock.entrance_locks
         - media_player.aventage
         - media_player.firetv
         - media_player.heargo2
