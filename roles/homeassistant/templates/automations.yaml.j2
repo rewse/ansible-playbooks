@@ -1038,16 +1038,26 @@
   alias: Turn off Surveillance
   description: Turn off Surveillance when someone is at home
   trigger:
-    - platform: state
-      entity_id: person.shibata_tats
-      to: home
-    - platform: state
-      entity_id: person.shibata_akiko
-      to: home
+    - type: motion
+      platform: device
+      device_id: 56a0fc235acbf9c9f708708a9682ab66
+      entity_id: binary_sensor.living_room_motion
+      domain: binary_sensor
+    - type: motion
+      platform: device
+      device_id: 40a395e27caf6e3dbf69e07fa01f780d
+      entity_id: binary_sensor.study_motion
+      domain: binary_sensor
   condition:
     - condition: state
       entity_id: alarm_control_panel.surveillance
       state: armed_away
+    - condition: state
+      entity_id: person.shibata_tats
+      state: home
+    - condition: state
+      entity_id: person.shibata_akiko
+      state: home
   action:
     - service: alarm_control_panel.alarm_disarm
       target:
