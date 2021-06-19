@@ -677,7 +677,7 @@
   action:
     - service: notify.all_devices
       data:
-        message: "Living Room Humidity is Too High. Current: {{ states('sensor.living_room_humidifier') }}%"
+        message: "Living Room Humidity is Too High. Current: {{ states('sensor.living_room_humidity') }}%"
         data:
           url: /lovelace/home
     - delay:
