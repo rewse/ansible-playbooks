@@ -1,5 +1,5 @@
-alarm_control_panel.entrance_lock:
-  icon: mdi:lock-open
+alarm_control_panel.entrance_auto_lock:
+  icon: mdi:lock-clock
 alarm_control_panel.surveillance:
   icon: mdi:cctv
 automation.alarm_amazonplug_is_offline:
