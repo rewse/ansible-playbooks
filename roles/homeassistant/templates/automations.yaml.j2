@@ -16,10 +16,7 @@
         data:
           url: /lovelace-machines/machines
     - delay:
-        hours: 0
-        minutes: 0
-        seconds: 10
-        milliseconds: 0
+        hours: 1
     - service: script.restart_zulu
   mode: single
 - id: automation.alarm_living_room_air_quality_is_poor
@@ -63,9 +60,6 @@
           url: /lovelace/home
     - delay:
         hours: 1
-        minutes: 0
-        seconds: 0
-        milliseconds: 0
   mode: single
 - id: automation.alarm_living_room_co2_is_too_high
   alias: "ALARM: Living Room CO2 is Too High"
@@ -108,9 +102,6 @@
           url: /lovelace/home
     - delay:
         hours: 1
-        minutes: 0
-        seconds: 0
-        milliseconds: 0
   mode: single
 - id: automation.alarm_zulu_is_offline
   alias: "ALARM: zulu is Offline"
@@ -632,10 +623,7 @@
       entity_id: sensor.denshobato_action
       state: 下校
     - delay:
-        hours: 0
         minutes: 10
-        seconds: 0
-        milliseconds: 0
     - service: lock.open
       target:
         entity_id: lock.entrance_locks
@@ -678,9 +666,6 @@
           url: /lovelace/home
     - delay:
         hours: 1
-        minutes: 0
-        seconds: 0
-        milliseconds: 0
   mode: single
 - id: automation.info_bedroom_temperature_is_too_high
   alias: "INFO: Bedroom Temperature is Too High"
@@ -720,9 +705,6 @@
           url: /lovelace/home
     - delay:
         hours: 1
-        minutes: 0
-        seconds: 0
-        milliseconds: 0
   mode: single
 - id: automation.info_living_room_humidity_is_too_high
   alias: "INFO: Living Room Humidity is Too High"
@@ -766,9 +748,6 @@
           url: /lovelace/home
     - delay:
         hours: 1
-        minutes: 0
-        seconds: 0
-        milliseconds: 0
   mode: single
 - id: automation.info_living_room_temperature_is_too_high
   alias: "INFO: Living Room Temperature is Too High"
@@ -812,9 +791,6 @@
           url: /lovelace/home
     - delay:
         hours: 1
-        minutes: 0
-        seconds: 0
-        milliseconds: 0
   mode: single
 - id: automation.info_mamorail
   alias: "INFO: Mamorail"
@@ -893,8 +869,6 @@
         message: Nobody in Home. Use a physical key
         data:
           url: /lovelace-people/people
-    - delay:
-        minutes: 10
   mode: single
 - id: automation.open_entrance_when_ios_action_fires
   alias: Open Entrance when iOS Action Fires
@@ -916,8 +890,6 @@
     - service: lock.open
       target:
         entity_id: lock.entrance_locks
-    - delay:
-        minutes: 10
   mode: single
 - id: automation.turn_on_surveillance_when_ios_action_fires
   alias: Turn on surveillance when iOS Action Fires
@@ -935,11 +907,6 @@
         message: Now Arming Away
         data:
           url: /lovelace/home
-    - delay:
-        hours: 0
-        minutes: 10
-        seconds: 0
-        milliseconds: 0
   mode: single
 - id: automation.turn_on_surveillance_when_nobody_is_in_home
   alias: Turn on surveillance when Nobody is in Home
@@ -964,11 +931,6 @@
     - service: notify.all_devices
       data:
         message: Turn on surveillance because nobody is in home
-    - delay:
-        hours: 0
-        minutes: 10
-        seconds: 0
-        milliseconds: 0
   mode: single
 - id: automation.turn_on_monitor_bio
   alias: Turn on monitor bio
@@ -1110,9 +1072,6 @@
           url: /lovelace/home
     - delay:
         hours: 1
-        minutes: 0
-        seconds: 0
-        milliseconds: 0
   mode: single
 - id: automation.turn_off_living_room_extra_lights
   alias: Turn off Living Room Extra Lights
@@ -1171,9 +1130,6 @@
           url: /lovelace/home
     - delay:
         hours: 1
-        minutes: 0
-        seconds: 0
-        milliseconds: 0
   mode: single
 - id: automation.turn_off_living_room_hvac
   alias: Turn off Living Room HVAC
@@ -1217,9 +1173,6 @@
           url: /lovelace/home
     - delay:
         hours: 1
-        minutes: 0
-        seconds: 0
-        milliseconds: 0
   mode: single
 - id: automation.turn_off_living_room_hvac_fan
   alias: Turn off Living Room HVAC Fan
@@ -1259,11 +1212,6 @@
         message: Turned off Living Room Lights
         data:
           url: /lovelace/home
-    - delay:
-        hours: 0
-        minutes: 10
-        seconds: 0
-        milliseconds: 0
   mode: single
 - id: automation.turn_off_living_room_lights_appliances
   alias: Turn off Living Room Lights & Appliances
@@ -1307,12 +1255,12 @@
       state: armed_away
     - condition: or
       conditions:
-    - condition: state
-      entity_id: person.shibata_tats
-      state: home
-    - condition: state
-      entity_id: person.shibata_akiko
-      state: home
+        - condition: state
+          entity_id: person.shibata_tats
+          state: home
+        - condition: state
+          entity_id: person.shibata_akiko
+          state: home
   action:
     - service: alarm_control_panel.alarm_disarm
       target:
@@ -1323,10 +1271,7 @@
         data:
           url: /lovelace/home
     - delay:
-        hours: 0
-        minutes: 10
-        seconds: 0
-        milliseconds: 0
+        hours: 1
   mode: single
 - id: automation.plan_to_turn_on_bedroom_hvac_cleaner
   alias: Plan to Turn on Bedrom HVAC Cleaner
@@ -1413,9 +1358,6 @@
           url: /lovelace/home
     - delay:
         hours: 1
-        minutes: 0
-        seconds: 0
-        milliseconds: 0
   mode: single
 - id: automation.turn_on_bedroom_hvac_cleaner
   alias: Turn on Bedroom HVAC Cleaner
@@ -1496,9 +1438,6 @@
           url: /lovelace/home
     - delay:
         hours: 1
-        minutes: 0
-        seconds: 0
-        milliseconds: 0
   mode: single
 - id: automation.turn_on_bedroom_hvac_cool_forcibly
   alias: Turn on Bedroom HVAC Cool Forcibly
@@ -1531,9 +1470,6 @@
           url: /lovelace/home
     - delay:
         hours: 1
-        minutes: 0
-        seconds: 0
-        milliseconds: 0
   mode: single
 - id: automation.turn_on_bedroom_hvac_dry
   alias: Turn on Bedroom HVAC Dry
@@ -1580,9 +1516,6 @@
           url: /lovelace/home
     - delay:
         hours: 1
-        minutes: 0
-        seconds: 0
-        milliseconds: 0
   mode: single
 - id: automation.turn_on_living_room_hvac_cleaner
   alias: Turn on Living Room HVAC Cleaner
@@ -1652,9 +1585,6 @@
           url: /lovelace/home
     - delay:
         hours: 1
-        minutes: 0
-        seconds: 0
-        milliseconds: 0
   mode: single
 - id: automation.turn_on_living_room_hvac_cool_forcibly
   alias: Turn on Living Room HVAC Cool Forcibly
@@ -1691,9 +1621,6 @@
           url: /lovelace/home
     - delay:
         hours: 1
-        minutes: 0
-        seconds: 0
-        milliseconds: 0
   mode: single
 - id: automation.turn_on_living_room_hvac_dry
   alias: Turn on Living Room HVAC Dry
@@ -1747,9 +1674,6 @@
           url: /lovelace/home
     - delay:
         hours: 1
-        minutes: 0
-        seconds: 0
-        milliseconds: 0
   mode: single
 - id: automation.turn_on_living_room_hvac_fan
   alias: Turn on Living Room HVAC Fan
@@ -1810,9 +1734,6 @@
           url: /lovelace/home
     - delay:
         hours: 1
-        minutes: 0
-        seconds: 0
-        milliseconds: 0
   mode: single
 - id: automation.turn_on_living_room_humidifier
   alias: Turn on Living Room Humidifier
@@ -1859,7 +1780,4 @@
           url: /lovelace/home
     - delay:
         hours: 1
-        minutes: 0
-        seconds: 0
-        milliseconds: 0
   mode: single
