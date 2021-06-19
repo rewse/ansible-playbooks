@@ -1277,6 +1277,19 @@
         seconds: 0
         milliseconds: 0
   mode: single
+- id: automation.plan_to_turn_on_bedroom_hvac_cleaner
+  alias: Plan to Turn on Bedrom HVAC Cleaner
+  description: Plan to turn on the HVAC cleaner in the bedroom
+  trigger:
+    - condition: numeric_state
+      entity_id: sensor.filtered_bedroom_hvac_plug_current
+      above: "100"
+  action:
+    - service: automation.turn_on
+      target:
+        entity_id:
+          - automation.turn_on_bedroom_hvac_cleaner
+  mode: single
 - id: automation.plan_to_turn_on_living_room_hvac_fan
   alias: Plan to Turn on Living Room HVAC Fan 
   description: Plan to turn on the HVAC in the living room with fan mode
@@ -1299,6 +1312,7 @@
         entity_id:
           - automation.turn_on_living_room_hvac_fan
           - automation.turn_off_living_room_hvac_fan
+          - automation.turn_on_living_room_hvac_cleaner
   mode: single
 - id: automation.turn_on_living_area_floor_heating
   alias: Turn on Living Area Floor Heating
@@ -1355,12 +1369,29 @@
   alias: Turn on Bedroom HVAC Cleaner
   description: Turn on the HVAC cleaner in the bedroom
   trigger:
-    - platform: time
-      at: '16:00'
+    - platform: time_pattern
+      minutes: 5
   condition:
     - condition: time
+      after: "16:00"
+      before: :20:00"
       weekday:
+        - sat
         - sun
+    - type: is_no_motion
+      condition: device
+      device_id: 1cfdcc15e8a8ebba52628efc0022f94b
+      entity_id: binary_sensor.bedroom_n_motion
+      domain: binary_sensor
+      for:
+        minutes: 30
+    - type: is_no_motion
+      condition: device
+      device_id: 2d183a12dcb81acda2688fbe4a4f2567
+      entity_id: binary_sensor.bedroom_s_motion
+      domain: binary_sensor
+      for:
+        minutes: 30
   action:
     - service: switch.turn_on
       target:
@@ -1370,6 +1401,9 @@
         message: Turned on Bedroom HVAC Cleaner
         data:
           url: /lovelace/home
+    - service: automation.turn_off
+      target:
+        entity_id: automation.turn_on_bedroom_hvac_cleaner
   mode: single
 - id: automation.turn_on_bedroom_hvac_cool
   alias: Turn on Bedroom HVAC Cool
@@ -1516,6 +1550,9 @@
         message: Turned on Living Room HVAC Cleaner
         data:
           url: /lovelace/home
+    - service: automation.turn_off
+      target:
+        entity_id: automation.turn_on_living_room_hvac_cleaner
   mode: single
 - id: automation.turn_on_living_room_hvac_cool
   alias: Turn on Living Room HVAC Cool
