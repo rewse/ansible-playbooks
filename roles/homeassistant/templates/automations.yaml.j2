@@ -596,6 +596,49 @@
         seconds: 0
         milliseconds: 0
   mode: single
+- id: automation.info_living_room_temperature_is_too_high
+  alias: "INFO: Living Room Temperature is Too High"
+  trigger:
+    - type: motion
+      platform: device
+      device_id: 56a0fc235acbf9c9f708708a9682ab66
+      entity_id: binary_sensor.living_room_motion
+      domain: binary_sensor
+    - type: motion
+      platform: device
+      device_id: 40a395e27caf6e3dbf69e07fa01f780d
+      entity_id: binary_sensor.study_motion
+      domain: binary_sensor
+  condition:
+    - condition: numeric_state
+      entity_id: sensor.living_room_wbgt
+      above: input_number.living_room_hvac_cool_turned_on_threshold
+    - condition: or
+      conditions:
+      - condition: state
+        entity_id: binary_sensor.living_room_window
+        state: "on"
+        for: 00:30:00
+      - condition: state
+        entity_id: binary_sensor.study_window_n
+        state: "on"
+        for: 00:30:00
+      - condition: state
+        entity_id: binary_sensor.study_window_s
+        state: "on"
+        for: 00:30:00
+  action:
+    - service: notify.all_devices
+      data:
+        message: "Living Room Temperature is Too High. Current: {{ states('sensor.living_room_temperature') }}°C"
+        data:
+          url: /lovelace/home
+    - delay:
+        hours: 1
+        minutes: 0
+        seconds: 0
+        milliseconds: 0
+  mode: single
 - id: automation.info_mamorail
   alias: "INFO: Mamorail"
   trigger:
