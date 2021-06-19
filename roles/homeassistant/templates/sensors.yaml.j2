@@ -190,7 +190,7 @@
     - position
     - CHSesame2Status
     - timestamp
-  scan_interval: 6000
+  scan_interval: 1200
 - platform: rest
   name: Entrance Lock Bottom Sensor
   resource: https://app.candyhouse.co/api/sesame2/[% sesame.uuid_bottom %]
@@ -203,7 +203,7 @@
     - position
     - CHSesame2Status
     - timestamp
-  scan_interval: 6000
+  scan_interval: 1200
 - platform: season
 - platform: statistics
   entity_id: sensor.balcony_humidity_difference
