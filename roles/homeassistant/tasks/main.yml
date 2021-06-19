@@ -6,6 +6,21 @@
       - python3-certbot-apache
   tags: [homeassistant, package]
 
+# Ref: https://community.home-assistant.io/t/imap-email-content-character-encoding/22928
+- name: Copy sensor.patch
+  copy:
+    src: sensor.patch
+    dest: /etc/homeassistant
+  notify: Restart docker
+  tags: [homeassistant, homeassistant-docker]
+
+- name: Copy Dockerfile
+  copy:
+    src: Dockerfile
+    dest: /etc/homeassistant
+  notify: Restart docker
+  tags: [homeassistant, homeassistant-docker]
+
 - name: Add to docker-compose.yml
   blockinfile:
     path: /etc/docker-compose.yml
@@ -13,13 +28,16 @@
       services:
         homeassistant:
           container_name: homeassistant
-          image: homeassistant/raspberrypi4-homeassistant:stable
+          build:
+            context: homeassistant
+            dockerfile: Dockerfile
           volumes:
             - /etc/homeassistant:/config
             - /etc/localtime:/etc/localtime:ro
           restart: unless-stopped
           network_mode: host
-  tags: [homeassistant]
+  notify: Restart docker
+  tags: [homeassistant, homeassistant-docker]
 
 - name: Copy automations.yaml.j2
   template:
@@ -465,22 +483,6 @@
   notify: Restart homeassistant
   tags: [homeassistant]
 
-- name: Copy imap_emal_content/sensor.py
-  command: docker container cp homeassistant:/usr/src/homeassistant/homeassistant/components/imap_email_content/sensor.py /tmp/sensor.py
-  tags: [homeassistant, homeassistant-fix]
-
-# Ref: https://community.home-assistant.io/t/imap-email-content-character-encoding/22928
-- name: Patch imap_emal_content/sensor.py
-  patch:
-    src: sensor.patch
-    dest: /tmp/sensor.py
-  tags: [homeassistant, homeassistant-fix]
-
-- name: Copy imap_emal_content/sensor.py
-  command: docker container cp /tmp/sensor.py homeassistant:/usr/src/homeassistant/homeassistant/components/imap_email_content/sensor.py
-  notify: Restart homeassistant
-  tags: [homeassistant, homeassistant-fix]
-
 - name: Create custom_components/jq300
   file:
     path: /etc/homeassistant/custom_components/jq300
@@ -733,11 +735,6 @@
     src: people.yaml
     dest: /etc/homeassistant/ui
   tags: [homeassistant, homeassistant-ui]
-
-- name: Start homeassistant container
-  community.docker.docker_compose:
-    project_src: /etc
-  tags: [homeassistant]
 
 - name: Enable proxy
   community.general.apache2_module:
