@@ -80,6 +80,10 @@ automation.alarm_zulu_is_offline:
   icon: mdi:router-network
 automation.info_denshobato:
   icon: mdi:bird
+automation.info_living_room_humidity_is_too_high:
+  icon: mdi:water-percent-alert
+automation.info_living_room_temperature_is_too_high:
+  icon: mdi:thermometer-alert
 automation.info_mamorail:
   icon: mdi:train
 automation.info_mamorail_needed_to_charge:
