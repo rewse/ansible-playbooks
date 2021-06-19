@@ -80,6 +80,10 @@ automation.alarm_zulu_is_offline:
   icon: mdi:router-network
 automation.info_denshobato:
   icon: mdi:bird
+automation.info_bedroom_humidity_is_too_high:
+  icon: mdi:water-percent-alert
+automation.info_bedroom_temperature_is_too_high:
+  icon: mdi:thermometer-alert
 automation.info_living_room_humidity_is_too_high:
   icon: mdi:water-percent-alert
 automation.info_living_room_temperature_is_too_high:
@@ -104,6 +108,8 @@ automation.turn_down_living_area:
   icon: mdi:brightness-6
 automation.turn_down_living_area_more:
   icon: mdi:brightness-4
+automation.turn_off_bedroom_hvac:
+  icon: mdi:thermostat
 automation.turn_off_living_area_lights:
   icon: mdi:lightbulb-group-off-outline
 automation.turn_off_living_room_extra_lights:
@@ -124,6 +130,12 @@ automation.turn_off_surveillance:
   icon: mdi:cctv
 automation.turn_on_bedroom_hvac_cleaner:
   icon: mdi:broom
+automation.turn_on_bedroom_hvac_cool:
+  icon: mdi:snowflake
+automation.turn_on_bedroom_hvac_cool_forcibly:
+  icon: mdi:snowflake-alert
+automation.turn_on_bedroom_hvac_dry:
+  icon: mdi:water-percent-alert
 automation.turn_on_living_area_downlights:
   icon: mdi:wall-sconce-flat
 automation.turn_on_living_area_floor_heating:
