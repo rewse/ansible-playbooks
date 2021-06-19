@@ -2,3 +2,4 @@
 dependencies:
   - {role: apache}
   - {role: docker}
+  - {role: sesame}
