@@ -71,7 +71,7 @@
     dest: /etc/homeassistant/automations.yaml
     variable_start_string: "[%"
     variable_end_string: "%]"
-  tags: [homeassistant, homeassistant-automations]
+  tags: [homeassistant, homeassistant-automation]
 
 - name: Copy secrets.yaml
   template:
