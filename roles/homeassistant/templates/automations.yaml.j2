@@ -538,6 +538,17 @@
       data:
         title: "[% notify_title_k %]"
         message: "️{{ states('sensor.denshobato_time') }}に{{ states('sensor.denshobato_action') }}しました"
+    - condition: state
+      entity_id: sensor.denshobato_action
+      state: 下校
+    - delay:
+        hours: 0
+        minutes: 10
+        seconds: 0
+        milliseconds: 0
+    - service: lock.open
+      target:
+        entity_id: lock.entrance_locks
   mode: single
 - id: automation.info_mamorail
   alias: "INFO: Mamorail"
