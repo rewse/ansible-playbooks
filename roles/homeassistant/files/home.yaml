@@ -339,12 +339,17 @@ cards:
       - type: entities
         title: Locks
         entities:
+          - entity: lock.entrance_locks
+            name: Entrance Both
+            secondary_info: last-changed
           - entity: lock.entrance_lock_top
+            name: Entrance Top
             secondary_info: last-changed
           - entity: lock.entrance_lock_bottom
+            name: Entrance Bottom
             secondary_info: last-changed
       - type: alarm-panel
-        entity: alarm_control_panel.entrance_lock
+        entity: alarm_control_panel.entrance_auto_lock
         states:
           - arm_home
   - type: alarm-panel
