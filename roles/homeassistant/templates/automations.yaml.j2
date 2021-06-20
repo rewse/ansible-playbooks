@@ -1368,6 +1368,14 @@
     - condition: numeric_state
       entity_id: sensor.bedroom_wbgt
       above: input_number.bedroom_hvac_cool_turned_on_threshold
+    - condition: state
+      entity_id: binary_sensor.bedroom_window_n
+      state: "off"
+      for: 00:30:00
+    - condition: state
+      entity_id: binary_sensor.bedroom_window_s
+      state: "off"
+      for: 00:30:00
     - condition: or
       conditions:
         - condition: template
@@ -1400,6 +1408,14 @@
     - condition: numeric_state
       entity_id: sensor.bedroom_wbgt
       above: input_number.bedroom_hvac_cool_forcibly_turned_on_threshold
+    - condition: state
+      entity_id: binary_sensor.bedroom_window_n
+      state: "off"
+      for: 00:30:00
+    - condition: state
+      entity_id: binary_sensor.bedroom_window_s
+      state: "off"
+      for: 00:30:00
     - condition: or
       conditions:
         - condition: template
@@ -1446,6 +1462,14 @@
     - condition: numeric_state
       entity_id: sensor.filtered_bedroom_hvac_plug_current
       below: "100"
+    - condition: state
+      entity_id: binary_sensor.bedroom_window_n
+      state: "off"
+      for: 00:30:00
+    - condition: state
+      entity_id: binary_sensor.bedroom_window_s
+      state: "off"
+      for: 00:30:00
     - condition: or
       conditions:
         - condition: template
