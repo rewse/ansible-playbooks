@@ -5,7 +5,7 @@ smart_home:
   client_secret: !secret alexa_client_secret
   filter:
     include_entities:
-      - alarm_control_panel.entrance_lock
+      - alarm_control_panel.entrance_auto_lock
       - alarm_control_panel.surveillance
       - automation.turn_down_living_area
       - automation.turn_down_living_area_more
@@ -31,6 +31,7 @@ smart_home:
       - light.living_room_entrance_light
       - light.living_room_footlight
       - light.living_room_tv_light
+      - lock.entrance_locks
       - media_player.appletv
       - media_player.aventage
       - media_player.heargo2
@@ -44,8 +45,8 @@ smart_home:
       - switch.living_room_humidifier
       - switch.living_room_hvac_cleaner
   entity_config:
-    alarm_control_panel.entrance_lock:
-      name: 玄関の鍵
+    alarm_control_panel.entrance_auto_lock:
+      name: 玄関のオートロック
     alarm_control_panel.surveillance:
       name: 監視カメラ
     automation.turn_down_living_area:
@@ -99,6 +100,8 @@ smart_home:
       name: リビングのフットライト
     light.living_room_tv_light:
       name: リビングのテレビの照明
+    lock.entrance_locks:
+      name: 玄関の鍵
     media_player.appletv:
       name: Apple TV
       display_categories: STREAMING_DEVICE

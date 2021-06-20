@@ -1,54 +1,59 @@
 ---
 alexa_client:
-  id: "{{ vault_alexa_client.id }}"
-  secret: "{{ vault_alexa_client.secret }}"
+  id: "[% vault_alexa_client.id %]"
+  secret: "[% vault_alexa_client.secret %]"
 card_mod_version: 3.0.12
 gmail:
-  address: "{{ vault_gmail.address }}"
-  password: "{{ vault_gmail.password }}"
-ifttt_key: "{{ vault_ifttt_key }}"
+  address: "[% vault_gmail.address %]"
+  password: "[% vault_gmail.password %]"
+ifttt_key: "[% vault_ifttt_key %]"
 homeassistant_token: "{{ vault_homeassistant_token }}"
 iaquk_version: 1.5.0
 jq300:
-  username: "{{ vault_jq300.username }}"
-  password: "{{ vault_jq300.password }}"
+  username: "[% vault_jq300.username %]"
+  password: "[% vault_jq300.password %]"
   version: 0.8.2
 latlng:
   home:
-    lat: "{{ vault_latlng.home.lat }}"
-    lng: "{{ vault_latlng.home.lng }}"
+    lat: "[% vault_latlng.home.lat %]"
+    lng: "[% vault_latlng.home.lng %]"
   office:
-    lat: "{{ vault_latlng.office.lat }}"
-    lng: "{{ vault_latlng.office.lng }}"
+    lat: "[% vault_latlng.office.lat %]"
+    lng: "[% vault_latlng.office.lng %]"
   s:
-    name: "{{ vault_latlng.s.name }}"
-    lat: "{{ vault_latlng.s.lat }}"
-    lng: "{{ vault_latlng.s.lng }}"
+    name: "[% vault_latlng.s.name %]"
+    lat: "[% vault_latlng.s.lat %]"
+    lng: "[% vault_latlng.s.lng %]"
 localtuya_version: 3.2.2
 mini_graph_card_version: 0.10.0
 mini_media_player_version: 1.12.1
-mosquitto_password: "{{ vault_mosquitto_password }}"
-mosquitto_pub_password: "[% vault_mosquitto_password %]"
+mosquitto_password: "[% vault_mosquitto_password %]"
 nature_remo_version: 0.5
 nfs_server: guppy.rewse.jp
 notify_rewse_jp:
-  address: "{{ vault_notify_rewse_jp.address }}"
-  password: "{{ vault_notify_rewse_jp.password }}"
+  address: "[% vault_notify_rewse_jp.address %]"
+  password: "[% vault_notify_rewse_jp.password %]"
 notify_title_k: "[% vault_notify_title_k %]"
 postgres:
-  username: "{{ vault_postgres.username }}"
-  password: "{{ vault_postgres.password }}"
+  username: "[% vault_postgres.username %]"
+  password: "[% vault_postgres.password %]"
   hostname: homeassistant-db.rewse.jp
   db: homeassistant
 regza:
   username: "[% vault_regza.username %]"
   password: "[% vault_regza.password %]"
-remo_token: "{{ vault_remo_token }}"
+remo_token: "[% vault_remo_token %]"
+sesame:
+  api_key: "[% vault_sesame.api_key %]"
+  uuid_top: 2A7E1C52-71C2-F532-5E49-2B6F8FA1B6DC
+  uuid_bottom: 233B5C17-E7DB-D860-445F-1E28863BC7F6
+  secret_top: "[% vault_sesame.secret_top %]"
+  secret_bottom: "[% vault_sesame.secret_bottom %]"
 simple_thermostat_version: 2.4.2
 simple_weather_card_version: 0.8.1
-switchbot_token: "{{ vault_switchbot_token }}"
+switchbot_token: "[% vault_switchbot_token %]"
 uptime_card_version: 0.4.0
 tuyaplug:
-  liv_key: "{{ vault_tuyaplug.liv_key }}"
-  bed_key: "{{ vault_tuyaplug.bed_key }}"
+  liv_key: "[% vault_tuyaplug.liv_key %]"
+  bed_key: "[% vault_tuyaplug.bed_key %]"
 xiaomi_gateway3_version: 1.2.1
