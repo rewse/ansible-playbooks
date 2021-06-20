@@ -655,10 +655,10 @@
       conditions:
         - condition: template
           value_template: >
-            {{ state_attr('sensor.average_of_bedroom_presence_n', 'count') > 5 }}
+            {{ states('sensor.average_of_bedroom_presence_n') > 50 }}
         - condition: template
           value_template: >
-            {{ state_attr('sensor.average_of_bedroom_presence_s', 'count') > 5 }}
+            {{ states('sensor.average_of_bedroom_presence_s') > 50 }}
   action:
     - service: notify.all_devices
       data:
@@ -695,10 +695,10 @@
       conditions:
         - condition: template
           value_template: >
-            {{ state_attr('sensor.average_of_bedroom_presence_n', 'count') > 5 }}
+            {{ states('sensor.average_of_bedroom_presence_n') > 50 }}
         - condition: template
           value_template: >
-            {{ state_attr('sensor.average_of_bedroom_presence_s', 'count') > 5 }}
+            {{ states('sensor.average_of_bedroom_presence_s') > 50 }}
   action:
     - service: notify.all_devices
       data:
@@ -1329,14 +1329,14 @@
     - condition: time
       after: "16:00"
       before: "20:00"
-    - condition: not
+    - condition: or
       conditions:
         - condition: template
           value_template: >
-            {{ state_attr('sensor.average_of_bedroom_presence_n', 'count') > 5 }}
+            {{ states('sensor.average_of_bedroom_presence_n') < 50 }}
         - condition: template
           value_template: >
-            {{ state_attr('sensor.average_of_bedroom_presence_s', 'count') > 5 }}
+            {{ states('sensor.average_of_bedroom_presence_s') < 50 }}
   action:
     - service: switch.turn_on
       target:
@@ -1380,10 +1380,10 @@
       conditions:
         - condition: template
           value_template: >
-            {{ state_attr('sensor.average_of_bedroom_presence_n', 'count') > 5 }}
+            {{ states('sensor.average_of_bedroom_presence_n') > 50 }}
         - condition: template
           value_template: >
-            {{ state_attr('sensor.average_of_bedroom_presence_s', 'count') > 5 }}
+            {{ states('sensor.average_of_bedroom_presence_s') > 50 }}
   action:
     - service: climate.set_hvac_mode
       target:
@@ -1420,10 +1420,10 @@
       conditions:
         - condition: template
           value_template: >
-            {{ state_attr('sensor.average_of_bedroom_presence_n', 'count') > 5 }}
+            {{ states('sensor.average_of_bedroom_presence_n') > 50 }}
         - condition: template
           value_template: >
-            {{ state_attr('sensor.average_of_bedroom_presence_s', 'count') > 5 }}
+            {{ states('sensor.average_of_bedroom_presence_s') > 50 }}
   action:
     - service: climate.set_hvac_mode
       target:
@@ -1474,10 +1474,10 @@
       conditions:
         - condition: template
           value_template: >
-            {{ state_attr('sensor.average_of_bedroom_presence_n', 'count') > 5 }}
+            {{ states('sensor.average_of_bedroom_presence_n') > 50 }}
         - condition: template
           value_template: >
-            {{ state_attr('sensor.average_of_bedroom_presence_s', 'count') > 5 }}
+            {{ states('sensor.average_of_bedroom_presence_s') > 50 }}
   action:
     - service: climate.set_hvac_mode
       target:
@@ -1486,7 +1486,7 @@
         hvac_mode: dry
     - service: notify.all_devices
       data:
-        message: "Turned on Bedroom HVAC Dry. Current: {{ states('sensor.bedroom_humidifier') }}%"
+        message: "Turned on Bedroom HVAC Dry. Current: {{ states('sensor.bedroom_humidity') }}%"
         data:
           url: /lovelace/home
     - delay:
