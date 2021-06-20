@@ -68,6 +68,26 @@ cards:
         state_map:
           - value: above_horizon
           - value: below_horizon
+      - type: custom:mini-graph-card
+        name: Living Room CO2
+        entities:
+          - entity: sensor.living_room_co2
+          - entity: sun.sun
+            color: gray
+            show_line: false
+            show_points: false
+            y_axis: secondary
+        hours_to_show: 48
+        points_per_hour: 4
+        animate: true
+        height: 200
+        hour24: true
+        show:
+          legend: false
+          labels_secondary: false
+        state_map:
+          - value: above_horizon
+          - value: below_horizon
       - type: entities
         title: Living Room IAQ
         entities:
@@ -75,27 +95,22 @@ cards:
             name: IAQ Level
           - entity: sensor.living_room_iaq_index
             name: IAQ Index
-          - entity: sensor.living_room_co2
-            name: CO2
-          - entity: sensor.living_room_tvoc
-            name: TVOC
           - entity: sensor.living_room_hcho
             name: HCHO
           - entity: sensor.living_room_pm25
             name: PM 2.5
       - type: entities
-        title: Living Room Appliances
+        title: Living Room Lights
         entities:
-          - entity: light.living_area_dimming_downlights
-            name: Dimming Lights
-          - entity: fan.living_room_ceiling_fans
-            name: Ceiling Fan
-          - entity: switch.living_room_humidifier
-            name: Humidifier
-          - entity: group.living_area_floor_heatings
-            name: Floor Heating
+          - entity: light.living_area_downlights
+            name: Downlights
+          - entity: light.living_room_tv_light
+            name: TV Light
+          - entity: light.living_room_entrance_light
+            name: Entrance Light
+          - entity: light.living_room_footlight
+            name: Footlight
         state_color: false
-        show_header_toggle: false
       - type: "custom:simple-thermostat"
         entity: climate.living_room_hvac
         layout:
@@ -118,17 +133,18 @@ cards:
             --st-mode-background: transparent;
           }
       - type: entities
-        title: Living Room Lights
+        title: Living Room Appliances
         entities:
-          - entity: light.living_area_downlights
-            name: Downlights
-          - entity: light.living_room_tv_light
-            name: TV Light
-          - entity: light.living_room_entrance_light
-            name: Entrance Light
-          - entity: light.living_room_footlight
-            name: Footlight
+          - entity: light.living_area_dimming_downlights
+            name: Dimming Lights
+          - entity: fan.living_room_ceiling_fans
+            name: Ceiling Fan
+          - entity: group.living_area_floor_heatings
+            name: Floor Heating
+          - entity: switch.living_room_humidifier
+            name: Humidifier
         state_color: false
+        show_header_toggle: false
   - type: vertical-stack
     cards:
       - type: custom:mini-graph-card
@@ -175,10 +191,11 @@ cards:
           - value: above_horizon
           - value: below_horizon
       - type: entities
-        title: Bedroom Appliances
+        title: Bedroom Lights
         entities:
-          - entity: switch.bedroom_curtains
-            name: Curtains
+          - entity: light.bedroom_light
+            name: Light
+        show_header_toggle: false
       - type: "custom:simple-thermostat"
         entity: climate.bedroom_hvac
         layout:
@@ -201,11 +218,10 @@ cards:
             --st-mode-background: transparent;
           }
       - type: entities
-        title: Bedroom Lights
+        title: Bedroom Appliances
         entities:
-          - entity: light.bedroom_light
-            name: Light
-        show_header_toggle: false
+          - entity: switch.bedroom_curtains
+            name: Curtains
   - type: vertical-stack
     cards:
       - type: custom:mini-graph-card
@@ -318,34 +334,69 @@ cards:
         state_map:
           - value: above_horizon
           - value: below_horizon
+  - type: vertical-stack
+    cards:
+      - type: entities
+        title: Entrance Locks
+        entities:
+          - entity: lock.entrance_locks
+            name: Entrance Both
+            secondary_info: last-changed
+          - entity: lock.entrance_lock_top
+            name: Entrance Top
+            secondary_info: last-changed
+          - entity: lock.entrance_lock_bottom
+            name: Entrance Bottom
+            secondary_info: last-changed
+      - type: alarm-panel
+        entity: alarm_control_panel.entrance_auto_lock
+        title: Entrance Auto-Lock
+        states:
+          - arm_home
+  - type: alarm-panel
+    name: Surveillance
+    entity: alarm_control_panel.surveillance
+    states:
+      - arm_away
   - type: entities
-    title: Automations
+    title: Motion Sensors
     entities:
-      - entity: automation.turn_on_living_room_hvac_cleaner
-        secondary_info: last-triggered
-      - entity: automation.turn_on_living_room_ceiling_fan
-        secondary_info: last-triggered
-      - entity: automation.turn_on_living_area_floor_heating
-        secondary_info: last-triggered
-      - entity: automation.turn_on_living_room_humidifier
-        secondary_info: last-triggered
-      - entity: automation.turn_off_living_room_humidifier
-        secondary_info: last-triggered
-      - entity: automation.turn_on_living_area_downlights
-        secondary_info: last-triggered
-      - entity: automation.turn_down_living_area
-        secondary_info: last-triggered
-      - entity: automation.turn_down_living_area_more
-        secondary_info: last-triggered
-      - entity: automation.turn_off_living_room_extra_lights
-        secondary_info: last-triggered
-      - entity: automation.open_bedroom_curtains_workday
-        secondary_info: last-triggered
-      - entity: automation.turn_down_bedroom
-        secondary_info: last-triggered
-      - entity: automation.turn_off_surveillance
-        secondary_info: last-triggered
-    show_header_toggle: false
+      - entity: binary_sensor.living_room_motion
+        name: Living Room
+        secondary_info: last-changed
+      - entity: binary_sensor.study_motion
+        name: Study
+        secondary_info: last-changed
+      - entity: binary_sensor.bedroom_n_motion
+        name: Bedroom N
+        secondary_info: last-changed
+      - entity: binary_sensor.bedroom_s_motion
+        name: Bedroom S
+        secondary_info: last-changed
+      - entity: binary_sensor.bathroom_motion
+        name: Bathroom
+        secondary_info: last-changed
+  - type: entities
+    title: Window Sensors
+    entities:
+      - entity: binary_sensor.living_room_window
+        name: Living Room
+        secondary_info: last-changed
+      - entity: binary_sensor.study_window_n
+        name: Study N
+        secondary_info: last-changed
+      - entity: binary_sensor.study_window_s
+        name: Study S
+        secondary_info: last-changed
+      - entity: binary_sensor.bedroom_window_n
+        name: Bedroom N
+        secondary_info: last-changed
+      - entity: binary_sensor.bedroom_window_s
+        name: Bedroom S
+        secondary_info: last-changed
+      - entity: binary_sensor.entrance_door
+        name: Entrance
+        secondary_info: last-changed
   - type: custom:mini-graph-card
     entities:
       - entity: sensor.enecoq_fee_total
@@ -392,36 +443,3 @@ cards:
             name: Wind
           - entity: sensor.home_uv_index
             name: UV Index
-  - type: entities
-    title: Motion Sensors
-    entities:
-      - entity: binary_sensor.living_room_motion
-        secondary_info: last-changed
-      - entity: binary_sensor.study_motion
-        secondary_info: last-changed
-      - entity: binary_sensor.bathroom_motion
-        secondary_info: last-changed
-  - type: entities
-    title: Window Sensors
-    entities:
-      - entity: binary_sensor.living_room_window
-        secondary_info: last-changed
-      - entity: binary_sensor.study_window_n
-        secondary_info: last-changed
-      - entity: binary_sensor.study_window_s
-        secondary_info: last-changed
-      - entity: binary_sensor.bedroom_window_n
-        secondary_info: last-changed
-      - entity: binary_sensor.bedroom_window_s
-        secondary_info: last-changed
-      - entity: binary_sensor.entrance_door
-        secondary_info: last-changed
-  - type: alarm-panel
-    name: Surveillance
-    entity: alarm_control_panel.surveillance
-    states:
-      - arm_away
-  - type: alarm-panel
-    entity: alarm_control_panel.entrance_lock
-    states:
-      - arm_home

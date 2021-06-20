@@ -1,5 +1,5 @@
-alarm_control_panel.entrance_lock:
-  icon: mdi:lock-open
+alarm_control_panel.entrance_auto_lock:
+  icon: mdi:lock-clock
 alarm_control_panel.surveillance:
   icon: mdi:cctv
 automation.alarm_amazonplug_is_offline:
@@ -80,31 +80,49 @@ automation.alarm_zulu_is_offline:
   icon: mdi:router-network
 automation.info_denshobato:
   icon: mdi:bird
+automation.info_bedroom_humidity_is_too_high:
+  icon: mdi:water-percent-alert
+automation.info_bedroom_temperature_is_too_high:
+  icon: mdi:thermometer-alert
+automation.info_living_room_humidity_is_too_high:
+  icon: mdi:water-percent-alert
+automation.info_living_room_temperature_is_too_high:
+  icon: mdi:thermometer-alert
 automation.info_mamorail:
+  icon: mdi:train
+automation.info_mamorail_needed_to_charge:
   icon: mdi:train
 automation.info_update_available:
   icon: mdi:update
-automation.notify_update_available:
-  icon: mdi:check-circle
+automation.open_entrance_when_ios_action_fails:
+  icon: mdi:lock-remove
+automation.open_entrance_when_ios_action_fires:
+  icon: mdi:lock-open-variant
 automation.open_bedroom_curtains_temporarily:
   icon: mdi:window-shutter-alert
 automation.open_bedroom_curtains_workday:
   icon: mdi:window-shutter-open
-automation.plan_to_turn_on_living_room_hvac_with_fan_mode:
-  icon: mdi:fan-alert
+automation.plan_to_turn_on_bedroom_hvac_cleaner:
+  icon: mdi:broom
+automation.plan_to_turn_on_living_room_hvac_fan:
+  icon: mdi:broom
 automation.turn_down_bedroom:
   icon: mdi:brightness-6
 automation.turn_down_living_area:
   icon: mdi:brightness-6
 automation.turn_down_living_area_more:
   icon: mdi:brightness-4
+automation.turn_off_bedroom_hvac:
+  icon: mdi:thermostat
 automation.turn_off_living_area_lights:
   icon: mdi:lightbulb-group-off-outline
 automation.turn_off_living_room_extra_lights:
   icon: mdi:led-strip-variant
 automation.turn_off_living_room_humidifier:
   icon: mdi:air-humidifier-off
-automation.turn_off_living_room_hvac_with_fan_mode:
+automation.turn_off_living_room_hvac:
+  icon: mdi:thermostat
+automation.turn_off_living_room_hvac_fan:
   icon: mdi:fan-off
 automation.turn_off_living_room_lights_appliances:
   icon: mdi:weather-night
@@ -114,6 +132,14 @@ automation.turn_off_monitor_bio:
   icon: mdi:cellphone-wireless
 automation.turn_off_surveillance:
   icon: mdi:cctv
+automation.turn_on_bedroom_hvac_cleaner:
+  icon: mdi:broom
+automation.turn_on_bedroom_hvac_cool:
+  icon: mdi:snowflake
+automation.turn_on_bedroom_hvac_cool_forcibly:
+  icon: mdi:snowflake-alert
+automation.turn_on_bedroom_hvac_dry:
+  icon: mdi:water-percent-alert
 automation.turn_on_living_area_downlights:
   icon: mdi:wall-sconce-flat
 automation.turn_on_living_area_floor_heating:
@@ -124,7 +150,13 @@ automation.turn_on_living_room_humidifier:
   icon: mdi:air-humidifier
 automation.turn_on_living_room_hvac_cleaner:
   icon: mdi:broom
-automation.turn_on_living_room_hvac_with_fan_mode:
+automation.turn_on_living_room_hvac_cool:
+  icon: mdi:snowflake
+automation.turn_on_living_room_hvac_cool_forcibly:
+  icon: mdi:snowflake-alert
+automation.turn_on_living_room_hvac_dry:
+  icon: mdi:water-percent-alert
+automation.turn_on_living_room_hvac_fan:
   icon: mdi:fan-alert
 automation.turn_on_monitor_akikos_iphone12mini:
   icon: mdi:cellphone-wireless
@@ -282,6 +314,24 @@ sensor.denshobato:
   icon: mdi:bird
 sensor.dns_hass_rewse_jp:
   icon: mdi:dns
+sensor.average_of_balcony_humidity_difference:
+  icon: mdi:water-percent-alert
+sensor.average_of_balcony_temperature_difference:
+  icon: mdi:thermometer-alert
+sensor.average_of_bedroom_humidity_difference:
+  icon: mdi:water-percent-alert
+sensor.average_of_bedroom_temperature_difference:
+  icon: mdi:thermometer-alert
+sensor.average_of_living_room_humidity_difference:
+  icon: mdi:water-percent-alert
+sensor.average_of_living_room_temperature_difference:
+  icon: mdi:thermometer-alert
+sensor.entrance_lock_bottom_sensor:
+  icon: mdi:lock-check
+sensor.entrance_lock_top_sensor:
+  icon: mdi:lock-check
+sensor.filtered_bedroom_hvac_plug_current:
+  icon: mdi:current-ac
 sensor.mamorail:
   icon: mdi:train
 sensor.monitor_akikos_iphone12mini:

@@ -9,10 +9,9 @@
     name: apache2
     state: restarted
 
-- name: Restart autofs
-  systemd:
-    name: autofs
-    state: restarted
+- name: Restart docker
+  community.docker.docker_compose:
+    project_src: /etc
 
 - name: Restart homeassistant
   uri:

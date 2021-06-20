@@ -4,21 +4,16 @@ icon: 'mdi:sofa-single'
 badges: []
 cards:
   - type: entities
-    title: Living Room Appliances
+    title: Living Room Lights
     entities:
-      - entity: light.living_area_dimming_downlights
-        name: Dimming Downlights
-      - entity: fan.living_room_ceiling_fans
-        name: Ceiling Fan
-      - entity: switch.living_room_humidifier
-        name: Humidifier
-      - entity: group.living_area_floor_heatings
-        name: Floor Heating
-    show_header_toggle: false
-  - type: alarm-panel
-    entity: alarm_control_panel.surveillance
-    states:
-      - arm_away
+      - entity: light.living_area_downlights
+        name: Downlights
+      - entity: light.living_room_tv_light
+        name: TV Light
+      - entity: light.living_room_entrance_light
+        name: Entrance Light
+      - entity: switch.living_room_footlight
+        name: Footlight
   - type: "custom:simple-thermostat"
     entity: climate.living_room_hvac
     layout:
@@ -41,39 +36,24 @@ cards:
         --st-mode-background: transparent;
       }
   - type: entities
-    title: Living Room Lights
+    title: Living Room Appliances
     entities:
-      - entity: light.living_area_downlights
-        name: Downlights
-      - entity: light.living_room_tv_light
-        name: TV Light
-      - entity: light.living_room_entrance_light
-        name: Entrance Light
-      - entity: switch.living_room_footlight
-        name: Footlight
+      - entity: light.living_area_dimming_downlights
+        name: Dimming Downlights
+      - entity: fan.living_room_ceiling_fans
+        name: Ceiling Fan
+      - entity: switch.living_room_humidifier
+        name: Humidifier
+      - entity: group.living_area_floor_heatings
+        name: Floor Heating
+    show_header_toggle: false
+  - type: alarm-panel
+    entity: alarm_control_panel.surveillance
+    states:
+      - arm_away
   - type: entities
     title: Living Room Automations
     entities:
-      - entity: automation.turn_on_living_room_hvac_cleaner
-        name: Turn on AC Cleaner
-        secondary_info: last-triggered
-      - entity: automation.turn_on_living_room_ceiling_fan
-        name: Turn on Ceiling Fan
-        secondary_info: last-triggered
-      - entity: automation.turn_on_living_area_floor_heating
-        name: Turn on Floor Heatings
-        secondary_info: last-triggered
-      - entity: input_number.living_room_floor_heating_turned_on_threshold
-        name: Floor Heatings Threshold
-      - entity: automation.turn_on_living_room_humidifier
-        name: Turn on Humidifier
-        secondary_info: last-triggered
-      - entity: input_number.living_room_humidifier_turned_on_threshold
-        name: Turned on Humidifier Threshold
-      - entity: automation.turn_off_living_room_humidifier
-        secondary_info: last-triggered
-      - entity: input_number.living_room_humidifier_turned_off_threshold
-        name: Turned off Humidifier Threshold
       - entity: automation.turn_on_living_area_downlights
         name: Turn on Downlights
         secondary_info: last-triggered
@@ -90,8 +70,55 @@ cards:
       - entity: input_datetime.living_area_turned_down_more_time
         name: Turned down More Time
       - entity: automation.turn_off_living_room_extra_lights
+        name: Turn off Extra Lights
+        secondary_info: last-triggered
+      - entity: automation.turn_on_living_room_hvac_cool
+        name: Turn on HVAC Cool
+        secondary_info: last-triggered
+      - entity: input_number.living_room_hvac_cool_turned_on_threshold
+        name: Turned on HVAC Cool Threshold
+      - entity: automation.turn_on_living_room_hvac_cool_forcibly
+        name: Turn on HVAC Cool Forcibly
+        secondary_info: last-triggered
+      - entity: input_number.living_room_hvac_cool_forcibly_turned_on_threshold
+        name: Turned on HVAC Cool Forcibly Threshold
+      - entity: automation.turn_on_living_room_hvac_dry
+        name: Turn on HVAC Dry
+        secondary_info: last-triggered
+      - entity: input_number.living_room_hvac_dry_turned_on_threshold
+        name: Turned on HVAC Dry Threshold
+        secondary_info: last-triggered
+      - entity: automation.turn_off_living_room_hvac
+        name: Turn off HVAC
+        secondary_info: last-triggered
+      - entity: input_number.living_room_hvac_cool_turned_off_threshold
+        name: Turned off HVAC Threshold
+      - entity: automation.turn_on_living_area_floor_heating
+        name: Turn on Floor Heatings
+        secondary_info: last-triggered
+      - entity: input_number.living_room_floor_heating_turned_on_threshold
+        name: Turned on Floor Heatings Threshold
+      - entity: automation.turn_on_living_room_humidifier
+        name: Turn on Humidifier
+        secondary_info: last-triggered
+      - entity: input_number.living_room_humidifier_turned_on_threshold
+        name: Turned on Humidifier Threshold
+      - entity: automation.turn_off_living_room_humidifier
+        name: Turn off Humidifier
+        secondary_info: last-triggered
+      - entity: input_number.living_room_humidifier_turned_off_threshold
+        name: Turned off Humidifier Threshold
+      - entity: automation.turn_on_living_room_ceiling_fan
+        name: Turn on Ceiling Fan
+        secondary_info: last-triggered
+      - entity: automation.turn_on_living_room_hvac_cleaner
+        name: Turn on AC Cleaner
+        secondary_info: last-triggered
+      - entity: automation.turn_on_surveillance_when_nobody_is_in_home
+        name: Turn on Surveillance
         secondary_info: last-triggered
       - entity: automation.turn_off_surveillance
+        name: Turn off Surveillance
         secondary_info: last-triggered
     show_header_toggle: false
   - type: vertical-stack
