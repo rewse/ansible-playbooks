@@ -55,18 +55,18 @@
     unique_id: sensor.bedroom_presence_n
     state: >
       {% if is_state('binary_sensor.bedroom_n_motion', 'on') %}
-        1
+        {{ 1 | int }}
       {% elif is_state('binary_sensor.bedroom_n_motion', 'off') %}
-        0
+        {{ 0 | int }}
       {% endif %}
     icon: mdi:comment-account
   - name: Bedroom Presence S
     unique_id: sensor.bedroom_presence_s
     state: >
       {% if is_state('binary_sensor.bedroom_s_motion', 'on') %}
-        1
+        {{ 1 | int }}
       {% elif is_state('binary_sensor.bedroom_s_motion', 'off') %}
-        0
+        {{ 0 | int }}
       {% endif %}
     icon: mdi:comment-account
   - name: Denshobato Received Date Time
