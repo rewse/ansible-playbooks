@@ -648,16 +648,17 @@
     - condition: state
       entity_id: sun.sun
       state: above_horizon
+    - condition: state
+      entity_id: binary_sensor.workday_sensor
+      state: 'on'
     - condition: or
       conditions:
-        - condition: state
-          entity_id: binary_sensor.bedroom_window_n
-          state: "on"
-          for: 00:30:00
-        - condition: state
-          entity_id: binary_sensor.bedroom_window_s
-          state: "on"
-          for: 00:30:00
+        - condition: template
+          value_template: >
+            {{ state_attr('sensor.average_of_bedroom_presence_n', 'count') > 5 }}
+        - condition: template
+          value_template: >
+            {{ state_attr('sensor.average_of_bedroom_presence_s', 'count') > 5 }}
   action:
     - service: notify.all_devices
       data:
@@ -687,16 +688,17 @@
     - condition: state
       entity_id: sun.sun
       state: above_horizon
+    - condition: state
+      entity_id: binary_sensor.workday_sensor
+      state: 'on'
     - condition: or
       conditions:
-      - condition: state
-        entity_id: binary_sensor.bedroom_window_n
-        state: "on"
-        for: 00:30:00
-      - condition: state
-        entity_id: binary_sensor.bedroom_window_s
-        state: "on"
-        for: 00:30:00
+        - condition: template
+          value_template: >
+            {{ state_attr('sensor.average_of_bedroom_presence_n', 'count') > 5 }}
+        - condition: template
+          value_template: >
+            {{ state_attr('sensor.average_of_bedroom_presence_s', 'count') > 5 }}
   action:
     - service: notify.all_devices
       data:
@@ -1366,26 +1368,20 @@
     - platform: time_pattern
       minutes: 5
   condition:
+    - condition: state
+      entity_id: binary_sensor.workday_sensor
+      state: 'off'
     - condition: time
       after: "16:00"
       before: "20:00"
-      weekday:
-        - sat
-        - sun
-    - type: is_no_motion
-      condition: device
-      device_id: 1cfdcc15e8a8ebba52628efc0022f94b
-      entity_id: binary_sensor.bedroom_n_motion
-      domain: binary_sensor
-      for:
-        minutes: 30
-    - type: is_no_motion
-      condition: device
-      device_id: 2d183a12dcb81acda2688fbe4a4f2567
-      entity_id: binary_sensor.bedroom_s_motion
-      domain: binary_sensor
-      for:
-        minutes: 30
+    - condition: not
+      conditions:
+        - condition: template
+          value_template: >
+            {{ state_attr('sensor.average_of_bedroom_presence_n', 'count') > 5 }}
+        - condition: template
+          value_template: >
+            {{ state_attr('sensor.average_of_bedroom_presence_s', 'count') > 5 }}
   action:
     - service: switch.turn_on
       target:
@@ -1417,14 +1413,14 @@
     - condition: numeric_state
       entity_id: sensor.bedroom_wbgt
       above: input_number.bedroom_hvac_cool_turned_on_threshold
-    - condition: state
-      entity_id: binary_sensor.bedroom_window_n
-      state: "off"
-      for: 00:30:00
-    - condition: state
-      entity_id: binary_sensor.bedroom_window_s
-      state: "off"
-      for: 00:30:00
+    - condition: or
+      conditions:
+        - condition: template
+          value_template: >
+            {{ state_attr('sensor.average_of_bedroom_presence_n', 'count') > 5 }}
+        - condition: template
+          value_template: >
+            {{ state_attr('sensor.average_of_bedroom_presence_s', 'count') > 5 }}
   action:
     - service: climate.set_hvac_mode
       target:
@@ -1449,14 +1445,14 @@
     - condition: numeric_state
       entity_id: sensor.bedroom_wbgt
       above: input_number.bedroom_hvac_cool_forcibly_turned_on_threshold
-    - condition: state
-      entity_id: binary_sensor.bedroom_window_n
-      state: "off"
-      for: 00:30:00
-    - condition: state
-      entity_id: binary_sensor.bedroom_window_s
-      state: "off"
-      for: 00:30:00
+    - condition: or
+      conditions:
+        - condition: template
+          value_template: >
+            {{ state_attr('sensor.average_of_bedroom_presence_n', 'count') > 5 }}
+        - condition: template
+          value_template: >
+            {{ state_attr('sensor.average_of_bedroom_presence_s', 'count') > 5 }}
   action:
     - service: climate.set_hvac_mode
       target:
@@ -1494,15 +1490,15 @@
       below: input_number.bedroom_hvac_cool_turned_on_threshold
     - condition: numeric_state
       entity_id: sensor.filtered_bedroom_hvac_plug_current
-      above: "100"
-    - condition: state
-      entity_id: binary_sensor.bedroom_window_n
-      state: "off"
-      for: 00:30:00
-    - condition: state
-      entity_id: binary_sensor.bedroom_window_s
-      state: "off"
-      for: 00:30:00
+      below: "100"
+    - condition: or
+      conditions:
+        - condition: template
+          value_template: >
+            {{ state_attr('sensor.average_of_bedroom_presence_n', 'count') > 5 }}
+        - condition: template
+          value_template: >
+            {{ state_attr('sensor.average_of_bedroom_presence_s', 'count') > 5 }}
   action:
     - service: climate.set_hvac_mode
       target:
