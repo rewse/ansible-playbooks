@@ -868,10 +868,8 @@
 - id: automation.turn_on_surveillance_when_nobody_is_in_home
   alias: Turn on surveillance when Nobody is in Home
   trigger:
-    - platform: state
-      entity_id: person.shibata_tats
-    - platform: state
-      entity_id: person.shibata_akiko
+    - platform: time_pattern
+      minutes: 5
   condition:
     - condition: not
       conditions:
