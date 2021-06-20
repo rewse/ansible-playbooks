@@ -5,4 +5,5 @@
   roles:
     - monitor
     - resolved
+    - sesame
     - syslogd

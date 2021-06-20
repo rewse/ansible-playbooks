@@ -4,10 +4,10 @@ icon: 'mdi:bed'
 badges: []
 cards:
   - type: entities
-    title: Bedroom Appliances
+    title: Bedroom Lights
     entities:
-      - entity: switch.bedroom_curtains
-        name: Curtains
+      - entity: light.bedroom_light
+        name: Light
   - type: "custom:simple-thermostat"
     entity: climate.bedroom_hvac
     layout:
@@ -30,12 +30,38 @@ cards:
         --st-mode-background: transparent;
       }
   - type: entities
-    title: Bedroom Lights
+    title: Bedroom Appliances
     entities:
-      - entity: light.bedroom_light
-        name: Light
+      - entity: switch.bedroom_curtains
+        name: Curtains
   - type: entities
+    title: Bedroom Automations
     entities:
+      - entity: automation.turn_down_bedroom
+        name: Turn down
+        secondary_info: last-triggered
+      - entity: input_datetime.bedroom_turned_down_time
+        name: Turned down Time
+      - entity: automation.turn_on_bedroom_hvac_cool
+        name: Turn on HVAC Cool
+        secondary_info: last-triggered
+      - entity: input_number.bedroom_hvac_cool_turned_on_threshold
+        name: Turned on HVAC Cool Threshold
+      - entity: automation.turn_on_bedroom_hvac_cool_forcibly
+        name: Turn on HVAC Cool Forcibly
+        secondary_info: last-triggered
+      - entity: input_number.bedroom_hvac_cool_forcibly_turned_on_threshold
+        name: Turned on HVAC Cool Forcibly Threshold
+      - entity: automation.turn_on_bedroom_hvac_dry
+        name: Turn on HVAC Dry
+        secondary_info: last-triggered
+      - entity: input_number.bedroom_hvac_dry_turned_on_threshold
+        name: Turned on HVAC Dry Threshold
+      - entity: automation.turn_off_bedroom_hvac
+        name: Turn off HVAC
+        secondary_info: last-triggered
+      - entity: input_number.bedroom_hvac_cool_turned_off_threshold
+        name: Turned off HVAC Threshold
       - entity: automation.open_bedroom_curtains_workday
         name: Open Curtains for Workday
         secondary_info: last-triggered
@@ -46,10 +72,7 @@ cards:
         secondary_info: last-triggered
       - entity: input_datetime.bedroom_curtains_opened_time
         name: Curtains Opened Time Temporarily
-      - entity: automation.turn_down_bedroom
-        name: Turn down
+      - entity: automation.turn_on_bedroom_hvac_cleaner
+        name: Turn on HVAC Cleaner
         secondary_info: last-triggered
-      - entity: input_datetime.bedroom_turned_down_time
-        name: Turned down Time
-    title: Bedroom Automations
     show_header_toggle: false

@@ -2,6 +2,13 @@
 - platform: command_line
   name: REGZA Channel
   command: curl --digest --user '[% regza.username %]:[% regza.password %]' http://regza.rewse.jp/v2/remote/play/status | jq -r .epg_info_current.channel_name
+- platform: filter
+  name: Filtered Bedroom HVAC Plug Current
+  entity_id: sensor.bedroom_hvac_plug_current
+  filters:
+    - filter: lowpass
+      window_size: 10
+      time_constant: 50
 - platform: imap_email_content
   name: Denshobato
   server: imap.gmail.com
@@ -171,4 +178,60 @@
   device_class: temperature
   unit_of_measurement: °C
   scan_interval: 36000
+- platform: rest
+  name: Entrance Lock Top Sensor
+  resource: https://app.candyhouse.co/api/sesame2/[% sesame.uuid_top %]
+  headers:
+    x-api-key: "[% sesame.api_key %]"
+  value_template: '{{ value_json.CHSesame2Status }}'
+  json_attributes:
+    - batteryPercentage
+    - batteryVoltage
+    - position
+    - CHSesame2Status
+    - timestamp
+  scan_interval: 2400
+- platform: rest
+  name: Entrance Lock Bottom Sensor
+  resource: https://app.candyhouse.co/api/sesame2/[% sesame.uuid_bottom %]
+  headers:
+    x-api-key: "[% sesame.api_key %]"
+  value_template: '{{ value_json.CHSesame2Status }}'
+  json_attributes:
+    - batteryPercentage
+    - batteryVoltage
+    - position
+    - CHSesame2Status
+    - timestamp
+  scan_interval: 2400
 - platform: season
+- platform: statistics
+  entity_id: sensor.balcony_humidity_difference
+  name: Average of Balcony Humidity Difference
+  sampling_size: 183600
+  max_age: "51:00:00"
+- platform: statistics
+  entity_id: sensor.balcony_temperature_difference
+  name: Average of Balcony Temperature Difference
+  sampling_size: 183600
+  max_age: "51:00:00"
+- platform: statistics
+  entity_id: sensor.bedroom_humidity_difference
+  name: Average of Bedroom Humidity Difference
+  sampling_size: 183600
+  max_age: "51:00:00"
+- platform: statistics
+  entity_id: sensor.bedroom_temperature_difference
+  name: Average of Bedroom Temperature Difference
+  sampling_size: 183600
+  max_age: "51:00:00"
+- platform: statistics
+  entity_id: sensor.living_room_humidity_difference
+  name: Average of Living Room Humidity Difference
+  sampling_size: 183600
+  max_age: "51:00:00"
+- platform: statistics
+  entity_id: sensor.living_room_temperature_difference
+  name: Average of Living Room Temperature Difference
+  sampling_size: 183600
+  max_age: "51:00:00"
