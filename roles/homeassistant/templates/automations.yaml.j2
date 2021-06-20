@@ -878,9 +878,11 @@
         - condition: state
           entity_id: person.shibata_tats
           state: home
+          for: 600
         - condition: state
           entity_id: person.shibata_akiko
           state: home
+          for: 600
   action:
     - service: alarm_control_panel.alarm_arm_away
       target:
