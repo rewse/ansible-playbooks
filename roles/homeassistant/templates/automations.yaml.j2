@@ -848,51 +848,6 @@
       data:
         title: INFO
         message: "Home Assistant {{ state_attr('binary_sensor.updater', 'newest_version') }} is available."
-- id: automation.open_entrance_when_ios_action_fails
-  alias: Open Entrance when iOS Action Fails
-  trigger:
-    - platform: event
-      event_type: ios.action_fired
-      event_data:
-        actionName: open_entrance
-  condition:
-    - condition: not
-      conditions:
-        - condition: state
-          entity_id: person.shibata_tats
-          state: home
-        - condition: state
-          entity_id: person.shibata_akiko
-          state: home
-  action:
-    - service: notify.all_devices
-      data:
-        title: "🚫 ERROR"
-        message: Nobody in Home. Use a physical key
-        data:
-          url: /lovelace-people/people
-  mode: single
-- id: automation.open_entrance_when_ios_action_fires
-  alias: Open Entrance when iOS Action Fires
-  trigger:
-    - platform: event
-      event_type: ios.action_fired
-      event_data:
-        actionName: open_entrance
-  condition:
-    - condition: or
-      conditions:
-        - condition: state
-          entity_id: person.shibata_tats
-          state: home
-        - condition: state
-          entity_id: person.shibata_akiko
-          state: home
-  action:
-    - service: lock.open
-      target:
-        entity_id: lock.entrance_locks
-  mode: single
 - id: automation.turn_on_surveillance_when_ios_action_fires
   alias: Turn on surveillance when iOS Action Fires
   trigger:
@@ -1776,4 +1731,48 @@
           url: /lovelace/home
     - delay:
         hours: 1
+  mode: single
+- id: automation.unlock_entrance_when_ios_action_fails
+  alias: Open Entrance when iOS Action Fails
+  trigger:
+    - platform: event
+      event_type: ios.action_fired
+      event_data:
+        actionName: open_entrance
+  condition:
+    - condition: not
+      conditions:
+        - condition: state
+          entity_id: person.shibata_tats
+          state: home
+        - condition: state
+          entity_id: person.shibata_akiko
+          state: home
+  action:
+    - service: notify.all_devices
+      data:
+        title: "🚫 ERROR"
+        message: Nobody in Home. Use a physical key
+        data:
+          url: /lovelace-people/people
+  mode: single
+- id: automation.unlock_entrance_when_ios_action_fires
+  alias: Open Entrance when iOS Action Fires
+  trigger:
+    - platform: event
+      event_type: ios.action_fired
+      event_data:
+        actionName: open_entrance
+  condition:
+    - condition: or
+      conditions:
+        - condition: state
+          entity_id: person.shibata_tats
+          state: home
+        - condition: state
+          entity_id: person.shibata_akiko
+          state: home
+  action:
+    - service: shell_command.control_entrance_lock_top_unlock
+    - service: shell_command.control_entrance_lock_bottom_unlock
   mode: single
