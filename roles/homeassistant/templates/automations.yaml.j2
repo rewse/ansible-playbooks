@@ -831,7 +831,7 @@
     - service: notify.all_devices
       data:
         title: "[% notify_title_k %]"
-        message: "️チャージしてください。{{ states('sensor.mamorail_station') }}を{{ states('sensor.mamorail_time') }}に{{ states('sensor.mamorail_action') }}しました。残高: {{ states('sensor.mamorail_balance') }}円"
+        message: "️【要チャージ】{{ states('sensor.mamorail_station') }}を{{ states('sensor.mamorail_time') }}に{{ states('sensor.mamorail_action') }}しました。残高: {{ states('sensor.mamorail_balance') }}円"
         data:
           url: /lovelace-people/people
   mode: single
