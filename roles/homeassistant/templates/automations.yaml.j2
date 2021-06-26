@@ -1771,9 +1771,11 @@
         - condition: state
           entity_id: person.shibata_tats
           state: home
+          for: 300
         - condition: state
           entity_id: person.shibata_akiko
           state: home
+          for: 300
   action:
     - service: notify.all_devices
       data:
