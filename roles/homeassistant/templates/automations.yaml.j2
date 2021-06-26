@@ -1405,7 +1405,7 @@
   description: Turn on the HVAC in the bedroom with cool mode forcibly
   trigger:
     - platform: time_pattern
-      minutes: '5'
+      minutes: "/5"
   condition:
     - condition: numeric_state
       entity_id: sensor.bedroom_wbgt
