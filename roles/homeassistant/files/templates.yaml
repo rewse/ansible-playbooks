@@ -53,26 +53,6 @@
     icon: mdi:water-percent-alert
     device_class: humidity
     unit_of_measurement: pt
-  - name: Bedroom Presence N
-    unique_id: sensor.bedroom_presence_n
-    state: >
-      {% if is_state('binary_sensor.bedroom_n_motion', 'on') %}
-        {{ 100 | int }}
-      {% elif is_state('binary_sensor.bedroom_n_motion', 'off') %}
-        {{ 0 | int }}
-      {% endif %}
-    icon: mdi:comment-account
-    unit_of_measurement: "%"
-  - name: Bedroom Presence S
-    unique_id: sensor.bedroom_presence_s
-    state: >
-      {% if is_state('binary_sensor.bedroom_s_motion', 'on') %}
-        {{ 100 | int }}
-      {% elif is_state('binary_sensor.bedroom_s_motion', 'off') %}
-        {{ 0 | int }}
-      {% endif %}
-    icon: mdi:comment-account
-    unit_of_measurement: "%"
   - name: Denshobato Received Date Time
     unique_id: sensor.denshobato_received_date_time
     state: "{{ as_timestamp(strptime(state_attr('sensor.denshobato', 'date'), '%a, %d %b %Y %H:%M:%S %z')) | timestamp_custom() }}"
