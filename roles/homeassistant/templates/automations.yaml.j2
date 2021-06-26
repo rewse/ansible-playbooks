@@ -624,9 +624,8 @@
       state: 下校
     - delay:
         minutes: 10
-    - service: lock.open
-      target:
-        entity_id: lock.entrance_locks
+    - service: shell_command.control_entrance_lock_top_unlock
+    - service: shell_command.control_entrance_lock_bottom_unlock
   mode: single
 - id: automation.info_bedroom_humidity_is_too_high
   alias: "INFO: Bedroom Humidity is Too High"
