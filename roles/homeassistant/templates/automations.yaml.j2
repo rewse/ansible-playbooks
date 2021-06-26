@@ -1321,7 +1321,7 @@
   description: Turn on the HVAC cleaner in the bedroom
   trigger:
     - platform: time_pattern
-      minutes: 5
+      minutes: "/5"
   condition:
     - condition: state
       entity_id: binary_sensor.workday_sensor
@@ -1346,6 +1346,8 @@
         message: Turned on Bedroom HVAC Cleaner
         data:
           url: /lovelace/home
+    - delay:
+        hours: 2
     - service: automation.turn_off
       target:
         entity_id: automation.turn_on_bedroom_hvac_cleaner
