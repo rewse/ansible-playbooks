@@ -873,14 +873,14 @@
     - condition: state
       entity_id: alarm_control_panel.surveillance
       state: disarmed
-        - condition: state
-          entity_id: person.shibata_tats
+    - condition: state
+      entity_id: person.shibata_tats
       state: not_home
-          for: 600
-        - condition: state
-          entity_id: person.shibata_akiko
+      for: 600
+    - condition: state
+      entity_id: person.shibata_akiko
       state: not_home
-          for: 600
+      for: 600
   action:
     - service: alarm_control_panel.alarm_arm_away
       target:
@@ -1797,10 +1797,17 @@
         - condition: state
           entity_id: person.shibata_tats
           state: home
+          for: 300
         - condition: state
           entity_id: person.shibata_akiko
           state: home
+          for: 300
   action:
     - service: shell_command.control_entrance_lock_top_unlock
     - service: shell_command.control_entrance_lock_bottom_unlock
+    - service: notify.all_devices
+      data:
+        message: Unlocked Entrance
+        data:
+          url: /lovelace-people/people
   mode: single
