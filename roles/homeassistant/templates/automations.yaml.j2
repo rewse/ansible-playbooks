@@ -868,17 +868,18 @@
   alias: Turn on surveillance when Nobody is in Home
   trigger:
     - platform: time_pattern
-      minutes: 5
+      minutes: "/5"
   condition:
-    - condition: not
-      conditions:
+    - condition: state
+      entity_id: alarm_control_panel.surveillance
+      state: disarmed
         - condition: state
           entity_id: person.shibata_tats
-          state: home
+      state: not_home
           for: 600
         - condition: state
           entity_id: person.shibata_akiko
-          state: home
+      state: not_home
           for: 600
   action:
     - service: alarm_control_panel.alarm_arm_away
