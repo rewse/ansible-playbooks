@@ -367,10 +367,10 @@ cards:
       - entity: binary_sensor.study_motion
         name: Study
         secondary_info: last-changed
-      - entity: binary_sensor.bedroom_n_motion
+      - entity: binary_sensor.bedroom_motion_n
         name: Bedroom N
         secondary_info: last-changed
-      - entity: binary_sensor.bedroom_s_motion
+      - entity: binary_sensor.bedroom_motion_s
         name: Bedroom S
         secondary_info: last-changed
       - entity: binary_sensor.bathroom_motion
