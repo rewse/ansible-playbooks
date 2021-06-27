@@ -12,7 +12,7 @@ iaquk_version: 1.5.0
 jq300:
   username: "[% vault_jq300.username %]"
   password: "[% vault_jq300.password %]"
-  version: 0.8.2
+  version: 0.9.1
 latlng:
   home:
     lat: "[% vault_latlng.home.lat %]"
@@ -50,7 +50,7 @@ sesame:
   secret_top: "[% vault_sesame.secret_top %]"
   secret_bottom: "[% vault_sesame.secret_bottom %]"
 simple_thermostat_version: 2.4.2
-simple_weather_card_version: 0.8.1
+simple_weather_card_version: 0.8.2
 switchbot_token: "[% vault_switchbot_token %]"
 uptime_card_version: 0.4.0
 tuyaplug:
