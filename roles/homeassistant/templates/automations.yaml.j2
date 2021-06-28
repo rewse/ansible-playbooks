@@ -847,6 +847,45 @@
       data:
         title: INFO
         message: "Home Assistant {{ state_attr('binary_sensor.updater', 'newest_version') }} is available."
+- id: automation.trigger_monitor
+  alias: Trigger monitor
+  trigger:
+    - platform: time_pattern
+      minutes: "/5"
+  action:
+    - service: mqtt.publish
+      data:
+        topic: monitor/scan/arrive
+        payload: '{"identity": "automation.trigger_monitor"}'
+        retain: true
+    - service: mqtt.publish
+      data:
+        topic: monitor/scan/depart
+        payload: '{"identity": "automation.trigger_monitor"}'
+        retain: true
+  mode: single
+- id: automation.trigger_monitor_by_entrance_door
+  alias: Trigger monitor by Entrance Door
+  trigger:
+    - type: not_opened
+      platform: device
+      device_id: c48c1aea332dd8d27a1629fe94321f00
+      entity_id: binary_sensor.entrance_door
+      domain: binary_sensor
+  action:
+    - delay:
+        minutes: 1
+    - service: mqtt.publish
+      data:
+        topic: monitor/scan/arrive
+        payload: '{"identity": "automation.trigger_monitor_by_entrance_door"}'
+        retain: true
+    - service: mqtt.publish
+      data:
+        topic: monitor/scan/depart
+        payload: '{"identity": "automation.trigger_monitor_by_entrance_door"}'
+        retain: true
+  mode: single
 - id: automation.turn_on_surveillance_when_ios_action_fires
   alias: Turn on surveillance when iOS Action Fires
   trigger:
