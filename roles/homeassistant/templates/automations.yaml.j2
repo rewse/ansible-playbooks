@@ -654,10 +654,10 @@
       conditions:
         - condition: template
           value_template: >
-            {{ states('sensor.count_of_bedroom_motion_n') >= 5 }}
+            {{ states('sensor.count_of_bedroom_motion_n') | int >= 5 }}
         - condition: template
           value_template: >
-            {{ states('sensor.count_of_bedroom_motion_s') >= 5 }}
+            {{ states('sensor.count_of_bedroom_motion_s') | int >= 5 }}
   action:
     - service: notify.all_devices
       data:
@@ -694,10 +694,10 @@
       conditions:
         - condition: template
           value_template: >
-            {{ states('sensor.count_of_bedroom_motion_n') >= 5 }}
+            {{ states('sensor.count_of_bedroom_motion_n') | int >= 5 }}
         - condition: template
           value_template: >
-            {{ states('sensor.count_of_bedroom_motion_s') >= 5 }}
+            {{ states('sensor.count_of_bedroom_motion_s') | int >= 5 }}
   action:
     - service: notify.all_devices
       data:
@@ -1382,10 +1382,10 @@
       conditions:
         - condition: template
           value_template: >
-            {{ states('sensor.count_of_bedroom_motion_n') >= 5 }}
+            {{ states('sensor.count_of_bedroom_motion_n') | int >= 5 }}
         - condition: template
           value_template: >
-            {{ states('sensor.count_of_bedroom_motion_s') >= 5 }}
+            {{ states('sensor.count_of_bedroom_motion_s') | int >= 5 }}
   action:
     - service: climate.set_hvac_mode
       target:
@@ -1422,10 +1422,10 @@
       conditions:
         - condition: template
           value_template: >
-            {{ states('sensor.count_of_bedroom_motion_n') >= 5 }}
+            {{ states('sensor.count_of_bedroom_motion_n') | int >= 5 }}
         - condition: template
           value_template: >
-            {{ states('sensor.count_of_bedroom_motion_s') >= 5 }}
+            {{ states('sensor.count_of_bedroom_motion_s') | int >= 5 }}
   action:
     - service: climate.set_hvac_mode
       target:
@@ -1476,10 +1476,10 @@
       conditions:
         - condition: template
           value_template: >
-            {{ states('sensor.count_of_bedroom_motion_n') >= 5 }}
+            {{ states('sensor.count_of_bedroom_motion_n') | int >= 5 }}
         - condition: template
           value_template: >
-            {{ states('sensor.count_of_bedroom_motion_s') >= 5 }}
+            {{ states('sensor.count_of_bedroom_motion_s') | int >= 5 }}
   action:
     - service: climate.set_hvac_mode
       target:
