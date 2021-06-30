@@ -1164,7 +1164,7 @@
         hvac_mode: 'off'
     - service: notify.all_devices
       data:
-        message: "Turned off Living Room HVAC. Current: {{ states('sensor.living_room_temperature') }}°C"
+        message: "Turned off Living Room HVAC. Current: {{ states('sensor.living_room_wbgt') }}°C"
         data:
           url: /lovelace/home
     - delay:
@@ -1597,7 +1597,7 @@
         hvac_mode: cool
     - service: notify.all_devices
       data:
-        message: "Turned on Living Room HVAC Cool. Current: {{ states('sensor.living_room_temperature') }}°C"
+        message: "Turned on Living Room HVAC Cool. Current: {{ states('sensor.living_room_wbgt') }}°C"
         data:
           url: /lovelace/home
     - delay:
@@ -1633,7 +1633,7 @@
         hvac_mode: cool
     - service: notify.all_devices
       data:
-        message: "Turned on Living Room HVAC Cool Forcibly. Current: {{ states('sensor.living_room_temperature') }}°C"
+        message: "Turned on Living Room HVAC Cool Forcibly. Current: {{ states('sensor.living_room_wbgt') }}°C"
         data:
           url: /lovelace/home
     - delay:
@@ -1686,7 +1686,7 @@
         hvac_mode: dry
     - service: notify.all_devices
       data:
-        message: "Turned on Living Room HVAC Dry. Current: {{ states('sensor.living_room_humidifier') }}%"
+        message: "Turned on Living Room HVAC Dry. Current: {{ states('sensor.living_room_humidity') }}%"
         data:
           url: /lovelace/home
     - delay:
