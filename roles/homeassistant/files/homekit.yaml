@@ -9,7 +9,6 @@
         - light.living_area_dimming_downlights
         - light.living_area_downlights
         - light.living_room_footlight
-        - lock.entrance_locks
         - media_player.aventage
         - media_player.firetv
         - media_player.heargo2
