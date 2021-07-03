@@ -361,11 +361,17 @@ cards:
   - type: entities
     title: Motion Sensors
     entities:
+      - entity: binary_sensor.living_room_presence
+        name: Living Room Presence
+        secondary_info: last-changed
       - entity: binary_sensor.living_room_motion
         name: Living Room
         secondary_info: last-changed
       - entity: binary_sensor.study_motion
         name: Study
+        secondary_info: last-changed
+      - entity: binary_sensor.bedroom_presence
+        name: Bedroom Presence
         secondary_info: last-changed
       - entity: binary_sensor.bedroom_motion_n
         name: Bedroom N
