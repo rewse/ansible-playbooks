@@ -1,3 +1,22 @@
+- binary_sensor:
+  - name: Living Room Presence
+    unique_id: binary_sensor.living_room_presence
+    state: "{{ states('sensor.count_of_living_room_motion') | int > 5 or states('sensor.count_of_study_motion') | int > 5 }}"
+    icon: >
+      {% if is_state('binary_sensor.living_room_presence', 'on') %}
+        mdi:comment-account
+      {% else %}
+        mdi:comment-account-outline
+      {% endif %}
+  - name: Bedroom Presence
+    unique_id: binary_sensor.bedroom_presence
+    state: "{{ states('sensor.count_of_bedroom_motion_n') | int > 5 or states('sensor.count_of_bedroom_motion_s') | int > 5 }}"
+    icon: >
+      {% if is_state('binary_sensor.bedroom_presence', 'on') %}
+        mdi:comment-account
+      {% else %}
+        mdi:comment-account-outline
+      {% endif %}
 - sensor:
   - name: Living Room WBGT
     unique_id: sensor.living_room_wbgt
