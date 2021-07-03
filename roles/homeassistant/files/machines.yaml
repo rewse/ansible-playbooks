@@ -46,7 +46,7 @@ views:
       - type: vertical-stack
         cards:
           - type: history-graph
-            title: Presence
+            title: Device Presence
             entities:
               - entity: person.shibata_tats
                 name: Tats
@@ -66,6 +66,23 @@ views:
               - entity: sensor.monitor_akikos_iphone12mini
               - entity: sensor.monitor_living_room_akikos_iphone12mini
               - entity: sensor.monitor_storage_akikos_iphone12mini
+      - type: entities
+        title: Room Presence
+        entities:
+          - entity: binary_sensor.living_room_presence
+            name: Living Room Presence
+            secondary_info: last-changed
+          - entity: sensor.count_of_living_room_motion
+            secondary_info: last-changed
+          - entity: sensor.count_of_study_motion
+            secondary_info: last-changed
+          - entity: binary_sensor.bedroom_presence
+            name: Bedroom Presence
+            secondary_info: last-changed
+          - entity: sensor.count_of_bedroom_motion_n
+            secondary_info: last-changed
+          - entity: sensor.count_of_bedroom_motion_s
+            secondary_info: last-changed
       - type: entities
         title: Batteries
         entities:
