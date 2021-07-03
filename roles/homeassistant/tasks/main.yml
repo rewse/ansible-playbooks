@@ -647,6 +647,8 @@
       logger:
         default: warning
         logs:
+          androidtv.adb_manager.adb_manager_async: error
+          homeassistant.components.androidtv.media_player: error
           homeassistant.components.imap_email_content.sensor: warning
       lovelace:
         mode: yaml
