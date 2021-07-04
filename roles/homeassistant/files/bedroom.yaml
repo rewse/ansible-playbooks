@@ -55,13 +55,17 @@ cards:
       - entity: automation.turn_on_bedroom_hvac_dry
         name: Turn on HVAC Dry
         secondary_info: last-triggered
-      - entity: input_number.bedroom_hvac_dry_turned_on_threshold
-        name: Turned on HVAC Dry Threshold
+      - entity: input_number.bedroom_hvac_dry_turned_on_threshold_wbgt
+        name: Turned on HVAC Dry Threshold WBGT
+      - entity: input_number.bedroom_hvac_dry_turned_on_threshold_humidity
+        name: Turned on HVAC Dry Threshold Humidity
       - entity: automation.turn_off_bedroom_hvac
         name: Turn off HVAC
         secondary_info: last-triggered
       - entity: input_number.bedroom_hvac_cool_turned_off_threshold
-        name: Turned off HVAC Threshold
+        name: Turned off HVAC Cool Threshold
+      - entity: input_number.bedroom_hvac_dry_turned_off_threshold
+        name: Turned off HVAC Dry Threshold
       - entity: automation.open_bedroom_curtains_workday
         name: Open Curtains for Workday
         secondary_info: last-triggered
