@@ -643,21 +643,29 @@
   condition:
     - condition: numeric_state
       entity_id: sensor.bedroom_humidity
-      above: input_number.bedroom_hvac_dry_turned_on_threshold
+      above: input_number.bedroom_hvac_dry_turned_on_threshold_humidity
+    - condition: numeric_state
+      entity_id: sensor.bedroom_wbgt
+      above: input_number.bedroom_hvac_dry_turned_on_threshold_wbgt
     - condition: state
       entity_id: sun.sun
       state: above_horizon
     - condition: state
       entity_id: binary_sensor.workday_sensor
-      state: 'on'
+      state: "on"
     - condition: or
       conditions:
-        - condition: template
-          value_template: >
-            {{ states('sensor.count_of_bedroom_motion_n') | int >= 5 }}
-        - condition: template
-          value_template: >
-            {{ states('sensor.count_of_bedroom_motion_s') | int >= 5 }}
+        - condition: state
+          entity_id: binary_sensor.bedroom_window_n
+          state: "on"
+          for: 00:30:00
+        - condition: state
+          entity_id: binary_sensor.bedroom_window_s
+          state: "on"
+          for: 00:30:0
+    - condition: state
+      entity_id: binary_sensor.bedroom_presence
+      state: "on"
   action:
     - service: notify.all_devices
       data:
@@ -689,15 +697,20 @@
       state: above_horizon
     - condition: state
       entity_id: binary_sensor.workday_sensor
-      state: 'on'
+      state: "on"
     - condition: or
       conditions:
-        - condition: template
-          value_template: >
-            {{ states('sensor.count_of_bedroom_motion_n') | int >= 5 }}
-        - condition: template
-          value_template: >
-            {{ states('sensor.count_of_bedroom_motion_s') | int >= 5 }}
+        - condition: state
+          entity_id: binary_sensor.bedroom_window_n
+          state: "on"
+          for: 00:30:00
+        - condition: state
+          entity_id: binary_sensor.bedroom_window_s
+          state: "on"
+          for: 00:30:0
+    - condition: state
+      entity_id: binary_sensor.bedroom_presence
+      state: "on"
   action:
     - service: notify.all_devices
       data:
@@ -723,7 +736,10 @@
   condition:
     - condition: numeric_state
       entity_id: sensor.living_room_humidity
-      above: input_number.living_room_hvac_dry_turned_on_threshold
+      above: input_number.living_room_hvac_dry_turned_on_threshold_humidity
+    - condition: numeric_state
+      entity_id: sensor.living_room_wbgt
+      above: input_number.living_room_hvac_dry_turned_on_threshold_wbgt
     - condition: state
       entity_id: sun.sun
       state: above_horizon
@@ -741,6 +757,9 @@
           entity_id: binary_sensor.study_window_s
           state: "on"
           for: 00:30:00
+    - condition: state
+      entity_id: binary_sensor.living_room_presence
+      state: "on"
   action:
     - service: notify.all_devices
       data:
@@ -784,6 +803,9 @@
         entity_id: binary_sensor.study_window_s
         state: "on"
         for: 00:30:00
+    - condition: state
+      entity_id: binary_sensor.living_room_presence
+      state: "on"
   action:
     - service: notify.all_devices
       data:
@@ -1053,6 +1075,9 @@
       entity_id: sensor.bedroom_wbgt
       below: input_number.bedroom_hvac_cool_turned_off_threshold
     - condition: numeric_state
+      entity_id: sensor.bedroom_humidity
+      above: input_number.bedroom_hvac_dry_turned_off_threshold
+    - condition: numeric_state
       entity_id: sensor.filtered_bedroom_hvac_plug_current
       above: "100"
   action:
@@ -1063,7 +1088,7 @@
         hvac_mode: "off"
     - service: notify.all_devices
       data:
-        message: "Turned off Bedroom HVAC. Current: {{ states('sensor.bedroom_temperature') }}°C"
+        message: "Turned off Bedroom HVAC. Current: {{ states('sensor.bedroom_wbgt') }}°C, {{ states('sensor.bedroom_humidity') }}%"
         data:
           url: /lovelace/home
     - delay:
@@ -1145,6 +1170,9 @@
     - condition: numeric_state
       entity_id: sensor.living_room_wbgt
       below: input_number.living_room_hvac_cool_turned_off_threshold
+    - condition: numeric_state
+      entity_id: sensor.living_room_humidity
+      above: input_number.living_room_hvac_dry_turned_off_threshold
     - condition: or
       conditions:
         - condition: state
@@ -1161,10 +1189,10 @@
       target:
         entity_id: climate.living_room_hvac
       data:
-        hvac_mode: 'off'
+        hvac_mode: "off"
     - service: notify.all_devices
       data:
-        message: "Turned off Living Room HVAC. Current: {{ states('sensor.living_room_wbgt') }}°C"
+        message: "Turned off Living Room HVAC. Current: {{ states('sensor.living_room_wbgt') }}°C, {{ states('sensor.living_room_humidity') }}%"
         data:
           url: /lovelace/home
     - delay:
@@ -1245,6 +1273,11 @@
       device_id: 40a395e27caf6e3dbf69e07fa01f780d
       entity_id: binary_sensor.study_motion
       domain: binary_sensor
+    - type: motion
+      platform: device
+      device_id: af58e8e429d511661b8b9ef8966b08ff
+      entity_id: binary_sensor.bathroom_motion
+      domain: binary_sensor
   condition:
     - condition: state
       entity_id: alarm_control_panel.surveillance
@@ -1277,7 +1310,7 @@
     - platform: numeric_state
       entity_id: sensor.filtered_bedroom_hvac_plug_current
       above: 100
-      for: 3600
+      for: 7200
   action:
     - service: automation.turn_on
       target:
@@ -1308,54 +1341,6 @@
           - automation.turn_off_living_room_hvac_fan
           - automation.turn_on_living_room_hvac_cleaner
   mode: single
-- id: automation.turn_on_living_area_floor_heating
-  alias: Turn on Living Area Floor Heating
-  description: Turn on the floor heating in the living area when the temperature is too low
-  trigger:
-    - type: motion
-      platform: device
-      device_id: 56a0fc235acbf9c9f708708a9682ab66
-      entity_id: binary_sensor.living_room_motion
-      domain: binary_sensor
-    - type: motion
-      platform: device
-      device_id: 40a395e27caf6e3dbf69e07fa01f780d
-      entity_id: binary_sensor.study_motion
-      domain: binary_sensor
-  condition:
-    - condition: numeric_state
-      entity_id: sensor.living_room_temperature
-      below: input_number.living_room_floor_heating_turned_on_threshold
-    - condition: sun
-      after: sunrise
-    - condition: state
-      entity_id: sensor.season
-      state: winter
-    - condition: state
-      entity_id: binary_sensor.living_room_window
-      state: "off"
-      for: 00:30:00
-    - condition: state
-      entity_id: binary_sensor.study_window_n
-      state: "off"
-      for: 00:30:00
-    - condition: state
-      entity_id: binary_sensor.study_window_s
-      state: "off"
-      for: 00:30:00
-  action:
-    - service: switch.toggle
-      entity_id: switch.living_room_floor_heating
-    - service: switch.toggle
-      entity_id: switch.study_floor_heating
-    - service: notify.all_devices
-      data:
-        message: "Turned on Living Area Floor Heating. Current: {{ states('sensor.living_room_temperature') }}°C"
-        data:
-          url: /lovelace/home
-    - delay:
-        hours: 1
-  mode: single
 - id: automation.turn_on_bedroom_hvac_cleaner
   alias: Turn on Bedroom HVAC Cleaner
   description: Turn on the HVAC cleaner in the bedroom
@@ -1369,19 +1354,14 @@
     - condition: time
       after: "16:00"
       before: "20:00"
-    - condition: or
-      conditions:
-        - condition: template
-          value_template: >
-            {{ states('sensor.count_of_bedroom_motion_n') < 5 }}
-        - condition: template
-          value_template: >
-            {{ states('sensor.count_of_bedroom_motion_s') < 5 }}
+    - condition: state
+      entity_id: binary_sensor.bedroom_presence
+      state: "off"
   action:
     - service: switch.turn_on
       target:
         entity_id: switch.bedroom_hvac_cleaner
-    - service: notify.tats_devices
+    - service: notify.all_devices
       data:
         message: Turned on Bedroom HVAC Cleaner
         data:
@@ -1418,14 +1398,9 @@
       entity_id: binary_sensor.bedroom_window_s
       state: "off"
       for: 00:30:00
-    - condition: or
-      conditions:
-        - condition: template
-          value_template: >
-            {{ states('sensor.count_of_bedroom_motion_n') | int >= 5 }}
-        - condition: template
-          value_template: >
-            {{ states('sensor.count_of_bedroom_motion_s') | int >= 5 }}
+    - condition: state
+      entity_id: binary_sensor.bedroom_presence
+      state: "on"
   action:
     - service: climate.set_hvac_mode
       target:
@@ -1458,14 +1433,6 @@
       entity_id: binary_sensor.bedroom_window_s
       state: "off"
       for: 00:30:00
-    - condition: or
-      conditions:
-        - condition: template
-          value_template: >
-            {{ states('sensor.count_of_bedroom_motion_n') | int >= 5 }}
-        - condition: template
-          value_template: >
-            {{ states('sensor.count_of_bedroom_motion_s') | int >= 5 }}
   action:
     - service: climate.set_hvac_mode
       target:
@@ -1497,7 +1464,10 @@
   condition:
     - condition: numeric_state
       entity_id: sensor.bedroom_humidity
-      above: input_number.bedroom_hvac_dry_turned_on_threshold
+      above: input_number.bedroom_hvac_dry_turned_on_threshold_humidity
+    - condition: numeric_state
+      entity_id: sensor.bedroom_wbgt
+      above: input_number.bedroom_hvac_dry_turned_on_threshold_wbgt
     - condition: numeric_state
       entity_id: sensor.bedroom_wbgt
       below: input_number.bedroom_hvac_cool_turned_on_threshold
@@ -1512,14 +1482,9 @@
       entity_id: binary_sensor.bedroom_window_s
       state: "off"
       for: 00:30:00
-    - condition: or
-      conditions:
-        - condition: template
-          value_template: >
-            {{ states('sensor.count_of_bedroom_motion_n') | int >= 5 }}
-        - condition: template
-          value_template: >
-            {{ states('sensor.count_of_bedroom_motion_s') | int >= 5 }}
+    - condition: state
+      entity_id: binary_sensor.bedroom_presence
+      state: "on"
   action:
     - service: climate.set_hvac_mode
       target:
@@ -1529,6 +1494,57 @@
     - service: notify.all_devices
       data:
         message: "Turned on Bedroom HVAC Dry. Current: {{ states('sensor.bedroom_humidity') }}%"
+        data:
+          url: /lovelace/home
+    - delay:
+        hours: 1
+  mode: single
+- id: automation.turn_on_living_area_floor_heating
+  alias: Turn on Living Area Floor Heating
+  description: Turn on the floor heating in the living area when the temperature is too low
+  trigger:
+    - type: motion
+      platform: device
+      device_id: 56a0fc235acbf9c9f708708a9682ab66
+      entity_id: binary_sensor.living_room_motion
+      domain: binary_sensor
+    - type: motion
+      platform: device
+      device_id: 40a395e27caf6e3dbf69e07fa01f780d
+      entity_id: binary_sensor.study_motion
+      domain: binary_sensor
+  condition:
+    - condition: numeric_state
+      entity_id: sensor.living_room_temperature
+      below: input_number.living_room_floor_heating_turned_on_threshold
+    - condition: sun
+      after: sunrise
+    - condition: state
+      entity_id: sensor.season
+      state: winter
+    - condition: state
+      entity_id: binary_sensor.living_room_window
+      state: "off"
+      for: 00:30:00
+    - condition: state
+      entity_id: binary_sensor.study_window_n
+      state: "off"
+      for: 00:30:00
+    - condition: state
+      entity_id: binary_sensor.study_window_s
+      state: "off"
+      for: 00:30:00
+    - condition: state
+      entity_id: binary_sensor.living_room_presence
+      state: "on"
+  action:
+    - service: switch.toggle
+      entity_id: switch.living_room_floor_heating
+    - service: switch.toggle
+      entity_id: switch.study_floor_heating
+    - service: notify.all_devices
+      data:
+        message: "Turned on Living Area Floor Heating. Current: {{ states('sensor.living_room_temperature') }}°C"
         data:
           url: /lovelace/home
     - delay:
@@ -1589,6 +1605,9 @@
       entity_id: binary_sensor.study_window_s
       state: "off"
       for: 00:30:00
+    - condition: state
+      entity_id: binary_sensor.living_room_presence
+      state: "on"
   action:
     - service: climate.set_hvac_mode
       target:
@@ -1656,16 +1675,16 @@
   condition:
     - condition: numeric_state
       entity_id: sensor.living_room_humidity
-      above: input_number.living_room_hvac_dry_turned_on_threshold
+      above: input_number.living_room_hvac_dry_turned_on_threshold_humidity
     - condition: numeric_state
       entity_id: sensor.living_room_wbgt
-      below: input_number.living_room_hvac_cool_turned_on_threshold
+      below: input_number.living_room_hvac_cool_turned_on_threshold_wbgt
     - condition: state
       entity_id: sun.sun
       state: above_horizon
     - condition: state
       entity_id: climate.living_room_hvac
-      state: 'off'
+      state: "off"
     - condition: state
       entity_id: binary_sensor.living_room_window
       state: "off"
@@ -1678,6 +1697,9 @@
       entity_id: binary_sensor.study_window_s
       state: "off"
       for: 00:30:00
+    - condition: state
+      entity_id: binary_sensor.living_room_presence
+      state: "on"
   action:
     - service: climate.set_hvac_mode
       target:
@@ -1787,6 +1809,9 @@
       entity_id: binary_sensor.study_window_s
       state: "off"
       for: 00:30:00
+    - condition: state
+      entity_id: binary_sensor.living_room_presence
+      state: "on"
   action:
     - service: switch.turn_on
       entity_id: switch.living_room_humidifier
