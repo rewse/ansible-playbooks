@@ -1172,7 +1172,7 @@
       below: input_number.living_room_hvac_cool_turned_off_threshold
     - condition: numeric_state
       entity_id: sensor.living_room_humidity
-      above: input_number.living_room_hvac_dry_turned_off_threshold
+      below: input_number.living_room_hvac_dry_turned_off_threshold
     - condition: or
       conditions:
         - condition: state
