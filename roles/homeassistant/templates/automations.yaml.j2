@@ -622,6 +622,14 @@
     - condition: state
       entity_id: sensor.denshobato_action
       state: 下校
+    - condition: or
+      conditions:
+      - condition: state
+        entity_id: person.shibata_tats
+        state: home
+      - condition: state
+        entity_id: person.shibata_akiko
+        state: home
     - delay:
         minutes: 10
     - service: shell_command.control_entrance_lock_top_unlock
