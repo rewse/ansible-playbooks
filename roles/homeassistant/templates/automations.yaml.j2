@@ -748,9 +748,6 @@
     - condition: numeric_state
       entity_id: sensor.living_room_wbgt
       above: input_number.living_room_hvac_dry_turned_on_threshold_wbgt
-    - condition: state
-      entity_id: sun.sun
-      state: above_horizon
     - condition: or
       conditions:
         - condition: state
@@ -794,9 +791,6 @@
     - condition: numeric_state
       entity_id: sensor.living_room_wbgt
       above: input_number.living_room_hvac_cool_turned_on_threshold
-    - condition: state
-      entity_id: sun.sun
-      state: above_horizon
     - condition: or
       conditions:
       - condition: state
@@ -1631,9 +1625,6 @@
       entity_id: sensor.living_room_wbgt
       above: input_number.living_room_hvac_cool_turned_on_threshold
     - condition: state
-      entity_id: sun.sun
-      state: above_horizon
-    - condition: state
       entity_id: binary_sensor.living_room_window
       state: "off"
       for: 00:30:00
@@ -1719,9 +1710,6 @@
     - condition: numeric_state
       entity_id: sensor.living_room_wbgt
       below: input_number.living_room_hvac_cool_turned_on_threshold_wbgt
-    - condition: state
-      entity_id: sun.sun
-      state: above_horizon
     - condition: state
       entity_id: climate.living_room_hvac
       state: "off"
