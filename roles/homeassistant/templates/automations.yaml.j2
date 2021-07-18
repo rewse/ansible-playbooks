@@ -869,6 +869,18 @@
       data:
         title: INFO
         message: "Home Assistant {{ state_attr('binary_sensor.updater', 'newest_version') }} is available."
+- id: automation.lock_entrance
+  alias: Lock Entrance
+  trigger:
+    - platform: state
+      entity_id: sensor.entrance_1_button_switch_action
+      to: double
+    - platform: state
+      entity_id: sensor.living_room_1_button_switch_action
+      to: double
+  action:
+    - service: shell_command.control_entrance_lock_top_lock
+    - service: shell_command.control_entrance_lock_bottom_lock
 - id: automation.trigger_monitor
   alias: Trigger monitor
   trigger:
@@ -1843,6 +1855,18 @@
     - delay:
         hours: 1
   mode: single
+- id: automation.unlock_entrance
+  alias: Unlock Entrance
+  trigger:
+    - platform: state
+      entity_id: sensor.entrance_1_button_switch_action
+      to: single
+    - platform: state
+      entity_id: sensor.living_room_1_button_switch_action
+      to: single
+  action:
+    - service: shell_command.control_entrance_lock_top_unlock
+    - service: shell_command.control_entrance_lock_bottom_unlock
 - id: automation.unlock_entrance_when_ios_action_fails
   alias: Unlock Entrance when iOS Action Fails
   trigger:
