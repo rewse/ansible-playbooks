@@ -81,6 +81,8 @@
       - schedule at 101 */* 10:52:16 * ntpdate {{ ntpd.fqdn }} syslog
       - schedule at 102 */* 16:52:16 * ntpdate {{ ntpd.fqdn }} syslog
       - schedule at 103 */* 22:52:16 * ntpdate {{ ntpd.fqdn }} syslog
+      - schedule at 110 */Sun,Tue,Thu,Sat 4:55:58 * nat descriptor masquerade static 1 2002 {{ guppy.ip }} tcp 80
+      - schedule at 111 */Mon,Wed,Fri 4:55:58 * nat descriptor masquerade static 1 2002 {{ fox.ip }} tcp 80
   tags: [rtx, rtx-schedule]
 
 - name: Set httpd
@@ -189,7 +191,6 @@
       - nat descriptor masquerade static 1 2001 {{ guppy.ip }} tcp 5000,5010
       - ipv6 filter 2001 pass * {{ guppy.ipv6 }} tcp * 5000,5001
       # guppy: HTTP
-      - nat descriptor masquerade static 1 2002 {{ guppy.ip }} tcp 80
       - ipv6 filter 2002 pass * {{ guppy.ipv6 }} tcp * 80
       # fox: SSH
       - nat descriptor masquerade static 1 3001 {{ fox.ip }} tcp 22
