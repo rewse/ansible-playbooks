@@ -91,22 +91,16 @@
   condition:
     - condition: numeric_state
       entity_id: sensor.living_room_iaq_index
-      below: "25"
-    - type: is_not_open
-      condition: device
-      device_id: 0a0f7c03555607ac48933b9de5da93a6
+      below: 25
+    - condition: state
       entity_id: binary_sensor.living_room_window
-      domain: binary_sensor
-    - type: is_not_open
-      condition: device
-      device_id: 853682a22dc992e6a13e776fd3ac105b
+      state: "off"
+    - condition: state
       entity_id: binary_sensor.study_window_n
-      domain: binary_sensor
-    - type: is_not_open
-      condition: device
-      device_id: cca7e061d97ab19596829722642432c3
+      state: "off"
+    - condition: state
       entity_id: binary_sensor.study_window_s
-      domain: binary_sensor
+      state: "off"
   action:
     - service: notify.tats_devices
       data:
@@ -129,22 +123,16 @@
   condition:
     - condition: numeric_state
       entity_id: sensor.living_room_co2
-      above: "1000"
-    - type: is_not_open
-      condition: device
-      device_id: 0a0f7c03555607ac48933b9de5da93a6
+      above: 1000
+    - condition: state
       entity_id: binary_sensor.living_room_window
-      domain: binary_sensor
-    - type: is_not_open
-      condition: device
-      device_id: 853682a22dc992e6a13e776fd3ac105b
+      state: "off"
+    - condition: state
       entity_id: binary_sensor.study_window_n
-      domain: binary_sensor
-    - type: is_not_open
-      condition: device
-      device_id: cca7e061d97ab19596829722642432c3
+      state: "off"
+    - condition: state
       entity_id: binary_sensor.study_window_s
-      domain: binary_sensor
+      state: "off"
   action:
     - service: notify.all_devices
       data:
@@ -580,7 +568,7 @@
     - condition: numeric_state
       entity_id: sensor.average_of_living_room_temperature_difference
       attribute: min_value
-      above: '1'
+      above: 1
   action:
     - service: notify.tats_devices
       data:
@@ -598,7 +586,7 @@
     - condition: numeric_state
       entity_id: sensor.average_of_bedroom_temperature_difference
       attribute: min_value
-      above: '1'
+      above: 1
   action:
     - service: notify.tats_devices
       data:
@@ -616,7 +604,7 @@
     - condition: numeric_state
       entity_id: sensor.average_of_balcony_temperature_difference
       attribute: min_value
-      above: '1'
+      above: 1
   action:
     - service: notify.tats_devices
       data:
@@ -635,7 +623,7 @@
     - condition: numeric_state
       entity_id: sensor.average_of_living_room_humidity_difference
       attribute: min_value
-      above: '10'
+      above: 10
   action:
     - service: notify.tats_devices
       data:
@@ -654,7 +642,7 @@
     - condition: numeric_state
       entity_id: sensor.average_of_bedroom_humidity_difference
       attribute: min_value
-      above: '10'
+      above: 10
   action:
     - service: notify.tats_devices
       data:
@@ -673,7 +661,7 @@
     - condition: numeric_state
       entity_id: sensor.average_of_balcony_humidity_difference
       attribute: min_value
-      above: '10'
+      above: 10
   action:
     - service: notify.tats_devices
       data:
@@ -759,8 +747,8 @@
     - delay:
         hours: 2
   mode: single
-- id: automation.info_bedroom_temperature_is_too_high
-  alias: "INFO: Bedroom Temperature is Too High"
+- id: automation.info_bedroom_wbgt_is_too_high
+  alias: "INFO: Bedroom WBGT is Too High"
   trigger:
     - platform: state
       entity_id: binary_sensor.bedroom_motion_n
@@ -796,7 +784,7 @@
   action:
     - service: notify.all_devices
       data:
-        message: "Bedroom Temperature is Too High. Current: {{ states('sensor.bedroom_temperature') }}°C"
+        message: "Bedroom WBGT is Too High. Current: {{ states('sensor.bedroom_wbgt') }}°C"
         data:
           url: /lovelace/home
     - delay:
@@ -847,8 +835,8 @@
     - delay:
         hours: 2
   mode: single
-- id: automation.info_living_room_temperature_is_too_high
-  alias: "INFO: Living Room Temperature is Too High"
+- id: automation.info_living_room_wbgt_is_too_high
+  alias: "INFO: Living Room WBGT is Too High"
   trigger:
     - platform: state
       entity_id: binary_sensor.living_room_motion
@@ -883,7 +871,7 @@
   action:
     - service: notify.all_devices
       data:
-        message: "Living Room Temperature is Too High. Current: {{ states('sensor.living_room_temperature') }}°C"
+        message: "Living Room WBGT is Too High. Current: {{ states('sensor.living_room_wbgt') }}°C"
         data:
           url: /lovelace/home
     - delay:
@@ -975,11 +963,9 @@
 - id: automation.trigger_monitor_by_entrance_door
   alias: Trigger monitor by Entrance Door
   trigger:
-    - type: not_opened
-      platform: device
-      device_id: c48c1aea332dd8d27a1629fe94321f00
+    - platform: state
       entity_id: binary_sensor.entrance_door
-      domain: binary_sensor
+      to: "off"
   action:
     - delay:
         minutes: 1
@@ -1105,7 +1091,7 @@
   condition:
     - condition: state
       entity_id: binary_sensor.workday_sensor
-      state: 'on'
+      state: "on"
   action:
     - service: switch.turn_on
       entity_id: switch.bedroom_curtains
@@ -1160,10 +1146,10 @@
       below: input_number.bedroom_hvac_cool_turned_off_threshold
     - condition: numeric_state
       entity_id: sensor.bedroom_humidity
-      above: input_number.bedroom_hvac_dry_turned_off_threshold
+      below: input_number.bedroom_hvac_dry_turned_off_threshold
     - condition: numeric_state
       entity_id: sensor.filtered_bedroom_hvac_plug_current
-      above: "100"
+      above: 100
   action:
     - service: climate.set_hvac_mode
       target:
@@ -1292,7 +1278,7 @@
   description: Turn off the HVAC in the living room with fan mode
   trigger:
     - platform: time
-      at: '5:30'
+      at: "5:30"
   action:
     - service: climate.turn_off
       target:
@@ -1341,12 +1327,9 @@
     - service: fan.turn_off
       target:
         entity_id: fan.living_room_ceiling_fans
-    - condition: state
-      entity_id: switch.living_room_humidifier
-      state: 'on' 
-    - service: switch.turn_off
+    - service: climate.turn_off
       target:
-        entity_id: switch.living_room_humidifier
+        entity_id: climate.living_room_hvac
   mode: single
 - id: automation.turn_off_surveillance
   alias: Turn off Surveillance
@@ -1399,7 +1382,7 @@
   condition:
     - condition: state
       entity_id: binary_sensor.workday_sensor
-      state: 'on'
+      state: "on"
   action:
     - service: automation.turn_on
       target:
@@ -1509,7 +1492,7 @@
         hvac_mode: cool
     - service: notify.all_devices
       data:
-        message: "Turned on Bedroom HVAC Cool. Current: {{ states('sensor.bedroom_temperature') }}°C"
+        message: "Turned on Bedroom HVAC Cool. Current: {{ states('sensor.bedroom_wbgt') }}°C"
         data:
           url: /lovelace/home
     - delay:
@@ -1543,7 +1526,7 @@
         hvac_mode: cool
     - service: notify.all_devices
       data:
-        message: "Turned on Bedroom HVAC Cool Forcibly. Current: {{ states('sensor.bedroom_temperature') }}°C"
+        message: "Turned on Bedroom HVAC Cool Forcibly. Current: {{ states('sensor.bedroom_wbgt') }}°C"
         data:
           url: /lovelace/home
     - delay:
@@ -1567,11 +1550,8 @@
       entity_id: sensor.bedroom_wbgt
       above: input_number.bedroom_hvac_dry_turned_on_threshold_wbgt
     - condition: numeric_state
-      entity_id: sensor.bedroom_wbgt
-      below: input_number.bedroom_hvac_cool_turned_on_threshold
-    - condition: numeric_state
       entity_id: sensor.filtered_bedroom_hvac_plug_current
-      below: "100"
+      below: 100
     - condition: state
       entity_id: binary_sensor.bedroom_window_n
       state: "off"
@@ -1654,7 +1634,7 @@
   description: Turn on the HVAC cleaner in the living room
   trigger:
     - platform: time
-      at: 04:00:00
+      at: "4:00"
   condition:
     - condition: time
       weekday:
@@ -1669,7 +1649,10 @@
           url: /lovelace/home
     - service: automation.turn_off
       target:
-        entity_id: automation.turn_on_living_room_hvac_cleaner
+        entity_id:
+          - automation.turn_on_living_room_hvac_cleaner
+          - automation.turn_on_living_room_hvac_fan
+          - automation.turn_off_living_room_hvac_fan
   mode: single
 - id: automation.turn_on_living_room_hvac_cool
   alias: Turn on Living Room HVAC Cool
@@ -1772,7 +1755,7 @@
       above: input_number.living_room_hvac_dry_turned_on_threshold_humidity
     - condition: numeric_state
       entity_id: sensor.living_room_wbgt
-      below: input_number.living_room_hvac_cool_turned_on_threshold_wbgt
+      above: input_number.living_room_hvac_dry_turned_on_threshold_wbgt
     - condition: state
       entity_id: climate.living_room_hvac
       state: "off"
@@ -1813,7 +1796,7 @@
   description: Turn on the HVAC in the living room with fan mode
   trigger:
     - platform: time
-      at: '4:30'
+      at: "4:30"
   action:
     - service: climate.set_hvac_mode
       target:
