@@ -670,6 +670,82 @@
         data:
           url: /lovelace/home
   mode: single
+- id: automation.auto_lock_entrance_lock_bottom_in_daytime
+  alias: "Auto-Lock Entrace Lock Bottom in Daytime"
+  trigger:
+    - platform: time_pattern
+      minutes: "/5"
+  condition:
+    - condition: state
+      entity_id: lock.entrance_lock_bottom
+      state: unlocked
+      for:
+        minutes: 30
+    - condition: time
+      after: "9:00"
+      before: "21:00"
+    - condition: state
+      entity_id: alarm_control_panel.entrance_auto_lock
+      state: armed_home
+  action:
+    - service: shell_command.control_entrance_lock_bottom_lock
+- id: automation.auto_lock_entrance_lock_top_in_daytime
+  alias: "Auto-Lock Entrace Lock Top in Daytime"
+  trigger:
+    - platform: time_pattern
+      minutes: "/5"
+  condition:
+    - condition: state
+      entity_id: lock.entrance_lock_top
+      state: unlocked
+      for:
+        minutes: 30
+    - condition: time
+      after: "9:00"
+      before: "21:00"
+    - condition: state
+      entity_id: alarm_control_panel.entrance_auto_lock
+      state: armed_home
+  action:
+    - service: shell_command.control_entrance_lock_top_lock
+- id: automation.auto_lock_entrance_lock_bottom_in_nighttime
+  alias: "Auto-Lock Entrace Lock Bottom in Nighttime"
+  trigger:
+    - platform: time_pattern
+      minutes: "/5"
+  condition:
+    - condition: state
+      entity_id: lock.entrance_lock_bottom
+      state: unlocked
+      for:
+        minutes: 10
+    - condition: time
+      after: "21:00"
+      before: "9:00"
+    - condition: state
+      entity_id: alarm_control_panel.entrance_auto_lock
+      state: armed_home
+  action:
+    - service: shell_command.control_entrance_lock_bottom_lock
+- id: automation.auto_lock_entrance_lock_top_in_nighttime
+  alias: "Auto-Lock Entrace Lock Top in Nighttime"
+  trigger:
+    - platform: time_pattern
+      minutes: "/5"
+  condition:
+    - condition: state
+      entity_id: lock.entrance_lock_top
+      state: unlocked
+      for:
+        minutes: 10
+    - condition: time
+      after: "21:00"
+      before: "9:00"
+    - condition: state
+      entity_id: alarm_control_panel.entrance_auto_lock
+      state: armed_home
+  action:
+    - service: shell_command.control_entrance_lock_top_lock
 - id: automation.info_denshobato
   alias: "INFO: Denshobato"
   trigger:
@@ -1895,8 +1971,8 @@
     - delay:
         hours: 1
   mode: single
-- id: automation.unlock_entrance
-  alias: Unlock Entrance
+- id: automation.unlock_entrance_lock
+  alias: Unlock Entrance Lock
   trigger:
     - platform: state
       entity_id: sensor.entrance_1_button_switch_action
@@ -1907,8 +1983,8 @@
   action:
     - service: shell_command.control_entrance_lock_top_unlock
     - service: shell_command.control_entrance_lock_bottom_unlock
-- id: automation.unlock_entrance_when_ios_action_fails
-  alias: Unlock Entrance when iOS Action Fails
+- id: automation.unlock_entrance_lock_when_ios_action_fails
+  alias: Unlock Entrance Lock when iOS Action Fails
   trigger:
     - platform: event
       event_type: ios.action_fired
@@ -1935,8 +2011,8 @@
         data:
           url: /lovelace-people/people
   mode: single
-- id: automation.unlock_entrance_when_ios_action_fires
-  alias: Unlock Entrance when iOS Action Fires
+- id: automation.unlock_entrance_lock_when_ios_action_fires
+  alias: Unlock Entrance Lock when iOS Action Fires
   trigger:
     - platform: event
       event_type: ios.action_fired
