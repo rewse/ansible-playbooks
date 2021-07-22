@@ -1,7 +1,7 @@
 - platform: template
   covers:
     bedroom_curtains:
-      unique_id: cover.template.bedroom_curtains
+      unique_id: cover.bedroom_curtains
       friendly_name: Bedroom Curtains
       device_class: curtain
       open_cover:
@@ -22,3 +22,4 @@
         {% else %}
           mdi:window-shutter
         {% endif %}
+      optimistic: true

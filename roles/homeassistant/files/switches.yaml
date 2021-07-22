@@ -13,7 +13,7 @@
           signal_id: 752e4cd3-b940-43e7-92b1-80c455612c96
       icon_template: mdi:broom
     bedroom_curtains:
-      unique_id: switch.template.bedroom_curtains
+      unique_id: switch.bedroom_curtains
       friendly_name: Bedroom Curtains
       turn_on: # open
         service: rest_command.control_switchbot_device
