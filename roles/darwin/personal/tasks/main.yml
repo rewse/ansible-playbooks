@@ -10,6 +10,7 @@
       - android-file-transfer
       - epic-games
       - gog-galaxy
+      - origin
       - raspberry-pi-imager
       - steam
     update_homebrew: yes
