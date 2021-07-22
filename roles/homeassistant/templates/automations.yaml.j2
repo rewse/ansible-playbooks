@@ -1,3 +1,71 @@
+- id: automation.alarm_akikos_iphone12mini_wifi_might_be_off
+  alias: "ALARM: akikos_iphone12mini WiFi might be Off"
+  trigger:
+    - type: motion
+      platform: device
+      device_id: 56a0fc235acbf9c9f708708a9682ab66
+      entity_id: binary_sensor.living_room_motion
+      domain: binary_sensor
+    - type: motion
+      platform: device
+      device_id: 40a395e27caf6e3dbf69e07fa01f780d
+      entity_id: binary_sensor.study_motion
+      domain: binary_sensor
+  condition:
+    - condition: state
+      entity_id: device_tracker.ping_akikos_iphone12mini
+      state: not_home
+      for:
+        hours: 1
+    - condition: state
+      entity_id: device_tracker.monitor_akikos_iphone12mini
+      state: home
+      for:
+        hours: 1
+  action:
+    - service: notify.akiko_devices
+      data:
+        title: "⚠️ ALARM"
+        message: akikos_iphone12mini WiFi might be off
+        data:
+          url: /lovelace-machines/machines
+    - delay:
+        hours: 1
+  mode: single
+- id: automation.alarm_bio_wifi_might_be_off
+  alias: "ALARM: bio WiFi might be Off"
+  trigger:
+    - type: motion
+      platform: device
+      device_id: 56a0fc235acbf9c9f708708a9682ab66
+      entity_id: binary_sensor.living_room_motion
+      domain: binary_sensor
+    - type: motion
+      platform: device
+      device_id: 40a395e27caf6e3dbf69e07fa01f780d
+      entity_id: binary_sensor.study_motion
+      domain: binary_sensor
+  condition:
+    - condition: state
+      entity_id: device_tracker.ping_bio
+      state: not_home
+      for:
+        hours: 1
+    - condition: state
+      entity_id: device_tracker.monitor_bio
+      state: home
+      for:
+        hours: 1
+  action:
+    - service: notify.tats_devices
+      data:
+        title: "⚠️ ALARM"
+        message: bio WiFi might be off
+        data:
+          url: /lovelace-machines/machines
+    - delay:
+        hours: 1
+  mode: single
 - id: automation.alarm_internet_speed_is_too_slow
   alias: "ALARM: Internet Speed is Too Slow"
   trigger:
