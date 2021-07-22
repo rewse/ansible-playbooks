@@ -32,7 +32,7 @@ cards:
   - type: entities
     title: Bedroom Appliances
     entities:
-      - entity: switch.bedroom_curtains
+      - entity: cover.bedroom_curtains
         name: Curtains
   - type: entities
     title: Bedroom Automations
