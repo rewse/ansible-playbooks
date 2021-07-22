@@ -1,16 +1,12 @@
 - id: automation.alarm_akikos_iphone12mini_wifi_might_be_off
   alias: "ALARM: akikos_iphone12mini WiFi might be Off"
   trigger:
-    - type: motion
-      platform: device
-      device_id: 56a0fc235acbf9c9f708708a9682ab66
+    - platform: state
       entity_id: binary_sensor.living_room_motion
-      domain: binary_sensor
-    - type: motion
-      platform: device
-      device_id: 40a395e27caf6e3dbf69e07fa01f780d
+      to: "on"
+    - platform: state
       entity_id: binary_sensor.study_motion
-      domain: binary_sensor
+      to: "on"
   condition:
     - condition: state
       entity_id: device_tracker.ping_akikos_iphone12mini
@@ -35,16 +31,12 @@
 - id: automation.alarm_bio_wifi_might_be_off
   alias: "ALARM: bio WiFi might be Off"
   trigger:
-    - type: motion
-      platform: device
-      device_id: 56a0fc235acbf9c9f708708a9682ab66
+    - platform: state
       entity_id: binary_sensor.living_room_motion
-      domain: binary_sensor
-    - type: motion
-      platform: device
-      device_id: 40a395e27caf6e3dbf69e07fa01f780d
+      to: "on"
+    - platform: state
       entity_id: binary_sensor.study_motion
-      domain: binary_sensor
+      to: "on"
   condition:
     - condition: state
       entity_id: device_tracker.ping_bio
@@ -90,16 +82,12 @@
 - id: automation.alarm_living_room_air_quality_is_poor
   alias: "ALARM: Living Room Air Quality is Poor"
   trigger:
-    - type: motion
-      platform: device
-      device_id: 56a0fc235acbf9c9f708708a9682ab66
+    - platform: state
       entity_id: binary_sensor.living_room_motion
-      domain: binary_sensor
-    - type: motion
-      platform: device
-      device_id: 40a395e27caf6e3dbf69e07fa01f780d
+      to: "on"
+    - platform: state
       entity_id: binary_sensor.study_motion
-      domain: binary_sensor
+      to: "on"
   condition:
     - condition: numeric_state
       entity_id: sensor.living_room_iaq_index
@@ -132,16 +120,12 @@
 - id: automation.alarm_living_room_co2_is_too_high
   alias: "ALARM: Living Room CO2 is Too High"
   trigger:
-    - type: motion
-      platform: device
-      device_id: 56a0fc235acbf9c9f708708a9682ab66
+    - platform: state
       entity_id: binary_sensor.living_room_motion
-      domain: binary_sensor
-    - type: motion
-      platform: device
-      device_id: 40a395e27caf6e3dbf69e07fa01f780d
+      to: "on"
+    - platform: state
       entity_id: binary_sensor.study_motion
-      domain: binary_sensor
+      to: "on"
   condition:
     - condition: numeric_state
       entity_id: sensor.living_room_co2
@@ -706,16 +690,12 @@
 - id: automation.info_bedroom_humidity_is_too_high
   alias: "INFO: Bedroom Humidity is Too High"
   trigger:
-    - type: motion
-      platform: device
-      device_id: 1cfdcc15e8a8ebba52628efc0022f94b
+    - platform: state
       entity_id: binary_sensor.bedroom_motion_n
-      domain: binary_sensor
-    - type: motion
-      platform: device
-      device_id: 2d183a12dcb81acda2688fbe4a4f2567
+      to: "on"
+    - platform: state
       entity_id: binary_sensor.bedroom_motion_s
-      domain: binary_sensor
+      to: "on"
   condition:
     - condition: numeric_state
       entity_id: sensor.bedroom_humidity
@@ -754,16 +734,12 @@
 - id: automation.info_bedroom_temperature_is_too_high
   alias: "INFO: Bedroom Temperature is Too High"
   trigger:
-    - type: motion
-      platform: device
-      device_id: 1cfdcc15e8a8ebba52628efc0022f94b
+    - platform: state
       entity_id: binary_sensor.bedroom_motion_n
-      domain: binary_sensor
-    - type: motion
-      platform: device
-      device_id: 2d183a12dcb81acda2688fbe4a4f2567
+      to: "on"
+    - platform: state
       entity_id: binary_sensor.bedroom_motion_s
-      domain: binary_sensor
+      to: "on"
   condition:
     - condition: numeric_state
       entity_id: sensor.bedroom_wbgt
@@ -799,16 +775,12 @@
 - id: automation.info_living_room_humidity_is_too_high
   alias: "INFO: Living Room Humidity is Too High"
   trigger:
-    - type: motion
-      platform: device
-      device_id: 56a0fc235acbf9c9f708708a9682ab66
+    - platform: state
       entity_id: binary_sensor.living_room_motion
-      domain: binary_sensor
-    - type: motion
-      platform: device
-      device_id: 40a395e27caf6e3dbf69e07fa01f780d
+      to: "on"
+    - platform: state
       entity_id: binary_sensor.study_motion
-      domain: binary_sensor
+      to: "on"
   condition:
     - condition: numeric_state
       entity_id: sensor.living_room_humidity
@@ -845,16 +817,12 @@
 - id: automation.info_living_room_temperature_is_too_high
   alias: "INFO: Living Room Temperature is Too High"
   trigger:
-    - type: motion
-      platform: device
-      device_id: 56a0fc235acbf9c9f708708a9682ab66
+    - platform: state
       entity_id: binary_sensor.living_room_motion
-      domain: binary_sensor
-    - type: motion
-      platform: device
-      device_id: 40a395e27caf6e3dbf69e07fa01f780d
+      to: "on"
+    - platform: state
       entity_id: binary_sensor.study_motion
-      domain: binary_sensor
+      to: "on"
   condition:
     - condition: numeric_state
       entity_id: sensor.living_room_wbgt
@@ -1142,16 +1110,12 @@
   alias: Turn off Bedroom HVAC
   description: Turn off the HVAC in the bedroom
   trigger:
-    - type: motion
-      platform: device
-      device_id: 1cfdcc15e8a8ebba52628efc0022f94b
+    - platform: state
       entity_id: binary_sensor.bedroom_motion_n
-      domain: binary_sensor
-    - type: motion
-      platform: device
-      device_id: 2d183a12dcb81acda2688fbe4a4f2567
+      to: "on"
+    - platform: state
       entity_id: binary_sensor.bedroom_motion_s
-      domain: binary_sensor
+      to: "on"
   condition:
     - condition: numeric_state
       entity_id: sensor.bedroom_wbgt
@@ -1204,16 +1168,12 @@
   alias: Turn off Living Room Humidifier
   description: Turn off the humidifier in the living room when the humidity is too high
   trigger:
-    - type: motion
-      platform: device
-      device_id: 56a0fc235acbf9c9f708708a9682ab66
+    - platform: state
       entity_id: binary_sensor.living_room_motion
-      domain: binary_sensor
-    - type: motion
-      platform: device
-      device_id: 40a395e27caf6e3dbf69e07fa01f780d
+      to: "on"
+    - platform: state
       entity_id: binary_sensor.study_motion
-      domain: binary_sensor
+      to: "on"
   condition:
     - condition: numeric_state
       entity_id: sensor.living_room_humidity
@@ -1248,16 +1208,12 @@
   alias: Turn off Living Room HVAC
   description: Turn off the HVAC in the living room
   trigger:
-    - type: motion
-      platform: device
-      device_id: 56a0fc235acbf9c9f708708a9682ab66
+    - platform: state
       entity_id: binary_sensor.living_room_motion
-      domain: binary_sensor
-    - type: motion
-      platform: device
-      device_id: 40a395e27caf6e3dbf69e07fa01f780d
+      to: "on"
+    - platform: state
       entity_id: binary_sensor.study_motion
-      domain: binary_sensor
+      to: "on"
   condition:
     - condition: numeric_state
       entity_id: sensor.living_room_wbgt
@@ -1355,21 +1311,15 @@
   alias: Turn off Surveillance
   description: Turn off Surveillance when someone is at home
   trigger:
-    - type: motion
-      platform: device
-      device_id: 56a0fc235acbf9c9f708708a9682ab66
+    - platform: state
       entity_id: binary_sensor.living_room_motion
-      domain: binary_sensor
-    - type: motion
-      platform: device
-      device_id: 40a395e27caf6e3dbf69e07fa01f780d
+      to: "on"
+    - platform: state
       entity_id: binary_sensor.study_motion
-      domain: binary_sensor
-    - type: motion
-      platform: device
-      device_id: af58e8e429d511661b8b9ef8966b08ff
+      to: "on"
+    - platform: state
       entity_id: binary_sensor.bathroom_motion
-      domain: binary_sensor
+      to: "on"
   condition:
     - condition: state
       entity_id: alarm_control_panel.surveillance
@@ -1482,16 +1432,12 @@
   alias: Turn on Bedroom HVAC Cool
   description: Turn on the HVAC in the bedroom with cool mode
   trigger:
-    - type: motion
-      platform: device
-      device_id: 1cfdcc15e8a8ebba52628efc0022f94b
+    - platform: state
       entity_id: binary_sensor.bedroom_motion_n
-      domain: binary_sensor
-    - type: motion
-      platform: device
-      device_id: 2d183a12dcb81acda2688fbe4a4f2567
+      to: "on"
+    - platform: state
       entity_id: binary_sensor.bedroom_motion_s
-      domain: binary_sensor
+      to: "on"
   condition:
     - condition: numeric_state
       entity_id: sensor.bedroom_wbgt
@@ -1557,16 +1503,12 @@
   alias: Turn on Bedroom HVAC Dry
   description: Turn on the HVAC in the bedroom with dry mode
   trigger:
-    - type: motion
-      platform: device
-      device_id: 1cfdcc15e8a8ebba52628efc0022f94b
+    - platform: state
       entity_id: binary_sensor.bedroom_motion_n
-      domain: binary_sensor
-    - type: motion
-      platform: device
-      device_id: 2d183a12dcb81acda2688fbe4a4f2567
+      to: "on"
+    - platform: state
       entity_id: binary_sensor.bedroom_motion_s
-      domain: binary_sensor
+      to: "on"
   condition:
     - condition: numeric_state
       entity_id: sensor.bedroom_humidity
@@ -1609,16 +1551,12 @@
   alias: Turn on Living Area Floor Heating
   description: Turn on the floor heating in the living area when the temperature is too low
   trigger:
-    - type: motion
-      platform: device
-      device_id: 56a0fc235acbf9c9f708708a9682ab66
+    - platform: state
       entity_id: binary_sensor.living_room_motion
-      domain: binary_sensor
-    - type: motion
-      platform: device
-      device_id: 40a395e27caf6e3dbf69e07fa01f780d
+      to: "on"
+    - platform: state
       entity_id: binary_sensor.study_motion
-      domain: binary_sensor
+      to: "on"
   condition:
     - condition: numeric_state
       entity_id: sensor.living_room_temperature
@@ -1682,16 +1620,12 @@
   alias: Turn on Living Room HVAC Cool
   description: Turn on the HVAC in the living room with cool mode
   trigger:
-    - type: motion
-      platform: device
-      device_id: 56a0fc235acbf9c9f708708a9682ab66
+    - platform: state
       entity_id: binary_sensor.living_room_motion
-      domain: binary_sensor
-    - type: motion
-      platform: device
-      device_id: 40a395e27caf6e3dbf69e07fa01f780d
+      to: "on"
+    - platform: state
       entity_id: binary_sensor.study_motion
-      domain: binary_sensor
+      to: "on"
   condition:
     - condition: numeric_state
       entity_id: sensor.living_room_wbgt
@@ -1765,16 +1699,12 @@
   alias: Turn on Living Room HVAC Dry
   description: Turn on the HVAC in the living room with dry mode
   trigger:
-    - type: motion
-      platform: device
-      device_id: 56a0fc235acbf9c9f708708a9682ab66
+    - platform: state
       entity_id: binary_sensor.living_room_motion
-      domain: binary_sensor
-    - type: motion
-      platform: device
-      device_id: 40a395e27caf6e3dbf69e07fa01f780d
+      to: "on"
+    - platform: state
       entity_id: binary_sensor.study_motion
-      domain: binary_sensor
+      to: "on"
   condition:
     - condition: numeric_state
       entity_id: sensor.living_room_humidity
@@ -1846,16 +1776,12 @@
   alias: Turn on Living Area Downlights
   description: Turn on the downlights in living area when the light level is too low
   trigger:
-    - type: motion
-      platform: device
-      device_id: 56a0fc235acbf9c9f708708a9682ab66
+    - platform: state
       entity_id: binary_sensor.living_room_motion
-      domain: binary_sensor
-    - type: motion
-      platform: device
-      device_id: 40a395e27caf6e3dbf69e07fa01f780d
+      to: "on"
+    - platform: state
       entity_id: binary_sensor.study_motion
-      domain: binary_sensor
+      to: "on"
   condition:
     - condition: numeric_state
       entity_id: sensor.living_room_light_level
@@ -1878,16 +1804,12 @@
   alias: Turn on Living Room Humidifier
   description: Turn on the humidifier on the living room when the humidity is too low
   trigger:
-    - type: motion
-      platform: device
-      device_id: 56a0fc235acbf9c9f708708a9682ab66
+    - platform: state
       entity_id: binary_sensor.living_room_motion
-      domain: binary_sensor
-    - type: motion
-      platform: device
-      device_id: 40a395e27caf6e3dbf69e07fa01f780d
+      to: "on"
+    - platform: state
       entity_id: binary_sensor.study_motion
-      domain: binary_sensor
+      to: "on"
   condition:
     - condition: numeric_state
       entity_id: sensor.living_room_humidity
