@@ -1335,6 +1335,10 @@
       entity_id: sensor.filtered_bedroom_hvac_plug_current
       above: 100
       for: 7200
+  condition:
+    - condition: state
+      entity_id: binary_sensor.workday_sensor
+      state: 'on'
   action:
     - service: automation.turn_on
       target:
