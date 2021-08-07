@@ -13,6 +13,7 @@ views:
           - entity: binary_sensor.tango
           - entity: binary_sensor.xray_liv
           - entity: binary_sensor.xray_sto
+          - entity: binary_sensor.uniform
         hours_to_show: 6
       - type: history-graph
         title: Ping Devices
