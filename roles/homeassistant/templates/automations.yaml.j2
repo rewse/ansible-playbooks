@@ -223,11 +223,11 @@
         data:
           url: /lovelace-machines/machines
   mode: single
-- id: automation.alarm_amazonplug_is_offline
-  alias: "ALARM: amazonplug is Offline"
+- id: automation.alarm_amazonplug_bed_is_offline
+  alias: "ALARM: amazonplug-bed is Offline"
   trigger:
     - platform: state
-      entity_id: binary_sensor.amazonplug
+      entity_id: binary_sensor.amazonplug_bed
       to: "off"
       for:
         minutes: 31
@@ -235,7 +235,23 @@
     - service: notify.tats_devices
       data:
         title: "⚠️ ALARM"
-        message: amazonplug is Offline
+        message: amazonplug-bed is Offline
+        data:
+          url: /lovelace-machines/machines
+  mode: single
+- id: automation.alarm_amazonplug_liv_is_offline
+  alias: "ALARM: amazonplug-liv is Offline"
+  trigger:
+    - platform: state
+      entity_id: binary_sensor.amazonplug_liv
+      to: "off"
+      for:
+        minutes: 31
+  action:
+    - service: notify.tats_devices
+      data:
+        title: "⚠️ ALARM"
+        message: amazonplug-liv is Offline
         data:
           url: /lovelace-machines/machines
   mode: single
