@@ -18,8 +18,9 @@
       - fontforge
       - jq
       - mas
-      - python3
+      - pv
       - pwgen
+      - python3
       - reattach-to-user-namespace
       - telnet
       - source-highlight
