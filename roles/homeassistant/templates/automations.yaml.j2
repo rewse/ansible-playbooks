@@ -704,7 +704,9 @@
       entity_id: alarm_control_panel.entrance_auto_lock
       state: armed_home
   action:
-    - service: shell_command.control_entrance_lock_bottom_lock
+    - service: lock.lock
+      target:
+        entity_id: lock.entrance_lock_bottom
 - id: automation.auto_lock_entrance_lock_top_in_daytime
   alias: "Auto-Lock Entrace Lock Top in Daytime"
   trigger:
@@ -723,7 +725,9 @@
       entity_id: alarm_control_panel.entrance_auto_lock
       state: armed_home
   action:
-    - service: shell_command.control_entrance_lock_top_lock
+    - service: lock.lock
+      target:
+        entity_id: lock.entrance_lock_top
 - id: automation.auto_lock_entrance_lock_bottom_in_nighttime
   alias: "Auto-Lock Entrace Lock Bottom in Nighttime"
   trigger:
@@ -742,7 +746,9 @@
       entity_id: alarm_control_panel.entrance_auto_lock
       state: armed_home
   action:
-    - service: shell_command.control_entrance_lock_bottom_lock
+    - service: lock.lock
+      target:
+        entity_id: lock.entrance_lock_bottom
 - id: automation.auto_lock_entrance_lock_top_in_nighttime
   alias: "Auto-Lock Entrace Lock Top in Nighttime"
   trigger:
@@ -761,7 +767,9 @@
       entity_id: alarm_control_panel.entrance_auto_lock
       state: armed_home
   action:
-    - service: shell_command.control_entrance_lock_top_lock
+    - service: lock.lock
+      target:
+        entity_id: lock.entrance_lock_top
 - id: automation.info_denshobato
   alias: "INFO: Denshobato"
   trigger:
@@ -790,8 +798,9 @@
         state: home
     - delay:
         minutes: 10
-    - service: shell_command.control_entrance_lock_top_unlock
-    - service: shell_command.control_entrance_lock_bottom_unlock
+    - service: lock.unlock
+      target:
+        entity_id: lock.entrance_locks
   mode: single
 - id: automation.info_bedroom_humidity_is_too_high
   alias: "INFO: Bedroom Humidity is Too High"
@@ -1033,8 +1042,9 @@
       entity_id: sensor.living_room_1_button_switch_action
       to: double
   action:
-    - service: shell_command.control_entrance_lock_top_lock
-    - service: shell_command.control_entrance_lock_bottom_lock
+    - service: lock.lock
+      target:
+        entity_id: lock.entrance_locks
 - id: automation.trigger_monitor
   alias: Trigger monitor
   trigger:
@@ -1997,8 +2007,9 @@
       entity_id: sensor.living_room_1_button_switch_action
       to: single
   action:
-    - service: shell_command.control_entrance_lock_top_unlock
-    - service: shell_command.control_entrance_lock_bottom_unlock
+    - service: lock.unlock
+      target:
+        entity_id: lock.entrance_locks
 - id: automation.unlock_entrance_lock_when_ios_action_fails
   alias: Unlock Entrance Lock when iOS Action Fails
   trigger:
@@ -2048,8 +2059,9 @@
           for:
             minutes: 5
   action:
-    - service: shell_command.control_entrance_lock_top_unlock
-    - service: shell_command.control_entrance_lock_bottom_unlock
+    - service: lock.unlock
+      target:
+        entity_id: lock.entrance_locks
     - service: notify.all_devices
       data:
         message: Unlocked Entrance
