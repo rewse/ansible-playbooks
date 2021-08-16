@@ -46,6 +46,7 @@
   state_topic: mhz19/co2
   value_template: "{{ value_json.co2 }}"
   unit_of_measurement: ppm
+  state_class: measurement
   device_class: carbon_dioxide
   availability:
     - topic: mhz19/state
@@ -56,30 +57,35 @@
   state_topic: monitor/living_room/bio
   value_template: "{{ value_json.confidence }}"
   unit_of_measurement: "%"
+  state_class: measurement
 - platform: mqtt
   unique_id: sensor.monitor_storage_bio
   name: monitor Storage bio
   state_topic: monitor/storage/bio
   value_template: "{{ value_json.confidence }}"
   unit_of_measurement: "%"
+  state_class: measurement
 - platform: mqtt
   unique_id: sensor.monitor_living_room_akikos_iphone12mini
   name: monitor Living Room akikos-iphone12mini
   state_topic: monitor/living_room/akikos_iphone12mini
   value_template: "{{ value_json.confidence }}"
   unit_of_measurement: "%"
+  state_class: measurement
 - platform: mqtt
   unique_id: sensor.monitor_storage_akikos_iphone12mini
   name: monitor Storage akikos-iphone12mini
   state_topic: monitor/storage/akikos_iphone12mini
   value_template: "{{ value_json.confidence }}"
   unit_of_measurement: "%"
+  state_class: measurement
 - platform: mqtt
   unique_id: sensor.enecoq_fee_low
   name: enecoQ Fee Low
   state_topic: enecoq/fee
   value_template: "{{ value_json.low }}"
   unit_of_measurement: JPY/h
+  state_class: measurement
   availability:
     - topic: enecoq/fee/state
   icon: mdi:transmission-tower
@@ -89,6 +95,7 @@
   state_topic: enecoq/fee
   value_template: "{{ value_json.mid }}"
   unit_of_measurement: JPY/h
+  state_class: measurement
   availability:
     - topic: enecoq/fee/state
   icon: mdi:transmission-tower
@@ -98,6 +105,7 @@
   state_topic: enecoq/fee
   value_template: "{{ value_json.high }}"
   unit_of_measurement: JPY/h
+  state_class: measurement
   availability:
     - topic: enecoq/fee/state
   icon: mdi:transmission-tower
@@ -107,8 +115,19 @@
   state_topic: enecoq/fee
   value_template: "{{ value_json.total }}"
   unit_of_measurement: JPY/h
+  state_class: measurement
   availability:
     - topic: enecoq/fee/state
+  icon: mdi:transmission-tower
+- platform: mqtt
+  unique_id: sensor.enecoq_kwh
+  name: enecoQ kWh
+  state_topic: enecoq/kwh
+  value_template: "{{ value_json.kwh }}"
+  unit_of_measurement: kWh
+  state_class: measurement
+  availability:
+    - topic: enecoq/kwh/state
   icon: mdi:transmission-tower
 - platform: rest
   name: Bedroom Curtains Position
