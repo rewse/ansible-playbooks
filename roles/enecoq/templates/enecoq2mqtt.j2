@@ -15,9 +15,9 @@ my_exit() {
 }
 
 # }}}
-# {{{ send_enecoq()
+# {{{ send_enecoq_fee()
 
-send_enecoq() {
+send_enecoq_fee() {
     csv=$(/usr/local/bin/enecoq $email $password)
 
     retval=$?
@@ -34,8 +34,6 @@ send_enecoq() {
             -h hass.rewse.jp -p 8883 \
             --cafile /etc/ssl/certs/DST_Root_CA_X3.pem \
             -m offline
-
-        my_exit $retval
     fi
 
     if [ "$(echo $csv | grep -v Insuff | grep -v None)" ]; then
@@ -69,9 +67,49 @@ send_enecoq() {
 }
 
 # }}}
+# {{{ send_enecoq_kwh()
+
+send_enecoq_kwh() {
+    kwh=$(/usr/local/bin/enecoq --kwh $email $password)
+
+    retval=$?
+
+    if [ "$retval" -eq 0 ]; then
+        mosquitto_pub -r -t enecoq/kwh/state \
+            -u pub_client -P [% mosquitto_password %] \
+            -h hass.rewse.jp -p 8883 \
+            --cafile /etc/ssl/certs/DST_Root_CA_X3.pem \
+            -m online
+    else
+        mosquitto_pub -r -t enecoq/kwh/state \
+            -u pub_client -P [% mosquitto_password %] \
+            -h hass.rewse.jp -p 8883 \
+            --cafile /etc/ssl/certs/DST_Root_CA_X3.pem \
+            -m offline
+    fi
+
+    json=$(cat <<!
+{
+    "datetime": "$(date --iso-8601=seconds)",
+    "kwh": "$kwh"
+}
+!
+    )
+
+    mosquitto_pub -r -t enecoq/kwh \
+        -u pub_client -P [% mosquitto_password %] \
+        -h hass.rewse.jp -p 8883 \
+        --cafile /etc/ssl/certs/DST_Root_CA_X3.pem \
+        -m "$json"
+
+    retval=$?
+}
+
+# }}}
 # {{{ Main
 
-send_enecoq
+send_enecoq_fee
+send_enecoq_kwh
 
 my_exit $retval
 
