@@ -620,6 +620,7 @@
         unit_system: metric
         temperature_unit: C
         time_zone: Asia/Tokyo
+        currency: JPY
         external_url: https://hass.rewse.jp/
         internal_url: https://hass.rewse.jp/
         customize: !include customize.yaml
