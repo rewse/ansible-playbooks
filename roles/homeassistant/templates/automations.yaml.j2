@@ -703,6 +703,11 @@
     - condition: state
       entity_id: alarm_control_panel.entrance_auto_lock
       state: armed_home
+    - condition: state
+      entity_id: binary_sensor.entrance_door
+      state: "off"
+      for:
+        minutes: 30
   action:
     - service: lock.lock
       target:
@@ -724,6 +729,11 @@
     - condition: state
       entity_id: alarm_control_panel.entrance_auto_lock
       state: armed_home
+    - condition: state
+      entity_id: binary_sensor.entrance_door
+      state: "off"
+      for:
+        minutes: 30
   action:
     - service: lock.lock
       target:
@@ -745,6 +755,11 @@
     - condition: state
       entity_id: alarm_control_panel.entrance_auto_lock
       state: armed_home
+    - condition: state
+      entity_id: binary_sensor.entrance_door
+      state: "off"
+      for:
+        minutes: 10
   action:
     - service: lock.lock
       target:
@@ -766,6 +781,11 @@
     - condition: state
       entity_id: alarm_control_panel.entrance_auto_lock
       state: armed_home
+    - condition: state
+      entity_id: binary_sensor.entrance_door
+      state: "off"
+      for:
+        minutes: 10
   action:
     - service: lock.lock
       target:
