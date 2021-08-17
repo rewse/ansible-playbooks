@@ -691,6 +691,7 @@
   trigger:
     - platform: time_pattern
       minutes: "/5"
+      seconds: 5
   condition:
     - condition: state
       entity_id: lock.entrance_lock_bottom
@@ -715,6 +716,7 @@
   trigger:
     - platform: time_pattern
       minutes: "/5"
+      seconds: 5
   condition:
     - condition: state
       entity_id: lock.entrance_lock_top
@@ -739,6 +741,7 @@
   trigger:
     - platform: time_pattern
       minutes: "/5"
+      seconds: 21
   condition:
     - condition: state
       entity_id: lock.entrance_lock_bottom
@@ -763,6 +766,7 @@
   trigger:
     - platform: time_pattern
       minutes: "/5"
+      seconds: 21
   condition:
     - condition: state
       entity_id: lock.entrance_lock_top
@@ -1062,6 +1066,7 @@
   trigger:
     - platform: time_pattern
       minutes: "/5"
+      seconds: 33
   action:
     - service: mqtt.publish
       data:
@@ -1116,6 +1121,7 @@
   trigger:
     - platform: time_pattern
       minutes: "/5"
+      seconds: 46
   condition:
     - condition: state
       entity_id: alarm_control_panel.surveillance
@@ -1146,6 +1152,7 @@
       above: 10
     - platform: time_pattern
       minutes: "/5"
+      seconds: 53
   condition:
     - condition: numeric_state
       entity_id: sensor.monitor_bio
@@ -1164,6 +1171,7 @@
       below: 10
     - platform: time_pattern
       minutes: "/5"
+      seconds: 53
   condition:
     - condition: numeric_state
       entity_id: sensor.monitor_bio
@@ -1182,6 +1190,7 @@
       above: 10
     - platform: time_pattern
       minutes: "/5"
+      seconds: 53
   condition:
     - condition: numeric_state
       entity_id: sensor.monitor_akikos_iphone12mini
@@ -1200,6 +1209,7 @@
       below: 10
     - platform: time_pattern
       minutes: "/5"
+      seconds: 53
   condition:
     - condition: numeric_state
       entity_id: sensor.monitor_akikos_iphone12mini
@@ -1567,6 +1577,7 @@
   trigger:
     - platform: time_pattern
       minutes: "/5"
+      seconds: 37
   condition:
     - condition: state
       entity_id: binary_sensor.workday_sensor
@@ -1639,6 +1650,7 @@
   trigger:
     - platform: time_pattern
       minutes: "/5"
+      seconds: 46
   condition:
     - condition: numeric_state
       entity_id: sensor.bedroom_wbgt
@@ -1841,6 +1853,7 @@
   trigger:
     - platform: time_pattern
       minutes: "/5"
+      seconds: 54
   condition:
     - condition: numeric_state
       entity_id: sensor.living_room_wbgt
