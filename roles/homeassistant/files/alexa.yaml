@@ -19,6 +19,7 @@ smart_home:
       - binary_sensor.study_window_n
       - binary_sensor.study_window_s
       - camera.guppy_living_room
+      - camera.guppy_bedroom
       - climate.bedroom_hvac
       - climate.living_room_hvac
       - cover.bedroom_curtains

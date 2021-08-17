@@ -226,6 +226,8 @@ binary_sensor.xray_sto:
   icon: mdi:access-point-network
 binary_sensor.zulu:
   icon: mdi:router-network
+camera.guppy_bedroom:
+  icon: mdi:cctv
 camera.guppy_living_room:
   icon: mdi:cctv
 climate.living_area_floor_heating:

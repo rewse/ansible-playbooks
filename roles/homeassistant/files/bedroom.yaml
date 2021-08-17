@@ -80,3 +80,6 @@ cards:
         name: Turn on HVAC Cleaner
         secondary_info: last-triggered
     show_header_toggle: false
+  - type: picture-entity
+    name: Bedroom Camera
+    entity: camera.guppy_bedroom
