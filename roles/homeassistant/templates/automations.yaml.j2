@@ -1079,26 +1079,6 @@
         payload: '{"identity": "automation.trigger_monitor"}'
         retain: true
   mode: single
-- id: automation.trigger_monitor_by_entrance_door
-  alias: Trigger monitor by Entrance Door
-  trigger:
-    - platform: state
-      entity_id: binary_sensor.entrance_door
-      to: "off"
-  action:
-    - delay:
-        minutes: 1
-    - service: mqtt.publish
-      data:
-        topic: monitor/scan/arrive
-        payload: '{"identity": "automation.trigger_monitor_by_entrance_door"}'
-        retain: true
-    - service: mqtt.publish
-      data:
-        topic: monitor/scan/depart
-        payload: '{"identity": "automation.trigger_monitor_by_entrance_door"}'
-        retain: true
-  mode: single
 - id: automation.turn_on_surveillance_when_ios_action_fires
   alias: Turn on surveillance when iOS Action Fires
   trigger:
@@ -2123,17 +2103,31 @@
         data:
           url: /lovelace-people/people
   mode: single
-- id: automation.update_entrance_lock_sensors
-  alias: Update Entrance Lock Sensors
+- id: automation.update_device_tracking_sensors
+  alias: Update Device Tracking Sensors
   trigger:
     - platform: state
       entity_id: binary_sensor.entrance_door
   action:
     - delay:
         minutes: 1
+    - service: mqtt.publish
+      data:
+        topic: monitor/scan/arrive
+        payload: '{"identity": "automation.trigger_monitor_by_entrance_door"}'
+        retain: true
+    - service: mqtt.publish
+      data:
+        topic: monitor/scan/depart
+        payload: '{"identity": "automation.trigger_monitor_by_entrance_door"}'
+        retain: true
+    - delay:
+        seconds: 4
     - service: homeassistant.update_entity
       target:
         entity_id:
+          - device_tracker.ping_bio
+          - device_tracker.ping_akikos_iphone12mini
           - sensor.entrance_lock_bottom_sensor
           - sensor.entrance_lock_top_sensor
   mode: single
