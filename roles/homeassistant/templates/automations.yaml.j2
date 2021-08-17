@@ -1144,6 +1144,12 @@
     - platform: numeric_state
       entity_id: sensor.monitor_bio
       above: 10
+    - platform: time_pattern
+      minutes: "/5"
+  condition:
+    - condition: numeric_state
+      entity_id: sensor.monitor_bio
+      above: 10
   action:
     - service: device_tracker.see
       data:
@@ -1154,6 +1160,12 @@
   alias: Turn off monitor bio
   trigger:
     - platform: numeric_state
+      entity_id: sensor.monitor_bio
+      below: 10
+    - platform: time_pattern
+      minutes: "/5"
+  condition:
+    - condition: numeric_state
       entity_id: sensor.monitor_bio
       below: 10
   action:
@@ -1168,6 +1180,12 @@
     - platform: numeric_state
       entity_id: sensor.monitor_akikos_iphone12mini
       above: 10
+    - platform: time_pattern
+      minutes: "/5"
+  condition:
+    - condition: numeric_state
+      entity_id: sensor.monitor_akikos_iphone12mini
+      above: 10
   action:
     - service: device_tracker.see
       data:
@@ -1178,6 +1196,12 @@
   alias: Turn off monitor akikos-iphone12mini
   trigger:
     - platform: numeric_state
+      entity_id: sensor.monitor_akikos_iphone12mini
+      below: 10
+    - platform: time_pattern
+      minutes: "/5"
+  condition:
+    - condition: numeric_state
       entity_id: sensor.monitor_akikos_iphone12mini
       below: 10
   action:
