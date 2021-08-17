@@ -1,16 +1,87 @@
+close_and_get_state_of_bedroom_curtains:
+  alias: Close and Get State of Bedroom Curtains
+  sequence:
+    - service: switch.turn_off
+      target:
+        entity_id: switch.bedroom_curtains
+    - delay:
+        minutes: 4
+    - service: homeassistant.update_entity
+      target:
+        entity_id: sensor.bedroom_curtains_position
+  mode: queued
+  max: 3
+  icon: mdi:window-shutter
+lock_and_get_state_of_entrance_lock_bottom:
+  alias: Lock and Get State of Entrance Lock Bottom
+  sequence:
+    - service: shell_command.control_lock_entrance_lock_bottom
+    - delay:
+        seconds: 8
+    - service: homeassistant.update_entity
+      target:
+        entity_id: sensor.entrance_lock_bottom_sensor
+  mode: queued
+  max: 3
+  icon: mdi:lock
+lock_and_get_state_of_entrance_lock_top:
+  alias: Lock and Get State of Entrance Lock Top
+  sequence:
+    - service: shell_command.control_lock_entrance_lock_top
+    - delay:
+        seconds: 8
+    - service: homeassistant.update_entity
+      target:
+        entity_id: sensor.entrance_lock_top_sensor
+  mode: queued
+  max: 3
+  icon: mdi:lock
+open_and_get_state_of_bedroom_curtains:
+  alias: Open and Get State of Bedroom Curtains
+  sequence:
+    - service: switch.turn_on
+      target:
+        entity_id: switch.bedroom_curtains
+    - delay:
+        minutes: 4
+    - service: homeassistant.update_entity
+      target:
+        entity_id: sensor.bedroom_curtains_position
+  mode: queued
+  max: 3
+  icon: mdi:window-shutter-open
+unlock_and_get_state_of_entrance_lock_bottom:
+  alias: Unlock and Get State of Entrance Lock Bottom
+  sequence:
+    - service: shell_command.control_unlock_entrance_lock_bottom
+    - delay:
+        seconds: 8
+    - service: homeassistant.update_entity
+      target:
+        entity_id: sensor.entrance_lock_bottom_sensor
+  mode: queued
+  max: 3
+  icon: mdi:lock-open-variant
+unlock_and_get_state_of_entrance_lock_top:
+  alias: Unlock and Get State of Entrance Lock Top
+  sequence:
+    - service: shell_command.control_unlock_entrance_lock_top
+    - delay:
+        seconds: 8
+    - service: homeassistant.update_entity
+      target:
+        entity_id: sensor.entrance_lock_top_sensor
+  mode: queued
+  max: 3
+  icon: mdi:lock-open-variant
 restart_zulu:
   alias: Restart zulu
   sequence:
     - service: switch.turn_off
-      data: {}
       entity_id: switch.entrance_zulu_power
     - delay:
-        hours: 0
-        minutes: 0
-        seconds: 3
-        milliseconds: 0
+        seconds: 4
     - service: switch.turn_on
-      data: {}
       entity_id: switch.entrance_zulu_power
   mode: single
   icon: 'mdi:power-plug'
