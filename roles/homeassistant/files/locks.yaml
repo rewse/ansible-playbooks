@@ -6,7 +6,6 @@
     service: shell_command.control_lock_entrance_lock_top
   unlock:
     service: shell_command.control_unlock_entrance_lock_top
-  optimistic: true
 - platform: template
   unique_id: lock.entrance_lock_bottom
   name: Entrance Lock Bottom
@@ -15,7 +14,6 @@
     service: shell_command.control_lock_entrance_lock_bottom
   unlock:
     service: shell_command.control_unlock_entrance_lock_bottom
-  optimistic: true
 - platform: template
   unique_id: lock.entrance_locks
   name: Entrance Locks
@@ -26,4 +24,3 @@
   unlock:
     - service: shell_command.control_unlock_entrance_lock_top
     - service: shell_command.control_unlock_entrance_lock_bottom
-  optimistic: true
