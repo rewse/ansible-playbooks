@@ -155,12 +155,6 @@ cards:
           controls: true
           mute: true
           power_state: false
-      - type: custom:mini-media-player
-        entity: media_player.stw2000
-        artwork: material
-        hide:
-          volume: true
-          power_state: false
   - type: picture-entity
     name: Living Room Camera
     entity: camera.guppy_living_room

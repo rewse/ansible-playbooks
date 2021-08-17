@@ -304,8 +304,6 @@ media_player.heargo2:
 media_player.regza:
   icon: mdi:television
   device_class: tv
-media_player.stw2000:
-  icon: mdi:android
 person.shibata_akiko:
   icon: mdi:human-female
 person.shibata_tats:
