@@ -1424,6 +1424,10 @@
   trigger:
     - platform: time
       at: "5:30"
+  condition:
+    - condition: state
+      entity_id: alarm_control_panel.surveillance
+      state: disarmed
   action:
     - service: climate.turn_off
       target:
@@ -1563,6 +1567,10 @@
       to: heat_cool
       for:
         hours: 2
+  condition:
+    - condition: state
+      entity_id: alarm_control_panel.surveillance
+      state: disarmed
   action:
     - service: automation.turn_on
       target:
@@ -1786,6 +1794,9 @@
     - condition: time
       weekday:
       - tue
+    - condition: state
+      entity_id: alarm_control_panel.surveillance
+      state: disarmed
   action:
     - service: switch.turn_on
       entity_id: switch.living_room_hvac_cleaner
