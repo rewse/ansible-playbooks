@@ -1,8 +1,8 @@
-control_entrance_lock_top_lock: /config/bin/sesame lock [% sesame.api_key %] [% sesame.uuid_top %] [% sesame.secret_top %]
-control_entrance_lock_top_unlock: /config/bin/sesame unlock [% sesame.api_key %] [% sesame.uuid_top %] [% sesame.secret_top %]
-control_entrance_lock_bottom_lock: /config/bin/sesame lock [% sesame.api_key %] [% sesame.uuid_bottom %] [% sesame.secret_bottom %]
-control_entrance_lock_bottom_unlock: /config/bin/sesame unlock [% sesame.api_key %] [% sesame.uuid_bottom %] [% sesame.secret_bottom %]
-control_regza_toggle: curl --digest --user '[% regza.username %]:[% regza.password %]' http://regza.rewse.jp/remote/remote.htm?key=40BF12
-control_regza_volume_up: curl --digest --user '[% regza.username %]:[% regza.password %]' http://regza.rewse.jp/remote/remote.htm?key=40BF1A
-control_regza_volume_down: curl --digest --user '[% regza.username %]:[% regza.password %]' http://regza.rewse.jp/remote/remote.htm?key=40BF1E
-control_regza_volume_mute: curl --digest --user '[% regza.username %]:[% regza.password %]' http://regza.rewse.jp/remote/remote.htm?key=40BF10
+control_lock_entrance_lock_bottom: /config/bin/sesame lock [% sesame.api_key %] [% sesame.uuid_bottom %] [% sesame.secret_bottom %]
+control_lock_entrance_lock_top: /config/bin/sesame lock [% sesame.api_key %] [% sesame.uuid_top %] [% sesame.secret_top %]
+control_unlock_entrance_lock_bottom: /config/bin/sesame unlock [% sesame.api_key %] [% sesame.uuid_bottom %] [% sesame.secret_bottom %]
+control_unlock_entrance_lock_top: /config/bin/sesame unlock [% sesame.api_key %] [% sesame.uuid_top %] [% sesame.secret_top %]
+control_toggle_regza: curl --digest --user '[% regza.username %]:[% regza.password %]' http://regza.rewse.jp/remote/remote.htm?key=40BF12
+control_volume_up_regza: curl --digest --user '[% regza.username %]:[% regza.password %]' http://regza.rewse.jp/remote/remote.htm?key=40BF1A
+control_volume_down_regza: curl --digest --user '[% regza.username %]:[% regza.password %]' http://regza.rewse.jp/remote/remote.htm?key=40BF1E
+control_mute_regza: curl --digest --user '[% regza.username %]:[% regza.password %]' http://regza.rewse.jp/remote/remote.htm?key=40BF10
