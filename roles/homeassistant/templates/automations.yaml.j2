@@ -709,9 +709,7 @@
       for:
         minutes: 30
   action:
-    - service: lock.lock
-      target:
-        entity_id: lock.entrance_lock_bottom
+    - service: script.lock_and_get_state_of_entrance_lock_bottom
 - id: automation.auto_lock_entrance_lock_top_in_daytime
   alias: "Auto-Lock Entrace Lock Top in Daytime"
   trigger:
@@ -735,9 +733,7 @@
       for:
         minutes: 30
   action:
-    - service: lock.lock
-      target:
-        entity_id: lock.entrance_lock_top
+    - service: script.lock_and_get_state_of_entrance_lock_top
 - id: automation.auto_lock_entrance_lock_bottom_in_nighttime
   alias: "Auto-Lock Entrace Lock Bottom in Nighttime"
   trigger:
@@ -761,9 +757,7 @@
       for:
         minutes: 10
   action:
-    - service: lock.lock
-      target:
-        entity_id: lock.entrance_lock_bottom
+    - service: script.lock_and_get_state_of_entrance_lock_bottom
 - id: automation.auto_lock_entrance_lock_top_in_nighttime
   alias: "Auto-Lock Entrace Lock Top in Nighttime"
   trigger:
@@ -787,9 +781,7 @@
       for:
         minutes: 10
   action:
-    - service: lock.lock
-      target:
-        entity_id: lock.entrance_lock_top
+    - service: script.lock_and_get_state_of_entrance_lock_top
 - id: automation.info_denshobato
   alias: "INFO: Denshobato"
   trigger:
@@ -1201,8 +1193,7 @@
     - platform: time
       at: input_datetime.bedroom_curtains_opened_time
   action:
-    - service: switch.turn_on
-      entity_id: switch.bedroom_curtains
+    - service: script.open_and_get_state_of_bedroom_curtains
   mode: single
 - id: automation.open_bedroom_curtains_workday
   alias: Open Bedroom Curtains Workday
@@ -1215,8 +1206,7 @@
       entity_id: binary_sensor.workday_sensor
       state: "on"
   action:
-    - service: switch.turn_on
-      entity_id: switch.bedroom_curtains
+    - service: script.open_and_get_state_of_bedroom_curtains
   mode: single
 - id: automation.turn_down_bedroom
   alias: Turn down Bedroom
@@ -1225,8 +1215,7 @@
     - platform: time
       at: input_datetime.bedroom_turned_down_time
   action:
-  - service: switch.turn_off
-    entity_id: switch.bedroom_curtains
+    - service: script.close_and_get_state_of_bedroom_curtains
   mode: single
 - id: automation.turn_down_living_area
   alias: Turn down Living Area
@@ -2027,9 +2016,8 @@
       entity_id: sensor.living_room_1_button_switch_action
       to: single
   action:
-    - service: lock.unlock
-      target:
-        entity_id: lock.entrance_locks
+    - service: script.unlock_and_get_state_of_entrance_lock_bottom
+    - service: script.unlock_and_get_state_of_entrance_lock_top
 - id: automation.unlock_entrance_lock_when_ios_action_fails
   alias: Unlock Entrance Lock when iOS Action Fails
   trigger:
@@ -2079,12 +2067,25 @@
           for:
             minutes: 5
   action:
-    - service: lock.unlock
-      target:
-        entity_id: lock.entrance_locks
+    - service: script.unlock_and_get_state_of_entrance_lock_bottom
+    - service: script.unlock_and_get_state_of_entrance_lock_top
     - service: notify.all_devices
       data:
         message: Unlocked Entrance
         data:
           url: /lovelace-people/people
+  mode: single
+- id: automation.update_entrance_lock_sensors
+  alias: Update Entrance Lock Sensors
+  trigger:
+    - platform: state
+      entity_id: binary_sensor.entrance_door
+  action:
+    - delay:
+        minutes: 1
+    - service: homeassistant.update_entity
+      target:
+        entity_id:
+          - sensor.entrance_lock_bottom_sensor
+          - sensor.entrance_lock_top_sensor
   mode: single

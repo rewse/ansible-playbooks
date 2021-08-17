@@ -387,7 +387,7 @@
   copy:
     src: scripts.yaml
     dest: /etc/homeassistant
-  tags: [homeassistant, homeassistant-component]
+  tags: [homeassistant, homeassistant-script]
 
 - name: Config sensor
   lineinfile:
