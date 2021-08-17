@@ -722,15 +722,9 @@
     dest: /etc/homeassistant/ui
   tags: [homeassistant, homeassistant-ui]
 
-- name: Copy bathroom.yaml
+- name: Copy others.yaml
   copy:
-    src: bathroom.yaml
-    dest: /etc/homeassistant/ui
-  tags: [homeassistant, homeassistant-ui]
-
-- name: Copy entrance.yaml
-  copy:
-    src: entrance.yaml
+    src: others.yaml
     dest: /etc/homeassistant/ui
   tags: [homeassistant, homeassistant-ui]
 
