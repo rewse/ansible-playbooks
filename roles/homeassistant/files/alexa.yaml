@@ -36,7 +36,6 @@ smart_home:
       - media_player.appletv
       - media_player.aventage
       - media_player.heargo2
-      - media_player.stw2000
       - sensor.balcony_temperature
       - sensor.bathroom_temperature
       - sensor.bedroom_temperature
@@ -74,6 +73,8 @@ smart_home:
       name: 書斎の北側の窓
     binary_sensor.study_window_s:
       name: 書斎の南側の窓
+    camera.guppy_bedroom:
+      name: 寝室のカメラ
     camera.guppy_living_room:
       name: リビングのカメラ
     climate.bedroom_hvac:
@@ -112,9 +113,6 @@ smart_home:
     media_player.heargo2:
       name: 書斎のスピーカー
       display_categories: SPEAKER
-    media_player.stw2000:
-      name: auひかり
-      display_categories: STREAMING_DEVICE
     sensor.balcony_temperature:
       name: ベランダの温度計
     sensor.bathroom_temperature:

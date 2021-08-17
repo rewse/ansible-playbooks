@@ -12,7 +12,6 @@
         - media_player.aventage
         - media_player.firetv
         - media_player.heargo2
-        - media_player.stw2000
         - sensor.living_room_co2
         - sensor.living_room_pm25
         - switch.bedroom_hvac_cleaner
@@ -28,7 +27,3 @@
       media_player.heargo2:
         feature_list:
           - feature: on_off
-      media_player.stw2000:
-        feature_list:
-          - feature: on_off
-          - feature: play_pause
