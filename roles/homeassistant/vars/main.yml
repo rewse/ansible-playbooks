@@ -54,6 +54,7 @@ simple_weather_card_version: 0.8.2
 switchbot_token: "[% vault_switchbot_token %]"
 uptime_card_version: 0.4.0
 tuyaplug:
+  bat_key: "[% vault_tuyaplug.bat_key %]"
   liv_key: "[% vault_tuyaplug.liv_key %]"
   bed_key: "[% vault_tuyaplug.bed_key %]"
 xiaomi_gateway3_version: 1.2.1

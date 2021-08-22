@@ -1,3 +1,32 @@
+- host: tuyaplug-bat.rewse.jp
+  friendly_name: Bathroom Washer Plug
+  device_id: 1826182840f520f484c0
+  local_key: !secret tuyaplug_bat_key
+  protocol_version: "3.3"
+  entities:
+    - platform: binary_sensor
+      friendly_name: Bathroom Washer Plug Status
+      id: 1
+      device_class: plug
+      state_on: "true"
+      state_off: "false"
+    - platform: sensor
+      friendly_name: Bathroom Washer Plug Current
+      id: 18
+      device_class: current
+      unit_of_measurement: mA
+    - platform: sensor
+      friendly_name: Bathroom Washer Plug Current Comsumption
+      id: 19
+      scaling: 0.1
+      device_class: power
+      unit_of_measurement: W
+    - platform: sensor
+      friendly_name: Bathroom Washer Plug Voltate
+      id: 20
+      scaling: 0.1
+      device_class: voltage
+      unit_of_measurement: V
 - host: tuyaplug-liv.rewse.jp
   friendly_name: Living Room Humidifier Plug
   device_id: eb0e24f3efa493fe42rvmy
