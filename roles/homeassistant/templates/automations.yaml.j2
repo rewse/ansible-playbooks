@@ -923,6 +923,9 @@
     - condition: numeric_state
       entity_id: sensor.living_room_wbgt
       above: input_number.living_room_hvac_dry_turned_on_threshold_wbgt
+    - condition: numeric_state
+      entity_id: sensor.living_room_wbgt
+      below: input_number.living_room_hvac_cool_turned_on_threshold
     - condition: or
       conditions:
         - condition: state
@@ -1895,6 +1898,9 @@
     - condition: numeric_state
       entity_id: sensor.living_room_wbgt
       above: input_number.living_room_hvac_dry_turned_on_threshold_wbgt
+    - condition: numeric_state
+      entity_id: sensor.living_room_wbgt
+      below: input_number.living_room_hvac_cool_turned_on_threshold
     - condition: state
       entity_id: climate.living_room_hvac
       state: "off"
