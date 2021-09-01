@@ -41,8 +41,10 @@ views:
           - entity: binary_sensor.remo_liv
           - entity: binary_sensor.sesamemodule
           - entity: binary_sensor.switchbothub
-          - entity: binary_sensor.tuyaplug_liv
+          - entity: binary_sensor.tuyaplug_bat
           - entity: binary_sensor.tuyaplug_bed
+          - entity: binary_sensor.tuyaplug_kit
+          - entity: binary_sensor.tuyaplug_liv
           - entity: binary_sensor.wfirex
           - entity: binary_sensor.xiaomigateway
         hours_to_show: 6
