@@ -28,201 +28,6 @@
     - delay:
         hours: 1
   mode: single
-- id: automation.alarm_bio_wifi_might_be_off
-  alias: "ALARM: bio WiFi might be Off"
-  trigger:
-    - platform: state
-      entity_id: binary_sensor.living_room_motion
-      to: "on"
-    - platform: state
-      entity_id: binary_sensor.study_motion
-      to: "on"
-  condition:
-    - condition: state
-      entity_id: device_tracker.ping_bio
-      state: not_home
-      for:
-        hours: 1
-    - condition: state
-      entity_id: device_tracker.monitor_bio
-      state: home
-      for:
-        hours: 1
-  action:
-    - service: notify.tats_devices
-      data:
-        title: "⚠️ ALARM"
-        message: bio WiFi might be off
-        data:
-          url: /lovelace-machines/machines
-    - delay:
-        hours: 1
-  mode: single
-- id: automation.alarm_internet_speed_is_too_slow
-  alias: "ALARM: Internet Speed is Too Slow"
-  trigger:
-    - platform: numeric_state
-      entity_id: sensor.fast_com_download
-      below: 1
-  condition:
-    - condition: numeric_state
-      entity_id: sensor.speedtest_download
-      below: 1
-  action:
-    - service: notify.tats_devices
-      data:
-        title: "⚠️ ALARM"
-        message: Internet Speed is Too Slow
-        data:
-          url: /lovelace-machines/machines
-    - delay:
-        hours: 1
-    - service: script.restart_zulu
-  mode: single
-- id: automation.alarm_living_room_air_quality_is_poor
-  alias: "ALARM: Living Room Air Quality is Poor"
-  trigger:
-    - platform: state
-      entity_id: binary_sensor.living_room_motion
-      to: "on"
-    - platform: state
-      entity_id: binary_sensor.study_motion
-      to: "on"
-  condition:
-    - condition: numeric_state
-      entity_id: sensor.living_room_iaq_index
-      below: 25
-    - condition: state
-      entity_id: binary_sensor.living_room_window
-      state: "off"
-    - condition: state
-      entity_id: binary_sensor.study_window_n
-      state: "off"
-    - condition: state
-      entity_id: binary_sensor.study_window_s
-      state: "off"
-  action:
-    - service: notify.tats_devices
-      data:
-        message: "Living Room Air Quality is Poor. Current: {{ states('sensor.living_room_iaq_index') }}IAQI"
-        title: "⚠️ ALARM"
-        data:
-          url: /lovelace/home
-    - delay:
-        hours: 1
-  mode: single
-- id: automation.alarm_living_room_co2_is_too_high
-  alias: "ALARM: Living Room CO2 is Too High"
-  trigger:
-    - platform: state
-      entity_id: binary_sensor.living_room_motion
-      to: "on"
-    - platform: state
-      entity_id: binary_sensor.study_motion
-      to: "on"
-  condition:
-    - condition: numeric_state
-      entity_id: sensor.living_room_co2
-      above: 1000
-    - condition: state
-      entity_id: binary_sensor.living_room_window
-      state: "off"
-    - condition: state
-      entity_id: binary_sensor.study_window_n
-      state: "off"
-    - condition: state
-      entity_id: binary_sensor.study_window_s
-      state: "off"
-  action:
-    - service: notify.all_devices
-      data:
-        title: "⚠️ ALARM"
-        message: "Living Room CO2 is too high. Current: {{ states('sensor.living_room_co2') }}ppm"
-        data:
-          url: /lovelace/home
-    - delay:
-        hours: 1
-  mode: single
-- id: automation.alarm_zulu_is_offline
-  alias: "ALARM: zulu is Offline"
-  trigger:
-    - platform: state
-      entity_id: binary_sensor.zulu
-      to: "off"
-      for:
-        minutes: 31
-  action:
-    - service: notify.tats_devices
-      data:
-        title: "⚠️ ALARM"
-        message: zulu is offline
-        data:
-          url: /lovelace-machines/machines
-  mode: single
-- id: automation.alarm_romeo_is_offline
-  alias: "ALARM: romeo is Offline"
-  trigger:
-    - platform: state
-      entity_id: binary_sensor.romeo
-      to: "off"
-      for:
-        minutes: 31
-  action:
-    - service: notify.tats_devices
-      data:
-        title: "⚠️ ALARM"
-        message: romeo is offline
-        data:
-          url: /lovelace-machines/machines
-  mode: single
-- id: automation.alarm_tango_is_offline
-  alias: "ALARM: tango is Offline"
-  trigger:
-    - platform: state
-      entity_id: binary_sensor.tango
-      to: "off"
-      for:
-        minutes: 31
-  action:
-    - service: notify.tats_devices
-      data:
-        title: "⚠️ ALARM"
-        message: tango is offline
-        data:
-          url: /lovelace-machines/machines
-  mode: single
-- id: automation.alarm_xray_liv_is_offline
-  alias: "ALARM: xray-liv is Offline"
-  trigger:
-    - platform: state
-      entity_id: binary_sensor.xray_liv
-      to: "off"
-      for:
-        minutes: 31
-  action:
-    - service: notify.tats_devices
-      data:
-        title: "⚠️ ALARM"
-        message: xray-liv is Offline
-        data:
-          url: /lovelace-machines/machines
-  mode: single
-- id: automation.alarm_xray_sto_is_offline
-  alias: "ALARM: xray-sto is Offline"
-  trigger:
-    - platform: state
-      entity_id: binary_sensor.xray_sto
-      to: "off"
-      for:
-        minutes: 31
-  action:
-    - service: notify.tats_devices
-      data:
-        title: "⚠️ ALARM"
-        message: xray-sto is Offline
-        data:
-          url: /lovelace-machines/machines
-  mode: single
 - id: automation.alarm_amazonplug_bed_is_offline
   alias: "ALARM: amazonplug-bed is Offline"
   trigger:
@@ -270,6 +75,110 @@
         message: aventage is Offline
         data:
           url: /lovelace-machines/machines
+  mode: single
+- id: automation.alarm_balcony_humidity_difference_is_too_large
+  alias: "ALARM: Balcony Humidity Difference is Too Large"
+  trigger:
+    - platform: state
+      entity_id: sensor.balcony_switchbot_meter_temperature
+      attribute: humidity
+  condition:
+    - condition: numeric_state
+      entity_id: sensor.average_of_balcony_humidity_difference
+      attribute: min_value
+      above: 10
+  action:
+    - service: notify.tats_devices
+      data:
+        title: "⚠️ ALARM"
+        message: ️Balcony Humidity Difference is Too Large
+        data:
+          url: /lovelace/home
+  mode: single
+- id: automation.alarm_balcony_temperature_difference_is_too_large
+  alias: "ALARM: Balcony Temperature Difference is Too Large"
+  trigger:
+    - platform: state
+      entity_id: sensor.balcony_switchbot_meter_temperature
+  condition:
+    - condition: numeric_state
+      entity_id: sensor.average_of_balcony_temperature_difference
+      attribute: min_value
+      above: 1
+  action:
+    - service: notify.tats_devices
+      data:
+        title: "⚠️ ALARM"
+        message: Balcony Temperature Difference is Too Large
+        data:
+          url: /lovelace/home
+  mode: single
+- id: automation.alarm_bedroom_humidity_difference_is_too_large
+  alias: "ALARM: Bedroom Humidity Difference is Too Large"
+  trigger:
+    - platform: state
+      entity_id: sensor.bedroom_switchbot_meter_temperature
+      attribute: humidity
+  condition:
+    - condition: numeric_state
+      entity_id: sensor.average_of_bedroom_humidity_difference
+      attribute: min_value
+      above: 10
+  action:
+    - service: notify.tats_devices
+      data:
+        title: "⚠️ ALARM"
+        message: ️Bedroom Humidity Difference is Too Large
+        data:
+          url: /lovelace/home
+  mode: single
+- id: automation.alarm_bedroom_temperature_difference_is_too_large
+  alias: "ALARM: Bedroom Temperature Difference is Too Large"
+  trigger:
+    - platform: state
+      entity_id: sensor.bedroom_switchbot_meter_temperature
+  condition:
+    - condition: numeric_state
+      entity_id: sensor.average_of_bedroom_temperature_difference
+      attribute: min_value
+      above: 1
+  action:
+    - service: notify.tats_devices
+      data:
+        title: "⚠️ ALARM"
+        message: ️Bedroom Temperature Difference is Too Large
+        data:
+          url: /lovelace/home
+  mode: single
+- id: automation.alarm_bio_wifi_might_be_off
+  alias: "ALARM: bio WiFi might be Off"
+  trigger:
+    - platform: state
+      entity_id: binary_sensor.living_room_motion
+      to: "on"
+    - platform: state
+      entity_id: binary_sensor.study_motion
+      to: "on"
+  condition:
+    - condition: state
+      entity_id: device_tracker.ping_bio
+      state: not_home
+      for:
+        hours: 1
+    - condition: state
+      entity_id: device_tracker.monitor_bio
+      state: home
+      for:
+        hours: 1
+  action:
+    - service: notify.tats_devices
+      data:
+        title: "⚠️ ALARM"
+        message: bio WiFi might be off
+        data:
+          url: /lovelace-machines/machines
+    - delay:
+        hours: 1
   mode: single
 - id: automation.alarm_catloghome_bed_is_offline
   alias: "ALARM: catloghome-bed is Offline"
@@ -383,21 +292,26 @@
         data:
           url: /lovelace-machines/machines
   mode: single
-- id: automation.alarm_justio_is_offline
-  alias: "ALARM: justio is Offline"
+- id: automation.alarm_internet_speed_is_too_slow
+  alias: "ALARM: Internet Speed is Too Slow"
   trigger:
-    - platform: state
-      entity_id: binary_sensor.justio
-      to: "off"
-      for:
-        minutes: 31
+    - platform: numeric_state
+      entity_id: sensor.fast_com_download
+      below: 1
+  condition:
+    - condition: numeric_state
+      entity_id: sensor.speedtest_download
+      below: 1
   action:
     - service: notify.tats_devices
       data:
         title: "⚠️ ALARM"
-        message: ️justio is Offline
+        message: Internet Speed is Too Slow
         data:
           url: /lovelace-machines/machines
+    - delay:
+        hours: 1
+    - service: script.restart_zulu
   mode: single
 - id: automation.alarm_jq300_is_offline
   alias: "ALARM: jq300 is Offline"
@@ -412,6 +326,22 @@
       data:
         title: "⚠️ ALARM"
         message: ️jq300 is Offline
+        data:
+          url: /lovelace-machines/machines
+  mode: single
+- id: automation.alarm_justio_is_offline
+  alias: "ALARM: justio is Offline"
+  trigger:
+    - platform: state
+      entity_id: binary_sensor.justio
+      to: "off"
+      for:
+        minutes: 31
+  action:
+    - service: notify.tats_devices
+      data:
+        title: "⚠️ ALARM"
+        message: ️justio is Offline
         data:
           url: /lovelace-machines/machines
   mode: single
@@ -444,6 +374,91 @@
       data:
         title: "⚠️ ALARM"
         message: ️kasaplug-liv is Offline
+        data:
+          url: /lovelace-machines/machines
+  mode: single
+- id: automation.alarm_living_room_co2_is_too_high
+  alias: "ALARM: Living Room CO2 is Too High"
+  trigger:
+    - platform: state
+      entity_id: binary_sensor.living_room_motion
+      to: "on"
+    - platform: state
+      entity_id: binary_sensor.study_motion
+      to: "on"
+  condition:
+    - condition: numeric_state
+      entity_id: sensor.living_room_co2
+      above: 1000
+    - condition: state
+      entity_id: binary_sensor.living_room_window
+      state: "off"
+    - condition: state
+      entity_id: binary_sensor.study_window_n
+      state: "off"
+    - condition: state
+      entity_id: binary_sensor.study_window_s
+      state: "off"
+  action:
+    - service: notify.all_devices
+      data:
+        title: "⚠️ ALARM"
+        message: "Living Room CO2 is too high. Current: {{ states('sensor.living_room_co2') }}ppm"
+        data:
+          url: /lovelace/home
+    - delay:
+        hours: 1
+  mode: single
+- id: automation.alarm_living_room_humidity_difference_is_too_large
+  alias: "ALARM: Living Room Humidity Difference is Too Large"
+  trigger:
+    - platform: state
+      entity_id: sensor.living_room_switchbot_meter_temperature
+      attribute: humidity
+  condition:
+    - condition: numeric_state
+      entity_id: sensor.average_of_living_room_humidity_difference
+      attribute: min_value
+      above: 10
+  action:
+    - service: notify.tats_devices
+      data:
+        title: "⚠️ ALARM"
+        message: Living Room Humidity Difference is Too Large
+        data:
+          url: /lovelace/home
+  mode: single
+- id: automation.alarm_living_room_temperature_difference_is_too_large
+  alias: "ALARM: Living Room Temperature Difference is Too Large"
+  trigger:
+    - platform: state
+      entity_id: sensor.living_room_switchbot_meter_temperature
+  condition:
+    - condition: numeric_state
+      entity_id: sensor.average_of_living_room_temperature_difference
+      attribute: min_value
+      above: 1
+  action:
+    - service: notify.tats_devices
+      data:
+        title: "⚠️ ALARM"
+        message: Living Room Temperature Difference is Too Large
+        data:
+          url: /lovelace/home
+  mode: single
+- id: automation.alarm_papa_is_offline
+  alias: "ALARM: papa is Offline"
+  trigger:
+    - platform: state
+      entity_id: binary_sensor.papa
+      to: "off"
+      for:
+        minutes: 31
+  action:
+    - service: notify.tats_devices
+      data:
+        title: "⚠️ ALARM"
+        message: papa is Offline
         data:
           url: /lovelace-machines/machines
   mode: single
@@ -495,6 +510,22 @@
         data:
           url: /lovelace-machines/machines
   mode: single
+- id: automation.alarm_romeo_is_offline
+  alias: "ALARM: romeo is Offline"
+  trigger:
+    - platform: state
+      entity_id: binary_sensor.romeo
+      to: "off"
+      for:
+        minutes: 31
+  action:
+    - service: notify.tats_devices
+      data:
+        title: "⚠️ ALARM"
+        message: romeo is offline
+        data:
+          url: /lovelace-machines/machines
+  mode: single
 - id: automation.alarm_sesamemodule_is_offline
   alias: "ALARM: sesamemodule is Offline"
   trigger:
@@ -527,11 +558,11 @@
         data:
           url: /lovelace-machines/machines
   mode: single
-- id: automation.alarm_tuyaplug_is_offline
-  alias: "ALARM: tuyaplug is Offline"
+- id: automation.alarm_tango_is_offline
+  alias: "ALARM: tango is Offline"
   trigger:
     - platform: state
-      entity_id: binary_sensor.tuyaplug
+      entity_id: binary_sensor.tango
       to: "off"
       for:
         minutes: 31
@@ -539,7 +570,71 @@
     - service: notify.tats_devices
       data:
         title: "⚠️ ALARM"
-        message: ️tuyaplug is Offline
+        message: tango is offline
+        data:
+          url: /lovelace-machines/machines
+  mode: single
+- id: automation.alarm_tuyaplug_bat_is_offline
+  alias: "ALARM: tuyaplug-bat is Offline"
+  trigger:
+    - platform: state
+      entity_id: binary_sensor.tuyaplug_bat
+      to: "off"
+      for:
+        minutes: 31
+  action:
+    - service: notify.tats_devices
+      data:
+        title: "⚠️ ALARM"
+        message: ️tuyaplug-bat is Offline
+        data:
+          url: /lovelace-machines/machines
+  mode: single
+- id: automation.alarm_tuyaplug_bed_is_offline
+  alias: "ALARM: tuyaplug-bed is Offline"
+  trigger:
+    - platform: state
+      entity_id: binary_sensor.tuyaplug_bed
+      to: "off"
+      for:
+        minutes: 31
+  action:
+    - service: notify.tats_devices
+      data:
+        title: "⚠️ ALARM"
+        message: ️tuyaplug-bed is Offline
+        data:
+          url: /lovelace-machines/machines
+  mode: single
+- id: automation.alarm_tuyaplug_kit_is_offline
+  alias: "ALARM: tuyaplug-kit is Offline"
+  trigger:
+    - platform: state
+      entity_id: binary_sensor.tuyaplug_kit
+      to: "off"
+      for:
+        minutes: 31
+  action:
+    - service: notify.tats_devices
+      data:
+        title: "⚠️ ALARM"
+        message: ️tuyaplug-kit is Offline
+        data:
+          url: /lovelace-machines/machines
+  mode: single
+- id: automation.alarm_tuyaplug_liv_is_offline
+  alias: "ALARM: tuyaplug-liv is Offline"
+  trigger:
+    - platform: state
+      entity_id: binary_sensor.tuyaplug_liv
+      to: "off"
+      for:
+        minutes: 31
+  action:
+    - service: notify.tats_devices
+      data:
+        title: "⚠️ ALARM"
+        message: ️tuyaplug-liv is Offline
         data:
           url: /lovelace-machines/machines
   mode: single
@@ -575,116 +670,53 @@
         data:
           url: /lovelace-machines/machines
   mode: single
-- id: automation.alarm_living_room_temperature_difference_is_too_large
-  alias: "ALARM: Living Room Temperature Difference is Too Large"
+- id: automation.alarm_xray_liv_is_offline
+  alias: "ALARM: xray-liv is Offline"
   trigger:
     - platform: state
-      entity_id: sensor.living_room_switchbot_meter_temperature
-  condition:
-    - condition: numeric_state
-      entity_id: sensor.average_of_living_room_temperature_difference
-      attribute: min_value
-      above: 1
+      entity_id: binary_sensor.xray_liv
+      to: "off"
+      for:
+        minutes: 31
   action:
     - service: notify.tats_devices
       data:
         title: "⚠️ ALARM"
-        message: Living Room Temperature Difference is Too Large
+        message: xray-liv is Offline
         data:
-          url: /lovelace/home
+          url: /lovelace-machines/machines
   mode: single
-- id: automation.alarm_bedroom_temperature_difference_is_too_large
-  alias: "ALARM: Bedroom Temperature Difference is Too Large"
+- id: automation.alarm_xray_sto_is_offline
+  alias: "ALARM: xray-sto is Offline"
   trigger:
     - platform: state
-      entity_id: sensor.bedroom_switchbot_meter_temperature
-  condition:
-    - condition: numeric_state
-      entity_id: sensor.average_of_bedroom_temperature_difference
-      attribute: min_value
-      above: 1
+      entity_id: binary_sensor.xray_sto
+      to: "off"
+      for:
+        minutes: 31
   action:
     - service: notify.tats_devices
       data:
         title: "⚠️ ALARM"
-        message: ️Bedroom Temperature Difference is Too Large
+        message: xray-sto is Offline
         data:
-          url: /lovelace/home
+          url: /lovelace-machines/machines
   mode: single
-- id: automation.alarm_balcony_temperature_difference_is_too_large
-  alias: "ALARM: Balcony Temperature Difference is Too Large"
+- id: automation.alarm_zulu_is_offline
+  alias: "ALARM: zulu is Offline"
   trigger:
     - platform: state
-      entity_id: sensor.balcony_switchbot_meter_temperature
-  condition:
-    - condition: numeric_state
-      entity_id: sensor.average_of_balcony_temperature_difference
-      attribute: min_value
-      above: 1
+      entity_id: binary_sensor.zulu
+      to: "off"
+      for:
+        minutes: 31
   action:
     - service: notify.tats_devices
       data:
         title: "⚠️ ALARM"
-        message: Balcony Temperature Difference is Too Large
+        message: zulu is offline
         data:
-          url: /lovelace/home
-  mode: single
-- id: automation.alarm_living_room_humidity_difference_is_too_large
-  alias: "ALARM: Living Room Humidity Difference is Too Large"
-  trigger:
-    - platform: state
-      entity_id: sensor.living_room_switchbot_meter_temperature
-      attribute: humidity
-  condition:
-    - condition: numeric_state
-      entity_id: sensor.average_of_living_room_humidity_difference
-      attribute: min_value
-      above: 10
-  action:
-    - service: notify.tats_devices
-      data:
-        title: "⚠️ ALARM"
-        message: Living Room Humidity Difference is Too Large
-        data:
-          url: /lovelace/home
-  mode: single
-- id: automation.alarm_bedroom_humidity_difference_is_too_large
-  alias: "ALARM: Bedroom Humidity Difference is Too Large"
-  trigger:
-    - platform: state
-      entity_id: sensor.bedroom_switchbot_meter_temperature
-      attribute: humidity
-  condition:
-    - condition: numeric_state
-      entity_id: sensor.average_of_bedroom_humidity_difference
-      attribute: min_value
-      above: 10
-  action:
-    - service: notify.tats_devices
-      data:
-        title: "⚠️ ALARM"
-        message: ️Bedroom Humidity Difference is Too Large
-        data:
-          url: /lovelace/home
-  mode: single
-- id: automation.alarm_balcony_humidity_difference_is_too_large
-  alias: "ALARM: Balcony Humidity Difference is Too Large"
-  trigger:
-    - platform: state
-      entity_id: sensor.balcony_switchbot_meter_temperature
-      attribute: humidity
-  condition:
-    - condition: numeric_state
-      entity_id: sensor.average_of_balcony_humidity_difference
-      attribute: min_value
-      above: 10
-  action:
-    - service: notify.tats_devices
-      data:
-        title: "⚠️ ALARM"
-        message: ️Balcony Humidity Difference is Too Large
-        data:
-          url: /lovelace/home
+          url: /lovelace-machines/machines
   mode: single
 - id: automation.auto_lock_entrance_lock_bottom_in_daytime
   alias: "Auto-Lock Entrace Lock Bottom in Daytime"
@@ -709,6 +741,31 @@
       state: "off"
       for:
         minutes: 30
+  action:
+    - service: script.lock_and_get_state_of_entrance_lock_bottom
+- id: automation.auto_lock_entrance_lock_bottom_in_nighttime
+  alias: "Auto-Lock Entrace Lock Bottom in Nighttime"
+  trigger:
+    - platform: time_pattern
+      minutes: "/5"
+      seconds: 21
+  condition:
+    - condition: state
+      entity_id: lock.entrance_lock_bottom
+      state: unlocked
+      for:
+        minutes: 10
+    - condition: time
+      after: "21:00"
+      before: "9:00"
+    - condition: state
+      entity_id: alarm_control_panel.entrance_auto_lock
+      state: armed_home
+    - condition: state
+      entity_id: binary_sensor.entrance_door
+      state: "off"
+      for:
+        minutes: 10
   action:
     - service: script.lock_and_get_state_of_entrance_lock_bottom
 - id: automation.auto_lock_entrance_lock_top_in_daytime
@@ -736,31 +793,6 @@
         minutes: 30
   action:
     - service: script.lock_and_get_state_of_entrance_lock_top
-- id: automation.auto_lock_entrance_lock_bottom_in_nighttime
-  alias: "Auto-Lock Entrace Lock Bottom in Nighttime"
-  trigger:
-    - platform: time_pattern
-      minutes: "/5"
-      seconds: 21
-  condition:
-    - condition: state
-      entity_id: lock.entrance_lock_bottom
-      state: unlocked
-      for:
-        minutes: 10
-    - condition: time
-      after: "21:00"
-      before: "9:00"
-    - condition: state
-      entity_id: alarm_control_panel.entrance_auto_lock
-      state: armed_home
-    - condition: state
-      entity_id: binary_sensor.entrance_door
-      state: "off"
-      for:
-        minutes: 10
-  action:
-    - service: script.lock_and_get_state_of_entrance_lock_bottom
 - id: automation.auto_lock_entrance_lock_top_in_nighttime
   alias: "Auto-Lock Entrace Lock Top in Nighttime"
   trigger:
@@ -786,38 +818,6 @@
         minutes: 10
   action:
     - service: script.lock_and_get_state_of_entrance_lock_top
-- id: automation.info_denshobato
-  alias: "INFO: Denshobato"
-  trigger:
-    - platform: state
-      entity_id: sensor.denshobato
-  condition:
-    - condition: template
-      value_template: >-
-        {{ (as_timestamp(now()) -
-        as_timestamp(states('sensor.denshobato_received_date_time'))) < 180 }}
-  action:
-    - service: notify.all_devices
-      data:
-        title: "[% notify_title_k %]"
-        message: "️{{ states('sensor.denshobato_time') }}に{{ states('sensor.denshobato_action') }}しました"
-    - condition: state
-      entity_id: sensor.denshobato_action
-      state: 下校
-    - condition: or
-      conditions:
-      - condition: state
-        entity_id: person.shibata_tats
-        state: home
-      - condition: state
-        entity_id: person.shibata_akiko
-        state: home
-    - delay:
-        minutes: 10
-    - service: lock.unlock
-      target:
-        entity_id: lock.entrance_locks
-  mode: single
 - id: automation.info_bathroom_washer_has_been_finished
   alias: "INFO: Bathroom Washer Has Been Finished"
   trigger:
@@ -919,6 +919,38 @@
           url: /lovelace/home
     - delay:
         hours: 2
+  mode: single
+- id: automation.info_denshobato
+  alias: "INFO: Denshobato"
+  trigger:
+    - platform: state
+      entity_id: sensor.denshobato
+  condition:
+    - condition: template
+      value_template: >-
+        {{ (as_timestamp(now()) -
+        as_timestamp(states('sensor.denshobato_received_date_time'))) < 180 }}
+  action:
+    - service: notify.all_devices
+      data:
+        title: "[% notify_title_k %]"
+        message: "️{{ states('sensor.denshobato_time') }}に{{ states('sensor.denshobato_action') }}しました"
+    - condition: state
+      entity_id: sensor.denshobato_action
+      state: 下校
+    - condition: or
+      conditions:
+      - condition: state
+        entity_id: person.shibata_tats
+        state: home
+      - condition: state
+        entity_id: person.shibata_akiko
+        state: home
+    - delay:
+        minutes: 10
+    - service: lock.unlock
+      target:
+        entity_id: lock.entrance_locks
   mode: single
 - id: automation.info_living_room_humidity_is_too_high
   alias: "INFO: Living Room Humidity is Too High"
@@ -1077,145 +1109,6 @@
     - service: lock.lock
       target:
         entity_id: lock.entrance_locks
-- id: automation.trigger_monitor
-  alias: Trigger monitor
-  trigger:
-    - platform: time_pattern
-      minutes: "/5"
-      seconds: 33
-  action:
-    - service: mqtt.publish
-      data:
-        topic: monitor/scan/arrive
-        payload: '{"identity": "automation.trigger_monitor"}'
-        retain: true
-    - service: mqtt.publish
-      data:
-        topic: monitor/scan/depart
-        payload: '{"identity": "automation.trigger_monitor"}'
-        retain: true
-  mode: single
-- id: automation.turn_on_surveillance_when_ios_action_fires
-  alias: Turn on surveillance when iOS Action Fires
-  trigger:
-    - platform: event
-      event_type: ios.action_fired
-      event_data:
-        actionName: turn_on_surveillance
-  action:
-    - service: alarm_control_panel.alarm_arm_away
-      target:
-        entity_id: alarm_control_panel.surveillance
-    - service: notify.all_devices
-      data:
-        message: Now Arming Away
-        data:
-          url: /lovelace/home
-  mode: single
-- id: automation.turn_on_surveillance_when_nobody_is_in_home
-  alias: Turn on surveillance when Nobody is in Home
-  trigger:
-    - platform: time_pattern
-      minutes: "/5"
-      seconds: 46
-  condition:
-    - condition: state
-      entity_id: alarm_control_panel.surveillance
-      state: disarmed
-    - condition: state
-      entity_id: person.shibata_tats
-      state: not_home
-      for:
-        minutes: 10
-    - condition: state
-      entity_id: person.shibata_akiko
-      state: not_home
-      for:
-        minutes: 10
-  action:
-    - service: alarm_control_panel.alarm_arm_away
-      target:
-        entity_id: alarm_control_panel.surveillance
-    - service: notify.all_devices
-      data:
-        message: Turn on surveillance because nobody is in home
-  mode: single
-- id: automation.turn_on_monitor_bio
-  alias: Turn on monitor bio
-  trigger:
-    - platform: numeric_state
-      entity_id: sensor.monitor_bio
-      above: 10
-    - platform: time_pattern
-      minutes: "/5"
-      seconds: 53
-  condition:
-    - condition: numeric_state
-      entity_id: sensor.monitor_bio
-      above: 10
-  action:
-    - service: device_tracker.see
-      data:
-        dev_id: monitor_bio
-        location_name: home
-        source_type: bluetooth
-- id: automation.turn_off_monitor_bio
-  alias: Turn off monitor bio
-  trigger:
-    - platform: numeric_state
-      entity_id: sensor.monitor_bio
-      below: 10
-    - platform: time_pattern
-      minutes: "/5"
-      seconds: 53
-  condition:
-    - condition: numeric_state
-      entity_id: sensor.monitor_bio
-      below: 10
-  action:
-    - service: device_tracker.see
-      data:
-        dev_id: monitor_bio
-        location_name: not_home
-        source_type: bluetooth
-- id: automation.turn_on_monitor_akikos_iphone12mini
-  alias: Turn on monitor akikos-iphone12mini
-  trigger:
-    - platform: numeric_state
-      entity_id: sensor.monitor_akikos_iphone12mini
-      above: 10
-    - platform: time_pattern
-      minutes: "/5"
-      seconds: 53
-  condition:
-    - condition: numeric_state
-      entity_id: sensor.monitor_akikos_iphone12mini
-      above: 10
-  action:
-    - service: device_tracker.see
-      data:
-        dev_id: monitor_akikos_iphone12mini
-        location_name: home
-        source_type: bluetooth
-- id: automation.turn_off_monitor_akikos_iphone12mini
-  alias: Turn off monitor akikos-iphone12mini
-  trigger:
-    - platform: numeric_state
-      entity_id: sensor.monitor_akikos_iphone12mini
-      below: 10
-    - platform: time_pattern
-      minutes: "/5"
-      seconds: 53
-  condition:
-    - condition: numeric_state
-      entity_id: sensor.monitor_akikos_iphone12mini
-      below: 10
-  action:
-    - service: device_tracker.see
-      data:
-        dev_id: monitor_akikos_iphone12mini
-        location_name: not_home
-        source_type: bluetooth
 - id: automation.open_bedroom_curtains_temporarily
   alias: Open Bedroom Curtains Temporarily
   description: Open the curtains in the bedroom temporarily
@@ -1237,6 +1130,74 @@
       state: "on"
   action:
     - service: script.open_and_get_state_of_bedroom_curtains
+  mode: single
+- id: automation.plan_to_turn_on_bedroom_hvac_cleaner
+  alias: Plan to Turn on Bedrom HVAC Cleaner
+  description: Plan to turn on the HVAC cleaner in the bedroom
+  trigger:
+    - platform: numeric_state
+      entity_id: sensor.filtered_bedroom_hvac_plug_current
+      above: 100
+      for:
+        hours: 2
+  condition:
+    - condition: state
+      entity_id: binary_sensor.workday_sensor
+      state: "on"
+  action:
+    - service: automation.turn_on
+      target:
+        entity_id:
+          - automation.turn_on_bedroom_hvac_cleaner
+  mode: single
+- id: automation.plan_to_turn_on_living_room_hvac_fan
+  alias: Plan to Turn on Living Room HVAC Fan
+  description: Plan to turn on the HVAC in the living room with fan mode
+  trigger:
+    - platform: state
+      entity_id: climate.living_room_hvac
+      to: dry
+      for:
+        hours: 2
+    - platform: state
+      entity_id: climate.living_room_hvac
+      to: cool
+      for:
+        hours: 2
+    - platform: state
+      entity_id: climate.living_room_hvac
+      to: heat_cool
+      for:
+        hours: 2
+  condition:
+    - condition: state
+      entity_id: alarm_control_panel.surveillance
+      state: disarmed
+  action:
+    - service: automation.turn_on
+      target:
+        entity_id:
+          - automation.turn_on_living_room_hvac_fan
+          - automation.turn_off_living_room_hvac_fan
+          - automation.turn_on_living_room_hvac_cleaner
+  mode: single
+- id: automation.trigger_monitor
+  alias: Trigger monitor
+  trigger:
+    - platform: time_pattern
+      minutes: "/5"
+      seconds: 33
+  action:
+    - service: mqtt.publish
+      data:
+        topic: monitor/scan/arrive
+        payload: '{"identity": "automation.trigger_monitor"}'
+        retain: true
+    - service: mqtt.publish
+      data:
+        topic: monitor/scan/depart
+        payload: '{"identity": "automation.trigger_monitor"}'
+        retain: true
   mode: single
 - id: automation.turn_down_bedroom
   alias: Turn down Bedroom
@@ -1315,6 +1276,24 @@
     - service: light.turn_off
       target:
         entity_id: light.bedroom_light
+- id: automation.turn_off_living_area_lights
+  alias: Turn off Living Area Lights
+  description: Turn off the living area lights when iOS action fires
+  trigger:
+    - platform: event
+      event_type: ios.action_fired
+      event_data:
+        actionName: turn_off_living_room_lights
+  action:
+    - service: light.turn_off
+      target:
+        entity_id: light.living_area_lights
+    - service: notify.tats_devices
+      data:
+        message: Turned off Living Room Lights
+        data:
+          url: /lovelace/home
+  mode: single
 - id: automation.turn_off_living_room_extra_lights
   alias: Turn off Living Room Extra Lights
   description: Turn off the extra lights in the living room
@@ -1439,24 +1418,6 @@
           - automation.turn_on_living_room_hvac_fan
           - automation.turn_off_living_room_hvac_fan
   mode: single
-- id: automation.turn_off_living_area_lights
-  alias: Turn off Living Area Lights
-  description: Turn off the living area lights when iOS action fires
-  trigger:
-    - platform: event
-      event_type: ios.action_fired
-      event_data:
-        actionName: turn_off_living_room_lights
-  action:
-    - service: light.turn_off
-      target:
-        entity_id: light.living_area_lights
-    - service: notify.tats_devices
-      data:
-        message: Turned off Living Room Lights
-        data:
-          url: /lovelace/home
-  mode: single
 - id: automation.turn_off_living_room_lights_appliances
   alias: Turn off Living Room Lights & Appliances
   description: Turn off the living room lights & appliances when iOS action fires
@@ -1476,6 +1437,44 @@
       target:
         entity_id: climate.living_room_hvac
   mode: single
+- id: automation.turn_off_monitor_akikos_iphone12mini
+  alias: Turn off monitor akikos-iphone12mini
+  trigger:
+    - platform: numeric_state
+      entity_id: sensor.monitor_akikos_iphone12mini
+      below: 10
+    - platform: time_pattern
+      minutes: "/5"
+      seconds: 53
+  condition:
+    - condition: numeric_state
+      entity_id: sensor.monitor_akikos_iphone12mini
+      below: 10
+  action:
+    - service: device_tracker.see
+      data:
+        dev_id: monitor_akikos_iphone12mini
+        location_name: not_home
+        source_type: bluetooth
+- id: automation.turn_off_monitor_bio
+  alias: Turn off monitor bio
+  trigger:
+    - platform: numeric_state
+      entity_id: sensor.monitor_bio
+      below: 10
+    - platform: time_pattern
+      minutes: "/5"
+      seconds: 53
+  condition:
+    - condition: numeric_state
+      entity_id: sensor.monitor_bio
+      below: 10
+  action:
+    - service: device_tracker.see
+      data:
+        dev_id: monitor_bio
+        location_name: not_home
+        source_type: bluetooth
 - id: automation.turn_off_surveillance
   alias: Turn off Surveillance
   description: Turn off Surveillance when someone is at home
@@ -1514,66 +1513,6 @@
           url: /lovelace/home
     - delay:
         hours: 1
-  mode: single
-- id: automation.plan_to_turn_on_bedroom_hvac_cleaner
-  alias: Plan to Turn on Bedrom HVAC Cleaner
-  description: Plan to turn on the HVAC cleaner in the bedroom
-  trigger:
-    - platform: numeric_state
-      entity_id: sensor.filtered_bedroom_hvac_plug_current
-      above: 100
-      for:
-        hours: 2
-  condition:
-    - condition: state
-      entity_id: binary_sensor.workday_sensor
-      state: "on"
-  action:
-    - service: automation.turn_on
-      target:
-        entity_id:
-          - automation.turn_on_bedroom_hvac_cleaner
-  mode: single
-- id: automation.turn_on_bedroom_light
-  alias: Turn on Bedroom Light
-  trigger:
-    - platform: state
-      entity_id: sensor.bedroom_1_button_switch_action
-      to: single
-  action:
-    - service: light.turn_on
-      target:
-        entity_id: light.bedroom_light
-- id: automation.plan_to_turn_on_living_room_hvac_fan
-  alias: Plan to Turn on Living Room HVAC Fan
-  description: Plan to turn on the HVAC in the living room with fan mode
-  trigger:
-    - platform: state
-      entity_id: climate.living_room_hvac
-      to: dry
-      for:
-        hours: 2
-    - platform: state
-      entity_id: climate.living_room_hvac
-      to: cool
-      for:
-        hours: 2
-    - platform: state
-      entity_id: climate.living_room_hvac
-      to: heat_cool
-      for:
-        hours: 2
-  condition:
-    - condition: state
-      entity_id: alarm_control_panel.surveillance
-      state: disarmed
-  action:
-    - service: automation.turn_on
-      target:
-        entity_id:
-          - automation.turn_on_living_room_hvac_fan
-          - automation.turn_off_living_room_hvac_fan
-          - automation.turn_on_living_room_hvac_cleaner
   mode: single
 - id: automation.turn_on_bedroom_hvac_cleaner
   alias: Turn on Bedroom HVAC Cleaner
@@ -1730,6 +1669,44 @@
     - delay:
         hours: 1
   mode: single
+- id: automation.turn_on_bedroom_light
+  alias: Turn on Bedroom Light
+  trigger:
+    - platform: state
+      entity_id: sensor.bedroom_1_button_switch_action
+      to: single
+  action:
+    - service: light.turn_on
+      target:
+        entity_id: light.bedroom_light
+- id: automation.turn_on_living_area_downlights
+  alias: Turn on Living Area Downlights
+  description: Turn on the downlights in living area when the light level is too low
+  trigger:
+    - platform: state
+      entity_id: binary_sensor.living_room_motion
+      to: "on"
+    - platform: state
+      entity_id: binary_sensor.study_motion
+      to: "on"
+  condition:
+    - condition: numeric_state
+      entity_id: sensor.living_room_light_level
+      below: input_number.living_area_downlights_turned_on_threshold
+    - condition: state
+      entity_id: sun.sun
+      state: above_horizon
+  action:
+    - service: light.turn_on
+      entity_id: light.living_area_downlights
+    - service: notify.tats_devices
+      data:
+        message: "Turned on Living Room Downlights. Current: {{ states('sensor.living_room_light_level') }}lx"
+        data:
+          url: /lovelace/home
+    - delay:
+        hours: 1
+  mode: single
 - id: automation.turn_on_living_area_floor_heating
   alias: Turn on Living Area Floor Heating
   description: Turn on the floor heating in the living area when the temperature is too low
@@ -1775,6 +1752,64 @@
     - service: notify.all_devices
       data:
         message: "Turned on Living Area Floor Heating. Current: {{ states('sensor.living_room_temperature') }}°C"
+        data:
+          url: /lovelace/home
+    - delay:
+        hours: 1
+  mode: single
+- id: automation.turn_on_living_room_ceiling_fan
+  alias: Turn on Living Room Ceiling Fan
+  description: Turn on the ceiling fan in the living room
+  trigger:
+    - platform: sun
+      event: sunrise
+  action:
+    - service: fan.turn_on
+      entity_id: fan.living_room_ceiling_fans
+  mode: single
+- id: automation.turn_on_living_room_humidifier
+  alias: Turn on Living Room Humidifier
+  description: Turn on the humidifier on the living room when the humidity is too low
+  trigger:
+    - platform: state
+      entity_id: binary_sensor.living_room_motion
+      to: "on"
+    - platform: state
+      entity_id: binary_sensor.study_motion
+      to: "on"
+  condition:
+    - condition: numeric_state
+      entity_id: sensor.living_room_humidity
+      below: input_number.living_room_humidifier_turned_on_threshold
+    - condition: state
+      entity_id: switch.living_room_humidifier
+      state: "off"
+    - condition: sun
+      after: sunrise
+    - condition: state
+      entity_id: binary_sensor.living_room_window
+      state: "off"
+      for:
+        minutes: 30
+    - condition: state
+      entity_id: binary_sensor.study_window_n
+      state: "off"
+      for:
+        minutes: 30
+    - condition: state
+      entity_id: binary_sensor.study_window_s
+      state: "off"
+      for:
+        minutes: 30
+    - condition: state
+      entity_id: binary_sensor.living_room_presence
+      state: "on"
+  action:
+    - service: switch.turn_on
+      entity_id: switch.living_room_humidifier
+    - service: notify.all_devices
+      data:
+        message: "Turned on Living Room Humidifier. Current: {{ states('sensor.living_room_humidity') }}%"
         data:
           url: /lovelace/home
     - delay:
@@ -1967,91 +2002,88 @@
         data:
           url: /lovelace/home
   mode: single
-- id: automation.turn_on_living_room_ceiling_fan
-  alias: Turn on Living Room Ceiling Fan
-  description: Turn on the ceiling fan in the living room
+- id: automation.turn_on_monitor_akikos_iphone12mini
+  alias: Turn on monitor akikos-iphone12mini
   trigger:
-    - platform: sun
-      event: sunrise
-  action:
-    - service: fan.turn_on
-      entity_id: fan.living_room_ceiling_fans
-  mode: single
-- id: automation.turn_on_living_area_downlights
-  alias: Turn on Living Area Downlights
-  description: Turn on the downlights in living area when the light level is too low
-  trigger:
-    - platform: state
-      entity_id: binary_sensor.living_room_motion
-      to: "on"
-    - platform: state
-      entity_id: binary_sensor.study_motion
-      to: "on"
+    - platform: numeric_state
+      entity_id: sensor.monitor_akikos_iphone12mini
+      above: 10
+    - platform: time_pattern
+      minutes: "/5"
+      seconds: 53
   condition:
     - condition: numeric_state
-      entity_id: sensor.living_room_light_level
-      below: input_number.living_area_downlights_turned_on_threshold
-    - condition: state
-      entity_id: sun.sun
-      state: above_horizon
+      entity_id: sensor.monitor_akikos_iphone12mini
+      above: 10
   action:
-    - service: light.turn_on
-      entity_id: light.living_area_downlights
-    - service: notify.tats_devices
+    - service: device_tracker.see
       data:
-        message: "Turned on Living Room Downlights. Current: {{ states('sensor.living_room_light_level') }}lx"
-        data:
-          url: /lovelace/home
-    - delay:
-        hours: 1
-  mode: single
-- id: automation.turn_on_living_room_humidifier
-  alias: Turn on Living Room Humidifier
-  description: Turn on the humidifier on the living room when the humidity is too low
+        dev_id: monitor_akikos_iphone12mini
+        location_name: home
+        source_type: bluetooth
+- id: automation.turn_on_monitor_bio
+  alias: Turn on monitor bio
   trigger:
-    - platform: state
-      entity_id: binary_sensor.living_room_motion
-      to: "on"
-    - platform: state
-      entity_id: binary_sensor.study_motion
-      to: "on"
+    - platform: numeric_state
+      entity_id: sensor.monitor_bio
+      above: 10
+    - platform: time_pattern
+      minutes: "/5"
+      seconds: 53
   condition:
     - condition: numeric_state
-      entity_id: sensor.living_room_humidity
-      below: input_number.living_room_humidifier_turned_on_threshold
-    - condition: state
-      entity_id: switch.living_room_humidifier
-      state: "off"
-    - condition: sun
-      after: sunrise
-    - condition: state
-      entity_id: binary_sensor.living_room_window
-      state: "off"
-      for:
-        minutes: 30
-    - condition: state
-      entity_id: binary_sensor.study_window_n
-      state: "off"
-      for:
-        minutes: 30
-    - condition: state
-      entity_id: binary_sensor.study_window_s
-      state: "off"
-      for:
-        minutes: 30
-    - condition: state
-      entity_id: binary_sensor.living_room_presence
-      state: "on"
+      entity_id: sensor.monitor_bio
+      above: 10
   action:
-    - service: switch.turn_on
-      entity_id: switch.living_room_humidifier
+    - service: device_tracker.see
+      data:
+        dev_id: monitor_bio
+        location_name: home
+        source_type: bluetooth
+- id: automation.turn_on_surveillance_when_ios_action_fires
+  alias: Turn on surveillance when iOS Action Fires
+  trigger:
+    - platform: event
+      event_type: ios.action_fired
+      event_data:
+        actionName: turn_on_surveillance
+  action:
+    - service: alarm_control_panel.alarm_arm_away
+      target:
+        entity_id: alarm_control_panel.surveillance
     - service: notify.all_devices
       data:
-        message: "Turned on Living Room Humidifier. Current: {{ states('sensor.living_room_humidity') }}%"
+        message: Now Arming Away
         data:
           url: /lovelace/home
-    - delay:
-        hours: 1
+  mode: single
+- id: automation.turn_on_surveillance_when_nobody_is_in_home
+  alias: Turn on surveillance when Nobody is in Home
+  trigger:
+    - platform: time_pattern
+      minutes: "/5"
+      seconds: 46
+  condition:
+    - condition: state
+      entity_id: alarm_control_panel.surveillance
+      state: disarmed
+    - condition: state
+      entity_id: person.shibata_tats
+      state: not_home
+      for:
+        minutes: 10
+    - condition: state
+      entity_id: person.shibata_akiko
+      state: not_home
+      for:
+        minutes: 10
+  action:
+    - service: alarm_control_panel.alarm_arm_away
+      target:
+        entity_id: alarm_control_panel.surveillance
+    - service: notify.all_devices
+      data:
+        message: Turn on surveillance because nobody is in home
   mode: single
 - id: automation.unlock_entrance_lock
   alias: Unlock Entrance Lock

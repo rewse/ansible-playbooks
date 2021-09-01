@@ -39,46 +39,16 @@
   entity_ids:
     - sensor.monitor_living_room_akikos_iphone12mini
     - sensor.monitor_storage_akikos_iphone12mini
-# Do not use mhz19 integration because it cannot the correct value
 - platform: mqtt
-  unique_id: sensor.living_room_co2
-  name: Living Room CO2
-  state_topic: mhz19/co2
-  value_template: "{{ value_json.co2 }}"
-  unit_of_measurement: ppm
+  unique_id: sensor.enecoq_fee_high
+  name: enecoQ Fee High
+  state_topic: enecoq/fee
+  value_template: "{{ value_json.high }}"
+  unit_of_measurement: JPY/h
   state_class: measurement
-  device_class: carbon_dioxide
   availability:
-    - topic: mhz19/state
-  icon: mdi:molecule-co2
-- platform: mqtt
-  unique_id: sensor.monitor_living_room_bio
-  name: monitor Living Room bio
-  state_topic: monitor/living_room/bio
-  value_template: "{{ value_json.confidence }}"
-  unit_of_measurement: "%"
-  state_class: measurement
-- platform: mqtt
-  unique_id: sensor.monitor_storage_bio
-  name: monitor Storage bio
-  state_topic: monitor/storage/bio
-  value_template: "{{ value_json.confidence }}"
-  unit_of_measurement: "%"
-  state_class: measurement
-- platform: mqtt
-  unique_id: sensor.monitor_living_room_akikos_iphone12mini
-  name: monitor Living Room akikos-iphone12mini
-  state_topic: monitor/living_room/akikos_iphone12mini
-  value_template: "{{ value_json.confidence }}"
-  unit_of_measurement: "%"
-  state_class: measurement
-- platform: mqtt
-  unique_id: sensor.monitor_storage_akikos_iphone12mini
-  name: monitor Storage akikos-iphone12mini
-  state_topic: monitor/storage/akikos_iphone12mini
-  value_template: "{{ value_json.confidence }}"
-  unit_of_measurement: "%"
-  state_class: measurement
+    - topic: enecoq/fee/state
+  icon: mdi:transmission-tower
 - platform: mqtt
   unique_id: sensor.enecoq_fee_low
   name: enecoQ Fee Low
@@ -94,16 +64,6 @@
   name: enecoQ Fee Mid
   state_topic: enecoq/fee
   value_template: "{{ value_json.mid }}"
-  unit_of_measurement: JPY/h
-  state_class: measurement
-  availability:
-    - topic: enecoq/fee/state
-  icon: mdi:transmission-tower
-- platform: mqtt
-  unique_id: sensor.enecoq_fee_high
-  name: enecoQ Fee High
-  state_topic: enecoq/fee
-  value_template: "{{ value_json.high }}"
   unit_of_measurement: JPY/h
   state_class: measurement
   availability:
@@ -129,6 +89,46 @@
   availability:
     - topic: enecoq/kwh/state
   icon: mdi:transmission-tower
+- platform: mqtt
+  unique_id: sensor.monitor_living_room_akikos_iphone12mini
+  name: monitor Living Room akikos-iphone12mini
+  state_topic: monitor/living_room/akikos_iphone12mini
+  value_template: "{{ value_json.confidence }}"
+  unit_of_measurement: "%"
+  state_class: measurement
+- platform: mqtt
+  unique_id: sensor.monitor_living_room_bio
+  name: monitor Living Room bio
+  state_topic: monitor/living_room/bio
+  value_template: "{{ value_json.confidence }}"
+  unit_of_measurement: "%"
+  state_class: measurement
+# Do not use mhz19 integration because it cannot the correct value
+- platform: mqtt
+  unique_id: sensor.living_room_co2
+  name: Living Room CO2
+  state_topic: mhz19/co2
+  value_template: "{{ value_json.co2 }}"
+  unit_of_measurement: ppm
+  state_class: measurement
+  device_class: carbon_dioxide
+  availability:
+    - topic: mhz19/state
+  icon: mdi:molecule-co2
+- platform: mqtt
+  unique_id: sensor.monitor_storage_akikos_iphone12mini
+  name: monitor Storage akikos-iphone12mini
+  state_topic: monitor/storage/akikos_iphone12mini
+  value_template: "{{ value_json.confidence }}"
+  unit_of_measurement: "%"
+  state_class: measurement
+- platform: mqtt
+  unique_id: sensor.monitor_storage_bio
+  name: monitor Storage bio
+  state_topic: monitor/storage/bio
+  value_template: "{{ value_json.confidence }}"
+  unit_of_measurement: "%"
+  state_class: measurement
 - platform: rest
   name: Bedroom Curtains Position
   resource: https://api.switch-bot.com/v1.0/devices/EAED0CCBC1A2/status
@@ -148,8 +148,8 @@
   unit_of_measurement: "%"
   scan_interval: 2400
 - platform: rest
-  name: Living Room SwitchBot Meter Temperature
-  resource: https://api.switch-bot.com/v1.0/devices/F5DAB9477E91/status
+  name: Balcony SwitchBot Meter Temperature
+  resource: https://api.switch-bot.com/v1.0/devices/EDE4EAA09EA3/status
   headers:
     Authorization: !secret switchbot_token
     Content-Type: 'application/json'
@@ -182,22 +182,18 @@
   unit_of_measurement: °C
   scan_interval: 36000
 - platform: rest
-  name: Balcony SwitchBot Meter Temperature
-  resource: https://api.switch-bot.com/v1.0/devices/EDE4EAA09EA3/status
+  name: Entrance Lock Bottom Sensor
+  resource: https://app.candyhouse.co/api/sesame2/[% sesame.uuid_bottom %]
   headers:
-    Authorization: !secret switchbot_token
-    Content-Type: 'application/json'
-  value_template: '{{ value_json.body.temperature }}'
-  json_attributes_path: "$.body"
+    x-api-key: "[% sesame.api_key %]"
+  value_template: '{{ value_json.CHSesame2Status }}'
   json_attributes:
-    - deviceId
-    - deviceType
-    - hubDeviceId
-    - humidity
-    - temperature
-  device_class: temperature
-  unit_of_measurement: °C
-  scan_interval: 36000
+    - batteryPercentage
+    - batteryVoltage
+    - position
+    - CHSesame2Status
+    - timestamp
+  scan_interval: 2400
 - platform: rest
   name: Entrance Lock Top Sensor
   resource: https://app.candyhouse.co/api/sesame2/[% sesame.uuid_top %]
@@ -212,18 +208,22 @@
     - timestamp
   scan_interval: 2400
 - platform: rest
-  name: Entrance Lock Bottom Sensor
-  resource: https://app.candyhouse.co/api/sesame2/[% sesame.uuid_bottom %]
+  name: Living Room SwitchBot Meter Temperature
+  resource: https://api.switch-bot.com/v1.0/devices/F5DAB9477E91/status
   headers:
-    x-api-key: "[% sesame.api_key %]"
-  value_template: '{{ value_json.CHSesame2Status }}'
+    Authorization: !secret switchbot_token
+    Content-Type: 'application/json'
+  value_template: '{{ value_json.body.temperature }}'
+  json_attributes_path: "$.body"
   json_attributes:
-    - batteryPercentage
-    - batteryVoltage
-    - position
-    - CHSesame2Status
-    - timestamp
-  scan_interval: 2400
+    - deviceId
+    - deviceType
+    - hubDeviceId
+    - humidity
+    - temperature
+  device_class: temperature
+  unit_of_measurement: °C
+  scan_interval: 36000
 - platform: season
 - platform: statistics
   entity_id: sensor.balcony_humidity_difference
@@ -241,6 +241,16 @@
   sampling_size: 183600
   max_age: "51:00:00"
 - platform: statistics
+  entity_id: binary_sensor.bedroom_motion_n
+  name: Count of Bedroom Motion N
+  sampling_size: 1800
+  max_age: "00:30:00"
+- platform: statistics
+  entity_id: binary_sensor.bedroom_motion_s
+  name: Count of Bedroom Motion S
+  sampling_size: 1800
+  max_age: "00:30:00"
+- platform: statistics
   entity_id: sensor.bedroom_temperature_difference
   name: Average of Bedroom Temperature Difference
   sampling_size: 183600
@@ -251,27 +261,17 @@
   sampling_size: 183600
   max_age: "51:00:00"
 - platform: statistics
-  entity_id: sensor.living_room_temperature_difference
-  name: Average of Living Room Temperature Difference
-  sampling_size: 183600
-  max_age: "51:00:00"
-- platform: statistics
   entity_id: binary_sensor.living_room_motion
   name: Count of Living Room Motion
   sampling_size: 1800
   max_age: "00:30:00"
 - platform: statistics
+  entity_id: sensor.living_room_temperature_difference
+  name: Average of Living Room Temperature Difference
+  sampling_size: 183600
+  max_age: "51:00:00"
+- platform: statistics
   entity_id: binary_sensor.study_motion
   name: Count of Study Motion
-  sampling_size: 1800
-  max_age: "00:30:00"
-- platform: statistics
-  entity_id: binary_sensor.bedroom_motion_n
-  name: Count of Bedroom Motion N
-  sampling_size: 1800
-  max_age: "00:30:00"
-- platform: statistics
-  entity_id: binary_sensor.bedroom_motion_s
-  name: Count of Bedroom Motion S
   sampling_size: 1800
   max_age: "00:30:00"
