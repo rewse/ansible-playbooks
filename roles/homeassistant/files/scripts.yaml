@@ -17,7 +17,7 @@ lock_and_get_state_of_entrance_lock_bottom:
   sequence:
     - service: shell_command.control_lock_entrance_lock_bottom
     - delay:
-        seconds: 8
+        seconds: 30
     - service: homeassistant.update_entity
       target:
         entity_id: sensor.entrance_lock_bottom_sensor
@@ -29,7 +29,7 @@ lock_and_get_state_of_entrance_lock_top:
   sequence:
     - service: shell_command.control_lock_entrance_lock_top
     - delay:
-        seconds: 8
+        seconds: 30
     - service: homeassistant.update_entity
       target:
         entity_id: sensor.entrance_lock_top_sensor
@@ -55,7 +55,7 @@ unlock_and_get_state_of_entrance_lock_bottom:
   sequence:
     - service: shell_command.control_unlock_entrance_lock_bottom
     - delay:
-        seconds: 8
+        seconds: 30
     - service: homeassistant.update_entity
       target:
         entity_id: sensor.entrance_lock_bottom_sensor
@@ -67,7 +67,7 @@ unlock_and_get_state_of_entrance_lock_top:
   sequence:
     - service: shell_command.control_unlock_entrance_lock_top
     - delay:
-        seconds: 8
+        seconds: 30
     - service: homeassistant.update_entity
       target:
         entity_id: sensor.entrance_lock_top_sensor
