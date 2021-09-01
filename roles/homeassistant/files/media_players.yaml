@@ -10,7 +10,7 @@
       service: shell_command.control_toggle_regza
     volume_up:
       service: shell_command.control_volume_up_regza
-    volume_volume_down:
+    volume_down:
       service: shell_command.control_volume_down_regza
     volume_mute:
       service: shell_command.control_mute_regza
