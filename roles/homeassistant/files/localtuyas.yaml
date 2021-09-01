@@ -27,6 +27,35 @@
       scaling: 0.1
       device_class: voltage
       unit_of_measurement: V
+- host: tuyaplug-bed.rewse.jp
+  friendly_name: Bedroom HVAC Plug
+  device_id: 86335701f4cfa2059192
+  local_key: !secret tuyaplug_bed_key
+  protocol_version: "3.3"
+  entities:
+    - platform: binary_sensor
+      friendly_name: Bedroom HVAC Plug Status
+      id: 1
+      device_class: plug
+      state_on: "true"
+      state_off: "false"
+    - platform: sensor
+      friendly_name: Bedroom HVAC Plug Current
+      id: 18
+      device_class: current
+      unit_of_measurement: mA
+    - platform: sensor
+      friendly_name: Bedroom HVAC Plug Current Comsumption
+      id: 19
+      scaling: 0.1
+      device_class: power
+      unit_of_measurement: W
+    - platform: sensor
+      friendly_name: Bedroom HVAC Plug Voltate
+      id: 20
+      scaling: 0.1
+      device_class: voltage
+      unit_of_measurement: V
 - host: tuyaplug-kit.rewse.jp
   friendly_name: Kitchen Rice Cooker Plug
   device_id: 68637644f4cfa2091055
@@ -81,35 +110,6 @@
       unit_of_measurement: W
     - platform: sensor
       friendly_name: Living Room Humidifier Plug Voltate
-      id: 20
-      scaling: 0.1
-      device_class: voltage
-      unit_of_measurement: V
-- host: tuyaplug-bed.rewse.jp
-  friendly_name: Bedroom HVAC Plug
-  device_id: 86335701f4cfa2059192
-  local_key: !secret tuyaplug_bed_key
-  protocol_version: "3.3"
-  entities:
-    - platform: binary_sensor
-      friendly_name: Bedroom HVAC Plug Status
-      id: 1
-      device_class: plug
-      state_on: "true"
-      state_off: "false"
-    - platform: sensor
-      friendly_name: Bedroom HVAC Plug Current
-      id: 18
-      device_class: current
-      unit_of_measurement: mA
-    - platform: sensor
-      friendly_name: Bedroom HVAC Plug Current Comsumption
-      id: 19
-      scaling: 0.1
-      device_class: power
-      unit_of_measurement: W
-    - platform: sensor
-      friendly_name: Bedroom HVAC Plug Voltate
       id: 20
       scaling: 0.1
       device_class: voltage

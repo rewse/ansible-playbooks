@@ -1,27 +1,27 @@
-bedroom_hvac_cool_turned_off_threshold:
-  name: Bedroom HVAC Cool Turned off Threshold
-  min: 19
-  max: 27
-  unit_of_measurement: °C
-  icon: mdi:thermometer-chevron-down
-bedroom_hvac_dry_turned_off_threshold:
-  name: Bedroom HVAC Dry Turned off Threshold
-  min: 52
-  max: 60
-  unit_of_measurement: "%"
-  icon: mdi:water-percent-alert
-bedroom_hvac_cool_turned_on_threshold:
-  name: Bedroom HVAC Cool Turned on Threshold
-  min: 24
-  max: 32
-  unit_of_measurement: °C
-  icon: mdi:thermometer-chevron-up
 bedroom_hvac_cool_forcibly_turned_on_threshold:
   name: Bedroom HVAC Cool Forcibly Turned on Threshold
   min: 27
   max: 35
   unit_of_measurement: °C
   icon: mdi:thermometer-alert
+bedroom_hvac_cool_turned_off_threshold:
+  name: Bedroom HVAC Cool Turned off Threshold
+  min: 19
+  max: 27
+  unit_of_measurement: °C
+  icon: mdi:thermometer-chevron-down
+bedroom_hvac_cool_turned_on_threshold:
+  name: Bedroom HVAC Cool Turned on Threshold
+  min: 24
+  max: 32
+  unit_of_measurement: °C
+  icon: mdi:thermometer-chevron-up
+bedroom_hvac_dry_turned_off_threshold:
+  name: Bedroom HVAC Dry Turned off Threshold
+  min: 52
+  max: 60
+  unit_of_measurement: "%"
+  icon: mdi:water-percent-alert
 bedroom_hvac_dry_turned_on_threshold_humidity:
   name: Bedroom HVAC Dry Turned on Threshold Humidity
   min: 56
@@ -30,42 +30,6 @@ bedroom_hvac_dry_turned_on_threshold_humidity:
   icon: mdi:water-percent-alert
 bedroom_hvac_dry_turned_on_threshold_wbgt:
   name: Bedroom HVAC Dry Turned on Threshold WBGT
-  min: 22
-  max: 30
-  unit_of_measurement: °C
-  icon: mdi:thermometer-chevron-up
-living_room_hvac_cool_turned_off_threshold:
-  name: Living Room HVAC Cool Turned off Threshold
-  min: 19
-  max: 27
-  unit_of_measurement: °C
-  icon: mdi:thermometer-chevron-down
-living_room_hvac_dry_turned_off_threshold:
-  name: Living Room HVAC Dry Turned off Threshold
-  min: 52
-  max: 60
-  unit_of_measurement: "%"
-  icon: mdi:water-percent-alert
-living_room_hvac_cool_turned_on_threshold:
-  name: Living Room HVAC Cool Turned on Threshold
-  min: 24
-  max: 32
-  unit_of_measurement: °C
-  icon: mdi:thermometer-chevron-up
-living_room_hvac_cool_forcibly_turned_on_threshold:
-  name: Living Room HVAC Cool Forcibly Turned on Threshold
-  min: 27
-  max: 35
-  unit_of_measurement: °C
-  icon: mdi:thermometer-alert
-living_room_hvac_dry_turned_on_threshold_humidity:
-  name: Living Room HVAC Dry Turned on Threshold Humidity
-  min: 56
-  max: 64
-  unit_of_measurement: "%"
-  icon: mdi:water-percent-alert
-living_room_hvac_dry_turned_on_threshold_wbgt:
-  name: Living Room HVAC Dry Turned on Threshold WBGT
   min: 22
   max: 30
   unit_of_measurement: °C
@@ -82,15 +46,51 @@ living_room_floor_heating_turned_on_threshold:
   max: 27
   unit_of_measurement: °C
   icon: mdi:thermometer-chevron-down
-living_room_humidifier_turned_on_threshold:
-  name: Living Room Humidifier Turned on Threshold
-  min: 36
-  max: 44
-  unit_of_measurement: "%"
-  icon: mdi:water-percent-alert
 living_room_humidifier_turned_off_threshold:
   name: Living Room Humidifier Turned off Threshold
   min: 46
   max: 54
   unit_of_measurement: "%"
   icon: mdi:water-percent-alert
+living_room_humidifier_turned_on_threshold:
+  name: Living Room Humidifier Turned on Threshold
+  min: 36
+  max: 44
+  unit_of_measurement: "%"
+  icon: mdi:water-percent-alert
+living_room_hvac_cool_forcibly_turned_on_threshold:
+  name: Living Room HVAC Cool Forcibly Turned on Threshold
+  min: 27
+  max: 35
+  unit_of_measurement: °C
+  icon: mdi:thermometer-alert
+living_room_hvac_cool_turned_off_threshold:
+  name: Living Room HVAC Cool Turned off Threshold
+  min: 19
+  max: 27
+  unit_of_measurement: °C
+  icon: mdi:thermometer-chevron-down
+living_room_hvac_cool_turned_on_threshold:
+  name: Living Room HVAC Cool Turned on Threshold
+  min: 24
+  max: 32
+  unit_of_measurement: °C
+  icon: mdi:thermometer-chevron-up
+living_room_hvac_dry_turned_off_threshold:
+  name: Living Room HVAC Dry Turned off Threshold
+  min: 52
+  max: 60
+  unit_of_measurement: "%"
+  icon: mdi:water-percent-alert
+living_room_hvac_dry_turned_on_threshold_humidity:
+  name: Living Room HVAC Dry Turned on Threshold Humidity
+  min: 56
+  max: 64
+  unit_of_measurement: "%"
+  icon: mdi:water-percent-alert
+living_room_hvac_dry_turned_on_threshold_wbgt:
+  name: Living Room HVAC Dry Turned on Threshold WBGT
+  min: 22
+  max: 30
+  unit_of_measurement: °C
+  icon: mdi:thermometer-chevron-up

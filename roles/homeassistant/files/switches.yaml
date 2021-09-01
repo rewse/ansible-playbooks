@@ -33,41 +33,6 @@
         {% else %}
           mdi:window-shutter
         {% endif %}
-    living_room_hvac_cleaner:
-      unique_id: switch.template.living_room_hvac_cleaner
-      friendly_name: Living Room HVAC Cleaner
-      turn_on:
-        service: rest_command.control_remo_device
-        data:
-          signal_id: e5286537-2c60-46ab-8fa5-3f695b9661ec
-      turn_off:
-        service: rest_command.control_remo_device
-        data:
-          signal_id: 70d5445a-3988-404b-82da-6793a1419425
-      icon_template: mdi:broom
-    living_room_humidifier:
-      unique_id: switch.template.living_room_humidifier
-      friendly_name: Living Room Humidifier
-      turn_on:
-        service: rest_command.control_switchbot_device
-        data:
-          device_id: C12F0898BAC5
-          command: press
-      turn_off:
-        service: rest_command.control_switchbot_device
-        data:
-          device_id: C12F0898BAC5
-          command: press
-      value_template: >
-        {{ states("sensor.living_room_humidifier_plug_current") | int > 200 }}
-      icon_template: >
-        {% if states("sensor.living_room_humidifier_plug_current") | int > 200 %}
-          mdi:air-humidifier
-        {% elif states("sensor.living_room_humidifier_plug_current") | int <= 200 %}
-          mdi:air-humidifier-off
-        {% else %}
-          mdi:air-humidifier
-        {% endif %}
     living_room_floor_heating:
       unique_id: switch.template.living_room_floor_heating
       friendly_name: Living Room Floor Heating
@@ -91,6 +56,41 @@
         {% else %}
           mdi:grid
         {% endif %}
+    living_room_humidifier:
+      unique_id: switch.template.living_room_humidifier
+      friendly_name: Living Room Humidifier
+      turn_on:
+        service: rest_command.control_switchbot_device
+        data:
+          device_id: C12F0898BAC5
+          command: press
+      turn_off:
+        service: rest_command.control_switchbot_device
+        data:
+          device_id: C12F0898BAC5
+          command: press
+      value_template: >
+        {{ states("sensor.living_room_humidifier_plug_current") | int > 200 }}
+      icon_template: >
+        {% if states("sensor.living_room_humidifier_plug_current") | int > 200 %}
+          mdi:air-humidifier
+        {% elif states("sensor.living_room_humidifier_plug_current") | int <= 200 %}
+          mdi:air-humidifier-off
+        {% else %}
+          mdi:air-humidifier
+        {% endif %}
+    living_room_hvac_cleaner:
+      unique_id: switch.template.living_room_hvac_cleaner
+      friendly_name: Living Room HVAC Cleaner
+      turn_on:
+        service: rest_command.control_remo_device
+        data:
+          signal_id: e5286537-2c60-46ab-8fa5-3f695b9661ec
+      turn_off:
+        service: rest_command.control_remo_device
+        data:
+          signal_id: 70d5445a-3988-404b-82da-6793a1419425
+      icon_template: mdi:broom
     study_floor_heating:
       unique_id: switch.template.study_floor_heating
       friendly_name: Study Floor Heating

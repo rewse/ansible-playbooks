@@ -1,13 +1,4 @@
 - binary_sensor:
-  - name: Living Room Presence
-    unique_id: binary_sensor.living_room_presence
-    state: "{{ states('sensor.count_of_living_room_motion') | int > 10 or states('sensor.count_of_study_motion') | int > 10 }}"
-    icon: >
-      {% if is_state('binary_sensor.living_room_presence', 'on') %}
-        mdi:comment-account
-      {% else %}
-        mdi:comment-account-outline
-      {% endif %}
   - name: Bedroom Presence
     unique_id: binary_sensor.bedroom_presence
     state: "{{ states('sensor.count_of_bedroom_motion_n') | int > 10 or states('sensor.count_of_bedroom_motion_s') | int > 10 }}"
@@ -17,17 +8,26 @@
       {% else %}
         mdi:comment-account-outline
       {% endif %}
+  - name: Living Room Presence
+    unique_id: binary_sensor.living_room_presence
+    state: "{{ states('sensor.count_of_living_room_motion') | int > 10 or states('sensor.count_of_study_motion') | int > 10 }}"
+    icon: >
+      {% if is_state('binary_sensor.living_room_presence', 'on') %}
+        mdi:comment-account
+      {% else %}
+        mdi:comment-account-outline
+      {% endif %}
 - sensor:
-  - name: Living Room WBGT
-    unique_id: sensor.living_room_wbgt
-    state: "{{ ((states('sensor.living_room_temperature') | float - 30.5) * 0.90739 + (states('sensor.living_room_humidity') | float - 60.0) * 0.14775 + (states('sensor.living_room_temperature') | float - 30.5) * (states('sensor.living_room_humidity') | float - 60.0) * 0.003655 + 27.77) | round(2) }}"
-    icon: mdi:thermometer-lines
-    device_class: temperature
-    unit_of_measurement: °C
-  - name: Bedroom WBGT
-    unique_id: sensor.bedroom_wbgt
-    state: "{{ ((states('sensor.bedroom_temperature') | float - 30.5) * 0.90739 + (states('sensor.bedroom_humidity') | float - 60.0) * 0.14775 + (states('sensor.bedroom_temperature') | float - 30.5) * (states('sensor.bedroom_humidity') | float - 60.0) * 0.003655 + 27.77) | round(2) }}"
-    icon: mdi:thermometer-lines
+  - name: Balcony Humidity Difference
+    unique_id: sensor.balcony_humidity_difference
+    state: "{{ (states('sensor.balcony_humidity') | float - state_attr('sensor.balcony_switchbot_meter_temperature', 'humidity') | float) | round(2) | abs }}"
+    icon: mdi:water-percent-alert
+    device_class: humidity
+    unit_of_measurement: pt
+  - name: Balcony Temperature Difference
+    unique_id: sensor.balcony_temperature_difference
+    state: "{{ (states('sensor.balcony_temperature') | float - states('sensor.balcony_switchbot_meter_temperature') | float) | round(2) | abs }}"
+    icon: mdi:thermometer-alert
     device_class: temperature
     unit_of_measurement: °C
   - name: Balcony WBGT
@@ -36,62 +36,54 @@
     icon: mdi:thermometer-lines
     device_class: temperature
     unit_of_measurement: °C
-  - name: Living Room Temperature Difference
-    unique_id: sensor.living_room_temperature_difference
-    state: "{{ (states('sensor.living_room_temperature') | float - states('sensor.living_room_switchbot_meter_temperature') | float) | round(2) | abs }}"
-    icon: mdi:thermometer-alert
-    device_class: temperature
-    unit_of_measurement: °C
-  - name: Bedroom Temperature Difference
-    unique_id: sensor.bedroom_temperature_difference
-    state: "{{ (states('sensor.bedroom_temperature') | float - states('sensor.bedroom_switchbot_meter_temperature') | float) | round(2) | abs }}"
-    icon: mdi:thermometer-alert
-    device_class: temperature
-    unit_of_measurement: °C
-  - name: Balcony Temperature Difference
-    unique_id: sensor.balcony_temperature_difference
-    state: "{{ (states('sensor.balcony_temperature') | float - states('sensor.balcony_switchbot_meter_temperature') | float) | round(2) | abs }}"
-    icon: mdi:thermometer-alert
-    device_class: temperature
-    unit_of_measurement: °C
-  - name: Living Room Humidity Difference
-    unique_id: sensor.living_room_humidity_difference
-    state: "{{ (states('sensor.living_room_humidity') | float - state_attr('sensor.living_room_switchbot_meter_temperature', 'humidity') | float) | round(2) | abs }}"
-    icon: mdi:water-percent-alert
-    device_class: humidity
-    unit_of_measurement: pt
   - name: Bedroom Humidity Difference
     unique_id: sensor.bedroom_humidity_difference
     state: "{{ (states('sensor.bedroom_humidity') | float - state_attr('sensor.bedroom_switchbot_meter_temperature', 'humidity') | float) | round(2) | abs }}"
     icon: mdi:water-percent-alert
     device_class: humidity
     unit_of_measurement: pt
-  - name: Balcony Humidity Difference
-    unique_id: sensor.balcony_humidity_difference
-    state: "{{ (states('sensor.balcony_humidity') | float - state_attr('sensor.balcony_switchbot_meter_temperature', 'humidity') | float) | round(2) | abs }}"
-    icon: mdi:water-percent-alert
-    device_class: humidity
-    unit_of_measurement: pt
-  - name: Denshobato Received Date Time
-    unique_id: sensor.denshobato_received_date_time
-    state: "{{ as_timestamp(strptime(state_attr('sensor.denshobato', 'date'), '%a, %d %b %Y %H:%M:%S %z')) | timestamp_custom() }}"
-    icon: mdi:clock-outline
+  - name: Bedroom Temperature Difference
+    unique_id: sensor.bedroom_temperature_difference
+    state: "{{ (states('sensor.bedroom_temperature') | float - states('sensor.bedroom_switchbot_meter_temperature') | float) | round(2) | abs }}"
+    icon: mdi:thermometer-alert
+    device_class: temperature
+    unit_of_measurement: °C
+  - name: Bedroom WBGT
+    unique_id: sensor.bedroom_wbgt
+    state: "{{ ((states('sensor.bedroom_temperature') | float - 30.5) * 0.90739 + (states('sensor.bedroom_humidity') | float - 60.0) * 0.14775 + (states('sensor.bedroom_temperature') | float - 30.5) * (states('sensor.bedroom_humidity') | float - 60.0) * 0.003655 + 27.77) | round(2) }}"
+    icon: mdi:thermometer-lines
+    device_class: temperature
+    unit_of_measurement: °C
   - name: Denshobato Action
     unique_id: sensor.denshobato_action
     state: '{{ state_attr("sensor.denshobato", "body") | regex_findall_index("\$B(..9;)\$7\$\^\$7\$\?") | regex_replace("EP9;", "登校") | regex_replace("2<9;", "下校") }}'
     icon: mdi:school
+  - name: Denshobato Received Date Time
+    unique_id: sensor.denshobato_received_date_time
+    state: "{{ as_timestamp(strptime(state_attr('sensor.denshobato', 'date'), '%a, %d %b %Y %H:%M:%S %z')) | timestamp_custom() }}"
+    icon: mdi:clock-outline
   - name: Denshobato Time
     unique_id: sensor.denshobato_time
     state: '{{ state_attr("sensor.denshobato", "body") | regex_findall_index(".$BF|.\(B ([0-9][0-9].\$B;~.\(B[0-9][0-9])") | regex_replace(".\$B;~.\(B", ":") }}'
     icon: mdi:clock-outline
-  - name: Mamorail Received Date Time
-    unique_id: sensor.mamorail_received_date_time
-    state: "{{ as_timestamp(strptime(state_attr('sensor.mamorail', 'date'), '%a, %d %b %Y %H:%M:%S %z')) | timestamp_custom() }}"
-    icon: mdi:clock-outline
-  - name: Mamorail Station
-    unique_id: sensor.mamorail_station
-    state: "{{ state_attr('sensor.mamorail', 'body') | regex_findall_index(':[0-9][0-9]に(..*)') }}"
-    icon: mdi:train
+  - name: Living Room Humidity Difference
+    unique_id: sensor.living_room_humidity_difference
+    state: "{{ (states('sensor.living_room_humidity') | float - state_attr('sensor.living_room_switchbot_meter_temperature', 'humidity') | float) | round(2) | abs }}"
+    icon: mdi:water-percent-alert
+    device_class: humidity
+    unit_of_measurement: pt
+  - name: Living Room Temperature Difference
+    unique_id: sensor.living_room_temperature_difference
+    state: "{{ (states('sensor.living_room_temperature') | float - states('sensor.living_room_switchbot_meter_temperature') | float) | round(2) | abs }}"
+    icon: mdi:thermometer-alert
+    device_class: temperature
+    unit_of_measurement: °C
+  - name: Living Room WBGT
+    unique_id: sensor.living_room_wbgt
+    state: "{{ ((states('sensor.living_room_temperature') | float - 30.5) * 0.90739 + (states('sensor.living_room_humidity') | float - 60.0) * 0.14775 + (states('sensor.living_room_temperature') | float - 30.5) * (states('sensor.living_room_humidity') | float - 60.0) * 0.003655 + 27.77) | round(2) }}"
+    icon: mdi:thermometer-lines
+    device_class: temperature
+    unit_of_measurement: °C
   - name: Mamorail Action
     unique_id: sensor.mamorail_action
     state: "{{ state_attr('sensor.mamorail', 'body') | regex_findall_index('(..*)しました') }}"
@@ -101,6 +93,14 @@
     state: "{{ state_attr('sensor.mamorail', 'body') | regex_findall_index('チャージ残額は(..*)円です') | regex_replace(',', '') | int }}"
     icon: mdi:credit-card-sync-outline
     unit_of_measurement: JPY
+  - name: Mamorail Received Date Time
+    unique_id: sensor.mamorail_received_date_time
+    state: "{{ as_timestamp(strptime(state_attr('sensor.mamorail', 'date'), '%a, %d %b %Y %H:%M:%S %z')) | timestamp_custom() }}"
+    icon: mdi:clock-outline
+  - name: Mamorail Station
+    unique_id: sensor.mamorail_station
+    state: "{{ state_attr('sensor.mamorail', 'body') | regex_findall_index(':[0-9][0-9]に(..*)') }}"
+    icon: mdi:train
   - name: Mamorail Time
     unique_id: sensor.mamorail_time
     state: "{{ state_attr('sensor.mamorail', 'body') |regex_findall_index('([0-9][0-9]*:[0-9][0-9])に') }}"

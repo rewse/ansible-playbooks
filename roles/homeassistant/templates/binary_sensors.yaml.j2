@@ -7,24 +7,6 @@
   name: REGZA Volume Muted
   command: curl --digest --user '[% regza.username %]:[% regza.password %]' http://regza/v2/remote/status/mute | jq -r .mute
 - platform: ping
-  name: zulu
-  host: zulu.rewse.jp
-- platform: ping
-  name: romeo
-  host: romeo.rewse.jp
-- platform: ping
-  name: tango
-  host: tango.rewse.jp
-- platform: ping
-  name: xray-liv
-  host: xray-liv.rewse.jp
-- platform: ping
-  name: xray-sto
-  host: xray-sto.rewse.jp
-- platform: ping
-  name: papa
-  host: papa.rewse.jp
-- platform: ping
   name: alfa
   host: alfa.rewse.jp
 - platform: ping
@@ -79,6 +61,9 @@
   name: kasaplug-liv
   host: kasaplug-liv.rewse.jp
 - platform: ping
+  name: papa
+  host: papa.rewse.jp
+- platform: ping
   name: regza
   host: regza.rewse.jp
 - platform: ping
@@ -88,11 +73,17 @@
   name: remo-liv
   host: remo-liv.rewse.jp
 - platform: ping
+  name: romeo
+  host: romeo.rewse.jp
+- platform: ping
   name: sesamemodule
   host: sesamemodule.rewse.jp
 - platform: ping
   name: switchbothub
   host: switchbothub.rewse.jp
+- platform: ping
+  name: tango
+  host: tango.rewse.jp
 - platform: ping
   name: tuyaplug-bed
   host: tuyaplug-bed.rewse.jp
@@ -111,5 +102,14 @@
 - platform: ping
   name: xiaomigateway
   host: xiaomigateway.rewse.jp
+- platform: ping
+  name: xray-liv
+  host: xray-liv.rewse.jp
+- platform: ping
+  name: xray-sto
+  host: xray-sto.rewse.jp
+- platform: ping
+  name: zulu
+  host: zulu.rewse.jp
 - platform: workday
   country: JP
