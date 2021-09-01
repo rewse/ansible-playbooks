@@ -216,6 +216,8 @@ binary_sensor.tuyaplug_liv:
   icon: mdi:power-socket-us
 binary_sensor.tuyaplug_bed:
   icon: mdi:power-socket-us
+binary_sensor.tuyaplug_kit:
+  icon: mdi:power-socket-us
 binary_sensor.wfirex:
   icon: mdi:network-outline
 binary_sensor.xiaomigateway:
