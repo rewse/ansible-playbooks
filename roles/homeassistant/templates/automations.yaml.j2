@@ -223,11 +223,11 @@
         data:
           url: /lovelace-machines/machines
   mode: single
-- id: automation.alarm_amazonplug_is_offline
-  alias: "ALARM: amazonplug is Offline"
+- id: automation.alarm_amazonplug_bed_is_offline
+  alias: "ALARM: amazonplug-bed is Offline"
   trigger:
     - platform: state
-      entity_id: binary_sensor.amazonplug
+      entity_id: binary_sensor.amazonplug_bed
       to: "off"
       for:
         minutes: 31
@@ -235,7 +235,23 @@
     - service: notify.tats_devices
       data:
         title: "⚠️ ALARM"
-        message: amazonplug is Offline
+        message: amazonplug-bed is Offline
+        data:
+          url: /lovelace-machines/machines
+  mode: single
+- id: automation.alarm_amazonplug_liv_is_offline
+  alias: "ALARM: amazonplug-liv is Offline"
+  trigger:
+    - platform: state
+      entity_id: binary_sensor.amazonplug_liv
+      to: "off"
+      for:
+        minutes: 31
+  action:
+    - service: notify.tats_devices
+      data:
+        title: "⚠️ ALARM"
+        message: amazonplug-liv is Offline
         data:
           url: /lovelace-machines/machines
   mode: single
@@ -675,6 +691,7 @@
   trigger:
     - platform: time_pattern
       minutes: "/5"
+      seconds: 5
   condition:
     - condition: state
       entity_id: lock.entrance_lock_bottom
@@ -687,13 +704,19 @@
     - condition: state
       entity_id: alarm_control_panel.entrance_auto_lock
       state: armed_home
+    - condition: state
+      entity_id: binary_sensor.entrance_door
+      state: "off"
+      for:
+        minutes: 30
   action:
-    - service: shell_command.control_entrance_lock_bottom_lock
+    - service: script.lock_and_get_state_of_entrance_lock_bottom
 - id: automation.auto_lock_entrance_lock_top_in_daytime
   alias: "Auto-Lock Entrace Lock Top in Daytime"
   trigger:
     - platform: time_pattern
       minutes: "/5"
+      seconds: 5
   condition:
     - condition: state
       entity_id: lock.entrance_lock_top
@@ -706,13 +729,19 @@
     - condition: state
       entity_id: alarm_control_panel.entrance_auto_lock
       state: armed_home
+    - condition: state
+      entity_id: binary_sensor.entrance_door
+      state: "off"
+      for:
+        minutes: 30
   action:
-    - service: shell_command.control_entrance_lock_top_lock
+    - service: script.lock_and_get_state_of_entrance_lock_top
 - id: automation.auto_lock_entrance_lock_bottom_in_nighttime
   alias: "Auto-Lock Entrace Lock Bottom in Nighttime"
   trigger:
     - platform: time_pattern
       minutes: "/5"
+      seconds: 21
   condition:
     - condition: state
       entity_id: lock.entrance_lock_bottom
@@ -725,13 +754,19 @@
     - condition: state
       entity_id: alarm_control_panel.entrance_auto_lock
       state: armed_home
+    - condition: state
+      entity_id: binary_sensor.entrance_door
+      state: "off"
+      for:
+        minutes: 10
   action:
-    - service: shell_command.control_entrance_lock_bottom_lock
+    - service: script.lock_and_get_state_of_entrance_lock_bottom
 - id: automation.auto_lock_entrance_lock_top_in_nighttime
   alias: "Auto-Lock Entrace Lock Top in Nighttime"
   trigger:
     - platform: time_pattern
       minutes: "/5"
+      seconds: 21
   condition:
     - condition: state
       entity_id: lock.entrance_lock_top
@@ -744,8 +779,13 @@
     - condition: state
       entity_id: alarm_control_panel.entrance_auto_lock
       state: armed_home
+    - condition: state
+      entity_id: binary_sensor.entrance_door
+      state: "off"
+      for:
+        minutes: 10
   action:
-    - service: shell_command.control_entrance_lock_top_lock
+    - service: script.lock_and_get_state_of_entrance_lock_top
 - id: automation.info_denshobato
   alias: "INFO: Denshobato"
   trigger:
@@ -774,8 +814,9 @@
         state: home
     - delay:
         minutes: 10
-    - service: shell_command.control_entrance_lock_top_unlock
-    - service: shell_command.control_entrance_lock_bottom_unlock
+    - service: lock.unlock
+      target:
+        entity_id: lock.entrance_locks
   mode: single
 - id: automation.info_bedroom_humidity_is_too_high
   alias: "INFO: Bedroom Humidity is Too High"
@@ -1017,13 +1058,15 @@
       entity_id: sensor.living_room_1_button_switch_action
       to: double
   action:
-    - service: shell_command.control_entrance_lock_top_lock
-    - service: shell_command.control_entrance_lock_bottom_lock
+    - service: lock.lock
+      target:
+        entity_id: lock.entrance_locks
 - id: automation.trigger_monitor
   alias: Trigger monitor
   trigger:
     - platform: time_pattern
       minutes: "/5"
+      seconds: 33
   action:
     - service: mqtt.publish
       data:
@@ -1034,26 +1077,6 @@
       data:
         topic: monitor/scan/depart
         payload: '{"identity": "automation.trigger_monitor"}'
-        retain: true
-  mode: single
-- id: automation.trigger_monitor_by_entrance_door
-  alias: Trigger monitor by Entrance Door
-  trigger:
-    - platform: state
-      entity_id: binary_sensor.entrance_door
-      to: "off"
-  action:
-    - delay:
-        minutes: 1
-    - service: mqtt.publish
-      data:
-        topic: monitor/scan/arrive
-        payload: '{"identity": "automation.trigger_monitor_by_entrance_door"}'
-        retain: true
-    - service: mqtt.publish
-      data:
-        topic: monitor/scan/depart
-        payload: '{"identity": "automation.trigger_monitor_by_entrance_door"}'
         retain: true
   mode: single
 - id: automation.turn_on_surveillance_when_ios_action_fires
@@ -1078,6 +1101,7 @@
   trigger:
     - platform: time_pattern
       minutes: "/5"
+      seconds: 46
   condition:
     - condition: state
       entity_id: alarm_control_panel.surveillance
@@ -1106,6 +1130,13 @@
     - platform: numeric_state
       entity_id: sensor.monitor_bio
       above: 10
+    - platform: time_pattern
+      minutes: "/5"
+      seconds: 53
+  condition:
+    - condition: numeric_state
+      entity_id: sensor.monitor_bio
+      above: 10
   action:
     - service: device_tracker.see
       data:
@@ -1116,6 +1147,13 @@
   alias: Turn off monitor bio
   trigger:
     - platform: numeric_state
+      entity_id: sensor.monitor_bio
+      below: 10
+    - platform: time_pattern
+      minutes: "/5"
+      seconds: 53
+  condition:
+    - condition: numeric_state
       entity_id: sensor.monitor_bio
       below: 10
   action:
@@ -1130,6 +1168,13 @@
     - platform: numeric_state
       entity_id: sensor.monitor_akikos_iphone12mini
       above: 10
+    - platform: time_pattern
+      minutes: "/5"
+      seconds: 53
+  condition:
+    - condition: numeric_state
+      entity_id: sensor.monitor_akikos_iphone12mini
+      above: 10
   action:
     - service: device_tracker.see
       data:
@@ -1140,6 +1185,13 @@
   alias: Turn off monitor akikos-iphone12mini
   trigger:
     - platform: numeric_state
+      entity_id: sensor.monitor_akikos_iphone12mini
+      below: 10
+    - platform: time_pattern
+      minutes: "/5"
+      seconds: 53
+  condition:
+    - condition: numeric_state
       entity_id: sensor.monitor_akikos_iphone12mini
       below: 10
   action:
@@ -1155,8 +1207,7 @@
     - platform: time
       at: input_datetime.bedroom_curtains_opened_time
   action:
-    - service: switch.turn_on
-      entity_id: switch.bedroom_curtains
+    - service: script.open_and_get_state_of_bedroom_curtains
   mode: single
 - id: automation.open_bedroom_curtains_workday
   alias: Open Bedroom Curtains Workday
@@ -1169,8 +1220,7 @@
       entity_id: binary_sensor.workday_sensor
       state: "on"
   action:
-    - service: switch.turn_on
-      entity_id: switch.bedroom_curtains
+    - service: script.open_and_get_state_of_bedroom_curtains
   mode: single
 - id: automation.turn_down_bedroom
   alias: Turn down Bedroom
@@ -1179,8 +1229,7 @@
     - platform: time
       at: input_datetime.bedroom_turned_down_time
   action:
-  - service: switch.turn_off
-    entity_id: switch.bedroom_curtains
+    - service: script.close_and_get_state_of_bedroom_curtains
   mode: single
 - id: automation.turn_down_living_area
   alias: Turn down Living Area
@@ -1355,6 +1404,10 @@
   trigger:
     - platform: time
       at: "5:30"
+  condition:
+    - condition: state
+      entity_id: alarm_control_panel.surveillance
+      state: disarmed
   action:
     - service: climate.turn_off
       target:
@@ -1494,6 +1547,10 @@
       to: heat_cool
       for:
         hours: 2
+  condition:
+    - condition: state
+      entity_id: alarm_control_panel.surveillance
+      state: disarmed
   action:
     - service: automation.turn_on
       target:
@@ -1508,6 +1565,7 @@
   trigger:
     - platform: time_pattern
       minutes: "/5"
+      seconds: 37
   condition:
     - condition: state
       entity_id: binary_sensor.workday_sensor
@@ -1580,6 +1638,7 @@
   trigger:
     - platform: time_pattern
       minutes: "/5"
+      seconds: 46
   condition:
     - condition: numeric_state
       entity_id: sensor.bedroom_wbgt
@@ -1715,6 +1774,9 @@
     - condition: time
       weekday:
       - tue
+    - condition: state
+      entity_id: alarm_control_panel.surveillance
+      state: disarmed
   action:
     - service: switch.turn_on
       entity_id: switch.living_room_hvac_cleaner
@@ -1782,6 +1844,7 @@
   trigger:
     - platform: time_pattern
       minutes: "/5"
+      seconds: 54
   condition:
     - condition: numeric_state
       entity_id: sensor.living_room_wbgt
@@ -1981,8 +2044,8 @@
       entity_id: sensor.living_room_1_button_switch_action
       to: single
   action:
-    - service: shell_command.control_entrance_lock_top_unlock
-    - service: shell_command.control_entrance_lock_bottom_unlock
+    - service: script.unlock_and_get_state_of_entrance_lock_bottom
+    - service: script.unlock_and_get_state_of_entrance_lock_top
 - id: automation.unlock_entrance_lock_when_ios_action_fails
   alias: Unlock Entrance Lock when iOS Action Fails
   trigger:
@@ -2032,11 +2095,39 @@
           for:
             minutes: 5
   action:
-    - service: shell_command.control_entrance_lock_top_unlock
-    - service: shell_command.control_entrance_lock_bottom_unlock
+    - service: script.unlock_and_get_state_of_entrance_lock_bottom
+    - service: script.unlock_and_get_state_of_entrance_lock_top
     - service: notify.all_devices
       data:
         message: Unlocked Entrance
         data:
           url: /lovelace-people/people
+  mode: single
+- id: automation.update_device_tracking_sensors
+  alias: Update Device Tracking Sensors
+  trigger:
+    - platform: state
+      entity_id: binary_sensor.entrance_door
+  action:
+    - delay:
+        minutes: 1
+    - service: mqtt.publish
+      data:
+        topic: monitor/scan/arrive
+        payload: '{"identity": "automation.trigger_monitor_by_entrance_door"}'
+        retain: true
+    - service: mqtt.publish
+      data:
+        topic: monitor/scan/depart
+        payload: '{"identity": "automation.trigger_monitor_by_entrance_door"}'
+        retain: true
+    - delay:
+        seconds: 4
+    - service: homeassistant.update_entity
+      target:
+        entity_id:
+          - device_tracker.ping_bio
+          - device_tracker.ping_akikos_iphone12mini
+          - sensor.entrance_lock_bottom_sensor
+          - sensor.entrance_lock_top_sensor
   mode: single

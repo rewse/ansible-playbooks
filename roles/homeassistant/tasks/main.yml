@@ -387,7 +387,7 @@
   copy:
     src: scripts.yaml
     dest: /etc/homeassistant
-  tags: [homeassistant, homeassistant-component]
+  tags: [homeassistant, homeassistant-script]
 
 - name: Config sensor
   lineinfile:
@@ -620,6 +620,7 @@
         unit_system: metric
         temperature_unit: C
         time_zone: Asia/Tokyo
+        currency: JPY
         external_url: https://hass.rewse.jp/
         internal_url: https://hass.rewse.jp/
         customize: !include customize.yaml
@@ -721,15 +722,9 @@
     dest: /etc/homeassistant/ui
   tags: [homeassistant, homeassistant-ui]
 
-- name: Copy bathroom.yaml
+- name: Copy others.yaml
   copy:
-    src: bathroom.yaml
-    dest: /etc/homeassistant/ui
-  tags: [homeassistant, homeassistant-ui]
-
-- name: Copy entrance.yaml
-  copy:
-    src: entrance.yaml
+    src: others.yaml
     dest: /etc/homeassistant/ui
   tags: [homeassistant, homeassistant-ui]
 

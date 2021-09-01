@@ -1,0 +1,40 @@
+path: others
+title: Others
+icon: mdi:dots-horizontal
+cards:
+  - type: entities
+    title: Balcony Humiture
+    entities:
+      - entity: sensor.balcony_temperature
+        name: Temperature
+      - entity: sensor.balcony_wbgt
+        name: WBGT
+      - entity: sensor.balcony_humidity
+        name: Humidity
+  - type: entities
+    title: Bathroom Lights
+    entities:
+      - entity: light.bathroom_entrance_light
+        name: Entrance Light
+      - entity: light.bathroom_left_light
+        name: Left Light
+      - entity: light.bathroom_right_light
+        name: Right Light
+  - type: vertical-stack
+    cards:
+      - type: entities
+        title: Entrance Locks
+        entities:
+          - entity: lock.entrance_locks
+            name: Both
+            secondary_info: last-changed
+          - entity: lock.entrance_lock_top
+            name: Top
+            secondary_info: last-changed
+          - entity: lock.entrance_lock_bottom
+            name: Bottom
+            secondary_info: last-changed
+      - type: alarm-panel
+        entity: alarm_control_panel.entrance_auto_lock
+        states:
+          - arm_home

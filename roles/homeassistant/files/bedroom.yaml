@@ -4,6 +4,15 @@ icon: 'mdi:bed'
 badges: []
 cards:
   - type: entities
+    title: Bedroom Humiture
+    entities:
+      - entity: sensor.bedroom_temperature
+        name: Temperature
+      - entity: sensor.bedroom_wbgt
+        name: WBGT
+      - entity: sensor.bedroom_humidity
+        name: Humidity
+  - type: entities
     title: Bedroom Lights
     entities:
       - entity: light.bedroom_light
@@ -80,3 +89,6 @@ cards:
         name: Turn on HVAC Cleaner
         secondary_info: last-triggered
     show_header_toggle: false
+  - type: picture-entity
+    name: Bedroom Camera
+    entity: camera.guppy_bedroom
