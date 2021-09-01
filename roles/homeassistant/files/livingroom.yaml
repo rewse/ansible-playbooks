@@ -158,7 +158,7 @@ cards:
         hide:
           power_state: false
       - type: custom:mini-media-player
-        entity: media_player.heargo2
+        entity: media_player.roam
         artwork: material
         hide:
           controls: true

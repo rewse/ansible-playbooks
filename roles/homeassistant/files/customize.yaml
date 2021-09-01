@@ -302,12 +302,12 @@ media_player.aventage:
   icon: mdi:audio-video
 media_player.firetv:
   icon: mdi:fire
-media_player.heargo2:
-  icon: mdi:speaker
-  device_class: speaker
 media_player.regza:
   icon: mdi:television
   device_class: tv
+media_player.roam:
+  icon: mdi:speaker
+  device_class: speaker
 person.shibata_akiko:
   icon: mdi:human-female
 person.shibata_tats:
