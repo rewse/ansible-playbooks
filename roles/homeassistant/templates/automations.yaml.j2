@@ -818,11 +818,11 @@
         minutes: 10
   action:
     - service: script.lock_and_get_state_of_entrance_lock_top
-- id: automation.info_bathroom_washer_has_been_finished
-  alias: "INFO: Bathroom Washer Has Been Finished"
+- id: automation.info_bathroom_washing_machine_has_been_finished
+  alias: "INFO: Bathroom Washer Machine Has Been Finished"
   trigger:
     - platform: numeric_state
-      entity_id: sensor.bathroom_washer_plug_current_comsumption
+      entity_id: sensor.bathroom_washing_machine_plug_current_comsumption
       below: 80
       for:
         minutes: 1
