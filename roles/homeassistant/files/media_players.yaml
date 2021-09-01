@@ -19,25 +19,3 @@
       state: binary_sensor.regza_state
       source: sensor.regza_channel
   device_class: tv
-- platform: yamaha
-  name: aventage
-  host: aventage.rewse.jp
-  zone_ignore:
-    - Zone_2
-    - Zone_3
-    - Zone_4
-  source_ignore:
-    - AUDIO2
-    - AUDIO3
-    - AV6
-    - PHONE
-    - Spotify
-    - iPod (USB)
-  source_names:
-    AUDIO1: REGZA
-    AV1: Apple TV
-    AV2: Fire TV
-    AV3: au Hikari
-    AV4: CXUHD
-    AV5: PS5
-    AV7: Switch
