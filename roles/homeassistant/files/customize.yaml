@@ -2,7 +2,11 @@ alarm_control_panel.entrance_auto_lock:
   icon: mdi:lock-clock
 alarm_control_panel.surveillance:
   icon: mdi:cctv
-automation.alarm_amazonplug_is_offline:
+automation.alarm_akikos_iphone12mini_wifi_might_be_off:
+  icon: mdi:wifi-off
+automation.alarm_amazonplug_bed_is_offline:
+  icon: mdi:power-socket-us
+automation.alarm_amazonplug_liv_is_offline:
   icon: mdi:power-socket-us
 automation.alarm_aventage_is_offline:
   icon: mdi:audio-video-off
@@ -14,14 +18,14 @@ automation.alarm_bedroom_humidity_difference_is_too_large:
   icon: mdi:water-percent-alert
 automation.alarm_bedroom_temperature_difference_is_too_large:
   icon: mdi:thermometer-alert
+automation.alarm_bio_wifi_might_be_off:
+  icon: mdi:wifi-off
 automation.alarm_catloghome_bed_is_offline:
   icon: mdi:cat
 automation.alarm_catloghome_liv_is_offline:
   icon: mdi:cat
 automation.alarm_daikinhvac_is_offline:
   icon: mdi:thermostat
-automation.alarm_dns_is_down:
-  icon: mdi:dns
 automation.alarm_fox_is_offline:
   icon: mdi:raspberry-pi
 automation.alarm_guppy_is_offline:
@@ -32,8 +36,6 @@ automation.alarm_huebridge_is_offline:
   icon: mdi:network-off-outline
 automation.alarm_internet_speed_is_too_slow:
   icon: mdi:gauge-low
-automation.alarm_co2_is_too_high:
-  icon: mdi:molecule-co2
 automation.alarm_jq300_is_offline:
   icon: mdi:air-filter
 automation.alarm_justio_is_offline:
@@ -42,8 +44,6 @@ automation.alarm_kasaplug_ent_is_offline:
   icon: mdi:power-socket-us
 automation.alarm_kasaplug_liv_is_offline:
   icon: mdi:power-socket-us
-automation.alarm_living_room_air_quality_is_poor:
-  icon: mdi:air-filter
 automation.alarm_living_room_co2_is_too_high:
   icon: mdi:molecule-co2
 automation.alarm_living_room_humidity_difference_is_too_large:
@@ -60,13 +60,17 @@ automation.alarm_romeo_is_offline:
   icon: mdi:router-network
 automation.alarm_sesamemodule_is_offline:
   icon: mdi:network-off-outline
-automation.alarm_suicas_balance_is_not_enough:
-  icon: mdi:credit-card-off-outline
 automation.alarm_switchbothub_is_offline:
   icon: mdi:network-off-outline
 automation.alarm_tango_is_offline:
   icon: mdi:switch
-automation.alarm_tuyaplug_is_offline:
+automation.alarm_tuyaplug_bat_is_offline:
+  icon: mdi:power-socket-us
+automation.alarm_tuyaplug_bed_is_offline:
+  icon: mdi:power-socket-us
+automation.alarm_tuyaplug_kit_is_offline:
+  icon: mdi:power-socket-us
+automation.alarm_tuyaplug_liv_is_offline:
   icon: mdi:power-socket-us
 automation.alarm_wfirex_is_offline:
   icon: mdi:network-off-outline
@@ -78,12 +82,22 @@ automation.alarm_xray_sto_is_offline:
   icon: mdi:access-point-network-off
 automation.alarm_zulu_is_offline:
   icon: mdi:router-network
-automation.info_denshobato:
-  icon: mdi:bird
+automation.auto_lock_entrance_lock_bottom_in_daytime:
+  icon: mdi:lock
+automation.auto_lock_entrance_lock_bottom_in_nighttime:
+  icon: mdi:lock
+automation.auto_lock_entrance_lock_top_in_daytime:
+  icon: mdi:lock
+automation.auto_lock_entrance_lock_top_in_nighttime:
+  icon: mdi:lock
+automation.info_bathroom_washing_machine_has_been_finished:
+  icon: mdi:washing-machine
 automation.info_bedroom_humidity_is_too_high:
   icon: mdi:water-percent-alert
 automation.info_bedroom_temperature_is_too_high:
   icon: mdi:thermometer-alert
+automation.info_denshobato:
+  icon: mdi:bird
 automation.info_living_room_humidity_is_too_high:
   icon: mdi:water-percent-alert
 automation.info_living_room_temperature_is_too_high:
@@ -94,6 +108,8 @@ automation.info_mamorail_needed_to_charge:
   icon: mdi:train
 automation.info_update_available:
   icon: mdi:update
+automation.lock_entrance:
+  icon: mdi:lock
 automation.open_bedroom_curtains_temporarily:
   icon: mdi:window-shutter-alert
 automation.open_bedroom_curtains_workday:
@@ -102,6 +118,8 @@ automation.plan_to_turn_on_bedroom_hvac_cleaner:
   icon: mdi:broom
 automation.plan_to_turn_on_living_room_hvac_fan:
   icon: mdi:broom
+automation.trigger_monitor:
+  icon: mdi:cellphone-wireless
 automation.turn_down_bedroom:
   icon: mdi:brightness-6
 automation.turn_down_living_area:
@@ -110,6 +128,8 @@ automation.turn_down_living_area_more:
   icon: mdi:brightness-4
 automation.turn_off_bedroom_hvac:
   icon: mdi:thermostat
+automation.turn_off_bedroom_light:
+  icon: mdi:ceiling-light
 automation.turn_off_living_area_lights:
   icon: mdi:lightbulb-group-off-outline
 automation.turn_off_living_room_extra_lights:
@@ -136,6 +156,8 @@ automation.turn_on_bedroom_hvac_cool_forcibly:
   icon: mdi:snowflake-alert
 automation.turn_on_bedroom_hvac_dry:
   icon: mdi:water-percent-alert
+automation.turn_on_bedroom_light:
+  icon: mdi:ceiling-light
 automation.turn_on_living_area_downlights:
   icon: mdi:wall-sconce-flat
 automation.turn_on_living_area_floor_heating:
@@ -162,11 +184,17 @@ automation.turn_on_surveillance_when_ios_action_fires:
   icon: mdi:cctv
 automation.turn_on_surveillance_when_nobody_is_in_home:
   icon: mdi:cctv
+automation.unlock_entrance_lock:
+  icon: mdi:lock-open-variant
 automation.unlock_entrance_when_ios_action_fails:
   icon: mdi:lock-remove
 automation.unlock_entrance_when_ios_action_fires:
   icon: mdi:lock-open-variant
-binary_sensor.amazonplug:
+automation.update_device_tracking_sensors:
+  icon: mdi:radar
+binary_sensor.amazonplug_bed:
+  icon: mdi:power-socket-us
+binary_sensor.amazonplug_liv:
   icon: mdi:power-socket-us
 binary_sensor.aventage:
   icon: mdi:audio-video
@@ -194,6 +222,8 @@ binary_sensor.kasaplug_ent:
   icon: mdi:power-socket-us
 binary_sensor.kasaplug_liv:
   icon: mdi:power-socket-us
+binary_sensor.papa:
+  icon: mdi:access-point-network
 binary_sensor.regza:
   icon: mdi:television
 binary_sensor.regza_state:
