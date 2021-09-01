@@ -35,7 +35,6 @@ smart_home:
       - lock.entrance_locks
       - media_player.appletv
       - media_player.aventage
-      - media_player.heargo2
       - sensor.balcony_temperature
       - sensor.bathroom_temperature
       - sensor.bedroom_temperature
@@ -110,9 +109,6 @@ smart_home:
     media_player.aventage:
       name: アンプ
       display_categories: MUSIC_SYSTEM
-    media_player.heargo2:
-      name: 書斎のスピーカー
-      display_categories: SPEAKER
     sensor.balcony_temperature:
       name: ベランダの温度計
     sensor.bathroom_temperature:
