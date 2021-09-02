@@ -44,6 +44,8 @@ automation.alarm_kasaplug_ent_is_offline:
   icon: mdi:power-socket-us
 automation.alarm_kasaplug_liv_is_offline:
   icon: mdi:power-socket-us
+automation.alarm_kitchen_rice_cooker_is_keeping_warm:
+  icon: mdi:rice
 automation.alarm_living_room_co2_is_too_high:
   icon: mdi:molecule-co2
 automation.alarm_living_room_humidity_difference_is_too_large:

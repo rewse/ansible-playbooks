@@ -377,6 +377,27 @@
         data:
           url: /lovelace-machines/machines
   mode: single
+- id: automation.alarm_kitchen_rice_cooker_is_keeping_warm
+  alias: "ALARM: Kitchen Rice Cooker is keeping warm"
+  trigger:
+    - platform: time
+      at: "21:00"
+    - platform: time
+      at: "21:30"
+    - platform: time
+      at: "22:00"
+    - platform: time
+      at: "22:30"
+  condition:
+    - condition: numeric_state
+      entity_id: sensor.kitchen_rice_cooker_plug_current_comsumption
+      above: 40
+  action:
+    - service: notify.all_devices
+      data:
+        title: "⚠️ ALARM"
+        message: ️Rice Cooker is Keeping Warm
+  mode: single
 - id: automation.alarm_living_room_co2_is_too_high
   alias: "ALARM: Living Room CO2 is Too High"
   trigger:
