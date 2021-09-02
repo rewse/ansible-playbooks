@@ -826,6 +826,11 @@
       below: 80
       for:
         minutes: 1
+  condition:
+    - condition: numeric_state
+      entity_id: sensor.average_of_bathroom_washing_machine_plug_current_comsumption
+      attribute: max_value
+      above: 80
   action:
     - service: notify.notify
       data:
