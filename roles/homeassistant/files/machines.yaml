@@ -190,8 +190,3 @@ views:
           state_map:
             - value: above_horizon
             - value: below_horizon
-      - type: entities
-        title: Offline Alarm
-        entities:
-          - entity: automation.alarm_akikos_iphone12mini_wifi_might_be_off
-            secondary_info: last-triggered
