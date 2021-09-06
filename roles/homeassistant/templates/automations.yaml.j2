@@ -740,7 +740,7 @@
           url: /lovelace-machines/machines
   mode: single
 - id: automation.auto_lock_entrance_lock_bottom_in_daytime
-  alias: "Auto-Lock Entrace Lock Bottom in Daytime"
+  alias: Auto-Lock Entrnace Lock Bottom in Daytime
   trigger:
     - platform: time_pattern
       minutes: "/5"
@@ -765,7 +765,7 @@
   action:
     - service: script.lock_and_get_state_of_entrance_lock_bottom
 - id: automation.auto_lock_entrance_lock_bottom_in_nighttime
-  alias: "Auto-Lock Entrace Lock Bottom in Nighttime"
+  alias: Auto-Lock Entrance Lock Bottom in Nighttime
   trigger:
     - platform: time_pattern
       minutes: "/5"
@@ -790,7 +790,7 @@
   action:
     - service: script.lock_and_get_state_of_entrance_lock_bottom
 - id: automation.auto_lock_entrance_lock_top_in_daytime
-  alias: "Auto-Lock Entrace Lock Top in Daytime"
+  alias: Auto-Lock Entrance Lock Top in Daytime
   trigger:
     - platform: time_pattern
       minutes: "/5"
@@ -815,7 +815,7 @@
   action:
     - service: script.lock_and_get_state_of_entrance_lock_top
 - id: automation.auto_lock_entrance_lock_top_in_nighttime
-  alias: "Auto-Lock Entrace Lock Top in Nighttime"
+  alias: Auto-Lock Entrance Lock Top in Nighttime
   trigger:
     - platform: time_pattern
       minutes: "/5"
@@ -840,18 +840,20 @@
   action:
     - service: script.lock_and_get_state_of_entrance_lock_top
 - id: automation.info_bathroom_washing_machine_has_been_finished
-  alias: "INFO: Bathroom Washer Machine Has Been Finished"
+  alias: "INFO: Bathroom Washing Machine Has Been Finished"
   trigger:
     - platform: numeric_state
       entity_id: sensor.bathroom_washing_machine_plug_current_comsumption
       below: 80
       for:
-        minutes: 1
+        minutes: 5
   condition:
     - condition: numeric_state
+      entity_id: sensor.unavailable_of_bathroom_washing_machine_plug_current_comsumption
+      below: 0.1
+    - condition: numeric_state
       entity_id: sensor.average_of_bathroom_washing_machine_plug_current_comsumption
-      attribute: max_value
-      above: 80
+      above: 50
   action:
     - service: notify.notify
       data:
@@ -2203,8 +2205,6 @@
     - service: homeassistant.update_entity
       target:
         entity_id:
-          - device_tracker.ping_bio
-          - device_tracker.ping_akikos_iphone12mini
           - sensor.entrance_lock_bottom_sensor
           - sensor.entrance_lock_top_sensor
   mode: single
