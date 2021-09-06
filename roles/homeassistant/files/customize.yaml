@@ -52,6 +52,8 @@ automation.alarm_living_room_humidity_difference_is_too_large:
   icon: mdi:water-percent-alert
 automation.alarm_living_room_temperature_difference_is_too_large:
   icon: mdi:thermometer-alert
+automation.alarm_papa_is_offline:
+  icon: mdi:access-point-network
 automation.alarm_regza_is_offline:
   icon: mdi:television
 automation.alarm_remo_bed_is_offline:
@@ -96,13 +98,13 @@ automation.info_bathroom_washing_machine_has_been_finished:
   icon: mdi:washing-machine
 automation.info_bedroom_humidity_is_too_high:
   icon: mdi:water-percent-alert
-automation.info_bedroom_temperature_is_too_high:
+automation.info_bedroom_wbgt_is_too_high:
   icon: mdi:thermometer-alert
 automation.info_denshobato:
   icon: mdi:bird
 automation.info_living_room_humidity_is_too_high:
   icon: mdi:water-percent-alert
-automation.info_living_room_temperature_is_too_high:
+automation.info_living_room_wbgt_is_too_high:
   icon: mdi:thermometer-alert
 automation.info_mamorail:
   icon: mdi:train
@@ -188,9 +190,9 @@ automation.turn_on_surveillance_when_nobody_is_in_home:
   icon: mdi:cctv
 automation.unlock_entrance_lock:
   icon: mdi:lock-open-variant
-automation.unlock_entrance_when_ios_action_fails:
+automation.unlock_entrance_lock_when_ios_action_fails:
   icon: mdi:lock-remove
-automation.unlock_entrance_when_ios_action_fires:
+automation.unlock_entrance_lock_when_ios_action_fires:
   icon: mdi:lock-open-variant
 automation.update_device_tracking_sensors:
   icon: mdi:radar
@@ -396,5 +398,7 @@ sensor.monitor_storage_akikos_iphone12mini:
   icon: mdi:cellphone-wireless
 sensor.monitor_storage_bio:
   icon: mdi:cellphone-wireless
+sensor.unavailable_of_bathroom_washing_machine_plug_current_comsumption:
+  icon: mdi:washing-machine-alert
 sensor.regza_channel:
   icon: mdi:television
