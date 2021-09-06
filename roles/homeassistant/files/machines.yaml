@@ -91,6 +91,28 @@ views:
       - type: entities
         title: Batteries
         entities:
+          - entity: sensor.balcony_thermometer_battery
+            name: Balcony Thermometer
+          - entity: sensor.bedroom_1_button_swtich_battery
+            name: Bedroom 1-Button Switch
+          - entity: sensor.bedroom_light_switch_battery_level
+            name: Bedroom Light Switch
+          - entity: sensor.bedroom_motion_sensor_n_battery
+            name: Bedroom Motion Sensor N
+          - entity: sensor.bedroom_motion_sensor_s_battery
+            name: Bedroom Motion Sensor S
+          - entity: sensor.bedroom_thermometer_battery
+            name: Bedroom Thermometer
+          - entity: sensor.bedroom_window_n_battery
+            name: Bedroom Window N
+          - entity: sensor.bedroom_window_s_battery
+            name: Bedroom Window S
+          - entity: sensor.entrance_1_button_switch_battery
+            name: Entrance 1-Button Switch
+          - entity: sensor.entrance_door_battery
+            name: Entrance Door
+          - entity: sensor.living_room_1_button_switch_battery
+            name: Living Room 1-Button Switch
           - entity: sensor.living_room_floor_thermometer_battery
             name: Living Room Floor Thermometer
           - entity: sensor.living_room_light_switch_battery_level
@@ -103,16 +125,6 @@ views:
             name: Study Window N
           - entity: sensor.study_window_s_battery
             name: Study Window S
-          - entity: sensor.bedroom_light_switch_battery_level
-            name: Bedroom Light Switch
-          - entity: sensor.bedroom_thermometer_battery
-            name: Bedroom Thermometer
-          - entity: sensor.bedroom_window_n_battery
-            name: Bedroom Window N
-          - entity: sensor.bedroom_window_s_battery
-            name: Bedroom Window S
-          - entity: sensor.balcony_thermometer_battery
-            name: Balcony Thermometer
       - type: entities
         title: Storages
         entities:
@@ -181,7 +193,5 @@ views:
       - type: entities
         title: Offline Alarm
         entities:
-          - entity: automation.alarm_internet_speed_is_too_slow
-            icon: 'mdi:speedometer-slow'
-            name: Internet
+          - entity: automation.alarm_akikos_iphone12mini_wifi_might_be_off
             secondary_info: last-triggered
