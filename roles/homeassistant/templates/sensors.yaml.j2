@@ -9,6 +9,12 @@
     - filter: lowpass
       window_size: 10
       time_constant: 24
+- platform: history_stats
+  entity_id: sensor.bathroom_washing_machine_plug_current_comsumption
+  name: Unavailable of Bathroom Washing Machine Plug Current Comsumption
+  state: unavailable
+  duration: 10
+  end: "{{ now() }}"
 - platform: imap_email_content
   name: Denshobato
   server: imap.gmail.com
@@ -238,6 +244,8 @@
 - platform: statistics
   entity_id: sensor.bathroom_washing_machine_plug_current_comsumption
   name: Average of Bathroom Washing Machine Plug Current Comsumption
+  sampling_size: 600
+  max_age: "00:10:00"
 - platform: statistics
   entity_id: sensor.bedroom_humidity_difference
   name: Average of Bedroom Humidity Difference
