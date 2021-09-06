@@ -63,11 +63,9 @@ cards:
   - type: entities
     title: Living Room Automations
     entities:
-      - entity: automation.turn_on_living_area_downlights
-        name: Turn on Downlights
+      - entity: automation.plan_to_turn_on_living_room_hvac_fan
+        name: Plan to Turn on HVAC Fan
         secondary_info: last-triggered
-      - entity: input_number.living_area_downlights_turned_on_threshold
-        name: Downlights Threshold
       - entity: automation.turn_down_living_area
         name: Turn down
         secondary_info: last-triggered
@@ -80,6 +78,42 @@ cards:
         name: Turned down More Time
       - entity: automation.turn_off_living_room_extra_lights
         name: Turn off Extra Lights
+        secondary_info: last-triggered
+      - entity: automation.turn_off_living_room_humidifier
+        name: Turn off Humidifier
+        secondary_info: last-triggered
+      - entity: input_number.living_room_humidifier_turned_off_threshold
+        name: Turned off Humidifier Threshold
+      - entity: automation.turn_off_living_room_hvac
+        name: Turn off HVAC
+        secondary_info: last-triggered
+      - entity: input_number.living_room_hvac_cool_turned_off_threshold
+        name: Turned off HVAC Cool Threshold
+      - entity: input_number.living_room_hvac_dry_turned_off_threshold
+        name: Turned off HVAC Dry Threshold
+      - entity: automation.turn_off_surveillance
+        name: Turn off Surveillance
+        secondary_info: last-triggered
+      - entity: automation.turn_on_living_area_downlights
+        name: Turn on Downlights
+        secondary_info: last-triggered
+      - entity: input_number.living_area_downlights_turned_on_threshold
+        name: Downlights Threshold
+      - entity: automation.turn_on_living_area_floor_heating
+        name: Turn on Floor Heatings
+        secondary_info: last-triggered
+      - entity: input_number.living_room_floor_heating_turned_on_threshold
+        name: Turned on Floor Heatings Threshold
+      - entity: automation.turn_on_living_room_ceiling_fan
+        name: Turn on Ceiling Fan
+        secondary_info: last-triggered
+      - entity: automation.turn_on_living_room_humidifier
+        name: Turn on Humidifier
+        secondary_info: last-triggered
+      - entity: input_number.living_room_humidifier_turned_on_threshold
+        name: Turned on Humidifier Threshold
+      - entity: automation.turn_on_living_room_hvac_cleaner
+        name: Turn on AC Cleaner
         secondary_info: last-triggered
       - entity: automation.turn_on_living_room_hvac_cool
         name: Turn on HVAC Cool
@@ -98,39 +132,11 @@ cards:
         name: Turned on HVAC Dry Threshold WBGT
       - entity: input_number.living_room_hvac_dry_turned_on_threshold_humidity
         name: Turned on HVAC Dry Threshold Humidity
-      - entity: automation.turn_off_living_room_hvac
-        name: Turn off HVAC
-        secondary_info: last-triggered
-      - entity: input_number.living_room_hvac_cool_turned_off_threshold
-        name: Turned off HVAC Cool Threshold
-      - entity: input_number.living_room_hvac_dry_turned_off_threshold
-        name: Turned off HVAC Dry Threshold
-      - entity: automation.turn_on_living_area_floor_heating
-        name: Turn on Floor Heatings
-        secondary_info: last-triggered
-      - entity: input_number.living_room_floor_heating_turned_on_threshold
-        name: Turned on Floor Heatings Threshold
-      - entity: automation.turn_on_living_room_humidifier
-        name: Turn on Humidifier
-        secondary_info: last-triggered
-      - entity: input_number.living_room_humidifier_turned_on_threshold
-        name: Turned on Humidifier Threshold
-      - entity: automation.turn_off_living_room_humidifier
-        name: Turn off Humidifier
-        secondary_info: last-triggered
-      - entity: input_number.living_room_humidifier_turned_off_threshold
-        name: Turned off Humidifier Threshold
-      - entity: automation.turn_on_living_room_ceiling_fan
-        name: Turn on Ceiling Fan
-        secondary_info: last-triggered
-      - entity: automation.turn_on_living_room_hvac_cleaner
-        name: Turn on AC Cleaner
+      - entity: automation.turn_on_living_room_hvac_fan
+        name: Turn on HVAC Fan
         secondary_info: last-triggered
       - entity: automation.turn_on_surveillance_when_nobody_is_in_home
         name: Turn on Surveillance
-        secondary_info: last-triggered
-      - entity: automation.turn_off_surveillance
-        name: Turn off Surveillance
         secondary_info: last-triggered
     show_header_toggle: false
   - type: vertical-stack
