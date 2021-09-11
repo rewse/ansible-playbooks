@@ -1717,6 +1717,10 @@
     - platform: state
       entity_id: binary_sensor.study_motion
       to: "on"
+    - platform: numeric_state
+      entity_id: sun.sun
+      attribute: elevation
+      below: -6.0
   condition:
     - condition: numeric_state
       entity_id: sensor.living_room_light_level
