@@ -948,6 +948,25 @@
     - delay:
         hours: 2
   mode: single
+- id: automation.info_entrance_auto_lock_is_off
+  alias: "INFO: Entrance Auto-Lock is Off"
+  trigger:
+    - platform: time_pattern
+      hours: "/2"
+      minutes: 48
+      seconds: 13
+  condition:
+    - condition: state
+      entity_id: alarm_control_panel.entrance_auto_lock
+      state: disarmed
+      for:
+        hours: 2
+  action:
+    - service: notify.tats_devices
+      data:
+        message: "Entrance Auto-Lock is Off"
+        data:
+          url: /lovelace/home
 - id: automation.info_denshobato
   alias: "INFO: Denshobato"
   trigger:
