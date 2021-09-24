@@ -25,9 +25,9 @@
     state: directory
   tags: [homeassistant]
 
-- name: Copy DST_Root_CA_X3.pem
+- name: Copy ISRG_Root_X1.pem
   copy:
-    src: /etc/ssl/certs/DST_Root_CA_X3.pem
+    src: /etc/ssl/certs/ISRG_Root_X1.pem
     dest: /etc/homeassistant/certs
     remote_src: yes
   tags: [homeassistant]
@@ -672,7 +672,7 @@
         port: 8883
         username: sub_client
         password: !secret mosquitto_password
-        certificate: /config/certs/DST_Root_CA_X3.pem
+        certificate: /config/certs/ISRG_Root_X1.pem
       nature_remo:
         access_token: !secret remo_token
       recorder:

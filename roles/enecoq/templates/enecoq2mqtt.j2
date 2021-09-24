@@ -26,13 +26,13 @@ send_enecoq_fee() {
         mosquitto_pub -r -t enecoq/fee/state \
             -u pub_client -P [% mosquitto_password %] \
             -h hass.rewse.jp -p 8883 \
-            --cafile /etc/ssl/certs/DST_Root_CA_X3.pem \
+            --cafile /etc/ssl/certs/ISRG_Root_X1.pem \
             -m online
     else
         mosquitto_pub -r -t enecoq/fee/state \
             -u pub_client -P [% mosquitto_password %] \
             -h hass.rewse.jp -p 8883 \
-            --cafile /etc/ssl/certs/DST_Root_CA_X3.pem \
+            --cafile /etc/ssl/certs/ISRG_Root_X1.pem \
             -m offline
     fi
 
@@ -57,7 +57,7 @@ send_enecoq_fee() {
         mosquitto_pub -r -t enecoq/fee \
             -u pub_client -P [% mosquitto_password %] \
             -h hass.rewse.jp -p 8883 \
-            --cafile /etc/ssl/certs/DST_Root_CA_X3.pem \
+            --cafile /etc/ssl/certs/ISRG_Root_X1.pem \
             -m "$json"
 
         retval=$?
@@ -78,13 +78,13 @@ send_enecoq_kwh() {
         mosquitto_pub -r -t enecoq/kwh/state \
             -u pub_client -P [% mosquitto_password %] \
             -h hass.rewse.jp -p 8883 \
-            --cafile /etc/ssl/certs/DST_Root_CA_X3.pem \
+            --cafile /etc/ssl/certs/ISRG_Root_X1.pem \
             -m online
     else
         mosquitto_pub -r -t enecoq/kwh/state \
             -u pub_client -P [% mosquitto_password %] \
             -h hass.rewse.jp -p 8883 \
-            --cafile /etc/ssl/certs/DST_Root_CA_X3.pem \
+            --cafile /etc/ssl/certs/ISRG_Root_X1.pem \
             -m offline
     fi
 
@@ -99,7 +99,7 @@ send_enecoq_kwh() {
     mosquitto_pub -r -t enecoq/kwh \
         -u pub_client -P [% mosquitto_password %] \
         -h hass.rewse.jp -p 8883 \
-        --cafile /etc/ssl/certs/DST_Root_CA_X3.pem \
+        --cafile /etc/ssl/certs/ISRG_Root_X1.pem \
         -m "$json"
 
     retval=$?
