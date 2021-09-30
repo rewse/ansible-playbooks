@@ -45,8 +45,8 @@ regza:
 remo_token: "[% vault_remo_token %]"
 sesame:
   api_key: "[% vault_sesame.api_key %]"
-  uuid_top: 2A7E1C52-71C2-F532-5E49-2B6F8FA1B6DC
-  uuid_bottom: 233B5C17-E7DB-D860-445F-1E28863BC7F6
+  uuid_top: 6D69522A-6A63-72DC-75AE-4057CF142B8B
+  uuid_bottom: E0A1A177-9F37-CD6A-05F4-E65AB625C0AC
   secret_top: "[% vault_sesame.secret_top %]"
   secret_bottom: "[% vault_sesame.secret_bottom %]"
 simple_thermostat_version: 2.4.2
