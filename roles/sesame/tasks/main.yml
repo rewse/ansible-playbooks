@@ -1,12 +1,4 @@
 ---
-- name: Install packages by pip
-  pip:
-    name:
-      - pysesame3
-    state: latest
-    executable: pip3
-  tags: [sesame, package, pip]
-
 - name: Copy sesame
   copy:
     src: sesame
