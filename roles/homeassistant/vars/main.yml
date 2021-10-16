@@ -58,4 +58,4 @@ tuyaplug:
   liv_key: "[% vault_tuyaplug.liv_key %]"
   bed_key: "[% vault_tuyaplug.bed_key %]"
   kit_key: "[% vault_tuyaplug.kit_key %]"
-xiaomi_gateway3_version: 1.2.1
+xiaomi_gateway3_version: 1.5.0
