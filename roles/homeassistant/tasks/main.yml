@@ -678,11 +678,6 @@
       recorder:
         db_url: !secret postgres_connstr
         purge_keep_days: 450
-      tplink:
-        discovery: false
-        switch:
-          - host: kasaplug-liv.rewse.jp
-          - host: kasaplug-ent.rewse.jp
   notify: Restart homeassistant
   tags: [homeassistant, homeassistant-component, homeassistant-custom]
 
