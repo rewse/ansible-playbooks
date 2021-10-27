@@ -15,7 +15,6 @@
 - name: Install packages by homebrew_cask
   homebrew_cask:
     name: 
-      - datagrip
       - dbeaver-community
       - font-noto-sans-cjk
       - gotomeeting
