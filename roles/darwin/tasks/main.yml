@@ -22,6 +22,7 @@
       - pwgen
       - python3
       - reattach-to-user-namespace
+      - switchaudio-osx
       - telnet
       - source-highlight
       - tmux
@@ -88,12 +89,10 @@
       - alfred
       - amazon-chime
       - amazon-music
-      - amazon-workdocs-drive
       - appcleaner
       - authy
       - bartender
       - calibre
-      - cardhop
       - chromedriver
       - cinebench
       - corretto
@@ -117,14 +116,14 @@
       - iterm2
       - jabra-direct
       - karabiner-elements
+      - keyboard-maestro
       - kindle
       - logitech-camera-settings
-      - logitech-unifying
       - macvim
       - notion
       - remember-the-milk
       - slack
-      - sony-ps4-remote-play
+      - sony-ps-remote-play
       - steelseries-engine
       - steermouse
       - tigervnc-viewer
@@ -143,7 +142,6 @@
     - 1099568401  # Home Assistant
     - 539883307   # LINE
     - 1480068668  # Messenger
-    - 1504024265  # Micro Sniff
     - 1295203466  # Microsoft Remote Desktop
     - 981430153   # Online
     - 445189367   # PopClip
@@ -173,3 +171,4 @@
 #     - https://www.blackmagicdesign.com/jp/products/davinciresolve/  # DaVinci Resolve
 #     - https://www.jpegmini.com/downloads/app                        # JPEGmini
 #     - https://www.ireasoning.com/mibbrowser.shtml                   # MIB Browser
+#     - https://www.xencelabs.com/support/download-drivers/           # Xencelabs Driver
