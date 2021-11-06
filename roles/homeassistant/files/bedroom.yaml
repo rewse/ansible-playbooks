@@ -71,6 +71,8 @@ cards:
         name: Turned off HVAC Cool Threshold
       - entity: input_number.bedroom_hvac_dry_turned_off_threshold
         name: Turned off HVAC Dry Threshold
+      - entity: input_number.bedroom_humidifier_turned_on_threshold
+        name: Turned on Humidifier Threshold
       - entity: automation.turn_on_bedroom_hvac_cleaner
         name: Turn on HVAC Cleaner
         secondary_info: last-triggered
