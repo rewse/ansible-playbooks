@@ -21,7 +21,7 @@ cards:
         name: TV Light
       - entity: light.living_room_entrance_light
         name: Entrance Light
-      - entity: switch.living_room_footlight
+      - entity: light.living_room_footlight
         name: Footlight
   - type: "custom:simple-thermostat"
     entity: climate.living_room_hvac
