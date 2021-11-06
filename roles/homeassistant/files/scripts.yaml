@@ -11,7 +11,7 @@ close_and_get_state_of_bedroom_curtains:
         entity_id: sensor.bedroom_curtains_position
   mode: queued
   max: 3
-  icon: mdi:window-shutter
+  icon: mdi:curtains-closed
 lock_and_get_state_of_entrance_lock_bottom:
   alias: Lock and Get State of Entrance Lock Bottom
   sequence:
@@ -49,7 +49,7 @@ open_and_get_state_of_bedroom_curtains:
         entity_id: sensor.bedroom_curtains_position
   mode: queued
   max: 3
-  icon: mdi:window-shutter-open
+  icon: mdi:curtains
 restart_zulu:
   alias: Restart zulu
   sequence:

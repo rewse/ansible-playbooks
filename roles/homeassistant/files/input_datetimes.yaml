@@ -1,11 +1,11 @@
 bedroom_curtains_opened_time:
   name: Bedroom Curtains Opened Time
   has_time: true
-  icon: mdi:window-shutter-alert
+  icon: mdi:curtains
 bedroom_curtains_opened_time_workday:
   name: Bedroom Curtains Opened Time for Workday
   has_time: true
-  icon: mdi:window-shutter-open
+  icon: mdi:curtains
 bedroom_turned_down_time:
   name: Bedroom Turned down Time
   has_time: true
