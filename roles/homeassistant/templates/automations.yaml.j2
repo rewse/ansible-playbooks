@@ -995,6 +995,47 @@
     - delay:
         hours: 2
   mode: single
+- id: automation.info_bedroom_humidity_is_too_low
+  alias: "INFO: Bedroom Humidity is Too Low"
+  trigger:
+    - platform: state
+      entity_id: binary_sensor.bedroom_motion_n
+      to: "on"
+    - platform: state
+      entity_id: binary_sensor.bedroom_motion_s
+      to: "on"
+  condition:
+    - condition: numeric_state
+      entity_id: sensor.bedroom_humidity
+      below: input_number.bedroom_humidifier_turned_on_threshold
+    - condition: sun
+      after: sunrise
+    - condition: or
+      conditions:
+        - condition: state
+          entity_id: binary_sensor.bedroom_window_n
+          state: "on"
+          for:
+            minutes: 30
+        - condition: state
+          entity_id: binary_sensor.bedroom_window_s
+          state: "on"
+          for:
+            minutes: 30
+    - condition: state
+      entity_id: binary_sensor.bedroom_presence
+      state: "on"
+  action:
+    - service: notify.all_devices
+      data:
+        message: "Bedroom Humidity is Too Low. Current: {{ states('sensor.bedroom_humidity') }}%"
+        data:
+          url: /lovelace/home
+          push:
+            interruption-level: time-sensitive
+    - delay:
+        hours: 2
+  mode: single
 - id: automation.info_bedroom_wbgt_is_too_high
   alias: "INFO: Bedroom WBGT is Too High"
   trigger:
@@ -1139,6 +1180,55 @@
     - service: notify.all_devices
       data:
         message: "Living Room Humidity is Too High. Current: {{ states('sensor.living_room_humidity') }}%"
+        data:
+          url: /lovelace/home
+          push:
+            interruption-level: time-sensitive
+    - delay:
+        hours: 2
+  mode: single
+- id: automation.info_living_room_humidity_is_too_low
+  alias: "INFO: Living Room Humidity is Too Low"
+  trigger:
+    - platform: state
+      entity_id: binary_sensor.living_room_motion
+      to: "on"
+    - platform: state
+      entity_id: binary_sensor.study_motion
+      to: "on"
+  condition:
+    - condition: numeric_state
+      entity_id: sensor.living_room_humidity
+      below: input_number.living_room_humidifier_turned_on_threshold
+    - condition: state
+      entity_id: switch.living_room_humidifier
+      state: "off"
+    - condition: sun
+      after: sunrise
+    - condition: or
+      conditions:
+        - condition: state
+          entity_id: binary_sensor.living_room_window
+          state: "on"
+          for:
+            minutes: 30
+        - condition: state
+          entity_id: binary_sensor.study_window_n
+          state: "on"
+          for:
+            minutes: 30
+        - condition: state
+          entity_id: binary_sensor.study_window_s
+          state: "on"
+          for:
+            minutes: 30
+    - condition: state
+      entity_id: binary_sensor.living_room_presence
+      state: "on"
+  action:
+    - service: notify.all_devices
+      data:
+        message: "Living Room Humidity is Too Low. Current: {{ states('sensor.living_room_humidity') }}%"
         data:
           url: /lovelace/home
           push:
@@ -1469,7 +1559,6 @@
   mode: single
 - id: automation.turn_off_living_room_humidifier
   alias: Turn off Living Room Humidifier
-  description: Turn off the humidifier in the living room when the humidity is too high
   trigger:
     - platform: state
       entity_id: binary_sensor.living_room_motion
@@ -1484,21 +1573,6 @@
     - condition: state
       entity_id: switch.living_room_humidifier
       state: "on"
-    - condition: state
-      entity_id: binary_sensor.living_room_window
-      state: "off"
-      for:
-        minutes: 30
-    - condition: state
-      entity_id: binary_sensor.study_window_n
-      state: "off"
-      for:
-        minutes: 30
-    - condition: state
-      entity_id: binary_sensor.study_window_s
-      state: "off"
-      for:
-        minutes: 30
   action:
     - service: switch.turn_off
       entity_id: switch.living_room_humidifier
@@ -1952,7 +2026,6 @@
   mode: single
 - id: automation.turn_on_living_room_humidifier
   alias: Turn on Living Room Humidifier
-  description: Turn on the humidifier on the living room when the humidity is too low
   trigger:
     - platform: state
       entity_id: binary_sensor.living_room_motion
