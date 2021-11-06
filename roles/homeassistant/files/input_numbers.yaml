@@ -1,3 +1,9 @@
+bedroom_humidifier_turned_on_threshold:
+  name: Bedroom Humidifier Turned on Threshold
+  min: 36
+  max: 44
+  unit_of_measurement: "%"
+  icon: mdi:water-percent-alert
 bedroom_hvac_cool_forcibly_turned_on_threshold:
   name: Bedroom HVAC Cool Forcibly Turned on Threshold
   min: 27
