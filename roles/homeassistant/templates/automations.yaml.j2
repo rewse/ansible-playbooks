@@ -1930,7 +1930,6 @@
         entity_id: light.bedroom_light
 - id: automation.turn_on_living_area_downlights
   alias: Turn on Living Area Downlights
-  description: Turn on the downlights in living area when the light level is too low
   trigger:
     - platform: state
       entity_id: binary_sensor.living_room_motion
@@ -1938,10 +1937,10 @@
     - platform: state
       entity_id: binary_sensor.study_motion
       to: "on"
-    - platform: numeric_state
-      entity_id: sun.sun
-      attribute: elevation
-      below: -6.0
+    - platform: sun
+      event: sunset
+      offset:
+        hours: 1
   condition:
     - condition: numeric_state
       entity_id: sensor.living_room_light_level
