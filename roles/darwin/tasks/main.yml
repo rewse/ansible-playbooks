@@ -27,6 +27,7 @@
       - source-highlight
       - tmux
       - tree
+      - watch
     update_homebrew: yes
   tags: [darwin, package, homebrew]
 
