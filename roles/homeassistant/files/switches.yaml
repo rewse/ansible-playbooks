@@ -1,7 +1,7 @@
 - platform: template
   switches:
     bedroom_hvac_cleaner:
-      unique_id: switch.template.bedroom_hvac_cleaner
+      unique_id: switch.bedroom_hvac_cleaner
       friendly_name: Bedroom HVAC Cleaner
       turn_on:
         service: rest_command.control_remo_device
@@ -34,7 +34,7 @@
           mdi:window-shutter
         {% endif %}
     living_room_floor_heating:
-      unique_id: switch.template.living_room_floor_heating
+      unique_id: switch.living_room_floor_heating
       friendly_name: Living Room Floor Heating
       turn_on:
         service: rest_command.control_switchbot_device
@@ -57,7 +57,7 @@
           mdi:grid
         {% endif %}
     living_room_humidifier:
-      unique_id: switch.template.living_room_humidifier
+      unique_id: switch.living_room_humidifier
       friendly_name: Living Room Humidifier
       turn_on:
         service: rest_command.control_switchbot_device
@@ -80,7 +80,7 @@
           mdi:air-humidifier
         {% endif %}
     living_room_hvac_cleaner:
-      unique_id: switch.template.living_room_hvac_cleaner
+      unique_id: switch.living_room_hvac_cleaner
       friendly_name: Living Room HVAC Cleaner
       turn_on:
         service: rest_command.control_remo_device
@@ -92,7 +92,7 @@
           signal_id: 70d5445a-3988-404b-82da-6793a1419425
       icon_template: mdi:broom
     study_floor_heating:
-      unique_id: switch.template.study_floor_heating
+      unique_id: switch.study_floor_heating
       friendly_name: Study Floor Heating
       turn_on:
         service: rest_command.control_switchbot_device
