@@ -70,11 +70,11 @@
           device_id: C12F0898BAC5
           command: press
       value_template: >
-        {{ states("sensor.living_room_humidifier_plug_current") | int > 200 }}
+        {{ states("sensor.living_room_humidifier_plug_current") | float > 0.2 }}
       icon_template: >
-        {% if states("sensor.living_room_humidifier_plug_current") | int > 200 %}
+        {% if states("sensor.living_room_humidifier_plug_current") | float > 0.2 %}
           mdi:air-humidifier
-        {% elif states("sensor.living_room_humidifier_plug_current") | int <= 200 %}
+        {% elif states("sensor.living_room_humidifier_plug_current") | float <= 0.2 %}
           mdi:air-humidifier-off
         {% else %}
           mdi:air-humidifier
