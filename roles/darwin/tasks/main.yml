@@ -138,6 +138,7 @@
 - name: Install packages by mas
   command: mas install {{item}}
   with_items:
+    - 545519333   # Amazon Prime Video
     - 417375580   # BetterSnapTool
     - 425264550   # Blackmagic Disk Speed Test
     - 1044629456  # GFXBench Metal
