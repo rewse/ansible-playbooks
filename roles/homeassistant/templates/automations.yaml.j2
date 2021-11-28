@@ -1010,18 +1010,6 @@
       below: input_number.bedroom_humidifier_turned_on_threshold
     - condition: sun
       after: sunrise
-    - condition: or
-      conditions:
-        - condition: state
-          entity_id: binary_sensor.bedroom_window_n
-          state: "on"
-          for:
-            minutes: 30
-        - condition: state
-          entity_id: binary_sensor.bedroom_window_s
-          state: "on"
-          for:
-            minutes: 30
     - condition: state
       entity_id: binary_sensor.bedroom_presence
       state: "on"
