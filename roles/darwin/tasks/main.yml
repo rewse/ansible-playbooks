@@ -92,6 +92,7 @@
       - amazon-music
       - amazon-workdocs-drive
       - appcleaner
+      - atok
       - authy
       - bartender
       - calibre
@@ -139,6 +140,7 @@
 - name: Install packages by mas
   command: mas install {{item}}
   with_items:
+    - 545519333   # Amazon Prime Video
     - 417375580   # BetterSnapTool
     - 425264550   # Blackmagic Disk Speed Test
     - 1044629456  # GFXBench Metal
@@ -170,7 +172,6 @@
 
 # - name: Install rest of the apps
 #   install_yourself:
-#     - https://mypassport.atok.com/                                  # Atok
 #     - https://www.blackmagicdesign.com/jp/products/davinciresolve/  # DaVinci Resolve
 #     - https://www.jpegmini.com/downloads/app                        # JPEGmini
 #     - https://www.ireasoning.com/mibbrowser.shtml                   # MIB Browser
