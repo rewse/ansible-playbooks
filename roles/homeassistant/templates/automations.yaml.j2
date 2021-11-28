@@ -432,7 +432,7 @@
       at: "22:30"
   condition:
     - condition: numeric_state
-      entity_id: sensor.kitchen_rice_cooker_plug_current_comsumption
+      entity_id: sensor.kitchen_rice_cooker_plug_power
       above: 40
   action:
     - service: notify.all_devices
@@ -928,16 +928,16 @@
   alias: "INFO: Bathroom Washing Machine Has Been Finished"
   trigger:
     - platform: numeric_state
-      entity_id: sensor.bathroom_washing_machine_plug_current_comsumption
+      entity_id: sensor.bathroom_washing_machine_plug_power
       below: 80
       for:
         minutes: 5
   condition:
     - condition: numeric_state
-      entity_id: sensor.unavailable_of_bathroom_washing_machine_plug_current_comsumption
+      entity_id: sensor.unavailable_of_bathroom_washing_machine_plug_power
       below: 0.1
     - condition: numeric_state
-      entity_id: sensor.average_of_bathroom_washing_machine_plug_current_comsumption
+      entity_id: sensor.average_of_bathroom_washing_machine_plug_power
       above: 50
   action:
     - service: notify.notify
