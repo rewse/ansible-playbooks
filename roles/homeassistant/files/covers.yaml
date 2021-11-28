@@ -18,7 +18,7 @@
         {% endif %}
       icon_template: >
         {% if states("sensor.bedroom_curtains_position") | int < 50 %}
-          mdi:window-shutter-open
+          mdi:curtains
         {% else %}
-          mdi:window-shutter
+          mdi:curtains-closed
         {% endif %}
