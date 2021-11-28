@@ -1332,8 +1332,10 @@
         data:
           push:
             interruption-level: active
-- id: automation.lock_entrance
-  alias: Lock Entrance
+# Do not merge with automation.lock_entrance_top. Because 
+# script.lock_and_get_state_of_entrance_lock_bottom waits 30 seconds.
+- id: automation.lock_entrance_bottom
+  alias: Lock Entrance Bottom
   trigger:
     - platform: state
       entity_id: sensor.entrance_1_button_switch_action
@@ -1342,9 +1344,18 @@
       entity_id: sensor.living_room_1_button_switch_action
       to: double
   action:
-    - service: lock.lock
-      target:
-        entity_id: lock.entrance_locks
+    - service: script.lock_and_get_state_of_entrance_lock_bottom
+- id: automation.lock_entrance_top
+  alias: Lock Entrance Top
+  trigger:
+    - platform: state
+      entity_id: sensor.entrance_1_button_switch_action
+      to: double
+    - platform: state
+      entity_id: sensor.living_room_1_button_switch_action
+      to: double
+  action:
+    - service: script.lock_and_get_state_of_entrance_lock_top
 - id: automation.open_bedroom_curtains_temporarily
   alias: Open Bedroom Curtains Temporarily
   description: Open the curtains in the bedroom temporarily
@@ -2358,8 +2369,10 @@
           push:
             interruption-level: time-sensitive
   mode: single
-- id: automation.unlock_entrance_lock
-  alias: Unlock Entrance Lock
+# Do not merge with automation.unlock_entrance_top. Because 
+# script.unlock_and_get_state_of_entrance_lock_bottom waits 30 seconds.
+- id: automation.unlock_entrance_lock_bottom
+  alias: Unlock Entrance Lock Bottom
   trigger:
     - platform: state
       entity_id: sensor.entrance_1_button_switch_action
@@ -2369,6 +2382,16 @@
       to: single
   action:
     - service: script.unlock_and_get_state_of_entrance_lock_bottom
+- id: automation.unlock_entrance_lock_top
+  alias: Unlock Entrance Lock Top
+  trigger:
+    - platform: state
+      entity_id: sensor.entrance_1_button_switch_action
+      to: single
+    - platform: state
+      entity_id: sensor.living_room_1_button_switch_action
+      to: single
+  action:
     - service: script.unlock_and_get_state_of_entrance_lock_top
 - id: automation.unlock_entrance_lock_when_ios_action_fails
   alias: Unlock Entrance Lock when iOS Action Fails
