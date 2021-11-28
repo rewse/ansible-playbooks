@@ -1120,10 +1120,13 @@
         entity_id: person.shibata_akiko
         state: home
     - delay:
-        minutes: 10
+        minutes: 5
     - service: lock.unlock
       target:
         entity_id: lock.entrance_locks
+    - service: alarm_control_panel.alarm_disarm
+      target:
+        entity_id: alarm_control_panel.entrance_auto_lock
   mode: single
 - id: automation.info_living_room_humidity_is_too_high
   alias: "INFO: Living Room Humidity is Too High"
@@ -1916,6 +1919,16 @@
     - service: light.turn_on
       target:
         entity_id: light.bedroom_light
+- id: automation.trun_on_entrance_auto_lock
+  alias: Turn on Entrance Auto-Lock
+  trigger:
+    - platform: state
+      entity_id: binary_sensor.entrance_door
+  action:
+    - service: alarm_control_panel.alarm_arm_home
+      target:
+        entity_id: alarm_control_panel.entrance_auto_lock
+  mode: single
 - id: automation.turn_on_living_area_downlights
   alias: Turn on Living Area Downlights
   trigger:
