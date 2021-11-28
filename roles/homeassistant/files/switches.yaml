@@ -29,9 +29,9 @@
         {{ states("sensor.bedroom_curtains_position") | int < 50 }}
       icon_template: >
         {% if states("sensor.bedroom_curtains_position") | int < 50 %}
-          mdi:window-shutter-open
+          mdi:curtains
         {% else %}
-          mdi:window-shutter
+          mdi:curtains-closed
         {% endif %}
     living_room_floor_heating:
       unique_id: switch.living_room_floor_heating
@@ -70,11 +70,11 @@
           device_id: C12F0898BAC5
           command: press
       value_template: >
-        {{ states("sensor.living_room_humidifier_plug_current") | float > 0.2 }}
+        {{ states("sensor.living_room_humidifier_plug_power") | float > 20 }}
       icon_template: >
-        {% if states("sensor.living_room_humidifier_plug_current") | float > 0.2 %}
+        {% if states("sensor.living_room_humidifier_plug_power") | float > 20 %}
           mdi:air-humidifier
-        {% elif states("sensor.living_room_humidifier_plug_current") | float <= 0.2 %}
+        {% elif states("sensor.living_room_humidifier_plug_power") | float <= 20 %}
           mdi:air-humidifier-off
         {% else %}
           mdi:air-humidifier
