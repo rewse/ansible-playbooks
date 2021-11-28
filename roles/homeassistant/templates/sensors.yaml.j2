@@ -10,8 +10,8 @@
       window_size: 10
       time_constant: 24
 - platform: history_stats
-  entity_id: sensor.bathroom_washing_machine_plug_current_comsumption
-  name: Unavailable of Bathroom Washing Machine Plug Current Comsumption
+  entity_id: sensor.bathroom_washing_machine_plug_power
+  name: Unavailable of Bathroom Washing Machine Plug Power
   state: unavailable
   duration: 10
   end: "{{ now() }}"
@@ -242,8 +242,8 @@
   sampling_size: 183600
   max_age: "51:00:00"
 - platform: statistics
-  entity_id: sensor.bathroom_washing_machine_plug_current_comsumption
-  name: Average of Bathroom Washing Machine Plug Current Comsumption
+  entity_id: sensor.bathroom_washing_machine_plug_power
+  name: Average of Bathroom Washing Machine Plug Power
   sampling_size: 600
   max_age: "00:10:00"
 - platform: statistics
