@@ -78,6 +78,12 @@
     icon: mdi:thermometer-alert
     device_class: temperature
     unit_of_measurement: °C
+  - name: Living Room Temperature Effect of Floor Hearting
+    unique_id: sensor.living_room_temperature_effect_of_floor_heating
+    state: "{{ states('sensor.living_room_floor_temperature') | float - states('sensor.living_room_temperature') | float }}"
+    icon: mdi:thermometer
+    device_class: temperature
+    unit_of_measurement: °C
   - name: Living Room WBGT
     unique_id: sensor.living_room_wbgt
     state: "{{ ((states('sensor.living_room_temperature') | float - 30.5) * 0.90739 + (states('sensor.living_room_humidity') | float - 60.0) * 0.14775 + (states('sensor.living_room_temperature') | float - 30.5) * (states('sensor.living_room_humidity') | float - 60.0) * 0.003655 + 27.77) | round(2) }}"
