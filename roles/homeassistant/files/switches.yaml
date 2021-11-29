@@ -47,11 +47,11 @@
           device_id: E55CF11F894A
           command: press
       value_template: >
-        {{ (states('sensor.living_room_floor_temperature') | float - states('sensor.living_room_temperature') | float) > 1 }}
+        {{ sensor.living_room_temperature_effect_of_floor_heating | float > 1 }}
       icon_template: >
-        {% if (states('sensor.living_room_floor_temperature') | float - states('sensor.living_room_temperature') | float) > 1 %}
+        {% if sensor.living_room_temperature_effect_of_floor_heating | float > 1 %}
           mdi:grid
-        {% elif (states('sensor.living_room_floor_temperature') | float - states('sensor.living_room_temperature') | float) <= 1 %}
+        {% elif sensor.living_room_temperature_effect_of_floor_heating | float <= 1 %}
           mdi:grid-off
         {% else %}
           mdi:grid
@@ -105,11 +105,11 @@
           device_id: D0ECA7E7803F
           command: press
       value_template: >
-        {{ (states('sensor.living_room_floor_temperature') | float - states('sensor.living_room_temperature') | float) > 1 }}
+        {{ sensor.living_room_temperature_effect_of_floor_heating | float > 1 }}
       icon_template: >
-        {% if (states('sensor.living_room_floor_temperature') | float - states('sensor.living_room_temperature') | float) > 1 %}
+        {% if sensor.living_room_temperature_effect_of_floor_heating | float > 1 %}
           mdi:grid
-        {% elif (states('sensor.living_room_floor_temperature') | float - states('sensor.living_room_temperature') | float) <= 1 %}
+        {% elif sensor.living_room_temperature_effect_of_floor_heating | float <= 1 %}
           mdi:grid-off
         {% else %}
           mdi:grid
