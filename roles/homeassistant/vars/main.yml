@@ -49,7 +49,7 @@ sesame:
   uuid_bottom: E0A1A177-9F37-CD6A-05F4-E65AB625C0AC
   secret_top: "[% vault_sesame.secret_top %]"
   secret_bottom: "[% vault_sesame.secret_bottom %]"
-simple_thermostat_version: 2.4.2
+simple_thermostat_version: 2.4.3
 simple_weather_card_version: 0.8.2
 switchbot_token: "[% vault_switchbot_token %]"
 uptime_card_version: 0.4.0
@@ -58,4 +58,4 @@ tuyaplug:
   liv_key: "[% vault_tuyaplug.liv_key %]"
   bed_key: "[% vault_tuyaplug.bed_key %]"
   kit_key: "[% vault_tuyaplug.kit_key %]"
-xiaomi_gateway3_version: 1.5.0
+xiaomi_gateway3_version: 1.6.3
