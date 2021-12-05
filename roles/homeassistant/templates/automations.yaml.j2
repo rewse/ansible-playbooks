@@ -66,6 +66,24 @@
           push:
             interruption-level: time-sensitive
   mode: single
+- id: automation.alarm_amazonplug_sto_is_offline
+  alias: "ALARM: amazonplug-sto is Offline"
+  trigger:
+    - platform: state
+      entity_id: binary_sensor.amazonplug_sto
+      to: "off"
+      for:
+        minutes: 31
+  action:
+    - service: notify.tats_devices
+      data:
+        title: "⚠️ ALARM"
+        message: amazonplug-sto is Offline
+        data:
+          url: /lovelace-machines/machines
+          push:
+            interruption-level: time-sensitive
+  mode: single
 - id: automation.alarm_aventage_is_offline
   alias: "ALARM: aventage is Offline"
   trigger:
