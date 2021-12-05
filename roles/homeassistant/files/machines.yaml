@@ -14,7 +14,7 @@ views:
           - entity: binary_sensor.xray_liv
           - entity: binary_sensor.xray_sto
           - entity: binary_sensor.papa
-        hours_to_show: 6
+        hours_to_show: 12
       - type: history-graph
         title: Ping Devices
         entities:
@@ -25,6 +25,7 @@ views:
           - entity: binary_sensor.hotel
           - entity: binary_sensor.amazonplug_bed
           - entity: binary_sensor.amazonplug_liv
+          - entity: binary_sensor.amazonplug_sto
           - entity: binary_sensor.aventage
           - entity: binary_sensor.catloghome_bed
           - entity: binary_sensor.catloghome_liv
@@ -47,7 +48,7 @@ views:
           - entity: binary_sensor.tuyaplug_liv
           - entity: binary_sensor.wfirex
           - entity: binary_sensor.xiaomigateway
-        hours_to_show: 6
+        hours_to_show: 12
       - type: vertical-stack
         cards:
           - type: history-graph
