@@ -46,3 +46,6 @@ cards:
       - entity: automation.update_device_tracking_sensors
         secondary_info: last-triggered
     show_header_toggle: false
+  - type: picture-entity
+    name: Entrance Camera
+    entity: camera.entrance_camera
