@@ -6,6 +6,8 @@ binary_sensor.amazonplug_bed:
   icon: mdi:power-socket-jp
 binary_sensor.amazonplug_liv:
   icon: mdi:power-socket-jp
+binary_sensor.amazonplug_sto:
+  icon: mdi:power-socket-jp
 binary_sensor.aventage:
   icon: mdi:audio-video
 binary_sensor.catloghome_bed:
