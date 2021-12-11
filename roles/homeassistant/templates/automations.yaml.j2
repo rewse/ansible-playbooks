@@ -1543,6 +1543,31 @@
     - service: light.turn_off
       target:
         entity_id: light.bedroom_light
+- id: automation.turn_off_living_area_floor_heating
+  alias: Turn off Living Area Floor Heating
+  trigger:
+    - platform: time_pattern
+      minutes: "/5"
+      seconds: 11
+  condition:
+    - condition: state
+      entity_id: group.living_area_floor_heatings
+      state: "on"
+    - condition: state
+      entity_id: binary_sensor.living_room_presence
+      state: "off"
+      for:
+        hours: 2
+    - condition: time
+      after: "00:00:00"
+      before: "07:00:00"
+  action:
+    - service: switch.turn_off
+      target:
+        entity_id:
+          - switch.living_room_floor_heating
+          - switch.study_floor_heating
+  mode: single
 - id: automation.turn_off_living_area_lights
   alias: Turn off Living Area Lights
   description: Turn off the living area lights when iOS action fires
