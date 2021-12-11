@@ -1714,9 +1714,12 @@
     - service: light.turn_off
       target:
         entity_id: light.living_area_lights
-    - service: fan.turn_off
+    - service: switch.turn_off
       target:
-        entity_id: fan.living_room_ceiling_fans
+        entity_id:
+          - switch.living_room_floor_heating
+          - switch.study_floor_heating
+          - switch.living_room_humidifier
     - service: climate.turn_off
       target:
         entity_id: climate.living_room_hvac
