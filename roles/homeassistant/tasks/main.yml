@@ -611,9 +611,9 @@
             pm: sensor.living_room_pm25
       ifttt:
         key: !secret ifttt_key
-      jq300:
-        username: !secret jq300_username
-        password: !secret jq300_password
+      #jq300:
+      #  username: !secret jq300_username
+      #  password: !secret jq300_password
       logger:
         default: warning
         logs:
