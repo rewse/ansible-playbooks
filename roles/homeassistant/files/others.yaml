@@ -49,3 +49,6 @@ cards:
   - type: picture-entity
     name: Entrance Camera
     entity: camera.entrance_camera
+  - type: picture-entity
+    name: Storage Camera
+    entity: camera.storage_camera
