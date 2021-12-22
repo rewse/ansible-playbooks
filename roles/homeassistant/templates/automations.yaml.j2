@@ -252,6 +252,24 @@
           push:
             interruption-level: time-sensitive
   mode: single
+- id: automation.alarm_catloghome_sto_is_offline
+  alias: "ALARM: catloghome-sto is Offline"
+  trigger:
+    - platform: state
+      entity_id: binary_sensor.catloghome_sto
+      to: "off"
+      for:
+        minutes: 31
+  action:
+    - service: notify.tats_devices
+      data:
+        title: "⚠️ ALARM"
+        message: catloghome-sto is Offline
+        data:
+          url: /lovelace-machines/machines
+          push:
+            interruption-level: time-sensitive
+  mode: single
 - id: automation.alarm_daikinhvac_is_offline
   alias: "ALARM: daikinhvac is Offline"
   trigger:
