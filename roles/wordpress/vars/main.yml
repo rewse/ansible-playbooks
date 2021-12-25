@@ -1,3 +1,11 @@
 ---
-aurora:
-  wordpress_password: "{{vault_aurora.wordpress_password}}"
+wordpress:
+  db_password: "{{ vault_wordpress.db_password }}"
+  auth_key: "{{ vault_wordpress.auth_key }}"
+  secure_auth_key: "{{ vault_wordpress.secure_auth_key }}"
+  logged_in_key: "{{ vault_wordpress.logged_in_key }}"
+  nonce_key: "{{ vault_wordpress.nonce_key }}"
+  auth_salt: "{{ vault_wordpress.auth_salt }}"
+  secure_autl_salt: "{{ vault_wordpress.secure_autl_salt }}"
+  logged_in_salt: "{{ vault_wordpress.logged_in_salt }}"
+  nonce_salt: "{{ vault_wordpress.nonce_salt }}"

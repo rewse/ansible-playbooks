@@ -1,58 +1,66 @@
 ---
-- name: Clone wordpress
-  git:
-    repo: git@github.com:rewse/WordPress.git
-    dest: /srv/www/wordpress
-    accept_hostkey: yes
-    key_file: /home/{{ admin }}/.ssh/id_rsa
-    force: yes
+- name: Install packages
+  apt:
+    name:
+      - php-curl
+      - php-imagick
+      - php-zip
+      - wordpress
+  tags: [wordpress, package]
+
+- name: Extract wordpress.zip
+  ansible.builtin.unarchive:
+    src: https://wordpress.org/latest.zip
+    dest: /srv/www
+    remote_src: yes
+    owner: www-data
+    group: www-data
   tags: [wordpress]
 
-- name: Copy wp-cache-config.php
-  copy:
-    src: wp-cache-config.php
-    dest: /srv/www/wordpress/wp-content
+- name: Copy wp-confg.php
+  ansible.builtin.template:
+    src: wp-config.php.j2
+    dest: /srv/www/wordpress/wp-config.php
+    owner: root
+    group: www-data
   tags: [wordpress]
 
-- name: Copy wp-db-config.php
-  template:
-    src: wp-db-config.php.j2
-    dest: /srv/www/wordpress/wp-db-config.php
+- name: Copy htaccess
+  ansible.builtin.copy:
+    src: htaccess
+    dest: /srv/www/wordpress/.htaccess
+    owner: www-data
+    group: www-data
   tags: [wordpress]
 
 - name: Copy wordpress.conf
-  template:
-    src: wordpress.conf.j2
-    dest: /etc/apache2/conf-available/wordpress.conf
+  ansible.builtin.copy:
+    src: wordpress.conf
+    dest: /etc/apache2/conf-available
   notify: Reload apache
   tags: [wordpress]
 
 - name: Enable wordpress.conf
-  command: a2enconf wordpress
+  ansible.builtin.command: a2enconf wordpress
   notify: Reload apache
   tags: [wordpress]
 
 - name: Copy welcome.conf
-  copy:
+  ansible.builtin.copy:
     src: welcome.conf
     dest: /etc/apache2/conf-available
   notify: Reload apache
   tags: [wordpress]
 
 - name: Enable welcome.conf
-  command: a2enconf welcome
+  ansible.builtin.command: a2enconf welcome
   notify: Reload apache
   tags: [wordpress]
 
-- name: Copy wordpress.cron
-  copy:
-    src: wordpress.cron
-    dest: /etc/cron.hourly
-    mode: 0755
-  tags: [wordpress]
-
-- name: Set perm
-  command: ./permset.sh
-  args:
-    chdir: /srv/www/wordpress
+- name: Enable htaccess
+  ansible.builtin.lineinfile:
+    dest: /etc/apache2/apache2.conf
+    regexp: "^	AllowOverride "
+    line: "	AllowOverride All"
+  notify: Reload apache
   tags: [wordpress]
