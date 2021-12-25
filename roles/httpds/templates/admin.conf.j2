@@ -1,6 +1,6 @@
 <IfModule mod_rewrite.c>
     <Directory /srv/www/html/admin>
-        Require ip {{ global_ip.home }} {{ global_ip.office }}
+        Require ip 192.168.0.0/16 10.0.0.0/16 {{ global_ip.home }} {{ global_ip.office }} {{ ipv6.home }} {{ ipv6.aws }}
 
         RewriteEngine on
         RewriteCond %{HTTPS} !=on
