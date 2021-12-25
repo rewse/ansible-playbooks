@@ -3,7 +3,7 @@
   become: yes
   remote_user: ubuntu
   roles:
-    - apache
+    - httpd
     - wordpress
     - zabbix/server
     - zabbix/money/market
