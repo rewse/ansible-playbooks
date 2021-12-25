@@ -4,8 +4,8 @@
   remote_user: ubuntu
   roles:
     - dhcpd
-    - apache
     - docker
     - homeassistant
+    - httpd
     - mhz19
     - mosquitto
