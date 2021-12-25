@@ -4,14 +4,14 @@
     path: /srv/www
     state: directory
     mode: 0755
-  tags: [apache]
+  tags: [httpd]
 
 - name: Create /var/www link
   file:
     src: /srv/www
     dest: /var/www
     state: link
-  tags: [apache]
+  tags: [httpd]
 
 - name: Install packages
   apt:
@@ -19,7 +19,7 @@
       - apache2
       - php
       - php-mysql
-  tags: [apache, package, php]
+  tags: [httpd, package, php]
 
 - name: Enable modules
   apache2_module:
@@ -29,19 +29,19 @@
     - ssl
     - status
   notify: Reload apache
-  tags: [apache]
+  tags: [httpd]
 
 - name: Enable SSL conf
   command: a2ensite default-ssl
   notify: Reload apache
-  tags: [apache]
+  tags: [httpd]
 
 - name: Add an apt key for mod_pagespeed
   apt_key:
     url: https://dl.google.com/linux/linux_signing_key.pub
   when:
     ansible_architecture == "x86_64"
-  tags: [apache, package]
+  tags: [httpd, package]
 
 - name: Install mod_pagespeed
   apt:
@@ -49,7 +49,7 @@
   when:
     ansible_architecture == "x86_64"
   notify: Reload apache
-  tags: [apache, package]
+  tags: [httpd, package]
 
 - name: Set ServerName
   lineinfile:
@@ -58,7 +58,7 @@
     regexp: "^	ServerName "
     line: "	ServerName rewse.jp:80"
   notify: Reload apache
-  tags: [apache]
+  tags: [httpd]
 
 - name: Set ServerAdmin for http
   lineinfile:
@@ -66,7 +66,7 @@
     regexp: "^	ServerAdmin "
     line: "	ServerAdmin hostmaster@rewse.jp"
   notify: Reload apache
-  tags: [apache]
+  tags: [httpd]
 
 - name: Set ServerAdmin for https
   lineinfile:
@@ -74,7 +74,7 @@
     regexp: "^		ServerAdmin "
     line: "		ServerAdmin hostmaster@rewse.jp"
   notify: Reload apache
-  tags: [apache]
+  tags: [httpd]
 
 - name: Disable ErrorLog in 000-default.conf
   lineinfile:
@@ -82,7 +82,7 @@
     regexp: "^	ErrorLog "
     line: "	#ErrorLog ${APACHE_LOG_DIR}/error.log"
   notify: Reload apache
-  tags: [apache]
+  tags: [httpd]
 
 - name: Disable ErrorLog in default-ssl.conf
   lineinfile:
@@ -90,7 +90,7 @@
     regexp: "^		ErrorLog "
     line: "		#ErrorLog ${APACHE_LOG_DIR}/error.log"
   notify: Reload apache
-  tags: [apache]
+  tags: [httpd]
 
 - name: Set ErrorLog
   lineinfile:
@@ -98,7 +98,7 @@
     regexp: "^ErrorLog "
     line: "ErrorLog syslog"
   notify: Reload apache
-  tags: [apache]
+  tags: [httpd]
 
 - name: Set LogLevel
   lineinfile:
@@ -106,7 +106,7 @@
     regexp: "^LogLevel "
     line: "LogLevel notice"
   notify: Reload apache
-  tags: [apache]
+  tags: [httpd]
 
 - name: Set LogFormat for combined
   lineinfile:
@@ -114,81 +114,81 @@
     regexp: "^LogFormat ..* combined$"
     line: 'LogFormat "%{X-Forwarded-For}i %h %l %u %t \"%r\" %>s %b \"%{Referer}i\" \"%{User-Agent}i\"" combined'
   notify: Reload apache
-  tags: [apache]
+  tags: [httpd]
 
 - name: Copy 00-forcessl.conf
   copy:
     src: 00-forcessl.conf
     dest: /etc/apache2/conf-available
-  tags: [apache]
+  tags: [httpd]
 
 - name: Enable forcessl
   command: a2enconf 00-forcessl
   notify: Reload apache
-  tags: [apache]
+  tags: [httpd]
 
 - name: Copy admin.conf
   template:
     src: admin.conf.j2
     dest: /etc/apache2/conf-available/admin.conf
-  tags: [apache]
+  tags: [httpd]
 
 - name: Enable admin
   command: a2enconf admin
   notify: Reload apache
-  tags: [apache]
+  tags: [httpd]
 
 - name: Copy status.conf
   template:
     src: status.conf.j2
     dest: /etc/apache2/conf-available/status.conf
   notify: Reload apache
-  tags: [apache]
+  tags: [httpd]
 
 - name: Enable status
   command: a2enconf status
   notify: Reload apache
-  tags: [apache]
+  tags: [httpd]
 
 - name: Create html/admin dir
   file:
     path: /srv/www/html/admin
     state: directory
-  tags: [apache]
+  tags: [httpd]
 
 - name: Copy phpinfo.php
   copy:
     src: phpinfo.php
     dest: /srv/www/html/admin
-  tags: [apache]
+  tags: [httpd]
 
 - name: Copy timezone.ini
   copy:
     src: timezone.ini
     dest: /etc/php/{{ php_version }}/mods-available
-  tags: [apache, php]
+  tags: [httpd, php]
 
 - name: Enable timezone
   command: phpenmod -v {{ php_version }} -s ALL timezone
   notify: Restart apache
-  tags: [apache, php]
+  tags: [httpd, php]
 
 - name: Make agentscripts dir
   file:
     path: /usr/lib/zabbix/agentscripts
     state: directory
-  tags: [apache, zabbix-agent]
+  tags: [httpd, zabbix-agent]
 
 - name: Copy apache.sh
   copy:
     src: apache.sh
     dest: /usr/lib/zabbix/agentscripts
     mode: 0755
-  tags: [apache, zabbix-agent]
+  tags: [httpd, zabbix-agent]
 
 - name: Copy apache.conf
   template:
     src: apache.conf.j2
     dest: /etc/zabbix/zabbix_agentd.d/apache.conf
   notify: Restart zabbix-agent
-  tags: [apache, zabbix-agent]
+  tags: [httpd, zabbix-agent]

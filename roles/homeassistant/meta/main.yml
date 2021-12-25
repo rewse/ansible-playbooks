@@ -1,5 +1,5 @@
 ---
 dependencies:
-  - {role: apache}
+  - {role: httpd}
   - {role: docker}
   - {role: sesame}
