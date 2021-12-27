@@ -64,3 +64,22 @@
     line: "	AllowOverride All"
   notify: Reload apache
   tags: [wordpress]
+
+- name: Add a filter for Yoast SEO
+  ansible.builtin.blockinfile:
+    path: /srv/www/wordpress/wp-content/themes/fukasawa/functions.php
+    block: |
+
+      /* ---------------------------------------------------------------------------------------------
+      CUSTOMIZE BY OWNER
+      --------------------------------------------------------------------------------------------- */
+
+      if ( ! function_exists( 'rewse_override_og_locale' ) ) {
+
+          function rewse_override_og_locale( $locale ) {
+              return 'ja_JP';
+          }
+          add_filter( 'wpseo_locale', 'rewse_override_og_locale' );
+
+      }
+  tags: [wordpress]
