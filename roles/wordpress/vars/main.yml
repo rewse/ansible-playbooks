@@ -6,6 +6,6 @@ wordpress:
   logged_in_key: "{{ vault_wordpress.logged_in_key }}"
   nonce_key: "{{ vault_wordpress.nonce_key }}"
   auth_salt: "{{ vault_wordpress.auth_salt }}"
-  secure_autl_salt: "{{ vault_wordpress.secure_autl_salt }}"
+  secure_auth_salt: "{{ vault_wordpress.secure_auth_salt }}"
   logged_in_salt: "{{ vault_wordpress.logged_in_salt }}"
   nonce_salt: "{{ vault_wordpress.nonce_salt }}"
