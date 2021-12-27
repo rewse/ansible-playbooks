@@ -8,14 +8,14 @@
       - wordpress
   tags: [wordpress, package]
 
-- name: Extract wordpress.zip
-  ansible.builtin.unarchive:
-    src: https://wordpress.org/latest.zip
-    dest: /srv/www
-    remote_src: yes
-    owner: www-data
-    group: www-data
-  tags: [wordpress]
+#- name: Extract wordpress.zip
+#  ansible.builtin.unarchive:
+#    src: https://wordpress.org/latest.zip
+#    dest: /srv/www
+#    remote_src: yes
+#    owner: www-data
+#    group: www-data
+#  tags: [wordpress]
 
 - name: Copy wp-confg.php
   ansible.builtin.template:
