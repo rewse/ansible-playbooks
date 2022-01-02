@@ -53,4 +53,4 @@ simple_thermostat_version: 2.4.3
 simple_weather_card_version: 0.8.2
 switchbot_token: "[% vault_switchbot_token %]"
 uptime_card_version: 0.4.0
-xiaomi_gateway3_version: 1.6.3
+xiaomi_gateway3_version: 1.6.5
