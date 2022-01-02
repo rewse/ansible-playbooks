@@ -1,6 +1,6 @@
 ---
 - name: Install packages
-  apt:
+  ansible.builtin.apt:
     name:
       - php-curl
       - php-imagick
@@ -21,7 +21,7 @@
   ansible.builtin.template:
     src: wp-config.php.j2
     dest: /srv/www/wordpress/wp-config.php
-    owner: root
+    owner: www-data
     group: www-data
   tags: [wordpress]
 
