@@ -2051,6 +2051,9 @@
     - condition: numeric_state
       entity_id: sensor.living_room_temperature
       below: input_number.living_room_floor_heating_turned_on_threshold
+    - condition: state
+      entity_id: group.living_area_floor_heatings
+      state: "off"
     - condition: sun
       after: sunrise
     - condition: state
