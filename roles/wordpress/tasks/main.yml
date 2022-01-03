@@ -72,6 +72,13 @@
   notify: Reload apache
   tags: [wordpress]
 
+- name: Copy 30-wordpress.ini
+  ansible.builtin.copy:
+    src: 30-wordpress.ini
+    dest: /etc/php/7.4/apache2/conf.d
+  notify: Reload apache
+  tags: [wordpress]
+
 - name: Add a filter for Yoast SEO
   ansible.builtin.blockinfile:
     path: /srv/www/wordpress/wp-content/themes/fukasawa/functions.php
