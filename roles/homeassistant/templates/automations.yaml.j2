@@ -2033,8 +2033,7 @@
       to: "on"
     - platform: sun
       event: sunset
-      offset:
-        hours: 1
+      offset: "-00:30:00"
   condition:
     - condition: numeric_state
       entity_id: sensor.living_room_light_level
