@@ -123,3 +123,10 @@
     regexp: '<html class="no-js" '
     line: '<html class="no-js" lang="ja">'
   tags: [wordpress]
+
+- name: Replace copyright
+  ansible.builtin.lineinfile:
+    path: /srv/www/wordpress/wp-content/themes/fukasawa/header.php
+    regexp: '<p>&copy;'
+    line: "                <p>&copy; <?php echo date( 'Y' ); ?> <a href=\"<?php echo esc_url( home_url( '/' ) ); ?>\">Tats Shibata</a>.</p>"
+  tags: [wordpress]
