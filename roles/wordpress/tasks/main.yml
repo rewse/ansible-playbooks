@@ -116,3 +116,10 @@
 
       }
   tags: [wordpress]
+
+- name: Replace lang
+  ansible.builtin.lineinfile:
+    path: /srv/www/wordpress/wp-content/themes/fukasawa/header.php
+    regexp: '<html class="no-js" '
+    line: '<html class="no-js" lang="ja">'
+  tags: [wordpress]
