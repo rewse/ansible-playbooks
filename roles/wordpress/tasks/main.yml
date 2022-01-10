@@ -130,3 +130,14 @@
     regexp: '<p>&copy;'
     line: "                <p>&copy; <?php echo date( 'Y' ); ?> <a href=\"<?php echo esc_url( home_url( '/' ) ); ?>\">Tats Shibata</a>.</p>"
   tags: [wordpress]
+
+- name: Add an author box
+  ansible.builtin.blockinfile:
+    path: /srv/www/wordpress/wp-content/themes/fukasawa/singular.php
+    marker: "<!-- {mark} ANSIBLE MANAGED BLOCK -->"
+    insertbefore: '</div><!-- .post-inner -->'
+    block: |2
+                          <?php if ( function_exists( 'wpsabox_author_box' ) ) echo wpsabox_author_box(); ?>
+
+                          <p class="post-disclaimer">ここで示されている見解は私自身のものであって、所属組織の見解を反映しておりません。</p>
+  tags: [wordpress]
