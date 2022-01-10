@@ -101,4 +101,18 @@
           add_filter( 'wpseo_locale', 'rewse_override_og_locale' );
 
       }
+
+      if ( ! function_exists( 'rewse_override_inlanguage' ) ) {
+        
+        function rewse_override_inlanguage( $data ) {
+          $data['inLanguage'] = 'ja_JP';
+          return $data;
+        }
+        add_filter( 'wpseo_schema_article', 'rewse_override_inlanguage' );
+        add_filter( 'wpseo_schema_imageobject', 'rewse_override_inlanguage' );
+        add_filter( 'wpseo_schema_person', 'rewse_override_inlanguage' );
+        add_filter( 'wpseo_schema_webpage', 'rewse_override_inlanguage' );
+        add_filter( 'wpseo_schema_website', 'rewse_override_inlanguage' );
+
+      }
   tags: [wordpress]
