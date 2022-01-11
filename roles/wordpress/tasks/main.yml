@@ -139,5 +139,7 @@
     block: |2
                           <?php if ( function_exists( 'wpsabox_author_box' ) ) echo wpsabox_author_box(); ?>
 
-                          <p class="post-disclaimer">ここで示されている発言は個人の見解であり、所属する組織の公式見解ではありません。</p>
+                          <?php if ( ! is_page() ) : ?>
+                            <p class="post-disclaimer">ここで示されている発言は個人の見解であり、所属する組織の公式見解ではありません。</p>
+                          <?php endif; ?>
   tags: [wordpress]
