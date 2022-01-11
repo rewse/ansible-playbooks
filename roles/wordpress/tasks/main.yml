@@ -143,3 +143,25 @@
                             <p class="post-disclaimer">ここで示されている発言は個人の見解であり、所属する組織の公式見解ではありません。</p>
                           <?php endif; ?>
   tags: [wordpress]
+
+- name: Translate 404 title
+  ansible.builtin.lineinfile:
+    path: /srv/www/wordpress/wp-content/themes/fukasawa/404.php
+    regexp: '<h1 class="post-title">'
+    line: '           <h1 class="post-title">見つかりませんでした</h1>'
+  tags: [wordpress]
+
+- name: Translate 404 message
+  ansible.builtin.lineinfile:
+    path: /srv/www/wordpress/wp-content/themes/fukasawa/404.php
+    insertafter: 'entry-content'
+    regexp: '<p class="not-found-message-ja">'
+    line: '            <p class="not-found-message-ja">存在していないページを開こうとしたようです。削除されたか、移動されたか、あるいはもともと存在しなかったのかもしれません。お探しのものを下記のフォームから検索してみてください。</p>'
+  tags: [wordpress]
+
+- name: Delete original 404 message
+  ansible.builtin.lineinfile:
+    path: /srv/www/wordpress/wp-content/themes/fukasawa/404.php
+    regexp: "It seems like you have tried to open a page that doesn't exist"
+    line: ""
+  tags: [wordpress]
