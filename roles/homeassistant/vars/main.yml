@@ -24,7 +24,7 @@ latlng:
     name: "[% vault_latlng.s.name %]"
     lat: "[% vault_latlng.s.lat %]"
     lng: "[% vault_latlng.s.lng %]"
-localtuya_version: 3.2.2
+localtuya_version: 3.3.0
 mini_graph_card_version: 0.10.0
 mini_media_player_version: 1.14.0
 mosquitto_password: "[% vault_mosquitto_password %]"
@@ -52,5 +52,10 @@ sesame:
 simple_thermostat_version: 2.4.3
 simple_weather_card_version: 0.8.2
 switchbot_token: "[% vault_switchbot_token %]"
+tuyaplug:
+  bat_key: "[% vault_tuyaplug.bat_key %]"
+  bed_key: "[% vault_tuyaplug.bed_key %]"
+  kit_key: "[% vault_tuyaplug.kit_key %]"
+  liv_key: "[% vault_tuyaplug.liv_key %]"
 uptime_card_version: 0.4.0
 xiaomi_gateway3_version: 1.6.5
