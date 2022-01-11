@@ -1441,15 +1441,15 @@
       above: 10
       for:
         hours: 2
+  condition:
+    - condition: state
+      entity_id: binary_sensor.workday_sensor
+      state: "on"
     - condition: not
       conditions:
         - condition: state
           entity_id: sensor.season
           state: winter
-  condition:
-    - condition: state
-      entity_id: binary_sensor.workday_sensor
-      state: "on"
   action:
     - service: automation.turn_on
       target:
