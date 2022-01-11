@@ -311,10 +311,26 @@
   notify: Restart homeassistant
   tags: [homeassistant, homeassistant-component]
 
-- name: Config lock
+- name: Config localtuya
   lineinfile:
     path: /etc/homeassistant/configuration.yaml
     insertafter: '^light:'
+    regexp: '^localtuya:'
+    line: "localtuya: !include localtuyas.yaml"
+  notify: Restart homeassistant
+  tags: [homeassistant, homeassistant-component]
+
+- name: Copy localtuyas.yaml
+  copy:
+    src: localtuyas.yaml
+    dest: /etc/homeassistant
+  notify: Restart homeassistant
+  tags: [homeassistant, homeassistant-component]
+
+- name: Config lock
+  lineinfile:
+    path: /etc/homeassistant/configuration.yaml
+    insertafter: '^localtuya:'
     regexp: '^lock:'
     line: "lock: !include locks.yaml"
   notify: Restart homeassistant
@@ -510,6 +526,21 @@
   unarchive:
     src: https://github.com/yutoyazaki/hass-nature-remo/archive/refs/tags/v{{ nature_remo_version }}.zip
     dest: /etc/homeassistant/custom_components/nature_remo
+    remote_src: yes
+  notify: Restart homeassistant
+  tags: [homeassistant, homeassistant-custom]
+
+- name: Download localtuya
+  unarchive:
+    src: https://github.com/rospogrigio/localtuya/archive/refs/tags/v{{ localtuya_version }}.zip
+    dest: /tmp
+    remote_src: yes
+  tags: [homeassistant, homeassistant-custom]
+
+- name: Copy localtuya
+  copy:
+    src: /tmp/localtuya-{{ localtuya_version }}/custom_components/localtuya
+    dest: /etc/homeassistant/custom_components
     remote_src: yes
   notify: Restart homeassistant
   tags: [homeassistant, homeassistant-custom]

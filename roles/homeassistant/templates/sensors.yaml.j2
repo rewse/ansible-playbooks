@@ -3,8 +3,8 @@
   name: REGZA Channel
   command: curl --digest --user '[% regza.username %]:[% regza.password %]' http://regza.rewse.jp/v2/remote/play/status | jq -r .epg_info_current.channel_name
 - platform: filter
-  name: Filtered Bedroom HVAC Plug Current
-  entity_id: sensor.bedroom_hvac_plug_current
+  name: Filtered Bedroom HVAC Plug Power
+  entity_id: sensor.bedroom_hvac_plug_power
   filters:
     - filter: lowpass
       window_size: 10
