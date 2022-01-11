@@ -1557,6 +1557,11 @@
     - condition: numeric_state
       entity_id: sensor.filtered_bedroom_hvac_plug_power
       above: 10
+    - condition: not
+      conditions:
+        - condition: state
+          entity_id: sensor.season
+          state: winter
   action:
     - service: climate.set_hvac_mode
       target:
