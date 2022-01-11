@@ -1437,10 +1437,15 @@
   description: Plan to turn on the HVAC cleaner in the bedroom
   trigger:
     - platform: numeric_state
-      entity_id: sensor.filtered_bedroom_hvac_plug_current
-      above: 100
+      entity_id: sensor.filtered_bedroom_hvac_plug_power
+      above: 10
       for:
         hours: 2
+    - condition: not
+      conditions:
+        - condition: state
+          entity_id: sensor.season
+          state: winter
   condition:
     - condition: state
       entity_id: binary_sensor.workday_sensor
@@ -1551,8 +1556,8 @@
       entity_id: sensor.bedroom_humidity
       below: input_number.bedroom_hvac_dry_turned_off_threshold
     - condition: numeric_state
-      entity_id: sensor.filtered_bedroom_hvac_plug_current
-      above: 100
+      entity_id: sensor.filtered_bedroom_hvac_plug_power
+      above: 10
   action:
     - service: climate.set_hvac_mode
       target:
@@ -1971,8 +1976,8 @@
       entity_id: sensor.bedroom_wbgt
       above: input_number.bedroom_hvac_dry_turned_on_threshold_wbgt
     - condition: numeric_state
-      entity_id: sensor.filtered_bedroom_hvac_plug_current
-      below: 100
+      entity_id: sensor.filtered_bedroom_hvac_plug_power
+      below: 10
     - condition: state
       entity_id: binary_sensor.bedroom_window_n
       state: "off"
