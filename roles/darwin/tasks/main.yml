@@ -174,6 +174,5 @@
 # - name: Install rest of the apps
 #   install_yourself:
 #     - https://www.blackmagicdesign.com/jp/products/davinciresolve/  # DaVinci Resolve
-#     - https://www.jpegmini.com/downloads/app                        # JPEGmini
 #     - https://www.ireasoning.com/mibbrowser.shtml                   # MIB Browser
 #     - https://www.xencelabs.com/support/download-drivers/           # Xencelabs Driver
