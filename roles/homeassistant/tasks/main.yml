@@ -32,14 +32,6 @@
     remote_src: yes
   tags: [homeassistant]
 
-# Ref: https://github.com/home-assistant/core/issues/62408
-- name: Copy openapi.py.patch
-  copy:
-    src: openapi.py.patch
-    dest: /etc/homeassistant
-  notify: Restart docker
-  tags: [homeassistant, homeassistant-docker]
-
 # Ref: https://community.home-assistant.io/t/imap-email-content-character-encoding/22928
 - name: Copy sensor.patch
   copy:
