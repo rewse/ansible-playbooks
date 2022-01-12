@@ -93,6 +93,15 @@
       CUSTOMIZE BY OWNER
       --------------------------------------------------------------------------------------------- */
 
+      function jetpackme_remove_rp() {
+          if ( class_exists( 'Jetpack_RelatedPosts' ) ) {
+              $jprp = Jetpack_RelatedPosts::init();
+              $callback = array( $jprp, 'filter_add_target_to_dom' );
+              remove_filter( 'the_content', $callback, 40 );
+          }
+      }
+
+      add_filter( 'wp', 'jetpackme_remove_rp', 20 );
       if ( ! function_exists( 'rewse_override_og_locale' ) ) {
 
           function rewse_override_og_locale( $locale ) {
@@ -140,8 +149,13 @@
                           <?php if ( function_exists( 'wpsabox_author_box' ) ) echo wpsabox_author_box(); ?>
 
                           <?php if ( ! is_page() ) : ?>
-                            <p class="post-disclaimer">ここで示されている発言は個人の見解であり、所属する組織の公式見解ではありません。</p>
+                              <p class="post-disclaimer">ここで示されている発言は個人の見解であり、所属する組織の公式見解ではありません。</p>
                           <?php endif; ?>
+                          <?php
+                              if ( class_exists( 'Jetpack_RelatedPosts' ) ) {
+                                  echo do_shortcode( '[jetpack-related-posts]' );
+                              }
+                          ?>
   tags: [wordpress]
 
 - name: Translate 404 title
