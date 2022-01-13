@@ -22,6 +22,18 @@ bedroom_hvac_cool_turned_on_threshold:
   max: 32
   unit_of_measurement: °C
   icon: mdi:thermometer-chevron-up
+bedroom_hvac_heat_turned_off_threshold:
+  name: Bedroom HVAC Heat Turned off Threshold
+  min: 22
+  max: 30
+  unit_of_measurement: °C
+  icon: mdi:thermometer-chevron-down
+bedroom_hvac_heat_turned_on_threshold:
+  name: Bedroom HVAC Heat Turned on Threshold
+  min: 19
+  max: 27
+  unit_of_measurement: °C
+  icon: mdi:thermometer-chevron-up
 bedroom_hvac_dry_turned_off_threshold:
   name: Bedroom HVAC Dry Turned off Threshold
   min: 52
