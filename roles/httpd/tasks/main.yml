@@ -43,14 +43,6 @@
     ansible_architecture == "x86_64"
   tags: [httpd, package]
 
-- name: Install mod_pagespeed
-  apt:
-    deb: https://dl-ssl.google.com/dl/linux/direct/mod-pagespeed-stable_current_amd64.deb
-  when:
-    ansible_architecture == "x86_64"
-  notify: Reload apache
-  tags: [httpd, package]
-
 - name: Set ServerName
   lineinfile:
     dest: /etc/apache2/sites-enabled/000-default.conf
