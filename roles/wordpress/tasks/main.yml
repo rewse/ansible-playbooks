@@ -84,7 +84,14 @@
   notify: Reload apache
   tags: [wordpress]
 
-- name: Add a filter for Yoast SEO
+- name: Add display=fallback to Google Fonts
+  ansible.builtin.lineinfile:
+    path: /srv/www/wordpress/wp-content/themes/fukasawa/functions.php
+    regexp: 'fukasawa_googleFonts'
+    line: "                wp_register_style( 'fukasawa_googleFonts', '//fonts.googleapis.com/css?family=Lato:400,400italic,700,700italic&amp;display=fallback' );"
+  tags: [wordpress]
+
+- name: Add some functions
   ansible.builtin.blockinfile:
     path: /srv/www/wordpress/wp-content/themes/fukasawa/functions.php
     block: |
