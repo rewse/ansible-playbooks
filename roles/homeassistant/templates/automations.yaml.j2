@@ -1537,8 +1537,8 @@
     - service: light.turn_off
       entity_id: light.living_area_dimming_downlights
   mode: single
-- id: automation.turn_off_bedroom_hvac
-  alias: Turn off Bedroom HVAC
+- id: automation.turn_off_bedroom_hvac_cool
+  alias: Turn off Bedroom HVAC Cool
   description: Turn off the HVAC in the bedroom
   trigger:
     - platform: state
@@ -1570,7 +1570,43 @@
         hvac_mode: "off"
     - service: notify.all_devices
       data:
-        message: "Turned off Bedroom HVAC. Current: {{ states('sensor.bedroom_wbgt') }}°C, {{ states('sensor.bedroom_humidity') }}%"
+        message: "Turned off Bedroom HVAC Cool. Current: {{ states('sensor.bedroom_wbgt') }}°C, {{ states('sensor.bedroom_humidity') }}%"
+        data:
+          url: /lovelace/home
+          push:
+            interruption-level: time-sensitive
+    - delay:
+        hours: 1
+  mode: single
+- id: automation.turn_off_bedroom_hvac_heat
+  alias: Turn off Bedroom HVAC Heat
+  description: Turn off the HVAC in the bedroom
+  trigger:
+    - platform: state
+      entity_id: binary_sensor.bedroom_motion_n
+      to: "on"
+    - platform: state
+      entity_id: binary_sensor.bedroom_motion_s
+      to: "on"
+  condition:
+    - condition: numeric_state
+      entity_id: sensor.bedroom_temperature
+      below: input_number.bedroom_hvac_heat_turned_off_threshold
+    - condition: numeric_state
+      entity_id: sensor.filtered_bedroom_hvac_plug_power
+      above: 10
+    - condition: state
+      entity_id: sensor.season
+      state: winter
+  action:
+    - service: climate.set_hvac_mode
+      target:
+        entity_id: climate.bedroom_hvac
+      data:
+        hvac_mode: "off"
+    - service: notify.all_devices
+      data:
+        message: "Turned off Bedroom HVAC Heat. Current: {{ states('sensor.bedroom_wbgt') }}°C, {{ states('sensor.bedroom_humidity') }}%"
         data:
           url: /lovelace/home
           push:
@@ -1925,6 +1961,55 @@
     - delay:
         hours: 1
   mode: single
+- id: automation.turn_on_bedroom_hvac_heat
+  alias: Turn on Bedroom HVAC Heat
+  mode: single
+  trigger:
+    - platform: state
+      entity_id: binary_sensor.bedroom_motion_n
+    - platform: state
+      entity_id: binary_sensor.bedroom_motion_s
+  condition:
+    - condition: numeric_state
+      entity_id: sensor.bedroom_temperature
+      below: input_number.bedroom_hvac_heat_turned_on_threshold
+    - condition: state
+      entity_id: binary_sensor.bedroom_window_n
+      state: "off"
+      for:
+        minutes: 30
+    - condition: state
+      entity_id: binary_sensor.bedroom_window_s
+      state: "off"
+      for:
+        minutes: 30
+    - condition: state
+      entity_id: binary_sensor.bedroom_presence
+      state: "on"
+    - condition: numeric_state
+      entity_id: sensor.filtered_bedroom_hvac_plug_power
+      below: "10"
+    - condition: state
+      entity_id: sensor.season
+      state: winter
+    - condition: time
+      before: "22:00:00"
+  action:
+    - service: climate.set_hvac_mode
+      target:
+        entity_id: climate.bedroom_hvac
+      data:
+        hvac_mode: heat
+    - service: notify.all_devices
+      data:
+        message: "Turned on Bedroom HVAC Heat. Current: {{ states('sensor.bedroom_wbgt') }}°C"
+        data:
+          url: /lovelace/home
+          push:
+            interruption-level: time-sensitive
+    - delay:
+        hours: 1
+  mode: single
 - id: automation.turn_on_bedroom_hvac_cool_forcibly
   alias: Turn on Bedroom HVAC Cool Forcibly
   description: Turn on the HVAC in the bedroom with cool mode forcibly
@@ -2134,8 +2219,6 @@
     - condition: state
       entity_id: switch.living_room_humidifier
       state: "off"
-    - condition: sun
-      after: sunrise
     - condition: state
       entity_id: binary_sensor.living_room_window
       state: "off"
@@ -2154,6 +2237,11 @@
     - condition: state
       entity_id: binary_sensor.living_room_presence
       state: "on"
+    - condition: state
+      entity_id: switch.living_room_humidifier
+      state: "off"
+      for:
+        minutes: 30
   action:
     - service: switch.turn_on
       entity_id: switch.living_room_humidifier
