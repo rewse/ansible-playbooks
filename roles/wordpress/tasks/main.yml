@@ -84,6 +84,15 @@
   notify: Reload apache
   tags: [wordpress]
 
+- name: Remvoe Japanese lang files for fukasawa
+  ansible.builtin.file:
+    path: /srv/www/wordpress/wp-content/languages/themes/{{ item }}
+    state: absent
+  with_items:
+    - fukasawa-ja.mo
+    - fukasawa-ja.po
+  tags: [wordpress]
+
 - name: Add display=fallback to Google Fonts
   ansible.builtin.lineinfile:
     path: /srv/www/wordpress/wp-content/themes/fukasawa/functions.php
