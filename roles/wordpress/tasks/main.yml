@@ -100,39 +100,6 @@
       CUSTOMIZE BY OWNER
       --------------------------------------------------------------------------------------------- */
 
-      // remove jetpack frontend css
-      add_filter( 'jetpack_implode_frontend_css', '__return_false' );
-
-      add_filter( 'wp', 'jetpackme_remove_rp', 20 );
-      if ( ! function_exists( 'rewse_override_og_locale' ) ) {
-
-          function rewse_override_og_locale( $locale ) {
-              return 'ja_JP';
-          }
-          add_filter( 'wpseo_locale', 'rewse_override_og_locale' );
-
-      }
-
-      if ( ! function_exists( 'rewse_override_inlanguage' ) ) {
-        
-        function rewse_override_inlanguage( $data ) {
-          $data['inLanguage'] = 'ja_JP';
-          return $data;
-        }
-        add_filter( 'wpseo_schema_article', 'rewse_override_inlanguage' );
-        add_filter( 'wpseo_schema_imageobject', 'rewse_override_inlanguage' );
-        add_filter( 'wpseo_schema_person', 'rewse_override_inlanguage' );
-        add_filter( 'wpseo_schema_webpage', 'rewse_override_inlanguage' );
-        add_filter( 'wpseo_schema_website', 'rewse_override_inlanguage' );
-
-      }
-  tags: [wordpress]
-
-- name: Replace lang
-  ansible.builtin.lineinfile:
-    path: /srv/www/wordpress/wp-content/themes/fukasawa/header.php
-    regexp: '<html class="no-js" '
-    line: '<html class="no-js" lang="ja">'
   tags: [wordpress]
 
 - name: Add preconnect
