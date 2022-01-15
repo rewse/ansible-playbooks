@@ -139,7 +139,7 @@
   ansible.builtin.blockinfile:
     path: /srv/www/wordpress/wp-content/themes/fukasawa/header.php
     marker: "<!-- {mark} ANSIBLE MANAGED BLOCK -->"
-    insertbefore: 'wp_head'
+    insertafter: '<head '
     block: |2
               <link rel="preconnect" href="https://fonts.gstatic.com/">
               <link rel="preconnect" href="https://fonts.googleapis.com/">
