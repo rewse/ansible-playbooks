@@ -1591,7 +1591,7 @@
   condition:
     - condition: numeric_state
       entity_id: sensor.bedroom_temperature
-      below: input_number.bedroom_hvac_heat_turned_off_threshold
+      above: input_number.bedroom_hvac_heat_turned_off_threshold
     - condition: numeric_state
       entity_id: sensor.filtered_bedroom_hvac_plug_power
       above: 10
@@ -1606,7 +1606,7 @@
         hvac_mode: "off"
     - service: notify.all_devices
       data:
-        message: "Turned off Bedroom HVAC Heat. Current: {{ states('sensor.bedroom_wbgt') }}°C, {{ states('sensor.bedroom_humidity') }}%"
+        message: "Turned off Bedroom HVAC Heat. Current: {{ states('sensor.bedroom_temperature') }}°C"
         data:
           url: /lovelace/home
           push:
