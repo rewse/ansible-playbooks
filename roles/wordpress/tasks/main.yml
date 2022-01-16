@@ -2,6 +2,7 @@
 - name: Install packages
   ansible.builtin.apt:
     name:
+      - gettext
       - php-curl
       - php-imagick
       - php-zip
@@ -84,10 +85,12 @@
   notify: Reload apache
   tags: [wordpress]
 
-- name: Remvoe Japanese lang files for fukasawa
-  ansible.builtin.file:
-    path: /srv/www/wordpress/wp-content/languages/themes/{{ item }}
-    state: absent
+- name: Copy fukawasa-ja to prevent updating
+  ansible.builtin.copy:
+    src: "{{ item }}"
+    dest: /srv/www/wordpress/wp-content/languages/themes
+    owner: www-data
+    group: www-data
   with_items:
     - fukasawa-ja.mo
     - fukasawa-ja.po
