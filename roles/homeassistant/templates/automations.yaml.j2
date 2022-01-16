@@ -880,6 +880,7 @@
   mode: single
 - id: automation.auto_lock_entrance_lock_bottom_in_daytime
   alias: Auto-Lock Entrnace Lock Bottom in Daytime
+  mode: single
   trigger:
     - platform: time_pattern
       minutes: "/5"
@@ -890,21 +891,62 @@
       state: unlocked
       for:
         minutes: 30
+    - condition: state
+      entity_id: binary_sensor.entrance_door
+      state: "off"
+      for:
+        minutes: 30
     - condition: time
       after: "9:00"
       before: "21:00"
     - condition: state
       entity_id: alarm_control_panel.entrance_auto_lock
       state: armed_home
+  action:
+    - service: lock.lock
+      target:
+        entity_id: lock.entrance_lock_bottom
+    - delay:
+        seconds: 30
+    - service: homeassistant.update_entity
+      target:
+        entity_id: lock.entrance_lock_bottom
+- id: automation.auto_lock_entrance_lock_top_in_daytime
+  alias: Auto-Lock Entrnace Lock Top in Daytime
+  mode: single
+  trigger:
+    - platform: time_pattern
+      minutes: "/5"
+      seconds: 5
+  condition:
+    - condition: state
+      entity_id: lock.entrance_lock_top
+      state: unlocked
+      for:
+        minutes: 30
     - condition: state
       entity_id: binary_sensor.entrance_door
       state: "off"
       for:
         minutes: 30
+    - condition: time
+      after: "9:00"
+      before: "21:00"
+    - condition: state
+      entity_id: alarm_control_panel.entrance_auto_lock
+      state: armed_home
   action:
-    - service: script.lock_and_get_state_of_entrance_lock_bottom
+    - service: lock.lock
+      target:
+        entity_id: lock.entrance_lock_top
+    - delay:
+        seconds: 30
+    - service: homeassistant.update_entity
+      target:
+        entity_id: lock.entrance_lock_top
 - id: automation.auto_lock_entrance_lock_bottom_in_nighttime
   alias: Auto-Lock Entrance Lock Bottom in Nighttime
+  mode: single
   trigger:
     - platform: time_pattern
       minutes: "/5"
@@ -915,46 +957,29 @@
       state: unlocked
       for:
         minutes: 10
+    - condition: state
+      entity_id: binary_sensor.entrance_door
+      state: "off"
+      for:
+        minutes: 10
     - condition: time
       after: "21:00"
       before: "9:00"
     - condition: state
       entity_id: alarm_control_panel.entrance_auto_lock
       state: armed_home
-    - condition: state
-      entity_id: binary_sensor.entrance_door
-      state: "off"
-      for:
-        minutes: 10
   action:
-    - service: script.lock_and_get_state_of_entrance_lock_bottom
-- id: automation.auto_lock_entrance_lock_top_in_daytime
-  alias: Auto-Lock Entrance Lock Top in Daytime
-  trigger:
-    - platform: time_pattern
-      minutes: "/5"
-      seconds: 5
-  condition:
-    - condition: state
-      entity_id: lock.entrance_lock_top
-      state: unlocked
-      for:
-        minutes: 30
-    - condition: time
-      after: "9:00"
-      before: "21:00"
-    - condition: state
-      entity_id: alarm_control_panel.entrance_auto_lock
-      state: armed_home
-    - condition: state
-      entity_id: binary_sensor.entrance_door
-      state: "off"
-      for:
-        minutes: 30
-  action:
-    - service: script.lock_and_get_state_of_entrance_lock_top
+    - service: lock.lock
+      target:
+        entity_id: lock.entrance_lock_bottom
+    - delay:
+        seconds: 30
+    - service: homeassistant.update_entity
+      target:
+        entity_id: lock.entrance_lock_bottom
 - id: automation.auto_lock_entrance_lock_top_in_nighttime
   alias: Auto-Lock Entrance Lock Top in Nighttime
+  mode: single
   trigger:
     - platform: time_pattern
       minutes: "/5"
@@ -965,19 +990,26 @@
       state: unlocked
       for:
         minutes: 10
+    - condition: state
+      entity_id: binary_sensor.entrance_door
+      state: "off"
+      for:
+        minutes: 10
     - condition: time
       after: "21:00"
       before: "9:00"
     - condition: state
       entity_id: alarm_control_panel.entrance_auto_lock
       state: armed_home
-    - condition: state
-      entity_id: binary_sensor.entrance_door
-      state: "off"
-      for:
-        minutes: 10
   action:
-    - service: script.lock_and_get_state_of_entrance_lock_top
+    - service: lock.lock
+      target:
+        entity_id: lock.entrance_lock_top
+    - delay:
+        seconds: 30
+    - service: homeassistant.update_entity
+      target:
+        entity_id: lock.entrance_lock_top
 - id: automation.info_bathroom_washing_machine_has_been_finished
   alias: "INFO: Bathroom Washing Machine Has Been Finished"
   trigger:
@@ -1146,6 +1178,7 @@
             interruption-level: time-sensitive
 - id: automation.info_denshobato
   alias: "INFO: Denshobato"
+  mode: single
   trigger:
     - platform: state
       entity_id: sensor.denshobato
@@ -1181,7 +1214,13 @@
     - service: alarm_control_panel.alarm_disarm
       target:
         entity_id: alarm_control_panel.entrance_auto_lock
-  mode: single
+    - delay:
+        seconds: 30
+    - service: homeassistant.update_entity
+      target:
+        entity_id:
+          - lock.entrance_lock_bottom
+          - lock.entrance_lock_top
 - id: automation.info_living_room_humidity_is_too_high
   alias: "INFO: Living Room Humidity is Too High"
   trigger:
@@ -1386,10 +1425,9 @@
         data:
           push:
             interruption-level: active
-# Do not merge with automation.lock_entrance_top. Because 
-# script.lock_and_get_state_of_entrance_lock_bottom waits 30 seconds.
 - id: automation.lock_entrance_bottom
   alias: Lock Entrance Bottom
+  mode: restart
   trigger:
     - platform: state
       entity_id: sensor.entrance_1_button_switch_action
@@ -1398,7 +1436,16 @@
       entity_id: sensor.living_room_1_button_switch_action
       to: double
   action:
-    - service: script.lock_and_get_state_of_entrance_lock_bottom
+    - service: lock.lock
+      target:
+          entity_id: lock.entrance_locks
+    - delay:
+        seconds: 30
+    - service: homeassistant.update_entity
+      target:
+        entity_id:
+          - lock.entrance_lock_bottom
+          - lock.entrance_lock_top
 - id: automation.lock_entrance_top
   alias: Lock Entrance Top
   trigger:
@@ -2009,7 +2056,6 @@
             interruption-level: time-sensitive
     - delay:
         hours: 1
-  mode: single
 - id: automation.turn_on_bedroom_hvac_cool_forcibly
   alias: Turn on Bedroom HVAC Cool Forcibly
   description: Turn on the HVAC in the bedroom with cool mode forcibly
@@ -2108,14 +2154,16 @@
         entity_id: light.bedroom_light
 - id: automation.trun_on_entrance_auto_lock
   alias: Turn on Entrance Auto-Lock
+  mode: single
   trigger:
     - platform: state
       entity_id: binary_sensor.entrance_door
+      from: "off"
+      to: "on"
   action:
     - service: alarm_control_panel.alarm_arm_home
       target:
         entity_id: alarm_control_panel.entrance_auto_lock
-  mode: single
 - id: automation.turn_on_living_area_downlights
   alias: Turn on Living Area Downlights
   trigger:
@@ -2540,10 +2588,9 @@
           push:
             interruption-level: time-sensitive
   mode: single
-# Do not merge with automation.unlock_entrance_top. Because 
-# script.unlock_and_get_state_of_entrance_lock_bottom waits 30 seconds.
-- id: automation.unlock_entrance_lock_bottom
-  alias: Unlock Entrance Lock Bottom
+- id: automation.unlock_entrance_locks
+  alias: Unlock Entrance Locks
+  mode: restart
   trigger:
     - platform: state
       entity_id: sensor.entrance_1_button_switch_action
@@ -2552,18 +2599,16 @@
       entity_id: sensor.living_room_1_button_switch_action
       to: single
   action:
-    - service: script.unlock_and_get_state_of_entrance_lock_bottom
-- id: automation.unlock_entrance_lock_top
-  alias: Unlock Entrance Lock Top
-  trigger:
-    - platform: state
-      entity_id: sensor.entrance_1_button_switch_action
-      to: single
-    - platform: state
-      entity_id: sensor.living_room_1_button_switch_action
-      to: single
-  action:
-    - service: script.unlock_and_get_state_of_entrance_lock_top
+    - service: lock.unlock
+      target:
+        entity_id: lock.entrance_locks
+    - delay:
+        seconds: 30
+    - service: homeassistant.update_entity
+      target:
+        entity_id:
+          - lock.entrance_lock_bottom
+          - lock.entrance_lock_top
 - id: automation.unlock_entrance_lock_when_ios_action_fails
   alias: Unlock Entrance Lock when iOS Action Fails
   trigger:
@@ -2596,6 +2641,7 @@
   mode: single
 - id: automation.unlock_entrance_lock_when_ios_action_fires
   alias: Unlock Entrance Lock when iOS Action Fires
+  mode: single
   trigger:
     - platform: event
       event_type: ios.action_fired
@@ -2615,8 +2661,9 @@
           for:
             minutes: 5
   action:
-    - service: script.unlock_and_get_state_of_entrance_lock_bottom
-    - service: script.unlock_and_get_state_of_entrance_lock_top
+    - service: lock.unlock
+      target:
+        entity_id: lock.entrance_locks
     - service: notify.all_devices
       data:
         message: Unlocked Entrance
@@ -2624,7 +2671,13 @@
           url: /lovelace-people/people
           push:
             interruption-level: time-sensitive
-  mode: single
+    - delay:
+        seconds: 30
+    - service: homeassistant.update_entity
+      target:
+        entity_id:
+          - lock.entrance_lock_bottom
+          - lock.entrance_lock_top
 - id: automation.update_device_tracking_sensors
   alias: Update Device Tracking Sensors
   trigger:
@@ -2651,3 +2704,19 @@
           - sensor.entrance_lock_bottom_sensor
           - sensor.entrance_lock_top_sensor
   mode: single
+- id: automation.update_entrace_lock_states
+  alias: Update Entrance Lock States
+  mode: restart
+  trigger:
+    - platform: state
+      entity_id: binary_sensor.entrance_door
+      from: "on"
+      to: "off"
+  action:
+    - delay:
+        seconds: 30
+    - service: homeassistant.update_entity
+      target:
+        entity_id:
+          - lock.entrance_lock_bottom
+          - lock.entrance_lock_top
