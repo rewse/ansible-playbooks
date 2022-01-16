@@ -12,6 +12,7 @@ def main():
         secret = sys.argv[4]
     except IndexError:
         print("Usage: sesame <lock|unlock|toggle> <api_key> <uuid> <secret>")
+        sys.exit(1)
 
     if command == "lock":
         cmd = 82
