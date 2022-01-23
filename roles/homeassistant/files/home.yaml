@@ -88,17 +88,17 @@ cards:
         state_map:
           - value: above_horizon
           - value: below_horizon
-      - type: entities
-        title: Living Room IAQ
-        entities:
-          - entity: sensor.living_room_iaq_level
-            name: IAQ Level
-          - entity: sensor.living_room_iaq_index
-            name: IAQ Index
-          - entity: sensor.living_room_hcho
-            name: HCHO
-          - entity: sensor.living_room_pm25
-            name: PM 2.5
+      # - type: entities
+      #   title: Living Room IAQ
+      #   entities:
+      #     - entity: sensor.living_room_iaq_level
+      #       name: IAQ Level
+      #     - entity: sensor.living_room_iaq_index
+      #       name: IAQ Index
+      #     - entity: sensor.living_room_hcho
+      #       name: HCHO
+      #     - entity: sensor.living_room_pm25
+      #       name: PM 2.5
       - type: entities
         title: Living Room Lights
         entities:
