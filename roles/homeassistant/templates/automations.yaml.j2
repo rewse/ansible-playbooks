@@ -2040,7 +2040,8 @@
       entity_id: sensor.season
       state: winter
     - condition: time
-      before: "22:00:00"
+      after: "9:00:00"
+      before: "21:00:00"
   action:
     - service: climate.set_hvac_mode
       target:
