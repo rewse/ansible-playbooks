@@ -121,6 +121,24 @@
           add_filter( 'wp', 'jetpackme_remove_rp', 20 );
       }
 
+      /* Ref; https://blog.rizkipratama.com/change-jetpack-related-posts-category-primary-yoast-seo/ */
+      if ( ! function_exists( 'jp_rp_context_cat_primary_yoast' ) ) {
+        function jp_rp_context_cat_primary_yoast( $context, $post_id ) {
+            $primary_cat_id = get_post_meta( $post_id , '_yoast_wpseo_primary_category', true );
+            if ( $primary_cat_id ) {
+                $post_cat_name = get_the_category_by_ID( $primary_cat_id );
+                if ( isset( $post_cat_name ) ) {
+                    $context = sprintf( 
+                        _x( 'In "%s"', 'in {category/tag name}', 'jetpack' ),
+                        $post_cat_name
+                    );
+                }
+            }
+            return $context;
+        }
+        add_filter( 'jetpack_relatedposts_filter_post_context', 'jp_rp_context_cat_primary_yoast', 10, 2 );
+      }
+
   tags: [wordpress]
 
 - name: Replace copyright
