@@ -123,10 +123,28 @@
     line: "                <p>&copy; <?php echo date( 'Y' ); ?> <a href=\"<?php echo esc_url( home_url( '/' ) ); ?>\">Tats Shibata</a>.</p>"
   tags: [wordpress]
 
+- name: Add the date on top
+  ansible.builtin.blockinfile:
+    path: /srv/www/wordpress/wp-content/themes/fukasawa/singular.php
+    marker: "<!-- {mark} ANSIBLE MANAGED BLOCK .post-date-top -->"
+    insertafter: '</header><!-- .post-header -->'
+    block: |2
+                        <?php if ( is_single() ) : ?>
+                                <p class="post-date-top"><?php the_date( get_option( 'date_format' ) ); ?></p>
+                        <?php endif; ?>
+  tags: [wordpress]
+
+- name: Delete the date from bottom
+  ansible.builtin.lineinfile:
+    path: /srv/www/wordpress/wp-content/themes/fukasawa/singular.php
+    regexp: '<li class="post-date">'
+    line: ""
+  tags: [wordpress]
+
 - name: Add an author box
   ansible.builtin.blockinfile:
     path: /srv/www/wordpress/wp-content/themes/fukasawa/singular.php
-    marker: "<!-- {mark} ANSIBLE MANAGED BLOCK -->"
+    marker: "<!-- {mark} ANSIBLE MANAGED BLOCK wpsabox_author_box -->"
     insertbefore: '</div><!-- .post-inner -->'
     block: |2
                           <?php if ( function_exists( 'wpsabox_author_box' ) ) echo wpsabox_author_box(); ?>
