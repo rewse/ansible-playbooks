@@ -112,7 +112,14 @@
       CUSTOMIZE BY OWNER
       --------------------------------------------------------------------------------------------- */
 
-  tags: [wordpress]
+      if ( ! function_exists( 'jetpackme_remove_rp' ) ) {
+          function jetpackme_remove_rp() {
+              $jprp = Jetpack_RelatedPosts::init();
+              $callback = array( $jprp, 'filter_add_target_to_dom' );
+              remove_filter( 'the_content', $callback, 40 );
+          }
+          add_filter( 'wp', 'jetpackme_remove_rp', 20 );
+      }
 
   tags: [wordpress]
 
