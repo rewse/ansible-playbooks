@@ -96,11 +96,11 @@
     - fukasawa-ja.po
   tags: [wordpress]
 
-- name: Add display=fallback to Google Fonts
-  ansible.builtin.lineinfile:
+- name: Disable Lato font
+  ansible.builtin.replace:
     path: /srv/www/wordpress/wp-content/themes/fukasawa/functions.php
-    regexp: 'fukasawa_googleFonts'
-    line: "                wp_register_style( 'fukasawa_googleFonts', '//fonts.googleapis.com/css?family=Lato:400,400italic,700,700italic&amp;display=fallback' );"
+    regexp: '\$google_fonts = ..*'
+    replace: "$google_fonts = 'off';"
   tags: [wordpress]
 
 - name: Add some functions
@@ -114,14 +114,6 @@
 
   tags: [wordpress]
 
-- name: Add preconnect
-  ansible.builtin.blockinfile:
-    path: /srv/www/wordpress/wp-content/themes/fukasawa/header.php
-    marker: "<!-- {mark} ANSIBLE MANAGED BLOCK -->"
-    insertafter: '<head '
-    block: |2
-              <link rel="preconnect" href="https://fonts.gstatic.com/">
-              <link rel="preconnect" href="https://fonts.googleapis.com/">
   tags: [wordpress]
 
 - name: Replace copyright
