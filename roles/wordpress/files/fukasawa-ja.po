@@ -2,7 +2,7 @@
 # This file is distributed under the same license as the Themes - Fukasawa package.
 msgid ""
 msgstr ""
-"PO-Revision-Date: 9999-04-19 21:42:21+0000\n"
+"PO-Revision-Date: 9021-04-19 21:42:21+0000\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
@@ -11,3 +11,10 @@ msgstr ""
 "Language: ja_JP\n"
 "Project-Id-Version: Themes - Fukasawa\n"
 
+#: 404.php:15
+msgid "It seems like you have tried to open a page that doesn't exist. It could have been deleted, moved, or it never existed at all. You are welcome to search for what you are looking for with the form below."
+msgstr "存在しないページを開こうとしたようです。削除されたか、移動されたか、あるいはもともと存在しない可能性もあります。以下のフォームから検索することができます。"
+
+#: 404.php:10
+msgid "Error 404"
+msgstr "404 エラー"
