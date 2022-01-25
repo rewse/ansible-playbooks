@@ -1,13 +1,3 @@
-# Delete on 2023-01-25
-RedirectMatch 301 ^/blog/snowy-park-in-tokyo/ https://rewse.jp/blog/snowy-park-tokyo/
-RedirectMatch 301 ^/blog/how-to-auto-change-copied-image-format-from-tiff-to-png-on-mac/ https://rewse.jp/blog/change-copied-image-format/
-RedirectMatch 301 ^/blog/how-to-change-macs-mic-and-speaker-at-once-with-shortcut/ https://rewse.jp/blog/change-mic-speaker-shortuct/
-RedirectMatch 301 ^/blog/how-to-control-sesame-smart-lock-from-home-assistant/ https://rewse.jp/blog/control-sesame-home-assistant/
-RedirectMatch 301 ^/blog/cat-in-a-box-on-2022-01-24/ https://rewse.jp/blog/cat-box-2022-01/
-RedirectMatch 301 ^/blog/resolved-mac-repeatedly-receives-bluetooth-connection-requests-from-unknown-device/ https://rewse.jp/blog/receive-bluetooth-connection-requests/
-
-
-
 # BEGIN rlrssslReallySimpleSSL rsssl_version[5.2.3]
 <IfModule mod_rewrite.c>
 RewriteEngine on
