@@ -625,6 +625,9 @@
         internal_url: https://hass.rewse.jp/
         customize: !include customize.yaml
       fastdotcom:
+      frontend:
+        extra_module_url:
+          - /local/card-mod.js
       http:
         use_x_forwarded_for: true
         trusted_proxies:
@@ -655,8 +658,6 @@
         mode: yaml
         dashboards: !include dashboards.yaml
         resources:
-          - url: /local/card-mod.js
-            type: module
           - url: /local/mini-graph-card-bundle.js?v={{ mini_graph_card_version }}
             type: module
           - url: /local/mini-media-player-bundle.js?v={{ mini_media_player_version }}
