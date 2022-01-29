@@ -156,7 +156,7 @@
 - name: Copy alarm_control_panels.yaml
   copy:
     src: alarm_control_panels.yaml
-    dest: /etc/homeassistant/alarm_control_panels.yaml
+    dest: /etc/homeassistant
   notify: Restart homeassistant
   tags: [homeassistant, homeassistant-component]
 
@@ -172,7 +172,7 @@
 - name: Copy alexa.yaml
   copy:
     src: alexa.yaml
-    dest: /etc/homeassistant/alexa.yaml
+    dest: /etc/homeassistant
   notify: Restart homeassistant
   tags: [homeassistant, homeassistant-component]
 
