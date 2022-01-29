@@ -2039,9 +2039,11 @@
     - condition: state
       entity_id: sensor.season
       state: winter
-    - condition: time
-      after: "9:00:00"
-      before: "21:00:00"
+    - condition: state
+      entity_id: cover.bedroom_curtains
+      state: opening
+      for:
+        hours: 1
   action:
     - service: climate.set_hvac_mode
       target:
