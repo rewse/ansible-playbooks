@@ -1,0 +1,104 @@
+- id: automation.info_denshobato
+  alias: "INFO: Denshobato"
+  mode: single
+  trigger:
+    - platform: state
+      entity_id: sensor.denshobato
+  condition:
+    - condition: template
+      value_template: >-
+        {{ (as_timestamp(now()) -
+        as_timestamp(states('sensor.denshobato_received_date_time'))) < 180 }}
+  action:
+    - service: notify.all_devices
+      data:
+        title: "[% notify_title_k %]"
+        message: "️{{ states('sensor.denshobato_time') }}に{{ states('sensor.denshobato_action') }}しました"
+        data:
+          push:
+            interruption-level: time-sensitive
+    - condition: state
+      entity_id: sensor.denshobato_action
+      state: 下校
+    - condition: or
+      conditions:
+      - condition: state
+        entity_id: person.shibata_tats
+        state: home
+      - condition: state
+        entity_id: person.shibata_akiko
+        state: home
+    - delay:
+        minutes: 5
+    - service: lock.unlock
+      target:
+        entity_id: lock.entrance_locks
+    - service: alarm_control_panel.alarm_disarm
+      target:
+        entity_id: alarm_control_panel.entrance_auto_lock
+    - delay:
+        seconds: 30
+    - service: homeassistant.update_entity
+      target:
+        entity_id:
+          - lock.entrance_lock_bottom
+          - lock.entrance_lock_top
+- id: automation.info_mamorail
+  alias: "INFO: Mamorail"
+  trigger:
+    - platform: state
+      entity_id: sensor.mamorail
+  condition:
+    - condition: template
+      value_template: >-
+        {{ (as_timestamp(now()) -
+        as_timestamp(states('sensor.mamorail_received_date_time'))) < 180 }}
+    - condition: numeric_state
+      entity_id: sensor.mamorail_balance
+      above: 1000
+  action:
+    - service: notify.all_devices
+      data:
+        title: "[% notify_title_k %]"
+        message: "{{ states('sensor.mamorail_station') }}を{{ states('sensor.mamorail_time') }}に{{ states('sensor.mamorail_action') }}しました。残高: {{ states('sensor.mamorail_balance') }}円"
+        data:
+          url: /lovelace-people/people
+          push:
+            interruption-level: time-sensitive
+- id: automation.info_mamorail_needed_to_charge
+  alias: "INFO: Mamorail Needed to Charge"
+  trigger:
+    - platform: state
+      entity_id: sensor.mamorail
+  condition:
+    - condition: template
+      value_template: >-
+        {{ (as_timestamp(now()) -
+        as_timestamp(states('sensor.mamorail_received_date_time'))) < 180 }}
+    - condition: numeric_state
+      entity_id: sensor.mamorail_balance
+      below: 999
+  action:
+    - service: notify.all_devices
+      data:
+        title: "[% notify_title_k %]"
+        message: "️【要チャージ】{{ states('sensor.mamorail_station') }}を{{ states('sensor.mamorail_time') }}に{{ states('sensor.mamorail_action') }}しました。残高: {{ states('sensor.mamorail_balance') }}円"
+        data:
+          url: /lovelace-people/people
+          push:
+            interruption-level: time-sensitive
+- id: automation.info_update_available
+  alias: "INFO: Update Available"
+  trigger:
+    - platform: state
+      entity_id: binary_sensor.updater
+      from: "off"
+      to: "on"
+  action:
+    - service: notify.tats_devices
+      data:
+        title: INFO
+        message: "Home Assistant {{ state_attr('binary_sensor.updater', 'newest_version') }} is available."
+        data:
+          push:
+            interruption-level: active
