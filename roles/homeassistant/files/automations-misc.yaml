@@ -1,0 +1,202 @@
+- id: automation.trigger_monitor
+  alias: Trigger monitor
+  trigger:
+    - platform: time_pattern
+      minutes: "/5"
+      seconds: 33
+  action:
+    - service: mqtt.publish
+      data:
+        topic: monitor/scan/arrive
+        payload: '{"identity": "automation.trigger_monitor"}'
+        retain: true
+    - service: mqtt.publish
+      data:
+        topic: monitor/scan/depart
+        payload: '{"identity": "automation.trigger_monitor"}'
+        retain: true
+- id: automation.turn_off_monitor_akikos_iphone12mini
+  alias: Turn off monitor akikos-iphone12mini
+  trigger:
+    - platform: numeric_state
+      entity_id: sensor.monitor_akikos_iphone12mini
+      below: 10
+    - platform: time_pattern
+      minutes: "/5"
+      seconds: 53
+  condition:
+    - condition: numeric_state
+      entity_id: sensor.monitor_akikos_iphone12mini
+      below: 10
+  action:
+    - service: device_tracker.see
+      data:
+        dev_id: monitor_akikos_iphone12mini
+        location_name: not_home
+        source_type: bluetooth
+- id: automation.turn_off_monitor_bio
+  alias: Turn off monitor bio
+  trigger:
+    - platform: numeric_state
+      entity_id: sensor.monitor_bio
+      below: 10
+    - platform: time_pattern
+      minutes: "/5"
+      seconds: 53
+  condition:
+    - condition: numeric_state
+      entity_id: sensor.monitor_bio
+      below: 10
+  action:
+    - service: device_tracker.see
+      data:
+        dev_id: monitor_bio
+        location_name: not_home
+        source_type: bluetooth
+- id: automation.turn_off_surveillance
+  alias: Turn off Surveillance
+  mode: single
+  trigger:
+    - platform: state
+      entity_id: binary_sensor.living_room_motion
+      to: "on"
+    - platform: state
+      entity_id: binary_sensor.study_motion
+      to: "on"
+    - platform: state
+      entity_id: binary_sensor.bathroom_motion
+      to: "on"
+  condition:
+    - condition: state
+      entity_id: alarm_control_panel.surveillance
+      state: armed_away
+      for:
+        minutes: 20
+    - condition: or
+      conditions:
+        - condition: state
+          entity_id: person.shibata_tats
+          state: home
+        - condition: state
+          entity_id: person.shibata_akiko
+          state: home
+  action:
+    - service: alarm_control_panel.alarm_disarm
+      target:
+        entity_id: alarm_control_panel.surveillance
+    - service: notify.all_devices
+      data:
+        message: Turned off surveillance
+        data:
+          url: /lovelace/home
+          push:
+            interruption-level: time-sensitive
+    - delay:
+        hours: 1
+- id: automation.turn_on_monitor_akikos_iphone12mini
+  alias: Turn on monitor akikos-iphone12mini
+  trigger:
+    - platform: numeric_state
+      entity_id: sensor.monitor_akikos_iphone12mini
+      above: 10
+    - platform: time_pattern
+      minutes: "/5"
+      seconds: 53
+  condition:
+    - condition: numeric_state
+      entity_id: sensor.monitor_akikos_iphone12mini
+      above: 10
+  action:
+    - service: device_tracker.see
+      data:
+        dev_id: monitor_akikos_iphone12mini
+        location_name: home
+        source_type: bluetooth
+- id: automation.turn_on_monitor_bio
+  alias: Turn on monitor bio
+  trigger:
+    - platform: numeric_state
+      entity_id: sensor.monitor_bio
+      above: 10
+    - platform: time_pattern
+      minutes: "/5"
+      seconds: 53
+  condition:
+    - condition: numeric_state
+      entity_id: sensor.monitor_bio
+      above: 10
+  action:
+    - service: device_tracker.see
+      data:
+        dev_id: monitor_bio
+        location_name: home
+        source_type: bluetooth
+- id: automation.turn_on_surveillance_when_ios_action_fires
+  alias: Turn on surveillance when iOS Action Fires
+  trigger:
+    - platform: event
+      event_type: ios.action_fired
+      event_data:
+        actionName: turn_on_surveillance
+  action:
+    - service: alarm_control_panel.alarm_arm_away
+      target:
+        entity_id: alarm_control_panel.surveillance
+    - service: notify.all_devices
+      data:
+        message: Now Arming Away
+        data:
+          url: /lovelace/home
+          push:
+            interruption-level: time-sensitive
+- id: automation.turn_on_surveillance_when_nobody_is_in_home
+  alias: Turn on surveillance when Nobody is in Home
+  trigger:
+    - platform: time_pattern
+      minutes: "/5"
+      seconds: 46
+  condition:
+    - condition: state
+      entity_id: alarm_control_panel.surveillance
+      state: disarmed
+    - condition: state
+      entity_id: person.shibata_tats
+      state: not_home
+      for:
+        minutes: 10
+    - condition: state
+      entity_id: person.shibata_akiko
+      state: not_home
+      for:
+        minutes: 10
+  action:
+    - service: alarm_control_panel.alarm_arm_away
+      target:
+        entity_id: alarm_control_panel.surveillance
+    - service: notify.all_devices
+      data:
+        message: Turn on surveillance because nobody is in home
+        data:
+          push:
+            interruption-level: time-sensitive
+- id: automation.update_device_tracking_sensors
+  alias: Update Device Tracking Sensors
+  mode: restart
+  trigger:
+    - platform: state
+      entity_id: binary_sensor.entrance_door
+      from: "on"
+      to: "off"
+  action:
+    - delay:
+        minutes: 1
+    - service: mqtt.publish
+      data:
+        topic: monitor/scan/arrive
+        payload: '{"identity": "automation.trigger_monitor_by_entrance_door"}'
+        retain: true
+    - service: mqtt.publish
+      data:
+        topic: monitor/scan/depart
+        payload: '{"identity": "automation.trigger_monitor_by_entrance_door"}'
+        retain: true
