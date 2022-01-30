@@ -46,6 +46,11 @@
   notify: Restart apache
   tags: [wordpress]
 
+- name: Enable mod_expires
+  ansible.builtin.command: a2enmod headers
+  notify: Restart apache
+  tags: [wordpress]
+
 - name: Copy wordpress.conf
   ansible.builtin.copy:
     src: wordpress.conf
