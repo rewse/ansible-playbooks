@@ -5,6 +5,7 @@
       - gettext
       - php-curl
       - php-imagick
+      - php-intl
       - php-zip
       - wordpress
   tags: [wordpress, package]
