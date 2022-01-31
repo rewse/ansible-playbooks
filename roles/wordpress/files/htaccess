@@ -1,3 +1,20 @@
+# Really Simple SSL
+Header always set Strict-Transport-Security: "max-age=31536000" env=HTTPS
+Header always set Content-Security-Policy "upgrade-insecure-requests"
+Header always set X-Content-Type-Options "nosniff"
+Header always set X-XSS-Protection "1; mode=block"
+Header always set Expect-CT "max-age=7776000, enforce"
+Header always set Referrer-Policy: "no-referrer-when-downgrade"
+Header always set X-Frame-Options: "SAMEORIGIN"
+Header always set Permissions-Policy: "" 
+# End Really Simple SSL
+# BEGIN rlrssslReallySimpleSSL rsssl_version[5.2.3]
+<IfModule mod_rewrite.c>
+RewriteEngine on
+RewriteCond %{HTTP:X-Forwarded-Proto} !https
+RewriteRule ^(.*)$ https://%{HTTP_HOST}/$1 [R=301,L]
+</IfModule>
+# END rlrssslReallySimpleSSL
 # BEGIN WordPress
 # The directives (lines) between `BEGIN WordPress` and `END WordPress` are
 # dynamically generated, and should only be modified via WordPress filters.
