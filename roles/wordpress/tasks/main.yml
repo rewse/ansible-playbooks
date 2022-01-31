@@ -5,6 +5,7 @@
       - gettext
       - php-curl
       - php-imagick
+      - php-intl
       - php-zip
       - wordpress
   tags: [wordpress, package]
@@ -43,6 +44,11 @@
 
 - name: Enable mod_expires
   ansible.builtin.command: a2enmod expires
+  notify: Restart apache
+  tags: [wordpress]
+
+- name: Enable mod_expires
+  ansible.builtin.command: a2enmod headers
   notify: Restart apache
   tags: [wordpress]
 

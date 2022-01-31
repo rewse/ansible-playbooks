@@ -2,7 +2,7 @@
 alexa_client:
   id: "[% vault_alexa_client.id %]"
   secret: "[% vault_alexa_client.secret %]"
-card_mod_version: 3.0.12
+card_mod_version: 3.1.1
 gmail:
   address: "[% vault_gmail.address %]"
   password: "[% vault_gmail.password %]"
@@ -24,9 +24,9 @@ latlng:
     name: "[% vault_latlng.s.name %]"
     lat: "[% vault_latlng.s.lat %]"
     lng: "[% vault_latlng.s.lng %]"
-localtuya_version: 3.3.0
-mini_graph_card_version: 0.10.0
-mini_media_player_version: 1.14.0
+localtuya_version: 3.4.0
+mini_graph_card_version: 0.11.0
+mini_media_player_version: 1.15.0
 mosquitto_password: "[% vault_mosquitto_password %]"
 nature_remo_version: 0.5
 nfs_server: guppy.rewse.jp
