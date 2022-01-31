@@ -1,0 +1,522 @@
+- id: automation.alarm_bedroom_humidity_difference_is_too_large
+  alias: "ALARM: Bedroom Humidity Difference is Too Large"
+  mode: single
+  trigger:
+    - platform: state
+      entity_id: sensor.bedroom_switchbot_meter_temperature
+      attribute: humidity
+  condition:
+    - condition: numeric_state
+      entity_id: sensor.average_of_bedroom_humidity_difference
+      attribute: min_value
+      above: 10
+  action:
+    - service: notify.tats_devices
+      data:
+        title: "⚠️ ALARM"
+        message: ️Bedroom Humidity Difference is Too Large
+        data:
+          url: /lovelace/home
+          push:
+            interruption-level: time-sensitive
+    - delay:
+        hours: 1
+- id: automation.alarm_bedroom_temperature_difference_is_too_large
+  alias: "ALARM: Bedroom Temperature Difference is Too Large"
+  mode: single
+  trigger:
+    - platform: state
+      entity_id: sensor.bedroom_switchbot_meter_temperature
+  condition:
+    - condition: numeric_state
+      entity_id: sensor.average_of_bedroom_temperature_difference
+      attribute: min_value
+      above: 1
+  action:
+    - service: notify.tats_devices
+      data:
+        title: "⚠️ ALARM"
+        message: ️Bedroom Temperature Difference is Too Large
+        data:
+          url: /lovelace/home
+          push:
+            interruption-level: time-sensitive
+    - delay:
+        hours: 1
+- id: automation.info_bedroom_humidity_is_too_high
+  alias: "INFO: Bedroom Humidity is Too High"
+  mode: single
+  trigger:
+    - platform: state
+      entity_id: binary_sensor.bedroom_motion_n
+      to: "on"
+    - platform: state
+      entity_id: binary_sensor.bedroom_motion_s
+      to: "on"
+  condition:
+    - condition: numeric_state
+      entity_id: sensor.bedroom_humidity
+      above: input_number.bedroom_hvac_dry_turned_on_threshold_humidity
+    - condition: numeric_state
+      entity_id: sensor.bedroom_wbgt
+      above: input_number.bedroom_hvac_dry_turned_on_threshold_wbgt
+    - condition: state
+      entity_id: sun.sun
+      state: above_horizon
+    - condition: state
+      entity_id: binary_sensor.workday_sensor
+      state: "on"
+    - condition: or
+      conditions:
+        - condition: state
+          entity_id: binary_sensor.bedroom_window_n
+          state: "on"
+          for:
+            minutes: 30
+        - condition: state
+          entity_id: binary_sensor.bedroom_window_s
+          state: "on"
+          for:
+            minutes: 30
+    - condition: state
+      entity_id: binary_sensor.bedroom_presence
+      state: "on"
+  action:
+    - service: notify.all_devices
+      data:
+        message: "Bedroom Humidity is Too High. Current: {{ states('sensor.bedroom_humidity') }}%"
+        data:
+          url: /lovelace/home
+          push:
+            interruption-level: time-sensitive
+    - delay:
+        hours: 2
+- id: automation.info_bedroom_humidity_is_too_low
+  alias: "INFO: Bedroom Humidity is Too Low"
+  mode: single
+  trigger:
+    - platform: state
+      entity_id: binary_sensor.bedroom_motion_n
+      to: "on"
+    - platform: state
+      entity_id: binary_sensor.bedroom_motion_s
+      to: "on"
+  condition:
+    - condition: numeric_state
+      entity_id: sensor.bedroom_humidity
+      below: input_number.bedroom_humidifier_turned_on_threshold
+    - condition: sun
+      after: sunrise
+    - condition: state
+      entity_id: binary_sensor.bedroom_presence
+      state: "on"
+  action:
+    - service: notify.all_devices
+      data:
+        message: "Bedroom Humidity is Too Low. Current: {{ states('sensor.bedroom_humidity') }}%"
+        data:
+          url: /lovelace/home
+          push:
+            interruption-level: time-sensitive
+    - delay:
+        hours: 2
+- id: automation.info_bedroom_wbgt_is_too_high
+  alias: "INFO: Bedroom WBGT is Too High"
+  mode: single
+  trigger:
+    - platform: state
+      entity_id: binary_sensor.bedroom_motion_n
+      to: "on"
+    - platform: state
+      entity_id: binary_sensor.bedroom_motion_s
+      to: "on"
+  condition:
+    - condition: numeric_state
+      entity_id: sensor.bedroom_wbgt
+      above: input_number.bedroom_hvac_cool_turned_on_threshold
+    - condition: state
+      entity_id: sun.sun
+      state: above_horizon
+    - condition: state
+      entity_id: binary_sensor.workday_sensor
+      state: "on"
+    - condition: or
+      conditions:
+        - condition: state
+          entity_id: binary_sensor.bedroom_window_n
+          state: "on"
+          for:
+            minutes: 30
+        - condition: state
+          entity_id: binary_sensor.bedroom_window_s
+          state: "on"
+          for:
+            minutes: 30
+    - condition: state
+      entity_id: binary_sensor.bedroom_presence
+      state: "on"
+  action:
+    - service: notify.all_devices
+      data:
+        message: "Bedroom WBGT is Too High. Current: {{ states('sensor.bedroom_wbgt') }}°C"
+        data:
+          url: /lovelace/home
+          push:
+            interruption-level: time-sensitive
+    - delay:
+        hours: 2
+- id: automation.open_bedroom_curtains_temporarily
+  alias: Open Bedroom Curtains Temporarily
+  description: Open the curtains in the bedroom temporarily
+  trigger:
+    - platform: time
+      at: input_datetime.bedroom_curtains_opened_time
+  action:
+    - service: script.open_and_get_state_of_bedroom_curtains
+- id: automation.open_bedroom_curtains_workday
+  alias: Open Bedroom Curtains Workday
+  description: Open the curtains in the bedroom every workday
+  trigger:
+    - platform: time
+      at: input_datetime.bedroom_curtains_opened_time_workday
+  condition:
+    - condition: state
+      entity_id: binary_sensor.workday_sensor
+      state: "on"
+  action:
+    - service: script.open_and_get_state_of_bedroom_curtains
+- id: automation.plan_to_turn_on_bedroom_hvac_cleaner
+  alias: Plan to Turn on Bedroom HVAC Cleaner
+  trigger:
+    - platform: numeric_state
+      entity_id: sensor.filtered_bedroom_hvac_plug_power
+      above: 10
+      for:
+        hours: 2
+  condition:
+    - condition: state
+      entity_id: binary_sensor.workday_sensor
+      state: "on"
+    - condition: not
+      conditions:
+        - condition: state
+          entity_id: sensor.season
+          state: winter
+  action:
+    - service: automation.turn_on
+      target:
+        entity_id:
+          - automation.turn_on_bedroom_hvac_cleaner
+- id: automation.turn_down_bedroom
+  alias: Turn down Bedroom
+  description: Turn down the bedroom
+  trigger:
+    - platform: time
+      at: input_datetime.bedroom_turned_down_time
+  action:
+    - service: script.close_and_get_state_of_bedroom_curtains
+- id: automation.turn_off_bedroom_hvac_cool
+  alias: Turn off Bedroom HVAC Cool
+  mode: single
+  trigger:
+    - platform: state
+      entity_id: binary_sensor.bedroom_motion_n
+      to: "on"
+    - platform: state
+      entity_id: binary_sensor.bedroom_motion_s
+      to: "on"
+  condition:
+    - condition: numeric_state
+      entity_id: sensor.bedroom_wbgt
+      below: input_number.bedroom_hvac_cool_turned_off_threshold
+    - condition: numeric_state
+      entity_id: sensor.bedroom_humidity
+      below: input_number.bedroom_hvac_dry_turned_off_threshold
+    - condition: numeric_state
+      entity_id: sensor.filtered_bedroom_hvac_plug_power
+      above: 10
+    - condition: not
+      conditions:
+        - condition: state
+          entity_id: sensor.season
+          state: winter
+  action:
+    - service: climate.set_hvac_mode
+      target:
+        entity_id: climate.bedroom_hvac
+      data:
+        hvac_mode: "off"
+    - service: notify.all_devices
+      data:
+        message: "Turned off Bedroom HVAC Cool. Current: {{ states('sensor.bedroom_wbgt') }}°C, {{ states('sensor.bedroom_humidity') }}%"
+        data:
+          url: /lovelace/home
+          push:
+            interruption-level: time-sensitive
+    - delay:
+        hours: 1
+- id: automation.turn_off_bedroom_hvac_heat
+  alias: Turn off Bedroom HVAC Heat
+  mode: single
+  trigger:
+    - platform: state
+      entity_id: binary_sensor.bedroom_motion_n
+      to: "on"
+    - platform: state
+      entity_id: binary_sensor.bedroom_motion_s
+      to: "on"
+  condition:
+    - condition: numeric_state
+      entity_id: sensor.bedroom_temperature
+      above: input_number.bedroom_hvac_heat_turned_off_threshold
+    - condition: numeric_state
+      entity_id: sensor.filtered_bedroom_hvac_plug_power
+      above: 10
+    - condition: state
+      entity_id: sensor.season
+      state: winter
+  action:
+    - service: climate.set_hvac_mode
+      target:
+        entity_id: climate.bedroom_hvac
+      data:
+        hvac_mode: "off"
+    - service: notify.all_devices
+      data:
+        message: "Turned off Bedroom HVAC Heat. Current: {{ states('sensor.bedroom_temperature') }}°C"
+        data:
+          url: /lovelace/home
+          push:
+            interruption-level: time-sensitive
+    - delay:
+        hours: 1
+- id: automation.turn_off_bedroom_light
+  alias: Turn off Bedroom Light
+  trigger:
+    - platform: state
+      entity_id: sensor.bedroom_1_button_switch_action
+      to: double
+  action:
+    - service: light.turn_off
+      target:
+        entity_id: light.bedroom_light
+- id: automation.turn_on_bedroom_hvac_cleaner
+  alias: Turn on Bedroom HVAC Cleaner
+  mode: single
+  trigger:
+    - platform: time_pattern
+      minutes: "/5"
+      seconds: 37
+  condition:
+    - condition: state
+      entity_id: binary_sensor.workday_sensor
+      state: 'off'
+    - condition: time
+      after: "16:00"
+      before: "20:00"
+    - condition: state
+      entity_id: binary_sensor.bedroom_presence
+      state: "off"
+  action:
+    - service: switch.turn_on
+      target:
+        entity_id: switch.bedroom_hvac_cleaner
+    - service: notify.all_devices
+      data:
+        message: Turned on Bedroom HVAC Cleaner
+        data:
+          url: /lovelace/home
+          push:
+            interruption-level: time-sensitive
+    - delay:
+        hours: 2
+    - service: automation.turn_off
+      target:
+        entity_id: automation.turn_on_bedroom_hvac_cleaner
+- id: automation.turn_on_bedroom_hvac_cool
+  alias: Turn on Bedroom HVAC Cool
+  mode: single
+  trigger:
+    - platform: state
+      entity_id: binary_sensor.bedroom_motion_n
+      to: "on"
+    - platform: state
+      entity_id: binary_sensor.bedroom_motion_s
+      to: "on"
+  condition:
+    - condition: numeric_state
+      entity_id: sensor.bedroom_wbgt
+      above: input_number.bedroom_hvac_cool_turned_on_threshold
+    - condition: state
+      entity_id: binary_sensor.bedroom_window_n
+      state: "off"
+      for:
+        minutes: 30
+    - condition: state
+      entity_id: binary_sensor.bedroom_window_s
+      state: "off"
+      for:
+        minutes: 30
+    - condition: state
+      entity_id: binary_sensor.bedroom_presence
+      state: "on"
+  action:
+    - service: climate.set_hvac_mode
+      target:
+        entity_id: climate.bedroom_hvac
+      data:
+        hvac_mode: cool
+    - service: notify.all_devices
+      data:
+        message: "Turned on Bedroom HVAC Cool. Current: {{ states('sensor.bedroom_wbgt') }}°C"
+        data:
+          url: /lovelace/home
+          push:
+            interruption-level: time-sensitive
+    - delay:
+        hours: 1
+- id: automation.turn_on_bedroom_hvac_cool_forcibly
+  alias: Turn on Bedroom HVAC Cool Forcibly
+  mode: single
+  trigger:
+    - platform: time_pattern
+      minutes: "/5"
+      seconds: 46
+  condition:
+    - condition: numeric_state
+      entity_id: sensor.bedroom_wbgt
+      above: input_number.bedroom_hvac_cool_forcibly_turned_on_threshold
+    - condition: state
+      entity_id: binary_sensor.bedroom_window_n
+      state: "off"
+      for:
+        minutes: 30
+    - condition: state
+      entity_id: binary_sensor.bedroom_window_s
+      state: "off"
+      for:
+        minutes: 30
+  action:
+    - service: climate.set_hvac_mode
+      target:
+        entity_id: climate.bedroom_hvac
+      data:
+        hvac_mode: cool
+    - service: notify.all_devices
+      data:
+        message: "Turned on Bedroom HVAC Cool Forcibly. Current: {{ states('sensor.bedroom_wbgt') }}°C"
+        data:
+          url: /lovelace/home
+          push:
+            interruption-level: time-sensitive
+    - delay:
+        hours: 1
+- id: automation.turn_on_bedroom_hvac_dry
+  alias: Turn on Bedroom HVAC Dry
+  mode: single
+  trigger:
+    - platform: state
+      entity_id: binary_sensor.bedroom_motion_n
+      to: "on"
+    - platform: state
+      entity_id: binary_sensor.bedroom_motion_s
+      to: "on"
+  condition:
+    - condition: numeric_state
+      entity_id: sensor.bedroom_humidity
+      above: input_number.bedroom_hvac_dry_turned_on_threshold_humidity
+    - condition: numeric_state
+      entity_id: sensor.bedroom_wbgt
+      above: input_number.bedroom_hvac_dry_turned_on_threshold_wbgt
+    - condition: numeric_state
+      entity_id: sensor.filtered_bedroom_hvac_plug_power
+      below: 10
+    - condition: state
+      entity_id: binary_sensor.bedroom_window_n
+      state: "off"
+      for:
+        minutes: 30
+    - condition: state
+      entity_id: binary_sensor.bedroom_window_s
+      state: "off"
+      for:
+        minutes: 30
+    - condition: state
+      entity_id: binary_sensor.bedroom_presence
+      state: "on"
+  action:
+    - service: climate.set_hvac_mode
+      target:
+        entity_id: climate.bedroom_hvac
+      data:
+        hvac_mode: dry
+    - service: notify.all_devices
+      data:
+        message: "Turned on Bedroom HVAC Dry. Current: {{ states('sensor.bedroom_humidity') }}%"
+        data:
+          url: /lovelace/home
+          push:
+            interruption-level: time-sensitive
+    - delay:
+        hours: 1
+- id: automation.turn_on_bedroom_hvac_heat
+  alias: Turn on Bedroom HVAC Heat
+  mode: single
+  trigger:
+    - platform: state
+      entity_id: binary_sensor.bedroom_motion_n
+    - platform: state
+      entity_id: binary_sensor.bedroom_motion_s
+  condition:
+    - condition: numeric_state
+      entity_id: sensor.bedroom_temperature
+      below: input_number.bedroom_hvac_heat_turned_on_threshold
+    - condition: state
+      entity_id: binary_sensor.bedroom_window_n
+      state: "off"
+      for:
+        minutes: 30
+    - condition: state
+      entity_id: binary_sensor.bedroom_window_s
+      state: "off"
+      for:
+        minutes: 30
+    - condition: state
+      entity_id: binary_sensor.bedroom_presence
+      state: "on"
+    - condition: numeric_state
+      entity_id: sensor.filtered_bedroom_hvac_plug_power
+      below: "10"
+    - condition: state
+      entity_id: sensor.season
+      state: winter
+    - condition: state
+      entity_id: cover.bedroom_curtains
+      state: opening
+      for:
+        hours: 1
+  action:
+    - service: climate.set_hvac_mode
+      target:
+        entity_id: climate.bedroom_hvac
+      data:
+        hvac_mode: heat
+    - service: notify.all_devices
+      data:
+        message: "Turned on Bedroom HVAC Heat. Current: {{ states('sensor.bedroom_wbgt') }}°C"
+        data:
+          url: /lovelace/home
+          push:
+            interruption-level: time-sensitive
+    - delay:
+        hours: 1
+- id: automation.turn_on_bedroom_light
+  alias: Turn on Bedroom Light
+  trigger:
+    - platform: state
+      entity_id: sensor.bedroom_1_button_switch_action
+      to: single
+  action:
+    - service: light.turn_on
+      target:
+        entity_id: light.bedroom_light

@@ -65,12 +65,74 @@
   notify: Restart docker
   tags: [homeassistant, homeassistant-docker]
 
-- name: Copy automations.yaml.j2
+- name: Config automation
+  lineinfile:
+    path: /etc/homeassistant/configuration.yaml
+    regexp: '^automation:'
+    line: "automation: !include_dir_merge_list automations/"
+  notify: Restart homeassistant
+  tags: [homeassistant, homeassistant-component]
+
+- name: Create auatomations dir
+  file:
+    path: /etc/homeassistant/automations
+    state: directory
+  tags: [homeassistant, homeassistant-component]
+
+- name: Copy automations-alarm.yaml
+  copy:
+    src: automations-alarm.yaml
+    dest: /etc/homeassistant/automations
+  tags: [homeassistant, homeassistant-automation]
+
+- name: Copy automations-balcony.yaml
+  copy:
+    src: automations-balcony.yaml
+    dest: /etc/homeassistant/automations
+  tags: [homeassistant, homeassistant-automation]
+
+- name: Copy automations-bathroom.yaml
+  copy:
+    src: automations-bathroom.yaml
+    dest: /etc/homeassistant/automations
+  tags: [homeassistant, homeassistant-automation]
+
+- name: Copy automations-bedroom.yaml
+  copy:
+    src: automations-bedroom.yaml
+    dest: /etc/homeassistant/automations
+  tags: [homeassistant, homeassistant-automation]
+
+- name: Copy automations-entrance.yaml
+  copy:
+    src: automations-entrance.yaml
+    dest: /etc/homeassistant/automations
+  tags: [homeassistant, homeassistant-automation]
+
+- name: Copy automations-info.yaml.j2
   template:
-    src: automations.yaml.j2
-    dest: /etc/homeassistant/automations.yaml
+    src: automations-info.yaml.j2
+    dest: /etc/homeassistant/automations/automations-info.yaml
     variable_start_string: "[%"
     variable_end_string: "%]"
+  tags: [homeassistant, homeassistant-automation]
+
+- name: Copy automations-kitchen.yaml
+  copy:
+    src: automations-kitchen.yaml
+    dest: /etc/homeassistant/automations
+  tags: [homeassistant, homeassistant-automation]
+
+- name: Copy automations-living-room.yaml
+  copy:
+    src: automations-living-room.yaml
+    dest: /etc/homeassistant/automations
+  tags: [homeassistant, homeassistant-automation]
+
+- name: Copy automations-misc.yaml
+  copy:
+    src: automations-misc.yaml
+    dest: /etc/homeassistant/automations
   tags: [homeassistant, homeassistant-automation]
 
 - name: Copy secrets.yaml
@@ -94,7 +156,7 @@
 - name: Copy alarm_control_panels.yaml
   copy:
     src: alarm_control_panels.yaml
-    dest: /etc/homeassistant/alarm_control_panels.yaml
+    dest: /etc/homeassistant
   notify: Restart homeassistant
   tags: [homeassistant, homeassistant-component]
 
@@ -110,7 +172,7 @@
 - name: Copy alexa.yaml
   copy:
     src: alexa.yaml
-    dest: /etc/homeassistant/alexa.yaml
+    dest: /etc/homeassistant
   notify: Restart homeassistant
   tags: [homeassistant, homeassistant-component]
 
@@ -625,6 +687,9 @@
         internal_url: https://hass.rewse.jp/
         customize: !include customize.yaml
       fastdotcom:
+      frontend:
+        extra_module_url:
+          - /local/card-mod.js
       http:
         use_x_forwarded_for: true
         trusted_proxies:
@@ -655,8 +720,6 @@
         mode: yaml
         dashboards: !include dashboards.yaml
         resources:
-          - url: /local/card-mod.js
-            type: module
           - url: /local/mini-graph-card-bundle.js?v={{ mini_graph_card_version }}
             type: module
           - url: /local/mini-media-player-bundle.js?v={{ mini_media_player_version }}

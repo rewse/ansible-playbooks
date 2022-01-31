@@ -1,0 +1,290 @@
+- id: automation.auto_lock_entrance_lock_bottom_in_daytime
+  alias: Auto-Lock Entrnace Lock Bottom in Daytime
+  mode: single
+  trigger:
+    - platform: time_pattern
+      minutes: "/5"
+      seconds: 5
+  condition:
+    - condition: state
+      entity_id: lock.entrance_lock_bottom
+      state: unlocked
+      for:
+        minutes: 30
+    - condition: state
+      entity_id: binary_sensor.entrance_door
+      state: "off"
+      for:
+        minutes: 30
+    - condition: time
+      after: "9:00"
+      before: "21:00"
+    - condition: state
+      entity_id: alarm_control_panel.entrance_auto_lock
+      state: armed_home
+  action:
+    - service: lock.lock
+      target:
+        entity_id: lock.entrance_lock_bottom
+    - delay:
+        seconds: 30
+    - service: homeassistant.update_entity
+      target:
+        entity_id: lock.entrance_lock_bottom
+- id: automation.auto_lock_entrance_lock_top_in_daytime
+  alias: Auto-Lock Entrnace Lock Top in Daytime
+  mode: single
+  trigger:
+    - platform: time_pattern
+      minutes: "/5"
+      seconds: 5
+  condition:
+    - condition: state
+      entity_id: lock.entrance_lock_top
+      state: unlocked
+      for:
+        minutes: 30
+    - condition: state
+      entity_id: binary_sensor.entrance_door
+      state: "off"
+      for:
+        minutes: 30
+    - condition: time
+      after: "9:00"
+      before: "21:00"
+    - condition: state
+      entity_id: alarm_control_panel.entrance_auto_lock
+      state: armed_home
+  action:
+    - service: lock.lock
+      target:
+        entity_id: lock.entrance_lock_top
+    - delay:
+        seconds: 30
+    - service: homeassistant.update_entity
+      target:
+        entity_id: lock.entrance_lock_top
+- id: automation.auto_lock_entrance_lock_bottom_in_nighttime
+  alias: Auto-Lock Entrance Lock Bottom in Nighttime
+  mode: single
+  trigger:
+    - platform: time_pattern
+      minutes: "/5"
+      seconds: 21
+  condition:
+    - condition: state
+      entity_id: lock.entrance_lock_bottom
+      state: unlocked
+      for:
+        minutes: 10
+    - condition: state
+      entity_id: binary_sensor.entrance_door
+      state: "off"
+      for:
+        minutes: 10
+    - condition: time
+      after: "21:00"
+      before: "9:00"
+    - condition: state
+      entity_id: alarm_control_panel.entrance_auto_lock
+      state: armed_home
+  action:
+    - service: lock.lock
+      target:
+        entity_id: lock.entrance_lock_bottom
+    - delay:
+        seconds: 30
+    - service: homeassistant.update_entity
+      target:
+        entity_id: lock.entrance_lock_bottom
+- id: automation.auto_lock_entrance_lock_top_in_nighttime
+  alias: Auto-Lock Entrance Lock Top in Nighttime
+  mode: single
+  trigger:
+    - platform: time_pattern
+      minutes: "/5"
+      seconds: 21
+  condition:
+    - condition: state
+      entity_id: lock.entrance_lock_top
+      state: unlocked
+      for:
+        minutes: 10
+    - condition: state
+      entity_id: binary_sensor.entrance_door
+      state: "off"
+      for:
+        minutes: 10
+    - condition: time
+      after: "21:00"
+      before: "9:00"
+    - condition: state
+      entity_id: alarm_control_panel.entrance_auto_lock
+      state: armed_home
+  action:
+    - service: lock.lock
+      target:
+        entity_id: lock.entrance_lock_top
+    - delay:
+        seconds: 30
+    - service: homeassistant.update_entity
+      target:
+        entity_id: lock.entrance_lock_top
+- id: automation.info_entrance_auto_lock_is_off
+  alias: "INFO: Entrance Auto-Lock is Off"
+  trigger:
+    - platform: time_pattern
+      hours: "/2"
+      minutes: 48
+      seconds: 13
+  condition:
+    - condition: state
+      entity_id: alarm_control_panel.entrance_auto_lock
+      state: disarmed
+      for:
+        hours: 2
+  action:
+    - service: notify.tats_devices
+      data:
+        message: "Entrance Auto-Lock is Off"
+        data:
+          url: /lovelace/home
+          push:
+            interruption-level: time-sensitive
+- id: automation.lock_entrance_locks
+  alias: Lock Entrance Locks
+  mode: restart
+  trigger:
+    - platform: state
+      entity_id: sensor.entrance_1_button_switch_action
+      to: double
+    - platform: state
+      entity_id: sensor.living_room_1_button_switch_action
+      to: double
+  action:
+    - service: lock.lock
+      target:
+          entity_id: lock.entrance_locks
+    - delay:
+        seconds: 30
+    - service: homeassistant.update_entity
+      target:
+        entity_id:
+          - lock.entrance_lock_bottom
+          - lock.entrance_lock_top
+- id: automation.turn_on_entrance_auto_lock
+  alias: Turn on Entrance Auto-Lock
+  trigger:
+    - platform: state
+      entity_id: binary_sensor.entrance_door
+      from: "off"
+      to: "on"
+  action:
+    - service: alarm_control_panel.alarm_arm_home
+      target:
+        entity_id: alarm_control_panel.entrance_auto_lock
+- id: automation.unlock_entrance_locks
+  alias: Unlock Entrance Locks
+  mode: restart
+  trigger:
+    - platform: state
+      entity_id: sensor.entrance_1_button_switch_action
+      to: single
+    - platform: state
+      entity_id: sensor.living_room_1_button_switch_action
+      to: single
+  action:
+    - service: lock.unlock
+      target:
+        entity_id: lock.entrance_locks
+    - delay:
+        seconds: 30
+    - service: homeassistant.update_entity
+      target:
+        entity_id:
+          - lock.entrance_lock_bottom
+          - lock.entrance_lock_top
+- id: automation.unlock_entrance_lock_when_ios_action_fails
+  alias: Unlock Entrance Lock when iOS Action Fails
+  trigger:
+    - platform: event
+      event_type: ios.action_fired
+      event_data:
+        actionName: open_entrance
+  condition:
+    - condition: not
+      conditions:
+        - condition: state
+          entity_id: person.shibata_tats
+          state: home
+          for:
+            minutes: 5
+        - condition: state
+          entity_id: person.shibata_akiko
+          state: home
+          for:
+            minutes: 5
+  action:
+    - service: notify.all_devices
+      data:
+        title: "🚫 ERROR"
+        message: Nobody in Home. Use a physical key
+        data:
+          url: /lovelace-people/people
+          push:
+            interruption-level: time-sensitive
+- id: automation.unlock_entrance_lock_when_ios_action_fires
+  alias: Unlock Entrance Lock when iOS Action Fires
+  mode: single
+  trigger:
+    - platform: event
+      event_type: ios.action_fired
+      event_data:
+        actionName: open_entrance
+  condition:
+    - condition: or
+      conditions:
+        - condition: state
+          entity_id: person.shibata_tats
+          state: home
+          for:
+            minutes: 5
+        - condition: state
+          entity_id: person.shibata_akiko
+          state: home
+          for:
+            minutes: 5
+  action:
+    - service: lock.unlock
+      target:
+        entity_id: lock.entrance_locks
+    - service: notify.all_devices
+      data:
+        message: Unlocked Entrance
+        data:
+          url: /lovelace-people/people
+          push:
+            interruption-level: time-sensitive
+    - delay:
+        seconds: 30
+    - service: homeassistant.update_entity
+      target:
+        entity_id:
+          - lock.entrance_lock_bottom
+          - lock.entrance_lock_top
+- id: automation.update_entrace_lock_states
+  alias: Update Entrance Lock States
+  mode: restart
+  trigger:
+    - platform: state
+      entity_id: binary_sensor.entrance_door
+      from: "on"
+      to: "off"
+  action:
+    - delay:
+        seconds: 30
+    - service: homeassistant.update_entity
+      target:
+        entity_id:
+          - lock.entrance_lock_bottom
+          - lock.entrance_lock_top
