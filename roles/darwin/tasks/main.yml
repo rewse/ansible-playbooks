@@ -16,6 +16,7 @@
       - awscli
       - gh
       - fontforge
+      - fping
       - jq
       - mas
       - pv
@@ -109,7 +110,6 @@
       - font-source-han-serif
       - font-source-sans-pro
       - font-source-serif-pro
-      - fping
       - geekbench
       - gnucash
       - google-chrome
