@@ -16,6 +16,7 @@
       - awscli
       - gh
       - fontforge
+      - fping
       - jq
       - mas
       - pv
@@ -104,12 +105,16 @@
       - evernote
       - firefox
       - fantastical
+      - font-new-york
+      - font-sf-compact
+      - font-sf-mono
+      - font-sf-mono-for-powerline
+      - font-sf-pro
       - font-source-han-mono
       - font-source-han-sans
       - font-source-han-serif
       - font-source-sans-pro
       - font-source-serif-pro
-      - fping
       - geekbench
       - gnucash
       - google-chrome
