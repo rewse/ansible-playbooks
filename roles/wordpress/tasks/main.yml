@@ -127,6 +127,15 @@
           add_filter( 'wp', 'jetpackme_remove_rp', 20 );
       }
 
+      /* ref; https://github.com/Automattic/jetpack/pull/22269 */
+      add_filter(
+          'jetpack_stats_excluded_ips',
+          function ( $excluded_ips ) {
+              $excluded_ips[] = '{{ global_ip.home_ip }}';
+              return $excluded_ips;
+          }
+      );
+
       /* Ref; https://blog.rizkipratama.com/change-jetpack-related-posts-category-primary-yoast-seo/ */
       if ( ! function_exists( 'jp_rp_context_cat_primary_yoast' ) ) {
         function jp_rp_context_cat_primary_yoast( $context, $post_id ) {
