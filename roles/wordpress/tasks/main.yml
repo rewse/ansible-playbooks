@@ -129,6 +129,52 @@
       CUSTOMIZE BY OWNER
       --------------------------------------------------------------------------------------------- */
 
+      /* Ref; https://jetpack.com/support/related-posts/customize-related-posts/ */
+      function jetpackme_append_related_post( $hits, $post_id ) {
+          if ( 537 === $post_id ) {
+              array_unshift( $hits, array( 'id' => 268 ) );
+      
+              array_pop( $hits );
+          }
+          return $hits;
+      }
+      add_filter(
+          'jetpack_relatedposts_filter_hits',
+          'jetpackme_append_related_post',
+          20, 2
+      );
+
+      /* Ref; https://jetpack.com/support/related-posts/customize-related-posts/ */
+      function jetpackme_add_pages_to_related( $post_type, $post_id ) {
+          if ( is_array( $post_type ) ) {
+              $search_types = $post_type;
+          } else {
+              $search_types = array( $post_type );
+          }
+      
+          // Add pages.
+          $search_types[] = 'page';
+      
+          return $search_types;
+      }
+      add_filter(
+          'jetpack_relatedposts_filter_post_type',
+          'jetpackme_add_pages_to_related', 10, 2
+      );
+
+      /* Ref; https://jetpack.com/support/related-posts/customize-related-posts/ */
+      function jetpackme_allow_pages_for_relatedposts( $enabled ) {
+          if ( is_page() ) {
+              $enabled = true;
+          }
+      
+          return $enabled;
+      }
+      add_filter(
+          'jetpack_relatedposts_filter_enabled_for_request', 'jetpackme_allow_pages_for_relatedposts'
+      );
+
+      /* Ref; https://jetpack.com/support/related-posts/customize-related-posts/ */
       if ( ! function_exists( 'jetpackme_remove_rp' ) ) {
           function jetpackme_remove_rp() {
               $jprp = Jetpack_RelatedPosts::init();
