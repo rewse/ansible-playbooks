@@ -102,6 +102,17 @@
     - fukasawa-ja.po
   tags: [wordpress]
 
+- name: Copy jetpack-ja to prevent updating
+  ansible.builtin.copy:
+    src: "{{ item }}"
+    dest: /srv/www/wordpress/wp-content/languages/plugins
+    owner: www-data
+    group: www-data
+  with_items:
+    - jetpack-ja.mo
+    - jetpack-ja.po
+  tags: [wordpress]
+
 - name: Disable Lato font
   ansible.builtin.replace:
     path: /srv/www/wordpress/wp-content/themes/fukasawa/functions.php
