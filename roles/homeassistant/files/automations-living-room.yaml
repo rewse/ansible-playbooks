@@ -55,7 +55,6 @@
             interruption-level: time-sensitive
     - delay:
         hours: 1
-  mode: single
 - id: automation.alarm_living_room_temperature_difference_is_too_large
   alias: "ALARM: Living Room Temperature Difference is Too Large"
   mode: single
