@@ -133,7 +133,19 @@
       function jetpackme_append_related_post( $hits, $post_id ) {
           if ( 537 === $post_id ) {
               array_unshift( $hits, array( 'id' => 268 ) );
-      
+
+              array_pop( $hits );
+          } elseif ( 8 === $post_id) {
+              array_unshift( $hits, array( 'id' => 1198 ) );
+              array_unshift( $hits, array( 'id' => 537 ) );
+              array_unshift( $hits, array( 'id' => 830 ) );
+
+              array_pop( $hits );
+          } elseif ( 127 === $post_id) {
+              array_unshift( $hits, array( 'id' => 1198 ) );
+              array_unshift( $hits, array( 'id' => 537 ) );
+              array_unshift( $hits, array( 'id' => 830 ) );
+
               array_pop( $hits );
           }
           return $hits;
@@ -246,9 +258,8 @@
     block: |2
                           <?php if ( function_exists( 'wpsabox_author_box' ) ) echo wpsabox_author_box(); ?>
 
-                          <?php if ( ! is_page() ) : ?>
-                              <p class="post-disclaimer">ここで示されている発言は個人の見解であり、所属する組織の公式見解ではありません。</p>
-                          <?php endif; ?>
+                          <p class="post-disclaimer">ここで示されている発言は個人の見解であり、所属する組織の公式見解ではありません。</p>
+
                           <?php
                               if ( class_exists( 'Jetpack_RelatedPosts' ) ) {
                                   echo do_shortcode( '[jetpack-related-posts]' );
