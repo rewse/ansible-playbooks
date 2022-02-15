@@ -31,6 +31,14 @@
   folder: mamorail
   senders:
     - info@mamorail.jp
+- platform: imap_email_content
+  name: Yotsuya-Otsuka
+  server: imap.gmail.com
+  username: !secret gmail_address
+  password: !secret gmail_password
+  folder: yotsuya-otsuka
+  senders:
+    - ichigaya@yotsuya-otsuka.co.jp
 - platform: min_max
   name: monitor bio
   type: max

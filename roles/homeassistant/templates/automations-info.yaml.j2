@@ -102,3 +102,22 @@
         data:
           push:
             interruption-level: active
+- id: automation.info_yotsuya_otsuka
+  alias: "INFO: Yotsuya-Otsuka"
+  trigger:
+    - platform: state
+      entity_id: sensor.yotsuya_otsuka
+  condition:
+    - condition: template
+      value_template: >-
+        {{ (as_timestamp(now()) -
+        as_timestamp(states('sensor.yotsuya_otsuka_received_date_time'))) < 600 }}
+  action:
+    - service: notify.all_devices
+      data:
+        title: "[% notify_title_k %]"
+        message: "️{{ states('sensor.yotsuya_otsuka_time') }}に四谷大塚に{{ states('sensor.yotsuya_otsuka_action') }}しました"
+        data:
+          url: /lovelace-people/people
+          push:
+            interruption-level: time-sensitive

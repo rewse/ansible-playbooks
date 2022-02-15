@@ -111,3 +111,15 @@
     unique_id: sensor.mamorail_time
     state: "{{ state_attr('sensor.mamorail', 'body') |regex_findall_index('([0-9][0-9]*:[0-9][0-9])に') }}"
     icon: mdi:clock-outline
+  - name: Yotsuya-Otsuka Action
+    unique_id: sensor.yotsuya_otsuka_action
+    state: "{{ state_attr('sensor.yotsuya_otsuka', 'subject') | regex_findall_index('四谷大塚 (..*)のお知らせ') }}"
+    icon: mdi:lead-pencil
+  - name: Yotsuya-Otsuka Received Date Time
+    unique_id: sensor.yotsuya_otsuka_received_date_time
+    state: "{{ as_timestamp(strptime(state_attr('sensor.yotsuya_otsuka', 'date'), '%a, %d %b %Y %H:%M:%S %z')) | timestamp_custom() }}"
+    icon: mdi:clock-outline
+  - name: Yotsuya-Otsuka Time
+    unique_id: sensor.yotsuya_otsuka_time
+    state: "{{ as_timestamp(strptime(state_attr('sensor.yotsuya_otsuka', 'date'), '%a, %d %b %Y %H:%M:%S %z')) | timestamp_custom('%H:%M') }}"
+    icon: mdi:clock-outline

@@ -24,6 +24,13 @@ views:
           - entity: sensor.denshobato_time
             name: Time
       - type: entities
+        title: Yotsuya-Otsuka
+        entities:
+          - entity: sensor.yotsuya_otsuka_action
+            name: Action
+          - entity: sensor.yotsuya_otsuka_time
+            name: Time
+      - type: entities
         title: Family
         entities:
           - entity: person.shibata_tats
