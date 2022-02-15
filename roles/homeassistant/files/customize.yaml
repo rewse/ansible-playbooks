@@ -179,3 +179,5 @@ sensor.unavailable_of_bathroom_washing_machine_plug_power:
   icon: mdi:washing-machine-alert
 sensor.regza_channel:
   icon: mdi:television
+sensor.yotsuya_otsuka:
+  icon: mdi:lead-pencil
