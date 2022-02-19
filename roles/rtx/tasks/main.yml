@@ -48,6 +48,7 @@
   rtx_config:
     lines:
       - syslog host {{ fox.ip }}
+      - syslog notice on
       - syslog execute command on
   tags: [rtx, rtx-syslog]
 
@@ -112,36 +113,36 @@
       # ip lan2 secure filter in 101003 101020 101021 101022 101023 101024 101025 101030 101032 101080 101081 101082 101083
       - ip lan2 secure filter in 101003 101020 101021 101022 101023 101024 101025 101099
       - ip lan2 secure filter out 101013 101020 101021 101022 101023 101024 101025 101026 101027 101099 dynamic 101080 101081 101082 101083 101084 101085 101098 101099
-      - ipv6 lan2 secure filter in 101 102 2001 2002 3001 3004 101010 101011 101012 102000
+      - ipv6 lan2 secure filter in 101 102 2001 2002 3001 3004 101010 101011 101012 101100 101101 101102 101103 101104 101105 102000
       - ipv6 lan2 secure filter out 103000 dynamic 100100 100101 100102 100103 100104 100105 100106
   tags: [rtx, rtx-port]
 
 - name: Set the default filters
   rtx_config:
     lines:
-      - ip filter 100000 reject * * udp,tcp 135 *
-      - ip filter 100001 reject * * udp,tcp * 135
-      - ip filter 100002 reject * * udp,tcp netbios_ns-netbios_dgm *
-      - ip filter 100003 reject * * udp,tcp * netbios_ns-netbios_dgm
-      - ip filter 100004 reject * * udp,tcp netbios_ssn *
-      - ip filter 100005 reject * * udp,tcp * netbios_ssn
-      - ip filter 100006 reject * * udp,tcp 445 *
-      - ip filter 100007 reject * * udp,tcp * 445
+      - ip filter 100000 reject-nolog * * udp,tcp 135 *
+      - ip filter 100001 reject-nolog * * udp,tcp * 135
+      - ip filter 100002 reject-nolog * * udp,tcp netbios_ns-netbios_dgm *
+      - ip filter 100003 reject-nolog * * udp,tcp * netbios_ns-netbios_dgm
+      - ip filter 100004 reject-nolog * * udp,tcp netbios_ssn *
+      - ip filter 100005 reject-nolog * * udp,tcp * netbios_ssn
+      - ip filter 100006 reject-nolog * * udp,tcp 445 *
+      - ip filter 100007 reject-nolog * * udp,tcp * 445
       - ip filter 100099 pass * * * * *
-      - ip filter 101000 reject 10.0.0.0/8 * * * *
-      - ip filter 101001 reject 172.16.0.0/12 * * * *
-      - ip filter 101002 reject 192.168.0.0/16 * * * *
-      - ip filter 101003 reject 192.168.0.0/24 * * * *
-      - ip filter 101010 reject * 10.0.0.0/8 * * *
-      - ip filter 101011 reject * 172.16.0.0/12 * * *
-      - ip filter 101012 reject * 192.168.0.0/16 * * *
-      - ip filter 101013 reject * 192.168.0.0/24 * * *
-      - ip filter 101020 reject * * udp,tcp 135 *
-      - ip filter 101021 reject * * udp,tcp * 135
-      - ip filter 101022 reject * * udp,tcp netbios_ns-netbios_ssn *
-      - ip filter 101023 reject * * udp,tcp * netbios_ns-netbios_ssn
-      - ip filter 101024 reject * * udp,tcp 445 *
-      - ip filter 101025 reject * * udp,tcp * 445
+      - ip filter 101000 reject-nolog 10.0.0.0/8 * * * *
+      - ip filter 101001 reject-nolog 172.16.0.0/12 * * * *
+      - ip filter 101002 reject-nolog 192.168.0.0/16 * * * *
+      - ip filter 101003 reject-nolog 192.168.0.0/24 * * * *
+      - ip filter 101010 reject-nolog * 10.0.0.0/8 * * *
+      - ip filter 101011 reject-nolog * 172.16.0.0/12 * * *
+      - ip filter 101012 reject-nolog * 192.168.0.0/16 * * *
+      - ip filter 101013 reject-nolog * 192.168.0.0/24 * * *
+      - ip filter 101020 reject-nolog * * udp,tcp 135 *
+      - ip filter 101021 reject-nolog * * udp,tcp * 135
+      - ip filter 101022 reject-nolog * * udp,tcp netbios_ns-netbios_ssn *
+      - ip filter 101023 reject-nolog * * udp,tcp * netbios_ns-netbios_ssn
+      - ip filter 101024 reject-nolog * * udp,tcp 445 *
+      - ip filter 101025 reject-nolog * * udp,tcp * 445
       - ip filter 101026 restrict * * tcpfin * www,21,nntp
       - ip filter 101027 restrict * * tcprst * www,21,nntp
       - ip filter 101030 pass * 192.168.0.0/24 icmp * *
@@ -159,26 +160,39 @@
       - ip filter 101083 pass * 192.168.0.1 udp * 4500
       - ip filter 101099 pass * * * * *
       - ip filter 500000 restrict * * * * *
-      - ip filter dynamic 101080 * * ftp
-      - ip filter dynamic 101081 * * domain
-      - ip filter dynamic 101082 * * www
-      - ip filter dynamic 101083 * * smtp
-      - ip filter dynamic 101084 * * pop3
-      - ip filter dynamic 101085 * * submission
-      - ip filter dynamic 101098 * * tcp
-      - ip filter dynamic 101099 * * udp
+      - ip filter dynamic 101080 * * ftp syslog=off
+      - ip filter dynamic 101081 * * domain syslog=off
+      - ip filter dynamic 101082 * * www syslog=off
+      - ip filter dynamic 101083 * * smtp syslog=off
+      - ip filter dynamic 101084 * * pop3 syslog=off
+      - ip filter dynamic 101085 * * submission syslog=off
+      - ip filter dynamic 101098 * * tcp syslog=off
+      - ip filter dynamic 101099 * * udp syslog=off
       - ipv6 filter 101010 pass * * icmp6 * *
       - ipv6 filter 101011 pass * * tcp * ident
       - ipv6 filter 101012 pass * * udp * 546
       - ipv6 filter 102000 reject * * * * *
       - ipv6 filter 103000 pass * * * * *
-      - ipv6 filter dynamic 100100 * * ftp
-      - ipv6 filter dynamic 100101 * * domain
-      - ipv6 filter dynamic 100102 * * www
-      - ipv6 filter dynamic 100103 * * smtp
-      - ipv6 filter dynamic 100104 * * pop3
-      - ipv6 filter dynamic 100105 * * tcp
-      - ipv6 filter dynamic 100106 * * udp
+      - ipv6 filter dynamic 100100 * * ftp syslog=off
+      - ipv6 filter dynamic 100101 * * domain syslog=off
+      - ipv6 filter dynamic 100102 * * www syslog=off
+      - ipv6 filter dynamic 100103 * * smtp syslog=off
+      - ipv6 filter dynamic 100104 * * pop3 syslog=off
+      - ipv6 filter dynamic 100105 * * tcp syslog=off
+      - ipv6 filter dynamic 100106 * * udp syslog=off
+  tags: [rtx, rtx-port]
+
+- name: Add filters
+  rtx_config:
+    lines:
+      - ipv6 filter 101100 reject-nolog * * udp,tcp https *
+      - ipv6 filter 101101 reject-nolog * * udp,tcp www *
+      - ipv6 filter 101102 reject-nolog * * udp,tcp 993 *
+      - ipv6 filter 101103 reject-nolog * * udp,tcp 995 *
+        # 5228 is Google Play
+      - ipv6 filter 101104 reject-nolog * * udp,tcp 5228 *
+        # 5353 is mDNS
+      - ipv6 filter 101105 reject-nolog * * udp,tcp 5353 *
   tags: [rtx, rtx-port]
 
 - name: Open ports
