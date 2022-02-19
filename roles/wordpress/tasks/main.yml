@@ -266,3 +266,10 @@
                               }
                           ?>
   tags: [wordpress]
+
+- name: Add pochipp_assist
+  ansible.builtin.unarchive:
+    src: https://pochipp.com/download/?p=assist
+    dest: /srv/www/wordpress/wp-content/plugins
+    remote_src: yes
+  tags: [wordpress, wordpress-plugin]
