@@ -148,6 +148,7 @@
   command: mas install {{item}}
   with_items:
     - 545519333   # Amazon Prime Video
+    - 1168254295  # AmorphousDiskMark
     - 417375580   # BetterSnapTool
     - 425264550   # Blackmagic Disk Speed Test
     - 1044629456  # GFXBench Metal
