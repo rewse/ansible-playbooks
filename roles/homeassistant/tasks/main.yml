@@ -194,10 +194,26 @@
   notify: Restart homeassistant
   tags: [homeassistant, homeassistant-component]
 
-- name: Config climate
+- name: Config button
   lineinfile:
     path: /etc/homeassistant/configuration.yaml
     insertafter: '^binary_sensor:'
+    regexp: '^button:'
+    line: "button: !include buttons.yaml"
+  notify: Restart homeassistant
+  tags: [homeassistant, homeassistant-component]
+
+- name: Copy buttons.yaml
+  copy:
+    src: buttons.yaml
+    dest: /etc/homeassistant
+  notify: Restart homeassistant
+  tags: [homeassistant, homeassistant-component]
+
+- name: Config climate
+  lineinfile:
+    path: /etc/homeassistant/configuration.yaml
+    insertafter: '^button:'
     regexp: '^climate:'
     line: "climate: !include climates.yaml"
   notify: Restart homeassistant
