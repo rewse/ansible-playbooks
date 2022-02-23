@@ -145,8 +145,8 @@ views:
             icon: 'mdi:harddisk'
           - entity: sensor.global_internal_storage
             name: global Internal
-          - entity: sensor.guppy_volume_1_volume_used
-            name: guppy Volume 1
+          - entity: sensor.guppy_volume_used
+            name: guppy
             icon: 'mdi:harddisk'
       - type: vertical-stack
         cards:
