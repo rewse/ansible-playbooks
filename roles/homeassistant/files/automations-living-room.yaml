@@ -250,6 +250,40 @@
           - automation.turn_on_living_room_hvac_fan
           - automation.turn_off_living_room_hvac_fan
           - automation.turn_on_living_room_hvac_cleaner
+- id: automation.press_living_room_floor_heating_button
+  alias: Press Living Room Floor Heating Button
+  trigger:
+    - platform: state
+      entity_id: button.living_room_floor_heating
+  action:
+    - service: rest_command.control_switchbot_device
+      data:
+        device_id: E55CF11F894A
+        command: press
+    - service: notify.all_devices
+      data:
+        message: "Pressed Living Room Floor Heating Button"
+        data:
+          url: /lovelace/home
+          push:
+            interruption-level: time-sensitive
+- id: automation.press_study_floor_heating_button
+  alias: Press Study Floor Heating Button
+  trigger:
+    - platform: state
+      entity_id: button.study_room_floor_heating
+  action:
+    - service: rest_command.control_switchbot_device
+      data:
+        device_id: D0ECA7E7803F
+        command: press
+    - service: notify.all_devices
+      data:
+        message: "Pressed Study Floor Heating Button"
+        data:
+          url: /lovelace/home
+          push:
+            interruption-level: time-sensitive
 - id: automation.turn_down_living_area
   alias: Turn down Living Area
   description: Turn down the living area
