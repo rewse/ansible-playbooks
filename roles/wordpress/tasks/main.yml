@@ -131,6 +131,30 @@
 
       /* Ref; https://jetpack.com/support/related-posts/customize-related-posts/ */
       function jetpackme_append_related_post( $hits, $post_id ) {
+          $candidates = array(
+              268, 441, 537, 756, 830, 1085, 1396, 636, 865, 1198, 1286, 1358
+          );
+
+          $max = count($candidates) - 1;
+
+          $winner[0] = $candidates[mt_rand(0, $max)];
+
+          while (1) {
+            $winner[1] = $candidates[mt_rand(0, $max)];
+
+            if ($winner[1] != $winner[0]) {
+                break;
+            }
+          }
+
+          while (1) {
+            $winner[2] = $candidates[mt_rand(0, $max)];
+
+            if ($winner[2] != $winner[0] and $winner[2] != $winner[1]) {
+                break;
+            }
+          }
+
           if ( 537 === $post_id ) {
               array_unshift( $hits, array( 'id' => 268 ) );
 
