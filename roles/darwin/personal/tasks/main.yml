@@ -8,7 +8,6 @@
   homebrew_cask:
     name: 
       - android-file-transfer
-      - dropbox
       - epic-games
       - gog-galaxy
       - izotope-product-portal
