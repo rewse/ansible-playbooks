@@ -345,12 +345,12 @@
             interruption-level: time-sensitive
     - delay:
         hours: 1
-- id: automation.alarm_justio_is_offline
-  alias: "ALARM: justio is Offline"
+- id: automation.alarm_brother_is_offline
+  alias: "ALARM: brother is Offline"
   mode: single
   trigger:
     - platform: state
-      entity_id: binary_sensor.justio
+      entity_id: binary_sensor.brother
       to: "off"
       for:
         minutes: 31
@@ -358,7 +358,7 @@
     - service: notify.tats_devices
       data:
         title: "⚠️ ALARM"
-        message: ️justio is Offline
+        message: brother is Offline
         data:
           url: /lovelace-machines/machines
           push:
