@@ -1,0 +1,16 @@
+[Interface]
+PrivateKey = {{ wireguard.server.privatekey }}
+Address = 172.16.0.1/32
+ListenPort = 51820
+PostUp = iptables -A FORWARD -i wg0 -j ACCEPT; iptables -t nat -A POSTROUTING -o bond0 -j MASQUERADE
+PostDown = iptables -D FORWARD -i wg0 -j ACCEPT; iptables -t nat -D POSTROUTING -o bond0 -j MASQUERADE
+
+[Peer]
+# youth
+PublicKey = {{ wireguard.youth.publickey }}
+AllowedIPs = 172.16.0.200/32
+
+[Peer]
+# bio
+publickey = {{ wireguard.bio.publickey }}
+AllowedIPs = 172.16.0.180/32

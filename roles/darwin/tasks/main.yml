@@ -164,6 +164,7 @@
     - 425424353   # The Unarchiver
     - 485812721   # Tweetdeck
     - 494803304   # WiFi Explorer
+    - 1451685025  # WireGuard
     - 599799247   # そら案内
   tags: [darwin, package, mas]
 
