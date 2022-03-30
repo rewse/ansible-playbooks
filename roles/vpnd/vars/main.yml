@@ -1,0 +1,9 @@
+---
+wireguard:
+  server:
+    privatekey: "{{ vault_wireguard.server.privatekey }}"
+    publickey: oEuUacHnipt3MeGI8a0w/nUZKDWdceGHD/Jrto6LVQw=
+  bio:
+    publickey: Osi0t+ajrQqASM0pwp8nurnKXkgb7Y/UZIWwKP7NfVY=
+  youth:
+    publickey: FOYK1hjZNLspPFkdkS2LliHGIqWe3dmGylDVcSw4CzI=
