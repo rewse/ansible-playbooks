@@ -1,21 +1,21 @@
 [Interface]
 PrivateKey = {{ wireguard.server.privatekey }}
-Address = 172.16.0.1/32
+Address = 172.16.0.1/32, fdf5:3eec:ecad::1/128
 ListenPort = 51820
-PostUp = iptables -A FORWARD -i %i -j ACCEPT; iptables -A FORWARD -o %i -j ACCEPT; iptables -t nat -A POSTROUTING -o bond0 -j MASQUERADE
-PostDown = iptables -D FORWARD -i %i -j ACCEPT; iptables -D FORWARD -o %i -j ACCEPT; iptables -t nat -D POSTROUTING -o bond0 -j MASQUERADE
+PostUp = iptables -A FORWARD -i %i -j ACCEPT; iptables -A FORWARD -o %i -j ACCEPT; iptables -t nat -A POSTROUTING -o bond0 -j MASQUERADE; ip6tables -A FORWARD -i %i -j ACCEPT; ip6tables -A FORWARD -o %i -j ACCEPT; ip6tables -t nat -A POSTROUTING -o bond0 -j MASQUERADE
+PostDown = iptables -D FORWARD -i %i -j ACCEPT; iptables -D FORWARD -o %i -j ACCEPT; iptables -t nat -D POSTROUTING -o bond0 -j MASQUERADE; ip6tables -D FORWARD -i %i -j ACCEPT; ip6tables -D FORWARD -o %i -j ACCEPT; ip6tables -t nat -D POSTROUTING -o bond0 -j MASQUERADE
 
 [Peer]
 # bio
 publickey = {{ wireguard.bio.publickey }}
-AllowedIPs = 172.16.0.180/32
+AllowedIPs = 172.16.0.180/32, fdf5:3eec:ecad::180/128
 
 [Peer]
 # e0b55fe8e384
 publickey = {{ wireguard.e0b55fe8e384.publickey }}
-AllowedIPs = 172.16.0.202/32
+AllowedIPs = 172.16.0.202/32, fdf5:3eec:ecad::202/128
 
 [Peer]
 # youth
 PublicKey = {{ wireguard.youth.publickey }}
-AllowedIPs = 172.16.0.200/32
+AllowedIPs = 172.16.0.200/32, fdf5:3eec:ecad::200/128
