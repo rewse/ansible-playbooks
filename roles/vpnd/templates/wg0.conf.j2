@@ -6,11 +6,16 @@ PostUp = iptables -A FORWARD -i %i -j ACCEPT; iptables -A FORWARD -o %i -j ACCEP
 PostDown = iptables -D FORWARD -i %i -j ACCEPT; iptables -D FORWARD -o %i -j ACCEPT; iptables -t nat -D POSTROUTING -o bond0 -j MASQUERADE
 
 [Peer]
-# youth
-PublicKey = {{ wireguard.youth.publickey }}
-AllowedIPs = 172.16.0.200/32
-
-[Peer]
 # bio
 publickey = {{ wireguard.bio.publickey }}
 AllowedIPs = 172.16.0.180/32
+
+[Peer]
+# e0b55fe8e384
+publickey = {{ wireguard.e0b55fe8e384.publickey }}
+AllowedIPs = 172.16.0.202/32
+
+[Peer]
+# youth
+PublicKey = {{ wireguard.youth.publickey }}
+AllowedIPs = 172.16.0.200/32
