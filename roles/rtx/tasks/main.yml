@@ -214,6 +214,9 @@
       # fox: HTTPS
       - nat descriptor masquerade static 1 3004 {{ fox.ip }} tcp 443
       - ipv6 filter 3004 pass * {{ fox.ipv6 }} tcp * 443
+      # fox: WireGuard
+      - nat descriptor masquerade static 1 3005 {{ fox.ip }} udp 51820
+      - ipv6 filter 3005 pass * {{ fox.ipv6 }} udp * 51820
   tags: [rtx, rtx-port]
 
 # Ref: http://www.rtpro.yamaha.co.jp/RT/docs/l2tp_ipsec/
