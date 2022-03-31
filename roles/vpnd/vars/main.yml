@@ -5,6 +5,8 @@ wireguard:
     publickey: oEuUacHnipt3MeGI8a0w/nUZKDWdceGHD/Jrto6LVQw=
   bio:
     publickey: Osi0t+ajrQqASM0pwp8nurnKXkgb7Y/UZIWwKP7NfVY=
+  desert:
+    publickey: FP+HoBtyL/DJmDqDH9p+foD14Srupsvyrgfcjv/hbDw=
   e0b55fe8e384:
     publickey: YcMttQNvuZvUoGHyzoWIePTTwiy1n6QUFBXf3ggjUjQ=
   youth:
