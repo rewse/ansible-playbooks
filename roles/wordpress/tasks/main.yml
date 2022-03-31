@@ -132,7 +132,8 @@
       /* Ref; https://jetpack.com/support/related-posts/customize-related-posts/ */
       function jetpackme_append_related_post( $hits, $post_id ) {
           $candidates = array(
-              268, 441, 537, 756, 830, 1085, 1396, 636, 865, 1198, 1286, 1358
+              268, 441, 537, 756, 830, 1085, 1396, 636, 865, 1198, 1286, 1358,
+              1664, 1735, 1778
           );
 
           $max = count($candidates) - 1;
@@ -155,20 +156,10 @@
             }
           }
 
-          if ( 537 === $post_id ) {
-              array_unshift( $hits, array( 'id' => 268 ) );
-
-              array_pop( $hits );
-          } elseif ( 8 === $post_id) {
-              array_unshift( $hits, array( 'id' => 1198 ) );
-              array_unshift( $hits, array( 'id' => 537 ) );
-              array_unshift( $hits, array( 'id' => 830 ) );
-
-              array_pop( $hits );
-          } elseif ( 127 === $post_id) {
-              array_unshift( $hits, array( 'id' => 1198 ) );
-              array_unshift( $hits, array( 'id' => 537 ) );
-              array_unshift( $hits, array( 'id' => 830 ) );
+          if ( $post_id === 8 or $post_id === 127) {
+              array_unshift( $hits, array( 'id' => $winner[0] ) );
+              array_unshift( $hits, array( 'id' => $winner[1] ) );
+              array_unshift( $hits, array( 'id' => $winner[2] ) );
 
               array_pop( $hits );
           }
