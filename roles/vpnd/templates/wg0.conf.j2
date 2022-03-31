@@ -11,6 +11,11 @@ publickey = {{ wireguard.bio.publickey }}
 AllowedIPs = 172.16.0.180/32, fdf5:3eec:ecad::180/128
 
 [Peer]
+# desert
+publickey = {{ wireguard.desert.publickey }}
+AllowedIPs = 172.16.0.204/32, fdf5:3eec:ecad::204/128
+
+[Peer]
 # e0b55fe8e384
 publickey = {{ wireguard.e0b55fe8e384.publickey }}
 AllowedIPs = 172.16.0.202/32, fdf5:3eec:ecad::202/128
