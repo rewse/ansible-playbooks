@@ -156,10 +156,12 @@
     - 445189367   # PopClip
     - 1449412482  # Reeder 4
     - 1429033973  # RunCat
+    - 1187772509  # stts
     - 425424353   # The Unarchiver
-    - 485812721   # Tweetdeck
+    - 1482454543  # Twitter
     - 494803304   # WiFi Explorer
     - 1451685025  # WireGuard
+    - 1380563956  # 辞書 by 物書堂
     - 599799247   # そら案内
   tags: [darwin, package, mas]
 
