@@ -19,10 +19,9 @@
 
 # - name: Install rest of the apps
 #   install_yourself:
-#     - http://jocala.com/                                            # adbLink
+#     - https://adblink.me/download/                                  # adbLink
+#     - https://central.bitdefender.com/dashboard                     # Bitdefender
 #     - https://www.houdah.com/houdahGPS/download.html                # HoudahGPS
-#     - https://my.kaspersky.com/ja/                                  # Kaspersky
 #     - https://account.microsoft.com/                                # Microsoft Office
-#     - https://downloadcenter.nikonimglib.com/en/products/493/Z_6.html # Nikon Z 6
 #     - https://www.benq.com/ja-jp/support/downloads-faq/products/monitor/sw271/software-driver.html # Palette Master Element
 #     - http://www2.securebrain.co.jp/products/phishwall/smbc_direct.html # PhishWall
