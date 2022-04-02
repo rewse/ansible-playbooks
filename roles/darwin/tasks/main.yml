@@ -49,7 +49,7 @@
 
 - name: Copy ricty
   copy:
-    src: /usr/local/Cellar/ricty/{{ ricty_version }}/share/fonts/{{item}}
+    src: /opt/homebrew/Cellar/ricty/{{ ricty_version }}/share/fonts/{{item}}
     dest: /Library/Fonts/Ricty
     remote_src: yes
   with_items:
