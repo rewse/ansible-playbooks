@@ -4,4 +4,5 @@
   roles:
     - darwin
     - darwin/business
+    - darwin/intel
     - dotfiles/darwin
