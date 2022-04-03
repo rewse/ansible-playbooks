@@ -58,4 +58,4 @@ tuyaplug:
   kit_key: "[% vault_tuyaplug.kit_key %]"
   liv_key: "[% vault_tuyaplug.liv_key %]"
 uptime_card_version: 0.4.0
-xiaomi_gateway3_version: 1.6.5
+xiaomi_gateway3_version: 2.0.7
