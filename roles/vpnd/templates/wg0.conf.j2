@@ -21,6 +21,11 @@ publickey = {{ wireguard.e0b55fe8e384.publickey }}
 AllowedIPs = 172.16.0.202/32, fdf5:3eec:ecad::202/128
 
 [Peer]
+# whiskey
+publickey = {{ wireguard.whiskey.publickey }}
+AllowedIPs = 172.16.0.8/32, fdf5:3eec:ecad::8/128
+
+[Peer]
 # youth
 PublicKey = {{ wireguard.youth.publickey }}
 AllowedIPs = 172.16.0.200/32, fdf5:3eec:ecad::200/128
