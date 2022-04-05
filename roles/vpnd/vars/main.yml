@@ -9,6 +9,8 @@ wireguard:
     publickey: FP+HoBtyL/DJmDqDH9p+foD14Srupsvyrgfcjv/hbDw=
   e0b55fe8e384:
     publickey: YcMttQNvuZvUoGHyzoWIePTTwiy1n6QUFBXf3ggjUjQ=
+  whiskey:
+    publickey: tEsFbdcxlsDEZ9IZNKEdoa+Jv8gsVRN1Tslm3HIm03g=
   youth:
     publickey: FOYK1hjZNLspPFkdkS2LliHGIqWe3dmGylDVcSw4CzI=
   zoom:
