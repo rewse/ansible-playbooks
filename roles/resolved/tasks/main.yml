@@ -41,9 +41,11 @@
     block: |2
           access-control: 127.0.0.0/8 allow
           access-control: 192.168.0.0/24 allow
+          access-control: 172.16.0.0/24 allow
           access-control: ::1/128 allow
           access-control: fe80::/10 allow
           access-control: 240f:78:31e9:1::/64 allow
+          access-control: fdf5:3eec:ecad::/64 allow
   notify: Restart unbound
   tags: [resolved]
 
