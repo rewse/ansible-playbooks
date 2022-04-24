@@ -558,34 +558,6 @@
   notify: Restart homeassistant
   tags: [homeassistant, homeassistant-component]
 
-- name: Create custom_components/iaquk
-  file:
-    path: /etc/homeassistant/custom_components/iaquk
-    state: directory
-  tags: [homeassistant, homeassistant-custom]
-
-- name: Download ha-iqauk
-  unarchive:
-    src: https://github.com/Limych/ha-iaquk/releases/download/{{ iaquk_version }}/iaquk.zip
-    dest: /etc/homeassistant/custom_components/iaquk
-    remote_src: yes
-  notify: Restart homeassistant
-  tags: [homeassistant, homeassistant-custom]
-
-- name: Create custom_components/jq300
-  file:
-    path: /etc/homeassistant/custom_components/jq300
-    state: directory
-  tags: [homeassistant, homeassistant-custom]
-
-- name: Download ha-jq300
-  unarchive:
-    src: https://github.com/Limych/ha-jq300/releases/download/{{ jq300.version }}/jq300.zip
-    dest: /etc/homeassistant/custom_components/jq300
-    remote_src: yes
-  notify: Restart homeassistant
-  tags: [homeassistant, homeassistant-custom]
-
 - name: Create custom_components/nature_remo
   file:
     path: /etc/homeassistant/custom_components/nature_remo
@@ -714,18 +686,8 @@
           - ::1/128
           - fe80::/10
           - 240f:78:31e9:1::/64
-      iaquk:
-        living_room:
-          name: Living Room
-          sources:
-            co2: sensor.living_room_co2
-            hcho: sensor.living_room_hcho
-            pm: sensor.living_room_pm25
       ifttt:
         key: !secret ifttt_key
-      #jq300:
-      #  username: !secret jq300_username
-      #  password: !secret jq300_password
       logger:
         default: warning
         logs:

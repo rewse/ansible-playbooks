@@ -26,8 +26,6 @@ binary_sensor.hotel:
   icon: mdi:raspberry-pi
 binary_sensor.huebridge:
   icon: mdi:network-outline
-binary_sensor.jq300:
-  icon: mdi:network-outline
 binary_sensor.justio:
   icon: mdi:printer
 binary_sensor.kasaplug_ent:
