@@ -36,7 +36,6 @@ views:
           - entity: binary_sensor.eufy_bed
           - entity: binary_sensor.eufy_liv
           - entity: binary_sensor.huebridge
-          - entity: binary_sensor.jq300
           - entity: binary_sensor.kasaplug_ent
           - entity: binary_sensor.kasaplug_liv
           - entity: binary_sensor.regza
