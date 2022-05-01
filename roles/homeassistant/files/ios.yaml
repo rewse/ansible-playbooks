@@ -15,14 +15,6 @@ actions:
     icon:
       icon: mdi:weather-night
       color: "#ffffff"
-  - name: turn_off_living_room_lights_appliances
-    background_color: "#001e43"
-    label:
-      text: Turn off Living Room Lights & Appliances
-      color: "#ffffff"
-    icon:
-      icon: mdi:weather-night
-      color: "#ffffff"
   - name: turn_on_surveillance
     background_color: "#736d71"
     label:
