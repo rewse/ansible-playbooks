@@ -5,5 +5,7 @@
   roles:
     - ubuntu
     - postfix/client
-    - dotfiles/linux
+# Comment out due to "fatal: unsafe repository"
+# See also <https://github.com/actions/checkout/issues/760>
+#    - dotfiles/linux
     - zabbix/agent/ubuntu
