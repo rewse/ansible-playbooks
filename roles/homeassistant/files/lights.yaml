@@ -1,14 +1,17 @@
 - platform: group
+  unique_id: living_area_downlights
   name: Living Area Downlights
   entities:
     - light.living_room_downlights
     - light.study_downlights
 - platform: group
+  unique_id: living_area_dimming_downlights
   name: Living Area Dimming Downlights
   entities:
     - light.living_room_dimming_downlights
     - light.study_dimming_downlights
 - platform: group
+  unique_id: living_area_lights
   name: Living Area Lights
   entities:
     - light.living_room_downlights
@@ -17,6 +20,7 @@
     - light.living_room_footlight
     - light.study_downlights
 - platform: group
+  unique_id: living_room_lights
   name: Living Room Lights
   entities:
     - light.living_room_downlights
@@ -24,6 +28,7 @@
     - light.living_room_tv_light
     - light.living_room_footlight
 - platform: group
+  unique_id: bathroom_lights
   name: Bathroom Lights
   entities:
     - light.bathroom_entrance_light
