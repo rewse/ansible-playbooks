@@ -34,9 +34,6 @@
     - light.bathroom_entrance_light
     - light.bathroom_left_light
     - light.bathroom_right_light
-- platform: switch
-  name: Living Room Footlight
-  entity_id: switch.living_room_footlight
 - platform: template
   lights:
     living_room_dimming_downlights:
