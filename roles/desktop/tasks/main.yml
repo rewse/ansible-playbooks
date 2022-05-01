@@ -6,10 +6,7 @@
       - gconf2
       - tasksel
       - tigervnc-standalone-server
-  tags: [desktop, package]
-
-- name: Install ubuntu-desktop
-  command: tasksel install ubuntu-desktop
+      - ubuntu-desktop
   tags: [desktop, package]
 
 - name: "git : Clone one-gnome-terminal.git"
