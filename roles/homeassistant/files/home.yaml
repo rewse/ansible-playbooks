@@ -128,7 +128,7 @@ cards:
             name: Dimming Lights
           - entity: fan.living_room_ceiling_fans
             name: Ceiling Fan
-          - entity: group.living_area_floor_heatings
+          - entity: switch.living_area_floor_heatings
             name: Floor Heating
           - entity: button.living_room_floor_heating
             name: Living Room Floor Heating

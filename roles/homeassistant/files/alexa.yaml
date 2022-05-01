@@ -24,7 +24,7 @@ smart_home:
       - climate.living_room_hvac
       - cover.bedroom_curtains
       - fan.living_room_ceiling_fans
-      - group.living_area_floor_heatings
+      - switch.living_area_floor_heatings
       - light.bathroom_lights
       - light.bedroom_light
       - light.living_area_dimming_downlights
@@ -84,7 +84,7 @@ smart_home:
       name: 寝室のカーテン
     fan.living_room_ceiling_fans:
       name: リビングのシーリングファン
-    group.living_area_floor_heatings:
+    switch.living_area_floor_heatings:
       name: リビングの床暖房
       display_categories: SWITCH
     light.bathroom_lights:

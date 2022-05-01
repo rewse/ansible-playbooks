@@ -53,7 +53,7 @@ cards:
         name: Ceiling Fan
       - entity: switch.living_room_humidifier
         name: Humidifier
-      - entity: group.living_area_floor_heatings
+      - entity: switch.living_area_floor_heatings
         name: Floor Heating
       - entity: button.living_room_floor_heating
         name: Living Room Floor Heating

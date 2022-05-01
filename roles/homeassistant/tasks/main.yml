@@ -274,26 +274,10 @@
   notify: Restart homeassistant
   tags: [homeassistant, homeassistant-component]
 
-- name: Config group
-  lineinfile:
-    path: /etc/homeassistant/configuration.yaml
-    insertafter: '^fan:'
-    regexp: '^group:'
-    line: "group: !include groups.yaml"
-  notify: Restart homeassistant
-  tags: [homeassistant, homeassistant-component]
-
-- name: Copy groups.yaml
-  copy:
-    src: groups.yaml
-    dest: /etc/homeassistant
-  notify: Restart homeassistant
-  tags: [homeassistant, homeassistant-component]
-
 - name: Config input_boolean
   lineinfile:
     path: /etc/homeassistant/configuration.yaml
-    insertafter: '^group:'
+    insertafter: '^fan:'
     regexp: '^input_boolean:'
     line: "input_boolean: !include input_booleans.yaml"
   notify: Restart homeassistant
