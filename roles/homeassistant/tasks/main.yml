@@ -91,12 +91,6 @@
     dest: /etc/homeassistant/automations
   tags: [homeassistant, homeassistant-automation]
 
-- name: Copy automations-bathroom.yaml
-  copy:
-    src: automations-bathroom.yaml
-    dest: /etc/homeassistant/automations
-  tags: [homeassistant, homeassistant-automation]
-
 - name: Copy automations-bedroom.yaml
   copy:
     src: automations-bedroom.yaml
