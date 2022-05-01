@@ -9,12 +9,6 @@
     - filter: lowpass
       window_size: 10
       time_constant: 24
-- platform: history_stats
-  entity_id: sensor.bathroom_washing_machine_plug_power
-  name: Unavailable of Bathroom Washing Machine Plug Power
-  state: unavailable
-  duration: 10
-  end: "{{ now() }}"
 - platform: imap_email_content
   name: Denshobato
   server: imap.gmail.com
@@ -251,12 +245,6 @@
   state_characteristic: mean
   sampling_size: 183600
   max_age: "51:00:00"
-- platform: statistics
-  entity_id: sensor.bathroom_washing_machine_plug_power
-  name: Average of Bathroom Washing Machine Plug Power
-  state_characteristic: mean
-  sampling_size: 600
-  max_age: "00:10:00"
 - platform: statistics
   entity_id: sensor.bedroom_humidity_difference
   name: Average of Bedroom Humidity Difference
