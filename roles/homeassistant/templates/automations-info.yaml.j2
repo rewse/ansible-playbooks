@@ -3,7 +3,16 @@
   mode: single
   trigger:
     - platform: state
-      entity_id: sensor.denshobato
+    - platform: state
+      entity_id: sensor.denshobato_action
+      to: "登校"
+      variables:
+        trigger_message: "に"
+    - platform: state
+      entity_id: sensor.denshobato_action
+      to: "下校"
+      variables:
+        trigger_message: "を"
   condition:
     - condition: template
       value_template: >-
@@ -13,7 +22,7 @@
     - service: notify.all_devices
       data:
         title: "[% notify_title_k %]"
-        message: "️{{ states('sensor.denshobato_time') }}に{{ states('sensor.denshobato_action') }}しました"
+        message: "️{{ states('sensor.denshobato_time') }}に小学校{{ trigger_message }}{{ states('sensor.denshobato_action') }}しました"
         data:
           push:
             interruption-level: time-sensitive
@@ -106,7 +115,15 @@
   alias: "INFO: Yotsuya-Otsuka"
   trigger:
     - platform: state
-      entity_id: sensor.yotsuya_otsuka
+      entity_id: sensor.yotsuya_otsuka_action
+      to: "登校"
+      variables:
+        trigger_message: "に"
+    - platform: state
+      entity_id: sensor.yotsuya_otsuka_action
+      to: "下校"
+      variables:
+        trigger_message: "を"
   condition:
     - condition: template
       value_template: >-
@@ -116,7 +133,7 @@
     - service: notify.all_devices
       data:
         title: "[% notify_title_k %]"
-        message: "️{{ states('sensor.yotsuya_otsuka_time') }}に四谷大塚に{{ states('sensor.yotsuya_otsuka_action') }}しました"
+        message: "️{{ states('sensor.yotsuya_otsuka_time') }}に四谷大塚{{ trigger_message }}{{ states('sensor.yotsuya_otsuka_action') }}しました"
         data:
           url: /lovelace-people/people
           push:
