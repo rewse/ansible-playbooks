@@ -133,7 +133,7 @@
       function jetpackme_append_related_post( $hits, $post_id ) {
           $candidates = array(
               268, 441, 537, 756, 830, 1085, 1396, 636, 865, 1198, 1286, 1358,
-              1664, 1735, 1778
+              1664, 1735, 1778, 1802, 1818, 1915, 1918, 1999, 2170
           );
 
           $max = count($candidates) - 1;
