@@ -11,13 +11,13 @@
         service: switch.turn_off
         entity_id: switch.bedroom_curtains
       value_template: >
-        {% if states("sensor.bedroom_curtains_position") | int < 50 %}
+        {% if states("sensor.bedroom_curtains_position") | int(0) < 50 %}
           opening
-        {% elif states("sensor.bedroom_curtains_position") | int >= 50 %}
+        {% else %}
           closed
         {% endif %}
       icon_template: >
-        {% if states("sensor.bedroom_curtains_position") | int < 50 %}
+        {% if states("sensor.bedroom_curtains_position") | int(0) < 50 %}
           mdi:curtains
         {% else %}
           mdi:curtains-closed
