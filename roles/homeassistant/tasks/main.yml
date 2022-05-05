@@ -687,10 +687,6 @@
           - url: /local/uptime-card.js
             type: module
       mqtt:
-        broker: hass.rewse.jp
-        port: 8883
-        username: sub_client
-        password: !secret mosquitto_password
         certificate: /config/certs/ISRG_Root_X1.pem
       nature_remo:
         access_token: !secret remo_token
