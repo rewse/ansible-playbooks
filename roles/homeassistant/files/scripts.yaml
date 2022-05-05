@@ -26,14 +26,3 @@ open_and_get_state_of_bedroom_curtains:
   mode: queued
   max: 3
   icon: mdi:curtains
-restart_zulu:
-  alias: Restart zulu
-  sequence:
-    - service: switch.turn_off
-      entity_id: switch.entrance_zulu_power
-    - delay:
-        seconds: 4
-    - service: switch.turn_on
-      entity_id: switch.entrance_zulu_power
-  mode: single
-  icon: 'mdi:power-plug'

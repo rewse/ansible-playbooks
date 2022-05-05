@@ -172,6 +172,54 @@
         entity_id:
           - lock.entrance_lock_bottom
           - lock.entrance_lock_top
+- id: automation.restart_entrance_sesamemodule_power
+  alias: Restart Entrance sesamemodule Power
+  mode: single
+  trigger:
+    - platform: time_pattern
+      minutes: "/5"
+      seconds: 41
+  condition:
+    - condition: state
+      entity_id: alarm_control_panel.entrance_auto_lock
+      state: armed_home
+      for:
+        hours: 1
+    - condition: state
+      entity_id: binary_sensor.entrance_door
+      state: "off"
+      for:
+        hours: 1
+    - condition: or
+      conditions:
+        - condition: state
+          entity_id: lock.entrance_lock_bottom
+          state: unlocked
+          for:
+            hours: 1
+        - condition: state
+          entity_id: lock.entrance_lock_top
+          state: unlocked
+          for:
+            hours: 1
+  action:
+    - service: switch.turn_off
+      target:
+        entity_id: switch.entrance_sesamemodule_power
+    - delay:
+        seconds: 5
+    - service: switch.turn_on
+      target:
+        entity_id: switch.entrance_sesamemodule_power
+    - service: notify.tats_devices
+      data:
+        message: Restert Entrance sesamemodule Power
+        data:
+          url: /lovelace-machines/machines
+          push:
+            interruption-level: time-sensitive
+    - delay:
+        hours: 2
 - id: automation.turn_on_entrance_auto_lock
   alias: Turn on Entrance Auto-Lock
   trigger:
