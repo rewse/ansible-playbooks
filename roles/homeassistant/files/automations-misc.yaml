@@ -5,16 +5,17 @@
       minutes: "/5"
       seconds: 33
   action:
-    - service: mqtt.publish
-      data:
-        topic: monitor/scan/arrive
-        payload: '{"identity": "automation.trigger_monitor"}'
-        retain: true
-    - service: mqtt.publish
-      data:
-        topic: monitor/scan/depart
-        payload: '{"identity": "automation.trigger_monitor"}'
-        retain: true
+    - parallel:
+      - service: mqtt.publish
+        data:
+          topic: monitor/scan/arrive
+          payload: '{"identity": "automation.trigger_monitor"}'
+          retain: true
+      - service: mqtt.publish
+        data:
+          topic: monitor/scan/depart
+          payload: '{"identity": "automation.trigger_monitor"}'
+          retain: true
 - id: automation.turn_off_monitor_akikos_iphone12mini
   alias: Turn off monitor akikos-iphone12mini
   trigger:
@@ -190,13 +191,14 @@
   action:
     - delay:
         minutes: 1
-    - service: mqtt.publish
-      data:
-        topic: monitor/scan/arrive
-        payload: '{"identity": "automation.trigger_monitor_by_entrance_door"}'
-        retain: true
-    - service: mqtt.publish
-      data:
-        topic: monitor/scan/depart
-        payload: '{"identity": "automation.trigger_monitor_by_entrance_door"}'
-        retain: true
+    - parallel:
+      - service: mqtt.publish
+        data:
+          topic: monitor/scan/arrive
+          payload: '{"identity": "automation.trigger_monitor_by_entrance_door"}'
+          retain: true
+      - service: mqtt.publish
+        data:
+          topic: monitor/scan/depart
+          payload: '{"identity": "automation.trigger_monitor_by_entrance_door"}'
+          retain: true
