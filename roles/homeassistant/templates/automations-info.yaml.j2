@@ -87,21 +87,6 @@
               url: /lovelace-people/people
               push:
                 interruption-level: time-sensitive
-- id: automation.info_update_available
-  alias: "INFO: Update Available"
-  trigger:
-    - platform: state
-      entity_id: binary_sensor.updater
-      from: "off"
-      to: "on"
-  action:
-    - service: notify.tats_devices
-      data:
-        title: INFO
-        message: "Home Assistant {{ state_attr('binary_sensor.updater', 'newest_version') }} is available."
-        data:
-          push:
-            interruption-level: active
 - id: automation.info_yotsuya_otsuka
   alias: "INFO: Yotsuya-Otsuka"
   trigger:
