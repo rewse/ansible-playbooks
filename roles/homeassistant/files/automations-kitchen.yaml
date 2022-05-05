@@ -3,13 +3,13 @@
   mode: single
   trigger:
     - platform: time
-      at: "21:00"
-    - platform: time
-      at: "21:30"
-    - platform: time
       at: "22:00"
     - platform: time
       at: "22:30"
+    - platform: time
+      at: "23:00"
+    - platform: time
+      at: "23:30"
   condition:
     - condition: numeric_state
       entity_id: sensor.kitchen_rice_cooker_plug_power
