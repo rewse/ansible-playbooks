@@ -1,6 +1,3 @@
-- platform: androidtv
-  name: firetv
-  host: firetv.rewse.jp
 - platform: universal
   name: regza
   commands:

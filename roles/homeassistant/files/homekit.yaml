@@ -25,5 +25,4 @@
           - feature: play_pause
       media_player.roam:
         feature_list:
-          - feature: on_off
           - feature: play_pause
