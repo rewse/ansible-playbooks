@@ -25,9 +25,6 @@ mini_media_player_version: 1.16.0
 mosquitto_password: "[% vault_mosquitto_password %]"
 nature_remo_version: 0.5
 nfs_server: guppy.rewse.jp
-notify_rewse_jp:
-  address: "[% vault_notify_rewse_jp.address %]"
-  password: "[% vault_notify_rewse_jp.password %]"
 notify_title_k: "[% vault_notify_title_k %]"
 postgres:
   username: "[% vault_postgres.username %]"
