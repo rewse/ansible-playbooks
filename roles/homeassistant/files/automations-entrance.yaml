@@ -218,6 +218,16 @@
           url: /lovelace-machines/machines
           push:
             interruption-level: time-sensitive
+    - service: lock.lock
+      target:
+          entity_id: lock.entrance_locks
+    - delay:
+        seconds: 30
+    - service: homeassistant.update_entity
+      target:
+        entity_id:
+          - lock.entrance_lock_bottom
+          - lock.entrance_lock_top
     - delay:
         hours: 2
 - id: automation.turn_on_entrance_auto_lock
