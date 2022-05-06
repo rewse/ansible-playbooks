@@ -1,5 +1,5 @@
 ---
-zabbix_server_name: zabbix.rewse.jp
-aurora:
-  zabbix_password: "{{ vault_aurora.zabbix_password }}"
-  ep: zabbix-db.rewse.jp
+zabbix:
+  db_host: zabbix-db.rewse.jp
+  db_password: "{{ vault_zabbix.db_password }}"
+  server: zabbix.rewse.jp
