@@ -262,35 +262,6 @@
         entity_id:
           - lock.entrance_lock_bottom
           - lock.entrance_lock_top
-- id: automation.unlock_entrance_lock_when_ios_action_fails
-  alias: Unlock Entrance Lock when iOS Action Fails
-  trigger:
-    - platform: event
-      event_type: ios.action_fired
-      event_data:
-        actionName: open_entrance
-  condition:
-    - condition: not
-      conditions:
-        - condition: state
-          entity_id: person.shibata_tats
-          state: home
-          for:
-            minutes: 5
-        - condition: state
-          entity_id: person.shibata_akiko
-          state: home
-          for:
-            minutes: 5
-  action:
-    - service: notify.all_devices
-      data:
-        title: "🚫 ERROR"
-        message: Nobody in Home. Use a physical key
-        data:
-          url: /lovelace-people/people
-          push:
-            interruption-level: time-sensitive
 - id: automation.unlock_entrance_lock_when_ios_action_fires
   alias: Unlock Entrance Lock when iOS Action Fires
   mode: single
@@ -299,37 +270,47 @@
       event_type: ios.action_fired
       event_data:
         actionName: open_entrance
-  condition:
-    - condition: or
-      conditions:
-        - condition: state
-          entity_id: person.shibata_tats
-          state: home
-          for:
-            minutes: 5
-        - condition: state
-          entity_id: person.shibata_akiko
-          state: home
-          for:
-            minutes: 5
   action:
-    - service: lock.unlock
-      target:
-        entity_id: lock.entrance_locks
-    - service: notify.all_devices
-      data:
-        message: Unlocked Entrance
+    if:
+      - condition: or
+        conditions:
+          - condition: state
+            entity_id: person.shibata_tats
+            state: home
+            for:
+              minutes: 5
+          - condition: state
+            entity_id: person.shibata_akiko
+            state: home
+            for:
+              minutes: 5
+    then:
+      - service: lock.unlock
+        target:
+          entity_id: lock.entrance_locks
+      - service: notify.all_devices
         data:
-          url: /lovelace-people/people
-          push:
-            interruption-level: time-sensitive
-    - delay:
-        seconds: 30
-    - service: homeassistant.update_entity
-      target:
-        entity_id:
-          - lock.entrance_lock_bottom
-          - lock.entrance_lock_top
+          message: Unlocked Entrance
+          data:
+            url: /lovelace-people/people
+            push:
+              interruption-level: time-sensitive
+      - delay:
+          seconds: 30
+      - service: homeassistant.update_entity
+        target:
+          entity_id:
+            - lock.entrance_lock_bottom
+            - lock.entrance_lock_top
+    else:
+      - service: notify.all_devices
+        data:
+          title: "🚫 ERROR"
+          message: Nobody in Home. Use a physical key
+          data:
+            url: /lovelace-people/people
+            push:
+              interruption-level: time-sensitive
 - id: automation.update_entrace_lock_states
   alias: Update Entrance Lock States
   mode: restart
