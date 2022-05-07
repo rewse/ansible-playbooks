@@ -4,6 +4,7 @@
     name:
       - bluez
       - mosquitto-clients
+      - nfs-common
       - pi-bluetooth
       - snmp
       - snmp-mibs-downloader
@@ -69,4 +70,30 @@
 
 - name: Apply netplan
   command: netplan apply
+  tags: [raspberrypi]
+
+- name: Create /mnt/bak
+  file:
+    path: /mnt/bak
+    state: directory
+  tags: [raspberrypi]
+
+- name: Copy rsync-rime-backup
+  get_url:
+    url: https://raw.githubusercontent.com/laurent22/rsync-time-backup/master/rsync_tmbackup.sh
+    dest: /usr/local/bin/tmbackup
+    mode: 0755
+  tags: [raspberrypi]
+
+- name: Copy 000backup-daily
+  template:
+    src: 000backup-daily.j2
+    dest: /etc/cron.daily/000backup-daily
+    mode: 0755
+  tags: [raspberrypi]
+
+- name: Copy tmbackup.exclude
+  copy:
+    src: tmbackup.exclude
+    dest: /etc
   tags: [raspberrypi]
