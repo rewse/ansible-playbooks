@@ -49,13 +49,6 @@
       - vim
   tags: [ubuntu, package]
 
-- name: Install packages with pip3
-  pip:
-    name:
-      - speedtest-cli
-    executable: pip3
-  tags: [ubuntu, package]
-
 - name: Stat awscliv2
   stat: path=/usr/local/bin/aws
   register: aws

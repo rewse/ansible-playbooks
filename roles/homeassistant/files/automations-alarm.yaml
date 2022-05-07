@@ -302,29 +302,6 @@
             interruption-level: time-sensitive
     - delay:
         hours: 1
-- id: automation.alarm_internet_speed_is_too_slow
-  alias: "ALARM: Internet Speed is Too Slow"
-  mode: single
-  trigger:
-    - platform: numeric_state
-      entity_id: sensor.fast_com_download
-      below: 1
-  condition:
-    - condition: numeric_state
-      entity_id: sensor.speedtest_download
-      below: 1
-  action:
-    - service: notify.tats_devices
-      data:
-        title: "⚠️ ALARM"
-        message: Internet Speed is Too Slow
-        data:
-          url: /lovelace-machines/machines
-          push:
-            interruption-level: time-sensitive
-    - delay:
-        hours: 1
-    - service: script.restart_zulu
 - id: automation.alarm_brother_is_offline
   alias: "ALARM: brother is Offline"
   mode: single
