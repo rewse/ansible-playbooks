@@ -1,0 +1,25 @@
+#!/usr/bin/bash
+
+readonly remote=guppy:/volumeUSB1/usbshare/{{ ansible_hostname }}
+readonly src=/
+readonly dest=/mnt/bak
+
+trap 'my_exit 1' 1 2 3 15
+
+my_exit() {
+  if [ "$(grep $dest /proc/mounts)" != "" ]; then
+    umount $dest
+  fi
+
+  exit $1
+}
+
+if [ "$(grep $dest /proc/mounts)" = "" ]; then
+  mount $remote $dest
+fi
+
+nice -n 10 tmbackup $src $dest /etc/tmbackup.exclude
+
+retval=$?
+
+my_exit $retval

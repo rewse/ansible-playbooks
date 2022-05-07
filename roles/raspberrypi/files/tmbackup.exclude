@@ -1,0 +1,8 @@
+dev/
+media/
+mnt/
+proc/
+run/
+tmp/
+var/cache/
+var/swap
