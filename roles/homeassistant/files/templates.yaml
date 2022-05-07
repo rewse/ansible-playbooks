@@ -120,7 +120,7 @@
       {% if is_state("sensor.mamorail", "unknown") %}
         unknown
       {% else %}
-        {{ state_attr("sensor.mamorail", "body") | regex_findall_index("チャージ残額は(..*)円です") | regex_replace(",", "") | int }}"
+        {{ state_attr("sensor.mamorail", "body") | regex_findall_index("チャージ残額は(..*)円です") | regex_replace(",", "") | int }}
       {% endif %}
     icon: mdi:credit-card-sync-outline
     unit_of_measurement: JPY
