@@ -19,6 +19,7 @@
       - fping
       - jq
       - mas
+      - node
       - pv
       - pwgen
       - python3
@@ -128,7 +129,7 @@
       - logitech-unifying
       - macvim
       - microsoft-edge
-      - notion
+      - obsidian
       - remember-the-milk
       - slack
       - sony-ps-remote-play
@@ -169,6 +170,7 @@
   pip:
     name:
       - beautifulsoup4
+      - jupyter
       - pip-review
       - powerline-status
       - requests
