@@ -4,6 +4,7 @@
   remote_user: ubuntu
   roles:
     - httpd
+    - obsidian-livesync
     - wordpress
     - zabbix/server
     - zabbix/money/market
