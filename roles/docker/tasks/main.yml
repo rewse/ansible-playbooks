@@ -4,9 +4,18 @@
     url: https://download.docker.com/linux/ubuntu/gpg
   tags: [docker, package]
 
-- name: Add a repository
+- name: Add a repository for x86_64
+  apt_repository:
+    repo: deb [arch=amd64] https://download.docker.com/linux/ubuntu focal stable
+  when:
+    ansible_architecture == "x86_64"
+  tags: [docker, package]
+
+- name: Add a repository for aarch64
   apt_repository:
     repo: deb [arch=arm64] https://download.docker.com/linux/ubuntu focal stable
+  when:
+    ansible_architecture == "aarch64"
   tags: [docker, package]
 
 - name: Update all packages
