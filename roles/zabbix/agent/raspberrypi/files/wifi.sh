@@ -22,10 +22,10 @@ sendto_zabbix() {
 retval=0
 
 sendto_zabbix victor.rewse.jp band5 74:da:88:9c:57:c1
-sendto_zabbix xray-liv.rewse.jp band2 9c:c9:eb:da:1d:01
-sendto_zabbix xray-liv.rewse.jp band5 9c:c9:eb:da:1d:11
-sendto_zabbix xray-sto.rewse.jp band2 44:a5:6e:5b:83:81
-sendto_zabbix xray-sto.rewse.jp band5 44:a5:6e:5b:83:91
+sendto_zabbix xray-liv.rewse.jp band2 d0:21:f9:b1:b8:55
+sendto_zabbix xray-liv.rewse.jp band5 d2:21:f9:91:b8:56
+sendto_zabbix xray-sto.rewse.jp band2 d0:21:f9:b1:b1:a9
+sendto_zabbix xray-sto.rewse.jp band5 d2:21:f9:91:b1:aa
 
 echo $retval
 exit $retval
