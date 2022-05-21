@@ -92,3 +92,16 @@
     dest: /etc/cron.monthly
     mode: '0755'
   tags: [unifi]
+
+- name: Copy unifi.rewse.jp.conf
+  ansible.builtin.template:
+    src: unifi.rewse.jp.conf.j2
+    dest: /etc/apache2/sites-available/unifi.rewse.jp.conf
+  notify: Reload apache
+  tags: [unifi]
+
+- name: Enable unifi.rewse.jp
+  ansible.builtin.command: a2ensite unifi.rewse.jp
+  notify: Reload apache
+  tags: [unifi]
+  
