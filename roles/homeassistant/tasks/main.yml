@@ -1,11 +1,4 @@
 ---
-- name: Install additional packages
-  apt:
-    name:
-      - certbot
-      - python3-certbot-apache
-  tags: [homeassistant, package]
-
 - name: Create bin dir
   file:
     path: /etc/homeassistant/bin

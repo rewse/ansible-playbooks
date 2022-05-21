@@ -3,3 +3,4 @@ dependencies:
   - {role: httpd}
   - {role: docker}
   - {role: sesame}
+  - {role: sslcert}
