@@ -2,8 +2,12 @@
 - name: Register GPG key
   ansible.builtin.shell: |
     curl https://couchdb.apache.org/repo/keys.asc | gpg --dearmor > /usr/share/keyrings/couchdb-archive-keyring.gpg
+  tags: [obsidian-livesync]
 
-    echo "deb [signed-by=/usr/share/keyrings/couchdb-archive-keyring.gpg] https://apache.jfrog.io/artifactory/couchdb-deb/ focal main" > /etc/apt/sources.list.d/couchdb.list
+- name: Add an apt repository for unifi
+  ansible.builtin.apt_repository:
+    repo: "deb [signed-by=/usr/share/keyrings/couchdb-archive-keyring.gpg] https://apache.jfrog.io/artifactory/couchdb-deb/ focal main"
+    filename: couchdb
   tags: [obsidian-livesync]
 
 - name: Create /srv/couchdb
@@ -35,6 +39,7 @@
   ansible.builtin.apt:
     name:
       - couchdb
+    update_cache: yes
   tags: [obsidian-livesync]
 
 - name: Create a symlink /opt/couchdb/data
