@@ -18,23 +18,22 @@
     classic: yes
   tags: [sslcert]
 
-- name: Run certbot
-  # Added --dry-run to prevent that ansible does not make unnecessary requests
-  # Please run it without --dry-run manually if the first issue is needed
-  ansible.builtin.shell: |
-    sudo certbot certonly \
-    --dns-route53 \
-    --dry-run \
-    -d 'rewse.jp' \
-    -d '*.rewse.jp' \
-    -m 'hostmaster@rewse.jp' \
-    -i apache \
-    --post-hook 'systemctl reload apache2' \
-    --preferred-challenges 'dns-01' \
-    --server 'https://acme-v02.api.letsencrypt.org/directory' \
-    --agree-tos \
-    --manual-public-ip-logging-ok
-  tags: [sslcert]
+#   Commented out to prevent that ansible does not make unnecessary requests
+#   Please run it manually if the first issue is needed
+# - name: Run certbot
+#   ansible.builtin.shell: |
+#     sudo certbot certonly \
+#     --dns-route53 \
+#     -d 'rewse.jp' \
+#     -d '*.rewse.jp' \
+#     -m 'hostmaster@rewse.jp' \
+#     -i apache \
+#     --post-hook 'systemctl reload apache2' \
+#     --preferred-challenges 'dns-01' \
+#     --server 'https://acme-v02.api.letsencrypt.org/directory' \
+#     --agree-tos \
+#     --manual-public-ip-logging-ok
+#   tags: [sslcert]
 
 - name: Set the cert
   ansible.builtin.lineinfile:
