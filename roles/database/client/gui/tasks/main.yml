@@ -7,6 +7,7 @@
 - name: Add an apt repository for Amazon Corretto
   apt_repository:
     repo: deb https://apt.corretto.aws stable main
+    filename: corretto
   tags: [database-client-gui, package, java]
 
 - name: Install Amazon Corretto
