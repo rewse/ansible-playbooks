@@ -1,10 +1,4 @@
 ---
-- name: Add an apt repository for Amazon Corretto
-  ansible.builtin.apt_repository:
-    repo: deb https://apt.corretto.aws stable main
-    filename: corretto
-  tags: [unifi]
-
 - name: Install Java
   ansible.builtin.apt:
     name:
