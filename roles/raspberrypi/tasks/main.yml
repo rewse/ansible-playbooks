@@ -84,7 +84,7 @@
     state: directory
   tags: [raspberrypi]
 
-- name: Copy rsync-rime-backup
+- name: Copy rsync-time-backup
   get_url:
     url: https://raw.githubusercontent.com/laurent22/rsync-time-backup/master/rsync_tmbackup.sh
     dest: /usr/local/bin/tmbackup
