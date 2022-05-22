@@ -18,37 +18,14 @@ network:
           - {{ resolved2.ip }}
           - {{ resolved1.ipv6 }}
           - {{ resolved2.ipv6 }}
-  # wifis:
-  #   wlan0:
-  #     dhcp4: false
-  #     dhcp6: false
-  #     access-points:
-  #       xray:
-  #         password: {{ xray_password }}
-  # bonds:
-  #   bond0:
-  #     interfaces:
-  #       - eth0
-  #       - wlan0
-  #     parameters:
-  #       mode: active-backup
-  #       primary: eth0
-  #       arp-interval: 1000
-  #       arp-ip-targets:
-  #         - {{ default_gateway }}
-  #     dhcp4: false
-  #     dhcp6: false
-  #     optional: true
-  #     addresses:
-  #        - {{ local.ip }}/24
-  #        - {{ local.ipv6 }}/64
-  #     gateway4: {{ default_gateway }}
-  #     gateway6: {{ default_gateway6 }}
-  #     nameservers:
-  #       search:
-  #         - rewse.jp
-  #       addresses:
-  #         - {{ resolved1.ip }}
-  #         - {{ resolved2.ip }}
-  #         - {{ resolved1.ipv6 }}
-  #         - {{ resolved2.ipv6 }}
+  wifis:
+    wlan0:
+      access-points:
+        xray:
+          password: {{ xray_password }}
+      dhcp4: false
+      dhcp6: false
+      optional: true
+      addresses:
+         - {{ local.ip_2 }}/24
+         - {{ local.ipv6_2 }}/64
