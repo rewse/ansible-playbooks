@@ -68,6 +68,12 @@
     dest: /etc/netplan/99-config.yaml
   tags: [raspberrypi]
 
+- name: Copy ifmetric to cron.d
+  copy:
+    src: ifmetric
+    dest: /etc/cron.d
+  tags: [raspberrypi]
+
 - name: Apply netplan
   command: netplan apply
   tags: [raspberrypi]
