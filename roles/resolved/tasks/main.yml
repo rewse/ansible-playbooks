@@ -90,10 +90,8 @@
   notify: Restart systemd-resolved
   tags: [resolved]
 
-# Ref: https://askubuntu.com/questions/1012641/dns-set-to-systemds-127-0-0-53-how-to-change-permanently
-- name: Copy tail
+- name: Copy restart-unbound
   copy:
-    src: tail
-    dest: /etc/resolvconf/resolv.conf.d
-  notify: Restart systemd-resolved
+    src: restart-unbound
+    dest: /etc/cron.d
   tags: [resolved]
