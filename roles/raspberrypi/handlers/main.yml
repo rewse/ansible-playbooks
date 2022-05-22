@@ -3,3 +3,5 @@
   systemd:
     name: sshd
     state: restarted
+- name: Run ifmetric
+  command: ifmetric wlan0 100
