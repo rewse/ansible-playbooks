@@ -3,6 +3,7 @@
   apt:
     name:
       - bluez
+      - ifmetric
       - mosquitto-clients
       - nfs-common
       - pi-bluetooth
