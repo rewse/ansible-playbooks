@@ -41,12 +41,12 @@
     - sensor.monitor_living_room_bio
     - sensor.monitor_storage_bio
 - platform: min_max
-  name: monitor akikos-iphone12mini
+  name: monitor ubiqu-iphone12mini
   type: max
   round_digits: 0
   entity_ids:
-    - sensor.monitor_living_room_akikos_iphone12mini
-    - sensor.monitor_storage_akikos_iphone12mini
+    - sensor.monitor_living_room_ubiqu_iphone12mini
+    - sensor.monitor_storage_ubiqu_iphone12mini
 - platform: mqtt
   unique_id: sensor.enecoq_fee_high
   name: enecoQ Fee High
@@ -98,9 +98,9 @@
     - topic: enecoq/kwh/state
   icon: mdi:transmission-tower
 - platform: mqtt
-  unique_id: sensor.monitor_living_room_akikos_iphone12mini
-  name: monitor Living Room akikos-iphone12mini
-  state_topic: monitor/living_room/akikos_iphone12mini
+  unique_id: sensor.monitor_living_room_ubiqu_iphone12mini
+  name: monitor Living Room ubiqu-iphone12mini
+  state_topic: monitor/living_room/ubiqu_iphone12mini
   value_template: "{{ value_json.confidence }}"
   unit_of_measurement: "%"
   state_class: measurement
@@ -124,9 +124,9 @@
     - topic: mhz19/state
   icon: mdi:molecule-co2
 - platform: mqtt
-  unique_id: sensor.monitor_storage_akikos_iphone12mini
-  name: monitor Storage akikos-iphone12mini
-  state_topic: monitor/storage/akikos_iphone12mini
+  unique_id: sensor.monitor_storage_ubiqu_iphone12mini
+  name: monitor Storage ubiqu-iphone12mini
+  state_topic: monitor/storage/ubiqu_iphone12mini
   value_template: "{{ value_json.confidence }}"
   unit_of_measurement: "%"
   state_class: measurement
