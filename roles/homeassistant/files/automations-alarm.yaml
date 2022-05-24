@@ -1,5 +1,5 @@
-- id: automation.alarm_akikos_iphone12mini_wifi_might_be_off
-  alias: "ALARM: akikos_iphone12mini WiFi might be Off"
+- id: automation.alarm_ubiqu_iphone12mini_wifi_might_be_off
+  alias: "ALARM: ubiqu_iphone12mini WiFi might be Off"
   mode: single
   trigger:
     - platform: state
@@ -10,12 +10,12 @@
       to: "on"
   condition:
     - condition: state
-      entity_id: device_tracker.ping_akikos_iphone12mini
+      entity_id: device_tracker.ping_ubiqu_iphone12mini
       state: not_home
       for:
         hours: 1
     - condition: state
-      entity_id: device_tracker.monitor_akikos_iphone12mini
+      entity_id: device_tracker.monitor_ubiqu_iphone12mini
       state: home
       for:
         hours: 1
@@ -23,7 +23,7 @@
     - service: notify.akiko_devices
       data:
         title: "⚠️ ALARM"
-        message: akikos_iphone12mini WiFi might be off
+        message: ubiqu_iphone12mini WiFi might be off
         data:
           url: /lovelace-machines/machines
           push:

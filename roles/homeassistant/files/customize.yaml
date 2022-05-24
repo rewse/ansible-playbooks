@@ -72,7 +72,7 @@ binary_sensor.zulu:
   icon: mdi:router-network
 climate.living_area_floor_heating:
   icon: mdi:grid
-device_tracker.akikos_iphone_12_mini:
+device_tracker.ubiqu_iphone_12_mini:
   icon: mdi:cellphone
 device_tracker.bio:
   icon: mdi:cellphone
@@ -82,12 +82,12 @@ device_tracker.e0b55fe8e384:
   icon: mdi:laptop
 device_tracker.global:
   icon: mdi:cellphone
-device_tracker.monitor_akikos_iphone12mini:
+device_tracker.monitor_ubiqu_iphone12mini:
   icon: mdi:cellphone-wireless
 device_tracker.monitor_bio:
   icon: mdi:cellphone-wireless
-device_tracker.ping_akikos_iphone12mini:
-  friendly_name: ping akikos_iphone12mini
+device_tracker.ping_ubiqu_iphone12mini:
+  friendly_name: ping ubiqu_iphone12mini
   icon: mdi:cellphone-wireless
 device_tracker.ping_bio:
   friendly_name: ping bio
@@ -161,15 +161,15 @@ sensor.filtered_bedroom_hvac_plug_power:
   icon: mdi:flash
 sensor.mamorail:
   icon: mdi:train
-sensor.monitor_akikos_iphone12mini:
+sensor.monitor_ubiqu_iphone12mini:
   icon: mdi:cellphone-wireless
 sensor.monitor_bio:
   icon: mdi:cellphone-wireless
-sensor.monitor_living_room_akikos_iphone12mini:
+sensor.monitor_living_room_ubiqu_iphone12mini:
   icon: mdi:cellphone-wireless
 sensor.monitor_living_room_bio:
   icon: mdi:cellphone-wireless
-sensor.monitor_storage_akikos_iphone12mini:
+sensor.monitor_storage_ubiqu_iphone12mini:
   icon: mdi:cellphone-wireless
 sensor.monitor_storage_bio:
   icon: mdi:cellphone-wireless

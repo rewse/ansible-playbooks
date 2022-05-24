@@ -61,8 +61,8 @@ views:
               - entity: device_tracker.monitor_bio
               - entity: person.shibata_akiko
                 name: Akiko
-              - entity: device_tracker.ping_akikos_iphone12mini
-              - entity: device_tracker.monitor_akikos_iphone12mini
+              - entity: device_tracker.ping_ubiqu_iphone12mini
+              - entity: device_tracker.monitor_ubiqu_iphone12mini
             hours_to_show: 12
           - type: entities
             title: monitor
@@ -70,9 +70,9 @@ views:
               - entity: sensor.monitor_bio
               - entity: sensor.monitor_living_room_bio
               - entity: sensor.monitor_storage_bio
-              - entity: sensor.monitor_akikos_iphone12mini
-              - entity: sensor.monitor_living_room_akikos_iphone12mini
-              - entity: sensor.monitor_storage_akikos_iphone12mini
+              - entity: sensor.monitor_ubiqu_iphone12mini
+              - entity: sensor.monitor_living_room_ubiqu_iphone12mini
+              - entity: sensor.monitor_storage_ubiqu_iphone12mini
       - type: entities
         title: Room Presence
         entities:
