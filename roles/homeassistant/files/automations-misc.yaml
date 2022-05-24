@@ -16,23 +16,23 @@
           topic: monitor/scan/depart
           payload: '{"identity": "automation.trigger_monitor"}'
           retain: true
-- id: automation.turn_off_monitor_akikos_iphone12mini
-  alias: Turn off monitor akikos-iphone12mini
+- id: automation.turn_off_monitor_ubiqu_iphone12mini
+  alias: Turn off monitor ubiqu-iphone12mini
   trigger:
     - platform: numeric_state
-      entity_id: sensor.monitor_akikos_iphone12mini
+      entity_id: sensor.monitor_ubiqu_iphone12mini
       below: 10
     - platform: time_pattern
       minutes: "/5"
       seconds: 53
   condition:
     - condition: numeric_state
-      entity_id: sensor.monitor_akikos_iphone12mini
+      entity_id: sensor.monitor_ubiqu_iphone12mini
       below: 10
   action:
     - service: device_tracker.see
       data:
-        dev_id: monitor_akikos_iphone12mini
+        dev_id: monitor_ubiqu_iphone12mini
         location_name: not_home
         source_type: bluetooth
 - id: automation.turn_off_monitor_bio
@@ -94,23 +94,23 @@
             interruption-level: time-sensitive
     - delay:
         hours: 1
-- id: automation.turn_on_monitor_akikos_iphone12mini
-  alias: Turn on monitor akikos-iphone12mini
+- id: automation.turn_on_monitor_ubiqu_iphone12mini
+  alias: Turn on monitor ubiqu-iphone12mini
   trigger:
     - platform: numeric_state
-      entity_id: sensor.monitor_akikos_iphone12mini
+      entity_id: sensor.monitor_ubiqu_iphone12mini
       above: 10
     - platform: time_pattern
       minutes: "/5"
       seconds: 53
   condition:
     - condition: numeric_state
-      entity_id: sensor.monitor_akikos_iphone12mini
+      entity_id: sensor.monitor_ubiqu_iphone12mini
       above: 10
   action:
     - service: device_tracker.see
       data:
-        dev_id: monitor_akikos_iphone12mini
+        dev_id: monitor_ubiqu_iphone12mini
         location_name: home
         source_type: bluetooth
 - id: automation.turn_on_monitor_bio
