@@ -166,7 +166,7 @@
       {% if is_state("sensor.yotsuya_otsuka", "unknown") %}
         unknown
       {% else %}
-        {{ as_timestamp(strptime(state_attr("sensor.yotsuya_otsuka", "date"), "%a, %d %b %Y %H:%M:%S %z") - timedelta(minutes = 0)) | timestamp_custom() }}
+        {{ as_timestamp(strptime(state_attr("sensor.yotsuya_otsuka", "date"), "%a, %d %b %Y %H:%M:%S %z") - timedelta(minutes = 8)) | timestamp_custom() }}
       {% endif %}
     icon: mdi:clock-outline
   - name: Yotsuya-Otsuka Time
@@ -175,6 +175,6 @@
       {% if is_state("sensor.yotsuya_otsuka", "unknown") %}
         unknown
       {% else %}
-        {{ as_timestamp(strptime(state_attr("sensor.yotsuya_otsuka", "date"), "%a, %d %b %Y %H:%M:%S %z") - timedelta(minutes = 0)) | timestamp_custom("%H:%M") }}
+        {{ as_timestamp(strptime(state_attr("sensor.yotsuya_otsuka", "date"), "%a, %d %b %Y %H:%M:%S %z") - timedelta(minutes = 8)) | timestamp_custom("%H:%M") }}
       {% endif %}
     icon: mdi:clock-outline
