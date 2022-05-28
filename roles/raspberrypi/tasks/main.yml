@@ -93,6 +93,13 @@
     mode: 0755
   tags: [raspberrypi]
 
+- name: Add / for fn_df_t_src to tmpbackup
+  replace:
+    dest: /usr/local/bin/tmbackup
+    regexp: 'fn_df_t_src "\${SRC_FOLDER}"'
+    replace: 'fn_df_t_src "${SRC_FOLDER}/"'
+  tags: [raspberrypi]
+
 - name: Copy 000backup-daily
   template:
     src: 000backup-daily.j2
