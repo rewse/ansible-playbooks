@@ -61,9 +61,6 @@
       value_template: >-
         {{ (as_timestamp(now()) -
         as_timestamp(states('sensor.mamorail_received_date_time'))) < 180 }}
-    - condition: numeric_state
-      entity_id: sensor.mamorail_balance
-      above: 1000
   action:
     - if:
         - condition: numeric_state
