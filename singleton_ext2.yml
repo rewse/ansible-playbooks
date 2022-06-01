@@ -1,9 +1,10 @@
 ---
-- hosts: servers_ext
+- hosts: singleton_ext2
   become: yes
   remote_user: ubuntu
   roles:
     - httpd
+    - nextcloud
     - obsidian-livesync
     - wordpress
     - zabbix/server

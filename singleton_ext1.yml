@@ -1,5 +1,5 @@
 ---
-- hosts: singleton_ext
+- hosts: singleton_ext1
   become: yes
   remote_user: ubuntu
   roles:

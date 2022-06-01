@@ -1,0 +1,113 @@
+---
+- name: Format the secondary disk
+  ansible.builtin.filesystem:
+    fstype: ext4
+    dev: /dev/{{ nextcloud_diskname }}
+  tags: [nextcloud]
+
+- name: Label the secondary disk
+  ansible.builtin.command: e2label /dev/{{ nextcloud_diskname }} srv-nextcloud
+  tags: [nextcloud]
+
+- name: Mount srv
+  ansible.builtin.mount:
+    src: LABEL=srv-nextcloud
+    path: /srv/www/nextcloud
+    fstype: ext4
+    opts: defaults,discard
+    state: mounted
+  tags: [nextcloud]
+
+- name: Install packages
+  ansible.builtin.apt:
+    name:
+      - libapache2-mod-php
+      - php-gd
+      - php-mysql
+      - php-curl
+      - php-mbstring
+      - php-intl
+      - php-gmp
+      - php-bcmath
+      - php-xml
+      - php-imagick
+      - php-zip
+      - php-bz2
+      - php-redis
+      - ffmpeg
+      - libreoffice
+      - libmagickcore-6.q16-6-extra
+  tags: [nextcloud]
+
+- name: Download nextclud
+  ansible.builtin.get_url:
+    url: https://download.nextcloud.com/server/releases/latest.zip
+    dest: /tmp
+  tags: [nextcloud]
+
+- name: Unarchive nextcloud
+  ansible.builtin.unarchive:
+    src: /tmp/latest.zip
+    dest: /srv/www
+    owner: www-data
+    group: www-data
+    remote_src: yes
+  tags: [nextcloud]
+
+- name: Copy nextcloud.conf
+  ansible.builtin.copy:
+    src: nextcloud.conf
+    dest: /etc/apache2/conf-available
+  tags: [nextcloud]
+
+- name: Enable nextcloud.conf
+  ansible.builtin.command: a2enconf nextcloud.conf
+  notify: Reload apache
+  tags: [nextcloud]
+
+- name: Copy 30-nextcloud.ini
+  ansible.builtin.copy:
+    src: 30-nextcloud.ini
+    dest: /etc/php/7.4/apache2/conf.d
+  notify: Reload apache
+  tags: [nextcloud]
+
+- name: Enable apache modules
+  ansible.builtin.command: a2enmod {{ item }}
+  with_items:
+    - rewrite
+    - headers
+    - env
+    - dir
+    - mime
+  notify: Restart apache
+  tags: [nextcloud]
+
+- name: Copy nextcloud.cron
+  ansible.builtin.copy:
+    src: nextcloud.cron
+    dest: /etc/cron.d/nextcloud
+  tags: [nextcloud]
+
+- name: Add parameters
+  ansible.builtin.blockinfile:
+    path: /srv/www/nextcloud/config/config.php
+    insertafter: '\$CONFIG = array \('
+    block: |2
+        'default_language' => 'ja',
+        'default_locale' => 'ja_JP',
+        'default_phone_region' => 'JP',
+        'overwrite.cli.url' => 'https://rewse.jp/nextcloud',
+        'htaccess.RewriteBase' => '/nextcloud',
+        'memcache.distributed' => '\OC\Memcache\Redis',
+        'memcache.local' => '\OC\Memcache\Redis',
+        'memcache.locking' => '\OC\Memcache\Redis',
+        'redis' => [
+          'host' => 'nextcloud-cache.rewse.jp',
+          'port' => 6379,
+        ],
+  tags: [nextcloud]
+
+- name: Replace carddav
+  ansible.builtin.replace:
+    
