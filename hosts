@@ -22,17 +22,17 @@ delta.rewse.jp
 fox.rewse.jp
 hotel.rewse.jp
 
-[singleton_ext]
+[singleton_ext1]
 alfa.rewse.jp
+
+[singleton_ext2]
+delta.rewse.jp
 
 [singleton_int1]
 fox.rewse.jp
 
 [singleton_int2]
 hotel.rewse.jp
-
-[servers_ext]
-delta.rewse.jp
 
 [servers_int]
 fox.rewse.jp
