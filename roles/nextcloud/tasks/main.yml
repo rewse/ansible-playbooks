@@ -34,7 +34,7 @@
       - php-imagick
       - php-zip
       - php-bz2
-      - php-redis
+      - php-apcu
       - ffmpeg
       - libreoffice
       - libmagickcore-6.q16-6-extra
@@ -72,6 +72,12 @@
     src: 30-nextcloud.ini
     dest: /etc/php/7.4/apache2/conf.d
   notify: Reload apache
+  tags: [nextcloud]
+
+- name: Copy 30-nextcloud.cli.ini
+  ansible.builtin.copy:
+    src: 30-nextcloud.cli.ini
+    dest: /etc/php/7.4/cli/conf.d
   tags: [nextcloud]
 
 - name: Enable apache modules
