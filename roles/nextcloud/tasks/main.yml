@@ -6,7 +6,8 @@
   tags: [nextcloud]
 
 - name: Label the secondary disk
-  ansible.builtin.command: e2label /dev/{{ nextcloud_diskname }} srv-nextcloud
+  ansible.builtin.command: |
+    e2label /dev/{{ nextcloud_diskname }} srv-nextcloud
   tags: [nextcloud]
 
 - name: Mount srv
@@ -61,7 +62,8 @@
   tags: [nextcloud]
 
 - name: Enable nextcloud.conf
-  ansible.builtin.command: a2enconf nextcloud.conf
+  ansible.builtin.command: |
+    a2enconf nextcloud.conf
   notify: Reload apache
   tags: [nextcloud]
 
@@ -73,7 +75,8 @@
   tags: [nextcloud]
 
 - name: Enable apache modules
-  ansible.builtin.command: a2enmod {{ item }}
+  ansible.builtin.command: |
+    a2enmod {{ item }}
   with_items:
     - rewrite
     - headers
