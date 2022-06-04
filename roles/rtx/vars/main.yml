@@ -10,11 +10,6 @@ fox:
 hotel:
   ip: 192.168.0.40
   ipv6: 240f:78:31e9:1::40
-ipsec:
-  ip: 192.168.0.199
-  username: "{{ vault_ipsec.username }}"
-  password: "{{ vault_ipsec.password }}"
-  pre_shared_key: "{{ vault_ipsec.pre_shared_key }}"
 guppy:
   ip: 192.168.0.20
   ipv6: 240f:78:31e9:1:211:32ff:fe60:bfd3
