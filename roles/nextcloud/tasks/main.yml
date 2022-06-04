@@ -53,6 +53,7 @@
     owner: www-data
     group: www-data
     remote_src: yes
+  notify: Recreate htaccess
   tags: [nextcloud]
 
 - name: Copy nextcloud.conf
