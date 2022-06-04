@@ -109,15 +109,45 @@
         'default_phone_region' => 'JP',
         'overwrite.cli.url' => 'https://rewse.jp/nextcloud',
         'htaccess.RewriteBase' => '/nextcloud',
-        'memcache.distributed' => '\OC\Memcache\Redis',
-        'memcache.local' => '\OC\Memcache\Redis',
-        'memcache.locking' => '\OC\Memcache\Redis',
-        'redis' => [
-          'host' => 'nextcloud-cache.rewse.jp',
-          'port' => 6379,
+        'memcache.local' => '\OC\Memcache\APCu',
+        'enabledPreviewProviders' => [
+          'OC\Preview\BMP',
+          'OC\Preview\GIF',
+          'OC\Preview\JPEG',
+          'OC\Preview\MarkDown',
+          'OC\Preview\MP3',
+          'OC\Preview\PNG',
+          'OC\Preview\TXT',
+          'OC\Preview\XBitmap',
+          'OC\Preview\OpenDocument',
+          'OC\Preview\Krita',
+          'OC\Preview\Illustrator',
+          'OC\Preview\HEIC',
+          'OC\Preview\Movie',
+          'OC\Preview\MSOffice2003',
+          'OC\Preview\MSOffice2007',
+          'OC\Preview\MSOfficeDoc',
+          'OC\Preview\PDF',
+          'OC\Preview\Photoshop',
+          'OC\Preview\Postscript',
+          'OC\Preview\StarOffice',
+          'OC\Preview\SVG',
+          'OC\Preview\TIFF',
+          'OC\Preview\Font',
         ],
   tags: [nextcloud]
 
-- name: Replace carddav
+- name: Change the policy of ImageMagick
   ansible.builtin.replace:
-    
+    path: /etc/ImageMagick-6/policy.xml
+    regexp: 'rights="none" pattern="{{ item }}"'
+    replace: 'rights="read|write" pattern="{{ item }}"'
+  with_items:
+    - PS
+    - PS2
+    - PS3
+    - EPS
+    - PDF
+    - XPS
+  notify: Restart apache
+  tags: [nextcloud]
