@@ -92,7 +92,6 @@
       - adobe-creative-cloud
       - alfred
       - amazon-chime
-      - amazon-workdocs-drive
       - appcleaner
       - atok
       - authy
@@ -125,7 +124,6 @@
       - karabiner-elements
       - keyboard-maestro
       - kindle
-      - logitech-camera-settings
       - logitech-unifying
       - macvim
       - microsoft-edge
@@ -146,6 +144,7 @@
   command: mas install {{item}}
   with_items:
     - 545519333   # Amazon Prime Video
+    - 878419553   # Amazon WorkDocs
     - 1168254295  # AmorphousDiskMark
     - 417375580   # BetterSnapTool
     - 425264550   # Blackmagic Disk Speed Test
@@ -184,4 +183,6 @@
 #   install_yourself:
 #     - https://www.blackmagicdesign.com/jp/products/davinciresolve/  # DaVinci Resolve
 #     - https://www.ireasoning.com/mibbrowser.shtml                   # MIB Browser
+#     - https://www.obsbot.com/jp/download?tab=obsbot-meet            # OBSBOT MeetCam
+#     - https://jp.steelseries.com/gg                                 # SteelSeries GG
 #     - https://www.xencelabs.com/support/download-drivers/           # Xencelabs Driver

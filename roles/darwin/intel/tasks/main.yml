@@ -1,9 +1,0 @@
----
-- name: Install packages by homebrew_cask
-  homebrew_cask:
-    name:
-      - amazon-music
-      - intel-power-gadget
-      - steelseries-gg
-    update_homebrew: yes
-  tags: [darwin-intel, package, cask]

@@ -4,18 +4,10 @@
     name: homebrew/cask
   tags: [darwin-business, package, homebrew, cask]
 
-- name: Install packages by homebrew
-  homebrew:
-    name: 
-      - mysql
-      - postgresql
-    update_homebrew: yes
-  tags: [darwin-business, package, homebrew]
-
 - name: Install packages by homebrew_cask
   homebrew_cask:
     name: 
-      - dbeaver-community
+      - box-drive
       - font-noto-sans-cjk
       - gotomeeting
       - i1profiler
@@ -34,8 +26,3 @@
   with_items:
     - 973213640   # MSG Viewer for Outlook
   tags: [darwin-business, package, mas]
-
-# - name: Install rest of the apps
-#   install_yourself:
-#     - https://www.oracle.com/database/technologies/instant-client/macos-intel-x86-downloads.html # Oracle Instant Client
-#     - https://www.oracle.com/tools/downloads/sqldev-downloads.html # Oracle SQL Developer
