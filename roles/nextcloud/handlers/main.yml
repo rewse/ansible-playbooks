@@ -8,3 +8,9 @@
   ansible.builtin.systemd:
     name: apache2
     state: restarted
+
+- name: Recreate htaccess
+  become: yes
+  become_user: www-data
+  ansible.builtin.command: |
+    php /var/www/nextcloud/occ maintenance:update:htaccess
