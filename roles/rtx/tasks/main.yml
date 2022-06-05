@@ -275,6 +275,11 @@
 - name: Set AWS Site-to-Site VPN 3
   rtx_config:
     lines:
+      - nat descriptor masquerade static 1 101 {{ lan1.ip }} esp
+      - nat descriptor masquerade static 1 102 {{ lan1.ip }} udp 500,4500
+      - ipv6 filter 101 pass * {{ lan1.ipv6 }} esp
+      - ipv6 filter 102 pass * {{ lan1.ipv6 }} udp 500,4500
+      - ipsec auto refresh on
       - bgp use on
       - bgp autonomous-system 65000
       - bgp import filter 1 include 192.168.0.0/24
