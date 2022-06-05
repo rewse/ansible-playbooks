@@ -235,14 +235,14 @@
       - ipsec ike local id 10 {{ lan1.ip }}
       - ipsec ike pfs 10 on
       - ipsec ike pre-shared-key 10 text {{ s2svpn.pre_shared_key1 }}
-      - ipsec ike remote address 10 54.95.76.157
+      - ipsec ike remote address 10 3.114.226.166
       - ipsec ike nat-traversal 10 on
       - ipsec tunnel outer df-bit clear
-      - ip tunnel address 169.254.249.162/30
-      - ip tunnel remote address 169.254.249.161
+      - ip tunnel address 169.254.15.74/30
+      - ip tunnel remote address 169.254.15.73
       - ip tunnel tcp mss limit auto
       - tunnel enable 10
-      - bgp neighbor 10 64512 169.254.249.161 hold-time=30 local-address=169.254.249.162
+      - bgp neighbor 10 64512 169.254.15.73 hold-time=30 local-address=169.254.15.74
   tags: [rtx, rtx-s2svpn]
 
 - name: Set AWS Site-to-Site VPN 2
@@ -262,14 +262,14 @@
       - ipsec ike local id 20 {{ lan1.ip }}
       - ipsec ike pfs 20 on
       - ipsec ike pre-shared-key 20 text {{ s2svpn.pre_shared_key2 }}
-      - ipsec ike remote address 20 54.248.99.147
+      - ipsec ike remote address 20 18.182.206.35
       - ipsec ike nat-traversal 20 on
       - ipsec tunnel outer df-bit clear
-      - ip tunnel address 169.254.170.246/30
-      - ip tunnel remote address 169.254.170.245
+      - ip tunnel address 169.254.23.118/30
+      - ip tunnel remote address 169.254.23.117
       - ip tunnel tcp mss limit auto
       - tunnel enable 20
-      - bgp neighbor 20 64512 169.254.170.245 hold-time=30 local-address=169.254.170.246
+      - bgp neighbor 20 64512 169.254.23.117 hold-time=30 local-address=169.254.23.118
   tags: [rtx, rtx-s2svpn]
 
 - name: Set AWS Site-to-Site VPN 3
