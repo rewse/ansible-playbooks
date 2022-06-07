@@ -3,6 +3,8 @@ wireguard:
   server:
     privatekey: "{{ vault_wireguard.server.privatekey }}"
     publickey: oEuUacHnipt3MeGI8a0w/nUZKDWdceGHD/Jrto6LVQw=
+  bcd074348424:
+    publickey: 1/n6psZn/rueeD2i6Zz6+h+4bWPBd9yIhwB4S8MFzEA=
   bio:
     publickey: Osi0t+ajrQqASM0pwp8nurnKXkgb7Y/UZIWwKP7NfVY=
   desert:
