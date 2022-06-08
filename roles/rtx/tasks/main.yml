@@ -1,25 +1,28 @@
 ---
 # - name: Set up SSH
-#   do_it_yourself_rtx_config:
+#   do_it_yourself.yamaha_network.rtx.rtx_config:
 #     lines:
 #       - login user username password
 #       - sshd host key generate
 #       - sshd service on
 
+# - name: Add yamaha_netowrk.rtx
+#   local_command: ansible-galaxy collection install yamaha_network.rtx
+
 - name: Set login
-  rtx_config:
+  yamaha_network.rtx.rtx_config:
     lines:
       - login timer 3600
   tags: [rtx, rtx-login]
 
 - name: Set security
-  rtx_config:
+  yamaha_network.rtx.rtx_config:
     lines:
       - security class 2 on off off
   tags: [rtx, rtx-security]
 
 - name: Set console
-  rtx_config:
+  yamaha_network.rtx.rtx_config:
     lines:
       - console character ascii
       - console lines infinity
@@ -27,7 +30,7 @@
   tags: [rtx, rtx-console]
 
 - name: Set ip
-  rtx_config:
+  yamaha_network.rtx.rtx_config:
     lines:
       - ip route default gateway {{ default_gateway.ip }}
       - ip keepalive 1 icmp-echo 10 5 {{ default_gateway.ip }}
@@ -37,7 +40,7 @@
   tags: [rtx, rtx-ip]
 
 - name: Set ipv6
-  rtx_config:
+  yamaha_network.rtx.rtx_config:
     lines:
       - ipv6 prefix 1 ra-prefix@lan2::/64
       - ipv6 lan1 address ra-prefix@lan2::1/64
@@ -45,7 +48,7 @@
   tags: [rtx, rtx-ipv6]
 
 - name: Set syslog
-  rtx_config:
+  yamaha_network.rtx.rtx_config:
     lines:
       - syslog host {{ fox.ip }}
       - syslog notice on
@@ -53,13 +56,13 @@
   tags: [rtx, rtx-syslog]
 
 - name: Set telnet
-  rtx_config:
+  yamaha_network.rtx.rtx_config:
     lines:
       - telnetd host lan1
   tags: [rtx, rtx-telnet]
 
 - name: Set dns
-  rtx_config:
+  yamaha_network.rtx.rtx_config:
     lines:
       - dns server {{ fox.ip }} {{ hotel.ip }} {{ fox.ipv6 }} {{ hotel.ipv6 }}
       - dns domain {{ domain }}
@@ -68,7 +71,7 @@
   tags: [rtx, rtx-dns]
 
 - name: Set snmp
-  rtx_config:
+  yamaha_network.rtx.rtx_config:
     lines:
       - snmpv2c host any
       - snmpv2c trap community trap
@@ -76,7 +79,7 @@
   tags: [rtx, rtx-snmp]
 
 - name: Set schedule
-  rtx_config:
+  yamaha_network.rtx.rtx_config:
     lines:
       - schedule at 100 */* 04:52:16 * ntpdate {{ ntpd.fqdn }} syslog
       - schedule at 101 */* 10:52:16 * ntpdate {{ ntpd.fqdn }} syslog
@@ -85,26 +88,26 @@
   tags: [rtx, rtx-schedule]
 
 - name: Set httpd
-  rtx_config:
+  yamaha_network.rtx.rtx_config:
     lines:
       - httpd host lan1
   tags: [rtx, rtx-httpd]
 
 - name: Set sshd
-  rtx_config:
+  yamaha_network.rtx.rtx_config:
     lines:
       - sshd host lan1
   tags: [rtx, rtx-sshd]
 
 - name: Set sntpd
-  rtx_config:
+  yamaha_network.rtx.rtx_config:
     lines:
       - sntpd service on
       - sntpd host lan1
   tags: [rtx, rtx-sntpd]
 
 - name: Set ip interface secure filter
-  rtx_config:
+  yamaha_network.rtx.rtx_config:
     lines:
       - ip lan1 secure filter in 100000 100001 100002 100003 100004 100005 100006 100007 100099
       # Default ip lan2 secure filter in :
@@ -116,7 +119,7 @@
   tags: [rtx, rtx-port]
 
 - name: Set the default filters
-  rtx_config:
+  yamaha_network.rtx.rtx_config:
     lines:
       - ip filter 100000 reject-nolog * * udp,tcp 135 *
       - ip filter 100001 reject-nolog * * udp,tcp * 135
@@ -181,7 +184,7 @@
   tags: [rtx, rtx-port]
 
 - name: Add filters
-  rtx_config:
+  yamaha_network.rtx.rtx_config:
     lines:
       - ipv6 filter 101100 reject-nolog * * udp,tcp https *
       - ipv6 filter 101101 reject-nolog * * udp,tcp www *
@@ -194,7 +197,7 @@
   tags: [rtx, rtx-port]
 
 - name: Open ports
-  rtx_config:
+  yamaha_network.rtx.rtx_config:
     lines:
       - ip lan2 nat descriptor 1
       - nat descriptor type 1 masquerade
@@ -219,7 +222,7 @@
 # Ref: https://docs.aws.amazon.com/ja_jp/vpn/latest/s2svpn/SetUpVPNConnections.html
 # Ref: http://www.rtpro.yamaha.co.jp/RT/docs/cloud_vpn/amazon-vpc_api.html
 - name: Set AWS Site-to-Site VPN 1
-  rtx_config:
+  yamaha_network.rtx.rtx_config:
     parents:
       - tunnel select 10
     lines:
@@ -246,7 +249,7 @@
   tags: [rtx, rtx-s2svpn]
 
 - name: Set AWS Site-to-Site VPN 2
-  rtx_config:
+  yamaha_network.rtx.rtx_config:
     parents:
       - tunnel select 20
     lines:
@@ -273,7 +276,7 @@
   tags: [rtx, rtx-s2svpn]
 
 - name: Set AWS Site-to-Site VPN 3
-  rtx_config:
+  yamaha_network.rtx.rtx_config:
     lines:
       - nat descriptor masquerade static 1 101 {{ lan1.ip }} esp
       - nat descriptor masquerade static 1 102 {{ lan1.ip }} udp 500,4500
