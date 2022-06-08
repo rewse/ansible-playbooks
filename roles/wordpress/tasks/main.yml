@@ -288,6 +288,12 @@
     dest: /srv/www/wordpress/wp-content/themes/fukasawa
   tags: [wordpress]
 
+- name: Replace embed-content
+  ansible.builtin.copy:
+    src: embed-content.php
+    dest: /srv/www/wordpress/wp-content/themes/fukasawa/
+  tags: [wordpress]
+
 - name: Add pochipp_assist
   ansible.builtin.unarchive:
     src: https://pochipp.com/download/?p=assist
