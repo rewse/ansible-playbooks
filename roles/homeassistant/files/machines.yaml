@@ -131,11 +131,11 @@ views:
       - type: entities
         title: Storages
         entities:
-          - entity: sensor.youth_storage
-            name: youth
+          - entity: sensor.zoom_storage
+            name: zoom
             icon: 'mdi:harddisk'
-          - entity: sensor.e0b55fe8e384_storage
-            name: e0b55fe8e384
+          - entity: sensor.bcd074348424_storage
+            name: bcd07348424
             icon: 'mdi:harddisk'
           - entity: sensor.bio_storage
             name: bio
@@ -145,6 +145,9 @@ views:
             icon: 'mdi:harddisk'
           - entity: sensor.global_internal_storage
             name: global Internal
-          - entity: sensor.guppy_volume_used
-            name: guppy
+          - entity: sensor.guppy_volume_1_volume_used
+            name: guppy Data
+            icon: 'mdi:harddisk'
+          - entity: sensor.guppy_volume_2_volume_used
+            name: guppy Backup
             icon: 'mdi:harddisk'
