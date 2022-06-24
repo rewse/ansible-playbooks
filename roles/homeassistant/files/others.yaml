@@ -41,8 +41,6 @@ cards:
   - type: entities
     title: Other Automations
     entities:
-      - entity: automation.alarm_internet_speed_is_too_slow
-        secondary_info: last-triggered
       - entity: automation.update_device_tracking_sensors
         secondary_info: last-triggered
     show_header_toggle: false
