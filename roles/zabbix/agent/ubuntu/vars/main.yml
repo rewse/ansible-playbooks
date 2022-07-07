@@ -1,2 +1,4 @@
 ---
-zabbix_server_name: zabbix.rewse.jp
+zabbix:
+  server: zabbix.rewse.jp
+  version: 6.2
