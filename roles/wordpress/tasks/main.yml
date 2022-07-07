@@ -292,6 +292,8 @@
   ansible.builtin.copy:
     src: embed-content.php
     dest: /srv/www/wordpress/wp-content/themes/fukasawa/
+    owner: www-data
+    group: www-data
   tags: [wordpress]
 
 - name: Add pochipp_assist
