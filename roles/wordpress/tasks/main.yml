@@ -130,48 +130,6 @@
       --------------------------------------------------------------------------------------------- */
 
       /* Ref; https://jetpack.com/support/related-posts/customize-related-posts/ */
-      function jetpackme_append_related_post( $hits, $post_id ) {
-          $candidates = array(
-              268, 441, 537, 756, 830, 1085, 1396, 636, 865, 1198, 1286, 1358,
-              1664, 1735, 1778, 1802, 1818, 1915, 1918, 1999, 2170
-          );
-
-          $max = count($candidates) - 1;
-
-          $winner[0] = $candidates[mt_rand(0, $max)];
-
-          while (1) {
-            $winner[1] = $candidates[mt_rand(0, $max)];
-
-            if ($winner[1] != $winner[0]) {
-                break;
-            }
-          }
-
-          while (1) {
-            $winner[2] = $candidates[mt_rand(0, $max)];
-
-            if ($winner[2] != $winner[0] and $winner[2] != $winner[1]) {
-                break;
-            }
-          }
-
-          if ( $post_id === 8 or $post_id === 127) {
-              array_unshift( $hits, array( 'id' => $winner[0] ) );
-              array_unshift( $hits, array( 'id' => $winner[1] ) );
-              array_unshift( $hits, array( 'id' => $winner[2] ) );
-
-              array_pop( $hits );
-          }
-          return $hits;
-      }
-      add_filter(
-          'jetpack_relatedposts_filter_hits',
-          'jetpackme_append_related_post',
-          20, 2
-      );
-
-      /* Ref; https://jetpack.com/support/related-posts/customize-related-posts/ */
       function jetpackme_add_pages_to_related( $post_type, $post_id ) {
           if ( is_array( $post_type ) ) {
               $search_types = $post_type;
