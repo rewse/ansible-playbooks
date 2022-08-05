@@ -1,25 +1,25 @@
-- host: tuyaplug-bat.rewse.jp
-  friendly_name: Bathroom Washing Machine Plug
+- host: tuyaplug-fox.rewse.jp
+  friendly_name: fox Plug
   device_id: 1826182840f520f484c0
   local_key: !secret tuyaplug_bat_key
   protocol_version: "3.3"
   entities:
     - platform: switch
-      friendly_name: Bathroom Washing Machine Plug
+      friendly_name: fox Plug
       id: 1
     - platform: sensor
-      friendly_name: Bathroom Washing Machine Plug Current
+      friendly_name: fox Plug Current
       id: 18
       device_class: current
       unit_of_measurement: mA
     - platform: sensor
-      friendly_name: Bathroom Washing Machine Plug Power
+      friendly_name: fox Plug Power
       id: 19
       scaling: 0.1
       device_class: power
       unit_of_measurement: W
     - platform: sensor
-      friendly_name: Bathroom Washing Machine Plug Voltage
+      friendly_name: fox Plug Voltage
       id: 20
       scaling: 0.1
       device_class: voltage

@@ -503,7 +503,7 @@
     - delay:
         hours: 1
 - id: automation.alarm_tuyaplug_bat_is_offline
-  alias: "ALARM: tuyaplug-bat is Offline"
+  alias: "ALARM: tuyaplug-fox is Offline"
   mode: single
   trigger:
     - platform: state
@@ -515,7 +515,7 @@
     - service: notify.tats_devices
       data:
         title: "⚠️ ALARM"
-        message: ️tuyaplug-bat is Offline
+        message: ️tuyaplug-fox is Offline
         data:
           url: /lovelace-machines/machines
           push:
