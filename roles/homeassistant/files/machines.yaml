@@ -15,7 +15,6 @@ views:
           - entity: binary_sensor.xray_liv
           - entity: binary_sensor.xray_sto
           - entity: binary_sensor.victor
-          - entity: binary_sensor.papa
         hours_to_show: 12
       - type: history-graph
         title: Ping Devices
