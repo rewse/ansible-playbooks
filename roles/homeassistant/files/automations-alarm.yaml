@@ -362,26 +362,6 @@
             interruption-level: time-sensitive
     - delay:
         hours: 1
-- id: automation.alarm_papa_is_offline
-  alias: "ALARM: papa is Offline"
-  mode: single
-  trigger:
-    - platform: state
-      entity_id: binary_sensor.papa
-      to: "off"
-      for:
-        minutes: 31
-  action:
-    - service: notify.tats_devices
-      data:
-        title: "⚠️ ALARM"
-        message: papa is Offline
-        data:
-          url: /lovelace-machines/machines
-          push:
-            interruption-level: time-sensitive
-    - delay:
-        hours: 1
 - id: automation.alarm_regza_is_offline
   alias: "ALARM: regza is Offline"
   mode: single
