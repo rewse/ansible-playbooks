@@ -1,4 +1,9 @@
 ---
+- name: Install mh_z19
+  pip:
+    name: mh_z19
+  tags: [mhz19]
+
 # Ref: https://raspberrypi.stackexchange.com/questions/114366/rpi4-serial-port-not-working-on-either-raspberry-os-or-ubuntu/116860
 - name: Copy cmdline.txt
   copy:
