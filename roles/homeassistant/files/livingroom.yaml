@@ -45,6 +45,21 @@ cards:
         --st-mode-background: transparent;
       }
   - type: entities
+    title: Living Room 24-Hour HVAC
+    entities:
+      - entity: automation.plan_to_turn_on_living_room_hvac_fan
+        name: Plan to Turn on HVAC Fan
+        secondary_info: last-triggered
+      - entity: automation.turn_off_living_room_hvac_fan
+        name: Turn off HVAC Fan
+        secondary_info: last-triggered
+      - entity: automation.turn_on_living_room_hvac_cleaner
+        name: Turn on HVAC Cleaner
+        secondary_info: last-triggered
+      - entity: automation.turn_on_living_room_hvac_fan
+        name: Turn on HVAC Fan
+        secondary_info: last-triggered
+  - type: entities
     title: Living Room Appliances
     entities:
       - entity: light.living_area_dimming_downlights
@@ -88,6 +103,9 @@ cards:
       - entity: automation.turn_off_living_room_hvac
         name: Turn off HVAC
         secondary_info: last-triggered
+      - entity: automation.turn_off_living_room_hvac_fan
+        name: Turn off HVAC Fan
+        secondary_info: last-triggered
       - entity: input_number.living_room_hvac_cool_turned_off_threshold
         name: Turned off HVAC Cool Threshold
       - entity: input_number.living_room_hvac_dry_turned_off_threshold
@@ -114,7 +132,7 @@ cards:
       - entity: input_number.living_room_humidifier_turned_on_threshold
         name: Turned on Humidifier Threshold
       - entity: automation.turn_on_living_room_hvac_cleaner
-        name: Turn on AC Cleaner
+        name: Turn on HVAC Cleaner
         secondary_info: last-triggered
       - entity: automation.turn_on_living_room_hvac_cool
         name: Turn on HVAC Cool
