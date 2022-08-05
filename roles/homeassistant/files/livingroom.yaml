@@ -80,9 +80,6 @@ cards:
         secondary_info: last-triggered
       - entity: input_datetime.living_area_turned_down_more_time
         name: Turned down More Time
-      - entity: automation.turn_off_living_room_extra_lights
-        name: Turn off Extra Lights
-        secondary_info: last-triggered
       - entity: automation.turn_off_living_room_humidifier
         name: Turn off Humidifier
         secondary_info: last-triggered
