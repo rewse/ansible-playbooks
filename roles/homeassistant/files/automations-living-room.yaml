@@ -440,12 +440,15 @@
     - platform: state
       entity_id: binary_sensor.living_room_motion
       to: "on"
+      id: Living Room Motion
     - platform: state
       entity_id: binary_sensor.study_motion
       to: "on"
+      id: Study Motion
     - platform: sun
       event: sunset
       offset: "-00:30:00"
+      id: Sunset
   condition:
     - condition: numeric_state
       entity_id: sensor.living_room_light_level
@@ -458,7 +461,7 @@
       entity_id: light.living_area_downlights
     - service: notify.tats_devices
       data:
-        message: "Turned on Living Room Downlights. Current: {{ states('sensor.living_room_light_level') }}lx"
+        message: "Turned on Living Room Downlights due to {{ trigger.id }}. Current: {{ states('sensor.living_room_light_level') }}lx"
         data:
           url: /lovelace/home
           push:
