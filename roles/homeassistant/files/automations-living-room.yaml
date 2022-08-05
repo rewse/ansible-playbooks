@@ -317,8 +317,10 @@
           - switch.living_room_floor_heating
           - switch.study_floor_heating
 - id: automation.turn_off_living_area_lights
-  alias: Turn off Living Area Lights
+  alias: Turn off Living Room Area Lights
   trigger:
+    - platform: sun
+      event: sunrise
     - platform: event
       event_type: ios.action_fired
       event_data:
@@ -334,18 +336,6 @@
           url: /lovelace/home
           push:
             interruption-level: time-sensitive
-- id: automation.turn_off_living_room_extra_lights
-  alias: Turn off Living Room Extra Lights
-  trigger:
-    - platform: sun
-      event: sunrise
-  action:
-    - service: light.turn_off
-      target:
-        entity_id:
-        - light.living_room_tv_light
-        - light.living_room_entrance_light
-        - light.living_room_footlight
 - id: automation.turn_off_living_room_humidifier
   alias: Turn off Living Room Humidifier
   mode: single
