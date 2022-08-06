@@ -18,8 +18,8 @@ smart_home:
       - binary_sensor.study_motion
       - binary_sensor.study_window_n
       - binary_sensor.study_window_s
-      - camera.guppy_living_room
-      - camera.guppy_bedroom
+      - camera.guppy_living_room_camera
+      - camera.guppy_bedroom_camera
       - climate.bedroom_hvac
       - climate.living_room_hvac
       - cover.bedroom_curtains
@@ -72,9 +72,9 @@ smart_home:
       name: 書斎の北側の窓
     binary_sensor.study_window_s:
       name: 書斎の南側の窓
-    camera.guppy_bedroom:
+    camera.guppy_bedroom_camera:
       name: 寝室のカメラ
-    camera.guppy_living_room:
+    camera.guppy_living_room_camera:
       name: リビングのカメラ
     climate.bedroom_hvac:
       name: 寝室のエアコン
