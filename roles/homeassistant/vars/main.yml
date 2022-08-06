@@ -2,7 +2,7 @@
 alexa_client:
   id: "[% vault_alexa_client.id %]"
   secret: "[% vault_alexa_client.secret %]"
-card_mod_version: 3.1.4
+card_mod_version: 3.1.5
 gmail:
   address: "[% vault_gmail.address %]"
   password: "[% vault_gmail.password %]"
@@ -19,7 +19,7 @@ latlng:
     name: "[% vault_latlng.s.name %]"
     lat: "[% vault_latlng.s.lat %]"
     lng: "[% vault_latlng.s.lng %]"
-localtuya_version: 3.5.0
+localtuya_version: 4.0.1
 mini_graph_card_version: 0.11.0
 mini_media_player_version: 1.16.4
 mosquitto_password: "[% vault_mosquitto_password %]"
