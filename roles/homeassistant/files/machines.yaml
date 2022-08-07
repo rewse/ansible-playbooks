@@ -142,8 +142,6 @@ views:
           - entity: sensor.desert_storage
             name: desert
             icon: 'mdi:harddisk'
-          - entity: sensor.global_internal_storage
-            name: global Internal
           - entity: sensor.guppy_volume_1_volume_used
             name: guppy Data
             icon: 'mdi:harddisk'
