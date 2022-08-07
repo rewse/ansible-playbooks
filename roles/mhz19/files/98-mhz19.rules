@@ -1,2 +1,0 @@
-KERNEL=="ttyS0", SYMLINK+="serial0" GROUP="tty" MODE="0660"
-KERNEL=="ttyAMA0", SYMLINK+="serial1" GROUP="tty" MODE="0660"
