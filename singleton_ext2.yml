@@ -6,6 +6,7 @@
     - httpd
     - nextcloud
     - obsidian-livesync
+    - unifi
     - wordpress
     - zabbix/server
     - zabbix/money/market
