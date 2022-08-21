@@ -240,6 +240,9 @@
         - condition: state
           entity_id: sensor.season
           state: winter
+    - condition: state
+      entity_id: alarm_control_panel.surveillance
+      state: disarmed
   action:
     - service: climate.set_hvac_mode
       target:
@@ -275,6 +278,9 @@
     - condition: state
       entity_id: sensor.season
       state: winter
+    - condition: state
+      entity_id: alarm_control_panel.surveillance
+      state: disarmed
   action:
     - service: climate.set_hvac_mode
       target:
@@ -317,6 +323,9 @@
     - condition: state
       entity_id: binary_sensor.bedroom_presence
       state: "off"
+    - condition: state
+      entity_id: alarm_control_panel.surveillance
+      state: disarmed
   action:
     - service: switch.turn_on
       target:

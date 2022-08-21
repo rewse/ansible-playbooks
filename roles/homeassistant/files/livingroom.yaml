@@ -45,21 +45,6 @@ cards:
         --st-mode-background: transparent;
       }
   - type: entities
-    title: Living Room 24-Hour HVAC
-    entities:
-      - entity: automation.plan_to_turn_on_living_room_hvac_fan
-        name: Plan to Turn on HVAC Fan
-        secondary_info: last-triggered
-      - entity: automation.turn_off_living_room_hvac_fan
-        name: Turn off HVAC Fan
-        secondary_info: last-triggered
-      - entity: automation.turn_on_living_room_hvac_cleaner
-        name: Turn on HVAC Cleaner
-        secondary_info: last-triggered
-      - entity: automation.turn_on_living_room_hvac_fan
-        name: Turn on HVAC Fan
-        secondary_info: last-triggered
-  - type: entities
     title: Living Room Appliances
     entities:
       - entity: light.living_area_dimming_downlights
