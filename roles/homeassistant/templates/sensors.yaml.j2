@@ -111,7 +111,7 @@
     - position
     - CHSesame2Status
     - timestamp
-  scan_interval: 3600
+  scan_interval: 300
 - platform: rest
   name: Entrance Lock Top Sensor
   resource: https://app.candyhouse.co/api/sesame2/[% sesame.uuid_top %]
@@ -124,7 +124,7 @@
     - position
     - CHSesame2Status
     - timestamp
-  scan_interval: 3600
+  scan_interval: 300
 - platform: rest
   name: Living Room SwitchBot Meter Temperature
   resource: https://api.switch-bot.com/v1.0/devices/F5DAB9477E91/status
