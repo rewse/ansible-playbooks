@@ -239,10 +239,6 @@
       to: heat_cool
       for:
         hours: 2
-  condition:
-    - condition: state
-      entity_id: alarm_control_panel.surveillance
-      state: disarmed
   action:
     - service: automation.turn_on
       target:
@@ -310,6 +306,9 @@
     - condition: time
       after: "00:00:00"
       before: "07:00:00"
+    - condition: state
+      entity_id: alarm_control_panel.surveillance
+      state: disarmed
   action:
     - service: switch.turn_off
       target:
@@ -393,6 +392,9 @@
         - condition: state
           entity_id: climate.living_room_hvac
           state: dry
+    - condition: state
+      entity_id: alarm_control_panel.surveillance
+      state: disarmed
   action:
     - service: climate.set_hvac_mode
       target:
@@ -749,6 +751,10 @@
   trigger:
     - platform: time
       at: "4:30"
+  condition:
+    - condition: state
+      entity_id: alarm_control_panel.surveillance
+      state: disarmed
   action:
     - service: climate.set_hvac_mode
       target:
