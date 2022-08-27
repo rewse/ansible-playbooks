@@ -6,18 +6,8 @@
 
 - name: Add a repository for x86_64
   apt_repository:
-    repo: deb [arch=amd64] https://download.docker.com/linux/ubuntu focal stable
+    repo: deb [arch={{ ansible_architecture }}] https://download.docker.com/linux/ubuntu focal stable
     filename: docker
-  when:
-    ansible_architecture == "x86_64"
-  tags: [docker, package]
-
-- name: Add a repository for aarch64
-  apt_repository:
-    repo: deb [arch=arm64] https://download.docker.com/linux/ubuntu focal stable
-    filename: docker
-  when:
-    ansible_architecture == "aarch64"
   tags: [docker, package]
 
 - name: Update all packages
