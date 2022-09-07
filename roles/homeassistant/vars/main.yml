@@ -2,7 +2,7 @@
 alexa_client:
   id: "[% vault_alexa_client.id %]"
   secret: "[% vault_alexa_client.secret %]"
-card_mod_version: 3.1.4
+card_mod_version: 3.1.5
 gmail:
   address: "[% vault_gmail.address %]"
   password: "[% vault_gmail.password %]"
@@ -19,7 +19,7 @@ latlng:
     name: "[% vault_latlng.s.name %]"
     lat: "[% vault_latlng.s.lat %]"
     lng: "[% vault_latlng.s.lng %]"
-localtuya_version: 3.5.0
+localtuya_version: 4.0.1
 mini_graph_card_version: 0.11.0
 mini_media_player_version: 1.16.4
 mosquitto_password: "[% vault_mosquitto_password %]"
@@ -42,7 +42,7 @@ sesame:
   secret_top: "[% vault_sesame.secret_top %]"
   secret_bottom: "[% vault_sesame.secret_bottom %]"
 simple_thermostat_version: 2.4.3
-simple_weather_card_version: 0.8.2
+simple_weather_card_version: 0.8.3
 switchbot_token: "[% vault_switchbot_token %]"
 tuyaplug:
   bat_key: "[% vault_tuyaplug.bat_key %]"
@@ -50,4 +50,4 @@ tuyaplug:
   kit_key: "[% vault_tuyaplug.kit_key %]"
   liv_key: "[% vault_tuyaplug.liv_key %]"
 uptime_card_version: 0.4.0
-xiaomi_gateway3_version: 2.1.0
+xiaomi_gateway3_version: 2.1.1

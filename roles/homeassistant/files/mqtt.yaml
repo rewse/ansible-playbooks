@@ -1,0 +1,91 @@
+certificate: /config/certs/ISRG_Root_X1.pem
+button:
+  - unique_id: button.living_room_floor_heating
+    name: "Living Room Floor Heating Button"
+    command_topic: dummy
+    icon: mdi:grid
+  - unique_id: button.study_floor_heating
+    name: "Study Floor Heating Button"
+    command_topic: dummy
+    icon: mdi:grid
+sensor:
+  - unique_id: sensor.enecoq_fee_high
+    name: enecoQ Fee High
+    state_topic: enecoq/fee
+    value_template: "{{ value_json.high }}"
+    unit_of_measurement: JPY/h
+    state_class: measurement
+    availability:
+      - topic: enecoq/fee/state
+    icon: mdi:transmission-tower
+  - unique_id: sensor.enecoq_fee_low
+    name: enecoQ Fee Low
+    state_topic: enecoq/fee
+    value_template: "{{ value_json.low }}"
+    unit_of_measurement: JPY/h
+    state_class: measurement
+    availability:
+      - topic: enecoq/fee/state
+    icon: mdi:transmission-tower
+  - unique_id: sensor.enecoq_fee_mid
+    name: enecoQ Fee Mid
+    state_topic: enecoq/fee
+    value_template: "{{ value_json.mid }}"
+    unit_of_measurement: JPY/h
+    state_class: measurement
+    availability:
+      - topic: enecoq/fee/state
+    icon: mdi:transmission-tower
+  - unique_id: sensor.enecoq_fee_total
+    name: enecoQ Fee Total
+    state_topic: enecoq/fee
+    value_template: "{{ value_json.total }}"
+    unit_of_measurement: JPY/h
+    state_class: measurement
+    availability:
+      - topic: enecoq/fee/state
+    icon: mdi:transmission-tower
+  - unique_id: sensor.enecoq_kwh
+    name: enecoQ kWh
+    state_topic: enecoq/kwh
+    value_template: "{{ value_json.kwh }}"
+    unit_of_measurement: kWh
+    state_class: measurement
+    availability:
+      - topic: enecoq/kwh/state
+    icon: mdi:transmission-tower
+  - unique_id: sensor.monitor_living_room_ubiqu_iphone12mini
+    name: monitor Living Room ubiqu-iphone12mini
+    state_topic: monitor/living_room/ubiqu_iphone12mini
+    value_template: "{{ value_json.confidence }}"
+    unit_of_measurement: "%"
+    state_class: measurement
+  - unique_id: sensor.monitor_living_room_bio
+    name: monitor Living Room bio
+    state_topic: monitor/living_room/bio
+    value_template: "{{ value_json.confidence }}"
+    unit_of_measurement: "%"
+    state_class: measurement
+  # Do not use mhz19 integration because it cannot the correct value
+  - unique_id: sensor.living_room_co2
+    name: Living Room CO2
+    state_topic: mhz19/co2
+    value_template: "{{ value_json.co2 }}"
+    unit_of_measurement: ppm
+    state_class: measurement
+    device_class: carbon_dioxide
+    availability:
+      - topic: mhz19/state
+    icon: mdi:molecule-co2
+  - unique_id: sensor.monitor_storage_ubiqu_iphone12mini
+    name: monitor Storage ubiqu-iphone12mini
+    state_topic: monitor/storage/ubiqu_iphone12mini
+    value_template: "{{ value_json.confidence }}"
+    unit_of_measurement: "%"
+    state_class: measurement
+  - unique_id: sensor.monitor_storage_bio
+    name: monitor Storage bio
+    state_topic: monitor/storage/bio
+    value_template: "{{ value_json.confidence }}"
+    unit_of_measurement: "%"
+    state_class: measurement
