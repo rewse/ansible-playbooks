@@ -15,7 +15,6 @@ views:
           - entity: binary_sensor.xray_liv
           - entity: binary_sensor.xray_sto
           - entity: binary_sensor.victor
-          - entity: binary_sensor.papa
         hours_to_show: 12
       - type: history-graph
         title: Ping Devices
@@ -143,8 +142,6 @@ views:
           - entity: sensor.desert_storage
             name: desert
             icon: 'mdi:harddisk'
-          - entity: sensor.global_internal_storage
-            name: global Internal
           - entity: sensor.guppy_volume_1_volume_used
             name: guppy Data
             icon: 'mdi:harddisk'

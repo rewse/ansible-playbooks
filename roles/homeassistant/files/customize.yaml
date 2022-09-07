@@ -32,8 +32,6 @@ binary_sensor.kasaplug_ent:
   icon: mdi:power-socket-jp
 binary_sensor.kasaplug_liv:
   icon: mdi:power-socket-jp
-binary_sensor.papa:
-  icon: mdi:access-point-network
 binary_sensor.regza:
   icon: mdi:television
 binary_sensor.regza_state:

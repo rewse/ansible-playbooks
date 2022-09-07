@@ -181,26 +181,10 @@
   notify: Restart homeassistant
   tags: [homeassistant, homeassistant-component]
 
-- name: Config button
-  lineinfile:
-    path: /etc/homeassistant/configuration.yaml
-    insertafter: '^binary_sensor:'
-    regexp: '^button:'
-    line: "button: !include buttons.yaml"
-  notify: Restart homeassistant
-  tags: [homeassistant, homeassistant-component]
-
-- name: Copy buttons.yaml
-  copy:
-    src: buttons.yaml
-    dest: /etc/homeassistant
-  notify: Restart homeassistant
-  tags: [homeassistant, homeassistant-component]
-
 - name: Config climate
   lineinfile:
     path: /etc/homeassistant/configuration.yaml
-    insertafter: '^button:'
+    insertafter: '^binary_sensor:'
     regexp: '^climate:'
     line: "climate: !include climates.yaml"
   notify: Restart homeassistant
@@ -352,26 +336,10 @@
   notify: Restart homeassistant
   tags: [homeassistant, homeassistant-component]
 
-- name: Config localtuya
-  lineinfile:
-    path: /etc/homeassistant/configuration.yaml
-    insertafter: '^light:'
-    regexp: '^localtuya:'
-    line: "localtuya: !include localtuyas.yaml"
-  notify: Restart homeassistant
-  tags: [homeassistant, homeassistant-component]
-
-- name: Copy localtuyas.yaml
-  copy:
-    src: localtuyas.yaml
-    dest: /etc/homeassistant
-  notify: Restart homeassistant
-  tags: [homeassistant, homeassistant-component]
-
 - name: Config lock
   lineinfile:
     path: /etc/homeassistant/configuration.yaml
-    insertafter: '^localtuya:'
+    insertafter: '^light:'
     regexp: '^lock:'
     line: "lock: !include locks.yaml"
   notify: Restart homeassistant
@@ -400,10 +368,26 @@
   notify: Restart homeassistant
   tags: [homeassistant, homeassistant-component]
 
-- name: Config notify
+- name: Config MQTT
   lineinfile:
     path: /etc/homeassistant/configuration.yaml
     insertafter: '^media_player:'
+    regexp: '^mqtt:'
+    line: "mqtt: !include mqtt.yaml"
+  notify: Restart homeassistant
+  tags: [homeassistant, homeassistant-component]
+
+- name: Copy mqtt.yaml
+  copy:
+    src: mqtt.yaml
+    dest: /etc/homeassistant
+  notify: Restart homeassistant
+  tags: [homeassistant, homeassistant-component]
+
+- name: Config notify
+  lineinfile:
+    path: /etc/homeassistant/configuration.yaml
+    insertafter: '^mqtt:'
     regexp: '^notify:'
     line: "notify: !include notify.yaml"
   notify: Restart homeassistant
@@ -645,7 +629,6 @@
         external_url: https://hass.rewse.jp/
         internal_url: https://hass.rewse.jp/
         customize: !include customize.yaml
-      fastdotcom:
       frontend:
         extra_module_url:
           - /local/card-mod.js
@@ -679,8 +662,6 @@
             type: module
           - url: /local/uptime-card.js
             type: module
-      mqtt:
-        certificate: /config/certs/ISRG_Root_X1.pem
       nature_remo:
         access_token: !secret remo_token
       recorder:

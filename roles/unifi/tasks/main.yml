@@ -8,100 +8,18 @@
     update_cache: yes
   tags: [unifi]
 
+- name: Add an apt key
+  ansible.builtin.apt_key:
+    url: https://dl.ui.com/unifi/unifi-repo.gpg
+  tags: [unifi]
+
+- name: Add a repository
+  ansible.builtin.apt_repository:
+    repo: deb https://www.ui.com/downloads/unifi/debian stable ubiquiti
+    filename: unifi
+  tags: [unifi]
+
 - name: Install unifi
   ansible.builtin.apt:
-    deb: https://dl.ui.com/unifi/{{ unifi_version }}/unifi_sysvinit_all.deb
+    name: unifi
   tags: [unifi]
-
-- name: Download unifi_ssl_import.sh
-  ansible.builtin.get_url:
-    url: https://raw.githubusercontent.com/stevejenkins/unifi-linux-utils/master/unifi_ssl_import.sh
-    dest: /tmp
-  tags: [unifi]
-
-- name: Copy unifi_ssl_import.sh
-  ansible.builtin.copy:
-    src: /tmp/unifi_ssl_import.sh
-    dest: /usr/local/sbin/unifi-ssl-import
-    mode: '0755'
-    remote_src: yes
-  tags: [unifi]
-
-- name: Set UNIFI_HOSTNAME
-  ansible.builtin.lineinfile:
-    path: /usr/local/sbin/unifi-ssl-import
-    regexp: '^UNIFI_HOSTNAME'
-    line: 'UNIFI_HOSTNAME=rewse.jp'
-  tags: [unifi]
-
-- name: Comment out UNIFI_DIR
-  ansible.builtin.lineinfile:
-    path: /usr/local/sbin/unifi-ssl-import
-    regexp: '^UNIFI_DIR='
-    line: '#UNIFI_DIR=/opt/UniFi'
-  tags: [unifi]
-
-- name: Comment out JAVA_DIR
-  ansible.builtin.lineinfile:
-    path: /usr/local/sbin/unifi-ssl-import
-    regexp: '^JAVA_DIR='
-    line: '#JAVA_DIR=${UNIFI_DIR}'
-  tags: [unifi]
-
-- name: Comment out KEYSTORE
-  ansible.builtin.lineinfile:
-    path: /usr/local/sbin/unifi-ssl-import
-    regexp: '^KEYSTORE='
-    line: '#KEYSTORE=${UNIFI_DIR}/data/keystore'
-  tags: [unifi]
-
-- name: Set UFIFI_DIR, JAVA_DIR, KEYSTORE
-  ansible.builtin.blockinfile:
-    path: /usr/local/sbin/unifi-ssl-import
-    block: |
-      UNIFI_DIR=/var/lib/unifi
-      JAVA_DIR=/usr/lib/unifi
-      KEYSTORE=${UNIFI_DIR}/keystore
-    insertafter: '^UNIFI_SERVICE='
-  tags: [unifi]
-
-- name: Set PRIV_KEY
-  ansible.builtin.lineinfile:
-    path: /usr/local/sbin/unifi-ssl-import
-    regexp: '^PRIV_KEY'
-    line: 'PRIV_KEY=/etc/letsencrypt/live/rewse.jp/privkey.pem'
-  tags: [unifi]
-
-- name: Set SIGNED_CRT
-  ansible.builtin.lineinfile:
-    path: /usr/local/sbin/unifi-ssl-import
-    regexp: '^SIGNED_CRT'
-    line: 'SIGNED_CRT=/etc/letsencrypt/live/rewse.jp/cert.pem'
-  tags: [unifi]
-
-- name: Set CHAIN_FILE
-  ansible.builtin.lineinfile:
-    path: /usr/local/sbin/unifi-ssl-import
-    regexp: '^CHAIN_FILE'
-    line: 'CHAIN_FILE=/etc/letsencrypt/live/rewse.jp/chain.pem'
-  tags: [unifi]
-
-- name: Copy update-unifi-ssl
-  ansible.builtin.copy:
-    src: update-unifi-ssl
-    dest: /etc/cron.monthly
-    mode: '0755'
-  tags: [unifi]
-
-- name: Copy unifi.rewse.jp.conf
-  ansible.builtin.template:
-    src: unifi.rewse.jp.conf.j2
-    dest: /etc/apache2/sites-available/unifi.rewse.jp.conf
-  notify: Reload apache
-  tags: [unifi]
-
-- name: Enable unifi.rewse.jp
-  ansible.builtin.command: a2ensite unifi.rewse.jp
-  notify: Reload apache
-  tags: [unifi]
-  
