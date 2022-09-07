@@ -80,9 +80,6 @@ cards:
         secondary_info: last-triggered
       - entity: input_datetime.living_area_turned_down_more_time
         name: Turned down More Time
-      - entity: automation.turn_off_living_room_extra_lights
-        name: Turn off Extra Lights
-        secondary_info: last-triggered
       - entity: automation.turn_off_living_room_humidifier
         name: Turn off Humidifier
         secondary_info: last-triggered
@@ -90,6 +87,9 @@ cards:
         name: Turned off Humidifier Threshold
       - entity: automation.turn_off_living_room_hvac
         name: Turn off HVAC
+        secondary_info: last-triggered
+      - entity: automation.turn_off_living_room_hvac_fan
+        name: Turn off HVAC Fan
         secondary_info: last-triggered
       - entity: input_number.living_room_hvac_cool_turned_off_threshold
         name: Turned off HVAC Cool Threshold
@@ -117,7 +117,7 @@ cards:
       - entity: input_number.living_room_humidifier_turned_on_threshold
         name: Turned on Humidifier Threshold
       - entity: automation.turn_on_living_room_hvac_cleaner
-        name: Turn on AC Cleaner
+        name: Turn on HVAC Cleaner
         secondary_info: last-triggered
       - entity: automation.turn_on_living_room_hvac_cool
         name: Turn on HVAC Cool
@@ -176,4 +176,4 @@ cards:
           power_state: false
   - type: picture-entity
     name: Living Room Camera
-    entity: camera.guppy_living_room
+    entity: camera.guppy_living_room_camera

@@ -106,4 +106,4 @@ cards:
     show_header_toggle: false
   - type: picture-entity
     name: Bedroom Camera
-    entity: camera.guppy_bedroom
+    entity: camera.guppy_bedroom_camera
