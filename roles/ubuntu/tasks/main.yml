@@ -13,7 +13,7 @@
 - name: Add a repository for GitHub
   apt_repository:
     repo: "deb [arch={{ ansible_architecture }} signed-by=/usr/share/keyrings/githubcli-archive-keyring.gpg] https://cli.github.com/packages stable main"
-    filename: github-cli.list
+    filename: github-cli
   tags: [ubuntu, package]
 
 - name: Update all packages
