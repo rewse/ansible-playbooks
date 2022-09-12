@@ -2,6 +2,9 @@
 - platform: command_line
   name: REGZA Channel
   command: curl --digest --user '[% regza.username %]:[% regza.password %]' http://regza.rewse.jp/v2/remote/play/status | jq -r .epg_info_current.channel_name
+- platform: command_line
+  name: REGZA Content Type
+  command: curl --digest --user '[% regza.username %]:[% regza.password %]' http://regza.rewse.jp/v2/remote/play/status | jq -r .content_type
 - platform: filter
   name: Filtered Bedroom HVAC Plug Power
   entity_id: sensor.bedroom_hvac_plug_power
