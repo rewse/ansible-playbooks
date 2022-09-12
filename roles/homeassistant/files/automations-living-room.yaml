@@ -435,6 +435,51 @@
         entity_id:
           - automation.turn_on_living_room_hvac_fan
           - automation.turn_off_living_room_hvac_fan
+- id: automation.turn_off_living_room_tv
+  alias: Turn off Living Room TV
+  trigger:
+    - platform: time_pattern
+      seconds: 39
+  condition:
+    - condition: state
+      entity_id: alarm_control_panel.living_room_tv
+      state: armed_away
+    - condition: state
+      entity_id: person.shibata_tats
+      state: not_home
+      for:
+        minutes: 10
+    - condition: state
+      entity_id: person.shibata_akiko
+      state: not_home
+      for:
+        minutes: 10
+    - condition: or
+      conditions:
+        - condition: state
+          entity_id: sensor.regza_content_type
+          state: broadcast
+          for:
+            seconds: 5
+        - condition: state
+          entity_id: sensor.regza_content_type
+          state: external
+          for:
+            seconds: 5
+        - condition: state
+          entity_id: sensor.regza_content_type
+          state: recorded
+          for:
+            seconds: 5
+  action:
+    - service: shell_command.control_toggle_regza
+    - service: notify.tats_devices
+      data:
+        message: "Turned off Living Room TV"
+        data:
+          url: /lovelace/machines
+          push:
+            interruption-level: time-sensitive
 - id: automation.turn_on_living_area_downlights
   alias: Turn on Living Area Downlights
   mode: single

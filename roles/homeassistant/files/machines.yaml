@@ -148,3 +148,8 @@ views:
           - entity: sensor.guppy_volume_2_volume_used
             name: guppy Backup
             icon: 'mdi:harddisk'
+      - type: alarm-panel
+        name: Living Room TV
+        entity: alarm_control_panel.living_room_tv
+        states:
+          - arm_away
