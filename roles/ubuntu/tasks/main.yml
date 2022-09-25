@@ -12,8 +12,18 @@
 
 - name: Add a repository for GitHub
   apt_repository:
-    repo: "deb [arch={{ ansible_architecture }} signed-by=/usr/share/keyrings/githubcli-archive-keyring.gpg] https://cli.github.com/packages stable main"
+    repo: "deb [arch=amd64 signed-by=/usr/share/keyrings/githubcli-archive-keyring.gpg] https://cli.github.com/packages stable main"
     filename: github-cli
+  when:
+    ansible_architecture == "x86_64"
+  tags: [ubuntu, package]
+
+- name: Add a repository for GitHub
+  apt_repository:
+    repo: "deb [arch=arm64 signed-by=/usr/share/keyrings/githubcli-archive-keyring.gpg] https://cli.github.com/packages stable main"
+    filename: github-cli
+  when:
+    ansible_architecture == "aarch64"
   tags: [ubuntu, package]
 
 - name: Update all packages
