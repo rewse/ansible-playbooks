@@ -19,7 +19,7 @@ latlng:
     name: "[% vault_latlng.s.name %]"
     lat: "[% vault_latlng.s.lat %]"
     lng: "[% vault_latlng.s.lng %]"
-localtuya_version: 4.0.1
+localtuya_version: 4.1.0
 mini_graph_card_version: 0.11.0
 mini_media_player_version: 1.16.4
 mosquitto_password: "[% vault_mosquitto_password %]"
@@ -41,7 +41,7 @@ sesame:
   uuid_bottom: E0A1A177-9F37-CD6A-05F4-E65AB625C0AC
   secret_top: "[% vault_sesame.secret_top %]"
   secret_bottom: "[% vault_sesame.secret_bottom %]"
-simple_thermostat_version: 2.4.3
+simple_thermostat_version: 2.5.0
 simple_weather_card_version: 0.8.3
 switchbot_token: "[% vault_switchbot_token %]"
 tuyaplug:
