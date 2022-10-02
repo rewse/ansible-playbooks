@@ -87,7 +87,7 @@
 - name: Copy 30-wordpress.ini
   ansible.builtin.copy:
     src: 30-wordpress.ini
-    dest: /etc/php/7.4/apache2/conf.d
+    dest: /etc/php/{{ php_version }}/apache2/conf.d
   notify: Reload apache
   tags: [wordpress]
 
