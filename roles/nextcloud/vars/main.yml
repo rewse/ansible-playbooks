@@ -1,2 +1,3 @@
 ---
 nextcloud_diskname: nvme1n1
+php_version: 8.1
