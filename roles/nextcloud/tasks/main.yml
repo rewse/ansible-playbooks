@@ -71,14 +71,14 @@
 - name: Copy 30-nextcloud.ini
   ansible.builtin.copy:
     src: 30-nextcloud.ini
-    dest: /etc/php/7.4/apache2/conf.d
+    dest: /etc/php/{{ php_version }}/apache2/conf.d
   notify: Reload apache
   tags: [nextcloud]
 
 - name: Copy 30-nextcloud.cli.ini
   ansible.builtin.copy:
     src: 30-nextcloud.cli.ini
-    dest: /etc/php/7.4/cli/conf.d
+    dest: /etc/php/{{ php_version }}/cli/conf.d
   tags: [nextcloud]
 
 - name: Enable apache modules
