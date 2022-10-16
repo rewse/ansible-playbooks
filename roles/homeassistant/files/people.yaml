@@ -37,3 +37,5 @@ views:
             name: Tats
           - entity: person.shibata_akiko
             name: Akiko
+          - entity: person.shibata_kayano
+            name: Kayano
