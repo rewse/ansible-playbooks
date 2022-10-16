@@ -198,16 +198,20 @@
     - condition: state
       entity_id: alarm_control_panel.surveillance
       state: disarmed
-    - condition: state
-      entity_id: person.shibata_tats
-      state: not_home
-      for:
-        minutes: 10
-    - condition: state
-      entity_id: person.shibata_akiko
-      state: not_home
-      for:
-        minutes: 10
+    - condition: not
+      conditions:
+        - condition: state
+          entity_id: person.shibata_tats
+          state: home
+          for:
+            minutes: 10
+    - condition: not
+      conditions:
+        - condition: state
+          entity_id: person.shibata_akiko
+          state: home
+          for:
+            minutes: 10
   action:
     - service: alarm_control_panel.alarm_arm_away
       target:
