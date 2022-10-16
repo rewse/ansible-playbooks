@@ -35,7 +35,7 @@ cards:
     style: |
       ha-card {
         --st-font-size-xl: 36px;
-        --st-mode-active-background: #dff4fd;
+        --st-mode-active-background: #999999;
         --st-mode-background: transparent;
       }
   - type: entities
