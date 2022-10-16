@@ -16,25 +16,6 @@
           topic: monitor/scan/depart
           payload: '{"identity": "automation.trigger_monitor"}'
           retain: true
-- id: automation.turn_off_monitor_ubiqu_iphone12mini
-  alias: Turn off monitor ubiqu-iphone12mini
-  trigger:
-    - platform: numeric_state
-      entity_id: sensor.monitor_ubiqu_iphone12mini
-      below: 10
-    - platform: time_pattern
-      minutes: "/5"
-      seconds: 53
-  condition:
-    - condition: numeric_state
-      entity_id: sensor.monitor_ubiqu_iphone12mini
-      below: 10
-  action:
-    - service: device_tracker.see
-      data:
-        dev_id: monitor_ubiqu_iphone12mini
-        location_name: not_home
-        source_type: bluetooth
 - id: automation.turn_off_monitor_bio
   alias: Turn off monitor bio
   trigger:
@@ -52,6 +33,44 @@
     - service: device_tracker.see
       data:
         dev_id: monitor_bio
+        location_name: not_home
+        source_type: bluetooth
+- id: automation.turn_off_monitor_kijishiro
+  alias: Turn off monitor kijishiro
+  trigger:
+    - platform: numeric_state
+      entity_id: sensor.monitor_kijishiro
+      below: 10
+    - platform: time_pattern
+      minutes: "/5"
+      seconds: 58
+  condition:
+    - condition: numeric_state
+      entity_id: sensor.monitor_kijishiro
+      below: 10
+  action:
+    - service: device_tracker.see
+      data:
+        dev_id: monitor_kijishiro
+        location_name: not_home
+        source_type: bluetooth
+- id: automation.turn_off_monitor_ubiqu_iphone12mini
+  alias: Turn off monitor ubiqu-iphone12mini
+  trigger:
+    - platform: numeric_state
+      entity_id: sensor.monitor_ubiqu_iphone12mini
+      below: 10
+    - platform: time_pattern
+      minutes: "/5"
+      seconds: 2
+  condition:
+    - condition: numeric_state
+      entity_id: sensor.monitor_ubiqu_iphone12mini
+      below: 10
+  action:
+    - service: device_tracker.see
+      data:
+        dev_id: monitor_ubiqu_iphone12mini
         location_name: not_home
         source_type: bluetooth
 - id: automation.turn_off_surveillance
@@ -94,25 +113,6 @@
             interruption-level: time-sensitive
     - delay:
         hours: 1
-- id: automation.turn_on_monitor_ubiqu_iphone12mini
-  alias: Turn on monitor ubiqu-iphone12mini
-  trigger:
-    - platform: numeric_state
-      entity_id: sensor.monitor_ubiqu_iphone12mini
-      above: 10
-    - platform: time_pattern
-      minutes: "/5"
-      seconds: 53
-  condition:
-    - condition: numeric_state
-      entity_id: sensor.monitor_ubiqu_iphone12mini
-      above: 10
-  action:
-    - service: device_tracker.see
-      data:
-        dev_id: monitor_ubiqu_iphone12mini
-        location_name: home
-        source_type: bluetooth
 - id: automation.turn_on_monitor_bio
   alias: Turn on monitor bio
   trigger:
@@ -121,7 +121,7 @@
       above: 10
     - platform: time_pattern
       minutes: "/5"
-      seconds: 53
+      seconds: 34
   condition:
     - condition: numeric_state
       entity_id: sensor.monitor_bio
@@ -130,6 +130,44 @@
     - service: device_tracker.see
       data:
         dev_id: monitor_bio
+        location_name: home
+        source_type: bluetooth
+- id: automation.turn_on_monitor_kijishiro
+  alias: Turn on monitor bio
+  trigger:
+    - platform: numeric_state
+      entity_id: sensor.monitor_kijishiro
+      above: 10
+    - platform: time_pattern
+      minutes: "/5"
+      seconds: 20
+  condition:
+    - condition: numeric_state
+      entity_id: sensor.monitor_kijishiro
+      above: 10
+  action:
+    - service: device_tracker.see
+      data:
+        dev_id: monitor_kijishiro
+        location_name: home
+        source_type: bluetooth
+- id: automation.turn_on_monitor_ubiqu_iphone12mini
+  alias: Turn on monitor ubiqu-iphone12mini
+  trigger:
+    - platform: numeric_state
+      entity_id: sensor.monitor_ubiqu_iphone12mini
+      above: 10
+    - platform: time_pattern
+      minutes: "/5"
+      seconds: 24
+  condition:
+    - condition: numeric_state
+      entity_id: sensor.monitor_ubiqu_iphone12mini
+      above: 10
+  action:
+    - service: device_tracker.see
+      data:
+        dev_id: monitor_ubiqu_iphone12mini
         location_name: home
         source_type: bluetooth
 - id: automation.turn_on_surveillance_when_ios_action_fires

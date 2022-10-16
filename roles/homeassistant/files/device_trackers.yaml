@@ -2,4 +2,5 @@
   hosts:
     ping_bio: bio.rewse.jp
     ping_ubiqu_iphone12mini: ubiqu-iphone12mini.rewse.jp
+    ping_kijishiro: kijishiro.rewse.jp
   consider_home: 600
