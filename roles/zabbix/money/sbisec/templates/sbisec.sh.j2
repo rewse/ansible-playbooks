@@ -16,7 +16,7 @@ my_exit() {
 # {{{ send_shares()
 
 send_shares() {
-    csv=$(sudo -u [% user %] /usr/local/bin/sbisec $username $password)
+    csv=$(/usr/local/bin/sbisec $username $password)
 
     res=0
     for line in $csv; do
