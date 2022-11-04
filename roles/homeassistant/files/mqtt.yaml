@@ -1,4 +1,3 @@
-certificate: /config/certs/ISRG_Root_X1.pem
 button:
   - unique_id: button.living_room_floor_heating
     name: "Living Room Floor Heating Button"
