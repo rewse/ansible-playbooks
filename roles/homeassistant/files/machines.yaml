@@ -9,9 +9,8 @@ views:
         title: Ping Network Devices
         entities:
           - entity: binary_sensor.zulu
-          - entity: binary_sensor.romeo
-          - entity: binary_sensor.tango
-          - entity: binary_sensor.unifisw_ent
+          - entity: binary_sensor.sierra
+          - entity: binary_sensor.unifisw_stu
           - entity: binary_sensor.xray_liv
           - entity: binary_sensor.xray_sto
           - entity: binary_sensor.victor
@@ -116,7 +115,7 @@ views:
           - entity: sensor.bio_storage
             name: bio
             icon: 'mdi:harddisk'
-          - entity: sensor.desert_storage
+          - entity: sensor.chemical_storage
             name: desert
             icon: 'mdi:harddisk'
           - entity: sensor.guppy_volume_1_volume_used
