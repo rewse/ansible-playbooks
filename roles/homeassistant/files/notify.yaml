@@ -6,11 +6,11 @@
     - service: mobile_app_bio
     - service: mobile_app_chemical
     - service: mobile_app_global
-    - service: mobile_app_ubiqu_iphone_12_mini
+    - service: mobile_app_ubiqu_iphone12mini
 - name: akiko_devices
   platform: group
   services:
-    - service: mobile_app_ubiqu_iphone_12_mini
+    - service: mobile_app_ubiqu_iphone12mini
 - name: tats_devices
   platform: group
   services:
