@@ -53,24 +53,6 @@ sensor:
     availability:
       - topic: enecoq/kwh/state
     icon: mdi:transmission-tower
-  - unique_id: sensor.monitor_living_room_bio
-    name: monitor Living Room bio
-    state_topic: monitor/living_room/bio
-    value_template: "{{ value_json.confidence }}"
-    unit_of_measurement: "%"
-    state_class: measurement
-  - unique_id: sensor.monitor_living_room_kijishiro
-    name: monitor Living Room kijishiro
-    state_topic: monitor/living_room/kijishiro
-    value_template: "{{ value_json.confidence }}"
-    unit_of_measurement: "%"
-    state_class: measurement
-  - unique_id: sensor.monitor_living_room_ubiqu_iphone12mini
-    name: monitor Living Room ubiqu-iphone12mini
-    state_topic: monitor/living_room/ubiqu_iphone12mini
-    value_template: "{{ value_json.confidence }}"
-    unit_of_measurement: "%"
-    state_class: measurement
   # Do not use mhz19 integration because it cannot the correct value
   - unique_id: sensor.living_room_co2
     name: Living Room CO2
@@ -82,21 +64,3 @@ sensor:
     availability:
       - topic: mhz19/state
     icon: mdi:molecule-co2
-  - unique_id: sensor.monitor_storage_bio
-    name: monitor Storage bio
-    state_topic: monitor/storage/bio
-    value_template: "{{ value_json.confidence }}"
-    unit_of_measurement: "%"
-    state_class: measurement
-  - unique_id: sensor.monitor_storage_kijishiro
-    name: monitor Storage kijishiro
-    state_topic: monitor/storage/kijishiro
-    value_template: "{{ value_json.confidence }}"
-    unit_of_measurement: "%"
-    state_class: measurement
-  - unique_id: sensor.monitor_storage_ubiqu_iphone12mini
-    name: monitor Storage ubiqu-iphone12mini
-    state_topic: monitor/storage/ubiqu_iphone12mini
-    value_template: "{{ value_json.confidence }}"
-    unit_of_measurement: "%"
-    state_class: measurement

@@ -80,12 +80,6 @@ device_tracker.e0b55fe8e384:
   icon: mdi:laptop
 device_tracker.global:
   icon: mdi:cellphone
-device_tracker.monitor_bio:
-  icon: mdi:cellphone-wireless
-device_tracker.monitor_kijishiro:
-  icon: mdi:cellphone-wireless
-device_tracker.monitor_ubiqu_iphone12mini:
-  icon: mdi:cellphone-wireless
 device_tracker.ping_bio:
   friendly_name: ping bio
   icon: mdi:cellphone-wireless
@@ -164,24 +158,6 @@ sensor.filtered_bedroom_hvac_plug_power:
   icon: mdi:flash
 sensor.mamorail:
   icon: mdi:train
-sensor.monitor_bio:
-  icon: mdi:cellphone-wireless
-sensor.monitor_kijishiro:
-  icon: mdi:cellphone-wireless
-sensor.monitor_ubiqu_iphone12mini:
-  icon: mdi:cellphone-wireless
-sensor.monitor_living_room_bio:
-  icon: mdi:cellphone-wireless
-sensor.monitor_living_room_kijishiro:
-  icon: mdi:cellphone-wireless
-sensor.monitor_living_room_ubiqu_iphone12mini:
-  icon: mdi:cellphone-wireless
-sensor.monitor_storage_bio:
-  icon: mdi:cellphone-wireless
-sensor.monitor_storage_kijishiro:
-  icon: mdi:cellphone-wireless
-sensor.monitor_storage_ubiqu_iphone12mini:
-  icon: mdi:cellphone-wireless
 sensor.unavailable_of_bathroom_washing_machine_plug_power:
   icon: mdi:washing-machine-alert
 sensor.regza_channel:

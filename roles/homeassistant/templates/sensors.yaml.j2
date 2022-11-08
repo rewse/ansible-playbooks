@@ -36,27 +36,6 @@
   folder: yotsuya-otsuka
   senders:
     - ichigaya@yotsuya-otsuka.co.jp
-- platform: min_max
-  name: monitor bio
-  type: max
-  round_digits: 0
-  entity_ids:
-    - sensor.monitor_living_room_bio
-    - sensor.monitor_storage_bio
-- platform: min_max
-  name: monitor ubiqu-iphone12mini
-  type: max
-  round_digits: 0
-  entity_ids:
-    - sensor.monitor_living_room_ubiqu_iphone12mini
-    - sensor.monitor_storage_ubiqu_iphone12mini
-- platform: min_max
-  name: monitor kijishiro
-  type: max
-  round_digits: 0
-  entity_ids:
-    - sensor.monitor_living_room_kijishiro
-    - sensor.monitor_storage_kijishiro
 - platform: rest
   name: Bedroom Curtains Position
   resource: https://api.switch-bot.com/v1.0/devices/F6677F23B8CC/status
