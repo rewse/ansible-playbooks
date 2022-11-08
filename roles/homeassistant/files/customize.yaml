@@ -70,7 +70,7 @@ binary_sensor.zulu:
   icon: mdi:router-network
 climate.living_area_floor_heating:
   icon: mdi:grid
-device_tracker.ubiqu_iphone_12_mini:
+device_tracker.ubiqu_iphone12mini:
   icon: mdi:cellphone
 device_tracker.bio:
   icon: mdi:cellphone
