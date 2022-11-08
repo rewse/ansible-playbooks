@@ -49,6 +49,20 @@ views:
           - entity: binary_sensor.wfirex
           - entity: binary_sensor.xiaomigateway
         hours_to_show: 12
+      - type: history-graph
+        title: Device Tracker
+        entities:
+          - entity: person.shibata_tats
+            name: Tats
+          - entity: device_tracker.ping_bio
+          - entity: device_tracker.bio
+          - entity: person.shibata_akiko
+          - entity: device_tracker.ping_ubiqu_iphone12mini
+          - entity: device_tracker.ubiqu_iphone12mini
+          - entity: person.shibata_kayano
+          - entity: device_tracker.ping_kijishiro
+          - entity: device_tracker.kijishiro
+        hours_to_show: 12
       - type: entities
         title: Room Presence
         entities:
