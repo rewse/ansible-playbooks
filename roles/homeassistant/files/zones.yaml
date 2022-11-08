@@ -8,8 +8,8 @@
   longitude: !secret latlng_office_lng
   radius: 100
   icon: mdi:office-building
-- name: !secret latlng_s_name
-  latitude: !secret latlng_s_lat
-  longitude: !secret latlng_s_lng
+- name: !secret latlng_y_name
+  latitude: !secret latlng_y_lat
+  longitude: !secret latlng_y_lng
   radius: 100
-  icon: mdi:leaf
+  icon: mdi:lead-pencil

@@ -15,10 +15,10 @@ latlng:
   office:
     lat: "[% vault_latlng.office.lat %]"
     lng: "[% vault_latlng.office.lng %]"
-  s:
-    name: "[% vault_latlng.s.name %]"
-    lat: "[% vault_latlng.s.lat %]"
-    lng: "[% vault_latlng.s.lng %]"
+  y:
+    name: "[% vault_latlng.y.name %]"
+    lat: "[% vault_latlng.y.lat %]"
+    lng: "[% vault_latlng.y.lng %]"
 localtuya_version: 4.1.0
 mini_graph_card_version: 0.11.0
 mini_media_player_version: 1.16.4
