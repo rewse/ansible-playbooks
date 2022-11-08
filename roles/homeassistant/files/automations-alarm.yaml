@@ -78,38 +78,6 @@
             interruption-level: time-sensitive
     - delay:
         hours: 1
-- id: automation.alarm_bio_wifi_might_be_off
-  alias: "ALARM: bio WiFi might be Off"
-  mode: single
-  trigger:
-    - platform: state
-      entity_id: binary_sensor.living_room_motion
-      to: "on"
-    - platform: state
-      entity_id: binary_sensor.study_motion
-      to: "on"
-  condition:
-    - condition: state
-      entity_id: device_tracker.ping_bio
-      state: not_home
-      for:
-        hours: 1
-    - condition: state
-      entity_id: device_tracker.monitor_bio
-      state: home
-      for:
-        hours: 1
-  action:
-    - service: notify.tats_devices
-      data:
-        title: "⚠️ ALARM"
-        message: bio WiFi might be off
-        data:
-          url: /lovelace-machines/machines
-          push:
-            interruption-level: time-sensitive
-    - delay:
-        hours: 1
 - id: automation.alarm_catloghome_bed_is_offline
   alias: "ALARM: catloghome-bed is Offline"
   mode: single
@@ -330,38 +298,6 @@
             interruption-level: time-sensitive
     - delay:
         hours: 1
-- id: automation.alarm_kijishiro_wifi_might_be_off
-  alias: "ALARM: kijishiro WiFi might be Off"
-  mode: single
-  trigger:
-    - platform: state
-      entity_id: binary_sensor.living_room_motion
-      to: "on"
-    - platform: state
-      entity_id: binary_sensor.study_motion
-      to: "on"
-  condition:
-    - condition: state
-      entity_id: device_tracker.ping_kijishiro
-      state: not_home
-      for:
-        hours: 1
-    - condition: state
-      entity_id: device_tracker.monitor_kijishiro
-      state: home
-      for:
-        hours: 1
-  action:
-    - service: notify.tats_devices
-      data:
-        title: "⚠️ ALARM"
-        message: kijishiro WiFi might be off
-        data:
-          url: /lovelace-machines/machines
-          push:
-            interruption-level: time-sensitive
-    - delay:
-        hours: 1
 - id: automation.alarm_regza_is_offline
   alias: "ALARM: regza is Offline"
   mode: single
@@ -576,38 +512,6 @@
       data:
         title: "⚠️ ALARM"
         message: ️tuyaplug-liv is Offline
-        data:
-          url: /lovelace-machines/machines
-          push:
-            interruption-level: time-sensitive
-    - delay:
-        hours: 1
-- id: automation.alarm_ubiqu_iphone12mini_wifi_might_be_off
-  alias: "ALARM: ubiqu_iphone12mini WiFi might be Off"
-  mode: single
-  trigger:
-    - platform: state
-      entity_id: binary_sensor.living_room_motion
-      to: "on"
-    - platform: state
-      entity_id: binary_sensor.study_motion
-      to: "on"
-  condition:
-    - condition: state
-      entity_id: device_tracker.ping_ubiqu_iphone12mini
-      state: not_home
-      for:
-        hours: 1
-    - condition: state
-      entity_id: device_tracker.monitor_ubiqu_iphone12mini
-      state: home
-      for:
-        hours: 1
-  action:
-    - service: notify.akiko_devices
-      data:
-        title: "⚠️ ALARM"
-        message: ubiqu_iphone12mini WiFi might be off
         data:
           url: /lovelace-machines/machines
           push:
