@@ -140,6 +140,7 @@
       - tigervnc-viewer
       - visual-studio-code
       - vlc
+      - wireshark
     update_homebrew: yes
   tags: [darwin, package, cask]
 
