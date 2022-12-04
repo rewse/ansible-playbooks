@@ -1,14 +1,14 @@
 ---
 - name: Install zabbix-release for amd64
   apt:
-    deb: https://repo.zabbix.com/zabbix/{{ zabbix.version }}/ubuntu/pool/main/z/zabbix-release/zabbix-release_{{ zabbix.version }}-2+ubuntu22.04_all.deb
+    deb: https://repo.zabbix.com/zabbix/{{ zabbix.version }}/ubuntu/pool/main/z/zabbix-release/zabbix-release_{{ zabbix.version }}-{{ zabbix.release_revision }}+ubuntu22.04_all.deb
   when:
     ansible_architecture == "x86_64"
   tags: [zabbix-agent-ubuntu, package]
 
 - name: Install zabbix-release for arm64
   apt:
-    deb: https://repo.zabbix.com/zabbix/{{ zabbix.version }}/ubuntu-arm64/pool/main/z/zabbix-release/zabbix-release_{{ zabbix.version }}-2+ubuntu22.04_all.deb
+    deb: https://repo.zabbix.com/zabbix/{{ zabbix.version }}/ubuntu-arm64/pool/main/z/zabbix-release/zabbix-release_{{ zabbix.version }}-{{ zabbix.release_revision }}+ubuntu22.04_all.deb
   when:
     ansible_architecture == "aarch64"
   tags: [zabbix-agent-ubuntu, package]
