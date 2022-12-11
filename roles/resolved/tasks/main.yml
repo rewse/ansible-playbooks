@@ -28,7 +28,6 @@
     insertafter: '.*# interface: 2001:DB8::5'
     block: |2
           interface: 0.0.0.0
-          interface: {{ local.ipv6 }}
   notify: Restart unbound
   tags: [resolved]
 
@@ -42,10 +41,6 @@
           access-control: 127.0.0.0/8 allow
           access-control: 192.168.0.0/24 allow
           access-control: 172.16.0.0/24 allow
-          access-control: ::1/128 allow
-          access-control: fe80::/10 allow
-          access-control: 240f:78:31e9:1::/64 allow
-          access-control: fdf5:3eec:ecad::/64 allow
   notify: Restart unbound
   tags: [resolved]
 
@@ -58,10 +53,10 @@
     block: |
       forward-zone:
         name: "."
-        forward-addr: 1.1.1.1
-        forward-addr: 2606:4700:4700::1111
+        forward-addr: 1.1.1.2
+        forward-addr: 1.0.0.2
         forward-addr: 8.8.8.8
-        forward-addr: 2001:4860:4860::8888
+        forward-addr: 8.8.4.4
   notify: Restart unbound
   tags: [resolved]
 
