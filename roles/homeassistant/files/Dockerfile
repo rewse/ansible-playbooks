@@ -1,4 +1,4 @@
-FROM homeassistant/raspberrypi4-homeassistant:stable
+FROM ghcr.io/home-assistant/home-assistant:stable
 
 RUN apk add --update patch
 
