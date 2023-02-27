@@ -10,7 +10,6 @@ views:
         entities:
           - entity: binary_sensor.zulu
           - entity: binary_sensor.sierra
-          - entity: binary_sensor.unifisw_stu
           - entity: binary_sensor.xray_liv
           - entity: binary_sensor.xray_sto
           - entity: binary_sensor.victor
