@@ -3,11 +3,6 @@
   longitude: !secret latlng_home_lng
   radius: 250
   icon: mdi:home
-- name: Office
-  latitude: !secret latlng_office_lat
-  longitude: !secret latlng_office_lng
-  radius: 100
-  icon: mdi:office-building
 - name: !secret latlng_y_name
   latitude: !secret latlng_y_lat
   longitude: !secret latlng_y_lng
