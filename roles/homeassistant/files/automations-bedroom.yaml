@@ -512,7 +512,7 @@
         hvac_mode: heat
     - service: notify.all_devices
       data:
-        message: "Turned on Bedroom HVAC Heat. Current: {{ states('sensor.bedroom_wbgt') }}°C"
+        message: "Turned on Bedroom HVAC Heat. Current: {{ states('sensor.bedroom_temperature') }}°C"
         data:
           url: /lovelace/home
           push:
