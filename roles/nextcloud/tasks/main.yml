@@ -1,24 +1,4 @@
 ---
-- name: Format the secondary disk
-  ansible.builtin.filesystem:
-    fstype: ext4
-    dev: /dev/{{ nextcloud_diskname }}
-  tags: [nextcloud]
-
-- name: Label the secondary disk
-  ansible.builtin.command: |
-    e2label /dev/{{ nextcloud_diskname }} srv-nextcloud
-  tags: [nextcloud]
-
-- name: Mount srv
-  ansible.builtin.mount:
-    src: LABEL=srv-nextcloud
-    path: /srv/www/nextcloud
-    fstype: ext4
-    opts: defaults,discard
-    state: mounted
-  tags: [nextcloud]
-
 - name: Install packages
   ansible.builtin.apt:
     name:
@@ -110,7 +90,7 @@
         'overwrite.cli.url' => 'https://rewse.jp/nextcloud',
         'htaccess.RewriteBase' => '/nextcloud',
         'memcache.local' => '\OC\Memcache\APCu',
-        'enabledPreviewProviders' => [
+        'enabledPreviewProviders' => array (
           'OC\Preview\BMP',
           'OC\Preview\GIF',
           'OC\Preview\JPEG',
@@ -134,7 +114,18 @@
           'OC\Preview\SVG',
           'OC\Preview\TIFF',
           'OC\Preview\Font',
-        ],
+        ),
+        'objectstore' => array (
+          'class' => '\\OC\\Files\\ObjectStore\\S3',
+          'arguments' => array (
+                  'bucket' => 'rewse-nextcloud',
+                  'autocreate' => true,
+                  'key'    => '{{ nextcloud.iam_key }}',
+                  'secret' => '{{ nextcloud.iam_secret }}',
+                  'use_ssl' => true,
+                  'region' => 'ap-northeast-1'
+          ),
+        ),
   tags: [nextcloud]
 
 - name: Change the policy of ImageMagick
