@@ -1,3 +1,35 @@
+- id: automation.alarm_primary_sim_is_not_docomo
+  alias: "ALARM: Primary SIM is NOT Docomo"
+  mode: single
+  trigger:
+    - platform: state
+      entity_id: binary_sensor.living_room_motion
+      to: "on"
+    - platform: state
+      entity_id: binary_sensor.study_motion
+      to: "on"
+    - platform: state
+      entity_id: binary_sensor.bathroom_motion
+      to: "on"
+  condition:
+    - condition: state
+      entity_id: device_tracker.ping_bio
+      state: home
+    - condition: not
+      conditions:
+        - condition: state
+          entity_id: sensor.bio_sim_1
+          state: ドコモ
+  action:
+    - service: notify.tats_devices
+      data:
+        title: "⚠️ ALARM"
+        message: "Primary SIM is NOT Docomo. Current: {{ states('sensor.bio_sim_1') }}"
+        data:
+          push:
+            interruption-level: time-sensitive
+    - delay:
+        hours: 1
 - id: automation.turn_off_surveillance
   alias: Turn off Surveillance
   mode: single
