@@ -1,5 +1,5 @@
-- id: automation.alarm_primary_sim_is_not_docomo
-  alias: "ALARM: Primary SIM is NOT Docomo"
+- id: automation.alarm_bio_sim_1_is_not_docomo
+  alias: "ALARM: bio SIM 1 is not Docomo"
   mode: single
   trigger:
     - platform: state
@@ -24,7 +24,7 @@
     - service: notify.tats_devices
       data:
         title: "⚠️ ALARM"
-        message: "Primary SIM is NOT Docomo. Current: {{ states('sensor.bio_sim_1') }}"
+        message: "bio SIM 1 is not Docomo. Current: {{ states('sensor.bio_sim_1') }}"
         data:
           push:
             interruption-level: time-sensitive
