@@ -12,6 +12,7 @@
       - gog-galaxy
       - izotope-product-portal
       - origin
+      - microsoft-office
       - raspberry-pi-imager
       - steam
     update_homebrew: yes
@@ -22,6 +23,5 @@
 #     - https://adblink.me/download/                                  # adbLink
 #     - https://central.bitdefender.com/dashboard                     # Bitdefender
 #     - https://www.houdah.com/houdahGPS/download.html                # HoudahGPS
-#     - https://account.microsoft.com/                                # Microsoft Office
 #     - https://www.benq.com/ja-jp/support/downloads-faq/products/monitor/sw271/software-driver.html # Palette Master Element
 #     - http://www2.securebrain.co.jp/products/phishwall/smbc_direct.html # PhishWall
