@@ -15,6 +15,7 @@
       - microsoft-office
       - raspberry-pi-imager
       - steam
+      - steelseries-gg
     update_homebrew: yes
   tags: [darwin-personal, package, cask]
 
