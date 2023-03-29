@@ -19,7 +19,7 @@ latlng:
     name: "[% vault_latlng.y.name %]"
     lat: "[% vault_latlng.y.lat %]"
     lng: "[% vault_latlng.y.lng %]"
-localtuya_version: 4.1.0
+localtuya_version: 5.1.0
 mini_graph_card_version: 0.11.0
 mini_media_player_version: 1.16.5
 mosquitto_password: "[% vault_mosquitto_password %]"
