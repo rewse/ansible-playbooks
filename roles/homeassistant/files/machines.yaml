@@ -22,9 +22,7 @@ views:
           - entity: binary_sensor.fox
           - entity: binary_sensor.guppy
           - entity: binary_sensor.hotel
-          - entity: binary_sensor.amazonplug_bed
-          - entity: binary_sensor.amazonplug_liv
-          - entity: binary_sensor.amazonplug_sto
+          - entity: binary_sensor.amazonplug_liv_fox
           - entity: binary_sensor.aventage
           - entity: binary_sensor.brother
           - entity: binary_sensor.catloghome_bed
@@ -34,17 +32,19 @@ views:
           - entity: binary_sensor.eufy_bed
           - entity: binary_sensor.eufy_liv
           - entity: binary_sensor.huebridge
-          - entity: binary_sensor.kasaplug_ent
-          - entity: binary_sensor.kasaplug_liv
+          - entity: binary_sensor.kasaplug_ent_ses
+          - entity: binary_sensor.kasaplug_liv_foo
           - entity: binary_sensor.regza
           - entity: binary_sensor.remo_bed
           - entity: binary_sensor.remo_liv
           - entity: binary_sensor.sesamemodule
           - entity: binary_sensor.switchbothub
-          - entity: binary_sensor.tuyaplug_bat
-          - entity: binary_sensor.tuyaplug_bed
-          - entity: binary_sensor.tuyaplug_kit
-          - entity: binary_sensor.tuyaplug_liv
+          - entity: binary_sensor.tuyaplug_bed_hva
+          - entity: binary_sensor.tuyaplug_bed_sur
+          - entity: binary_sensor.tuyaplug_kit_ric
+          - entity: binary_sensor.tuyaplug_liv_hum
+          - entity: binary_sensor.tuyaplug_liv_sur
+          - entity: binary_sensor.tuyaplug_sto_swi
           - entity: binary_sensor.wfirex
           - entity: binary_sensor.xiaomigateway
         hours_to_show: 12
