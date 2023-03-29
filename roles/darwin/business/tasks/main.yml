@@ -13,7 +13,6 @@
       - i1profiler
       - jiggler
       - microsoft-teams
-      - plantronics-hub
       - quip
       - tripmode
       - webex-meetings
@@ -26,3 +25,7 @@
   with_items:
     - 973213640   # MSG Viewer for Outlook
   tags: [darwin-business, package, mas]
+
+# - name: Install rest of the apps
+#   install_yourself:
+#     - https://www.poly.com/us/en/products/services/cloud/poly-lens  # Poly Lens
