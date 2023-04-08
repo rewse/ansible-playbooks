@@ -57,8 +57,8 @@
             interruption-level: time-sensitive
     - delay:
         hours: 1
-- id: automation.turn_off_surveillance
-  alias: Turn off Surveillance
+- id: automation.turn_off_alarm_control_panel_surveillance
+  alias: Turn off Alarm Control Panel Surveillance
   mode: single
   trigger:
     - platform: state
@@ -97,8 +97,8 @@
             interruption-level: time-sensitive
     - delay:
         hours: 1
-- id: automation.turn_on_surveillance_when_ios_action_fires
-  alias: Turn on surveillance when iOS Action Fires
+- id: automation.turn_on_alarm_control_panel_surveillance_when_ios_action_fires
+  alias: Turn on Alarm Control Panel Surveillance when iOS Action Fires
   trigger:
     - platform: event
       event_type: ios.action_fired
@@ -115,8 +115,8 @@
           url: /lovelace/home
           push:
             interruption-level: time-sensitive
-- id: automation.turn_on_surveillance_when_nobody_is_in_home
-  alias: Turn on surveillance when Nobody is in Home
+- id: automation.turn_on_alarm_control_panel_surveillance_when_nobody_is_in_home
+  alias: Turn on Alarm Control Panel Surveillance when Nobody is in Home
   trigger:
     - platform: time_pattern
       minutes: "/5"
@@ -145,3 +145,39 @@
         data:
           push:
             interruption-level: time-sensitive
+- id: automation.turn_off_surveillances
+  alias: Turn off Surveillances
+  trigger:
+    - platform: state
+      entity_id: alarm_control_panel.surveillance
+      to: disarmed
+    - platform: time_pattern
+      minutes: "/5"
+      seconds: 2
+  condition:
+    - condition: state
+      entity_id: alarm_control_panel.surveillance
+      state: disarmed
+  action:
+    - service: switch.turn_off
+      entity_id:
+        - switch.living_room_surveillance_plug
+        - switch.bedroom_surveillance_plug
+- id: automation.turn_on_surveillances
+  alias: Turn on Surveillances
+  trigger:
+    - platform: state
+      entity_id: alarm_control_panel.surveillance
+      to: armed_away
+    - platform: time_pattern
+      minutes: "/5"
+      seconds: 58
+  condition:
+    - condition: state
+      entity_id: alarm_control_panel.surveillance
+      state: armed_away
+  action:
+    - service: switch.turn_on
+      entity_id:
+        - switch.living_room_surveillance_plug
+        - switch.bedroom_surveillance_plug

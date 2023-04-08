@@ -44,10 +44,5 @@ sesame:
 simple_thermostat_version: 2.5.0
 simple_weather_card_version: 0.8.3
 switchbot_token: "[% vault_switchbot_token %]"
-tuyaplug:
-  bat_key: "[% vault_tuyaplug.bat_key %]"
-  bed_key: "[% vault_tuyaplug.bed_key %]"
-  kit_key: "[% vault_tuyaplug.kit_key %]"
-  liv_key: "[% vault_tuyaplug.liv_key %]"
 uptime_card_version: 0.4.0
 xiaomi_gateway3_version: 3.1.0
