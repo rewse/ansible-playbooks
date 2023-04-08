@@ -2,11 +2,7 @@ alarm_control_panel.entrance_auto_lock:
   icon: mdi:lock-clock
 alarm_control_panel.surveillance:
   icon: mdi:cctv
-binary_sensor.amazonplug_bed:
-  icon: mdi:power-socket-jp
-binary_sensor.amazonplug_liv:
-  icon: mdi:power-socket-jp
-binary_sensor.amazonplug_sto:
+binary_sensor.amazonplug_liv_fox:
   icon: mdi:power-socket-jp
 binary_sensor.aventage:
   icon: mdi:audio-video
@@ -50,13 +46,17 @@ binary_sensor.switchbothub:
   icon: mdi:network-outline
 binary_sensor.tango:
   icon: mdi:switch
-binary_sensor.tuyaplug_bat:
+binary_sensor.tuyaplug_bed_hva:
   icon: mdi:power-socket-jp
-binary_sensor.tuyaplug_bed:
+binary_sensor.tuyaplug_bed_sur:
   icon: mdi:power-socket-jp
-binary_sensor.tuyaplug_kit:
+binary_sensor.tuyaplug_kit_ric:
   icon: mdi:power-socket-jp
-binary_sensor.tuyaplug_liv:
+binary_sensor.tuyaplug_liv_hum:
+  icon: mdi:power-socket-jp
+binary_sensor.tuyaplug_liv_sur:
+  icon: mdi:power-socket-jp
+binary_sensor.tuyaplug_sto_swi:
   icon: mdi:power-socket-jp
 binary_sensor.wfirex:
   icon: mdi:network-outline
