@@ -22,26 +22,3 @@
  
          if message_html is not None:
              return message_html
-@@ -241,12 +247,16 @@
-         """Read emails and publish state change."""
-         email_message = self._email_reader.read_next()
- 
-+        _LOGGER.debug("email_message: <%s>", email_message)
-+
-         if email_message is None:
-             self._message = None
-             self._state_attributes = {}
-             return
- 
-         if self.sender_allowed(email_message):
-+            _LOGGER.debug("allowed the sender")
-+
-             message = EmailContentSensor.get_msg_subject(email_message)
- 
-             if self._value_template is not None:
-@@ -259,3 +269,5 @@
-                 ATTR_DATE: email_message["Date"],
-                 ATTR_BODY: EmailContentSensor.get_msg_text(email_message),
-             }
-+        else:
-+            _LOGGER.debug("not allowed the sender")
