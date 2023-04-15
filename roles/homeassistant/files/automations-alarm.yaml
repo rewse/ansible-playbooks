@@ -613,7 +613,7 @@
       after: "22:00:00"
       before: "23:59:59"
   action:
-    - service: notify.akiko_devices
+    - service: notify.ubiqu_devices
       data:
         title: "⚠️ ALARM"
         message: ubiqu_iphone12mini WiFi might be off
