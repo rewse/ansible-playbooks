@@ -4,7 +4,6 @@
         - alarm_control_panel.surveillance
         - climate.bedroom_hvac
         - climate.living_room_hvac
-        - cover.bedroom_curtains
         - fan.living_room_ceiling_fans
         - light.living_area_dimming_downlights
         - light.living_area_downlights
