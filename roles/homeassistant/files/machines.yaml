@@ -44,7 +44,6 @@ views:
           - entity: binary_sensor.tuyaplug_kit_ric
           - entity: binary_sensor.tuyaplug_liv_hum
           - entity: binary_sensor.tuyaplug_liv_sur
-          - entity: binary_sensor.tuyaplug_sto_swi
           - entity: binary_sensor.wfirex
           - entity: binary_sensor.xiaomigateway
         hours_to_show: 12
