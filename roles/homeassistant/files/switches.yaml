@@ -66,15 +66,9 @@
       unique_id: switch.living_room_humidifier
       friendly_name: Living Room Humidifier
       turn_on:
-        service: rest_command.control_switchbot_device
-        data:
-          device_id: C12F0898BAC5
-          command: press
+        service: shell_command.press_living_room_humidifier
       turn_off:
-        service: rest_command.control_switchbot_device
-        data:
-          device_id: C12F0898BAC5
-          command: press
+        service: shell_command.press_living_room_humidifier
       value_template: >
         {{ states("sensor.living_room_humidifier_plug_power") | float(0) > 20 }}
       icon_template: >
@@ -101,15 +95,10 @@
       unique_id: switch.study_floor_heating
       friendly_name: Study Floor Heating
       turn_on:
-        service: rest_command.control_switchbot_device
-        data:
-          device_id: D0ECA7E7803F
-          command: press
+        service: shell_command.press_study_floor_heating
       turn_off:
-        service: rest_command.control_switchbot_device
-        data:
-          device_id: D0ECA7E7803F
-          command: press
+        service: shell_command.press_study_floor_heating
+      turn_off:
       value_template: >
         {{ states('sensor.living_room_temperature_effect_of_floor_heating') | float(0) > 1 }}
       icon_template: >

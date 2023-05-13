@@ -43,6 +43,13 @@ sesame:
   secret_bottom: "[% vault_sesame.secret_bottom %]"
 simple_thermostat_version: 2.5.0
 simple_weather_card_version: 0.8.3
+switchbot:
+  device_id:
+    living_room_floor_heating: FB9708856419
+    living_room_humidifier: C12F0898BAC5
+    study_floor_heating: D0ECA7E7803F
+  token: "[% vault_switchbot.token %]"
+  secret: "[% vault_switchbot.secret %]"
 switchbot_token: "[% vault_switchbot_token %]"
 uptime_card_version: 0.4.0
 xiaomi_gateway3_version: 3.1.0
