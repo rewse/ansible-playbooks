@@ -12,6 +12,13 @@
     remote_src: yes
   tags: [homeassistant]
 
+- name: Copy switchbot
+  copy:
+    src: /usr/local/bin/switchbot
+    dest: /etc/homeassistant/bin
+    remote_src: yes
+  tags: [homeassistant]
+
 - name: Create certs dir
   file:
     path: /etc/homeassistant/certs
