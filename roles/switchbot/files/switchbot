@@ -1,0 +1,50 @@
+#!/usr/bin/env python3
+
+import base64, hashlib, hmac, requests, sys, time, uuid
+
+def obtain_sign(token, secret):
+
+    nonce = uuid.uuid4()
+    t = int(round(time.time() * 1000))
+    string_to_sign = '{}{}{}'.format(token, t, nonce)
+
+    string_to_sign = bytes(string_to_sign, 'utf-8')
+    secret = bytes(secret, 'utf-8')
+
+    sign = {}
+
+    sign['sign'] = base64.b64encode(
+        hmac.new(secret, msg=string_to_sign, digestmod=hashlib.sha256).digest()
+    )
+    sign['t'] = t
+    sign['nonce'] = nonce
+
+    return sign
+
+def main():
+    try:
+        command = sys.argv[1]
+        device_id = sys.argv[2]
+        token = sys.argv[3]
+        secret = sys.argv[4]
+    except IndexError:
+        print("Usage: switchbot <get|command> <device_id> <token> <secret>")
+        sys.exit(1)
+
+    sign = obtain_sign(token, secret)
+
+    url = f'https://api.switch-bot.com/v1.1/devices/{device_id}/commands'
+    headers = {
+        'Authorization': token,  'Content-Type': 'application/json', 'charset': 'utf8',
+        'sign': sign['sign'], 't': str(sign['t']), 'nonce': str(sign['nonce'])
+    }
+    data = {
+        'commandType': 'command',
+        'command': command
+    }
+
+    res = requests.post(url, headers=headers, json=data)
+    print(res.status_code, res.text)
+
+if __name__ == "__main__":
+    main()
