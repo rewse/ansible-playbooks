@@ -1,8 +1,0 @@
-#!/usr/bin/env bash
-
-# See also https://askubuntu.com/questions/1246723/bluetooth-not-working-on-ubuntu-20-rapsberry-pi
-
-hciattach /dev/ttyAMA0 bcm43xx 921600 - &> /dev/null
-hciattach /dev/ttyAMA0 bcm43xx 921600 - &> /dev/null
-
-exit $?
