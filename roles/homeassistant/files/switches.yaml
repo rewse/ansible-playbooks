@@ -43,15 +43,9 @@
       unique_id: switch.living_room_floor_heating
       friendly_name: Living Room Floor Heating
       turn_on:
-        service: rest_command.control_switchbot_device
-        data:
-          device_id: E55CF11F894A
-          command: press
+        service: shell_command.press_living_room_floor_heating
       turn_off:
-        service: rest_command.control_switchbot_device
-        data:
-          device_id: E55CF11F894A
-          command: press
+        service: shell_command.press_living_room_floor_heating
       value_template: >
         {{ states('sensor.living_room_temperature_effect_of_floor_heating') | float(0) > 1 }}
       icon_template: >
