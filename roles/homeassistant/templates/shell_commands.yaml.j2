@@ -2,8 +2,10 @@ control_toggle_regza: curl --digest --user '[% regza.username %]:[% regza.passwo
 control_volume_up_regza: curl --digest --user '[% regza.username %]:[% regza.password %]' http://regza.rewse.jp/remote/remote.htm?key=40BF1A
 control_volume_down_regza: curl --digest --user '[% regza.username %]:[% regza.password %]' http://regza.rewse.jp/remote/remote.htm?key=40BF1E
 control_mute_regza: curl --digest --user '[% regza.username %]:[% regza.password %]' http://regza.rewse.jp/remote/remote.htm?key=40BF10
+close_bedroom_curtains: /config/bin/switchbot turnOff [% switchbot.device_id.bedroom_curtains %] [% switchbot.token %] [% switchbot.secret %]
 lock_entrance_lock_bottom: /config/bin/sesame lock [% sesame.api_key %] [% sesame.uuid_bottom %] [% sesame.secret_bottom %]
 lock_entrance_lock_top: /config/bin/sesame lock [% sesame.api_key %] [% sesame.uuid_top %] [% sesame.secret_top %]
+open_bedroom_curtains: /config/bin/switchbot turnOn [% switchbot.device_id.bedroom_curtains %] [% switchbot.token %] [% switchbot.secret %]
 press_living_room_floor_heating: /config/bin/switchbot press [% switchbot.device_id.living_room_floor_heating %] [% switchbot.token %] [% switchbot.secret %]
 press_living_room_humidifier: /config/bin/switchbot press [% switchbot.device_id.living_room_humidifier %] [% switchbot.token %] [% switchbot.secret %]
 press_study_floor_heating: /config/bin/switchbot press [% switchbot.device_id.study_floor_heating %] [% switchbot.token %] [% switchbot.secret %]
