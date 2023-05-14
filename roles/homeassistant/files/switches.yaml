@@ -22,15 +22,9 @@
       unique_id: switch.bedroom_curtains
       friendly_name: Bedroom Curtains
       turn_on: # open
-        service: rest_command.control_switchbot_device
-        data:
-          device_id: F6677F23B8CC
-          command: turnOn
+        service: shell_command.open_bedroom_curtains
       turn_off: # close
-        service: rest_command.control_switchbot_device
-        data:
-          device_id: F6677F23B8CC
-          command: turnOff
+        service: shell_command.close_bedroom_curtains
       value_template: >
         {{ states("sensor.bedroom_curtains_position") | int(0) < 50 }}
       icon_template: >
