@@ -252,20 +252,14 @@
     - platform: state
       entity_id: button.living_room_floor_heating
   action:
-    - service: rest_command.control_switchbot_device
-      data:
-        device_id: E55CF11F894A
-        command: press
+    - service: shell_command.press_living_room_floor_heating
 - id: automation.press_study_floor_heating_button
   alias: Press Study Floor Heating Button
   trigger:
     - platform: state
       entity_id: button.study_room_floor_heating
   action:
-    - service: rest_command.control_switchbot_device
-      data:
-        device_id: D0ECA7E7803F
-        command: press
+    - service: shell_command.press_study_floor_heating
 - id: automation.turn_down_living_area
   alias: Turn down Living Area
   description: Turn down the living area
