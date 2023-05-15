@@ -44,7 +44,6 @@ def main():
 
         res = requests.get(url, headers=headers)
     elif command == 'webhook':
-
         webhook_url = sys.argv[2]
 
         url = f'https://api.switch-bot.com/v1.1/webhook/setupWebhook'
@@ -59,6 +58,15 @@ def main():
 
         if json.loads(res.text)['statusCode'] == 190:
             url = f'https://api.switch-bot.com/v1.1/webhook/updateWebhook'
+
+            data = {
+                "action": "updateWebhook",
+                "config": {
+                    "url": webhook_url,
+                    "enable": True
+                }
+            }
+
             res = requests.post(url, headers=headers, json=data)
     else:
         url = f'https://api.switch-bot.com/v1.1/devices/{device_id}/commands'
