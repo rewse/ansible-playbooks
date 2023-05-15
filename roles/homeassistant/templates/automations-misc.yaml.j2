@@ -168,3 +168,14 @@
       entity_id:
         - switch.living_room_surveillance_plug
         - switch.bedroom_surveillance_plug
+- id: automation.webhook_switchbot
+  alias: "Webhook: Switchbot"
+  trigger:
+    - platform: webhook
+      webhook_id: [% switchbot.webhook_id %]
+      local_only: false
+  action:
+    - service: mqtt.publish
+      data_template:
+        topic: /switchbot/json
+        payload: "{{ trigger.json }}"
