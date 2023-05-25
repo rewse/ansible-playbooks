@@ -152,8 +152,6 @@ sensor.entrance_lock_top_sensor:
   icon: mdi:lock-check
 sensor.filtered_bedroom_hvac_plug_power:
   icon: mdi:flash
-sensor.mamorail:
-  icon: mdi:train
 sensor.regza_channel:
   icon: mdi:television
 sensor.yotsuya_otsuka:
