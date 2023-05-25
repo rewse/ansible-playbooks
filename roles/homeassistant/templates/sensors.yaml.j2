@@ -5,6 +5,37 @@
 - platform: command_line
   name: REGZA Content Type
   command: curl --digest --user '[% regza.username %]:[% regza.password %]' http://regza.rewse.jp/v2/remote/play/status | jq -r .content_type
+- platform: command_line
+  name: Balcony SwitchBot Meter Temperature
+  command: /config/bin/switchbot get [% switchbot.device_id.balcony_meter %] [% switchbot.token %] [% switchbot.secret %]
+  value_template: '{{ value_json.body.temperature }}'
+  json_attributes:
+    - body
+  device_class: temperature
+  unit_of_measurement: °C
+- platform: command_line
+  name: Bedroom Curtains Position
+  command: /config/bin/switchbot get [% switchbot.device_id.bedroom_curtains %] [% switchbot.token %] [% switchbot.secret %] 
+  value_template: '{{ value_json.body.slidePosition }}'
+  json_attributes:
+    - body
+  unit_of_measurement: "%"
+- platform: command_line
+  name: Bedroom SwitchBot Meter Temperature
+  command: /config/bin/switchbot get [% switchbot.device_id.bedroom_meter %] [% switchbot.token %] [% switchbot.secret %]
+  value_template: '{{ value_json.body.temperature }}'
+  json_attributes:
+    - body
+  device_class: temperature
+  unit_of_measurement: °C
+- platform: command_line
+  name: Living Room SwitchBot Hub2 Temperature
+  command: /config/bin/switchbot get [% switchbot.device_id.living_room_hub2 %] [% switchbot.token %] [% switchbot.secret %]
+  value_template: '{{ value_json.body.temperature }}'
+  json_attributes:
+    - body
+  device_class: temperature
+  unit_of_measurement: °C
 - platform: filter
   name: Filtered Bedroom HVAC Plug Power
   entity_id: sensor.bedroom_hvac_plug_power
@@ -37,58 +68,6 @@
   senders:
     - ichigaya@yotsuya-otsuka.co.jp
 - platform: rest
-  name: Bedroom Curtains Position
-  resource: https://api.switch-bot.com/v1.0/devices/F6677F23B8CC/status
-  headers:
-    Authorization: !secret switchbot_token
-    Content-Type: 'application/json'
-  value_template: '{{ value_json.body.slidePosition }}'
-  json_attributes_path: "$.body"
-  json_attributes:
-    - deviceId
-    - deviceType
-    - hubDeviceId
-    - calibrate
-    - group
-    - moving
-    - slidePosition
-  unit_of_measurement: "%"
-  scan_interval: 2400
-- platform: rest
-  name: Balcony SwitchBot Meter Temperature
-  resource: https://api.switch-bot.com/v1.0/devices/EDE4EAA09EA3/status
-  headers:
-    Authorization: !secret switchbot_token
-    Content-Type: 'application/json'
-  value_template: '{{ value_json.body.temperature }}'
-  json_attributes_path: "$.body"
-  json_attributes:
-    - deviceId
-    - deviceType
-    - hubDeviceId
-    - humidity
-    - temperature
-  device_class: temperature
-  unit_of_measurement: °C
-  scan_interval: 36000
-- platform: rest
-  name: Bedroom SwitchBot Meter Temperature
-  resource: https://api.switch-bot.com/v1.0/devices/F980AECF8644/status
-  headers:
-    Authorization: !secret switchbot_token
-    Content-Type: 'application/json'
-  value_template: '{{ value_json.body.temperature }}'
-  json_attributes_path: "$.body"
-  json_attributes:
-    - deviceId
-    - deviceType
-    - hubDeviceId
-    - humidity
-    - temperature
-  device_class: temperature
-  unit_of_measurement: °C
-  scan_interval: 36000
-- platform: rest
   name: Entrance Lock Bottom Sensor
   resource: https://app.candyhouse.co/api/sesame2/[% sesame.uuid_bottom %]
   headers:
@@ -114,23 +93,6 @@
     - CHSesame2Status
     - timestamp
   scan_interval: 300
-- platform: rest
-  name: Living Room SwitchBot Meter Temperature
-  resource: https://api.switch-bot.com/v1.0/devices/F5DAB9477E91/status
-  headers:
-    Authorization: !secret switchbot_token
-    Content-Type: 'application/json'
-  value_template: '{{ value_json.body.temperature }}'
-  json_attributes_path: "$.body"
-  json_attributes:
-    - deviceId
-    - deviceType
-    - hubDeviceId
-    - humidity
-    - temperature
-  device_class: temperature
-  unit_of_measurement: °C
-  scan_interval: 36000
 - platform: statistics
   entity_id: sensor.balcony_humidity_difference
   name: Average of Balcony Humidity Difference
