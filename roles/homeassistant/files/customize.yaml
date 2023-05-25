@@ -122,8 +122,6 @@ person.shibata_tats:
   icon: mdi:human-male
 sensor.bedroom_curtains_position:
   icon: mdi:curtains
-sensor.denshobato:
-  icon: mdi:bird
 sensor.average_of_balcony_humidity_difference:
   icon: mdi:water-percent-alert
 sensor.average_of_balcony_temperature_difference:
