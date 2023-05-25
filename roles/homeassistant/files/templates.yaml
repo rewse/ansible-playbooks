@@ -162,8 +162,8 @@
     - name: Anshin-Smile Action
       unique_id: sensor.anshin_smile_action
       state: >
-        {% if is_state('sensor.anshin_smile', 'unknown') %}
-          unknown
+        {% if is_state('sensor.anshin_smile', 'unavailable') %}
+          unavailable
         {% else %}
           {{ state_attr('sensor.anshin_smile', 'Message') | regex_findall_index('\$B(..9;)\$7\$\^\$7\$\?') | regex_replace('EP9;', '登校') | regex_replace('2<9;', '下校') }}
         {% endif %}
@@ -171,8 +171,8 @@
     - name: Anshin-Smile Time
       unique_id: sensor.anshin_smile_time
       state: >
-        {% if is_state('sensor.anshin_smile', 'unknown') %}
-          unknown
+        {% if is_state('sensor.anshin_smile', 'unavailable') %}
+          unavailable
         {% else %}
           {{ state_attr('sensor.anshin_smile', 'Message') | regex_findall_index('.$BF|.\(B ([0-9][0-9].\$B;~.\(B[0-9][0-9])') | regex_replace('.\$B;~.\(B', ':') }}
         {% endif %}
