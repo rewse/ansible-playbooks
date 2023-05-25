@@ -17,11 +17,11 @@ views:
           - entity: sensor.mamorail_time
             name: Time
       - type: entities
-        title: Denshobato
+        title: Anshin-Smile
         entities:
-          - entity: sensor.denshobato_action
+          - entity: sensor.anshin_smile_action
             name: Action
-          - entity: sensor.denshobato_time
+          - entity: sensor.anshin_smile_time
             name: Time
       - type: entities
         title: Yotsuya-Otsuka
