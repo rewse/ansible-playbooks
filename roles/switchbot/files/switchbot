@@ -78,7 +78,7 @@ def main():
 
         res = requests.post(url, headers=headers, json=data)
 
-    print(res.status_code, res.text)
+    print(res.text)
 
 if __name__ == "__main__":
     main()
