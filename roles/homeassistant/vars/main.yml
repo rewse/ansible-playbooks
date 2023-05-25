@@ -45,8 +45,11 @@ simple_thermostat_version: 2.5.0
 simple_weather_card_version: 0.8.3
 switchbot:
   device_id:
+    balcony_meter: EDE4EAA09EA3
     bedroom_curtains: F6677F23B8CC
+    bedroom_meter: F980AECF8644
     living_room_floor_heating: FB9708856419
+    living_room_hub2: CA4F4756744A
     living_room_humidifier: C12F0898BAC5
     study_floor_heating: D0ECA7E7803F
   token: "[% vault_switchbot.token %]"
