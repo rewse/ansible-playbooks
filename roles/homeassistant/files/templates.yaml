@@ -108,52 +108,6 @@
     icon: mdi:thermometer-lines
     device_class: temperature
     unit_of_measurement: °C
-  - name: Mamorail Action
-    unique_id: sensor.mamorail_action
-    state: >
-      {% if is_state("sensor.mamorail", "unknown") %}
-        unknown
-      {% else %}
-        {{ state_attr("sensor.mamorail", "body") | regex_findall_index("(..*)しました") }}
-      {% endif %}
-    icon: mdi:gate-open
-  - name: Mamorail Balance
-    unique_id: sensor.mamorail_balance
-    state: >
-      {% if is_state("sensor.mamorail", "unknown") %}
-        unknown
-      {% else %}
-        {{ state_attr("sensor.mamorail", "body") | regex_findall_index("チャージ残額は(..*)円です") | regex_replace(",", "") | int }}
-      {% endif %}
-    icon: mdi:credit-card-sync-outline
-    unit_of_measurement: JPY
-  - name: Mamorail Received Date Time
-    unique_id: sensor.mamorail_received_date_time
-    state: >
-      {% if is_state("sensor.mamorail", "unknown") %}
-        unknown
-      {% else %}
-        {{ as_timestamp(strptime(state_attr("sensor.mamorail", 'date'), "%a, %d %b %Y %H:%M:%S %z")) | timestamp_custom() }}
-      {% endif %}
-    icon: mdi:clock-outline
-  - name: Mamorail Station
-    unique_id: sensor.mamorail_station
-    state: >
-      {% if is_state("sensor.mamorail", "unknown") %}
-        unknown
-      {% else %}
-        {{ state_attr("sensor.mamorail", "body") | regex_findall_index(":[0-9][0-9]に(..*)") }}
-      {% endif %}
-    icon: mdi:train
-  - name: Mamorail Time
-    unique_id: sensor.mamorail_time
-    state: >
-      {% if is_state("sensor.mamorail", "unknown") %}
-        unknown
-      {% else %}
-        {{ state_attr("sensor.mamorail", "body") |regex_findall_index("([0-9][0-9]*:[0-9][0-9])に") }}
-      {% endif %}
-    icon: mdi:clock-outline
   - name: Yotsuya-Otsuka Action
     unique_id: sensor.yotsuya_otsuka_action
     state: >
@@ -221,5 +175,66 @@
           unknown
         {% else %}
           {{ state_attr('sensor.anshin_smile', 'Message') | regex_findall_index('.$BF|.\(B ([0-9][0-9].\$B;~.\(B[0-9][0-9])') | regex_replace('.\$B;~.\(B', ':') }}
+        {% endif %}
+      icon: mdi:clock-outline
+- trigger:
+    - platform: event
+      event_type: imap_content
+      id: custom_event
+      event_data:
+        sender: "info@mamorail.jp"
+  sensor:
+    - name: Mamorail
+      unique_id: sensor.mamorail
+      state: "{{ trigger.event.data['subject'] }}"
+      attributes:
+        Message: "{{ trigger.event.data['text'] }}"
+        Server: "{{ trigger.event.data['server'] }}"
+        Username: "{{ trigger.event.data['username'] }}"
+        Search: "{{ trigger.event.data['search'] }}"
+        Folder: "{{ trigger.event.data['folder'] }}"
+        Sender: "{{ trigger.event.data['sender'] }}"
+        Date: "{{ trigger.event.data['date'] }}"
+        Subject: "{{ trigger.event.data['subject'] }}"
+        To: "{{ trigger.event.data['headers']['Delivered-To'][0] }}"
+        Return_Path: "{{ trigger.event.data['headers']['Return-Path'][0] }}"
+        Received-first: "{{ trigger.event.data['headers']['Received'][0] }}"
+        Received-last: "{{ trigger.event.data['headers']['Received'][-1] }}"
+      icon: mdi:train
+    - name: Mamorail Action
+      unique_id: sensor.mamorail_action
+      state: >
+        {% if is_state('sensor.mamorail', "unavailable") %}
+          unavailable
+        {% else %}
+          {{ state_attr('sensor.mamorail', 'Message') | base64_decode | regex_findall_index('(..*)しました') }}
+        {% endif %}
+      icon: mdi:gate-open
+    - name: Mamorail Balance
+      unique_id: sensor.mamorail_balance
+      state: >
+        {% if is_state('sensor.mamorail', 'unavailable') %}
+          unavailable
+        {% else %}
+          {{ state_attr('sensor.mamorail', 'Message') | base64_decode | regex_findall_index('チャージ残額は(..*)円です') | regex_replace(',', '') | int }}
+        {% endif %}
+      icon: mdi:credit-card-sync-outline
+      unit_of_measurement: JPY
+    - name: Mamorail Station
+      unique_id: sensor.mamorail_station
+      state: >
+        {% if is_state('sensor.mamorail', 'unavailable') %}
+          unavailable
+        {% else %}
+          {{ state_attr('sensor.mamorail', 'Message') | base64_decode | regex_findall_index(':[0-9][0-9]に(..*)') }}
+        {% endif %}
+      icon: mdi:train
+    - name: Mamorail Time
+      unique_id: sensor.mamorail_time
+      state: >
+        {% if is_state('sensor.mamorail', 'unavailable') %}
+          unavailable
+        {% else %}
+          {{ state_attr('sensor.mamorail', 'Message') | base64_decode | regex_findall_index('([0-9][0-9]*:[0-9][0-9])に') }}
         {% endif %}
       icon: mdi:clock-outline

@@ -12,10 +12,10 @@ views:
             name: Station
           - entity: sensor.mamorail_action
             name: Action
-          - entity: sensor.mamorail_balance
-            name: Balance
           - entity: sensor.mamorail_time
             name: Time
+          - entity: sensor.mamorail_balance
+            name: Balance
       - type: entities
         title: Anshin-Smile
         entities:
