@@ -43,12 +43,12 @@
     device_class: humidity
     unit_of_measurement: pt
   - name: Bedroom HVAC Plug Power
-    unique_id: sesonr.bedroom_hvac_plug_power
+    unique_id: sensor.bedroom_hvac_plug_power
     state: "{{ state_attr('switch.bedroom_hvac_plug', 'current_consumption') }}"
     device_class: power
     unit_of_measurement: W
   - name: Bedroom Surveillance Plug Power
-    unique_id: sesonr.bedroom_hvac_plug_power
+    unique_id: sensor.bedroom_surveillance_plug_power
     state: "{{ state_attr('switch.bedroom_surveillance_plug', 'current_consumption') }}"
     device_class: power
     unit_of_measurement: W
