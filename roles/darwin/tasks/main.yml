@@ -6,8 +6,7 @@
     - homebrew/cask
     - homebrew/cask-drivers
     - homebrew/cask-fonts
-    - sanemat/font
-  tags: [darwin, package, homebrew, ricty]
+  tags: [darwin, package, homebrew]
 
 - name: Install packages by homebrew
   homebrew:
@@ -34,57 +33,6 @@
       - watch
     update_homebrew: yes
   tags: [darwin, package, homebrew]
-
-- name: Install ricty
-  homebrew:
-    name: ricty
-    update_homebrew: yes
-    install_options: with-powerline
-  tags: [darwin, package, homebrew, ricty]
-
-- name: Create Ricty dir
-  file:
-    path: /Library/Fonts/Ricty
-    state: directory
-    mode: 0755
-  tags: [darwin, ricty]
-
-- name: Copy ricty
-  copy:
-    src: /opt/homebrew/Cellar/ricty/{{ ricty_version }}/share/fonts/{{item}}
-    dest: /Library/Fonts/Ricty
-    remote_src: yes
-  with_items:
-    - "Ricty Bold for Powerline.ttf"
-    - "Ricty Discord Bold for Powerline.ttf"
-    - "Ricty Discord Regular for Powerline.ttf"
-    - "Ricty Regular for Powerline.ttf"
-    - Ricty-Bold.ttf
-    - Ricty-Regular.ttf
-    - RictyDiscord-Bold.ttf
-    - RictyDiscord-Regular.ttf
-  tags: [darwin, ricty]
-
-- name: Copy fix_ricty.pe
-  copy:
-    src: fix_ricty.pe
-    dest: /tmp
-    mode: 0755
-  tags: [darwin, ricty]
-
-# See also <https://qiita.com/uKLEina/items/ff0877871fc425952b92>
-- name: Fix Ricty
-  command: /tmp/fix_ricty.pe "/Library/Fonts/Ricty/{{ item }}"
-  with_items:
-    - "Ricty Bold for Powerline.ttf"
-    - "Ricty Discord Bold for Powerline.ttf"
-    - "Ricty Discord Regular for Powerline.ttf"
-    - "Ricty Regular for Powerline.ttf"
-    - Ricty-Bold.ttf
-    - Ricty-Regular.ttf
-    - RictyDiscord-Bold.ttf
-    - RictyDiscord-Regular.ttf
-  tags: [darwin, ricty]
 
 - name: Install packages by homebrew_cask
   homebrew_cask:
