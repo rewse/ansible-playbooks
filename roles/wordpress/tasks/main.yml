@@ -159,6 +159,9 @@
           'jetpack_relatedposts_filter_enabled_for_request', 'jetpackme_allow_pages_for_relatedposts'
       );
 
+      /* Ref; https://jetpack.com/support/sso/ */
+      add_filter( 'jetpack_remove_login_form', '__return_true' );
+
       /* Ref; https://jetpack.com/support/related-posts/customize-related-posts/ */
       if ( ! function_exists( 'jetpackme_remove_rp' ) ) {
           function jetpackme_remove_rp() {
