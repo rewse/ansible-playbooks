@@ -86,7 +86,6 @@
         service: shell_command.press_study_floor_heating
       turn_off:
         service: shell_command.press_study_floor_heating
-      turn_off:
       value_template: >
         {{ states('sensor.living_room_temperature_effect_of_floor_heating') | float(0) > 1 }}
       icon_template: >
