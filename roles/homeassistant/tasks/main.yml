@@ -210,10 +210,26 @@
   notify: Restart homeassistant
   tags: [homeassistant, homeassistant-component]
 
-- name: Config cover
+- name: Config command_line
   lineinfile:
     path: /etc/homeassistant/configuration.yaml
     insertafter: '^climate:'
+    regexp: '^command_line:'
+    line: "command_line: !include command_lines.yaml"
+  notify: Restart homeassistant
+  tags: [homeassistant, homeassistant-component]
+
+- name: Copy command_lines.yaml
+  copy:
+    src: command_lines.yaml
+    dest: /etc/homeassistant
+  notify: Restart homeassistant
+  tags: [homeassistant, homeassistant-component]
+
+- name: Config cover
+  lineinfile:
+    path: /etc/homeassistant/configuration.yaml
+    insertafter: '^command_line:'
     regexp: '^cover:'
     line: "cover: !include covers.yaml"
   notify: Restart homeassistant

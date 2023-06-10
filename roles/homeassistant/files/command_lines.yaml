@@ -1,0 +1,46 @@
+- binary_sensor:
+    name: REGZA State
+    command: curl --digest --user '[% regza.username %]:[% regza.password %]' http://regza.rewse.jp/v2/remote/play/status | jq -r .content_type | sed 's/external/other/'
+    payload_on: broadcast
+    payload_off: other
+- binary_sensor:
+    name: REGZA Volume Muted
+    command: curl --digest --user '[% regza.username %]:[% regza.password %]' http://regza/v2/remote/status/mute | jq -r .mute
+# Do not use value_template because it causes a warning message every time
+- sensor:
+    name: REGZA Channel
+    command: curl --digest --user '[% regza.username %]:[% regza.password %]' http://regza.rewse.jp/v2/remote/play/status | jq -r .epg_info_current.channel_name
+- sensor:
+    name: REGZA Content Type
+    command: curl --digest --user '[% regza.username %]:[% regza.password %]' http://regza.rewse.jp/v2/remote/play/status | jq -r .content_type
+- sensor:
+    name: Balcony SwitchBot Meter Temperature
+    command: /config/bin/switchbot get [% switchbot.device_id.balcony_meter %] [% switchbot.token %] [% switchbot.secret %]
+    value_template: '{{ value_json.body.temperature }}'
+    json_attributes:
+        - body
+    device_class: temperature
+    unit_of_measurement: °C
+- sensor:
+    name: Bedroom Curtains Position
+    command: /config/bin/switchbot get [% switchbot.device_id.bedroom_curtains %] [% switchbot.token %] [% switchbot.secret %] 
+    value_template: '{{ value_json.body.slidePosition }}'
+    json_attributes:
+        - body
+    unit_of_measurement: "%"
+- sensor:
+    name: Bedroom SwitchBot Meter Temperature
+    command: /config/bin/switchbot get [% switchbot.device_id.bedroom_meter %] [% switchbot.token %] [% switchbot.secret %]
+    value_template: '{{ value_json.body.temperature }}'
+    json_attributes:
+        - body
+    device_class: temperature
+    unit_of_measurement: °C
+- sensor:
+    name: Living Room SwitchBot Hub2 Temperature
+    command: /config/bin/switchbot get [% switchbot.device_id.living_room_hub2 %] [% switchbot.token %] [% switchbot.secret %]
+    value_template: '{{ value_json.body.temperature }}'
+    json_attributes:
+        - body
+    device_class: temperature
+    unit_of_measurement: °C
