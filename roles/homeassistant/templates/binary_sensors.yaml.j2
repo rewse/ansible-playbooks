@@ -1,11 +1,3 @@
-- platform: command_line
-  name: REGZA State
-  command: curl --digest --user '[% regza.username %]:[% regza.password %]' http://regza.rewse.jp/v2/remote/play/status | jq -r .content_type | sed 's/external/other/'
-  payload_on: broadcast
-  payload_off: other
-- platform: command_line
-  name: REGZA Volume Muted
-  command: curl --digest --user '[% regza.username %]:[% regza.password %]' http://regza/v2/remote/status/mute | jq -r .mute
 - platform: ping
   name: alfa
   host: alfa.rewse.jp
