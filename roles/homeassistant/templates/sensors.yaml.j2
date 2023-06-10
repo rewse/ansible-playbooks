@@ -43,14 +43,6 @@
     - filter: lowpass
       window_size: 10
       time_constant: 24
-- platform: imap_email_content
-  name: Yotsuya-Otsuka
-  server: imap.gmail.com
-  username: !secret gmail_address
-  password: !secret gmail_password
-  folder: yotsuya-otsuka
-  senders:
-    - ichigaya@yotsuya-otsuka.co.jp
 - platform: rest
   name: Entrance Lock Bottom Sensor
   resource: https://app.candyhouse.co/api/sesame2/[% sesame.uuid_bottom %]

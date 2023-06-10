@@ -98,8 +98,7 @@
   condition:
     - condition: template
       value_template: >-
-        {{ (as_timestamp(now()) -
-        as_timestamp(states('sensor.yotsuya_otsuka_received_date_time'))) < 600 }}
+        {{ (as_timestamp(now()) - as_timestamp(state_attr('sensor.yotsuya_otsuka', 'Date'))) < 600 }}
   action:
     - service: notify.all_devices
       data:
