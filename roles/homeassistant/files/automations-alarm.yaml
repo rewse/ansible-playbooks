@@ -469,7 +469,7 @@
     - delay:
         hours: 1
 - id: automation.alarm_tuyaplug_bed_hva_is_offline
-  alias: "ALARM: tuyaplug-hed-hva is Offline"
+  alias: "ALARM: tuyaplug-bed-hva is Offline"
   mode: single
   trigger:
     - platform: state
@@ -569,7 +569,7 @@
     - delay:
         hours: 1
 - id: automation.alarm_tuyaplug_sto_swi_is_offline
-  alias: "ALARM: tuyaplug-st-swi is Offline"
+  alias: "ALARM: tuyaplug-sto-swi is Offline"
   mode: single
   trigger:
     - platform: state
