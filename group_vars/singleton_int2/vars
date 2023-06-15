@@ -6,13 +6,5 @@ local:
     ip_2: 192.168.0.42
     ipv6_2: 240f:78:31e9:2::42
 location: storage
-dhcpd:
-    role: secondary
-    port: 520
-    peer:
-        fqdn: fox.rewse.jp
-        port: 519
-    mclt: "# mclt 3600;"
-    split: "# split 255;"
 monitor:
     option: -tad
