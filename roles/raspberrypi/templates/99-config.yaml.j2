@@ -7,15 +7,17 @@ network:
       optional: true
       addresses:
          - {{ local.ip }}/24
-      routes:
-        - to: default
-          via: {{ default_gateway }}
+         - {{ local.ipv6 }}/64
+      gateway4: {{ default_gateway }}
+      gateway6: {{ default_gateway6 }}
       nameservers:
         search:
           - rewse.jp
         addresses:
           - {{ resolved1.ip }}
           - {{ resolved2.ip }}
+          - {{ resolved1.ipv6 }}
+          - {{ resolved2.ipv6 }}
   wifis:
     wlan0:
       access-points:
@@ -26,3 +28,4 @@ network:
       optional: true
       addresses:
          - {{ local.ip_2 }}/24
+         - {{ local.ipv6_2 }}/64
