@@ -29,7 +29,7 @@
     - service: alarm_control_panel.alarm_disarm
       target:
         entity_id: alarm_control_panel.surveillance
-    - service: notify.all_devices
+    - service: notify.tats_devices
       data:
         message: Turned off surveillance
         data:
@@ -49,7 +49,7 @@
     - service: alarm_control_panel.alarm_arm_away
       target:
         entity_id: alarm_control_panel.surveillance
-    - service: notify.all_devices
+    - service: notify.tats_devices
       data:
         message: Now Arming Away
         data:
@@ -80,7 +80,7 @@
     - service: alarm_control_panel.alarm_arm_away
       target:
         entity_id: alarm_control_panel.surveillance
-    - service: notify.all_devices
+    - service: notify.tats_devices
       data:
         message: Turn on surveillance because nobody is in home
         data:
