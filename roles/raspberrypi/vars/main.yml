@@ -1,12 +1,12 @@
 ---
 default_gateway: 192.168.0.1
-default_gateway6: 240f:78:31e9:1::1
+default_gateway6: 240f:78:31e9:2::1
 netgear_gs108tv3_version: 7.0.6.2
 php_miio_version: 0.2.6
 resolved1:
   ip: 192.168.0.30
-  ipv6: 240f:78:31e9:1::30
+  ipv6: 240f:78:31e9:2::30
 resolved2:
   ip: 192.168.0.40
-  ipv6: 240f:78:31e9:1::40
+  ipv6: 240f:78:31e9:2::40
 xray_password: "{{ vault_xray_password }}"

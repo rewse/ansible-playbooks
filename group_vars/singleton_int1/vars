@@ -2,9 +2,9 @@
 local:
     fqdn: fox.rewse.jp
     ip: 192.168.0.30
-    ipv6: 240f:78:31e9:1::30
+    ipv6: 240f:78:31e9:2::30
     ip_2: 192.168.0.32
-    ipv6_2: 240f:78:31e9:1::32
+    ipv6_2: 240f:78:31e9:2::32
 location: living_room
 dhcpd:
     role: primary
@@ -14,8 +14,5 @@ dhcpd:
         port: 520
     mclt: mclt 3600;
     split: split 256;
-    range6:
-        begin: 240f:78:31e9:1::200
-        end: 240f:78:31e9:1::224
 monitor:
     option: -tr
