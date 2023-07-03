@@ -10,7 +10,7 @@ sendto_zabbix() {
     -c /etc/zabbix/zabbix_agentd.conf \
     -s $1 \
     -k net.wifi.$2.ch \
-    -o $(iw dev wlan0 scan | grep -A 10 $3 | grep channel | awk '{print $5}') \
+    -o $(iw dev wlan0 scan | grep -v associated | grep -A 10 $3 | grep channel | awk '{print $5}') \
     > /dev/null 2>&1
 
     retval=$(expr $retval + $?)
