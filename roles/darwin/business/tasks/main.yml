@@ -10,13 +10,10 @@
       - box-drive
       - font-noto-sans-cjk
       - gotomeeting
-      - i1profiler
-      - jiggler
       - microsoft-teams
       - quip
       - tripmode
       - webex-meetings
-      - zoom
     update_homebrew: yes
   tags: [darwin-business, package, cask]
 
