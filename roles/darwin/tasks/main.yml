@@ -92,6 +92,7 @@
       - visual-studio-code
       - vlc
       - wireshark
+      - zoom
     update_homebrew: yes
   tags: [darwin, package, cask]
 
