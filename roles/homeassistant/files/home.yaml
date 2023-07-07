@@ -88,6 +88,26 @@ cards:
         state_map:
           - value: above_horizon
           - value: below_horizon
+      - type: custom:mini-graph-card
+        name: Living Room Pressure
+        entities:
+          - entity: sensor.living_room_pressure
+          - entity: sun.sun
+            color: gray
+            show_line: false
+            show_points: false
+            y_axis: secondary
+        hours_to_show: 48
+        points_per_hour: 4
+        animate: true
+        height: 200
+        hour24: true
+        show:
+          legend: false
+          labels_secondary: false
+        state_map:
+          - value: above_horizon
+          - value: below_horizon
       - type: entities
         title: Living Room Lights
         entities:
@@ -267,7 +287,7 @@ cards:
       - type: custom:mini-graph-card
         name: Balcony Temperature
         entities:
-          - entity: sensor.balcony_temperature
+          - entity: sensor.balcony_switchbot_outdoor_meter_temperature
           - entity: sensor.balcony_wbgt
             show_state: true
             show_fill: false
@@ -291,26 +311,6 @@ cards:
         name: Balcony Humidity
         entities:
           - entity: sensor.balcony_humidity
-          - entity: sun.sun
-            color: gray
-            show_line: false
-            show_points: false
-            y_axis: secondary
-        hours_to_show: 48
-        points_per_hour: 4
-        animate: true
-        height: 200
-        hour24: true
-        show:
-          legend: false
-          labels_secondary: false
-        state_map:
-          - value: above_horizon
-          - value: below_horizon
-      - type: custom:mini-graph-card
-        name: Balcony Pressure
-        entities:
-          - entity: sensor.balcony_pressure
           - entity: sun.sun
             color: gray
             show_line: false
