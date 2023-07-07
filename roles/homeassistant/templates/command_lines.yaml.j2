@@ -27,6 +27,15 @@
     device_class: temperature
     unit_of_measurement: °C
 - sensor:
+    name: Balcony SwitchBot Outdoor Meter Temperature
+    unique_id: sensor.balcony_switchbot_outdoor_meter_temperature
+    command: /config/bin/switchbot get [% switchbot.device_id.balcony_outdoor_meter %] [% switchbot.token %] [% switchbot.secret %]
+    value_template: '{{ value_json.body.temperature }}'
+    json_attributes:
+        - body
+    device_class: temperature
+    unit_of_measurement: °C
+- sensor:
     name: Bedroom Curtains Position
     unique_id: sensor.bedroom_curtains_position
     command: /config/bin/switchbot get [% switchbot.device_id.bedroom_curtains %] [% switchbot.token %] [% switchbot.secret %] 
