@@ -30,7 +30,7 @@
     unit_of_measurement: °C
   - name: Balcony Humidity Difference
     unique_id: sensor.balcony_humidity_difference
-    state: "{{ (states('sensor.balcony_humidity') | float(50) - state_attr('sensor.balcony_switchbot_meter_temperature', 'humidity') | float(50)) | round(2) | abs }}"
+    state: "{{ (states('sensor.balcony_humidity') | float(50) - state_attr('sensor.balcony_switchbot_meter_temperature', 'body')['humidity'] | float(50)) | round(2) | abs }}"
     icon: mdi:water-percent-alert
     unit_of_measurement: pt
   - name: Balcony Temperature Difference
@@ -47,7 +47,7 @@
     unit_of_measurement: °C
   - name: Bedroom Humidity Difference
     unique_id: sensor.bedroom_humidity_difference
-    state: "{{ (states('sensor.bedroom_humidity') | float(50) - state_attr('sensor.bedroom_switchbot_meter_temperature', 'humidity') | float(50)) | round(2) | abs }}"
+    state: "{{ (states('sensor.bedroom_humidity') | float(50) - state_attr('sensor.bedroom_switchbot_meter_temperature', 'body')['humidity'] | float(50)) | round(2) | abs }}"
     icon: mdi:water-percent-alert
     unit_of_measurement: pt
   - name: Bedroom HVAC Plug Power
@@ -84,7 +84,7 @@
     unit_of_measurement: W
   - name: Living Room Humidity Difference
     unique_id: sensor.living_room_humidity_difference
-    state: "{{ (states('sensor.living_room_humidity') | float(50) - state_attr('sensor.living_room_switchbot_meter_temperature', 'humidity') | float(50)) | round(2) | abs }}"
+    state: "{{ (states('sensor.living_room_humidity') | float(50) - state_attr('sensor.living_room_switchbot_hub2_temperature', 'body')['humidity'] | float(50)) | round(2) | abs }}"
     icon: mdi:water-percent-alert
     unit_of_measurement: pt
   - name: Living Room Humidifier Plug Power
