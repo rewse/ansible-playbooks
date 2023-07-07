@@ -220,9 +220,11 @@
   tags: [homeassistant, homeassistant-component]
 
 - name: Copy command_lines.yaml
-  copy:
-    src: command_lines.yaml
-    dest: /etc/homeassistant
+  template:
+    src: command_lines.yaml.j2
+    dest: /etc/homeassistant/command_lines.yaml
+    variable_start_string: "[%"
+    variable_end_string: "%]"
   notify: Restart homeassistant
   tags: [homeassistant, homeassistant-component]
 
