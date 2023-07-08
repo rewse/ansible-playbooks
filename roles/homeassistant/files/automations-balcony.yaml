@@ -20,7 +20,7 @@
           push:
             interruption-level: time-sensitive
     - delay:
-        hours: 1
+        hours: 8
 - id: automation.alarm_balcony_temperature_difference_is_too_large
   alias: "ALARM: Balcony Temperature Difference is Too Large"
   mode: single
@@ -41,4 +41,4 @@
           push:
             interruption-level: time-sensitive
     - delay:
-        hours: 1
+        hours: 8
