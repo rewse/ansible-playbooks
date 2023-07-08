@@ -37,7 +37,7 @@
   mode: single
   trigger:
     - platform: state
-      entity_id: sensor.living_room_switchbot_meter_temperature
+      entity_id: sensor.living_room_switchbot_hub2_temperature
       attribute: humidity
   condition:
     - condition: numeric_state
@@ -60,7 +60,7 @@
   mode: single
   trigger:
     - platform: state
-      entity_id: sensor.living_room_switchbot_meter_temperature
+      entity_id: sensor.living_room_switchbot_hub2_temperature
   condition:
     - condition: numeric_state
       entity_id: sensor.average_of_living_room_temperature_difference
