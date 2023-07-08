@@ -8,7 +8,6 @@
   condition:
     - condition: numeric_state
       entity_id: sensor.average_of_bedroom_humidity_difference
-      attribute: min_value
       above: 10
   action:
     - service: notify.tats_devices
@@ -30,7 +29,6 @@
   condition:
     - condition: numeric_state
       entity_id: sensor.average_of_bedroom_temperature_difference
-      attribute: min_value
       above: 1
   action:
     - service: notify.tats_devices
