@@ -1,5 +1,6 @@
 - platform: filter
   name: Filtered Bedroom HVAC Plug Power
+  unique_id: sensor.filtered_bedroom_hvac_plug_power
   entity_id: sensor.bedroom_hvac_plug_power
   filters:
     - filter: lowpass
@@ -7,6 +8,7 @@
       time_constant: 24
 - platform: rest
   name: Entrance Lock Bottom Sensor
+  unique_id: sensor.entrance_lock_bottom_sensor
   resource: https://app.candyhouse.co/api/sesame2/[% sesame.uuid_bottom %]
   headers:
     x-api-key: "[% sesame.api_key %]"
@@ -20,6 +22,7 @@
   scan_interval: 300
 - platform: rest
   name: Entrance Lock Top Sensor
+  unique_id: sensor.entrance_lock_top_sensor
   resource: https://app.candyhouse.co/api/sesame2/[% sesame.uuid_top %]
   headers:
     x-api-key: "[% sesame.api_key %]"
@@ -32,62 +35,72 @@
     - timestamp
   scan_interval: 300
 - platform: statistics
-  entity_id: sensor.balcony_humidity_difference
   name: Average of Balcony Humidity Difference
+  unique_id: sensor.average_of_balcony_humidity_difference
+  entity_id: sensor.balcony_humidity_difference
   state_characteristic: mean
   sampling_size: 183600
   max_age: "51:00:00"
 - platform: statistics
-  entity_id: sensor.balcony_temperature_difference
   name: Average of Balcony Temperature Difference
+  unique_id: sensor.average_of_balcony_temperature_difference
+  entity_id: sensor.balcony_temperature_difference
   state_characteristic: mean
   sampling_size: 183600
   max_age: "51:00:00"
 - platform: statistics
-  entity_id: sensor.bedroom_humidity_difference
   name: Average of Bedroom Humidity Difference
+  unique_id: sensor.average_of_bedroom_humidity_difference
+  entity_id: sensor.bedroom_humidity_difference
   state_characteristic: mean
   sampling_size: 183600
   max_age: "51:00:00"
 - platform: statistics
-  entity_id: binary_sensor.bedroom_motion_n
   name: Count of Bedroom Motion N
+  unique_id: sensor.count_of_bedroom_motion_n
+  entity_id: binary_sensor.bedroom_motion_n
   state_characteristic: count
   sampling_size: 1800
   max_age: "00:30:00"
 - platform: statistics
-  entity_id: binary_sensor.bedroom_motion_s
   name: Count of Bedroom Motion S
+  unique_id: sensor.count_of_bedroom_motion_s
+  entity_id: binary_sensor.bedroom_motion_s
   state_characteristic: count
   sampling_size: 1800
   max_age: "00:30:00"
 - platform: statistics
-  entity_id: sensor.bedroom_temperature_difference
   name: Average of Bedroom Temperature Difference
+  unique_id: sensor.average_of_bedroom_temperature_difference
+  entity_id: sensor.bedroom_temperature_difference
   state_characteristic: mean
   sampling_size: 183600
   max_age: "51:00:00"
 - platform: statistics
-  entity_id: sensor.living_room_humidity_difference
   name: Average of Living Room Humidity Difference
+  unique_id: sensor.average_of_living_room_humidity_difference
+  entity_id: sensor.living_room_humidity_difference
   state_characteristic: mean
   sampling_size: 183600
   max_age: "51:00:00"
 - platform: statistics
-  entity_id: binary_sensor.living_room_motion
   name: Count of Living Room Motion
+  unique_id: sensor.count_of_living_room_motion
+  entity_id: binary_sensor.living_room_motion
   state_characteristic: count
   sampling_size: 1800
   max_age: "00:30:00"
 - platform: statistics
-  entity_id: sensor.living_room_temperature_difference
   name: Average of Living Room Temperature Difference
+  unique_id: sensor.average_of_living_room_temperature_difference
+  entity_id: sensor.living_room_temperature_difference
   state_characteristic: mean
   sampling_size: 183600
   max_age: "51:00:00"
 - platform: statistics
-  entity_id: binary_sensor.study_motion
   name: Count of Study Motion
+  unique_id: sensor.count_of_study_motion
+  entity_id: binary_sensor.study_motion
   state_characteristic: count
   sampling_size: 1800
   max_age: "00:30:00"
