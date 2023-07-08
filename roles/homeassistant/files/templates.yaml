@@ -99,7 +99,7 @@
     unit_of_measurement: W
   - name: Living Room Temperature Difference
     unique_id: sensor.living_room_temperature_difference
-    state: "{{ (states('sensor.living_room_temperature') | float(25) - states('sensor.living_room_switchbot_meter_temperature') | float(25)) | round(2) | abs }}"
+    state: "{{ (states('sensor.living_room_temperature') | float(25) - states('sensor.living_room_switchbot_hub2_temperature') | float(25)) | round(2) | abs }}"
     icon: mdi:thermometer-alert
     device_class: temperature
     unit_of_measurement: °C
