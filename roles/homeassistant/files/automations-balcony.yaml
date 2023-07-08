@@ -4,7 +4,7 @@
   mode: single
   trigger:
     - platform: state
-      entity_id: sensor.balcony_switchbot_meter_temperature
+      entity_id: sensor.balcony_switchbot_outdoor_meter_temperature
       attribute: humidity
   condition:
     - condition: numeric_state
@@ -27,7 +27,7 @@
   mode: single
   trigger:
     - platform: state
-      entity_id: sensor.balcony_switchbot_meter_temperature
+      entity_id: sensor.balcony_switchbot_outdoor_meter_temperature
   condition:
     - condition: numeric_state
       entity_id: sensor.average_of_balcony_temperature_difference
