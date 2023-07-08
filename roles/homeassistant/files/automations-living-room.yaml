@@ -53,7 +53,7 @@
           push:
             interruption-level: time-sensitive
     - delay:
-        hours: 1
+        hours: 8
 - id: automation.alarm_living_room_temperature_difference_is_too_large
   alias: "ALARM: Living Room Temperature Difference is Too Large"
   mode: single
@@ -74,7 +74,7 @@
           push:
             interruption-level: time-sensitive
     - delay:
-        hours: 1
+        hours: 8
 - id: automation.info_living_room_humidity_is_too_high
   alias: "INFO: Living Room Humidity is Too High"
   mode: single
