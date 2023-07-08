@@ -19,7 +19,7 @@
           push:
             interruption-level: time-sensitive
     - delay:
-        hours: 1
+        hours: 8
 - id: automation.alarm_bedroom_temperature_difference_is_too_large
   alias: "ALARM: Bedroom Temperature Difference is Too Large"
   mode: single
@@ -40,7 +40,7 @@
           push:
             interruption-level: time-sensitive
     - delay:
-        hours: 1
+        hours: 8
 - id: automation.info_bedroom_humidity_is_too_high
   alias: "INFO: Bedroom Humidity is Too High"
   mode: single
