@@ -13,7 +13,7 @@
     - service: notify.tats_devices
       data:
         title: "⚠️ ALARM"
-        message: ️Bedroom Humidity Difference is Too Large
+        message: "Bedroom Humidity Difference is Too Large. Current: {{ states('sensor.bedroom_humidity') }}% / {{ states('sensor.bedroom_switchbot_meter_humidity') }}%"
         data:
           url: /lovelace/home
           push:
@@ -34,7 +34,7 @@
     - service: notify.tats_devices
       data:
         title: "⚠️ ALARM"
-        message: ️Bedroom Temperature Difference is Too Large
+        message: "Bedroom Temperature Difference is Too Large. Current: {{ states('sensor.bedroom_temperature') }}°C / {{ states('sensor.bedroom_switchbot_meter_temperature') }}°C"
         data:
           url: /lovelace/home
           push:

@@ -14,7 +14,7 @@
     - service: notify.tats_devices
       data:
         title: "⚠️ ALARM"
-        message: ️Balcony Humidity Difference is Too Large
+        message: "Balcony Humidity Difference is Too Large. Current: {{ states('sensor.balcony_switchbot_outdoor_meter_humidity') }}% / {{ states('sensor.balcony_switchbot_meter_humidity') }}%"
         data:
           url: /lovelace/home
           push:
@@ -35,7 +35,7 @@
     - service: notify.tats_devices
       data:
         title: "⚠️ ALARM"
-        message: Balcony Temperature Difference is Too Large
+        message: "Balcony Temperature Difference is Too Large. Current: {{ states('sensor.balcony_switchbot_outdoor_meter_temperature') }}°C / {{ states('sensor.balcony_switchbot_meter_temperature') }}°C"
         data:
           url: /lovelace/home
           push:
