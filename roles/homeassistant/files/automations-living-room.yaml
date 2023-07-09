@@ -47,7 +47,7 @@
     - service: notify.tats_devices
       data:
         title: "⚠️ ALARM"
-        message: Living Room Humidity Difference is Too Large
+        message: "Living Room Humidity Difference is Too Large. Current: {{ states('sensor.living_room_humidity') }}% / {{ states('sensor.living_room_switchbot_hub2_humidity') }}%"
         data:
           url: /lovelace/home
           push:
@@ -68,7 +68,7 @@
     - service: notify.tats_devices
       data:
         title: "⚠️ ALARM"
-        message: Living Room Temperature Difference is Too Large
+        message: "Living Room Temperature Difference is Too Large. Current: {{ states('sensor.living_room_temperature') }}°C / {{ states('sensor.living_room_switchbot_hub2_temperature') }}°C"
         data:
           url: /lovelace/home
           push:
