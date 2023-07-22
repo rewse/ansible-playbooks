@@ -38,12 +38,6 @@ cards:
         entity: alarm_control_panel.entrance_auto_lock
         states:
           - arm_home
-  - type: entities
-    title: Other Automations
-    entities:
-      - entity: automation.update_device_tracking_sensors
-        secondary_info: last-triggered
-    show_header_toggle: false
   - type: picture-entity
     name: Entrance Camera
     entity: camera.entrance_camera
