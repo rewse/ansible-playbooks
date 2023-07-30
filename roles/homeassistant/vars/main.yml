@@ -1,46 +1,46 @@
 ---
 alexa_client:
-  id: "[% vault_alexa_client.id %]"
-  secret: "[% vault_alexa_client.secret %]"
+  id: "{{ vault_alexa_client.id }}"
+  secret: "{{ vault_alexa_client.secret }}"
 card_mod_version: 3.2.2
 gmail:
-  address: "[% vault_gmail.address %]"
-  password: "[% vault_gmail.password %]"
-ifttt_key: "[% vault_ifttt_key %]"
+  address: "{{ vault_gmail.address }}"
+  password: "{{ vault_gmail.password }}"
+ifttt_key: "{{ vault_ifttt_key }}"
 homeassistant_token: "{{ vault_homeassistant_token }}"
 latlng:
   home:
-    lat: "[% vault_latlng.home.lat %]"
-    lng: "[% vault_latlng.home.lng %]"
+    lat: "{{ vault_latlng.home.lat }}"
+    lng: "{{ vault_latlng.home.lng }}"
   office:
-    lat: "[% vault_latlng.office.lat %]"
-    lng: "[% vault_latlng.office.lng %]"
+    lat: "{{ vault_latlng.office.lat }}"
+    lng: "{{ vault_latlng.office.lng }}"
   y:
-    name: "[% vault_latlng.y.name %]"
-    lat: "[% vault_latlng.y.lat %]"
-    lng: "[% vault_latlng.y.lng %]"
+    name: "{{ vault_latlng.y.name }}"
+    lat: "{{ vault_latlng.y.lat }}"
+    lng: "{{ vault_latlng.y.lng }}"
 localtuya_version: 5.2.1
 mini_graph_card_version: 0.11.0
 mini_media_player_version: 1.16.5
-mosquitto_password: "[% vault_mosquitto_password %]"
+mosquitto_password: "{{ vault_mosquitto_password }}"
 nature_remo_version: 0.5
 nfs_server: guppy.rewse.jp
-notify_title_k: "[% vault_notify_title_k %]"
+notify_title_k: "{{ vault_notify_title_k }}"
 postgres:
-  username: "[% vault_postgres.username %]"
-  password: "[% vault_postgres.password %]"
+  username: "{{ vault_postgres.username }}"
+  password: "{{ vault_postgres.password }}"
   hostname: homeassistant-db.rewse.jp
   db: homeassistant
 regza:
-  username: "[% vault_regza.username %]"
-  password: "[% vault_regza.password %]"
-remo_token: "[% vault_remo_token %]"
+  username: "{{ vault_regza.username }}"
+  password: "{{ vault_regza.password }}"
+remo_token: "{{ vault_remo_token }}"
 sesame:
-  api_key: "[% vault_sesame.api_key %]"
+  api_key: "{{ vault_sesame.api_key }}"
   uuid_top: 6D69522A-6A63-72DC-75AE-4057CF142B8B
   uuid_bottom: E0A1A177-9F37-CD6A-05F4-E65AB625C0AC
-  secret_top: "[% vault_sesame.secret_top %]"
-  secret_bottom: "[% vault_sesame.secret_bottom %]"
+  secret_top: "{{ vault_sesame.secret_top }}"
+  secret_bottom: "{{ vault_sesame.secret_bottom }}"
 simple_thermostat_version: 2.5.0
 simple_weather_card_version: 0.8.5
 switchbot:
@@ -53,9 +53,9 @@ switchbot:
     living_room_hub2: CA4F4756744A
     living_room_humidifier: C12F0898BAC5
     study_floor_heating: D0ECA7E7803F
-  token: "[% vault_switchbot.token %]"
-  secret: "[% vault_switchbot.secret %]"
-  webhook_id: "[% vault_switchbot.webhook_id %]"
-switchbot_token: "[% vault_switchbot_token %]"
+  token: "{{ vault_switchbot.token }}"
+  secret: "{{ vault_switchbot.secret }}"
+  webhook_id: "{{ vault_switchbot.webhook_id }}"
+switchbot_token: "{{ vault_switchbot_token }}"
 uptime_card_version: 0.4.0
 xiaomi_gateway3_version: 3.3.2

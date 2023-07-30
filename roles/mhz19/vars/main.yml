@@ -1,2 +1,2 @@
 ---
-mosquitto_password: "[% vault_mosquitto_password %]"
+mosquitto_password: "{{ vault_mosquitto_password }}"
