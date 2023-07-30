@@ -1,5 +1,5 @@
 ---
 cyberhome:
-  email: "[% vault_cyberhome.email %]"
-  password: "[% vault_cyberhome.password %]"
-mosquitto_password: "[% vault_mosquitto_password %]"
+  email: "{{ vault_cyberhome.email }}"
+  password: "{{ vault_cyberhome.password }}"
+mosquitto_password: "{{ vault_mosquitto_password }}"

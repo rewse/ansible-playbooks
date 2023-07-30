@@ -1,4 +1,4 @@
 ---
 sjdc:
-  login_id: "[% vault_sjdc.login_id %]"
-  password: "[% vault_sjdc.password %]"
+  login_id: "{{ vault_sjdc.login_id }}"
+  password: "{{ vault_sjdc.password }}"
