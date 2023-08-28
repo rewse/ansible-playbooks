@@ -78,6 +78,15 @@
   notify: Restart zabbix-server
   tags: [zabbix-server]
 
+- name: Set AllowUnsupportedDBVersions
+  lineinfile:
+    dest: /etc/zabbix/zabbix_server.conf
+    insertafter: "^# AllowUnsupportedDBVersions="
+    regexp: "^AllowUnsupportedDBVersions="
+    line: "AllowUnsupportedDBVersions=1"
+  notify: Restart zabbix-server
+  tags: [zabbix-server]
+
 - name: Set php_value
   lineinfile:
     dest: /etc/zabbix/apache.conf

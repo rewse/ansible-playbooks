@@ -3,5 +3,5 @@ zabbix:
   db_host: zabbix-db.rewse.jp
   db_password: "{{ vault_zabbix.db_password }}"
   server: zabbix.rewse.jp
-  version: 6.2
-  release_revision: 4
+  version: 6.4
+  release_revision: 1
