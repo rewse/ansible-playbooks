@@ -11,6 +11,7 @@
       - font-noto-sans-cjk
       - gotomeeting
       - microsoft-teams
+      - monitorcontrol
       - quip
       - tripmode
       - webex-meetings
@@ -21,6 +22,7 @@
   command: mas install {{item}}
   with_items:
     - 973213640   # MSG Viewer for Outlook
+    - 1639692859  # WattsConnected
   tags: [darwin-business, package, mas]
 
 # - name: Install rest of the apps
