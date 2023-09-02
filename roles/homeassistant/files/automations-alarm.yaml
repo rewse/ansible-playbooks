@@ -623,26 +623,6 @@
             interruption-level: time-sensitive
     - delay:
         hours: 1
-- id: automation.alarm_victor_is_offline
-  alias: "ALARM: victor is Offline"
-  mode: single
-  trigger:
-    - platform: state
-      entity_id: binary_sensor.victor
-      to: "off"
-      for:
-        minutes: 31
-  action:
-    - service: notify.tats_devices
-      data:
-        title: "⚠️ ALARM"
-        message: victor is Offline
-        data:
-          url: /lovelace-machines/machines
-          push:
-            interruption-level: time-sensitive
-    - delay:
-        hours: 1
 - id: automation.alarm_wfirex_is_offline
   alias: "ALARM: wfirex is Offline"
   mode: single
