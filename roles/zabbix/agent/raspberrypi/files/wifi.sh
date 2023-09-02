@@ -21,7 +21,6 @@ sendto_zabbix() {
 
 retval=0
 
-sendto_zabbix victor.rewse.jp band5 74:da:88:9c:57:c1
 sendto_zabbix xray-liv.rewse.jp band2 70:a7:41:a4:eb:16
 sendto_zabbix xray-liv.rewse.jp band5 76:a7:41:a4:eb:17
 sendto_zabbix xray-sto.rewse.jp band2 d0:21:f9:b1:b1:a9
