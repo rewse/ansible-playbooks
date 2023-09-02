@@ -258,6 +258,37 @@
       entity_id: button.study_room_floor_heating
   action:
     - service: shell_command.press_study_floor_heating
+- id: automation.raise_living_room_hvac_cool_at_sunset
+  alias: Raise Living Room HVAC Cool at Sunset
+  trigger:
+    - platform: sun
+      event: sunset
+  condition:
+    - condition: state
+      entity_id: climate.living_room_hvac
+      state: cool
+  action:
+    - service: climate.set_temperature
+      target:
+        entity_id: climate.living_room_hvac 
+      data:
+        temperature: 26
+- id: automation.raise_living_room_hvac_cool_one_hour_at_sunset
+  alias: Raise Living Room HVAC Cool One Hour at Sunset
+  trigger:
+    - platform: sun
+      event: sunset
+      offset: "01:00:00"
+  condition:
+    - condition: state
+      entity_id: climate.living_room_hvac
+      state: cool
+  action:
+    - service: climate.set_temperature
+      target:
+        entity_id: climate.living_room_hvac
+      data:
+        temperature: 27
 - id: automation.turn_down_living_area
   alias: Turn down Living Area
   description: Turn down the living area
@@ -681,11 +712,12 @@
       entity_id: binary_sensor.living_room_presence
       state: "on"
   action:
-    - service: climate.set_hvac_mode
+    - service: climate.set_temperature
       target:
         entity_id: climate.living_room_hvac
       data:
         hvac_mode: cool
+        temperature: 25
     - service: notify.all_devices
       data:
         message: "Turned on Living Room HVAC Cool. Current: {{ states('sensor.living_room_wbgt') }}°C"
@@ -722,11 +754,12 @@
       for:
         minutes: 30
   action:
-    - service: climate.set_hvac_mode
+    - service: climate.set_temperature
       target:
         entity_id: climate.living_room_hvac
       data:
         hvac_mode: cool
+        temperature: 25
     - service: notify.all_devices
       data:
         message: "Turned on Living Room HVAC Cool Forcibly. Current: {{ states('sensor.living_room_wbgt') }}°C"
