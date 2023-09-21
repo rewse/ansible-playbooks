@@ -263,6 +263,7 @@
   trigger:
     - platform: sun
       event: sunset
+      offset: "01:00:00"
   condition:
     - condition: state
       entity_id: climate.living_room_hvac
@@ -273,12 +274,12 @@
         entity_id: climate.living_room_hvac 
       data:
         temperature: 26
-- id: automation.raise_living_room_hvac_cool_one_hour_at_sunset
-  alias: Raise Living Room HVAC Cool One Hour at Sunset
+- id: automation.raise_living_room_hvac_cool_at_night
+  alias: Raise Living Room HVAC Cool at Night
   trigger:
     - platform: sun
       event: sunset
-      offset: "01:00:00"
+      offset: "04:00:00"
   condition:
     - condition: state
       entity_id: climate.living_room_hvac
