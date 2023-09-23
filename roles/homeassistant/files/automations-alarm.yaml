@@ -38,8 +38,8 @@
             interruption-level: time-sensitive
     - delay:
         hours: 1
-- id: automation.alarm_bio_wifi_might_be_off
-  alias: "ALARM: bio WiFi might be Off"
+- id: automation.alarm_atom_wifi_might_be_off
+  alias: "ALARM: atom WiFi might be Off"
   mode: single
   trigger:
     - platform: state
@@ -50,12 +50,12 @@
       to: "on"
   condition:
     - condition: state
-      entity_id: device_tracker.ping_bio
+      entity_id: device_tracker.ping_atom
       state: not_home
       for:
         hours: 2
     - condition: state
-      entity_id: device_tracker.bio
+      entity_id: device_tracker.atom
       state: home
       for:
         hours: 2
@@ -66,7 +66,7 @@
     - service: notify.tats_devices
       data:
         title: "⚠️ ALARM"
-        message: bio WiFi might be off
+        message: atom WiFi might be off
         data:
           url: /lovelace-machines/machines
           push:
