@@ -51,8 +51,8 @@ views:
         entities:
           - entity: person.shibata_tats
             name: Tats
-          - entity: device_tracker.ping_bio
-          - entity: device_tracker.bio
+          - entity: device_tracker.ping_atom
+          - entity: device_tracker.atom
           - entity: person.shibata_akiko
           - entity: device_tracker.ping_ubiqu_iphone12mini
           - entity: device_tracker.ubiqu_iphone12mini
@@ -121,8 +121,8 @@ views:
           - entity: sensor.bcd074348424_storage
             name: bcd07348424
             icon: 'mdi:harddisk'
-          - entity: sensor.bio_storage
-            name: bio
+          - entity: sensor.atom_storage
+            name: atom
             icon: 'mdi:harddisk'
           - entity: sensor.chemical_storage
             name: desert

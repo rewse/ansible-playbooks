@@ -72,7 +72,7 @@ climate.living_area_floor_heating:
   icon: mdi:grid
 device_tracker.ubiqu_iphone12mini:
   icon: mdi:cellphone
-device_tracker.bio:
+device_tracker.atom:
   icon: mdi:cellphone
 device_tracker.desert:
   icon: mdi:tablet
@@ -80,8 +80,8 @@ device_tracker.bcd074348424:
   icon: mdi:laptop
 device_tracker.global:
   icon: mdi:cellphone
-device_tracker.ping_bio:
-  friendly_name: ping bio
+device_tracker.ping_atom:
+  friendly_name: ping atom
   icon: mdi:cellphone-wireless
 device_tracker.ping_kijishiro:
   friendly_name: ping kijishiro
