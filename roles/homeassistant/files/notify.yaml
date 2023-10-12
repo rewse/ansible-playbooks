@@ -3,7 +3,7 @@
   services:
     - service: mobile_app_zoom
     - service: mobile_app_bcd074348424
-    - service: mobile_app_atomic
+    - service: mobile_app_atom
     - service: mobile_app_chemical
     - service: mobile_app_global
     - service: mobile_app_ubiqu_iphone12mini
