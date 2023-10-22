@@ -528,7 +528,19 @@
     - platform: sun
       event: sunset
       offset: "-00:30:00"
-      id: Sunset
+      id: Sunset30
+    - platform: sun
+      event: sunset
+      offset: "-00:20:00"
+      id: Sunset20
+    - platform: sun
+      event: sunset
+      offset: "-00:10:00"
+      id: Sunset10
+    - platform: sun
+      event: sunset
+      offset: "-00:01:00"
+      id: Sunset01
   condition:
     - condition: numeric_state
       entity_id: sensor.living_room_light_level
