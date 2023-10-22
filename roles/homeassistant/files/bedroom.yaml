@@ -17,27 +17,20 @@ cards:
     entities:
       - entity: light.bedroom_light
         name: Light
-  - type: "custom:simple-thermostat"
+  - type: tile
     entity: climate.bedroom_hvac
-    layout:
-      step: row
-      mode:
-        names: false
-        headings: false
-    decimals: 0
-    fallback: --
-    step_size: 1
-    hide:
-      temperature: true
-      state: true
-    control:
-      hvac: true
-    style: |
-      ha-card {
-        --st-font-size-xl: 36px;
-        --st-mode-active-background: #999999;
-        --st-mode-background: transparent;
-      }
+    tap_action:
+      action: more-info
+    icon_tap_action:
+      action: more-info
+    features:
+      - type: climate-hvac-modes
+        hvac_modes:
+          - cool
+          - dry
+          - heat
+          - 'off'
+      - type: target-temperature
   - type: entities
     title: Bedroom Appliances
     entities:

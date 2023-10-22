@@ -630,13 +630,6 @@
   notify: Restart homeassistant
   tags: [homeassistant, homeassistant-custom]
 
-- name: Copy Lovelace Simple Thermostat Card
-  get_url:
-    url: https://github.com/nervetattoo/simple-thermostat/releases/download/v{{ simple_thermostat_version }}/simple-thermostat.js
-    dest: /etc/homeassistant/www
-  notify: Restart homeassistant
-  tags: [homeassistant, homeassistant-custom]
-
 - name: Copy Lovelace Simeple Weather Card
   get_url:
     url: https://github.com/kalkih/simple-weather-card/releases/download/v{{ simple_weather_card_version }}/simple-weather-card-bundle.js
@@ -687,8 +680,6 @@
           - url: /local/mini-graph-card-bundle.js?v={{ mini_graph_card_version }}
             type: module
           - url: /local/mini-media-player-bundle.js?v={{ mini_media_player_version }}
-            type: module
-          - url: /local/simple-thermostat.js?v=1
             type: module
           - url: /local/simple-weather-card-bundle.js?v={{ simple_weather_card_version }}
             type: module
