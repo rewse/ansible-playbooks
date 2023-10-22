@@ -120,27 +120,29 @@ cards:
           - entity: light.living_room_footlight
             name: Footlight
         state_color: false
-      - type: "custom:simple-thermostat"
+      - type: tile
         entity: climate.living_room_hvac
-        layout:
-          step: row
-          mode:
-            names: false
-            headings: false
-        decimals: 0
-        fallback: --
-        step_size: 1
-        hide:
-          temperature: true
-          state: true
-        control:
-          hvac: true
-        style: |
-          ha-card {
-            --st-font-size-xl: 36px;
-            --st-mode-active-background: #999999;
-            --st-mode-background: transparent;
-          }
+        tap_action:
+          action: more-info
+        icon_tap_action:
+          action: more-info
+        features:
+          - type: climate-hvac-modes
+            hvac_modes:
+              - fan_only
+              - dry
+              - cool
+              - heat
+              - heat_cool
+              - 'off'
+          - type: target-temperature
+          - type: climate-preset-modes
+            style: icons
+            preset_modes:
+              - none
+              - away
+              - eco
+              - boost
       - type: entities
         title: Living Room Appliances
         entities:
@@ -209,27 +211,20 @@ cards:
           - entity: light.bedroom_light
             name: Light
         show_header_toggle: false
-      - type: "custom:simple-thermostat"
+      - type: tile
         entity: climate.bedroom_hvac
-        layout:
-          step: row
-          mode:
-            names: false
-            headings: false
-        decimals: 0
-        fallback: --
-        step_size: 1
-        hide:
-          temperature: true
-          state: true
-        control:
-          hvac: true
-        style: |
-          ha-card {
-            --st-font-size-xl: 36px;
-            --st-mode-active-background: #999999;
-            --st-mode-background: transparent;
-          }
+        tap_action:
+          action: more-info
+        icon_tap_action:
+          action: more-info
+        features:
+          - type: climate-hvac-modes
+            hvac_modes:
+              - cool
+              - dry
+              - heat
+              - 'off'
+          - type: target-temperature
       - type: entities
         title: Bedroom Appliances
         entities:
