@@ -1,2 +1,0 @@
----
-mosquitto_password: "{{ vault_mosquitto_password }}"
