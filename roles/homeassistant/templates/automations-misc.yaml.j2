@@ -1,3 +1,50 @@
+- id: automation.plan_to_start_roomba
+  alias: Plan to Start Roomba
+  trigger:
+    - platform: state
+      entity_id: vacuum.roomba_combo
+      to: docked
+      for:
+        hours: 48
+  action:
+    - service: automation.turn_on
+      target:
+        entity_id:
+          - automation.start_roomba
+- id: automation.start_roomba
+  alias: Start Roomba
+  trigger:
+    - platform: time_pattern
+      minutes: "/5"
+      seconds: 8
+  condition:
+    - condition: state
+      entity_id: person.shibata_tats
+      state: not_home
+      for:
+        minutes: 10
+    - condition: state
+      entity_id: person.shibata_akiko
+      state: not_home
+      for:
+        minutes: 10
+    - condition: state
+      entity_id: person.shibata_kayano
+      state: not_home
+      for:
+        minutes: 10
+  action:
+    - service: vacuum.start
+      target:
+        entity_id: vacuum.roomba_combo
+    - service: notify.tats_devices
+      data:
+        message: Start Roomba
+        data:
+          push:
+            interruption-level: time-sensitive
+    - delay:
+        hours: 1
 - id: automation.turn_off_alarm_control_panel_surveillance
   alias: Turn off Alarm Control Panel Surveillance
   mode: single
@@ -122,6 +169,19 @@
       entity_id:
         - switch.living_room_surveillance_plug
         - switch.bedroom_surveillance_plug
+- id: automation.unplan_to_start_roomba
+  alias: Unplan to Start Roomba
+  trigger:
+    - platform: state
+      entity_id: vacuum.roomba_combo
+      to: cleaning
+      for:
+        minutes: 30
+  action:
+    - service: automation.turn_off
+      target:
+        entity_id:
+          - automation.start_roomba
 - id: automation.webhook_switchbot
   alias: "Webhook: Switchbot"
   trigger:
