@@ -97,9 +97,6 @@ cards:
         name: Turned off HVAC Cool Threshold
       - entity: input_number.living_room_hvac_dry_turned_off_threshold
         name: Turned off HVAC Dry Threshold
-      - entity: automation.turn_off_alarm_control_panel_surveillance
-        name: Turn off Surveillance Alarm Control Panel
-        secondary_info: last-triggered
       - entity: automation.turn_on_living_area_downlights
         name: Turn on Downlights
         secondary_info: last-triggered
@@ -140,9 +137,6 @@ cards:
         name: Turned on HVAC Dry Threshold Humidity
       - entity: automation.turn_on_living_room_hvac_fan
         name: Turn on HVAC Fan
-        secondary_info: last-triggered
-      - entity: automation.turn_on_alarm_control_panel_surveillance_when_nobody_is_in_home
-        name: Turn on Surveillance Alarm Control Panel
         secondary_info: last-triggered
     show_header_toggle: false
   - type: vertical-stack
