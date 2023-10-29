@@ -2,7 +2,7 @@
 alexa_client:
   id: "{{ vault_alexa_client.id }}"
   secret: "{{ vault_alexa_client.secret }}"
-card_mod_version: 3.2.2
+card_mod_version: 3.2.3
 gmail:
   address: "{{ vault_gmail.address }}"
   password: "{{ vault_gmail.password }}"
@@ -58,4 +58,4 @@ switchbot:
   webhook_id: "{{ vault_switchbot.webhook_id }}"
 switchbot_token: "{{ vault_switchbot_token }}"
 uptime_card_version: 0.4.0
-xiaomi_gateway3_version: 3.3.2
+xiaomi_gateway3_version: 3.3.3

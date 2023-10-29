@@ -12,7 +12,7 @@
 
 - name: Install Amazon Corretto
   apt:
-    name: java-19-amazon-corretto-jdk
+    name: java-{{ corretto_version }}-amazon-corretto-jdk
     update_cache: yes
   tags: [database-client-gui, package, java]
 
