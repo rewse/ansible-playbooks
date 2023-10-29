@@ -15,9 +15,9 @@
       - rlwrap
   tags: [database-client, package, mysql, postgresql, oracle]
 
-- name: Install mysql-connector-java
+- name: Install mysql-connector-j
   apt:
-    deb: https://cdn.mysql.com//Downloads/Connector-J/mysql-connector-java_{{ mysql_connector_version }}_all.deb
+    deb: https://cdn.mysql.com//Downloads/Connector-J/mysql-connector-j_{{ mysql_connector_version }}_all.deb
   tags: [database-client, package, mysql]
 
 - name: Copy instantclient
@@ -91,16 +91,16 @@
 
 - name: Install Redshift JDBC driver
   get_url:
-    url: https://s3.amazonaws.com/redshift-downloads/drivers/jdbc/{{redshiftjdbc_version}}/RedshiftJDBC42-no-awssdk-{{ redshiftjdbc_version }}.jar
+    url: https://s3.amazonaws.com/redshift-downloads/drivers/jdbc/{{ redshift_jdbc_version }}/redshift-jdbc42-{{ redshift_jdbc_version }}.jar
     dest: /usr/share/java
   tags: [database-client, redshift]
 
 - name: Create symlink RedShiftJDBC.jar
   file:
-    src: RedshiftJDBC42-no-awssdk-{{ redshiftjdbc_version }}.jar
+    src: redshift-jdbc42-{{ redshift_jdbc_version }}.jar
     dest: /usr/share/java/{{ item }}
     state: link
   with_items:
-    - RedshiftJDBC42.jar
-    - RedshiftJDBC.jar
+    - redshift-jdbc42.jar
+    - redshift-jdbc.jar
   tags: [database-client, redshift]
