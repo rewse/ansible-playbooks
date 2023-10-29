@@ -1,4 +1,11 @@
 ---
+- name: Add safe directory
+  git_config:
+    name: safe.directory
+    scope: global
+    value: /srv/git/dotfiles
+  tags: [dotfiles-linux]
+
 - name: Clone dotfiles.git
   git:
     repo: git@github.com:rewse/dotfiles.git
