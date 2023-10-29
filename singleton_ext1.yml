@@ -4,9 +4,7 @@
   remote_user: ubuntu
   roles:
     - desktop
-# Comment out due to "fatal: unsafe repository"
-# See also <https://github.com/actions/checkout/issues/760>
-#    - database/client
+    - database/client
     - database/client/gui
     - enecoq
     - zabbix/aws

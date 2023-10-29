@@ -50,6 +50,13 @@
     state: link
   tags: [database-client, oracle]
 
+- name: Add safe directory
+  git_config:
+    name: safe.directory
+    scope: global
+    value: /srv/git/orascript
+  tags: [database-client, oracle]
+
 - name: Clone orascript.git
   git:
     repo: git@github.com:rewse/orascript.git
