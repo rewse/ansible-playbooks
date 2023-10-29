@@ -26,7 +26,7 @@
     enabled: yes
   with_items:
     - bluetooth
-    - hciuart
+    # - hciuart
   tags: [raspberrypi]
 
 - name: Enable SNMP mibs
@@ -39,13 +39,6 @@
 - name: Copy NETGEAR GS108Tv3 MIB
   unarchive:
     src: https://www.downloads.netgear.com/files/GDC/GS108Tv3/GS108T_110TP_TPP_V{{ netgear_gs108tv3_version }}_MIBs.zip
-    dest: /usr/share/snmp/mibs
-    remote_src: yes
-  tags: [raspberrypi]
-
-- name: Copy YAMAHA MIB
-  unarchive:
-    src: http://www.rtpro.yamaha.co.jp/RT/docs/mib/yamaha-private-mib.zip
     dest: /usr/share/snmp/mibs
     remote_src: yes
   tags: [raspberrypi]
