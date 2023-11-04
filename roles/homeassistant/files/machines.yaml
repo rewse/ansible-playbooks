@@ -112,27 +112,6 @@ views:
             name: Study Window N
           - entity: sensor.study_window_s_battery
             name: Study Window S
-      - type: entities
-        title: Storages
-        entities:
-          - entity: sensor.zoom_storage
-            name: zoom
-            icon: 'mdi:harddisk'
-          - entity: sensor.bcd074348424_storage
-            name: bcd07348424
-            icon: 'mdi:harddisk'
-          - entity: sensor.atom_storage
-            name: atom
-            icon: 'mdi:harddisk'
-          - entity: sensor.chemical_storage
-            name: desert
-            icon: 'mdi:harddisk'
-          - entity: sensor.guppy_volume_1_volume_used
-            name: guppy Data
-            icon: 'mdi:harddisk'
-          - entity: sensor.guppy_volume_2_volume_used
-            name: guppy Backup
-            icon: 'mdi:harddisk'
       - type: alarm-panel
         name: Living Room TV
         entity: alarm_control_panel.living_room_tv
