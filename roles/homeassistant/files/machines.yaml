@@ -82,3 +82,8 @@ views:
         entity: alarm_control_panel.living_room_tv
         states:
           - arm_away
+      - type: history-graph
+        title: Roomba
+        entities:
+          - entity: vacuum.roomba_combo
+        hours_to_show: 36
