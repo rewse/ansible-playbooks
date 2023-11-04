@@ -77,41 +77,6 @@ views:
             secondary_info: last-changed
           - entity: sensor.count_of_bedroom_motion_s
             secondary_info: last-changed
-      - type: entities
-        title: Batteries
-        entities:
-          - entity: sensor.bedroom_1_button_switch_battery
-            name: Bedroom 1-Button Switch
-          - entity: sensor.bedroom_light_switch_battery_level
-            name: Bedroom Light Switch
-          - entity: sensor.bedroom_motion_sensor_n_battery
-            name: Bedroom Motion Sensor N
-          - entity: sensor.bedroom_motion_sensor_s_battery
-            name: Bedroom Motion Sensor S
-          - entity: sensor.bedroom_thermometer_battery
-            name: Bedroom Thermometer
-          - entity: sensor.bedroom_window_n_battery
-            name: Bedroom Window N
-          - entity: sensor.bedroom_window_s_battery
-            name: Bedroom Window S
-          - entity: sensor.entrance_1_button_switch_battery
-            name: Entrance 1-Button Switch
-          - entity: sensor.entrance_door_battery
-            name: Entrance Door
-          - entity: sensor.living_room_1_button_switch_battery
-            name: Living Room 1-Button Switch
-          - entity: sensor.living_room_floor_thermometer_battery
-            name: Living Room Floor Thermometer
-          - entity: sensor.living_room_light_switch_battery_level
-            name: Living Room Light Switch
-          - entity: sensor.living_room_thermometer_battery
-            name: Living Room Thermometer
-          - entity: sensor.living_room_window_battery
-            name: Living Room Window
-          - entity: sensor.study_window_n_battery
-            name: Study Window N
-          - entity: sensor.study_window_s_battery
-            name: Study Window S
       - type: alarm-panel
         name: Living Room TV
         entity: alarm_control_panel.living_room_tv
