@@ -219,6 +219,21 @@
                         <?php endif; ?>
   tags: [wordpress]
 
+- name: Add an affiliate message
+  ansible.builtin.blockinfile:
+    path: /srv/www/wordpress/wp-content/themes/fukasawa/singular.php
+    marker: "<!-- {mark} ANSIBLE MANAGED BLOCK .pr-message -->"
+    insertafter: '<div class="post-content entry-content">'
+    block: |2
+                        <?php
+                          $tags = get_the_tags();
+                          foreach ( $tags as $tag ) :
+                            if ( $tag->name == 'affiliate') :
+                        ?>
+                              <p class='pr-message'>アフィリエイトリンクが含まれていますが、広告主などからの依頼に基づく投稿ではありません。</p>
+                        <?php break; endif; endforeach; ?>
+  tags: [wordpress]
+
 - name: Delete the date from bottom
   ansible.builtin.lineinfile:
     path: /srv/www/wordpress/wp-content/themes/fukasawa/singular.php
