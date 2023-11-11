@@ -212,7 +212,7 @@
   ansible.builtin.blockinfile:
     path: /srv/www/wordpress/wp-content/themes/fukasawa/singular.php
     marker: "<!-- {mark} ANSIBLE MANAGED BLOCK .post-date-top -->"
-    insertafter: '</header><!-- .post-header -->'
+    insertbefore: '</header><!-- .post-header -->'
     block: |2
                         <?php if ( is_single() ) : ?>
                                 <p class="post-date-top"><?php the_date( get_option( 'date_format' ) ); ?></p>
