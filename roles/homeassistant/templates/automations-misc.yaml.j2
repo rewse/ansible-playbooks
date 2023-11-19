@@ -1,16 +1,3 @@
-- id: automation.plan_to_start_roomba
-  alias: Plan to Start Roomba
-  trigger:
-    - platform: state
-      entity_id: vacuum.roomba_combo
-      to: docked
-      for:
-        hours: 48
-  action:
-    - service: automation.turn_on
-      target:
-        entity_id:
-          - automation.start_roomba
 - id: automation.start_roomba
   alias: Start Roomba
   trigger:
@@ -33,6 +20,8 @@
       state: not_home
       for:
         minutes: 10
+    - condition: template
+      value_template: "{{ (now().timestamp() - state_attr('input_datetime.roomba_combo_finished_time', 'timestamp')) / 60 / 60 > 48 }}"
   action:
     - service: vacuum.start
       target:
@@ -44,7 +33,12 @@
           push:
             interruption-level: time-sensitive
     - delay:
-        hours: 1
+        minutes: 30
+    - service: input_datetime.set_datetime
+      target:
+        entity_id: input_datetime.roomba_combo_finished_time
+      data:
+        time: "{{ now().timestamp() }}"
 - id: automation.turn_off_alarm_control_panel_surveillance
   alias: Turn off Alarm Control Panel Surveillance
   mode: single
@@ -169,19 +163,6 @@
       entity_id:
         - switch.living_room_surveillance_plug
         - switch.bedroom_surveillance_plug
-- id: automation.unplan_to_start_roomba
-  alias: Unplan to Start Roomba
-  trigger:
-    - platform: state
-      entity_id: vacuum.roomba_combo
-      to: cleaning
-      for:
-        minutes: 30
-  action:
-    - service: automation.turn_off
-      target:
-        entity_id:
-          - automation.start_roomba
 - id: automation.webhook_switchbot
   alias: "Webhook: Switchbot"
   trigger:
