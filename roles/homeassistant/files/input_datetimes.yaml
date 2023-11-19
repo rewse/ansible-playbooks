@@ -18,3 +18,8 @@ living_area_turned_down_time:
   name: Living Area Turned down Time
   has_time: true
   icon: mdi:brightness-6
+roomba_combo_finished_time:
+  name: Roomba Combo Finished Time
+  has_date: true
+  has_time: true
+  icon: mdi:robot-vacuum-alert
