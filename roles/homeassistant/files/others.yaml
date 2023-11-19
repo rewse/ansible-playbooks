@@ -41,12 +41,6 @@ cards:
   - type: entities
     title: Automations
     entities:
-      - entity: automation.plan_to_start_roomba
-        name: Plan to Start Roomba
-        secondary_info: last-triggered
-      - entity: automation.start_roomba
-        name: Start Roomba
-        secondary_info: last-triggered
       - entity: automation.turn_off_alarm_control_panel_surveillance
         name: Turn off Surveillance Alarm Control Panel
         secondary_info: last-triggered
