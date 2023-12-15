@@ -1,5 +1,19 @@
-- id: automation.start_roomba
-  alias: Start Roomba
+- id: automation.update_roomba_combo_finished_time
+  alias: Update Roomba Combo Finished Time
+  trigger:
+    - platform: state
+      entity_id: vacuum.roomba_combo
+      to: cleaning
+      for:
+        minutes: 30
+  action:
+    - service: input_datetime.set_datetime
+      target:
+        entity_id: input_datetime.roomba_combo_finished_time
+      data:
+        timestamp: "{{ now().timestamp() }}"
+- id: automation.start_roomba_combo
+  alias: Start Roomba Combo
   trigger:
     - platform: time_pattern
       minutes: "/5"
@@ -28,17 +42,12 @@
         entity_id: vacuum.roomba_combo
     - service: notify.tats_devices
       data:
-        message: Start Roomba
+        message: Start Roomba Combo
         data:
           push:
             interruption-level: time-sensitive
     - delay:
-        minutes: 30
-    - service: input_datetime.set_datetime
-      target:
-        entity_id: input_datetime.roomba_combo_finished_time
-      data:
-        time: "{{ now().timestamp() }}"
+        hours: 2
 - id: automation.turn_off_alarm_control_panel_surveillance
   alias: Turn off Alarm Control Panel Surveillance
   mode: single
