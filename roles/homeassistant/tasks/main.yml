@@ -176,28 +176,10 @@
   notify: Restart homeassistant
   tags: [homeassistant, homeassistant-component]
 
-- name: Config binary_sensor
-  lineinfile:
-    path: /etc/homeassistant/configuration.yaml
-    insertafter: '^alexa:'
-    regexp: '^binary_sensor:'
-    line: "binary_sensor: !include binary_sensors.yaml"
-  notify: Restart homeassistant
-  tags: [homeassistant, homeassistant-component]
-
-- name: Copy binary_sensors.yaml
-  template:
-    src: binary_sensors.yaml.j2
-    dest: /etc/homeassistant/binary_sensors.yaml
-    variable_start_string: "[%"
-    variable_end_string: "%]"
-  notify: Restart homeassistant
-  tags: [homeassistant, homeassistant-component]
-
 - name: Config climate
   lineinfile:
     path: /etc/homeassistant/configuration.yaml
-    insertafter: '^binary_sensor:'
+    insertafter: '^alexa:'
     regexp: '^climate:'
     line: "climate: !include climates.yaml"
   notify: Restart homeassistant
@@ -244,26 +226,10 @@
   notify: Restart homeassistant
   tags: [homeassistant, homeassistant-component]
 
-- name: Config device_tracker
-  lineinfile:
-    path: /etc/homeassistant/configuration.yaml
-    insertafter: '^cover:'
-    regexp: '^device_tracker:'
-    line: "device_tracker: !include device_trackers.yaml"
-  notify: Restart homeassistant
-  tags: [homeassistant, homeassistant-component]
-
-- name: Copy device_trackers.yaml
-  copy:
-    src: device_trackers.yaml
-    dest: /etc/homeassistant
-  notify: Restart homeassistant
-  tags: [homeassistant, homeassistant-component]
-
 - name: Config fan
   lineinfile:
     path: /etc/homeassistant/configuration.yaml
-    insertafter: '^device_tracker:'
+    insertafter: '^cover:'
     regexp: '^fan:'
     line: "fan: !include fans.yaml"
   notify: Restart homeassistant
