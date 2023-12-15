@@ -58,4 +58,4 @@ switchbot:
   webhook_id: "{{ vault_switchbot.webhook_id }}"
 switchbot_token: "{{ vault_switchbot_token }}"
 uptime_card_version: 0.4.0
-xiaomi_gateway3_version: 3.3.3
+xiaomi_gateway3_version: 3.3.4
