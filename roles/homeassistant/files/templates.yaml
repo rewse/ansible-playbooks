@@ -187,7 +187,7 @@
         {% if is_state('sensor.mamorail', "unavailable") %}
           unavailable
         {% else %}
-          {{ state_attr('sensor.mamorail', 'Message') | base64_decode | regex_findall_index('(..*)しました') }}
+          {{ state_attr('sensor.mamorail', 'Message') | regex_findall_index('(..*)しました') }}
         {% endif %}
       icon: mdi:gate-open
     - name: Mamorail Balance
@@ -196,7 +196,7 @@
         {% if is_state('sensor.mamorail', 'unavailable') %}
           unavailable
         {% else %}
-          {{ state_attr('sensor.mamorail', 'Message') | base64_decode | regex_findall_index('チャージ残額は(..*)円です') | regex_replace(',', '') | int }}
+          {{ state_attr('sensor.mamorail', 'Message') | regex_findall_index('チャージ残額は(..*)円です') | regex_replace(',', '') | int }}
         {% endif %}
       icon: mdi:credit-card-sync-outline
       unit_of_measurement: JPY
@@ -206,7 +206,7 @@
         {% if is_state('sensor.mamorail', 'unavailable') %}
           unavailable
         {% else %}
-          {{ state_attr('sensor.mamorail', 'Message') | base64_decode | regex_findall_index(':[0-9][0-9]に(..*)') }}
+          {{ state_attr('sensor.mamorail', 'Message') | regex_findall_index(':[0-9][0-9]に(..*)') }}
         {% endif %}
       icon: mdi:train
     - name: Mamorail Time
@@ -215,7 +215,7 @@
         {% if is_state('sensor.mamorail', 'unavailable') %}
           unavailable
         {% else %}
-          {{ state_attr('sensor.mamorail', 'Message') | base64_decode | regex_findall_index('([0-9][0-9]*:[0-9][0-9])に') }}
+          {{ state_attr('sensor.mamorail', 'Message') | regex_findall_index('([0-9][0-9]*:[0-9][0-9])に') }}
         {% endif %}
       icon: mdi:clock-outline
 - trigger:
