@@ -94,3 +94,9 @@ if ( ! defined( 'ABSPATH' ) ) {
 
 /** Sets up WordPress vars and included files. */
 require_once ABSPATH . 'wp-settings.php';
+
+/**
+ * Use System Cron instead of PHP 
+ * https://developer.wordpress.org/plugins/cron/hooking-wp-cron-into-the-system-task-scheduler/
+ */
+ define( 'DISABLE_WP_CRON', true );

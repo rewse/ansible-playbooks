@@ -34,6 +34,13 @@
     group: www-data
   tags: [wordpress]
 
+- name: Copy wordpress.cron
+  ansible.builtin.copy:
+    src: wordpress.cron
+    dest: /etc/cron.daily/wordpress
+    mode: 0755
+  tags: [wordpress]
+
 - name: Copy htaccess
   ansible.builtin.copy:
     src: htaccess
