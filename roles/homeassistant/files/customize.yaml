@@ -58,8 +58,6 @@ binary_sensor.tuyaplug_liv_sur:
   icon: mdi:power-socket-jp
 binary_sensor.tuyaplug_sto_swi:
   icon: mdi:power-socket-jp
-binary_sensor.wfirex:
-  icon: mdi:network-outline
 binary_sensor.xiaomigateway:
   icon: mdi:network-outline
 binary_sensor.xray_liv:
