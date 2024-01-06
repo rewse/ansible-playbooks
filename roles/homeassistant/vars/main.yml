@@ -12,9 +12,6 @@ latlng:
   home:
     lat: "{{ vault_latlng.home.lat }}"
     lng: "{{ vault_latlng.home.lng }}"
-  office:
-    lat: "{{ vault_latlng.office.lat }}"
-    lng: "{{ vault_latlng.office.lng }}"
   y:
     name: "{{ vault_latlng.y.name }}"
     lat: "{{ vault_latlng.y.lat }}"
