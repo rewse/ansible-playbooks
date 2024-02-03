@@ -2,7 +2,7 @@
 alexa_client:
   id: "{{ vault_alexa_client.id }}"
   secret: "{{ vault_alexa_client.secret }}"
-card_mod_version: 3.3.1
+card_mod_version: 3.4.2
 gmail:
   address: "{{ vault_gmail.address }}"
   password: "{{ vault_gmail.password }}"
@@ -17,7 +17,7 @@ latlng:
     lat: "{{ vault_latlng.y.lat }}"
     lng: "{{ vault_latlng.y.lng }}"
 localtuya_version: 5.2.1
-mini_graph_card_version: 0.11.0
+mini_graph_card_version: 0.12.0
 mini_media_player_version: 1.16.5
 mosquitto_password: "{{ vault_mosquitto_password }}"
 nature_remo_version: 0.5
@@ -55,4 +55,4 @@ switchbot:
   webhook_id: "{{ vault_switchbot.webhook_id }}"
 switchbot_token: "{{ vault_switchbot_token }}"
 uptime_card_version: 0.4.0
-xiaomi_gateway3_version: 3.3.4
+xiaomi_gateway3_version: 3.3.6

@@ -562,7 +562,7 @@
 
 - name: Download Lovelace Card Mod
   unarchive:
-    src: https://github.com/thomasloven/lovelace-card-mod/archive/refs/tags/{{ card_mod_version }}.tar.gz
+    src: https://github.com/thomasloven/lovelace-card-mod/archive/refs/tags/v{{ card_mod_version }}.tar.gz
     dest: /tmp
     remote_src: yes
   tags: [homeassistant, homeassistant-custom]

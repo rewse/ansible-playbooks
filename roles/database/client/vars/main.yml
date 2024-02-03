@@ -1,6 +1,6 @@
 ---
 mysql_apt_config_version: 0.8.29-1
-mysql_connector_version: 8.2.0-1ubuntu22.04
+mysql_connector_version: 8.3.0-1ubuntu22.04
 oracle_instantclient_major_version: 21
-oracle_instantclient_minor_version: 12
+oracle_instantclient_minor_version: 13
 redshift_jdbc_version: 2.1.0.21
