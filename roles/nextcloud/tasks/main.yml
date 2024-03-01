@@ -126,6 +126,7 @@
                   'region' => 'ap-northeast-1'
           ),
         ),
+        'maintenance_window_start' => 20,
   tags: [nextcloud]
 
 - name: Change the policy of ImageMagick
