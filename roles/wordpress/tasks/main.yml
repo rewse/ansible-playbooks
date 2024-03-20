@@ -206,6 +206,14 @@
         add_filter( 'jetpack_relatedposts_filter_post_context', 'jp_rp_context_cat_primary_yoast', 10, 2 );
       }
 
+      /* Remove Hashtag */
+      if ( ! function_exists( 'remove_hashtag' ) ) {
+        function remove_hashtag($content) {
+          return preg_replace('/#(\\w+)/','#$1', $content);
+        }
+        add_filter('the_content', 'remove_hashtag', 8);
+      }
+
   tags: [wordpress]
 
 - name: Replace copyright
