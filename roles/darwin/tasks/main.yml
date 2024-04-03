@@ -86,8 +86,8 @@
       - slack
       - sony-ps-remote-play
       - steermouse
-      - tigervnc-viewer
       - ticktick
+      - tigervnc-viewer
       - visual-studio-code
       - vlc
       - wireshark
