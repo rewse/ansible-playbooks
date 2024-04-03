@@ -9,6 +9,7 @@
     name: 
       - asana
       - box-drive
+      - displaylink
       - font-noto-sans-cjk
       - gotomeeting
       - microsoft-teams
