@@ -322,6 +322,10 @@ cards:
         state_map:
           - value: above_horizon
           - value: below_horizon
+  - type: entities
+    title: Storage Appliance
+    entities:
+      - vacuum.roomba_combo
   - type: vertical-stack
     cards:
       - type: entities
