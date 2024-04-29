@@ -55,6 +55,18 @@
     dest: /etc/netplan/99-config.yaml
   tags: [raspberrypi]
 
+- name: Delete 50-cloud-init.yaml
+  file:
+    path: 50-cloud-init.yaml
+    state: absent
+  tags: [raspberrypi]
+
+- name: Copy 99-disable-network-config.cfg
+  copy:
+    src: 99-disable-network-config.cfg
+    dest: /etc/cloud/cloud.cfg.d
+  tags: [raspberrypi]
+
 - name: Copy ifmetric to cron.d
   copy:
     src: ifmetric
