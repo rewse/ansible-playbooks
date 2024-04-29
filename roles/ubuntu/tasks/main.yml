@@ -126,13 +126,13 @@
 - name: Add a group for admin user
   group:
     name: "{{ admin }}"
-    gid: 1001
+    gid: 2000
   tags: [ubuntu, user]
 
 - name: Add admin user
   user:
     name: "{{ admin }}"
-    uid: 1001
+    uid: 2000
     group: "{{ admin }}"
     groups: "adm,sudo"
     shell: /bin/bash
