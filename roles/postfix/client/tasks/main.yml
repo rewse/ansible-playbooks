@@ -35,6 +35,22 @@
   notify: Reload postfix
   tags: [postfix-client]
 
+- name: Change smtp_tls_security_level
+  lineinfile:
+    dest: /etc/postfix/main.cf
+    regexp: "^smtp_tls_security_level"
+    line: "smtp_tls_security_level = encrypt"
+  notify: Reload postfix
+  tags: [postfix-client]
+
+- name: Change smtp_tls_wrappermode
+  lineinfile:
+    dest: /etc/postfix/main.cf
+    regexp: "^smtp_tls_wrappermode"
+    line: "smtp_tls_wrappermode = yes"
+  notify: Reload postfix
+  tags: [postfix-client]
+
 - name: Set smtp_sasl_auth_enable
   lineinfile:
     dest: /etc/postfix/main.cf
