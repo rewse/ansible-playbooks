@@ -69,6 +69,13 @@
   notify: Restart docker
   tags: [homeassistant, homeassistant-docker]
 
+- name: Copy deafult configuration.yaml
+  copy:
+    src: configuration.yaml
+    dest: /etc/homeassistant
+  notify: Restart homeassistant
+  tags: [homeassistant, homeassistant-component]
+
 - name: Config automation
   lineinfile:
     path: /etc/homeassistant/configuration.yaml
