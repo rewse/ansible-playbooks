@@ -108,15 +108,6 @@
     line: 'preserve_hostname: true'
   tags: [ubuntu, cloud-init]
 
-- name: Add NTP servers
-  lineinfile:
-    dest: /etc/systemd/timesyncd.conf
-    insertafter: '^#NTP='
-    regexp: '^NTP='
-    line: 'NTP=ntp.nict.jp ntp.jst.mfeed.ad.jp'
-  notify: Restart systemd-timesyncd
-  tags: [ubuntu, time, systemd-timesyncd]
-
 - name: "input : Set editing-mode to vi"
   lineinfile:
     dest: /etc/inputrc
