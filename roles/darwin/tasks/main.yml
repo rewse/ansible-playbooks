@@ -127,6 +127,16 @@
     - 599799247   # そら案内
   tags: [darwin, package, mas]
 
+- name: Create $HOME/.venv
+  file:
+    path: $HOME/.venv
+    state: directory
+  tags: [darwin, package, pip]
+
+- name: Create venv
+  command: python3 -m venv $HOME/.venv
+  tags: [darwin, package, pip]
+
 - name: Install packages by pip
   pip:
     name:
@@ -137,7 +147,7 @@
       - requests
       - selenium
     state: latest
-    executable: pip3
+    virtualenv: $HOME/.venv
   tags: [darwin, package, pip]
 
 # - name: Install rest of the apps
