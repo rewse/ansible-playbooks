@@ -45,7 +45,6 @@
     enabled: yes
   with_items:
     - bluetooth
-    - hciuart
   tags: [raspberrypi]
 
 - name: Enable SNMP mibs
@@ -72,11 +71,12 @@
   template:
     src: 99-config.yaml.j2
     dest: /etc/netplan/99-config.yaml
+    mode: 0600
   tags: [raspberrypi]
 
 - name: Delete 50-cloud-init.yaml
   file:
-    path: 50-cloud-init.yaml
+    path: /etc/netplan/50-cloud-init.yaml
     state: absent
   tags: [raspberrypi]
 
