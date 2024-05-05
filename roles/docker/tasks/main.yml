@@ -4,9 +4,9 @@
     url: https://download.docker.com/linux/ubuntu/gpg
   tags: [docker, package]
 
-- name: Add a repository for x86_64
+- name: Add a repository
   apt_repository:
-    repo: deb [arch=arm64] https://download.docker.com/linux/ubuntu focal stable
+    repo: deb [arch=arm64] https://download.docker.com/linux/ubuntu noble stable
     filename: docker
   when:
     ansible_architecture == "aarch64"
@@ -24,28 +24,13 @@
     name:
       - apt-transport-https
       - ca-certificates
+      - containerd.io
       - curl
       - gnupg-agent
       - software-properties-common
+      - docker-buildx-plugin 
       - docker-ce
       - docker-ce-cli
+      - docker-compose-plugin
       - containerd.io
   tags: [docker, package]
-
-- name: Install packages by pip
-  pip:
-    name:
-      - docker
-      - docker-compose
-    state: latest
-    executable: pip3
-  tags: [docker, package, pip]
-
-- name: Create docker-compose.yml
-  lineinfile:
-    path: /etc/docker-compose.yml
-    insertbefore: BOF
-    regexp: 'version: '
-    line: "version: '3'"
-    create: yes
-  tags: [docker]
