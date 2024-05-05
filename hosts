@@ -5,24 +5,24 @@ bcd074348424.local
 zoom.local
 
 [ubuntu]
-alfa.rewse.jp
-delta.rewse.jp
+bravo.rewse.jp
+charlie.rewse.jp
 fox.rewse.jp
 hotel.rewse.jp
 
 [ec2]
-alfa.rewse.jp
-delta.rewse.jp
+bravo.rewse.jp
+charlie.rewse.jp
 
 [raspberrypi]
 fox.rewse.jp
 hotel.rewse.jp
 
 [singleton_ext1]
-alfa.rewse.jp
+bravo.rewse.jp
 
 [singleton_ext2]
-delta.rewse.jp
+charlie.rewse.jp
 
 [singleton_int1]
 fox.rewse.jp
