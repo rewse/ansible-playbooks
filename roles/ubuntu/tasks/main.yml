@@ -47,6 +47,7 @@
       - irqbalance
       - libsasl2-modules
       - libwww-perl
+      - locales-all
       - logwatch
       - mailutils
       - ncdu
