@@ -32,6 +32,15 @@
   notify: Restart unbound
   tags: [resolved]
 
+- name: Add interface-automatic
+  lineinfile:
+    path: /etc/unbound/unbound.conf.d/unbound.conf
+    insertafter: '.*# interface-automatic'
+    regexp: '.*interface-automatic: '
+    line: "    interface-automatic: yes"
+  notify: Restart unbound
+  tags: [resolved]
+
 - name: Add access-control
   blockinfile:
     path: /etc/unbound/unbound.conf.d/unbound.conf
