@@ -19,10 +19,6 @@
     remote_src: yes
   tags: [homeassistant]
 
-- name: Set Webhook for Switchbot Server
-  command: /usr/local/bin/switchbot webhook https://hass.rewse.jp/api/webhook/{{ vault_switchbot.webhook_id }} {{ vault_switchbot.token }} {{ vault_switchbot.secret }}
-  tags: [homeassistant]
-
 - name: Create certs dir
   file:
     path: /etc/homeassistant/certs
