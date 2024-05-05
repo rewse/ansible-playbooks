@@ -18,7 +18,16 @@
     classic: yes
   tags: [sslcert]
 
-#   Commented out to prevent that ansible does not make unnecessary requests
+- name: Copy AWS credential
+  template:
+    src: config.j2
+    dest: /root/.aws/config
+    mode: 0600
+    variable_start_string: "[%"
+    variable_end_string: "%]"
+  tags: [sslcert]
+
+#   Commented out to prevent that ansible makes unnecessary requests
 #   Please run it manually if the first issue is needed
 # - name: Run certbot
 #   ansible.builtin.shell: |
@@ -31,8 +40,7 @@
 #     --post-hook 'systemctl reload apache2' \
 #     --preferred-challenges 'dns-01' \
 #     --server 'https://acme-v02.api.letsencrypt.org/directory' \
-#     --agree-tos \
-#     --manual-public-ip-logging-ok
+#     --agree-tos
 #   tags: [sslcert]
 
 - name: Set the cert

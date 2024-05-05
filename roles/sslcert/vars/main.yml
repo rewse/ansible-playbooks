@@ -1,0 +1,3 @@
+---
+aws_config:
+  secret: "{{ vault_aws_config.secret }}"
