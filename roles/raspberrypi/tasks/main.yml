@@ -11,12 +11,22 @@
       - snmp-mibs-downloader
   tags: [raspberrypi, package]
 
+- name: Create /var/lib/python/raspberrypi
+  file:
+    path: /var/lib/python/ansible
+    state: directory
+  tags: [raspberrypi, package]
+
+- name: Create venv
+  command: python3 -m venv /var/lib/python/raspberrypi
+  tags: [raspberrypi, package]
+
 - name: Install packages with pip3
   pip:
     name:
       - pydaikin
       - python-miio
-    executable: pip3
+    virtualenv: /var/lib/python/raspberrypi
   tags: [raspberrypi, package]
 
 - name: Enable bluetooth services
