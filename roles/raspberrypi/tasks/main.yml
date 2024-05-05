@@ -29,6 +29,15 @@
     virtualenv: /var/lib/python/raspberrypi
   tags: [raspberrypi, package]
 
+- name: Add NTP servers
+  lineinfile:
+    dest: /etc/systemd/timesyncd.conf
+    insertafter: '^#NTP='
+    regexp: '^NTP='
+    line: 'NTP=ntp.nict.jp ntp.jst.mfeed.ad.jp'
+  notify: Restart systemd-timesyncd
+  tags: [raspberrypi, time, systemd-timesyncd]
+
 - name: Enable bluetooth services
   systemd:
     name: "{{ item }}"

@@ -3,8 +3,3 @@
   systemd:
     name: sshd
     state: restarted
-
-- name: Restart systemd-timesyncd
-  systemd:
-    name: systemd-timesyncd
-    state: restarted
