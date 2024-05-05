@@ -83,7 +83,6 @@
       - nextcloud
       - obsbot-webcam
       - obsidian
-      - omnivore
       - prowritingaid
       - slack
       - sony-ps-remote-play
@@ -111,6 +110,7 @@
     - 539883307   # LINE
     - 1480068668  # Messenger
     - 1295203466  # Microsoft Remote Desktop
+    - 1564031042  # Omnivore
     - 981430153   # Online
     - 445189367   # PopClip
     - 1436994560  # Portal
