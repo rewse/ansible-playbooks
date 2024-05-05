@@ -171,7 +171,7 @@
   copy:
     src: authentication.conf
     dest: /etc/ssh/sshd_config.d
-  notify: Restart sshd
+  notify: Restart ssh
   tags: [ubuntu, ssh]
 
 - name: Copy authorized_keys
