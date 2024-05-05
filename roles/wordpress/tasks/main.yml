@@ -98,6 +98,26 @@
   notify: Reload apache
   tags: [wordpress]
 
+- name: Copy fukasawa
+  ansible.builtin.unarchive:
+    src: https://downloads.wordpress.org/theme/fukasawa.{{ fukasawa_version }}.zip
+    dest: /srv/www/wordpress/wp-content/themes
+    owner: www-data
+    group: www-data
+    remote_src: yes
+  tags: [wordpress]
+
+- name: Create directories
+  ansible.builtin.file:
+    path: "{{ item }}"
+    state: directory
+    owner: www-data
+    group: www-data
+  with_items:
+    - /srv/www/wordpress/wp-content/languages/themes
+    - /srv/www/wordpress/wp-content/languages/plugins
+  tags: [wordpress]
+
 - name: Copy fukawasa-ja to prevent updating
   ansible.builtin.copy:
     src: "{{ item }}"
