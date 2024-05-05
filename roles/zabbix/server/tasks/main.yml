@@ -1,7 +1,7 @@
 ---
 - name: Install zabbix-release
   apt:
-    deb: https://repo.zabbix.com/zabbix/{{ zabbix.version }}/ubuntu/pool/main/z/zabbix-release/zabbix-release_{{ zabbix.version }}-{{ zabbix.release_revision }}+ubuntu22.04_all.deb
+    deb: https://repo.zabbix.com/zabbix/{{ zabbix.version }}/ubuntu/pool/main/z/zabbix-release/zabbix-release_{{ zabbix.version }}-{{ zabbix.release_revision }}+ubuntu24.04_all.deb
   tags: [zabbix-server, package, zabbix-frontend]
 
 - name: Install packages
