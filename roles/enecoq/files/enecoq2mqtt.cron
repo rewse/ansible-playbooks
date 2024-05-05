@@ -1,3 +1,3 @@
 SHELL=/bin/bash
 PATH=/usr/local/sbin:/usr/local/bin:/sbin:/bin:/usr/sbin:/usr/bin
-02 * * * * tats enecoq2mqtt
+02 * * * * tats enecoq2mqtt >/dev/null 2>&1
