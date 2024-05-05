@@ -32,14 +32,6 @@
     remote_src: yes
   tags: [homeassistant]
 
-# Ref: https://community.home-assistant.io/t/imap-email-content-character-encoding/22928
-- name: Copy sensor.patch
-  copy:
-    src: sensor.patch
-    dest: /etc/homeassistant
-  notify: Restart docker
-  tags: [homeassistant, homeassistant-docker]
-
 - name: Copy Dockerfile
   copy:
     src: Dockerfile
