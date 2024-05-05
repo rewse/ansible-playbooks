@@ -108,6 +108,19 @@
   notify: Reload apache
   tags: [httpd]
 
+- name: Enable .htaccess
+  blockinfile:
+    path: /etc/apache2/apache2.conf
+    insertbefore: '<Directory /srv/>'
+    block: |
+      <Directory /srv/www>
+          Options Indexes FollowSymLinks
+          AllowOverride All
+          Require all granted
+      </Directory>
+  notify: Reload apache
+  tags: [httpd]
+
 - name: Copy 00-forcessl.conf
   copy:
     src: 00-forcessl.conf
