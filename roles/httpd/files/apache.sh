@@ -31,7 +31,7 @@ send_server_status() {
     fi
 
     working_processes=$(grep 'requests currently being processed' $tmpfile | awk '{print $1}' | sed 's/<dt>//')
-    idle_processes=$(grep 'requests currently being processed' $tmpfile | awk '{print $6}')
+    idle_processes=$(grep 'requests currently being processed' $tmpfile | awk '{print $10}')
     reqps=$(grep 'requests/sec' $tmpfile | awk '{print $1}' | sed 's/<dt>//')
     byteps=$(grep 'B/second' $tmpfile | awk '{print $4}')
 
