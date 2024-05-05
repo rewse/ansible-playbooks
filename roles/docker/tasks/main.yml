@@ -1,36 +1,7 @@
 ---
-- name: Add an apt key
-  apt_key:
-    url: https://download.docker.com/linux/ubuntu/gpg
-  tags: [docker, package]
-
-- name: Add a repository
-  apt_repository:
-    repo: deb [arch=arm64] https://download.docker.com/linux/ubuntu noble stable
-    filename: docker
-  when:
-    ansible_architecture == "aarch64"
-  tags: [docker, package]
-
-- name: Update all packages
-  apt:
-    name: '*'
-    state: latest
-    update_cache: yes
-  tags: [docker, package]
-
 - name: Install additional packages
   apt:
     name:
-      - apt-transport-https
-      - ca-certificates
-      - containerd.io
-      - curl
-      - gnupg-agent
-      - software-properties-common
-      - docker-buildx-plugin 
-      - docker-ce
-      - docker-ce-cli
-      - docker-compose-plugin
-      - containerd.io
+      - docker.io
+      - docker-compose-v2
   tags: [docker, package]
