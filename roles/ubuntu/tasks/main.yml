@@ -52,6 +52,7 @@
       - ncdu
       - postfix
       - python3-pip
+      - python3-venv
       - sysstat
       - tldr
       - unattended-upgrades
