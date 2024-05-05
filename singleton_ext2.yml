@@ -5,7 +5,6 @@
   roles:
     - httpd
     - nextcloud
-    - obsidian-livesync
     - wordpress
     - zabbix/server
     - zabbix/money/market
