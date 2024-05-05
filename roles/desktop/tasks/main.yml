@@ -3,8 +3,6 @@
   apt:
     name:
       - fonts-ricty-diminished
-      - gconf2
-      - tasksel
       - tigervnc-standalone-server
       - ubuntu-desktop
   tags: [desktop, package]
