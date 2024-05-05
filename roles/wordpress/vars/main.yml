@@ -1,5 +1,5 @@
 ---
-php_version: 8.1
+php_version: 8.3
 wordpress:
   db_password: "{{ vault_wordpress.db_password }}"
   auth_key: "{{ vault_wordpress.auth_key }}"
