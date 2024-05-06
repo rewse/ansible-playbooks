@@ -1,10 +1,4 @@
 ---
-- name: Install additional packages
-  apt:
-    name:
-      - python3-rpi-lgpio
-  tags: [mhz19]
-
 - name: Create /var/lib/python/mhz19
   file:
     path: /var/lib/python/mhz19
