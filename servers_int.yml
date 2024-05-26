@@ -1,8 +1,0 @@
----
-- hosts: servers_int
-  become: yes
-  remote_user: ubuntu
-  roles:
-    - resolved
-    - sesame
-    - syslogd
