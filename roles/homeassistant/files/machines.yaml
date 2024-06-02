@@ -8,8 +8,8 @@ views:
       - type: history-graph
         title: Ping Devices
         entities:
-          - entity: binary_sensor.alfa
-          - entity: binary_sensor.delta
+          - entity: binary_sensor.bravo
+          - entity: binary_sensor.charlie
           - entity: binary_sensor.fox
           - entity: binary_sensor.guppy
           - entity: binary_sensor.hotel
