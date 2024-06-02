@@ -1,4 +1,10 @@
 ---
+- name: Install additional packages
+  apt:
+    name:
+      - snapd
+  tags: [sslcert]
+
 - name: Insall packages
   community.general.snap:
     name:
