@@ -6,14 +6,6 @@ views:
     badges: []
     cards:
       - type: history-graph
-        title: Ping Network Devices
-        entities:
-          - entity: binary_sensor.zulu
-          - entity: binary_sensor.sierra
-          - entity: binary_sensor.xray_liv
-          - entity: binary_sensor.xray_sto
-        hours_to_show: 12
-      - type: history-graph
         title: Ping Devices
         entities:
           - entity: binary_sensor.alfa
