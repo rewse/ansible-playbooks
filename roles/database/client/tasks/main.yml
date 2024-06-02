@@ -9,8 +9,7 @@
     name:
       - mysql-client
       - postgresql-client
-      # Comment out due to https://ubuntu.com/security/CVE-2024-1597
-      # - libpostgresql-jdbc-java
+      - libpostgresql-jdbc-java
       - alien
       - rlwrap
   tags: [database-client, package, mysql, postgresql, oracle]
