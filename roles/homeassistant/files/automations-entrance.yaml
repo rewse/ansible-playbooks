@@ -30,7 +30,7 @@
         seconds: 30
     - service: homeassistant.update_entity
       target:
-        entity_id: lock.entrance_lock_bottom
+        entity_id: sensor.entrance_lock_bottom_sensor
 - id: automation.auto_lock_entrance_lock_top_in_daytime
   alias: Auto-Lock Entrnace Lock Top in Daytime
   mode: single
@@ -63,7 +63,7 @@
         seconds: 30
     - service: homeassistant.update_entity
       target:
-        entity_id: lock.entrance_lock_top
+        entity_id: sensor.entrance_lock_top_sensor
 - id: automation.auto_lock_entrance_lock_bottom_in_nighttime
   alias: Auto-Lock Entrance Lock Bottom in Nighttime
   mode: single
@@ -96,7 +96,7 @@
         seconds: 30
     - service: homeassistant.update_entity
       target:
-        entity_id: lock.entrance_lock_bottom
+        entity_id: sensor.entrance_lock_bottom_sensor
 - id: automation.auto_lock_entrance_lock_top_in_nighttime
   alias: Auto-Lock Entrance Lock Top in Nighttime
   mode: single
@@ -129,7 +129,7 @@
         seconds: 30
     - service: homeassistant.update_entity
       target:
-        entity_id: lock.entrance_lock_top
+        entity_id: sensor.entrance_lock_top_sensor
 - id: automation.info_entrance_auto_lock_is_off
   alias: "INFO: Entrance Auto-Lock is Off"
   trigger:
@@ -170,8 +170,8 @@
     - service: homeassistant.update_entity
       target:
         entity_id:
-          - lock.entrance_lock_bottom
-          - lock.entrance_lock_top
+          - sensor.entrance_lock_bottom_sensor
+          - sensor.entrance_lock_top_sensor
 - id: automation.restart_entrance_sesamemodule_power
   alias: Restart Entrance sesamemodule Power
   mode: single
@@ -226,8 +226,8 @@
     - service: homeassistant.update_entity
       target:
         entity_id:
-          - lock.entrance_lock_bottom
-          - lock.entrance_lock_top
+          - sensor.entrance_lock_bottom_sensor
+          - sensor.entrance_lock_top_sensor
     - delay:
         hours: 2
 - id: automation.turn_on_entrance_auto_lock
@@ -260,8 +260,8 @@
     - service: homeassistant.update_entity
       target:
         entity_id:
-          - lock.entrance_lock_bottom
-          - lock.entrance_lock_top
+          - sensor.entrance_lock_bottom_sensor
+          - sensor.entrance_lock_top_sensor
 - id: automation.unlock_entrance_lock_when_ios_action_fires
   alias: Unlock Entrance Lock when iOS Action Fires
   mode: single
@@ -300,8 +300,8 @@
       - service: homeassistant.update_entity
         target:
           entity_id:
-            - lock.entrance_lock_bottom
-            - lock.entrance_lock_top
+            - sensor.entrance_lock_bottom_sensor
+            - sensor.entrance_lock_top_sensor
     else:
       - service: notify.all_devices
         data:
@@ -325,5 +325,5 @@
     - service: homeassistant.update_entity
       target:
         entity_id:
-          - lock.entrance_lock_bottom
-          - lock.entrance_lock_top
+          - sensor.entrance_lock_bottom_sensor
+          - sensor.entrance_lock_top_sensor
