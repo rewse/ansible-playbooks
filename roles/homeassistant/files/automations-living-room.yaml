@@ -218,31 +218,29 @@
             interruption-level: time-sensitive
     - delay:
         hours: 2
-- id: automation.plan_to_turn_on_living_room_hvac_fan
-  alias: Plan to Turn on Living Room HVAC Fan
-  description: Plan to turn on the HVAC in the living room with fan mode
+- id: automation.plan_to_turn_on_living_room_hvac_internal_clean
+  alias: Plan to Turn on Living Room HVAC Internal Clean
   trigger:
     - platform: state
       entity_id: climate.living_room_hvac
       to: dry
       for:
-        hours: 2
+        minutes: 5
     - platform: state
       entity_id: climate.living_room_hvac
       to: cool
       for:
-        hours: 2
+        minutes: 5
     - platform: state
       entity_id: climate.living_room_hvac
       to: heat_cool
       for:
-        hours: 2
+        minutes: 5
   action:
     - service: automation.turn_on
       target:
         entity_id:
-          - automation.turn_on_living_room_hvac_fan
-          - automation.turn_off_living_room_hvac_fan
+          - automation.turn_on_living_room_hvac_internal_clean
           - automation.turn_on_living_room_hvac_cleaner
 - id: automation.press_living_room_floor_heating_button
   alias: Press Living Room Floor Heating Button
@@ -436,31 +434,6 @@
             interruption-level: time-sensitive
     - delay:
         hours: 1
-- id: automation.turn_off_living_room_hvac_fan
-  alias: Turn off Living Room HVAC Fan
-  trigger:
-    - platform: time
-      at: "5:30"
-  condition:
-    - condition: state
-      entity_id: alarm_control_panel.surveillance
-      state: disarmed
-  action:
-    - service: climate.turn_off
-      target:
-        entity_id: climate.living_room_hvac
-    - service: notify.tats_devices
-      data:
-        message: Turned off Living Room HVAC Fan
-        data:
-          url: /lovelace/home
-          push:
-            interruption-level: time-sensitive
-    - service: automation.turn_off
-      target:
-        entity_id:
-          - automation.turn_on_living_room_hvac_fan
-          - automation.turn_off_living_room_hvac_fan
 - id: automation.turn_off_living_room_tv
   alias: Turn off Living Room TV
   trigger:
@@ -690,8 +663,7 @@
       target:
         entity_id:
           - automation.turn_on_living_room_hvac_cleaner
-          - automation.turn_on_living_room_hvac_fan
-          - automation.turn_off_living_room_hvac_fan
+          - automation.turn_on_living_room_hvac_internal_clean
 - id: automation.turn_on_living_room_hvac_cool
   alias: Turn on Living Room HVAC Cool
   mode: single
@@ -838,25 +810,28 @@
             interruption-level: time-sensitive
     - delay:
         hours: 1
-- id: automation.turn_on_living_room_hvac_fan
-  alias: Turn on Living Room HVAC Fan
+- id: automation.turn_on_living_room_hvac_internal_clean
+  alias: Turn on Living Room HVAC Internal Clean
   trigger:
-    - platform: time
-      at: "4:30"
-  condition:
-    - condition: state
-      entity_id: alarm_control_panel.surveillance
-      state: disarmed
+    - platform: state
+      entity_id: climate.living_room_hvac
+      to: "off"
   action:
+    - delay:
+        seconds: 10
     - service: climate.set_hvac_mode
       target:
         entity_id: climate.living_room_hvac
       data:
         hvac_mode: fan_only
-    - service: notify.tats_devices
+    - delay:
+        hours: 2
+    - service: climate.set_hvac_mode
+      target:
+        entity_id: climate.living_room_hvac
       data:
-        message: Turned on Living Room HVAC Fan
-        data:
-          url: /lovelace/home
-          push:
-            interruption-level: time-sensitive
+        hvac_mode: "off"
+    - service: automation.turn_off
+      target:
+        entity_id:
+          - automation.turn_on_living_room_hvac_internal_clean

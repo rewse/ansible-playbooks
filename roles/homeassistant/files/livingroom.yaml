@@ -69,8 +69,8 @@ cards:
   - type: entities
     title: Living Room Automations
     entities:
-      - entity: automation.plan_to_turn_on_living_room_hvac_fan
-        name: Plan to Turn on HVAC Fan
+      - entity: automation.plan_to_turn_on_living_room_hvac_internal_clean
+        name: Plan to Turn on HVAC Internal Clean
         secondary_info: last-triggered
       - entity: automation.turn_down_living_area
         name: Turn down
@@ -89,9 +89,6 @@ cards:
         name: Turned off Humidifier Threshold
       - entity: automation.turn_off_living_room_hvac
         name: Turn off HVAC
-        secondary_info: last-triggered
-      - entity: automation.turn_off_living_room_hvac_fan
-        name: Turn off HVAC Fan
         secondary_info: last-triggered
       - entity: input_number.living_room_hvac_cool_turned_off_threshold
         name: Turned off HVAC Cool Threshold
@@ -135,9 +132,6 @@ cards:
         name: Turned on HVAC Dry Threshold WBGT
       - entity: input_number.living_room_hvac_dry_turned_on_threshold_humidity
         name: Turned on HVAC Dry Threshold Humidity
-      - entity: automation.turn_on_living_room_hvac_fan
-        name: Turn on HVAC Fan
-        secondary_info: last-triggered
     show_header_toggle: false
   - type: vertical-stack
     cards:
