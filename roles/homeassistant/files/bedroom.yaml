@@ -18,7 +18,7 @@ cards:
       - entity: light.bedroom_light
         name: Light
   - type: tile
-    entity: climate.bedroom_hvac
+    entity: climate.bedroom_ac
     tap_action:
       action: more-info
     icon_tap_action:
@@ -26,9 +26,11 @@ cards:
     features:
       - type: climate-hvac-modes
         hvac_modes:
+          - auto
           - cool
           - dry
           - heat
+          - fan_only
           - 'off'
       - type: target-temperature
   - type: entities
