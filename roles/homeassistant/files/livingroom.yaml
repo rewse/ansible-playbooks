@@ -32,11 +32,11 @@ cards:
     features:
       - type: climate-hvac-modes
         hvac_modes:
-          - fan_only
+          - heat_cool
           - dry
           - cool
           - heat
-          - heat_cool
+          - fan_only
           - 'off'
       - type: target-temperature
       - type: climate-preset-modes
