@@ -129,11 +129,11 @@ cards:
         features:
           - type: climate-hvac-modes
             hvac_modes:
-              - fan_only
-              - dry
-              - cool
-              - heat
               - heat_cool
+              - cool
+              - dry
+              - heat
+              - fan_only
               - 'off'
           - type: target-temperature
           - type: climate-preset-modes
@@ -212,7 +212,7 @@ cards:
             name: Light
         show_header_toggle: false
       - type: tile
-        entity: climate.bedroom_hvac
+        entity: climate.bedroom_ac
         tap_action:
           action: more-info
         icon_tap_action:
@@ -220,9 +220,11 @@ cards:
         features:
           - type: climate-hvac-modes
             hvac_modes:
+              - auto
               - cool
               - dry
               - heat
+              - fan_only
               - 'off'
           - type: target-temperature
       - type: entities
