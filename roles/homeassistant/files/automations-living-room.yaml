@@ -434,6 +434,25 @@
             interruption-level: time-sensitive
     - delay:
         hours: 1
+- id: automation.turn_off_living_room_hvac_internal_clean
+  alias: Turn Off Living Room HVAC Internal Clean
+  mode: single
+  trigger:
+    - platform: state
+      entity_id: climate.living_room_hvac
+      to: fan_only
+      for:
+        hours: 2
+  action:
+    - service: climate.set_hvac_mode
+      target:
+        entity_id: climate.living_room_hvac
+      data:
+        hvac_mode: "off"
+    - service: automation.turn_off
+      target:
+        entity_id:
+          - automation.turn_on_living_room_hvac_internal_clean
 - id: automation.turn_off_living_room_tv
   alias: Turn off Living Room TV
   trigger:
@@ -824,14 +843,3 @@
         entity_id: climate.living_room_hvac
       data:
         hvac_mode: fan_only
-    - delay:
-        hours: 2
-    - service: climate.set_hvac_mode
-      target:
-        entity_id: climate.living_room_hvac
-      data:
-        hvac_mode: "off"
-    - service: automation.turn_off
-      target:
-        entity_id:
-          - automation.turn_on_living_room_hvac_internal_clean
