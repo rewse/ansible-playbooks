@@ -90,6 +90,8 @@
       value_template: >-
         {{ (as_timestamp(now()) - as_timestamp(state_attr('sensor.mamorail', 'Date'))) < 180 }}
   action:
+    - delay:
+        seconds: 5
     - if:
         - condition: numeric_state
           entity_id: sensor.mamorail_balance
