@@ -63,26 +63,19 @@
   sampling_size: 183600
   max_age: "51:00:00"
 - platform: statistics
-  name: Count of Bedroom Motion N
-  unique_id: sensor.count_of_bedroom_motion_n
-  entity_id: binary_sensor.bedroom_motion_n
+  name: Count of Dad’s Room Motion
+  unique_id: sensor.count_of_dads_room_motion
+  entity_id: binary_sensor.dads_room_motion
   state_characteristic: count
   sampling_size: 1800
   max_age: "00:30:00"
 - platform: statistics
-  name: Count of Bedroom Motion S
-  unique_id: sensor.count_of_bedroom_motion_s
-  entity_id: binary_sensor.bedroom_motion_s
+  name: Count of Dining Room Motion
+  unique_id: sensor.count_of_dining_room_motion
+  entity_id: binary_sensor.dining_room_motion
   state_characteristic: count
   sampling_size: 1800
   max_age: "00:30:00"
-- platform: statistics
-  name: Average of Bedroom Temperature Difference
-  unique_id: sensor.average_of_bedroom_temperature_difference
-  entity_id: sensor.bedroom_temperature_difference
-  state_characteristic: mean
-  sampling_size: 183600
-  max_age: "51:00:00"
 - platform: statistics
   name: Average of Living Room Humidity Difference
   unique_id: sensor.average_of_living_room_humidity_difference
@@ -104,6 +97,13 @@
   state_characteristic: mean
   sampling_size: 183600
   max_age: "51:00:00"
+- platform: statistics
+  name: Count of Mom’s Room Motion
+  unique_id: sensor.count_of_moms_room_motion
+  entity_id: binary_sensor.moms_room_motion
+  state_characteristic: count
+  sampling_size: 1800
+  max_age: "00:30:00"
 - platform: statistics
   name: Count of Study Motion
   unique_id: sensor.count_of_study_motion
