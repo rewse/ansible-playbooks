@@ -4,13 +4,13 @@ icon: 'mdi:bed'
 badges: []
 cards:
   - type: entities
-    title: Bedroom Humiture
+    title: Mom’s Room Humiture
     entities:
-      - entity: sensor.bedroom_temperature
+      - entity: sensor.moms_room_temperature
         name: Temperature
-      - entity: sensor.bedroom_wbgt
+      - entity: sensor.moms_room_wbgt
         name: WBGT
-      - entity: sensor.bedroom_humidity
+      - entity: sensor.moms_room_humidity
         name: Humidity
   - type: entities
     title: Bedroom Lights

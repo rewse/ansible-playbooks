@@ -45,11 +45,6 @@
     icon: mdi:thermometer-lines
     device_class: temperature
     unit_of_measurement: °C
-  - name: Bedroom Humidity Difference
-    unique_id: sensor.bedroom_humidity_difference
-    state: "{{ (states('sensor.bedroom_humidity') | float(50) - state_attr('sensor.bedroom_switchbot_meter_temperature', 'body')['humidity'] | float(50)) | round(2) | abs }}"
-    icon: mdi:water-percent-alert
-    unit_of_measurement: pt
   - name: Bedroom HVAC Plug Power
     unique_id: sensor.bedroom_hvac_plug_power
     state: "{{ state_attr('switch.bedroom_hvac_plug', 'current_consumption') }}"
@@ -60,18 +55,6 @@
     state: "{{ state_attr('switch.bedroom_surveillance_plug', 'current_consumption') }}"
     device_class: power
     unit_of_measurement: W
-  - name: Bedroom Temperature Difference
-    unique_id: sensor.bedroom_temperature_difference
-    state: "{{ (states('sensor.bedroom_temperature') | float(25) - states('sensor.bedroom_switchbot_meter_temperature') | float(25)) | round(2) | abs }}"
-    icon: mdi:thermometer-alert
-    device_class: temperature
-    unit_of_measurement: °C
-  - name: Bedroom WBGT
-    unique_id: sensor.bedroom_wbgt
-    state: "{{ ((states('sensor.bedroom_temperature') | float(25) - 30.5) * 0.90739 + (states('sensor.bedroom_humidity') | float(50) - 60.0) * 0.14775 + (states('sensor.bedroom_temperature') | float(25) - 30.5) * (states('sensor.bedroom_humidity') | float(50) - 60.0) * 0.003655 + 27.77) | round(2) }}"
-    icon: mdi:thermometer-lines
-    device_class: temperature
-    unit_of_measurement: °C
   - name: Kitchen Rice Cooker Plug Power
     unique_id: switch.kitchen_rice_cooker_plug_power
     state: "{{ state_attr('switch.kitchen_rice_cooker_plug', 'current_consumption') }}"
@@ -112,6 +95,23 @@
   - name: Living Room WBGT
     unique_id: sensor.living_room_wbgt
     state: "{{ ((states('sensor.living_room_temperature') | float(25) - 30.5) * 0.90739 + (states('sensor.living_room_humidity') | float(50) - 60.0) * 0.14775 + (states('sensor.living_room_temperature') | float(25) - 30.5) * (states('sensor.living_room_humidity') | float(50) - 60.0) * 0.003655 + 27.77) | round(2) }}"
+    icon: mdi:thermometer-lines
+    device_class: temperature
+    unit_of_measurement: °C
+  - name: Mom’s Room Humidity Difference
+    unique_id: sensor.moms_room_humidity_difference
+    state: "{{ (states('sensor.moms_room_humidity') | float(50) - state_attr('sensor.bedroom_switchbot_meter_temperature', 'body')['humidity'] | float(50)) | round(2) | abs }}"
+    icon: mdi:water-percent-alert
+    unit_of_measurement: pt
+  - name: Mom’s Room Temperature Difference
+    unique_id: sensor.moms_room_temperature_difference
+    state: "{{ (states('sensor.moms_room_temperature') | float(25) - states('sensor.bedroom_switchbot_meter_temperature') | float(25)) | round(2) | abs }}"
+    icon: mdi:thermometer-alert
+    device_class: temperature
+    unit_of_measurement: °C
+  - name: Mom’s Room WBGT
+    unique_id: sensor.moms_room_wbgt
+    state: "{{ ((states('sensor.moms_room_temperature') | float(25) - 30.5) * 0.90739 + (states('sensor.moms_room_humidity') | float(50) - 60.0) * 0.14775 + (states('sensor.moms_room_temperature') | float(25) - 30.5) * (states('sensor.moms_room_humidity') | float(50) - 60.0) * 0.003655 + 27.77) | round(2) }}"
     icon: mdi:thermometer-lines
     device_class: temperature
     unit_of_measurement: °C

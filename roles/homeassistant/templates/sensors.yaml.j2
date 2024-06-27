@@ -50,8 +50,15 @@
   max_age: "51:00:00"
 - platform: statistics
   name: Average of Bedroom Humidity Difference
-  unique_id: sensor.average_of_bedroom_humidity_difference
-  entity_id: sensor.bedroom_humidity_difference
+  unique_id: sensor.average_of_moms_room_humidity_difference
+  entity_id: sensor.moms_room_humidity_difference
+  state_characteristic: mean
+  sampling_size: 183600
+  max_age: "51:00:00"
+- platform: statistics
+  name: Average of Bedroom Temperature Difference
+  unique_id: sensor.average_of_moms_room_temperature_difference
+  entity_id: sensor.moms_room_temperature_difference
   state_characteristic: mean
   sampling_size: 183600
   max_age: "51:00:00"
