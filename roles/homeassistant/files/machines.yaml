@@ -61,12 +61,17 @@ views:
             secondary_info: last-changed
           - entity: sensor.count_of_study_motion
             secondary_info: last-changed
-          - entity: binary_sensor.bedroom_presence
-            name: Bedroom Presence
+          - entity: sensor.count_of_dining_room_motion
             secondary_info: last-changed
-          - entity: sensor.count_of_bedroom_motion_n
+          - entity: binary_sensor.dads_room_presence
+            name: Dad’s Room Presence
             secondary_info: last-changed
-          - entity: sensor.count_of_bedroom_motion_s
+          - entity: sensor.count_of_dads_room_motion
+            secondary_info: last-changed
+          - entity: binary_sensor.moms_room_presence
+            name: Mom’s Room Presence
+            secondary_info: last-changed
+          - entity: sensor.count_of_moms_room_motion
             secondary_info: last-changed
       - type: alarm-panel
         name: Living Room TV

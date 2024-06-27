@@ -228,10 +228,7 @@
   mode: single
   trigger:
     - platform: state
-      entity_id: binary_sensor.bedroom_motion_n
-      to: "on"
-    - platform: state
-      entity_id: binary_sensor.bedroom_motion_s
+      entity_id: binary_sensor.bedroom_motion
       to: "on"
   condition:
     - condition: numeric_state
@@ -271,10 +268,7 @@
   mode: single
   trigger:
     - platform: state
-      entity_id: binary_sensor.bedroom_motion_n
-      to: "on"
-    - platform: state
-      entity_id: binary_sensor.bedroom_motion_s
+      entity_id: binary_sensor.bedroom_motion
       to: "on"
   condition:
     - condition: numeric_state
@@ -355,10 +349,7 @@
   mode: single
   trigger:
     - platform: state
-      entity_id: binary_sensor.bedroom_motion_n
-      to: "on"
-    - platform: state
-      entity_id: binary_sensor.bedroom_motion_s
+      entity_id: binary_sensor.bedroom_motion
       to: "on"
   condition:
     - condition: numeric_state
@@ -434,10 +425,7 @@
   mode: single
   trigger:
     - platform: state
-      entity_id: binary_sensor.bedroom_motion_n
-      to: "on"
-    - platform: state
-      entity_id: binary_sensor.bedroom_motion_s
+      entity_id: binary_sensor.bedroom_motion
       to: "on"
   condition:
     - condition: numeric_state
@@ -482,9 +470,8 @@
   mode: single
   trigger:
     - platform: state
-      entity_id: binary_sensor.bedroom_motion_n
-    - platform: state
-      entity_id: binary_sensor.bedroom_motion_s
+      entity_id: binary_sensor.bedroom_motion
+      to: "on"
   condition:
     - condition: numeric_state
       entity_id: sensor.moms_room_temperature
