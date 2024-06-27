@@ -230,7 +230,7 @@ cards:
               - 'off'
           - type: target-temperature
       - type: entities
-        title: Bedroom Appliances
+        title: Mom’s Room Appliances
         entities:
           - entity: cover.bedroom_curtains
             name: Curtains
