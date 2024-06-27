@@ -37,7 +37,7 @@ smart_home:
       - media_player.aventage
       - sensor.balcony_temperature
       - sensor.bathroom_temperature
-      - sensor.bedroom_temperature
+      - sensor.moms_room_temperature
       - sensor.living_room_temperature
       - sensor.study_temperature
       - switch.bedroom_hvac_cleaner
@@ -113,7 +113,7 @@ smart_home:
       name: ベランダの温度計
     sensor.bathroom_temperature:
       name: 浴室の温度計
-    sensor.bedroom_temperature:
+    sensor.moms_room_temperature:
       name: 寝室の温度計
     sensor.living_room_temperature:
       name: リビングの温度計
