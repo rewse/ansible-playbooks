@@ -206,9 +206,9 @@ cards:
           - value: above_horizon
           - value: below_horizon
       - type: entities
-        title: Bedroom Lights
+        title: Mom’s Room Lights
         entities:
-          - entity: light.bedroom_light
+          - entity: light.moms_room_light
             name: Light
         show_header_toggle: false
       - type: tile
