@@ -1,4 +1,4 @@
-- id: automation.alarm_bedroom_humidity_difference_is_too_large
+- id: automation.alarm_moms_room_humidity_difference_is_too_large
   alias: "ALARM: Bedroom Humidity Difference is Too Large"
   mode: single
   trigger:
@@ -7,20 +7,20 @@
       attribute: humidity
   condition:
     - condition: numeric_state
-      entity_id: sensor.average_of_bedroom_humidity_difference
+      entity_id: sensor.average_of_moms_room_humidity_difference
       above: 10
   action:
     - service: notify.tats_devices
       data:
         title: "⚠️ ALARM"
-        message: "Bedroom Humidity Difference is Too Large. Current: {{ states('sensor.bedroom_humidity') }}% / {{ states('sensor.bedroom_switchbot_meter_humidity') }}%"
+        message: "Bedroom Humidity Difference is Too Large. Current: {{ states('sensor.moms_room_humidity') }}% / {{ states('sensor.bedroom_switchbot_meter_humidity') }}%"
         data:
           url: /lovelace/home
           push:
             interruption-level: time-sensitive
     - delay:
         hours: 8
-- id: automation.alarm_bedroom_temperature_difference_is_too_large
+- id: automation.alarm_moms_room_temperature_difference_is_too_large
   alias: "ALARM: Bedroom Temperature Difference is Too Large"
   mode: single
   trigger:
@@ -28,35 +28,32 @@
       entity_id: sensor.bedroom_switchbot_meter_temperature
   condition:
     - condition: numeric_state
-      entity_id: sensor.average_of_bedroom_temperature_difference
+      entity_id: sensor.average_of_moms_room_temperature_difference
       above: 1
   action:
     - service: notify.tats_devices
       data:
         title: "⚠️ ALARM"
-        message: "Bedroom Temperature Difference is Too Large. Current: {{ states('sensor.bedroom_temperature') }}°C / {{ states('sensor.bedroom_switchbot_meter_temperature') }}°C"
+        message: "Bedroom Temperature Difference is Too Large. Current: {{ states('sensor.moms_room_temperature') }}°C / {{ states('sensor.bedroom_switchbot_meter_temperature') }}°C"
         data:
           url: /lovelace/home
           push:
             interruption-level: time-sensitive
     - delay:
         hours: 8
-- id: automation.info_bedroom_humidity_is_too_high
+- id: automation.info_moms_room_humidity_is_too_high
   alias: "INFO: Bedroom Humidity is Too High"
   mode: single
   trigger:
     - platform: state
-      entity_id: binary_sensor.bedroom_motion_n
-      to: "on"
-    - platform: state
-      entity_id: binary_sensor.bedroom_motion_s
+      entity_id: binary_sensor.bedroom_motion
       to: "on"
   condition:
     - condition: numeric_state
-      entity_id: sensor.bedroom_humidity
+      entity_id: sensor.moms_room_humidity
       above: input_number.bedroom_hvac_dry_turned_on_threshold_humidity
     - condition: numeric_state
-      entity_id: sensor.bedroom_wbgt
+      entity_id: sensor.moms_room_wbgt
       above: input_number.bedroom_hvac_dry_turned_on_threshold_wbgt
     - condition: state
       entity_id: sun.sun
@@ -82,26 +79,23 @@
   action:
     - service: notify.all_devices
       data:
-        message: "Bedroom Humidity is Too High. Current: {{ states('sensor.bedroom_humidity') }}%"
+        message: "Bedroom Humidity is Too High. Current: {{ states('sensor.moms_room_humidity') }}%"
         data:
           url: /lovelace/home
           push:
             interruption-level: time-sensitive
     - delay:
         hours: 2
-- id: automation.info_bedroom_humidity_is_too_low
+- id: automation.info_moms_room_humidity_is_too_low
   alias: "INFO: Bedroom Humidity is Too Low"
   mode: single
   trigger:
     - platform: state
-      entity_id: binary_sensor.bedroom_motion_n
-      to: "on"
-    - platform: state
-      entity_id: binary_sensor.bedroom_motion_s
+      entity_id: binary_sensor.bedroom_motion
       to: "on"
   condition:
     - condition: numeric_state
-      entity_id: sensor.bedroom_humidity
+      entity_id: sensor.moms_room_humidity
       below: input_number.bedroom_humidifier_turned_on_threshold
     - condition: sun
       after: sunrise
@@ -111,26 +105,23 @@
   action:
     - service: notify.all_devices
       data:
-        message: "Bedroom Humidity is Too Low. Current: {{ states('sensor.bedroom_humidity') }}%"
+        message: "Bedroom Humidity is Too Low. Current: {{ states('sensor.moms_room_humidity') }}%"
         data:
           url: /lovelace/home
           push:
             interruption-level: time-sensitive
     - delay:
         hours: 2
-- id: automation.info_bedroom_wbgt_is_too_high
+- id: automation.info_moms_room_wbgt_is_too_high
   alias: "INFO: Bedroom WBGT is Too High"
   mode: single
   trigger:
     - platform: state
-      entity_id: binary_sensor.bedroom_motion_n
-      to: "on"
-    - platform: state
-      entity_id: binary_sensor.bedroom_motion_s
+      entity_id: binary_sensor.bedroom_motion
       to: "on"
   condition:
     - condition: numeric_state
-      entity_id: sensor.bedroom_wbgt
+      entity_id: sensor.moms_room_wbgt
       above: input_number.bedroom_hvac_cool_turned_on_threshold
     - condition: state
       entity_id: sun.sun
@@ -156,7 +147,7 @@
   action:
     - service: notify.all_devices
       data:
-        message: "Bedroom WBGT is Too High. Current: {{ states('sensor.bedroom_wbgt') }}°C"
+        message: "Bedroom WBGT is Too High. Current: {{ states('sensor.moms_room_wbgt') }}°C"
         data:
           url: /lovelace/home
           push:
@@ -244,10 +235,10 @@
       to: "on"
   condition:
     - condition: numeric_state
-      entity_id: sensor.bedroom_wbgt
+      entity_id: sensor.moms_room_wbgt
       below: input_number.bedroom_hvac_cool_turned_off_threshold
     - condition: numeric_state
-      entity_id: sensor.bedroom_humidity
+      entity_id: sensor.moms_room_humidity
       below: input_number.bedroom_hvac_dry_turned_off_threshold
     - condition: numeric_state
       entity_id: sensor.filtered_bedroom_hvac_plug_power
@@ -268,7 +259,7 @@
         hvac_mode: "off"
     - service: notify.all_devices
       data:
-        message: "Turned off Bedroom HVAC Cool. Current: {{ states('sensor.bedroom_wbgt') }}°C, {{ states('sensor.bedroom_humidity') }}%"
+        message: "Turned off Bedroom HVAC Cool. Current: {{ states('sensor.moms_room_wbgt') }}°C, {{ states('sensor.moms_room_humidity') }}%"
         data:
           url: /lovelace/home
           push:
@@ -287,7 +278,7 @@
       to: "on"
   condition:
     - condition: numeric_state
-      entity_id: sensor.bedroom_temperature
+      entity_id: sensor.moms_room_temperature
       above: input_number.bedroom_hvac_heat_turned_off_threshold
     - condition: numeric_state
       entity_id: sensor.filtered_bedroom_hvac_plug_power
@@ -306,7 +297,7 @@
         hvac_mode: "off"
     - service: notify.all_devices
       data:
-        message: "Turned off Bedroom HVAC Heat. Current: {{ states('sensor.bedroom_temperature') }}°C"
+        message: "Turned off Bedroom HVAC Heat. Current: {{ states('sensor.moms_room_temperature') }}°C"
         data:
           url: /lovelace/home
           push:
@@ -371,7 +362,7 @@
       to: "on"
   condition:
     - condition: numeric_state
-      entity_id: sensor.bedroom_wbgt
+      entity_id: sensor.moms_room_wbgt
       above: input_number.bedroom_hvac_cool_turned_on_threshold
     - condition: state
       entity_id: binary_sensor.bedroom_window_n
@@ -395,7 +386,7 @@
         temperature: 26
     - service: notify.all_devices
       data:
-        message: "Turned on Bedroom HVAC Cool. Current: {{ states('sensor.bedroom_wbgt') }}°C"
+        message: "Turned on Bedroom HVAC Cool. Current: {{ states('sensor.moms_room_wbgt') }}°C"
         data:
           url: /lovelace/home
           push:
@@ -411,7 +402,7 @@
       seconds: 46
   condition:
     - condition: numeric_state
-      entity_id: sensor.bedroom_wbgt
+      entity_id: sensor.moms_room_wbgt
       above: input_number.bedroom_hvac_cool_forcibly_turned_on_threshold
     - condition: state
       entity_id: binary_sensor.bedroom_window_n
@@ -431,7 +422,7 @@
         hvac_mode: cool
     - service: notify.all_devices
       data:
-        message: "Turned on Bedroom HVAC Cool Forcibly. Current: {{ states('sensor.bedroom_wbgt') }}°C"
+        message: "Turned on Bedroom HVAC Cool Forcibly. Current: {{ states('sensor.moms_room_wbgt') }}°C"
         data:
           url: /lovelace/home
           push:
@@ -450,10 +441,10 @@
       to: "on"
   condition:
     - condition: numeric_state
-      entity_id: sensor.bedroom_humidity
+      entity_id: sensor.moms_room_humidity
       above: input_number.bedroom_hvac_dry_turned_on_threshold_humidity
     - condition: numeric_state
-      entity_id: sensor.bedroom_wbgt
+      entity_id: sensor.moms_room_wbgt
       above: input_number.bedroom_hvac_dry_turned_on_threshold_wbgt
     - condition: numeric_state
       entity_id: sensor.filtered_bedroom_hvac_plug_power
@@ -479,7 +470,7 @@
         hvac_mode: dry
     - service: notify.all_devices
       data:
-        message: "Turned on Bedroom HVAC Dry. Current: {{ states('sensor.bedroom_humidity') }}%"
+        message: "Turned on Bedroom HVAC Dry. Current: {{ states('sensor.moms_room_humidity') }}%"
         data:
           url: /lovelace/home
           push:
@@ -496,7 +487,7 @@
       entity_id: binary_sensor.bedroom_motion_s
   condition:
     - condition: numeric_state
-      entity_id: sensor.bedroom_temperature
+      entity_id: sensor.moms_room_temperature
       below: input_number.bedroom_hvac_heat_turned_on_threshold
     - condition: state
       entity_id: binary_sensor.bedroom_window_n
@@ -530,7 +521,7 @@
         hvac_mode: heat
     - service: notify.all_devices
       data:
-        message: "Turned on Bedroom HVAC Heat. Current: {{ states('sensor.bedroom_temperature') }}°C"
+        message: "Turned on Bedroom HVAC Heat. Current: {{ states('sensor.moms_room_temperature') }}°C"
         data:
           url: /lovelace/home
           push:

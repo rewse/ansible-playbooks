@@ -163,10 +163,10 @@ cards:
   - type: vertical-stack
     cards:
       - type: custom:mini-graph-card
-        name: Bedroom Temperature
+        name: Mom’s Room Temperature
         entities:
-          - entity: sensor.bedroom_temperature
-          - entity: sensor.bedroom_wbgt
+          - entity: sensor.moms_room_temperature
+          - entity: sensor.moms_room_wbgt
             show_state: true
             show_fill: false
           - entity: sun.sun
@@ -186,9 +186,9 @@ cards:
           - value: above_horizon
           - value: below_horizon
       - type: custom:mini-graph-card
-        name: Bedroom Humidity
+        name: Mom’s Room Humidity
         entities:
-          - entity: sensor.bedroom_humidity
+          - entity: sensor.moms_room_humidity
           - entity: sun.sun
             color: gray
             show_line: false
