@@ -390,10 +390,10 @@ cards:
       - entity: binary_sensor.study_window_s
         name: Study S
         secondary_info: last-changed
-      - entity: binary_sensor.bedroom_window_n
+      - entity: binary_sensor.moms_room_window_n
         name: Bedroom N
         secondary_info: last-changed
-      - entity: binary_sensor.bedroom_window_s
+      - entity: binary_sensor.moms_room_window_s
         name: Bedroom S
         secondary_info: last-changed
       - entity: binary_sensor.entrance_door
