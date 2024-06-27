@@ -15,26 +15,25 @@ views:
           - entity: binary_sensor.hotel
           - entity: binary_sensor.aventage
           - entity: binary_sensor.brother
-          - entity: binary_sensor.catloghome_bed
+          - entity: binary_sensor.catloghome_dad
           - entity: binary_sensor.catloghome_liv
-          - entity: binary_sensor.catloghome_sto
-          - entity: binary_sensor.daikinhvac
-          - entity: binary_sensor.eufy_bed
+          - entity: binary_sensor.catloghome_mom
+          - entity: binary_sensor.daikinac_liv
           - entity: binary_sensor.eufy_liv
+          - entity: binary_sensor.eufy_mom
           - entity: binary_sensor.huebridge
           - entity: binary_sensor.kasaplug_ent_ses
           - entity: binary_sensor.kasaplug_liv_foo
           - entity: binary_sensor.regza
-          - entity: binary_sensor.remo_bed
           - entity: binary_sensor.remo_liv
+          - entity: binary_sensor.remo_mom
           - entity: binary_sensor.sesamemodule
           - entity: binary_sensor.switchbothub2
-          - entity: binary_sensor.tuyaplug_bed_hva
-          - entity: binary_sensor.tuyaplug_bed_sur
           - entity: binary_sensor.tuyaplug_kit_ric
           - entity: binary_sensor.tuyaplug_liv_fox
           - entity: binary_sensor.tuyaplug_liv_hum
-          - entity: binary_sensor.tuyaplug_liv_sur
+          - entity: binary_sensor.tuyaplug_mom_ac
+          - entity: binary_sensor.tuyaplug_mom_sur
           - entity: binary_sensor.xiaomigateway
         hours_to_show: 12
       - type: history-graph
