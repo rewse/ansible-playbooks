@@ -26,7 +26,7 @@ smart_home:
       - fan.living_room_ceiling_fans
       - switch.living_area_floor_heatings
       - light.bathroom_lights
-      - light.bedroom_light
+      - light.moms_room_light
       - light.living_area_dimming_downlights
       - light.living_area_downlights
       - light.living_room_entrance_light
@@ -89,7 +89,7 @@ smart_home:
       display_categories: SWITCH
     light.bathroom_lights:
       name: 浴室の照明
-    light.bedroom_light:
+    light.moms_room_light:
       name: 寝室の照明
     light.living_area_dimming_downlights:
       name: リビングのダウンライトの調光
