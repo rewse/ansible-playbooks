@@ -399,33 +399,6 @@ cards:
       - entity: binary_sensor.entrance_door
         name: Entrance
         secondary_info: last-changed
-  - type: custom:mini-graph-card
-    entities:
-      - entity: sensor.enecoq_fee_total
-        name: enecoQ Fee
-      - entity: sun.sun
-        color: gray
-        show_line: false
-        show_points: false
-        y_axis: secondary
-    hours_to_show: 48
-    points_per_hour: 4
-    animate: true
-    height: 200
-    hour24: true
-    show:
-      legend: false
-      labels_secondary: false
-    color_thresholds:
-      - value: 0
-        color: "#00cc00"
-      - value: 9.8
-        color: "#cccc00"
-      - value: 41.77
-        color: "#cc0000"
-    state_map:
-      - value: above_horizon
-      - value: below_horizon
   - type: vertical-stack
     cards:
       - type: custom:simple-weather-card
