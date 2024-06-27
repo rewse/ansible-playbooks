@@ -8,6 +8,9 @@
     - platform: state
       entity_id: binary_sensor.study_motion
       to: "on"
+    - platform: state
+      entity_id: binary_sensor.dining_room_motion
+      to: "on"
   condition:
     - condition: numeric_state
       entity_id: sensor.living_room_co2
@@ -85,6 +88,9 @@
     - platform: state
       entity_id: binary_sensor.study_motion
       to: "on"
+    - platform: state
+      entity_id: binary_sensor.dining_room_motion
+      to: "on"
   condition:
     - condition: numeric_state
       entity_id: sensor.living_room_humidity
@@ -135,6 +141,9 @@
     - platform: state
       entity_id: binary_sensor.study_motion
       to: "on"
+    - platform: state
+      entity_id: binary_sensor.dining_room_motion
+      to: "on"
   condition:
     - condition: numeric_state
       entity_id: sensor.living_room_humidity
@@ -183,6 +192,9 @@
       to: "on"
     - platform: state
       entity_id: binary_sensor.study_motion
+      to: "on"
+    - platform: state
+      entity_id: binary_sensor.dining_room_motion
       to: "on"
   condition:
     - condition: numeric_state
@@ -369,6 +381,9 @@
     - platform: state
       entity_id: binary_sensor.study_motion
       to: "on"
+    - platform: state
+      entity_id: binary_sensor.dining_room_motion
+      to: "on"
   condition:
     - condition: numeric_state
       entity_id: sensor.living_room_humidity
@@ -397,6 +412,9 @@
       to: "on"
     - platform: state
       entity_id: binary_sensor.study_motion
+      to: "on"
+    - platform: state
+      entity_id: binary_sensor.dining_room_motion
       to: "on"
   condition:
     - condition: numeric_state
@@ -517,22 +535,26 @@
       entity_id: binary_sensor.study_motion
       to: "on"
       id: Study Motion
+    - platform: state
+      entity_id: binary_sensor.dining_room_motion
+      to: "on"
+      id: Dining Room Motion
     - platform: sun
       event: sunset
       offset: "-00:30:00"
-      id: Sunset30
+      id: 30 min before Sunset
     - platform: sun
       event: sunset
       offset: "-00:20:00"
-      id: Sunset20
+      id: 20 min before Sunset
     - platform: sun
       event: sunset
       offset: "-00:10:00"
-      id: Sunset10
+      id: 10 min before Sunset
     - platform: sun
       event: sunset
       offset: "-00:01:00"
-      id: Sunset01
+      id: 1 min before Sunset
   condition:
     - condition: numeric_state
       entity_id: sensor.living_room_light_level
@@ -561,6 +583,9 @@
       to: "on"
     - platform: state
       entity_id: binary_sensor.study_motion
+      to: "on"
+    - platform: state
+      entity_id: binary_sensor.dining_room_motion
       to: "on"
   condition:
     - condition: numeric_state
@@ -613,6 +638,9 @@
       to: "on"
     - platform: state
       entity_id: binary_sensor.study_motion
+      to: "on"
+    - platform: state
+      entity_id: binary_sensor.dining_room_motion
       to: "on"
   condition:
     - condition: numeric_state
@@ -692,6 +720,9 @@
       to: "on"
     - platform: state
       entity_id: binary_sensor.study_motion
+      to: "on"
+    - platform: state
+      entity_id: binary_sensor.dining_room_motion
       to: "on"
   condition:
     - condition: numeric_state
@@ -782,6 +813,9 @@
       to: "on"
     - platform: state
       entity_id: binary_sensor.study_motion
+      to: "on"
+    - platform: state
+      entity_id: binary_sensor.dining_room_motion
       to: "on"
   condition:
     - condition: numeric_state

@@ -364,14 +364,18 @@ cards:
       - entity: binary_sensor.study_motion
         name: Study
         secondary_info: last-changed
-      - entity: binary_sensor.bedroom_presence
-        name: Bedroom Presence
+      - entity: binary_sensor.dining_room_motion
+        name: Dining Room
         secondary_info: last-changed
-      - entity: binary_sensor.bedroom_motion_n
-        name: Bedroom N
+      - entity: binary_sensor.dads_room_presence
+        name: Dad’s Room Presence
         secondary_info: last-changed
-      - entity: binary_sensor.bedroom_motion_s
-        name: Bedroom S
+      - entity: binary_sensor.dads_room_motion
+        secondary_info: last-changed
+      - entity: binary_sensor.moms_room_presence
+        name: Mom’s Room Presence
+        secondary_info: last-changed
+      - entity: binary_sensor.moms_room_motion
         secondary_info: last-changed
       - entity: binary_sensor.bathroom_motion
         name: Bathroom

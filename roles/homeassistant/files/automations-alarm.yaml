@@ -48,6 +48,9 @@
     - platform: state
       entity_id: binary_sensor.study_motion
       to: "on"
+    - platform: state
+      entity_id: binary_sensor.dining_room_motion
+      to: "on"
   condition:
     - condition: state
       entity_id: device_tracker.ping_atom
@@ -302,6 +305,9 @@
       to: "on"
     - platform: state
       entity_id: binary_sensor.study_motion
+      to: "on"
+    - platform: state
+      entity_id: binary_sensor.dining_room_motion
       to: "on"
   condition:
     - condition: state
@@ -597,6 +603,9 @@
       to: "on"
     - platform: state
       entity_id: binary_sensor.study_motion
+      to: "on"
+    - platform: state
+      entity_id: binary_sensor.dining_room_motion
       to: "on"
   condition:
     - condition: state

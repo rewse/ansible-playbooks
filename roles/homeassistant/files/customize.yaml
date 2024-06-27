@@ -138,10 +138,13 @@ sensor.count_of_living_room_motion:
 sensor.count_of_study_motion:
   icon: mdi:comment-account
   unit_of_measurement: detections
-sensor.count_of_bedroom_motion_n:
+sensor.count_of_dining_room_motion:
   icon: mdi:comment-account
   unit_of_measurement: detections
-sensor.count_of_bedroom_motion_s:
+sensor.count_of_dads_room_motion:
+  icon: mdi:comment-account
+  unit_of_measurement: detections
+sensor.count_of_moms_room_motion:
   icon: mdi:comment-account
   unit_of_measurement: detections
 sensor.entrance_lock_bottom_sensor:

@@ -1,18 +1,27 @@
 - binary_sensor:
-  - name: Bedroom Presence
-    unique_id: binary_sensor.bedroom_presence
-    state: "{{ states('sensor.count_of_bedroom_motion_n') | int(0) > 10 or states('sensor.count_of_bedroom_motion_s') | int(0) > 10 }}"
+  - name: Dad’s Room Presence
+    unique_id: binary_sensor.dads_room_presence
+    state: "{{ states('sensor.count_of_dads_room_motion') | int(0) > 10 }}"
     icon: >
-      {% if is_state('binary_sensor.bedroom_presence', 'on') %}
+      {% if is_state('binary_sensor.dads_room_presence', 'on') %}
         mdi:comment-account
       {% else %}
         mdi:comment-account-outline
       {% endif %}
   - name: Living Room Presence
     unique_id: binary_sensor.living_room_presence
-    state: "{{ states('sensor.count_of_living_room_motion') | int(0) > 10 or states('sensor.count_of_study_motion') | int(0) > 10 }}"
+    state: "{{ states('sensor.count_of_living_room_motion') | int(0) > 10 or states('sensor.count_of_study_motion') | int(0) > 10 or states('sensor.count_of_dining_room_motion') | int(0) > 10 }}"
     icon: >
       {% if is_state('binary_sensor.living_room_presence', 'on') %}
+        mdi:comment-account
+      {% else %}
+        mdi:comment-account-outline
+      {% endif %}
+  - name: Mom’s Room Presence
+    unique_id: binary_sensor.moms_room_presence
+    state: "{{ states('sensor.count_of_moms_room_motion') | int(0) > 10 }}"
+    icon: >
+      {% if is_state('binary_sensor.moms_room_presence', 'on') %}
         mdi:comment-account
       {% else %}
         mdi:comment-account-outline
