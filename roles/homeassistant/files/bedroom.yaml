@@ -1,5 +1,5 @@
 path: bedroom
-title: Bedroom
+title: Mom’s Room
 icon: 'mdi:bed'
 badges: []
 cards:
@@ -15,7 +15,7 @@ cards:
   - type: entities
     title: Bedroom Lights
     entities:
-      - entity: light.bedroom_light
+      - entity: light.moms_room_light
         name: Light
   - type: tile
     entity: climate.bedroom_ac
