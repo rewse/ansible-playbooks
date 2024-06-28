@@ -1,6 +1,7 @@
 ---
 - import_playbook: ubuntu.yml
 - import_playbook: ec2.yml
+- import_playbook: internal.yml
 - import_playbook: raspberrypi.yml
 - import_playbook: singleton_ext1.yml
 - import_playbook: singleton_ext2.yml
