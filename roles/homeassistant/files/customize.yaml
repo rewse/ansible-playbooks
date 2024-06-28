@@ -132,21 +132,6 @@ sensor.average_of_living_room_humidity_difference:
   icon: mdi:water-percent-alert
 sensor.average_of_living_room_temperature_difference:
   icon: mdi:thermometer-alert
-sensor.count_of_living_room_motion:
-  icon: mdi:comment-account
-  unit_of_measurement: detections
-sensor.count_of_study_motion:
-  icon: mdi:comment-account
-  unit_of_measurement: detections
-sensor.count_of_dining_room_motion:
-  icon: mdi:comment-account
-  unit_of_measurement: detections
-sensor.count_of_dads_room_motion:
-  icon: mdi:comment-account
-  unit_of_measurement: detections
-sensor.count_of_moms_room_motion:
-  icon: mdi:comment-account
-  unit_of_measurement: detections
 sensor.entrance_lock_bottom_sensor:
   icon: mdi:lock-check
 sensor.entrance_lock_top_sensor:
