@@ -64,6 +64,12 @@
     state: "{{ state_attr('switch.bedroom_surveillance_plug', 'current_consumption') }}"
     device_class: power
     unit_of_measurement: W
+  - name: Dad’s Room WBGT
+    unique_id: sensor.dads_room_wbgt
+    state: "{{ ((states('sensor.dads_room_temperature') | float(25) - 30.5) * 0.90739 + (states('sensor.dads_room_humidity') | float(50) - 60.0) * 0.14775 + (states('sensor.dads_room_temperature') | float(25) - 30.5) * (states('sensor.dads_room_humidity') | float(50) - 60.0) * 0.003655 + 27.77) | round(2) }}"
+    icon: mdi:thermometer-lines
+    device_class: temperature
+    unit_of_measurement: °C
   - name: Kitchen Rice Cooker Plug Power
     unique_id: switch.kitchen_rice_cooker_plug_power
     state: "{{ state_attr('switch.kitchen_rice_cooker_plug', 'current_consumption') }}"
