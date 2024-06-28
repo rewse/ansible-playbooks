@@ -227,6 +227,12 @@ cards:
         state_map:
           - value: above_horizon
           - value: below_horizon
+      - type: entities
+        title: Dad’s Room Lights
+        entities:
+          - entity: light.dads_room_light
+            name: Light
+        show_header_toggle: false
   - type: vertical-stack
     cards:
       - type: custom:mini-graph-card
