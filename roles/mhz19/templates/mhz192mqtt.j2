@@ -13,13 +13,13 @@ send_co2() {
     retval=$?
 
     if [ "$co2" != "null" ]; then
-        mosquitto_pub -r -t mhz19/state \
+        mosquitto_pub -r -t mhz19/[% location %]/state \
             -u pub_client -P [% mosquitto_password %] \
             -h hass.rewse.jp -p 8883 \
             --cafile /etc/ssl/certs/ISRG_Root_X1.pem \
             -m online
     else
-        mosquitto_pub -r -t mhz19/state \
+        mosquitto_pub -r -t mhz19/[% location %]/state \
             -u pub_client -P [% mosquitto_password %] \
             -h hass.rewse.jp -p 8883 \
             --cafile /etc/ssl/certs/ISRG_Root_X1.pem \
@@ -38,7 +38,7 @@ send_co2() {
 !
 )
 
-    mosquitto_pub -r -t mhz19/co2 \
+    mosquitto_pub -r -t mhz19/[% location %]/co2 \
         -u pub_client -P [% mosquitto_password %] \
         -h hass.rewse.jp -p 8883 \
         --cafile /etc/ssl/certs/ISRG_Root_X1.pem \

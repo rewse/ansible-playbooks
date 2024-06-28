@@ -6,7 +6,6 @@
     - docker
     - homeassistant
     - httpd
-    - mhz19
     - mosquitto
     - sesame
     - switchbot
