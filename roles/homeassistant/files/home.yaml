@@ -165,6 +165,50 @@ cards:
   - type: vertical-stack
     cards:
       - type: custom:mini-graph-card
+        name: Dad’s Room Temperature
+        entities:
+          - entity: sensor.dads_room_temperature
+          - entity: sensor.dads_room_wbgt
+            show_state: true
+            show_fill: false
+          - entity: sun.sun
+            color: gray
+            show_line: false
+            show_points: false
+            y_axis: secondary
+        hours_to_show: 48
+        points_per_hour: 4
+        animate: true
+        height: 200
+        hour24: true
+        show:
+          legend: false
+          labels_secondary: false
+        state_map:
+          - value: above_horizon
+          - value: below_horizon
+      - type: custom:mini-graph-card
+        name: Dad’s Room Humidity
+        entities:
+          - entity: sensor.dads_room_humidity
+          - entity: sun.sun
+            color: gray
+            show_line: false
+            show_points: false
+            y_axis: secondary
+        hours_to_show: 48
+        points_per_hour: 4
+        animate: true
+        height: 200
+        hour24: true
+        show:
+          legend: false
+          labels_secondary: false
+        state_map:
+          - value: above_horizon
+          - value: below_horizon
+    cards:
+      - type: custom:mini-graph-card
         name: Mom’s Room Temperature
         entities:
           - entity: sensor.moms_room_temperature
