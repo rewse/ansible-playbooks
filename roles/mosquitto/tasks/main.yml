@@ -22,23 +22,3 @@
     dest: /etc/mosquitto/conf.d
   notify: Restart mosquitto
   tags: [mosquitto]
-
-- name: Copy ssl.conf
-  copy:
-    src: ssl.conf
-    dest: /etc/mosquitto/conf.d
-  notify: Restart mosquitto
-  tags: [mosquitto]
-
-- name: Change group of /etc/letsencrypt
-  file:
-    path: "{{ item }}"
-    state: directory
-    group: mosquitto
-    mode: '0750'
-    recurse: yes
-  with_items:
-    - /etc/letsecnrypt/archive
-    - /etc/letsecnrypt/live
-  notify: Restart mosquitto
-  tags: [mosquitto]
