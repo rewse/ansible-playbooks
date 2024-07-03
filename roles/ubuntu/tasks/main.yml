@@ -49,8 +49,10 @@
       - libwww-perl
       - locales-all
       - logwatch
+      - iw
       - mailutils
       - ncdu
+      - net-tools
       - postfix
       - python3-pip
       - python3-venv
@@ -59,6 +61,7 @@
       - unattended-upgrades
       - unzip
       - vim
+      - wireless-tools
   tags: [ubuntu, package]
 
 - name: Stat awscliv2
