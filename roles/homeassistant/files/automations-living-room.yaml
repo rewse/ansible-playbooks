@@ -557,7 +557,7 @@
       id: 1 min before Sunset
   condition:
     - condition: numeric_state
-      entity_id: sensor.study_light_level
+      entity_id: sensor.living_room_light_level
       below: input_number.living_area_downlights_turned_on_threshold
     - condition: state
       entity_id: sun.sun

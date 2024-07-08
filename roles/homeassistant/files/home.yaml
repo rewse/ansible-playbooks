@@ -51,7 +51,7 @@ cards:
       - type: custom:mini-graph-card
         name: Living Room Light Level
         entities:
-          - entity: sensor.study_light_level
+          - entity: sensor.living_room_light_level
           - entity: sun.sun
             color: gray
             show_line: false
