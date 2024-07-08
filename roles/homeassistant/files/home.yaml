@@ -285,7 +285,7 @@ cards:
             name: Light
         show_header_toggle: false
       - type: tile
-        entity: climate.bedroom_ac
+        entity: climate.moms_room_ac
         tap_action:
           action: more-info
         icon_tap_action:
@@ -303,7 +303,7 @@ cards:
       - type: entities
         title: Mom’s Room Appliances
         entities:
-          - entity: cover.bedroom_curtains
+          - entity: cover.moms_room_curtains
             name: Curtains
   - type: vertical-stack
     cards:
@@ -464,10 +464,10 @@ cards:
         name: Study S
         secondary_info: last-changed
       - entity: binary_sensor.moms_room_window_n
-        name: Bedroom N
+        name: Mom’s Room N
         secondary_info: last-changed
       - entity: binary_sensor.moms_room_window_s
-        name: Bedroom S
+        name: Mom’s Room S
         secondary_info: last-changed
       - entity: binary_sensor.entrance_door
         name: Entrance

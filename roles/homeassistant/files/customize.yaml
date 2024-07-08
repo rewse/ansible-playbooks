@@ -118,8 +118,6 @@ person.shibata_akiko:
   icon: mdi:human-female
 person.shibata_tats:
   icon: mdi:human-male
-sensor.bedroom_curtains_position:
-  icon: mdi:curtains
 sensor.average_of_balcony_humidity_difference:
   icon: mdi:water-percent-alert
 sensor.average_of_balcony_temperature_difference:
@@ -136,7 +134,7 @@ sensor.entrance_lock_bottom_sensor:
   icon: mdi:lock-check
 sensor.entrance_lock_top_sensor:
   icon: mdi:lock-check
-sensor.filtered_bedroom_hvac_plug_power:
+sensor.filtered_moms_room_ac_plug_power:
   icon: mdi:flash
 sensor.regza_channel:
   icon: mdi:television
