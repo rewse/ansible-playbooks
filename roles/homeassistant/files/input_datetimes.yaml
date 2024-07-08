@@ -1,13 +1,13 @@
-bedroom_curtains_opened_time:
-  name: Bedroom Curtains Opened Time
+moms_room_curtains_opened_time:
+  name: Mom’s Room Curtains Opened Time
   has_time: true
   icon: mdi:curtains
-bedroom_curtains_opened_time_workday:
-  name: Bedroom Curtains Opened Time for Workday
+moms_room_curtains_opened_time_workday:
+  name: Mom’s Room Curtains Opened Time for Workday
   has_time: true
   icon: mdi:curtains
-bedroom_turned_down_time:
-  name: Bedroom Turned down Time
+moms_room_turned_down_time:
+  name: Mom’s Room Turned down Time
   has_time: true
   icon: mdi:brightness-6
 living_area_turned_down_more_time:

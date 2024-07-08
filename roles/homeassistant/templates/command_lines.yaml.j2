@@ -38,18 +38,18 @@
     unit_of_measurement: °C
     scan_interval: 60
 - sensor:
-    name: Bedroom Curtains Position
-    unique_id: sensor.bedroom_curtains_position
-    command: /config/bin/switchbot get [% switchbot.device_id.bedroom_curtains %] [% switchbot.token %] [% switchbot.secret %] 
+    name: Mom’s Room Curtains Position
+    unique_id: sensor.moms_room_curtains_position
+    command: /config/bin/switchbot get [% switchbot.device_id.moms_room_curtains %] [% switchbot.token %] [% switchbot.secret %] 
     value_template: '{{ value_json.body.slidePosition }}'
     json_attributes:
         - body
     unit_of_measurement: "%"
     scan_interval: 300
 - sensor:
-    name: Bedroom SwitchBot Meter Temperature
-    unique_id: sensor.bedroom_switchbot_meter_temperature
-    command: /config/bin/switchbot get [% switchbot.device_id.bedroom_meter %] [% switchbot.token %] [% switchbot.secret %]
+    name: Mom’s Room SwitchBot Meter Temperature
+    unique_id: sensor.moms_room_switchbot_meter_temperature
+    command: /config/bin/switchbot get [% switchbot.device_id.moms_room_meter %] [% switchbot.token %] [% switchbot.secret %]
     value_template: '{{ value_json.body.temperature }}'
     json_attributes:
         - body

@@ -1,23 +1,23 @@
 - platform: template
   covers:
-    bedroom_curtains:
-      unique_id: cover.bedroom_curtains
-      friendly_name: Bedroom Curtains
+    moms_room_curtains:
+      unique_id: cover.moms_room_curtains
+      friendly_name: Mom’s Room Curtains
       device_class: curtain
       open_cover:
         service: switch.turn_on
-        entity_id: switch.bedroom_curtains
+        entity_id: switch.moms_room_curtains
       close_cover:
         service: switch.turn_off
-        entity_id: switch.bedroom_curtains
+        entity_id: switch.moms_room_curtains
       value_template: >
-        {% if states("sensor.bedroom_curtains_position") | int(0) < 50 %}
+        {% if states("sensor.moms_room_curtains_position") | int(0) < 50 %}
           opening
         {% else %}
           closed
         {% endif %}
       icon_template: >
-        {% if states("sensor.bedroom_curtains_position") | int(0) < 50 %}
+        {% if states("sensor.moms_room_curtains_position") | int(0) < 50 %}
           mdi:curtains
         {% else %}
           mdi:curtains-closed
