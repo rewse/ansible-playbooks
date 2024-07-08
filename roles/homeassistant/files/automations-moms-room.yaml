@@ -174,28 +174,6 @@
       state: "on"
   action:
     - service: script.open_and_get_state_of_moms_room_curtains
-- id: automation.plan_to_turn_on_moms_room_hvac_cleaner
-  alias: Plan to Turn on Mom’s Room HVAC Cleaner
-  trigger:
-    - platform: numeric_state
-      entity_id: sensor.filtered_moms_room_ac_plug_power
-      above: 10
-      for:
-        hours: 2
-  condition:
-    - condition: state
-      entity_id: binary_sensor.workday_sensor
-      state: "on"
-    - condition: not
-      conditions:
-        - condition: state
-          entity_id: sensor.season
-          state: winter
-  action:
-    - service: automation.turn_on
-      target:
-        entity_id:
-          - automation.turn_on_moms_room_hvac_cleaner
 - id: automation.raise_moms_room_hvac_cool_at_sunset
   alias: Raise Mom’s Room HVAC Cool at Sunset
   trigger:
@@ -308,42 +286,6 @@
     - service: light.turn_off
       target:
         entity_id: light.moms_room_light
-- id: automation.turn_on_moms_room_hvac_cleaner
-  alias: Turn on Mom’s Room HVAC Cleaner
-  mode: single
-  trigger:
-    - platform: time_pattern
-      minutes: "/5"
-      seconds: 37
-  condition:
-    - condition: state
-      entity_id: binary_sensor.workday_sensor
-      state: 'off'
-    - condition: time
-      after: "16:00"
-      before: "20:00"
-    - condition: state
-      entity_id: binary_sensor.moms_room_presence
-      state: "off"
-    - condition: state
-      entity_id: alarm_control_panel.surveillance
-      state: disarmed
-  action:
-    - service: switch.turn_on
-      target:
-        entity_id: switch.moms_room_hvac_cleaner
-    - service: notify.all_devices
-      data:
-        message: Turned on Mom’s Room HVAC Cleaner
-        data:
-          url: /lovelace/home
-          push:
-            interruption-level: time-sensitive
-    - delay:
-        hours: 2
-    - service: automation.turn_off
-      target:
-        entity_id: automation.turn_on_moms_room_hvac_cleaner
 - id: automation.turn_on_moms_room_hvac_cool
   alias: Turn on Mom’s Room HVAC Cool
   mode: single

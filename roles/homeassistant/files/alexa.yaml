@@ -40,7 +40,6 @@ smart_home:
       - sensor.moms_room_temperature
       - sensor.living_room_temperature
       - sensor.study_temperature
-      - switch.moms_room_hvac_cleaner
       - switch.living_room_humidifier
       - switch.living_room_hvac_cleaner
   entity_config:
@@ -125,6 +124,3 @@ smart_home:
     switch.living_room_humidifier:
       name: リビングの加湿器
       display_categories: AIR_PURIFIER
-    switch.living_room_hvac_cleaner:
-      name: リビングのエアコンクリーナー
-      display_categories: VACUUM_CLEANER
