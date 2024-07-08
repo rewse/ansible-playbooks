@@ -51,9 +51,6 @@ cards:
         secondary_info: last-triggered
       - entity: input_datetime.moms_room_curtains_opened_time_workday
         name: Curtains Opened Time for Workday
-      - entity: automation.plan_to_turn_on_moms_room_hvac_cleaner
-        name: Plan to Turn on HVAC Cleaner
-        secondary_info: last-triggered
       - entity: automation.turn_down_moms_room
         name: Turn down
         secondary_info: last-triggered
@@ -73,9 +70,6 @@ cards:
         name: Turned off HVAC Cool Threshold
       - entity: input_number.moms_room_humidifier_turned_on_threshold
         name: Turned on Humidifier Threshold
-      - entity: automation.turn_on_moms_room_hvac_cleaner
-        name: Turn on HVAC Cleaner
-        secondary_info: last-triggered
       - entity: automation.turn_on_moms_room_hvac_cool
         name: Turn on HVAC Cool
         secondary_info: last-triggered

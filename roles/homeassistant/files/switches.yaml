@@ -6,18 +6,6 @@
     - switch.study_floor_heating
 - platform: template
   switches:
-    moms_room_hvac_cleaner:
-      unique_id: switch.moms_room_hvac_cleaner
-      friendly_name: Mom’s Room HVAC Cleaner
-      turn_on:
-        service: rest_command.control_remo_device
-        data:
-          signal_id: 7a7700f7-bee8-4227-bad0-9fafade1cfcb
-      turn_off:
-        service: rest_command.control_remo_device
-        data:
-          signal_id: 752e4cd3-b940-43e7-92b1-80c455612c96
-      icon_template: mdi:broom
     moms_room_curtains:
       unique_id: switch.moms_room_curtains
       friendly_name: Moms’s Room Curtains
