@@ -50,28 +50,6 @@ views:
           - entity: device_tracker.ping_kijishiro
           - entity: device_tracker.kijishiro
         hours_to_show: 12
-      - type: entities
-        title: Room Presence
-        entities:
-          - entity: binary_sensor.living_room_presence
-            name: Living Room Presence
-            secondary_info: last-changed
-          - entity: sensor.count_of_living_room_motion
-            secondary_info: last-changed
-          - entity: sensor.count_of_study_motion
-            secondary_info: last-changed
-          - entity: sensor.count_of_dining_room_motion
-            secondary_info: last-changed
-          - entity: binary_sensor.dads_room_presence
-            name: Dad’s Room Presence
-            secondary_info: last-changed
-          - entity: sensor.count_of_dads_room_motion
-            secondary_info: last-changed
-          - entity: binary_sensor.moms_room_presence
-            name: Mom’s Room Presence
-            secondary_info: last-changed
-          - entity: sensor.count_of_moms_room_motion
-            secondary_info: last-changed
       - type: alarm-panel
         name: Living Room TV
         entity: alarm_control_panel.living_room_tv

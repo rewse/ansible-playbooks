@@ -427,29 +427,21 @@ cards:
       - entity: binary_sensor.living_room_presence
         name: Living Room Presence
         secondary_info: last-changed
-      - entity: binary_sensor.living_room_motion
-        name: Living Room
+      - entity: sensor.count_of_living_room_motion
         secondary_info: last-changed
-      - entity: binary_sensor.study_motion
-        name: Study
+      - entity: sensor.count_of_study_motion
         secondary_info: last-changed
-      - entity: binary_sensor.dining_room_motion
-        name: Dining Room
+      - entity: sensor.count_of_dining_room_motion
         secondary_info: last-changed
       - entity: binary_sensor.dads_room_presence
         name: Dad’s Room Presence
         secondary_info: last-changed
-      - entity: binary_sensor.dads_room_motion
-        name: Dad’s Room
+      - entity: sensor.count_of_dads_room_motion
         secondary_info: last-changed
       - entity: binary_sensor.moms_room_presence
         name: Mom’s Room Presence
         secondary_info: last-changed
-      - entity: binary_sensor.moms_room_motion
-        name: Mom’s Room
-        secondary_info: last-changed
-      - entity: binary_sensor.bathroom_motion
-        name: Bathroom
+      - entity: sensor.count_of_moms_room_motion
         secondary_info: last-changed
   - type: entities
     title: Window Sensors
