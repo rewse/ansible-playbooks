@@ -2,14 +2,14 @@
       include_entities:
         - alarm_control_panel.entrance_auto_lock
         - alarm_control_panel.surveillance
-        - climate.bedroom_hvac
+        - climate.moms_room_hvac
         - climate.living_room_hvac
         - fan.living_room_ceiling_fans
         - light.living_area_dimming_downlights
         - light.living_area_downlights
         - light.living_room_footlight
         - sensor.living_room_co2
-        - switch.bedroom_hvac_cleaner
+        - switch.moms_room_hvac_cleaner
         - switch.living_room_hvac_cleaner
         - switch.living_room_floor_heating
         - switch.living_room_humidifier

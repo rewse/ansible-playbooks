@@ -54,14 +54,24 @@
     icon: mdi:thermometer-lines
     device_class: temperature
     unit_of_measurement: °C
-  - name: Bedroom HVAC Plug Power
-    unique_id: sensor.bedroom_hvac_plug_power
-    state: "{{ state_attr('switch.bedroom_hvac_plug', 'current_consumption') }}"
+  - name: Dad’s Room HVAC Plug Power
+    unique_id: sensor.dads_room_hvac_plug_power
+    state: "{{ state_attr('switch.dads_room_ac_plug', 'current_consumption') }}"
     device_class: power
     unit_of_measurement: W
-  - name: Bedroom Surveillance Plug Power
-    unique_id: sensor.bedroom_surveillance_plug_power
-    state: "{{ state_attr('switch.bedroom_surveillance_plug', 'current_consumption') }}"
+  - name: Dad’s Room Surveillance Plug Power
+    unique_id: sensor.dads_room_surveillance_plug_power
+    state: "{{ state_attr('switch.dads_room_surveillance_plug', 'current_consumption') }}"
+    device_class: power
+    unit_of_measurement: W
+  - name: Mom’s Room HVAC Plug Power
+    unique_id: sensor.moms_room_ac_plug_power
+    state: "{{ state_attr('switch.moms_room_ac_plug', 'current_consumption') }}"
+    device_class: power
+    unit_of_measurement: W
+  - name: Mom’s Room Surveillance Plug Power
+    unique_id: sensor.moms_room_surveillance_plug_power
+    state: "{{ state_attr('switch.moms_room_surveillance_plug', 'current_consumption') }}"
     device_class: power
     unit_of_measurement: W
   - name: Dad’s Room WBGT
@@ -115,12 +125,12 @@
     unit_of_measurement: °C
   - name: Mom’s Room Humidity Difference
     unique_id: sensor.moms_room_humidity_difference
-    state: "{{ (states('sensor.moms_room_humidity') | float(50) - state_attr('sensor.bedroom_switchbot_meter_temperature', 'body')['humidity'] | float(50)) | round(2) | abs }}"
+    state: "{{ (states('sensor.moms_room_humidity') | float(50) - state_attr('sensor.moms_room_switchbot_meter_temperature', 'body')['humidity'] | float(50)) | round(2) | abs }}"
     icon: mdi:water-percent-alert
     unit_of_measurement: pt
   - name: Mom’s Room Temperature Difference
     unique_id: sensor.moms_room_temperature_difference
-    state: "{{ (states('sensor.moms_room_temperature') | float(25) - states('sensor.bedroom_switchbot_meter_temperature') | float(25)) | round(2) | abs }}"
+    state: "{{ (states('sensor.moms_room_temperature') | float(25) - states('sensor.moms_room_switchbot_meter_temperature') | float(25)) | round(2) | abs }}"
     icon: mdi:thermometer-alert
     device_class: temperature
     unit_of_measurement: °C

@@ -1,6 +1,6 @@
-path: bedroom
+path: momsroom
 title: Mom’s Room
-icon: 'mdi:bed'
+icon: 'mdi:teddy-bear'
 badges: []
 cards:
   - type: entities
@@ -13,12 +13,12 @@ cards:
       - entity: sensor.moms_room_humidity
         name: Humidity
   - type: entities
-    title: Bedroom Lights
+    title: Mom’s Room Lights
     entities:
       - entity: light.moms_room_light
         name: Light
   - type: tile
-    entity: climate.bedroom_ac
+    entity: climate.moms_room_ac
     tap_action:
       action: more-info
     icon_tap_action:
@@ -34,71 +34,71 @@ cards:
           - 'off'
       - type: target-temperature
   - type: entities
-    title: Bedroom Appliances
+    title: Mom’s Room Appliances
     entities:
-      - entity: cover.bedroom_curtains
+      - entity: cover.moms_room_curtains
         name: Curtains
   - type: entities
-    title: Bedroom Automations
+    title: Mom’s Room Automations
     entities:
-      - entity: automation.open_bedroom_curtains_temporarily
+      - entity: automation.open_moms_room_curtains_temporarily
         name: Open Curtains Temporarily
         secondary_info: last-triggered
-      - entity: input_datetime.bedroom_curtains_opened_time
+      - entity: input_datetime.moms_room_curtains_opened_time
         name: Curtains Opened Time Temporarily
-      - entity: automation.open_bedroom_curtains_workday
+      - entity: automation.open_moms_room_curtains_workday
         name: Open Curtains for Workday
         secondary_info: last-triggered
-      - entity: input_datetime.bedroom_curtains_opened_time_workday
+      - entity: input_datetime.moms_room_curtains_opened_time_workday
         name: Curtains Opened Time for Workday
-      - entity: automation.plan_to_turn_on_bedroom_hvac_cleaner
+      - entity: automation.plan_to_turn_on_moms_room_hvac_cleaner
         name: Plan to Turn on HVAC Cleaner
         secondary_info: last-triggered
-      - entity: automation.turn_down_bedroom
+      - entity: automation.turn_down_moms_room
         name: Turn down
         secondary_info: last-triggered
-      - entity: input_datetime.bedroom_turned_down_time
+      - entity: input_datetime.moms_room_turned_down_time
         name: Turned down Time
-      - entity: automation.turn_off_bedroom_hvac_cool
+      - entity: automation.turn_off_moms_room_hvac_cool
         name: Turn off HVAC Cool
         secondary_info: last-triggered
-      - entity: input_number.bedroom_hvac_cool_turned_off_threshold
+      - entity: input_number.moms_room_hvac_cool_turned_off_threshold
         name: Turned off HVAC Cool Threshold
-      - entity: input_number.bedroom_hvac_dry_turned_off_threshold
+      - entity: input_number.moms_room_hvac_dry_turned_off_threshold
         name: Turned off HVAC Dry Threshold
-      - entity: automation.turn_off_bedroom_hvac_heat
+      - entity: automation.turn_off_moms_room_hvac_heat
         name: Turn off HVAC Heat
         secondary_info: last-triggered
-      - entity: input_number.bedroom_hvac_heat_turned_off_threshold
+      - entity: input_number.moms_room_hvac_heat_turned_off_threshold
         name: Turned off HVAC Cool Threshold
-      - entity: input_number.bedroom_humidifier_turned_on_threshold
+      - entity: input_number.moms_room_humidifier_turned_on_threshold
         name: Turned on Humidifier Threshold
-      - entity: automation.turn_on_bedroom_hvac_cleaner
+      - entity: automation.turn_on_moms_room_hvac_cleaner
         name: Turn on HVAC Cleaner
         secondary_info: last-triggered
-      - entity: automation.turn_on_bedroom_hvac_cool
+      - entity: automation.turn_on_moms_room_hvac_cool
         name: Turn on HVAC Cool
         secondary_info: last-triggered
-      - entity: input_number.bedroom_hvac_cool_turned_on_threshold
+      - entity: input_number.moms_room_hvac_cool_turned_on_threshold
         name: Turned on HVAC Cool Threshold
-      - entity: automation.turn_on_bedroom_hvac_cool_forcibly
+      - entity: automation.turn_on_moms_room_hvac_cool_forcibly
         name: Turn on HVAC Cool Forcibly
         secondary_info: last-triggered
-      - entity: input_number.bedroom_hvac_cool_forcibly_turned_on_threshold
+      - entity: input_number.moms_room_hvac_cool_forcibly_turned_on_threshold
         name: Turned on HVAC Cool Forcibly Threshold
-      - entity: automation.turn_on_bedroom_hvac_dry
+      - entity: automation.turn_on_moms_room_hvac_dry
         name: Turn on HVAC Dry
         secondary_info: last-triggered
-      - entity: input_number.bedroom_hvac_dry_turned_on_threshold_wbgt
+      - entity: input_number.moms_room_hvac_dry_turned_on_threshold_wbgt
         name: Turned on HVAC Dry Threshold WBGT
-      - entity: input_number.bedroom_hvac_dry_turned_on_threshold_humidity
+      - entity: input_number.moms_room_hvac_dry_turned_on_threshold_humidity
         name: Turned on HVAC Dry Threshold Humidity
-      - entity: automation.turn_on_bedroom_hvac_heat
+      - entity: automation.turn_on_moms_room_hvac_heat
         name: Turn on HVAC Heat
         secondary_info: last-triggered
-      - entity: input_number.bedroom_hvac_heat_turned_on_threshold
+      - entity: input_number.moms_room_hvac_heat_turned_on_threshold
         name: Turned on HVAC Heat Threshold
     show_header_toggle: false
   - type: picture-entity
-    name: Bedroom Camera
-    entity: camera.guppy_bedroom_camera
+    name: Mom’s Room Camera
+    entity: camera.moms_room_camera

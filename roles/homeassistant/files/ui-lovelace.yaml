@@ -2,5 +2,5 @@ title: Overview
 views:
   - !include ui/home.yaml
   - !include ui/livingroom.yaml
-  - !include ui/bedroom.yaml
+  - !include ui/momsroom.yaml
   - !include ui/others.yaml

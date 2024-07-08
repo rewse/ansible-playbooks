@@ -10,8 +10,8 @@ smart_home:
       - automation.turn_down_living_area
       - automation.turn_down_living_area_more
       - binary_sensor.bathroom_motion
-      - binary_sensor.bedroom_window_n
-      - binary_sensor.bedroom_window_s
+      - binary_sensor.moms_room_window_n
+      - binary_sensor.moms_room_window_s
       - binary_sensor.entrance_door
       - binary_sensor.living_room_motion
       - binary_sensor.living_room_window
@@ -19,10 +19,10 @@ smart_home:
       - binary_sensor.study_window_n
       - binary_sensor.study_window_s
       - camera.guppy_living_room_camera
-      - camera.guppy_bedroom_camera
-      - climate.bedroom_hvac
+      - camera.guppy_moms_room_camera
+      - climate.moms_room_hvac
       - climate.living_room_hvac
-      - cover.bedroom_curtains
+      - cover.moms_room_curtains
       - fan.living_room_ceiling_fans
       - switch.living_area_floor_heatings
       - light.bathroom_lights
@@ -40,7 +40,7 @@ smart_home:
       - sensor.moms_room_temperature
       - sensor.living_room_temperature
       - sensor.study_temperature
-      - switch.bedroom_hvac_cleaner
+      - switch.moms_room_hvac_cleaner
       - switch.living_room_humidifier
       - switch.living_room_hvac_cleaner
   entity_config:
@@ -56,10 +56,10 @@ smart_home:
       display_categories: SCENE_TRIGGER
     binary_sensor.bathroom_motion:
       name: 浴室のモーションセンサー
-    binary_sensor.bedroom_window_n:
-      name: 寝室の北側の窓
-    binary_sensor.bedroom_window_s:
-      name: 寝室の南側のの窓
+    binary_sensor.moms_room_window_n:
+      name: ママの部屋の北側の窓
+    binary_sensor.moms_room_window_s:
+      name: ママの部屋の南側のの窓
     binary_sensor.entrance_door:
       name: 玄関のドア
     binary_sensor.living_room_motion:
@@ -72,16 +72,16 @@ smart_home:
       name: 書斎の北側の窓
     binary_sensor.study_window_s:
       name: 書斎の南側の窓
-    camera.guppy_bedroom_camera:
-      name: 寝室のカメラ
+    camera.moms_room_camera:
+      name: ママの部屋のカメラ
     camera.guppy_living_room_camera:
       name: リビングのカメラ
-    climate.bedroom_hvac:
-      name: 寝室のエアコン
+    climate.moms_room_ac:
+      name: ママの部屋のエアコン
     climate.living_room_hvac:
       name: リビングのエアコン
-    cover.bedroom_curtains:
-      name: 寝室のカーテン
+    cover.moms_room_curtains:
+      name: ママの部屋のカーテン
     fan.living_room_ceiling_fans:
       name: リビングのシーリングファン
     switch.living_area_floor_heatings:
@@ -119,8 +119,8 @@ smart_home:
       name: リビングの温度計
     sensor.study_temperature:
       name: 書斎の温度計
-    switch.bedroom_hvac_cleaner:
-      name: 寝室のエアコンクリーナー
+    switch.moms_room_ac_cleaner:
+      name: ママの部屋のエアコンクリーナー
       display_categories: VACUUM_CLEANER
     switch.living_room_humidifier:
       name: リビングの加湿器

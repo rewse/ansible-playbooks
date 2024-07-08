@@ -165,7 +165,8 @@
     - service: switch.turn_off
       entity_id:
         - switch.living_room_surveillance_plug
-        - switch.bedroom_surveillance_plug
+        - switch.dads_room_surveillance_plug
+        - switch.moms_room_surveillance_plug
 - id: automation.turn_on_surveillances
   alias: Turn on Surveillances
   trigger:
@@ -183,7 +184,8 @@
     - service: switch.turn_on
       entity_id:
         - switch.living_room_surveillance_plug
-        - switch.bedroom_surveillance_plug
+        - switch.dads_room_surveillance_plug
+        - switch.moms_room_surveillance_plug
 - id: automation.webhook_switchbot
   alias: "Webhook: Switchbot"
   trigger:

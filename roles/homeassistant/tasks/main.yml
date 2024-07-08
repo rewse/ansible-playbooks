@@ -90,9 +90,9 @@
     dest: /etc/homeassistant/automations
   tags: [homeassistant, homeassistant-automation]
 
-- name: Copy automations-bedroom.yaml
+- name: Copy automations-moms-room.yaml
   copy:
-    src: automations-bedroom.yaml
+    src: automations-moms-room.yaml
     dest: /etc/homeassistant/automations
   tags: [homeassistant, homeassistant-automation]
 
@@ -684,9 +684,9 @@
     dest: /etc/homeassistant/ui
   tags: [homeassistant, homeassistant-ui]
 
-- name: Copy bedroom.yaml
+- name: Copy momsroom.yaml
   copy:
-    src: bedroom.yaml
+    src: momsroom.yaml
     dest: /etc/homeassistant/ui
   tags: [homeassistant, homeassistant-ui]
 
