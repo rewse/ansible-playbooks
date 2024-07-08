@@ -684,6 +684,12 @@
     dest: /etc/homeassistant/ui
   tags: [homeassistant, homeassistant-ui]
 
+- name: Copy dadsroom.yaml
+  copy:
+    src: dadsroom.yaml
+    dest: /etc/homeassistant/ui
+  tags: [homeassistant, homeassistant-ui]
+
 - name: Copy momsroom.yaml
   copy:
     src: momsroom.yaml
