@@ -56,42 +56,42 @@ cards:
         secondary_info: last-triggered
       - entity: input_datetime.moms_room_turned_down_time
         name: Turned down Time
-      - entity: automation.turn_off_moms_room_hvac_cool
-        name: Turn off HVAC Cool
+      - entity: automation.turn_off_moms_room_ac_cool
+        name: Turn off AC Cool
         secondary_info: last-triggered
-      - entity: input_number.moms_room_hvac_cool_turned_off_threshold
-        name: Turned off HVAC Cool Threshold
-      - entity: input_number.moms_room_hvac_dry_turned_off_threshold
-        name: Turned off HVAC Dry Threshold
-      - entity: automation.turn_off_moms_room_hvac_heat
-        name: Turn off HVAC Heat
+      - entity: input_number.moms_room_ac_cool_turned_off_threshold
+        name: Turned off AC Cool Threshold
+      - entity: input_number.moms_room_ac_dry_turned_off_threshold
+        name: Turned off AC Dry Threshold
+      - entity: automation.turn_off_moms_room_ac_heat
+        name: Turn off AC Heat
         secondary_info: last-triggered
-      - entity: input_number.moms_room_hvac_heat_turned_off_threshold
-        name: Turned off HVAC Cool Threshold
+      - entity: input_number.moms_room_ac_heat_turned_off_threshold
+        name: Turned off AC Cool Threshold
       - entity: input_number.moms_room_humidifier_turned_on_threshold
         name: Turned on Humidifier Threshold
-      - entity: automation.turn_on_moms_room_hvac_cool
-        name: Turn on HVAC Cool
+      - entity: automation.turn_on_moms_room_ac_cool
+        name: Turn on AC Cool
         secondary_info: last-triggered
-      - entity: input_number.moms_room_hvac_cool_turned_on_threshold
-        name: Turned on HVAC Cool Threshold
-      - entity: automation.turn_on_moms_room_hvac_cool_forcibly
-        name: Turn on HVAC Cool Forcibly
+      - entity: input_number.moms_room_ac_cool_turned_on_threshold
+        name: Turned on AC Cool Threshold
+      - entity: automation.turn_on_moms_room_ac_cool_forcibly
+        name: Turn on AC Cool Forcibly
         secondary_info: last-triggered
-      - entity: input_number.moms_room_hvac_cool_forcibly_turned_on_threshold
-        name: Turned on HVAC Cool Forcibly Threshold
-      - entity: automation.turn_on_moms_room_hvac_dry
-        name: Turn on HVAC Dry
+      - entity: input_number.moms_room_ac_cool_forcibly_turned_on_threshold
+        name: Turned on AC Cool Forcibly Threshold
+      - entity: automation.turn_on_moms_room_ac_dry
+        name: Turn on AC Dry
         secondary_info: last-triggered
-      - entity: input_number.moms_room_hvac_dry_turned_on_threshold_wbgt
-        name: Turned on HVAC Dry Threshold WBGT
-      - entity: input_number.moms_room_hvac_dry_turned_on_threshold_humidity
-        name: Turned on HVAC Dry Threshold Humidity
-      - entity: automation.turn_on_moms_room_hvac_heat
-        name: Turn on HVAC Heat
+      - entity: input_number.moms_room_ac_dry_turned_on_threshold_wbgt
+        name: Turned on AC Dry Threshold WBGT
+      - entity: input_number.moms_room_ac_dry_turned_on_threshold_humidity
+        name: Turned on AC Dry Threshold Humidity
+      - entity: automation.turn_on_moms_room_ac_heat
+        name: Turn on AC Heat
         secondary_info: last-triggered
-      - entity: input_number.moms_room_hvac_heat_turned_on_threshold
-        name: Turned on HVAC Heat Threshold
+      - entity: input_number.moms_room_ac_heat_turned_on_threshold
+        name: Turned on AC Heat Threshold
     show_header_toggle: false
   - type: picture-entity
     name: Mom’s Room Camera
