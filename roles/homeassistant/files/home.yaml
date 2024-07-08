@@ -233,6 +233,22 @@ cards:
           - entity: light.dads_room_light
             name: Light
         show_header_toggle: false
+      - type: tile
+        entity: climate.dads_room_ac
+        tap_action:
+          action: more-info
+        icon_tap_action:
+          action: more-info
+        features:
+          - type: climate-hvac-modes
+            hvac_modes:
+              - auto
+              - cool
+              - dry
+              - heat
+              - fan_only
+              - 'off'
+          - type: target-temperature
   - type: vertical-stack
     cards:
       - type: custom:mini-graph-card
