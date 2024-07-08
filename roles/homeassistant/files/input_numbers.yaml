@@ -1,53 +1,53 @@
-moms_room_humidifier_turned_on_threshold:
-  name: Mom’s Room Humidifier Turned on Threshold
+dads_room_humidifier_turned_on_threshold:
+  name: Dad’s Room Humidifier Turned on Threshold
   min: 36
   max: 44
   unit_of_measurement: "%"
   icon: mdi:water-percent-alert
-moms_room_ac_cool_forcibly_turned_on_threshold:
-  name: Mom’s Room AC Cool Forcibly Turned on Threshold
+dads_room_ac_cool_forcibly_turned_on_threshold:
+  name: Dad’s Room AC Cool Forcibly Turned on Threshold
   min: 27
   max: 35
   unit_of_measurement: °C
   icon: mdi:thermometer-alert
-moms_room_ac_cool_turned_off_threshold:
-  name: Mom’s Room AC Cool Turned off Threshold
+dads_room_ac_cool_turned_off_threshold:
+  name: Dad’s Room AC Cool Turned off Threshold
   min: 19
   max: 27
   unit_of_measurement: °C
   icon: mdi:thermometer-chevron-down
-moms_room_ac_cool_turned_on_threshold:
-  name: Mom’s Room AC Cool Turned on Threshold
+dads_room_ac_cool_turned_on_threshold:
+  name: Dad’s Room AC Cool Turned on Threshold
   min: 24
   max: 32
   unit_of_measurement: °C
   icon: mdi:thermometer-chevron-up
-moms_room_ac_heat_turned_off_threshold:
-  name: Mom’s Room AC Heat Turned off Threshold
+dads_room_ac_heat_turned_off_threshold:
+  name: Dad’s Room AC Heat Turned off Threshold
   min: 22
   max: 30
   unit_of_measurement: °C
   icon: mdi:thermometer-chevron-down
-moms_room_ac_heat_turned_on_threshold:
-  name: Mom’s Room AC Heat Turned on Threshold
+dads_room_ac_heat_turned_on_threshold:
+  name: Dad’s Room AC Heat Turned on Threshold
   min: 19
   max: 27
   unit_of_measurement: °C
   icon: mdi:thermometer-chevron-up
-moms_room_ac_dry_turned_off_threshold:
-  name: Mom’s Room AC Dry Turned off Threshold
+dads_room_ac_dry_turned_off_threshold:
+  name: Dad’s Room AC Dry Turned off Threshold
   min: 52
   max: 60
   unit_of_measurement: "%"
   icon: mdi:water-percent-alert
-moms_room_ac_dry_turned_on_threshold_humidity:
-  name: Mom’s Room AC Dry Turned on Threshold Humidity
+dads_room_ac_dry_turned_on_threshold_humidity:
+  name: Dad’s Room AC Dry Turned on Threshold Humidity
   min: 56
   max: 64
   unit_of_measurement: "%"
   icon: mdi:water-percent-alert
-moms_room_ac_dry_turned_on_threshold_wbgt:
-  name: Mom’s Room AC Dry Turned on Threshold WBGT
+dads_room_ac_dry_turned_on_threshold_wbgt:
+  name: Dad’s Room AC Dry Turned on Threshold WBGT
   min: 22
   max: 30
   unit_of_measurement: °C
@@ -108,6 +108,60 @@ living_room_hvac_dry_turned_on_threshold_humidity:
   icon: mdi:water-percent-alert
 living_room_hvac_dry_turned_on_threshold_wbgt:
   name: Living Room HVAC Dry Turned on Threshold WBGT
+  min: 22
+  max: 30
+  unit_of_measurement: °C
+  icon: mdi:thermometer-chevron-up
+moms_room_humidifier_turned_on_threshold:
+  name: Mom’s Room Humidifier Turned on Threshold
+  min: 36
+  max: 44
+  unit_of_measurement: "%"
+  icon: mdi:water-percent-alert
+moms_room_ac_cool_forcibly_turned_on_threshold:
+  name: Mom’s Room AC Cool Forcibly Turned on Threshold
+  min: 27
+  max: 35
+  unit_of_measurement: °C
+  icon: mdi:thermometer-alert
+moms_room_ac_cool_turned_off_threshold:
+  name: Mom’s Room AC Cool Turned off Threshold
+  min: 19
+  max: 27
+  unit_of_measurement: °C
+  icon: mdi:thermometer-chevron-down
+moms_room_ac_cool_turned_on_threshold:
+  name: Mom’s Room AC Cool Turned on Threshold
+  min: 24
+  max: 32
+  unit_of_measurement: °C
+  icon: mdi:thermometer-chevron-up
+moms_room_ac_heat_turned_off_threshold:
+  name: Mom’s Room AC Heat Turned off Threshold
+  min: 22
+  max: 30
+  unit_of_measurement: °C
+  icon: mdi:thermometer-chevron-down
+moms_room_ac_heat_turned_on_threshold:
+  name: Mom’s Room AC Heat Turned on Threshold
+  min: 19
+  max: 27
+  unit_of_measurement: °C
+  icon: mdi:thermometer-chevron-up
+moms_room_ac_dry_turned_off_threshold:
+  name: Mom’s Room AC Dry Turned off Threshold
+  min: 52
+  max: 60
+  unit_of_measurement: "%"
+  icon: mdi:water-percent-alert
+moms_room_ac_dry_turned_on_threshold_humidity:
+  name: Mom’s Room AC Dry Turned on Threshold Humidity
+  min: 56
+  max: 64
+  unit_of_measurement: "%"
+  icon: mdi:water-percent-alert
+moms_room_ac_dry_turned_on_threshold_wbgt:
+  name: Mom’s Room AC Dry Turned on Threshold WBGT
   min: 22
   max: 30
   unit_of_measurement: °C
