@@ -1,0 +1,35 @@
+path: dadsroom
+title: Dad’s Room
+icon: 'mdi:monitor'
+badges: []
+cards:
+  - type: entities
+    title: Dad’s Room Humiture
+    entities:
+      - entity: sensor.dads_room_temperature
+        name: Temperature
+      - entity: sensor.dads_room_wbgt
+        name: WBGT
+      - entity: sensor.dads_room_humidity
+        name: Humidity
+  - type: entities
+    title: Dad’s Room Lights
+    entities:
+      - entity: light.dads_room_light
+        name: Light
+  - type: tile
+    entity: climate.dads_room_ac
+    tap_action:
+      action: more-info
+    icon_tap_action:
+      action: more-info
+    features:
+      - type: climate-hvac-modes
+        hvac_modes:
+          - auto
+          - cool
+          - dry
+          - heat
+          - fan_only
+          - 'off'
+      - type: target-temperature
