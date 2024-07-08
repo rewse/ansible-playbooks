@@ -9,7 +9,6 @@
         - light.living_area_downlights
         - light.living_room_footlight
         - sensor.living_room_co2
-        - switch.moms_room_hvac_cleaner
         - switch.living_room_hvac_cleaner
         - switch.living_room_floor_heating
         - switch.living_room_humidifier
