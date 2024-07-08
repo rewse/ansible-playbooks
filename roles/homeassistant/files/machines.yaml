@@ -20,18 +20,22 @@ views:
           - entity: binary_sensor.catloghome_mom
           - entity: binary_sensor.daikinac_liv
           - entity: binary_sensor.eufy_liv
+          - entity: binary_sensor.eufy_dad
           - entity: binary_sensor.eufy_mom
           - entity: binary_sensor.huebridge
           - entity: binary_sensor.kasaplug_ent_ses
           - entity: binary_sensor.kasaplug_liv_foo
           - entity: binary_sensor.regza
           - entity: binary_sensor.remo_liv
+          - entity: binary_sensor.remo_dad
           - entity: binary_sensor.remo_mom
           - entity: binary_sensor.sesamemodule
           - entity: binary_sensor.switchbothub2
           - entity: binary_sensor.tuyaplug_kit_ric
           - entity: binary_sensor.tuyaplug_liv_fox
           - entity: binary_sensor.tuyaplug_liv_hum
+          - entity: binary_sensor.tuyaplug_dad_ac
+          - entity: binary_sensor.tuyaplug_dad_sur
           - entity: binary_sensor.tuyaplug_mom_ac
           - entity: binary_sensor.tuyaplug_mom_sur
           - entity: binary_sensor.xiaomigateway
