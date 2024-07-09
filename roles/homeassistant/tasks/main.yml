@@ -504,6 +504,13 @@
   notify: Restart homeassistant
   tags: [homeassistant, homeassistant-component]
 
+- name: Copy customize.yaml
+  copy:
+    src: customize.yaml
+    dest: /etc/homeassistant
+  notify: Restart homeassistant
+  tags: [homeassistant, homeassistant-component]
+
 - name: Create custom_components/nature_remo
   file:
     path: /etc/homeassistant/custom_components/nature_remo
@@ -613,6 +620,7 @@
         currency: JPY
         external_url: https://hass.rewse.jp/
         internal_url: https://hass.rewse.jp/
+        customize: !include customize.yaml
       frontend:
         extra_module_url:
           - /local/card-mod.js
