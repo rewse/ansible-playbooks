@@ -1,11 +1,29 @@
 - platform: manual
+  name: Dad’s Room AC
+  code_arm_required: false
+  delay_time: 0
+  arming_time: 0
+  trigger_time: 0
+- platform: manual
   name: Entrance Auto-Lock
   code_arm_required: false
   delay_time: 0
   arming_time: 0
   trigger_time: 0
 - platform: manual
+  name: Living Room AC
+  code_arm_required: false
+  delay_time: 0
+  arming_time: 0
+  trigger_time: 0
+- platform: manual
   name: Living Room TV
+  code_arm_required: false
+  delay_time: 0
+  arming_time: 0
+  trigger_time: 0
+- platform: manual
+  name: Mom’s Room AC
   code_arm_required: false
   delay_time: 0
   arming_time: 0
