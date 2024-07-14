@@ -57,9 +57,9 @@ cards:
         name: Humidifier
       - entity: switch.living_area_floor_heatings
         name: Floor Heating
-      - entity: button.living_room_floor_heating
+      - entity: switch.living_room_floor_heating
         name: Living Room Floor Heating
-      - entity: button.study_floor_heating
+      - entity: switch.study_floor_heating
         name: Study Floor Heating
     show_header_toggle: false
   - type: alarm-panel

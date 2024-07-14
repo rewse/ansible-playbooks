@@ -394,12 +394,12 @@
             interruption-level: time-sensitive
     - delay:
         hours: 1
-- id: automation.alarm_switchbothub_is_offline
-  alias: "ALARM: switchbothub is Offline"
+- id: automation.alarm_switchbothub2_is_offline
+  alias: "ALARM: switchbothub2 is Offline"
   mode: single
   trigger:
     - platform: state
-      entity_id: binary_sensor.switchbothub
+      entity_id: binary_sensor.switchbothub2
       to: "off"
       for:
         minutes: 31
@@ -407,7 +407,67 @@
     - service: notify.tats_devices
       data:
         title: "⚠️ ALARM"
-        message: ️switchbothub is Offline
+        message: ️switchbothub2 is Offline
+        data:
+          url: /lovelace-machines/machines
+          push:
+            interruption-level: time-sensitive
+    - delay:
+        hours: 1
+- id: automation.alarm_switchbothubmini_liv_is_offline
+  alias: "ALARM: switchbothubmini-liv is Offline"
+  mode: single
+  trigger:
+    - platform: state
+      entity_id: binary_sensor.switchbothubmini_liv
+      to: "off"
+      for:
+        minutes: 31
+  action:
+    - service: notify.tats_devices
+      data:
+        title: "⚠️ ALARM"
+        message: switchbothubmini-liv is Offline
+        data:
+          url: /lovelace-machines/machines
+          push:
+            interruption-level: time-sensitive
+    - delay:
+        hours: 1
+- id: automation.alarm_switchbothubmini_dad_is_offline
+  alias: "ALARM: switchbothubmini-dad is Offline"
+  mode: single
+  trigger:
+    - platform: state
+      entity_id: binary_sensor.switchbothubmini_dad
+      to: "off"
+      for:
+        minutes: 31
+  action:
+    - service: notify.tats_devices
+      data:
+        title: "⚠️ ALARM"
+        message: ️switchbothubmini-mom is Offline
+        data:
+          url: /lovelace-machines/machines
+          push:
+            interruption-level: time-sensitive
+    - delay:
+        hours: 1
+- id: automation.alarm_switchbothubmini_mom_is_offline
+  alias: "ALARM: switchbothubmini-mom is Offline"
+  mode: single
+  trigger:
+    - platform: state
+      entity_id: binary_sensor.switchbothubmini_mom
+      to: "off"
+      for:
+        minutes: 31
+  action:
+    - service: notify.tats_devices
+      data:
+        title: "⚠️ ALARM"
+        message: ️switchbothubmini-mom is Offline
         data:
           url: /lovelace-machines/machines
           push:
