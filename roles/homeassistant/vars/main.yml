@@ -20,7 +20,6 @@ localtuya_version: 5.2.1
 mini_graph_card_version: 0.12.0
 mini_media_player_version: 1.16.9
 mosquitto_password: "{{ vault_mosquitto_password }}"
-nature_remo_version: 0.5
 nfs_server: guppy.rewse.jp
 notify_title_k: "{{ vault_notify_title_k }}"
 postgres:
@@ -31,7 +30,6 @@ postgres:
 regza:
   username: "{{ vault_regza.username }}"
   password: "{{ vault_regza.password }}"
-remo_token: "{{ vault_remo_token }}"
 sesame:
   api_key: "{{ vault_sesame.api_key }}"
   uuid_top: 6D69522A-6A63-72DC-75AE-4057CF142B8B
