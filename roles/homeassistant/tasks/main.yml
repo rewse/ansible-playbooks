@@ -473,6 +473,21 @@
   notify: Restart homeassistant
   tags: [homeassistant, homeassistant-component]
 
+- name: Download ha-switchbot-remote
+  unarchive:
+    src: https://github.com/KiraPC/ha-switchbot-remote/archive/refs/tags/{{ ha_switchbot_remote_version }}.zip
+    dest: /tmp
+    remote_src: yes
+  tags: [homeassistant, homeassistant-custom]
+
+- name: Copy ha-switchbot-remote
+  copy:
+    src: /tmp/ha-switchbot-remote-{{ ha_switchbot_remote_version }}/custom_components/switchbotremote
+    dest: /etc/homeassistant/custom_components
+    remote_src: yes
+  notify: Restart homeassistant
+  tags: [homeassistant, homeassistant-custom]
+
 - name: Download localtuya
   unarchive:
     src: https://github.com/rospogrigio/localtuya/archive/refs/tags/v{{ localtuya_version }}.zip
