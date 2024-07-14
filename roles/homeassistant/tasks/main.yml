@@ -52,6 +52,7 @@
           volumes:
             - /etc/homeassistant:/config
             - /etc/localtime:/etc/localtime:ro
+            - /run/dbus:/run/dbus:ro
           restart: unless-stopped
           network_mode: host
   notify: Restart docker
