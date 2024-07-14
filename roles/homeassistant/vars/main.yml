@@ -6,7 +6,6 @@ card_mod_version: 3.4.3
 gmail:
   address: "{{ vault_gmail.address }}"
   password: "{{ vault_gmail.password }}"
-ifttt_key: "{{ vault_ifttt_key }}"
 homeassistant_token: "{{ vault_homeassistant_token }}"
 latlng:
   home:
