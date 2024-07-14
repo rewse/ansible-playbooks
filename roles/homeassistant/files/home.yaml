@@ -152,9 +152,9 @@ cards:
             name: Ceiling Fan
           - entity: switch.living_area_floor_heatings
             name: Floor Heating
-          - entity: button.living_room_floor_heating
+          - entity: switch.living_room_floor_heating
             name: Living Room Floor Heating
-          - entity: button.study_floor_heating
+          - entity: switch.study_floor_heating
             name: Study Floor Heating
           - entity: switch.living_room_humidifier
             name: Humidifier
@@ -413,7 +413,7 @@ cards:
       - type: custom:mini-graph-card
         name: Balcony Temperature
         entities:
-          - entity: sensor.balcony_switchbot_outdoor_meter_temperature
+          - entity: sensor.balcony_temperature
           - entity: sensor.balcony_wbgt
             show_state: true
             show_fill: false

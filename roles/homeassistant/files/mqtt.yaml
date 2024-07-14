@@ -1,12 +1,3 @@
-button:
-  - unique_id: button.living_room_floor_heating
-    name: "Living Room Floor Heating Button"
-    command_topic: dummy
-    icon: mdi:grid
-  - unique_id: button.study_floor_heating
-    name: "Study Floor Heating Button"
-    command_topic: dummy
-    icon: mdi:grid
 sensor:
   - unique_id: sensor.enecoq_fee_high
     name: enecoQ Fee High
