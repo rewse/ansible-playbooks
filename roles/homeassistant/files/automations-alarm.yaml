@@ -354,46 +354,6 @@
             interruption-level: time-sensitive
     - delay:
         hours: 1
-- id: automation.alarm_remo_bed_is_offline
-  alias: "ALARM: remo-bed is Offline"
-  mode: single
-  trigger:
-    - platform: state
-      entity_id: binary_sensor.remo_bed
-      to: "off"
-      for:
-        minutes: 31
-  action:
-    - service: notify.tats_devices
-      data:
-        title: "⚠️ ALARM"
-        message: ️remo-bed is Offline
-        data:
-          url: /lovelace-machines/machines
-          push:
-            interruption-level: time-sensitive
-    - delay:
-        hours: 1
-- id: automation.alarm_remo_liv_is_offline
-  alias: "ALARM: remo-liv is Offline"
-  mode: single
-  trigger:
-    - platform: state
-      entity_id: binary_sensor.remo_liv
-      to: "off"
-      for:
-        minutes: 31
-  action:
-    - service: notify.tats_devices
-      data:
-        title: "⚠️ ALARM"
-        message: remo-liv is Offline
-        data:
-          url: /lovelace-machines/machines
-          push:
-            interruption-level: time-sensitive
-    - delay:
-        hours: 1
 - id: automation.alarm_romeo_is_offline
   alias: "ALARM: romeo is Offline"
   mode: single

@@ -1,5 +1,0 @@
-control_remo_device:
-  url: https://api.nature.global/1/signals/{{ signal_id }}/send
-  method: post
-  headers:
-    Authorization: !secret remo_token_bearer
