@@ -254,20 +254,6 @@
         entity_id:
           - automation.turn_on_living_room_hvac_internal_clean
           - automation.turn_on_living_room_hvac_cleaner
-- id: automation.press_living_room_floor_heating_button
-  alias: Press Living Room Floor Heating Button
-  trigger:
-    - platform: state
-      entity_id: button.living_room_floor_heating
-  action:
-    - service: shell_command.press_living_room_floor_heating
-- id: automation.press_study_floor_heating_button
-  alias: Press Study Floor Heating Button
-  trigger:
-    - platform: state
-      entity_id: button.study_room_floor_heating
-  action:
-    - service: shell_command.press_study_floor_heating
 - id: automation.raise_living_room_hvac_cool_at_sunset
   alias: Raise Living Room HVAC Cool at Sunset
   trigger:
