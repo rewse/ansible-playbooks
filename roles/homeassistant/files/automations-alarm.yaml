@@ -419,7 +419,7 @@
   mode: single
   trigger:
     - platform: state
-      entity_id: binary_sensor.tuyaplug_dad-ac
+      entity_id: binary_sensor.tuyaplug_dad_ac
       to: "off"
       for:
         minutes: 31
@@ -439,7 +439,7 @@
   mode: single
   trigger:
     - platform: state
-      entity_id: binary_sensor.tuyaplug_dad-sur
+      entity_id: binary_sensor.tuyaplug_dad_sur
       to: "off"
       for:
         minutes: 31
