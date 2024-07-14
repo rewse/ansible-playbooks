@@ -221,22 +221,6 @@
   notify: Restart homeassistant
   tags: [homeassistant, homeassistant-component]
 
-- name: Config fan
-  lineinfile:
-    path: /etc/homeassistant/configuration.yaml
-    insertafter: '^cover:'
-    regexp: '^fan:'
-    line: "fan: !include fans.yaml"
-  notify: Restart homeassistant
-  tags: [homeassistant, homeassistant-component]
-
-- name: Copy fans.yaml
-  copy:
-    src: fans.yaml
-    dest: /etc/homeassistant
-  notify: Restart homeassistant
-  tags: [homeassistant, homeassistant-component]
-
 - name: Config input_boolean
   lineinfile:
     path: /etc/homeassistant/configuration.yaml
