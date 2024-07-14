@@ -399,22 +399,6 @@
   notify: Restart homeassistant
   tags: [homeassistant, homeassistant-component]
 
-- name: Config rest_command
-  lineinfile:
-    path: /etc/homeassistant/configuration.yaml
-    insertafter: '^nofity:'
-    regexp: '^rest_command:'
-    line: "rest_command: !include rest_commands.yaml"
-  notify: Restart homeassistant
-  tags: [homeassistant, homeassistant-component]
-
-- name: Copy rest_commands.yaml
-  copy:
-    src: rest_commands.yaml
-    dest: /etc/homeassistant
-  notify: Restart homeassistant
-  tags: [homeassistant, homeassistant-component]
-
 - name: Copy scripts.yaml
   copy:
     src: scripts.yaml
@@ -511,20 +495,6 @@
     dest: /etc/homeassistant
   notify: Restart homeassistant
   tags: [homeassistant, homeassistant-component]
-
-- name: Create custom_components/nature_remo
-  file:
-    path: /etc/homeassistant/custom_components/nature_remo
-    state: directory
-  tags: [homeassistant, homeassistant-custom]
-
-- name: Download hass-nature-remo
-  unarchive:
-    src: https://github.com/yutoyazaki/hass-nature-remo/archive/refs/tags/v{{ nature_remo_version }}.zip
-    dest: /etc/homeassistant/custom_components/nature_remo
-    remote_src: yes
-  notify: Restart homeassistant
-  tags: [homeassistant, homeassistant-custom]
 
 - name: Download localtuya
   unarchive:
@@ -653,8 +623,6 @@
             type: module
           - url: /local/uptime-card.js
             type: module
-      nature_remo:
-        access_token: !secret remo_token
       recorder:
         db_url: !secret postgres_connstr
         purge_keep_days: 450
