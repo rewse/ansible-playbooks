@@ -1,16 +1,13 @@
 light.living_area_dimming_downlights:
   assumed_state: true
+  icon: mdi:brightness-2
 light.living_area_downlights:
   assumed_state: true
 light.living_area_lights:
   assumed_state: true
-light.living_room_dimming_downlights:
-  assumed_state: true
 light.living_room_downlights:
   assumed_state: true
 light.living_room_lights:
-  assumed_state: true
-light.study_dimming_downlights:
   assumed_state: true
 light.study_downlights:
   assumed_state: true

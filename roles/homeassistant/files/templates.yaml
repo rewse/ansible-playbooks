@@ -29,7 +29,7 @@
 - sensor:
   - name: Balcony Humidity Difference
     unique_id: sensor.balcony_humidity_difference
-    state: "{{ (states('sensor.balcony_humidity') | float(50) - state_attr('sensor.balcony_switchbot_meter_temperature', 'body')['humidity'] | float(50)) | round(2) | abs }}"
+    state: "{{ (states('sensor.balcony_humidity') | float(50) - states('sensor.balcony_switchbot_meter_humidity') | float(50)) | round(2) | abs }}"
     icon: mdi:water-percent-alert
     unit_of_measurement: pt
   - name: Balcony Temperature Difference
@@ -41,7 +41,7 @@
   - name: Balcony WBGT
     unique_id: sensor.balcony_wbgt
     state: "{{ ((states('sensor.balcony_temperature') | float(25) - 30.5) * 0.90739 + (states('sensor.balcony_humidity') | float(50) - 60.0) * 0.14775 + (states('sensor.balcony_temperature') | float(25) - 30.5) * (states('sensor.balcony_humidity') | float(50) - 60.0) * 0.003655 + 27.77) | round(2) }}"
-    icon: mdi:thermometer-lines
+    icon: mdi:thermometer-water
     device_class: temperature
     unit_of_measurement: °C
   - name: Dad’s Room HVAC Plug Power
@@ -67,7 +67,7 @@
   - name: Dad’s Room WBGT
     unique_id: sensor.dads_room_wbgt
     state: "{{ ((states('sensor.dads_room_temperature') | float(25) - 30.5) * 0.90739 + (states('sensor.dads_room_humidity') | float(50) - 60.0) * 0.14775 + (states('sensor.dads_room_temperature') | float(25) - 30.5) * (states('sensor.dads_room_humidity') | float(50) - 60.0) * 0.003655 + 27.77) | round(2) }}"
-    icon: mdi:thermometer-lines
+    icon: mdi:thermometer-water
     device_class: temperature
     unit_of_measurement: °C
   - name: Kitchen Rice Cooker Plug Power
@@ -82,7 +82,7 @@
     unit_of_measurement: W
   - name: Living Room Humidity Difference
     unique_id: sensor.living_room_humidity_difference
-    state: "{{ (states('sensor.living_room_humidity') | float(50) - state_attr('sensor.living_room_switchbot_hub2_temperature', 'body')['humidity'] | float(50)) | round(2) | abs }}"
+    state: "{{ (states('sensor.living_room_humidity') | float(50) - states('sensor.living_room_switchbot_hub2_humidity') | float(50)) | round(2) | abs }}"
     icon: mdi:water-percent-alert
     unit_of_measurement: pt
   - name: Living Room Humidifier Plug Power
@@ -110,7 +110,7 @@
   - name: Living Room WBGT
     unique_id: sensor.living_room_wbgt
     state: "{{ ((states('sensor.living_room_temperature') | float(25) - 30.5) * 0.90739 + (states('sensor.living_room_humidity') | float(50) - 60.0) * 0.14775 + (states('sensor.living_room_temperature') | float(25) - 30.5) * (states('sensor.living_room_humidity') | float(50) - 60.0) * 0.003655 + 27.77) | round(2) }}"
-    icon: mdi:thermometer-lines
+    icon: mdi:thermometer-water
     device_class: temperature
     unit_of_measurement: °C
   - name: Mom’s Room Humidity Difference
@@ -127,7 +127,7 @@
   - name: Mom’s Room WBGT
     unique_id: sensor.moms_room_wbgt
     state: "{{ ((states('sensor.moms_room_temperature') | float(25) - 30.5) * 0.90739 + (states('sensor.moms_room_humidity') | float(50) - 60.0) * 0.14775 + (states('sensor.moms_room_temperature') | float(25) - 30.5) * (states('sensor.moms_room_humidity') | float(50) - 60.0) * 0.003655 + 27.77) | round(2) }}"
-    icon: mdi:thermometer-lines
+    icon: mdi:thermometer-water
     device_class: temperature
     unit_of_measurement: °C
 - trigger:
