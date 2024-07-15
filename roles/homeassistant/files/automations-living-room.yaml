@@ -1,56 +1,20 @@
-- id: automation.alarm_living_room_co2_is_too_high
-  alias: "ALARM: Living Room CO2 is Too High"
-  mode: single
-  trigger:
-    - platform: state
-      entity_id: binary_sensor.living_room_motion
-      to: "on"
-    - platform: state
-      entity_id: binary_sensor.study_motion
-      to: "on"
-    - platform: state
-      entity_id: binary_sensor.dining_room_motion
-      to: "on"
-  condition:
-    - condition: numeric_state
-      entity_id: sensor.living_room_co2
-      above: 1000
-    - condition: state
-      entity_id: binary_sensor.living_room_window
-      state: "off"
-    - condition: state
-      entity_id: binary_sensor.study_window_n
-      state: "off"
-    - condition: state
-      entity_id: binary_sensor.study_window_s
-      state: "off"
-  action:
-    - service: notify.all_devices
-      data:
-        title: "⚠️ ALARM"
-        message: "Living Room CO2 is too high. Current: {{ states('sensor.living_room_co2') }}ppm"
-        data:
-          url: /lovelace/home
-          push:
-            interruption-level: time-sensitive
-    - delay:
-        hours: 1
+# Climates
 - id: automation.alarm_living_room_humidity_difference_is_too_large
   alias: "ALARM: Living Room Humidity Difference is Too Large"
   mode: single
   trigger:
     - platform: state
-      entity_id: sensor.living_room_switchbot_hub2_temperature
-      attribute: humidity
+      entity_id: sensor.living_room_switchbot_hub_2_humidity
   condition:
     - condition: numeric_state
       entity_id: sensor.average_of_living_room_humidity_difference
       above: 10
+    - "{{ (states('sensor.living_room_humidity') | float - states('sensor.living_room_switchbot_hub_2_humidity') | float) | abs > 10 }}"
   action:
     - service: notify.tats_devices
       data:
         title: "⚠️ ALARM"
-        message: "Living Room Humidity Difference is Too Large. Current: {{ states('sensor.living_room_humidity') }}% / {{ states('sensor.living_room_switchbot_hub2_humidity') }}%"
+        message: "Living Room Humidity Difference is Too Large. Current: {{ states('sensor.living_room_humidity') }}% / {{ states('sensor.living_room_switchbot_hub_2_humidity') }}%"
         data:
           url: /lovelace/home
           push:
@@ -62,16 +26,17 @@
   mode: single
   trigger:
     - platform: state
-      entity_id: sensor.living_room_switchbot_hub2_temperature
+      entity_id: sensor.living_room_switchbot_hub_2_temperature
   condition:
     - condition: numeric_state
       entity_id: sensor.average_of_living_room_temperature_difference
       above: 1
+    - "{{ (states('sensor.living_room_temperature') | float - states('sensor.living_room_switchbot_hub_2_temperature') | float) | abs > 1 }}"
   action:
     - service: notify.tats_devices
       data:
         title: "⚠️ ALARM"
-        message: "Living Room Temperature Difference is Too Large. Current: {{ states('sensor.living_room_temperature') }}°C / {{ states('sensor.living_room_switchbot_hub2_temperature') }}°C"
+        message: "Living Room Temperature Difference is Too Large. Current: {{ states('sensor.living_room_temperature') }}°C / {{ states('sensor.living_room_switchbot_hub_2_temperature') }}°C"
         data:
           url: /lovelace/home
           push:
@@ -94,13 +59,13 @@
   condition:
     - condition: numeric_state
       entity_id: sensor.living_room_humidity
-      above: input_number.living_room_hvac_dry_turned_on_threshold_humidity
+      above: input_number.living_room_ac_dry_turned_on_threshold_humidity
     - condition: numeric_state
       entity_id: sensor.living_room_wbgt
-      above: input_number.living_room_hvac_dry_turned_on_threshold_wbgt
+      above: input_number.living_room_ac_dry_turned_on_threshold_wbgt
     - condition: numeric_state
       entity_id: sensor.living_room_wbgt
-      below: input_number.living_room_hvac_cool_turned_on_threshold
+      below: input_number.living_room_ac_cool_turned_on_threshold
     - condition: or
       conditions:
         - condition: state
@@ -121,6 +86,9 @@
     - condition: state
       entity_id: binary_sensor.living_room_presence
       state: "on"
+    - condition: state
+      entity_id: alarm_control_panel.living_room_ac
+      state: armed_home
   action:
     - service: notify.all_devices
       data:
@@ -173,6 +141,9 @@
     - condition: state
       entity_id: binary_sensor.living_room_presence
       state: "on"
+    - condition: state
+      entity_id: alarm_control_panel.living_room_ac
+      state: armed_home
   action:
     - service: notify.all_devices
       data:
@@ -199,7 +170,7 @@
   condition:
     - condition: numeric_state
       entity_id: sensor.living_room_wbgt
-      above: input_number.living_room_hvac_cool_turned_on_threshold
+      above: input_number.living_room_ac_cool_turned_on_threshold
     - condition: or
       conditions:
       - condition: state
@@ -220,6 +191,9 @@
     - condition: state
       entity_id: binary_sensor.living_room_presence
       state: "on"
+    - condition: state
+      entity_id: alarm_control_panel.living_room_ac
+      state: armed_home
   action:
     - service: notify.all_devices
       data:
@@ -230,21 +204,21 @@
             interruption-level: time-sensitive
     - delay:
         hours: 2
-- id: automation.plan_to_turn_on_living_room_hvac_internal_clean
-  alias: Plan to Turn on Living Room HVAC Internal Clean
+- id: automation.plan_to_turn_on_living_room_ac_internal_clean
+  alias: Plan to Turn on Living Room AC Internal Clean
   trigger:
     - platform: state
-      entity_id: climate.living_room_hvac
+      entity_id: climate.living_room_ac
       to: dry
       for:
         minutes: 5
     - platform: state
-      entity_id: climate.living_room_hvac
+      entity_id: climate.living_room_ac
       to: cool
       for:
         minutes: 5
     - platform: state
-      entity_id: climate.living_room_hvac
+      entity_id: climate.living_room_ac
       to: heat_cool
       for:
         minutes: 5
@@ -252,62 +226,49 @@
     - service: automation.turn_on
       target:
         entity_id:
-          - automation.turn_on_living_room_hvac_internal_clean
-          - automation.turn_on_living_room_hvac_cleaner
-- id: automation.raise_living_room_hvac_cool_at_sunset
-  alias: Raise Living Room HVAC Cool at Sunset
+          - automation.turn_on_living_room_ac_internal_clean
+- id: automation.raise_living_room_ac_cool_at_sunset
+  alias: Raise Living Room AC Cool at Sunset
   trigger:
     - platform: sun
       event: sunset
       offset: "01:00:00"
   condition:
     - condition: state
-      entity_id: climate.living_room_hvac
+      entity_id: climate.living_room_ac
       state: cool
+    - condition: state
+      entity_id: alarm_control_panel.living_room_ac
+      state: armed_home
   action:
+    - variables:
+        target: "{{ states('input_number.living_room_ac_cool_target_temperature') | int + 1 }}"
     - service: climate.set_temperature
       target:
-        entity_id: climate.living_room_hvac 
+        entity_id: climate.living_room_ac 
       data:
-        temperature: 26
-- id: automation.raise_living_room_hvac_cool_at_night
-  alias: Raise Living Room HVAC Cool at Night
+        temperature: "{{ target }}"
+- id: automation.raise_living_room_ac_cool_at_night
+  alias: Raise Living Room AC Cool at Night
   trigger:
     - platform: sun
       event: sunset
       offset: "04:00:00"
   condition:
     - condition: state
-      entity_id: climate.living_room_hvac
+      entity_id: climate.living_room_ac
       state: cool
+    - condition: state
+      entity_id: alarm_control_panel.living_room_ac
+      state: armed_home
   action:
+    - variables:
+        target: "{{ states('input_number.living_room_ac_cool_target_temperature') | int + 2 }}"
     - service: climate.set_temperature
       target:
-        entity_id: climate.living_room_hvac
+        entity_id: climate.living_room_ac
       data:
-        temperature: 27
-- id: automation.turn_down_living_area
-  alias: Turn down Living Area
-  description: Turn down the living area
-  trigger:
-    - platform: time
-      at: input_datetime.living_area_turned_down_time
-  action:
-    - service: scene.turn_on
-      entity_id: scene.living_area_turned_down
-    - service: light.turn_on
-      entity_id: light.living_area_dimming_downlights
-- id: automation.turn_down_living_area_more
-  alias: Turn down Living Area More
-  description: Turn down the living area more
-  trigger:
-    - platform: time
-      at: input_datetime.living_area_turned_down_more_time
-  action:
-    - service: scene.turn_on
-      entity_id: scene.living_area_turned_down_more
-    - service: light.turn_off
-      entity_id: light.living_area_dimming_downlights
+        temperature: "{{ target }}"
 - id: automation.turn_off_living_area_floor_heating
   alias: Turn off Living Area Floor Heating
   trigger:
@@ -337,26 +298,78 @@
           - switch.study_floor_heating
     - delay:
         hours: 2
-- id: automation.turn_off_living_area_lights
-  alias: Turn off Living Room Area Lights
+- id: automation.turn_off_living_room_ac
+  alias: Turn off Living Room AC
+  mode: single
   trigger:
-    - platform: sun
-      event: sunrise
-    - platform: event
-      event_type: ios.action_fired
-      event_data:
-        actionName: turn_off_living_room_lights
+    - platform: state
+      entity_id: binary_sensor.living_room_motion
+      to: "on"
+    - platform: state
+      entity_id: binary_sensor.study_motion
+      to: "on"
+    - platform: state
+      entity_id: binary_sensor.dining_room_motion
+      to: "on"
+  condition:
+    - condition: numeric_state
+      entity_id: sensor.living_room_wbgt
+      below: input_number.living_room_ac_cool_turned_off_threshold
+    - condition: numeric_state
+      entity_id: sensor.living_room_humidity
+      below: input_number.living_room_ac_dry_turned_off_threshold
+    - condition: or
+      conditions:
+        - condition: state
+          entity_id: climate.living_room_ac
+          state: heat_cool
+        - condition: state
+          entity_id: climate.living_room_ac
+          state: cool
+        - condition: state
+          entity_id: climate.living_room_ac
+          state: dry
+    - condition: state
+      entity_id: alarm_control_panel.living_room_ac
+      state: armed_home
   action:
-    - service: light.turn_off
+    - service: climate.set_hvac_mode
       target:
-        entity_id: light.living_area_lights
-    - service: notify.tats_devices
+        entity_id: climate.living_room_ac
       data:
-        message: Turned off Living Room Lights
+        hvac_mode: "off"
+    - service: notify.all_devices
+      data:
+        message: "Turned off Living Room AC. Current: {{ states('sensor.living_room_wbgt') }}°C, {{ states('sensor.living_room_humidity') }}%"
         data:
           url: /lovelace/home
           push:
             interruption-level: time-sensitive
+    - delay:
+        hours: 1
+- id: automation.turn_off_living_room_ac_internal_clean
+  alias: Turn Off Living Room AC Internal Clean
+  mode: single
+  trigger:
+    - platform: state
+      entity_id: climate.living_room_ac
+      to: fan_only
+      for:
+        hours: 2
+  condition:
+    - condition: state
+      entity_id: alarm_control_panel.living_room_ac
+      state: armed_home
+  action:
+    - service: climate.set_hvac_mode
+      target:
+        entity_id: climate.living_room_ac
+      data:
+        hvac_mode: "off"
+    - service: automation.turn_off
+      target:
+        entity_id:
+          - automation.turn_on_living_room_ac_internal_clean
 - id: automation.turn_off_living_room_humidifier
   alias: Turn off Living Room Humidifier
   mode: single
@@ -383,177 +396,6 @@
     - service: notify.all_devices
       data:
         message: "Turned off Living Room Humidifier. Current: {{ states('sensor.living_room_humidity') }}%"
-        data:
-          url: /lovelace/home
-          push:
-            interruption-level: time-sensitive
-    - delay:
-        hours: 1
-- id: automation.turn_off_living_room_hvac
-  alias: Turn off Living Room HVAC
-  mode: single
-  trigger:
-    - platform: state
-      entity_id: binary_sensor.living_room_motion
-      to: "on"
-    - platform: state
-      entity_id: binary_sensor.study_motion
-      to: "on"
-    - platform: state
-      entity_id: binary_sensor.dining_room_motion
-      to: "on"
-  condition:
-    - condition: numeric_state
-      entity_id: sensor.living_room_wbgt
-      below: input_number.living_room_hvac_cool_turned_off_threshold
-    - condition: numeric_state
-      entity_id: sensor.living_room_humidity
-      below: input_number.living_room_hvac_dry_turned_off_threshold
-    - condition: or
-      conditions:
-        - condition: state
-          entity_id: climate.living_room_hvac
-          state: heat_cool
-        - condition: state
-          entity_id: climate.living_room_hvac
-          state: cool
-        - condition: state
-          entity_id: climate.living_room_hvac
-          state: dry
-    - condition: state
-      entity_id: alarm_control_panel.surveillance
-      state: disarmed
-  action:
-    - service: climate.set_hvac_mode
-      target:
-        entity_id: climate.living_room_hvac
-      data:
-        hvac_mode: "off"
-    - service: notify.all_devices
-      data:
-        message: "Turned off Living Room HVAC. Current: {{ states('sensor.living_room_wbgt') }}°C, {{ states('sensor.living_room_humidity') }}%"
-        data:
-          url: /lovelace/home
-          push:
-            interruption-level: time-sensitive
-    - delay:
-        hours: 1
-- id: automation.turn_off_living_room_hvac_internal_clean
-  alias: Turn Off Living Room HVAC Internal Clean
-  mode: single
-  trigger:
-    - platform: state
-      entity_id: climate.living_room_hvac
-      to: fan_only
-      for:
-        hours: 2
-  action:
-    - service: climate.set_hvac_mode
-      target:
-        entity_id: climate.living_room_hvac
-      data:
-        hvac_mode: "off"
-    - service: automation.turn_off
-      target:
-        entity_id:
-          - automation.turn_on_living_room_hvac_internal_clean
-- id: automation.turn_off_living_room_tv
-  alias: Turn off Living Room TV
-  trigger:
-    - platform: time_pattern
-      seconds: 39
-  condition:
-    - condition: state
-      entity_id: alarm_control_panel.living_room_tv
-      state: armed_away
-    - condition: template
-      value_template: >-
-        {{ as_timestamp(now()) - as_timestamp(states('sensor.uptime')) > 600 }}
-    - condition: not
-      conditions:
-        - condition: state
-          entity_id: person.shibata_tats
-          state: home
-          for:
-            minutes: 10
-    - condition: not
-      conditions:
-        - condition: state
-          entity_id: person.shibata_akiko
-          state: home
-          for:
-            minutes: 10
-    - condition: or
-      conditions:
-        - condition: state
-          entity_id: sensor.regza_content_type
-          state: broadcast
-          for:
-            seconds: 5
-        - condition: state
-          entity_id: sensor.regza_content_type
-          state: external
-          for:
-            seconds: 5
-        - condition: state
-          entity_id: sensor.regza_content_type
-          state: recorded
-          for:
-            seconds: 5
-  action:
-    - service: shell_command.control_toggle_regza
-    - service: notify.tats_devices
-      data:
-        message: "Turned off Living Room TV"
-        data:
-          url: /lovelace/machines
-          push:
-            interruption-level: time-sensitive
-- id: automation.turn_on_living_area_downlights
-  alias: Turn on Living Area Downlights
-  mode: single
-  trigger:
-    - platform: state
-      entity_id: binary_sensor.living_room_motion
-      to: "on"
-      id: Living Room Motion
-    - platform: state
-      entity_id: binary_sensor.study_motion
-      to: "on"
-      id: Study Motion
-    - platform: state
-      entity_id: binary_sensor.dining_room_motion
-      to: "on"
-      id: Dining Room Motion
-    - platform: sun
-      event: sunset
-      offset: "-00:30:00"
-      id: 30 min before Sunset
-    - platform: sun
-      event: sunset
-      offset: "-00:20:00"
-      id: 20 min before Sunset
-    - platform: sun
-      event: sunset
-      offset: "-00:10:00"
-      id: 10 min before Sunset
-    - platform: sun
-      event: sunset
-      offset: "-00:01:00"
-      id: 1 min before Sunset
-  condition:
-    - condition: numeric_state
-      entity_id: sensor.living_room_light_level
-      below: input_number.living_area_downlights_turned_on_threshold
-    - condition: state
-      entity_id: sun.sun
-      state: above_horizon
-  action:
-    - service: light.turn_on
-      entity_id: light.living_area_downlights
-    - service: notify.tats_devices
-      data:
-        message: "Turned on Living Room Downlights due to {{ trigger.id }}. Current: {{ states('sensor.living_room_light_level') }}lx"
         data:
           url: /lovelace/home
           push:
@@ -595,9 +437,9 @@
       state: "on"
   action:
     - service: switch.toggle
-      entity_id: switch.living_room_floor_heating
-    - service: switch.toggle
-      entity_id: switch.study_floor_heating
+      entity_id: 
+        - switch.living_room_floor_heating
+        - switch.study_floor_heating
     - service: notify.all_devices
       data:
         message: "Turned on Living Area Floor Heating. Current: {{ states('sensor.living_room_temperature') }}°C"
@@ -607,14 +449,181 @@
             interruption-level: time-sensitive
     - delay:
         hours: 1
-- id: automation.turn_on_living_room_ceiling_fan
-  alias: Turn on Living Room Ceiling Fan
+- id: automation.turn_on_living_room_ac_cool
+  alias: Turn on Living Room AC Cool
+  mode: single
   trigger:
-    - platform: sun
-      event: sunrise
+    - platform: state
+      entity_id: binary_sensor.living_room_motion
+      to: "on"
+    - platform: state
+      entity_id: binary_sensor.study_motion
+      to: "on"
+    - platform: state
+      entity_id: binary_sensor.dining_room_motion
+      to: "on"
+  condition:
+    - condition: numeric_state
+      entity_id: sensor.living_room_wbgt
+      above: input_number.living_room_ac_cool_turned_on_threshold
+    - condition: state
+      entity_id: binary_sensor.living_room_window
+      state: "off"
+      for:
+        minutes: 30
+    - condition: state
+      entity_id: binary_sensor.study_window_n
+      state: "off"
+      for:
+        minutes: 30
+    - condition: state
+      entity_id: binary_sensor.study_window_s
+      state: "off"
+      for:
+        minutes: 30
+    - condition: state
+      entity_id: binary_sensor.living_room_presence
+      state: "on"
+    - condition: state
+      entity_id: alarm_control_panel.living_room_ac
+      state: armed_home
   action:
-    - service: fan.turn_on
-      entity_id: fan.living_room_ceiling_fans
+    - service: climate.set_temperature
+      target:
+        entity_id: climate.living_room_ac
+      data:
+        hvac_mode: cool
+        temperature: living_room_ac_cool_target_temperature
+    - service: notify.all_devices
+      data:
+        message: "Turned on Living Room AC Cool. Current: {{ states('sensor.living_room_wbgt') }}°C"
+        data:
+          url: /lovelace/home
+          push:
+            interruption-level: time-sensitive
+    - delay:
+        hours: 1
+- id: automation.turn_on_living_room_ac_cool_forcibly
+  alias: Turn on Living Room AC Cool Forcibly
+  mode: single
+  trigger:
+    - platform: time_pattern
+      minutes: "/5"
+      seconds: 54
+  condition:
+    - condition: numeric_state
+      entity_id: sensor.living_room_wbgt
+      above: input_number.living_room_ac_cool_forcibly_turned_on_threshold
+    - condition: state
+      entity_id: binary_sensor.living_room_window
+      state: "off"
+      for:
+        minutes: 30
+    - condition: state
+      entity_id: binary_sensor.study_window_n
+      state: "off"
+      for:
+        minutes: 30
+    - condition: state
+      entity_id: binary_sensor.study_window_s
+      state: "off"
+      for:
+        minutes: 30
+    - condition: state
+      entity_id: alarm_control_panel.living_room_ac
+      state: armed_home
+  action:
+    - service: climate.set_temperature
+      target:
+        entity_id: climate.living_room_ac
+      data:
+        hvac_mode: cool
+        temperature: living_room_ac_cool_target_temperature
+    - service: notify.all_devices
+      data:
+        message: "Turned on Living Room AC Cool Forcibly. Current: {{ states('sensor.living_room_wbgt') }}°C"
+        data:
+          url: /lovelace/home
+          push:
+            interruption-level: time-sensitive
+    - delay:
+        hours: 1
+- id: automation.turn_on_living_room_ac_dry
+  alias: Turn on Living Room AC Dry
+  mode: single
+  trigger:
+    - platform: state
+      entity_id: binary_sensor.living_room_motion
+      to: "on"
+    - platform: state
+      entity_id: binary_sensor.study_motion
+      to: "on"
+    - platform: state
+      entity_id: binary_sensor.dining_room_motion
+      to: "on"
+  condition:
+    - condition: numeric_state
+      entity_id: sensor.living_room_humidity
+      above: input_number.living_room_ac_dry_turned_on_threshold_humidity
+    - condition: numeric_state
+      entity_id: sensor.living_room_wbgt
+      above: input_number.living_room_ac_dry_turned_on_threshold_wbgt
+    - condition: numeric_state
+      entity_id: sensor.living_room_wbgt
+      below: input_number.living_room_ac_cool_turned_on_threshold
+    - condition: state
+      entity_id: climate.living_room_ac
+      state: "off"
+    - condition: state
+      entity_id: binary_sensor.living_room_window
+      state: "off"
+      for:
+        minutes: 30
+    - condition: state
+      entity_id: binary_sensor.study_window_n
+      state: "off"
+      for:
+        minutes: 30
+    - condition: state
+      entity_id: binary_sensor.study_window_s
+      state: "off"
+      for:
+        minutes: 30
+    - condition: state
+      entity_id: binary_sensor.living_room_presence
+      state: "on"
+    - condition: state
+      entity_id: alarm_control_panel.living_room_ac
+      state: armed_home
+  action:
+    - service: climate.set_hvac_mode
+      target:
+        entity_id: climate.living_room_ac
+      data:
+        hvac_mode: dry
+    - service: notify.all_devices
+      data:
+        message: "Turned on Living Room AC Dry. Current: {{ states('sensor.living_room_humidity') }}%"
+        data:
+          url: /lovelace/home
+          push:
+            interruption-level: time-sensitive
+    - delay:
+        hours: 1
+- id: automation.turn_on_living_room_ac_internal_clean
+  alias: Turn on Living Room AC Internal Clean
+  trigger:
+    - platform: state
+      entity_id: climate.living_room_ac
+      to: "off"
+  action:
+    - delay:
+        seconds: 10
+    - service: climate.set_hvac_mode
+      target:
+        entity_id: climate.living_room_ac
+      data:
+        hvac_mode: fan_only
 - id: automation.turn_on_living_room_humidifier
   alias: Turn on Living Room Humidifier
   mode: single
@@ -670,35 +679,105 @@
             interruption-level: time-sensitive
     - delay:
         hours: 1
-- id: automation.turn_on_living_room_hvac_cleaner
-  alias: Turn on Living Room HVAC Cleaner
+
+# Lights
+
+- id: automation.turn_down_living_area
+  alias: Turn down Living Area
   trigger:
     - platform: time
-      at: "4:00"
-  condition:
-    - condition: time
-      weekday:
-      - tue
-    - condition: state
-      entity_id: alarm_control_panel.surveillance
-      state: disarmed
+      at: input_datetime.living_area_turned_down_time
   action:
-    - service: switch.turn_on
-      entity_id: switch.living_room_hvac_cleaner
+    - service: scene.turn_on
+      entity_id: scene.living_area_turned_down
+    - service: light.turn_on
+      entity_id: light.living_area_dimming_downlights
+- id: automation.turn_down_living_area_more
+  alias: Turn down Living Area More
+  trigger:
+    - platform: time
+      at: input_datetime.living_area_turned_down_more_time
+  action:
+    - service: scene.turn_on
+      entity_id: scene.living_area_turned_down_more
+    - service: light.turn_off
+      entity_id: light.living_area_dimming_downlights
+- id: automation.turn_off_living_area_lights
+  alias: Turn off Living Room Area Lights
+  trigger:
+    - platform: sun
+      event: sunrise
+    - platform: event
+      event_type: ios.action_fired
+      event_data:
+        actionName: turn_off_living_room_lights
+  action:
+    - service: light.turn_off
+      target:
+        entity_id: light.living_area_lights
     - service: notify.tats_devices
       data:
-        message: Turned on Living Room HVAC Cleaner
+        message: Turned off Living Room Lights
         data:
           url: /lovelace/home
           push:
             interruption-level: time-sensitive
-    - service: automation.turn_off
-      target:
-        entity_id:
-          - automation.turn_on_living_room_hvac_cleaner
-          - automation.turn_on_living_room_hvac_internal_clean
-- id: automation.turn_on_living_room_hvac_cool
-  alias: Turn on Living Room HVAC Cool
+- id: automation.turn_on_living_area_downlights
+  alias: Turn on Living Area Downlights
+  mode: single
+  trigger:
+    - platform: state
+      entity_id: binary_sensor.living_room_motion
+      to: "on"
+      id: Living Room Motion
+    - platform: state
+      entity_id: binary_sensor.study_motion
+      to: "on"
+      id: Study Motion
+    - platform: state
+      entity_id: binary_sensor.dining_room_motion
+      to: "on"
+      id: Dining Room Motion
+    - platform: sun
+      event: sunset
+      offset: "-00:30:00"
+      id: 30 min before Sunset
+    - platform: sun
+      event: sunset
+      offset: "-00:20:00"
+      id: 20 min before Sunset
+    - platform: sun
+      event: sunset
+      offset: "-00:10:00"
+      id: 10 min before Sunset
+    - platform: sun
+      event: sunset
+      offset: "-00:01:00"
+      id: 1 min before Sunset
+  condition:
+    - condition: numeric_state
+      entity_id: sensor.living_room_light_level
+      below: input_number.living_area_downlights_turned_on_threshold
+    - condition: state
+      entity_id: sun.sun
+      state: above_horizon
+  action:
+    - service: light.turn_on
+      entity_id: light.living_area_downlights
+    - service: notify.tats_devices
+      data:
+        message: "Turned on Living Area Downlights due to {{ trigger.id }}. Current: {{ states('sensor.living_room_light_level') }}lx"
+        data:
+          url: /lovelace/home
+          push:
+            interruption-level: time-sensitive
+    - delay:
+        hours: 1
+
+# Others
+
+- id: automation.alarm_living_room_co2_is_too_high
+  alias: "ALARM: Living Room CO2 is Too High"
   mode: single
   trigger:
     - platform: state
@@ -712,154 +791,76 @@
       to: "on"
   condition:
     - condition: numeric_state
-      entity_id: sensor.living_room_wbgt
-      above: input_number.living_room_hvac_cool_turned_on_threshold
+      entity_id: sensor.living_room_co2
+      above: 1000
     - condition: state
       entity_id: binary_sensor.living_room_window
       state: "off"
-      for:
-        minutes: 30
     - condition: state
       entity_id: binary_sensor.study_window_n
       state: "off"
-      for:
-        minutes: 30
     - condition: state
       entity_id: binary_sensor.study_window_s
       state: "off"
-      for:
-        minutes: 30
-    - condition: state
-      entity_id: binary_sensor.living_room_presence
-      state: "on"
   action:
-    - service: climate.set_temperature
-      target:
-        entity_id: climate.living_room_hvac
-      data:
-        hvac_mode: cool
-        temperature: 25
     - service: notify.all_devices
       data:
-        message: "Turned on Living Room HVAC Cool. Current: {{ states('sensor.living_room_wbgt') }}°C"
+        title: "⚠️ ALARM"
+        message: "Living Room CO2 is too high. Current: {{ states('sensor.living_room_co2') }}ppm"
         data:
           url: /lovelace/home
           push:
             interruption-level: time-sensitive
     - delay:
         hours: 1
-- id: automation.turn_on_living_room_hvac_cool_forcibly
-  alias: Turn on Living Room HVAC Cool Forcibly
-  mode: single
+- id: automation.turn_off_living_room_tv
+  alias: Turn off Living Room TV
   trigger:
     - platform: time_pattern
-      minutes: "/5"
-      seconds: 54
+      seconds: 39
   condition:
-    - condition: numeric_state
-      entity_id: sensor.living_room_wbgt
-      above: input_number.living_room_hvac_cool_forcibly_turned_on_threshold
     - condition: state
-      entity_id: binary_sensor.living_room_window
-      state: "off"
-      for:
-        minutes: 30
-    - condition: state
-      entity_id: binary_sensor.study_window_n
-      state: "off"
-      for:
-        minutes: 30
-    - condition: state
-      entity_id: binary_sensor.study_window_s
-      state: "off"
-      for:
-        minutes: 30
+      entity_id: alarm_control_panel.living_room_tv
+      state: armed_away
+    - condition: template
+      value_template: "{{ as_timestamp(now()) - as_timestamp(states('sensor.uptime')) > 600 }}"
+    - condition: not
+      conditions:
+        - condition: state
+          entity_id: person.shibata_tats
+          state: home
+          for:
+            minutes: 10
+    - condition: not
+      conditions:
+        - condition: state
+          entity_id: person.shibata_akiko
+          state: home
+          for:
+            minutes: 10
+    - condition: or
+      conditions:
+        - condition: state
+          entity_id: sensor.regza_content_type
+          state: broadcast
+          for:
+            seconds: 5
+        - condition: state
+          entity_id: sensor.regza_content_type
+          state: external
+          for:
+            seconds: 5
+        - condition: state
+          entity_id: sensor.regza_content_type
+          state: recorded
+          for:
+            seconds: 5
   action:
-    - service: climate.set_temperature
-      target:
-        entity_id: climate.living_room_hvac
+    - service: shell_command.control_toggle_regza
+    - service: notify.tats_devices
       data:
-        hvac_mode: cool
-        temperature: 25
-    - service: notify.all_devices
-      data:
-        message: "Turned on Living Room HVAC Cool Forcibly. Current: {{ states('sensor.living_room_wbgt') }}°C"
+        message: "Turned off Living Room TV"
         data:
-          url: /lovelace/home
+          url: /lovelace/machines
           push:
             interruption-level: time-sensitive
-    - delay:
-        hours: 1
-- id: automation.turn_on_living_room_hvac_dry
-  alias: Turn on Living Room HVAC Dry
-  mode: single
-  trigger:
-    - platform: state
-      entity_id: binary_sensor.living_room_motion
-      to: "on"
-    - platform: state
-      entity_id: binary_sensor.study_motion
-      to: "on"
-    - platform: state
-      entity_id: binary_sensor.dining_room_motion
-      to: "on"
-  condition:
-    - condition: numeric_state
-      entity_id: sensor.living_room_humidity
-      above: input_number.living_room_hvac_dry_turned_on_threshold_humidity
-    - condition: numeric_state
-      entity_id: sensor.living_room_wbgt
-      above: input_number.living_room_hvac_dry_turned_on_threshold_wbgt
-    - condition: numeric_state
-      entity_id: sensor.living_room_wbgt
-      below: input_number.living_room_hvac_cool_turned_on_threshold
-    - condition: state
-      entity_id: climate.living_room_hvac
-      state: "off"
-    - condition: state
-      entity_id: binary_sensor.living_room_window
-      state: "off"
-      for:
-        minutes: 30
-    - condition: state
-      entity_id: binary_sensor.study_window_n
-      state: "off"
-      for:
-        minutes: 30
-    - condition: state
-      entity_id: binary_sensor.study_window_s
-      state: "off"
-      for:
-        minutes: 30
-    - condition: state
-      entity_id: binary_sensor.living_room_presence
-      state: "on"
-  action:
-    - service: climate.set_hvac_mode
-      target:
-        entity_id: climate.living_room_hvac
-      data:
-        hvac_mode: dry
-    - service: notify.all_devices
-      data:
-        message: "Turned on Living Room HVAC Dry. Current: {{ states('sensor.living_room_humidity') }}%"
-        data:
-          url: /lovelace/home
-          push:
-            interruption-level: time-sensitive
-    - delay:
-        hours: 1
-- id: automation.turn_on_living_room_hvac_internal_clean
-  alias: Turn on Living Room HVAC Internal Clean
-  trigger:
-    - platform: state
-      entity_id: climate.living_room_hvac
-      to: "off"
-  action:
-    - delay:
-        seconds: 10
-    - service: climate.set_hvac_mode
-      target:
-        entity_id: climate.living_room_hvac
-      data:
-        hvac_mode: fan_only

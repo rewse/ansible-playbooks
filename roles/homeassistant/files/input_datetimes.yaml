@@ -1,15 +1,15 @@
 dads_room_turned_down_time:
   name: Dad’s Room Turned down Time
   has_time: true
-  icon: mdi:brightness-6
+  icon: mdi:brightness-2
 living_area_turned_down_more_time:
   name: Living Area Turned down More Time
   has_time: true
-  icon: mdi:brightness-4
+  icon: mdi:brightness-3
 living_area_turned_down_time:
   name: Living Area Turned down Time
   has_time: true
-  icon: mdi:brightness-6
+  icon: mdi:brightness-2
 moms_room_curtains_opened_time:
   name: Mom’s Room Curtains Opened Time
   has_time: true
@@ -21,7 +21,7 @@ moms_room_curtains_opened_time_workday:
 moms_room_turned_down_time:
   name: Mom’s Room Turned down Time
   has_time: true
-  icon: mdi:brightness-6
+  icon: mdi:brightness-2
 roomba_combo_finished_time:
   name: Roomba Combo Finished Time
   has_date: true
