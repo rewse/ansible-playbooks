@@ -23,29 +23,35 @@ cards:
         name: Entrance Light
       - entity: light.living_room_footlight
         name: Footlight
-  - type: tile
-    entity: climate.living_room_ac
-    tap_action:
-      action: more-info
-    icon_tap_action:
-      action: more-info
-    features:
-      - type: climate-hvac-modes
-        AC_modes:
-          - heat_cool
-          - dry
-          - cool
-          - heat
-          - fan_only
-          - 'off'
-      - type: target-temperature
-      - type: climate-preset-modes
-        style: icons
-        preset_modes:
-          - none
-          - away
-          - eco
-          - boost
+  - type: vertical-stack
+    cards:
+      - type: tile
+        entity: climate.living_room_ac
+        tap_action:
+          action: more-info
+        icon_tap_action:
+          action: more-info
+        features:
+          - type: climate-hvac-modes
+            AC_modes:
+              - heat_cool
+              - dry
+              - cool
+              - heat
+              - fan_only
+              - 'off'
+          - type: target-temperature
+          - type: climate-preset-modes
+            style: icons
+            preset_modes:
+              - none
+              - away
+              - eco
+              - boost
+      - type: alarm-panel
+        entity: alarm_control_panel.living_room_ac
+        states:
+          - arm_home
   - type: entities
     title: Living Room Appliances
     entities:
