@@ -55,6 +55,25 @@ views:
           - entity: device_tracker.ping_kijishiro
           - entity: device_tracker.kijishiro
         hours_to_show: 12
+      - type: vertical-stack
+        cards:
+          - type: history-graph
+            title: Count of Living Room Motion
+            entities:
+              - entity: sensor.count_of_living_room_motion
+              - entity: sensor.count_of_study_motion
+              - entity: sensor.count_of_dining_room_motion
+            hours_to_show: 12
+          - type: history-graph
+            title: Count of Dad’s Room Motion
+            entities:
+              - entity: sensor.count_of_dads_room_motion
+            hours_to_show: 12
+          - type: history-graph
+            title: Count of Mom’s Room Motion
+            entities:
+              - entity: sensor.count_of_moms_room_motion
+            hours_to_show: 12
       - type: alarm-panel
         name: Living Room TV
         entity: alarm_control_panel.living_room_tv
