@@ -1,6 +1,6 @@
 light.living_area_dimming_downlights:
   assumed_state: true
-  icon: mdi:brightness-2
+  icon: mdi:lightbulb-night
 light.living_area_downlights:
   assumed_state: true
 light.living_area_lights:
