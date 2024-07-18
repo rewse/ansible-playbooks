@@ -15,32 +15,81 @@ cards:
   - type: entities
     title: Dad’s Room Lights
     entities:
-      - entity: light.dads_room_light
-        name: Light
-  - type: tile
-    entity: climate.dads_room_ac
-    tap_action:
-      action: more-info
-    icon_tap_action:
-      action: more-info
-    features:
-      - type: climate-hvac-modes
-        hvac_modes:
-          - auto
-          - cool
-          - dry
-          - heat
-          - fan_only
-          - 'off'
-      - type: target-temperature
+      - entity: light.dads_room_pendant_light
+        name: Pendant Light
+      - entity: light.dads_room_floor_light
+        name: Floorlight
+      - entity: light.dads_room_monitor_light
+        name: Monitor Light
+      - entity: light.dads_room_chest_light
+        name: Chest Light
   - type: entities
-    title: Dad’s Room Automations
+    title: Dad’s Room Scene
     entities:
-      - entity: automation.turn_down_dads_room
-        name: Turn down
-        secondary_info: last-triggered
-      - entity: input_datetime.dads_room_turned_down_time
-        name: Turned down Time
+        - entity: scene.dads_room_natural_light
+          name: Natural Light
+    footer:
+      type: buttons
+      entities:
+        - entity: scene.dads_room_energize
+          name: Energize
+        - entity: scene.dads_room_concentrate
+          name: Concentrate
+        - entity: scene.dads_room_read
+          name: Read
+        - entity: scene.dads_room_dimmed_read
+          name: Dimmed Read
+        - entity: scene.dads_room_relax
+          name: Relax
+        - entity: scene.dads_room_rest
+          name: Rest
+        - entity: scene.dads_room_nightlight
+          name: Nightlight
+        - entity: scene.dads_room_bright
+          name: Bright
+        - entity: scene.dads_room_dimmed
+          name: Dimmed
+        - entity: scene.dads_room_arise
+          name: Arise
+        - entity: scene.dads_room_shine
+          name: Shine
+        - entity: scene.dads_room_storybook
+          name: Storybook
+        - entity: scene.dads_room_unwind
+          name: Unwind
+        - entity: scene.dads_room_nighttime
+          name: Nighttime
+        - entity: scene.dads_room_blossom
+          name: Blossom
+        - entity: scene.dads_room_crocus
+          name: Crocus
+        - entity: scene.dads_room_starlight
+          name: Starlight
+  - type: vertical-stack
+    cards:
+      - type: tile
+        entity: climate.dads_room_ac
+        tap_action:
+          action: more-info
+        icon_tap_action:
+          action: more-info
+        features:
+          - type: climate-hvac-modes
+            hvac_modes:
+              - auto
+              - cool
+              - dry
+              - heat
+              - fan_only
+              - 'off'
+          - type: target-temperature
+      - type: alarm-panel
+        entity: alarm_control_panel.dads_room_ac
+        states:
+          - arm_home
+  - type: entities
+    title: Dad’s Room Climate Automations
+    entities:
       - entity: automation.turn_off_dads_room_ac_cool
         name: Turn off AC Cool
         secondary_info: last-triggered
@@ -77,4 +126,13 @@ cards:
         secondary_info: last-triggered
       - entity: input_number.dads_room_ac_heat_turned_on_threshold
         name: Turned on AC Heat Threshold
-    show_header_toggle: false
+    show_header_call-service: false
+  - type: entities
+    title: Dad’s Light Climate Automations
+    entities:
+      - entity: automation.turn_down_dads_room
+        name: Turn down
+        secondary_info: last-triggered
+      - entity: input_datetime.dads_room_turned_down_time
+        name: Turned down Time
+    show_header_call-service: false
