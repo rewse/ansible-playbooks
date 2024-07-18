@@ -41,11 +41,11 @@
       friendly_name: Living Area Dimming Downlights
       turn_on:
         - service: button.press
-          entity_id: 
+          entity_id:
             - button.living_room_dimming_downlights_brighter
             - button.study_dimming_downlights_brighter
       turn_off:
         - service: button.press
-          entity_id: 
-            - button.living_room_dimming_lights_darker
-            - button.study_dimming_lights_darker
+          entity_id:
+            - button.study_dimming_downlights_darker
+            - button.living_room_dimming_downlights_darker
