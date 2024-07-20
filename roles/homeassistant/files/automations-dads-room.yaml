@@ -91,7 +91,7 @@
   trigger:
     - platform: state
       entity_id: sensor.filtered_dads_room_ac_plug_power
-      to: "0"
+      below: 5
   condition:
     - condition: not
       conditions:
@@ -120,7 +120,7 @@
       below: input_number.dads_room_ac_dry_turned_off_threshold
     - condition: numeric_state
       entity_id: sensor.filtered_dads_room_ac_plug_power
-      above: 10
+      above: 5
     - condition: not
       conditions:
         - condition: state
@@ -157,7 +157,7 @@
       above: input_number.dads_room_ac_heat_turned_off_threshold
     - condition: numeric_state
       entity_id: sensor.filtered_dads_room_ac_plug_power
-      above: 10
+      above: 5
     - condition: state
       entity_id: sensor.season
       state: winter
@@ -258,7 +258,7 @@
       above: input_number.dads_room_ac_dry_turned_on_threshold_wbgt
     - condition: numeric_state
       entity_id: sensor.filtered_dads_room_ac_plug_power
-      below: 10
+      below: 5
     - condition: state
       entity_id: binary_sensor.dads_room_presence
       state: "on"
@@ -297,7 +297,7 @@
       state: "on"
     - condition: numeric_state
       entity_id: sensor.filtered_dads_room_ac_plug_power
-      below: "10"
+      below: 5
     - condition: state
       entity_id: sensor.season
       state: winter
