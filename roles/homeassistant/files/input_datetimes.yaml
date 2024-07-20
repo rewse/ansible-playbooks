@@ -1,3 +1,7 @@
+dads_room_turned_down_more_time:
+  name: Dad’s Room Turned down More Time
+  has_time: true
+  icon: mdi:brightness-3
 dads_room_turned_down_time:
   name: Dad’s Room Turned down Time
   has_time: true

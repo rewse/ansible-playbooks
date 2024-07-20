@@ -27,7 +27,8 @@
   entities:
     - light.dads_room_pendant_light
     - light.dads_room_monitor_light
-    - light.dads_room_floorlight
+    - light.dads_room_footlight
+    - light.dads_room_chest_light
 - platform: group
   unique_id: bathroom_lights
   name: Bathroom Lights
