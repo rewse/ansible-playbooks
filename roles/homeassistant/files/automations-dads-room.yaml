@@ -202,7 +202,7 @@
         entity_id: climate.dads_room_ac
       data:
         hvac_mode: cool
-        temperature: dads_room_ac_cool_target_temperature
+        temperature: input_number.dads_room_ac_cool_target_temperature
     - service: notify.all_devices
       data:
         message: "Turned on Dad’s Room AC Cool. Current: {{ states('sensor.dads_room_wbgt') }}°C"
@@ -232,7 +232,7 @@
         entity_id: climate.dads_room_ac
       data:
         hvac_mode: cool
-        temperature: dads_room_ac_cool_target_temperature
+        temperature: input_number.dads_room_ac_cool_target_temperature
     - service: notify.all_devices
       data:
         message: "Turned on Dad’s Room AC Cool Forcibly. Current: {{ states('sensor.dads_room_wbgt') }}°C"
@@ -271,6 +271,7 @@
         entity_id: climate.dads_room_ac
       data:
         hvac_mode: dry
+        temperature: input_number.dads_room_ac_cool_target_temperature
     - service: notify.all_devices
       data:
         message: "Turned on Dad’s Room AC Dry. Current: {{ states('sensor.dads_room_humidity') }}%"
@@ -309,7 +310,7 @@
         entity_id: climate.dads_room_ac
       data:
         hvac_mode: heat
-        temperature: dads_room_ac_heat_target_temperature
+        temperature: input_number.dads_room_ac_heat_target_temperature
     - service: notify.all_devices
       data:
         message: "Turned on Dad’s Room AC Heat. Current: {{ states('sensor.dads_room_temperature') }}°C"
