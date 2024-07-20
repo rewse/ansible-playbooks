@@ -1,14 +1,16 @@
+# Climates
+
 - id: automation.alarm_moms_room_humidity_difference_is_too_large
   alias: "ALARM: Mom’s Room Humidity Difference is Too Large"
   mode: single
   trigger:
     - platform: state
-      entity_id: sensor.moms_room_switchbot_meter_temperature
-      attribute: humidity
+      entity_id: sensor.moms_room_switchbot_meter_humidity
   condition:
     - condition: numeric_state
       entity_id: sensor.average_of_moms_room_humidity_difference
       above: 10
+    - "{{ (states('sensor.moms_room_humidity') | float - states('sensor.moms_room_switchbot_meter_humidity') | float) | abs > 10 }}"
   action:
     - service: notify.tats_devices
       data:
@@ -30,6 +32,7 @@
     - condition: numeric_state
       entity_id: sensor.average_of_moms_room_temperature_difference
       above: 1
+    - "{{ (states('sensor.moms_room_temperature') | float - states('sensor.moms_room_switchbot_meter_temperature') | float) | abs > 1 }}"
   action:
     - service: notify.tats_devices
       data:
@@ -154,26 +157,6 @@
             interruption-level: time-sensitive
     - delay:
         hours: 2
-- id: automation.open_moms_room_curtains_temporarily
-  alias: Open Mom’s Room Curtains Temporarily
-  description: Open the curtains in the moms_room temporarily
-  trigger:
-    - platform: time
-      at: input_datetime.moms_room_curtains_opened_time
-  action:
-    - service: script.open_and_get_state_of_moms_room_curtains
-- id: automation.open_moms_room_curtains_workday
-  alias: Open Mom’s Room Curtains Workday
-  description: Open the curtains in the moms_room every workday
-  trigger:
-    - platform: time
-      at: input_datetime.moms_room_curtains_opened_time_workday
-  condition:
-    - condition: state
-      entity_id: binary_sensor.workday_sensor
-      state: "on"
-  action:
-    - service: script.open_and_get_state_of_moms_room_curtains
 - id: automation.raise_moms_room_ac_cool_at_sunset
   alias: Raise Mom’s Room AC Cool at Sunset
   trigger:
@@ -184,23 +167,32 @@
       entity_id: climate.moms_room_ac
       state: cool
   action:
+    - variables:
+        target: "{{ states('input_number.moms_room_ac_cool_target_temperature') | int + 1 }}"
     - service: climate.set_temperature
       target:
         entity_id: climate.moms_room_ac 
       data:
-        temperature: 27
-- id: automation.turn_down_moms_room
-  alias: Turn down Mom’s Room
-  description: Turn down the moms_room
+        temperature: "{{ target }}"
+- id: automation.sync_moms_room_ac_power_off
+  alias: Sync Moms’s Room AC Power Off
+  mode: single
   trigger:
-    - platform: time
-      at: input_datetime.moms_room_turned_down_time
+    - platform: state
+      entity_id: sensor.filtered_moms_room_ac_plug_power
+      below: 5
+  condition:
+    - condition: not
+      conditions:
+        - condition: state
+          entity_id: climate.moms_room_ac
+          state: "off"
   action:
-    - delay:
-        minutes: 15
-    - service: homeassistant.update_entity
+    - service: climate.set_hvac_mode
       target:
-        entity_id: sensor.moms_room_curtains_position
+        entity_id: climate.moms_room_ac
+      data:
+        hvac_mode: "off"
 - id: automation.turn_off_moms_room_ac_cool
   alias: Turn off Mom’s Room AC Cool
   mode: single
@@ -217,15 +209,15 @@
       below: input_number.moms_room_ac_dry_turned_off_threshold
     - condition: numeric_state
       entity_id: sensor.filtered_moms_room_ac_plug_power
-      above: 10
+      above: 5
     - condition: not
       conditions:
         - condition: state
           entity_id: sensor.season
           state: winter
     - condition: state
-      entity_id: alarm_control_panel.surveillance
-      state: disarmed
+      entity_id: alarm_control_panel.moms_room_ac
+      state: armed_home
   action:
     - service: climate.set_ac_mode
       target:
@@ -254,13 +246,13 @@
       above: input_number.moms_room_ac_heat_turned_off_threshold
     - condition: numeric_state
       entity_id: sensor.filtered_moms_room_ac_plug_power
-      above: 10
+      above: 5
     - condition: state
       entity_id: sensor.season
       state: winter
     - condition: state
-      entity_id: alarm_control_panel.surveillance
-      state: disarmed
+      entity_id: alarm_control_panel.moms_room_ac
+      state: armed_home
   action:
     - service: climate.set_ac_mode
       target:
@@ -276,16 +268,6 @@
             interruption-level: time-sensitive
     - delay:
         hours: 1
-- id: automation.turn_off_moms_room_light
-  alias: Turn off Mom’s Room Light
-  trigger:
-    - platform: state
-      entity_id: sensor.moms_room_1_button_switch_action
-      to: double
-  action:
-    - service: light.turn_off
-      target:
-        entity_id: light.moms_room_light
 - id: automation.turn_on_moms_room_ac_cool
   alias: Turn on Mom’s Room AC Cool
   mode: single
@@ -310,13 +292,16 @@
     - condition: state
       entity_id: binary_sensor.moms_room_presence
       state: "on"
+    - condition: state
+      entity_id: alarm_control_panel.moms_room_ac
+      state: armed_home
   action:
     - service: climate.set_temperature
       target:
         entity_id: climate.moms_room_ac
       data:
         hvac_mode: cool
-        temperature: 26
+        temperature: input_number.moms_room_ac_cool_target_temperature
     - service: notify.all_devices
       data:
         message: "Turned on Mom’s Room AC Cool. Current: {{ states('sensor.moms_room_wbgt') }}°C"
@@ -347,12 +332,17 @@
       state: "off"
       for:
         minutes: 30
+    - condition: state
+      entity_id: alarm_control_panel.moms_room_ac
+      state: armed_home
   action:
     - service: climate.set_ac_mode
       target:
         entity_id: climate.moms_room_ac
       data:
         hvac_mode: cool
+        temperature: input_number.moms_room_ac_cool_target_temperature
+    - service: notify.all_devices
     - service: notify.all_devices
       data:
         message: "Turned on Mom’s Room AC Cool Forcibly. Current: {{ states('sensor.moms_room_wbgt') }}°C"
@@ -378,7 +368,7 @@
       above: input_number.moms_room_ac_dry_turned_on_threshold_wbgt
     - condition: numeric_state
       entity_id: sensor.filtered_moms_room_ac_plug_power
-      below: 10
+      below: 5
     - condition: state
       entity_id: binary_sensor.moms_room_window_n
       state: "off"
@@ -392,12 +382,16 @@
     - condition: state
       entity_id: binary_sensor.moms_room_presence
       state: "on"
+    - condition: state
+      entity_id: alarm_control_panel.moms_room_ac
+      state: armed_home
   action:
     - service: climate.set_ac_mode
       target:
         entity_id: climate.moms_room_ac
       data:
         hvac_mode: dry
+        temperature: input_number.moms_room_ac_cool_target_temperature
     - service: notify.all_devices
       data:
         message: "Turned on Mom’s Room AC Dry. Current: {{ states('sensor.moms_room_humidity') }}%"
@@ -433,7 +427,7 @@
       state: "on"
     - condition: numeric_state
       entity_id: sensor.filtered_moms_room_ac_plug_power
-      below: "10"
+      below: 5
     - condition: state
       entity_id: sensor.season
       state: winter
@@ -442,12 +436,16 @@
       state: opening
       for:
         hours: 1
+    - condition: state
+      entity_id: alarm_control_panel.moms_room_ac
+      state: armed_home
   action:
     - service: climate.set_ac_mode
       target:
         entity_id: climate.moms_room_ac
       data:
         hvac_mode: heat
+        temperature: input_number.moms_room_ac_heat_target_temperature
     - service: notify.all_devices
       data:
         message: "Turned on Mom’s Room AC Heat. Current: {{ states('sensor.moms_room_temperature') }}°C"
@@ -457,6 +455,19 @@
             interruption-level: time-sensitive
     - delay:
         hours: 1
+
+# Lights
+
+- id: automation.turn_off_moms_room_light
+  alias: Turn off Mom’s Room Light
+  trigger:
+    - platform: state
+      entity_id: sensor.moms_room_1_button_switch_action
+      to: double
+  action:
+    - service: light.turn_off
+      target:
+        entity_id: light.moms_room_light
 - id: automation.turn_on_moms_room_light
   alias: Turn on Mom’s Room Light
   trigger:
@@ -467,3 +478,29 @@
     - service: light.turn_on
       target:
         entity_id: light.moms_room_light
+
+# Others
+
+- id: automation.open_moms_room_curtains_temporarily
+  alias: Open Mom’s Room Curtains Temporarily
+  trigger:
+    - platform: time
+      at: input_datetime.moms_room_curtains_opened_time
+  action:
+    - service: cover.open_cover
+      target:
+        entity_id: cover.moms_room_curtains
+- id: automation.open_moms_room_curtains_workday
+  alias: Open Mom’s Room Curtains Workday
+  description: Open the curtains in the moms_room every workday
+  trigger:
+    - platform: time
+      at: input_datetime.moms_room_curtains_opened_time_workday
+  condition:
+    - condition: state
+      entity_id: binary_sensor.workday_sensor
+      state: "on"
+  action:
+    - service: cover.open_cover
+      target:
+        entity_id: cover.moms_room_curtains

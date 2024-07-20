@@ -3,17 +3,15 @@
   unique_id: sensor.filtered_dads_room_ac_plug_power
   entity_id: sensor.dads_room_ac_plug_power
   filters:
-    - filter: lowpass
-      window_size: 10
-      time_constant: 24
+    - filter: time_simple_moving_average
+      window_size: "00:10"
 - platform: filter
   name: Filtered Mom’s Room AC Plug Power
   unique_id: sensor.filtered_moms_room_ac_plug_power
   entity_id: sensor.moms_room_ac_plug_power
   filters:
-    - filter: lowpass
-      window_size: 10
-      time_constant: 24
+    - filter: time_simple_moving_average
+      window_size: "00:10"
 - platform: rest
   name: Entrance Lock Bottom Sensor
   unique_id: sensor.entrance_lock_bottom_sensor
