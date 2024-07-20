@@ -280,6 +280,20 @@
     dest: /etc/homeassistant
   tags: [homeassistant, homeassistant-input-number]
 
+- name: Config input_select
+  lineinfile:
+    path: /etc/homeassistant/configuration.yaml
+    insertafter: '^input_numbers:'
+    regexp: '^input_select:'
+    line: "input_select: !include input_selects.yaml"
+  tags: [homeassistant, homeassistant-input-select]
+
+- name: Copy input_selects.yaml
+  copy:
+    src: input_selects.yaml
+    dest: /etc/homeassistant
+  tags: [homeassistant, homeassistant-input-select]
+
 - name: Config ios
   lineinfile:
     path: /etc/homeassistant/configuration.yaml

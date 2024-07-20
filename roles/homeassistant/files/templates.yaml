@@ -44,8 +44,8 @@
     icon: mdi:thermometer-water
     device_class: temperature
     unit_of_measurement: °C
-  - name: Dad’s Room HVAC Plug Power
-    unique_id: sensor.dads_room_hvac_plug_power
+  - name: Dad’s Room AC Plug Power
+    unique_id: sensor.dads_room_ac_plug_power
     state: "{{ state_attr('switch.dads_room_ac_plug', 'current_consumption') }}"
     device_class: power
     unit_of_measurement: W

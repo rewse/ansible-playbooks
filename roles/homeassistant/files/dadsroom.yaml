@@ -17,8 +17,8 @@ cards:
     entities:
       - entity: light.dads_room_pendant_light
         name: Pendant Light
-      - entity: light.dads_room_floor_light
-        name: Floorlight
+      - entity: light.dads_room_footlight
+        name: Footlight
       - entity: light.dads_room_monitor_light
         name: Monitor Light
       - entity: light.dads_room_chest_light
@@ -26,11 +26,39 @@ cards:
   - type: entities
     title: Dad’s Room Scene
     entities:
-        - entity: scene.dads_room_natural_light
-          name: Natural Light
+        - entity: input_select.dads_room_morning_scene
+          name: Morning Scene
+        - entity: input_select.dads_room_daytime_scene
+          name: Daytime Scene
+        - entity: input_select.dads_room_sunset_scene
+          name: Sunset Scene
+        - entity: input_select.dads_room_night_scene
+          name: Night Scene
+        - entity: input_datetime.dads_room_turned_down_time
+          name: Turned Down Time
+        - entity: input_select.dads_room_midnight_scene
+          name: Midnight Scene
+        - entity: input_datetime.dads_room_turned_down_more_time
+          name: Turned Down More Time
     footer:
       type: buttons
       entities:
+        - entity: scene.dads_room_arise
+          name: Arise
+        - entity: scene.dads_room_shine
+          name: Shine
+        - entity: scene.dads_room_storybook
+          name: Storybook
+        - entity: scene.dads_room_unwind
+          name: Unwind
+        - entity: scene.dads_room_nighttime
+          name: Nighttime
+        - entity: scene.dads_room_blossom
+          name: Blossom
+        - entity: scene.dads_room_crocus
+          name: Crocus
+        - entity: scene.dads_room_starlight
+          name: Starlight
         - entity: scene.dads_room_energize
           name: Energize
         - entity: scene.dads_room_concentrate
@@ -49,22 +77,6 @@ cards:
           name: Bright
         - entity: scene.dads_room_dimmed
           name: Dimmed
-        - entity: scene.dads_room_arise
-          name: Arise
-        - entity: scene.dads_room_shine
-          name: Shine
-        - entity: scene.dads_room_storybook
-          name: Storybook
-        - entity: scene.dads_room_unwind
-          name: Unwind
-        - entity: scene.dads_room_nighttime
-          name: Nighttime
-        - entity: scene.dads_room_blossom
-          name: Blossom
-        - entity: scene.dads_room_crocus
-          name: Crocus
-        - entity: scene.dads_room_starlight
-          name: Starlight
   - type: vertical-stack
     cards:
       - type: tile
@@ -102,13 +114,13 @@ cards:
         secondary_info: last-triggered
       - entity: input_number.dads_room_ac_heat_turned_off_threshold
         name: Turned off AC Cool Threshold
-      - entity: input_number.dads_room_humidifier_turned_on_threshold
-        name: Turned on Humidifier Threshold
       - entity: automation.turn_on_dads_room_ac_cool
         name: Turn on AC Cool
         secondary_info: last-triggered
       - entity: input_number.dads_room_ac_cool_turned_on_threshold
         name: Turned on AC Cool Threshold
+      - entity: input_number.dads_room_ac_cool_target_temperature
+        name: AC Cool Target Temperature
       - entity: automation.turn_on_dads_room_ac_cool_forcibly
         name: Turn on AC Cool Forcibly
         secondary_info: last-triggered
@@ -126,13 +138,6 @@ cards:
         secondary_info: last-triggered
       - entity: input_number.dads_room_ac_heat_turned_on_threshold
         name: Turned on AC Heat Threshold
-    show_header_call-service: false
-  - type: entities
-    title: Dad’s Light Climate Automations
-    entities:
-      - entity: automation.turn_down_dads_room
-        name: Turn down
-        secondary_info: last-triggered
-      - entity: input_datetime.dads_room_turned_down_time
-        name: Turned down Time
-    show_header_call-service: false
+      - entity: input_number.dads_room_ac_heat_target_temperature
+        name: AC Heat Target Temperature
+    show_header_toggle: false

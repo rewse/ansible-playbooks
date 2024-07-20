@@ -1,14 +1,16 @@
+# Climates
+
 - id: automation.alarm_dads_room_humidity_difference_is_too_large
   alias: "ALARM: Dad’s Room Humidity Difference is Too Large"
   mode: single
   trigger:
     - platform: state
-      entity_id: sensor.dads_room_switchbot_meter_temperature
-      attribute: humidity
+      entity_id: sensor.dads_room_switchbot_meter_humidity
   condition:
     - condition: numeric_state
       entity_id: sensor.average_of_dads_room_humidity_difference
       above: 10
+    - "{{ (states('sensor.dads_room_humidity') | float - states('sensor.dads_room_switchbot_meter_humidity') | float) | abs > 10 }}"
   action:
     - service: notify.tats_devices
       data:
@@ -30,6 +32,7 @@
     - condition: numeric_state
       entity_id: sensor.average_of_dads_room_temperature_difference
       above: 1
+    - "{{ (states('sensor.dads_room_temperature') | float - states('sensor.dads_room_switchbot_meter_temperature') | float) | abs > 1 }}"
   action:
     - service: notify.tats_devices
       data:
@@ -41,32 +44,6 @@
             interruption-level: time-sensitive
     - delay:
         hours: 8
-- id: automation.info_dads_room_humidity_is_too_low
-  alias: "INFO: Dad’s Room Humidity is Too Low"
-  mode: single
-  trigger:
-    - platform: state
-      entity_id: binary_sensor.dads_room_motion
-      to: "on"
-  condition:
-    - condition: numeric_state
-      entity_id: sensor.dads_room_humidity
-      below: input_number.dads_room_humidifier_turned_on_threshold
-    - condition: sun
-      after: sunrise
-    - condition: state
-      entity_id: binary_sensor.dads_room_presence
-      state: "on"
-  action:
-    - service: notify.all_devices
-      data:
-        message: "Dad’s Room Humidity is Too Low. Current: {{ states('sensor.dads_room_humidity') }}%"
-        data:
-          url: /lovelace/home
-          push:
-            interruption-level: time-sensitive
-    - delay:
-        hours: 2
 - id: automation.raise_dads_room_ac_cool_at_sunset
   alias: Raise Dad’s Room AC Cool at Sunset
   trigger:
@@ -76,21 +53,57 @@
     - condition: state
       entity_id: climate.dads_room_ac
       state: cool
+    - condition: state
+      entity_id: alarm_control_panel.dads_room_ac
+      state: armed_home
   action:
+    - variables:
+        target: "{{ states('input_number.dads_room_ac_cool_target_temperature') | int + 1 }}"
     - service: climate.set_temperature
       target:
         entity_id: climate.dads_room_ac 
       data:
-        temperature: 27
-- id: automation.turn_down_dads_room
-  alias: Turn down Dad’s Room
-  description: Turn down the dads_room
+        temperature: "{{ target }}"
+- id: automation.raise_dads_room_ac_cool_at_night
+  alias: Raise Dad’s Room AC Cool at Night
   trigger:
-    - platform: time
-      at: input_datetime.dads_room_turned_down_time
+    - platform: sun
+      event: sunset
+      offset: "04:00:00"
+  condition:
+    - condition: state
+      entity_id: climate.dads_room_ac
+      state: cool
+    - condition: state
+      entity_id: alarm_control_panel.dads_room_ac
+      state: armed_home
   action:
-    - delay:
-        minutes: 15
+    - variables:
+        target: "{{ states('input_number.dads_room_ac_cool_target_temperature') | int + 2 }}"
+    - service: climate.set_temperature
+      target:
+        entity_id: climate.dads_room_ac
+      data:
+        temperature: "{{ target }}"
+- id: automation.sync_dads_room_ac_power_off
+  alias: Sync Dad’s Room AC Power Off
+  mode: single
+  trigger:
+    - platform: state
+      entity_id: sensor.filtered_dads_room_ac_plug_power
+      to: "0"
+  condition:
+    - condition: not
+      conditions:
+        - condition: state
+          entity_id: climate.dads_room_ac
+          state: "off"
+  action:
+    - service: climate.set_hvac_mode
+      target:
+        entity_id: climate.dads_room_ac
+      data:
+        hvac_mode: "off"
 - id: automation.turn_off_dads_room_ac_cool
   alias: Turn off Dad’s Room AC Cool
   mode: single
@@ -114,10 +127,10 @@
           entity_id: sensor.season
           state: winter
     - condition: state
-      entity_id: alarm_control_panel.surveillance
-      state: disarmed
+      entity_id: alarm_control_panel.dads_room_ac
+      state: armed_home
   action:
-    - service: climate.set_ac_mode
+    - service: climate.set_hvac_mode
       target:
         entity_id: climate.dads_room_ac
       data:
@@ -149,10 +162,10 @@
       entity_id: sensor.season
       state: winter
     - condition: state
-      entity_id: alarm_control_panel.surveillance
-      state: disarmed
+      entity_id: alarm_control_panel.dads_room_ac
+      state: armed_home
   action:
-    - service: climate.set_ac_mode
+    - service: climate.set_hvac_mode
       target:
         entity_id: climate.dads_room_ac
       data:
@@ -166,16 +179,6 @@
             interruption-level: time-sensitive
     - delay:
         hours: 1
-- id: automation.turn_off_dads_room_light
-  alias: Turn off Dad’s Room Light
-  trigger:
-    - platform: state
-      entity_id: sensor.dads_room_1_button_switch_action
-      to: double
-  action:
-    - service: light.turn_off
-      target:
-        entity_id: light.dads_room_light
 - id: automation.turn_on_dads_room_ac_cool
   alias: Turn on Dad’s Room AC Cool
   mode: single
@@ -188,25 +191,18 @@
       entity_id: sensor.dads_room_wbgt
       above: input_number.dads_room_ac_cool_turned_on_threshold
     - condition: state
-      entity_id: binary_sensor.dads_room_window_n
-      state: "off"
-      for:
-        minutes: 30
-    - condition: state
-      entity_id: binary_sensor.dads_room_window_s
-      state: "off"
-      for:
-        minutes: 30
-    - condition: state
       entity_id: binary_sensor.dads_room_presence
       state: "on"
+    - condition: state
+      entity_id: alarm_control_panel.dads_room_ac
+      state: armed_home
   action:
     - service: climate.set_temperature
       target:
         entity_id: climate.dads_room_ac
       data:
         hvac_mode: cool
-        temperature: 26
+        temperature: dads_room_ac_cool_target_temperature
     - service: notify.all_devices
       data:
         message: "Turned on Dad’s Room AC Cool. Current: {{ states('sensor.dads_room_wbgt') }}°C"
@@ -228,21 +224,15 @@
       entity_id: sensor.dads_room_wbgt
       above: input_number.dads_room_ac_cool_forcibly_turned_on_threshold
     - condition: state
-      entity_id: binary_sensor.dads_room_window_n
-      state: "off"
-      for:
-        minutes: 30
-    - condition: state
-      entity_id: binary_sensor.dads_room_window_s
-      state: "off"
-      for:
-        minutes: 30
+      entity_id: alarm_control_panel.dads_room_ac
+      state: armed_home
   action:
-    - service: climate.set_ac_mode
+    - service: climate.set_hvac_mode
       target:
         entity_id: climate.dads_room_ac
       data:
         hvac_mode: cool
+        temperature: dads_room_ac_cool_target_temperature
     - service: notify.all_devices
       data:
         message: "Turned on Dad’s Room AC Cool Forcibly. Current: {{ states('sensor.dads_room_wbgt') }}°C"
@@ -270,20 +260,13 @@
       entity_id: sensor.filtered_dads_room_ac_plug_power
       below: 10
     - condition: state
-      entity_id: binary_sensor.dads_room_window_n
-      state: "off"
-      for:
-        minutes: 30
-    - condition: state
-      entity_id: binary_sensor.dads_room_window_s
-      state: "off"
-      for:
-        minutes: 30
-    - condition: state
       entity_id: binary_sensor.dads_room_presence
       state: "on"
+    - condition: state
+      entity_id: alarm_control_panel.dads_room_ac
+      state: armed_home
   action:
-    - service: climate.set_ac_mode
+    - service: climate.set_hvac_mode
       target:
         entity_id: climate.dads_room_ac
       data:
@@ -309,16 +292,6 @@
       entity_id: sensor.dads_room_temperature
       below: input_number.dads_room_ac_heat_turned_on_threshold
     - condition: state
-      entity_id: binary_sensor.dads_room_window_n
-      state: "off"
-      for:
-        minutes: 30
-    - condition: state
-      entity_id: binary_sensor.dads_room_window_s
-      state: "off"
-      for:
-        minutes: 30
-    - condition: state
       entity_id: binary_sensor.dads_room_presence
       state: "on"
     - condition: numeric_state
@@ -328,16 +301,15 @@
       entity_id: sensor.season
       state: winter
     - condition: state
-      entity_id: cover.dads_room_curtains
-      state: opening
-      for:
-        hours: 1
+      entity_id: alarm_control_panel.dads_room_ac
+      state: armed_home
   action:
-    - service: climate.set_ac_mode
+    - service: climate.set_hvac_mode
       target:
         entity_id: climate.dads_room_ac
       data:
         hvac_mode: heat
+        temperature: dads_room_ac_heat_target_temperature
     - service: notify.all_devices
       data:
         message: "Turned on Dad’s Room AC Heat. Current: {{ states('sensor.dads_room_temperature') }}°C"
@@ -347,13 +319,273 @@
             interruption-level: time-sensitive
     - delay:
         hours: 1
-- id: automation.turn_on_dads_room_light
-  alias: Turn on Dad’s Room Light
+
+# Lights
+
+- id: automation.decrease_dads_room_light_brightness
+  alias: Decrease Dad’s Room Light Brightness
+  mode: single
+  trigger:
+    - platform: state
+      entity_id: event.dads_room_4_button_switch_button_3
+  action:
+    - variables:
+        new_brightness: "{{ state_attr('light.dads_room', 'brightness') | int - 255 / 5 }}"
+    - service: scene.apply
+      data:
+        entities:
+          light.dads_room:
+            state: "on"
+            brightness: "{{ new_brightness }}"
+- id: automation.dim_dads_room_monitor_light
+  alias: Dim Dad’s Room Monitor Light
+  mode: single
   trigger:
     - platform: state
       entity_id: sensor.dads_room_1_button_switch_action
-      to: single
+      to: hold
   action:
-    - service: light.turn_on
+    - service: scene.apply
+      data:
+        entities:
+          light.dads_room_monitor_light:
+            state: "on"
+            brightness: 10
+          light.dads_room_footlight:
+            state: "on"
+            brightness: 10
+- id: automation.increase_dads_room_light_brightness
+  alias: Increase Dad’s Room Light Brightness
+  mode: single
+  trigger:
+    - platform: state
+      entity_id: event.dads_room_4_button_switch_button_2
+  action:
+    - variables:
+        new_brightness: "{{ state_attr('light.dads_room', 'brightness') | int + 255 / 5 }}"
+    - service: scene.apply
+      data:
+        entities:
+          light.dads_room:
+            state: "on"
+            brightness: "{{ new_brightness }}"
+- id: automation.turn_off_dads_room_light
+  alias: Turn off Dad’s Room Light
+  trigger:
+    - platform: state
+      entity_id: event.dads_room_4_button_switch_button_4
+    - platform: state
+      entity_id: sensor.dads_room_1_button_switch_action
+      to: double
+  action:
+    - service: light.turn_off
       target:
-        entity_id: light.dads_room_light
+        entity_id: light.dads_room
+- id: automation.transition_dads_room_light_to_morning_scene
+  alias: Transition Dad’s Room Light to Morning Scene
+  mode: single
+  trigger:
+    - platform: time
+      at: "07:00:00"
+  condition:
+    - condition: state
+      entity_id: light.dads_room
+      state: "on"
+  action:
+    - service: hue.activate_scene
+      target:
+        entity_id: "{{ states('input_select.dads_room_morning_scene') }}"
+      data:
+        transition: 300
+- id: automation.transition_dads_room_light_to_daytime_scene
+  alias: Transition Dad’s Room Light to Daytime Scene
+  mode: single
+  trigger:
+    - platform: time
+      at: "10:00:00"
+  condition:
+    - condition: state
+      entity_id: light.dads_room
+      state: "on"
+  action:
+    - service: hue.activate_scene
+      target:
+        entity_id: "{{ states('input_select.dads_room_daytime_scene') }}"
+      data:
+        transition: 300
+- id: automation.transition_dads_room_light_to_sunset_scene
+  alias: Transition Dad’s Room Light to Sunset Scene
+  mode: single
+  trigger:
+    - platform: sun
+      event: sunset
+  condition:
+    - condition: state
+      entity_id: light.dads_room
+      state: "on"
+  action:
+    - service: hue.activate_scene
+      target:
+        entity_id: "{{ states('input_select.dads_room_sunset_scene') }}"
+      data:
+        transition: 300
+- id: automation.transition_dads_room_light_to_night_scene
+  alias: Transition Dad’s Room Light to Night Scene
+  mode: single
+  trigger:
+    - platform: time
+      at: input_datetime.dads_room_turned_down_time
+  condition:
+    - condition: state
+      entity_id: light.dads_room
+      state: "on"
+  action:
+    - service: hue.activate_scene
+      target:
+        entity_id: "{{ states('input_select.dads_room_night_scene') }}"
+      data:
+        transition: 300
+- id: automation.transition_dads_room_light_to_midnight_scene
+  alias: Transition Dad’s Room Light to Midnight Scene
+  mode: single
+  trigger:
+    - platform: time
+      at: input_datetime.dads_room_turned_down_more_time
+  condition:
+    - condition: state
+      entity_id: light.dads_room
+      state: "on"
+  action:
+    - service: hue.activate_scene
+      target:
+        entity_id: "{{ states('input_select.dads_room_midnight_scene') }}"
+      data:
+        transition: 300
+- id: automation.turn_on_dads_room_light_with_morning_scene
+  alias: Turn on Dad’s Room Light with Morning Scene
+  mode: single
+  trigger:
+    - platform: state
+      entity_id: event.dads_room_4_button_switch_button_1
+    - platform: state
+      entity_id: sensor.dads_room_1_button_switch_action
+      to: single
+  condition:
+    - condition: time
+      after: "07:00:00"
+      before: "10:00:00"
+  action:
+    - service: scene.turn_on
+      target:
+        entity_id: "{{ states('input_select.dads_room_morning_scene') }}"
+- id: automation.turn_on_dads_room_light_with_daytime_scene
+  alias: Turn on Dad’s Room Light with Daytime Scene
+  mode: single
+  trigger:
+    - platform: state
+      entity_id: event.dads_room_4_button_switch_button_1
+    - platform: state
+      entity_id: sensor.dads_room_1_button_switch_action
+      to: single
+  condition:
+    - condition: time
+      after: "10:00:00"
+      before: "20:00:00"
+    - condition: state
+      entity_id: sun.sun
+      state: above_horizon
+  action:
+    - service: scene.turn_on
+      target:
+        entity_id: "{{ states('input_select.dads_room_daytime_scene') }}"
+- id: automation.turn_on_dads_room_light_with_sunset_scene
+  alias: Turn on Dad’s Room Light with Sunset Scene
+  mode: single
+  trigger:
+    - platform: state
+      entity_id: event.dads_room_4_button_switch_button_1
+    - platform: state
+      entity_id: sensor.dads_room_1_button_switch_action
+      to: single
+  condition:
+    - condition: time
+      after: "16:00:00"
+      before: input_datetime.dads_room_turned_down_time
+    - condition: state
+      entity_id: sun.sun
+      state: below_horizon
+  action:
+    - service: scene.turn_on
+      target:
+        entity_id: "{{ states('input_select.dads_room_sunset_scene') }}"
+- id: automation.turn_on_dads_room_light_with_night_scene
+  alias: Turn on Dad’s Room Light with Night Scene
+  mode: single
+  trigger:
+    - platform: state
+      entity_id: event.dads_room_4_button_switch_button_1
+    - platform: state
+      entity_id: sensor.dads_room_1_button_switch_action
+      to: single
+  condition:
+    - condition: time
+      after: input_datetime.dads_room_turned_down_time
+      before: input_datetime.dads_room_turned_down_more_time
+  action:
+    - service: scene.turn_on
+      target:
+        entity_id: "{{ states('input_select.dads_room_night_scene') }}"
+- id: automation.turn_on_dads_room_light_with_midnight_scene
+  alias: Turn on Dad’s Room Light with Midnight Scene
+  mode: single
+  trigger:
+    - platform: state
+      entity_id: event.dads_room_4_button_switch_button_1
+    - platform: state
+      entity_id: sensor.dads_room_1_button_switch_action
+      to: single
+  condition:
+    - condition: time
+      after: input_datetime.dads_room_turned_down_more_time
+      before: "07:00:00"
+  action:
+    - service: scene.turn_on
+      target:
+        entity_id: "{{ states('input_select.dads_room_midnight_scene') }}"
+- id: automation.turn_on_dads_room_light_with_natural_light
+  alias: Turn on Dad’s Room Light with Natural Light
+  mode: single
+  trigger:
+    - platform: state
+      entity_id: event.dads_room_4_button_switch_button_1
+      attribute: event_type
+      to: long_release
+  action:
+    - service: scene.turn_on
+      target:
+        entity_id: scene.dads_room_natural_light
+
+# Others
+
+- id: automation.alarm_dads_room_co2_is_too_high
+  alias: "ALARM: Dad’s Room CO2 is Too High"
+  mode: single
+  trigger:
+    - platform: state
+      entity_id: binary_sensor.dads_room_motion
+      to: "on"
+  condition:
+    - condition: numeric_state
+      entity_id: sensor.dads_room_co2
+      above: 1000
+  action:
+    - service: notify.tats_devices
+      data:
+        title: "⚠️ ALARM"
+        message: "Dad’s Room CO2 is too high. Current: {{ states('sensor.dads_room_co2') }}ppm"
+        data:
+          url: /lovelace/home
+          push:
+            interruption-level: time-sensitive
+    - delay:
+        hours: 1
