@@ -1,15 +1,14 @@
-
 - id: automation.alarm_balcony_humidity_difference_is_too_large
   alias: "ALARM: Balcony Humidity Difference is Too Large"
   mode: single
   trigger:
     - platform: state
-      entity_id: sensor.balcony_switchbot_outdoor_meter_temperature
-      attribute: humidity
+      entity_id: sensor.balcony_switchbot_outdoor_meter_humidity
   condition:
     - condition: numeric_state
       entity_id: sensor.average_of_balcony_humidity_difference
       above: 10
+    - "{{ (states('sensor.dads_room_humidity') | float - states('sensor.dads_room_switchbot_meter_humidity') | float) | abs > 10 }}"
   action:
     - service: notify.tats_devices
       data:
@@ -31,6 +30,7 @@
     - condition: numeric_state
       entity_id: sensor.average_of_balcony_temperature_difference
       above: 1
+    - "{{ (states('sensor.dads_room_temperature') | float - states('sensor.dads_room_switchbot_meter_temperature') | float) | abs > 10 }}"
   action:
     - service: notify.tats_devices
       data:
