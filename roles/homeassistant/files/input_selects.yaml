@@ -1,0 +1,105 @@
+dads_room_morning_scene:
+  name: Dad’s Room Morning Scene
+  options:
+    - scene.dads_room_bright
+    - scene.dads_room_dimmed
+    - scene.dads_room_arise
+    - scene.dads_room_shine
+    - scene.dads_room_storybook
+    - scene.dads_room_unwind
+    - scene.dads_room_nighttime
+    - scene.dads_room_blossom
+    - scene.dads_room_crocus
+    - scene.dads_room_starlight
+    - scene.dads_room_energize
+    - scene.dads_room_concentrate
+    - scene.dads_room_read
+    - scene.dads_room_dimmed_read
+    - scene.dads_room_relax
+    - scene.dads_room_rest
+    - scene.dads_room_nightlight
+  icon: mdi:weather-sunset-up
+dads_room_daytime_scene:
+  name: Dad’s Room Daytime Scene
+  options:
+    - scene.dads_room_bright
+    - scene.dads_room_dimmed
+    - scene.dads_room_arise
+    - scene.dads_room_shine
+    - scene.dads_room_storybook
+    - scene.dads_room_unwind
+    - scene.dads_room_nighttime
+    - scene.dads_room_blossom
+    - scene.dads_room_crocus
+    - scene.dads_room_starlight
+    - scene.dads_room_energize
+    - scene.dads_room_concentrate
+    - scene.dads_room_read
+    - scene.dads_room_dimmed_read
+    - scene.dads_room_relax
+    - scene.dads_room_rest
+    - scene.dads_room_nightlight
+  icon: mdi:weather-sunny
+dads_room_sunset_scene:
+  name: Dad’s Room Sunset Scene
+  options:
+    - scene.dads_room_bright
+    - scene.dads_room_dimmed
+    - scene.dads_room_arise
+    - scene.dads_room_shine
+    - scene.dads_room_storybook
+    - scene.dads_room_unwind
+    - scene.dads_room_nighttime
+    - scene.dads_room_blossom
+    - scene.dads_room_crocus
+    - scene.dads_room_starlight
+    - scene.dads_room_energize
+    - scene.dads_room_concentrate
+    - scene.dads_room_read
+    - scene.dads_room_dimmed_read
+    - scene.dads_room_relax
+    - scene.dads_room_rest
+    - scene.dads_room_nightlight
+  icon: mdi:weather-sunset
+dads_room_night_scene:
+  name: Dad’s Room Night Scene
+  options:
+    - scene.dads_room_bright
+    - scene.dads_room_dimmed
+    - scene.dads_room_arise
+    - scene.dads_room_shine
+    - scene.dads_room_storybook
+    - scene.dads_room_unwind
+    - scene.dads_room_nighttime
+    - scene.dads_room_blossom
+    - scene.dads_room_crocus
+    - scene.dads_room_starlight
+    - scene.dads_room_energize
+    - scene.dads_room_concentrate
+    - scene.dads_room_read
+    - scene.dads_room_dimmed_read
+    - scene.dads_room_relax
+    - scene.dads_room_rest
+    - scene.dads_room_nightlight
+  icon: mdi:brightness-2
+dads_room_midnight_scene:
+  name: Dad’s Room Midnight Scene
+  options:
+    - scene.dads_room_bright
+    - scene.dads_room_dimmed
+    - scene.dads_room_arise
+    - scene.dads_room_shine
+    - scene.dads_room_storybook
+    - scene.dads_room_unwind
+    - scene.dads_room_nighttime
+    - scene.dads_room_blossom
+    - scene.dads_room_crocus
+    - scene.dads_room_starlight
+    - scene.dads_room_energize
+    - scene.dads_room_concentrate
+    - scene.dads_room_read
+    - scene.dads_room_dimmed_read
+    - scene.dads_room_relax
+    - scene.dads_room_rest
+    - scene.dads_room_nightlight
+  icon: mdi:brightness-3

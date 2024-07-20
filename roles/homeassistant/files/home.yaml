@@ -248,7 +248,7 @@ cards:
         entities:
           - entity: light.dads_room_pendant_light
             name: Pendant Light
-          - entity: light.dads_room_floor_light
+          - entity: light.dads_room_footlight
             name: Floorlight
           - entity: light.dads_room_monitor_light
             name: Monitor Light

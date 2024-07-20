@@ -10,6 +10,18 @@ dads_room_ac_cool_forcibly_turned_on_threshold:
   max: 35
   unit_of_measurement: °C
   icon: mdi:thermometer-alert
+dads_room_ac_cool_target_temperature:
+  name: Dad’s Room AC Cool Target Temperature
+  min: 24
+  max: 28
+  unit_of_measurement: °C
+  icon: mdi:thermometer-check
+dads_room_ac_heat_target_temperature:
+  name: Dad’s Room AC Heat Target Temperature
+  min: 24
+  max: 28
+  unit_of_measurement: °C
+  icon: mdi:thermometer-check
 dads_room_ac_cool_turned_off_threshold:
   name: Dad’s Room AC Cool Turned off Threshold
   min: 19
