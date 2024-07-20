@@ -3,8 +3,6 @@
   mode: single
   trigger:
     - platform: time
-      at: "22:00"
-    - platform: time
       at: "22:30"
     - platform: time
       at: "23:00"
