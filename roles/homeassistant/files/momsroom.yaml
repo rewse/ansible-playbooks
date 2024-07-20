@@ -17,45 +17,36 @@ cards:
     entities:
       - entity: light.moms_room_light
         name: Light
-  - type: tile
-    entity: climate.moms_room_ac
-    tap_action:
-      action: more-info
-    icon_tap_action:
-      action: more-info
-    features:
-      - type: climate-hvac-modes
-        hvac_modes:
-          - auto
-          - cool
-          - dry
-          - heat
-          - fan_only
-          - 'off'
-      - type: target-temperature
+  - type: vertical-stack
+    cards:
+      - type: tile
+        entity: climate.moms_room_ac
+        tap_action:
+          action: more-info
+        icon_tap_action:
+          action: more-info
+        features:
+          - type: climate-hvac-modes
+            hvac_modes:
+              - auto
+              - cool
+              - dry
+              - heat
+              - fan_only
+              - 'off'
+          - type: target-temperature
+      - type: alarm-panel
+        entity: alarm_control_panel.moms_room_ac
+        states:
+          - arm_home
   - type: entities
     title: Mom’s Room Appliances
     entities:
       - entity: cover.moms_room_curtains
         name: Curtains
   - type: entities
-    title: Mom’s Room Automations
+    title: Dad’s Room Climate Automations
     entities:
-      - entity: automation.open_moms_room_curtains_temporarily
-        name: Open Curtains Temporarily
-        secondary_info: last-triggered
-      - entity: input_datetime.moms_room_curtains_opened_time
-        name: Curtains Opened Time Temporarily
-      - entity: automation.open_moms_room_curtains_workday
-        name: Open Curtains for Workday
-        secondary_info: last-triggered
-      - entity: input_datetime.moms_room_curtains_opened_time_workday
-        name: Curtains Opened Time for Workday
-      - entity: automation.turn_down_moms_room
-        name: Turn down
-        secondary_info: last-triggered
-      - entity: input_datetime.moms_room_turned_down_time
-        name: Turned down Time
       - entity: automation.turn_off_moms_room_ac_cool
         name: Turn off AC Cool
         secondary_info: last-triggered
@@ -92,6 +83,20 @@ cards:
         secondary_info: last-triggered
       - entity: input_number.moms_room_ac_heat_turned_on_threshold
         name: Turned on AC Heat Threshold
+    show_header_toggle: false
+  - type: entities
+    title: Mom’s Room Appliances Automations
+    entities:
+      - entity: automation.open_moms_room_curtains_temporarily
+        name: Open Curtains Temporarily
+        secondary_info: last-triggered
+      - entity: input_datetime.moms_room_curtains_opened_time
+        name: Curtains Opened Time Temporarily
+      - entity: automation.open_moms_room_curtains_workday
+        name: Open Curtains for Workday
+        secondary_info: last-triggered
+      - entity: input_datetime.moms_room_curtains_opened_time_workday
+        name: Curtains Opened Time for Workday
     show_header_toggle: false
   - type: picture-entity
     name: Mom’s Room Camera
