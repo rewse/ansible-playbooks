@@ -95,4 +95,4 @@ cards:
     show_header_toggle: false
   - type: picture-entity
     name: Mom’s Room Camera
-    entity: camera.moms_room_camera
+    entity: camera.moms_room_surveillance

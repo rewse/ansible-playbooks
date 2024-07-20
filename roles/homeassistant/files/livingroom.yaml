@@ -193,4 +193,4 @@ cards:
           power_state: false
   - type: picture-entity
     name: Living Room Camera
-    entity: camera.guppy_living_room_camera
+    entity: camera.living_room_surveillance
