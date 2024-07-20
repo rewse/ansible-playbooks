@@ -38,18 +38,6 @@ cards:
         entity: alarm_control_panel.entrance_auto_lock
         states:
           - arm_home
-  - type: entities
-    title: Automations
-    entities:
-      - entity: automation.turn_off_alarm_control_panel_surveillance
-        name: Turn off Surveillance Alarm Control Panel
-        secondary_info: last-triggered
-      - entity: automation.turn_on_alarm_control_panel_surveillance_when_nobody_is_in_home
-        name: Turn on Surveillance Alarm Control Panel
-        secondary_info: last-triggered
-      - entity: automation.unplan_to_start_roomba
-        name: Unplan to Start Roomba
-        secondary_info: last-triggered
   - type: picture-entity
     name: Entrance Camera
     entity: camera.entrance_camera
