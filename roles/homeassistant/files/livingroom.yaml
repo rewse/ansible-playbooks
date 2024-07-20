@@ -68,11 +68,6 @@ cards:
     entity: alarm_control_panel.surveillance
     states:
       - arm_away
-  - type: alarm-panel
-    entity: alarm_control_panel.living_room_ac
-    title: Living Room AC
-    states:
-      - arm_home
   - type: entities
     title: Living Room Climate Automations
     entities:
@@ -118,6 +113,8 @@ cards:
         secondary_info: last-triggered
       - entity: input_number.living_room_ac_cool_turned_on_threshold
         name: Turned on AC Cool Threshold
+      - entity: input_number.living_room_ac_cool_target_temperature
+        name: AC Cool Target Temperature
       - entity: automation.turn_on_living_room_ac_cool_forcibly
         name: Turn on AC Cool Forcibly
         secondary_info: last-triggered
