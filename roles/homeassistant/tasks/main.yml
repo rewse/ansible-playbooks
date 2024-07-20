@@ -390,12 +390,6 @@
   notify: Restart homeassistant
   tags: [homeassistant, homeassistant-component]
 
-- name: Copy scripts.yaml
-  copy:
-    src: scripts.yaml
-    dest: /etc/homeassistant
-  tags: [homeassistant, homeassistant-script]
-
 - name: Config sensor
   lineinfile:
     path: /etc/homeassistant/configuration.yaml
