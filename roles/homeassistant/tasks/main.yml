@@ -496,21 +496,6 @@
   notify: Restart homeassistant
   tags: [homeassistant, homeassistant-custom]
 
-- name: Download localtuya
-  unarchive:
-    src: https://github.com/rospogrigio/localtuya/archive/refs/tags/v{{ localtuya_version }}.zip
-    dest: /tmp
-    remote_src: yes
-  tags: [homeassistant, homeassistant-custom]
-
-- name: Copy localtuya
-  copy:
-    src: /tmp/localtuya-{{ localtuya_version }}/custom_components/localtuya
-    dest: /etc/homeassistant/custom_components
-    remote_src: yes
-  notify: Restart homeassistant
-  tags: [homeassistant, homeassistant-custom]
-
 - name: Download XiaomiGateway3
   unarchive:
     src: https://github.com/AlexxIT/XiaomiGateway3/archive/refs/tags/v{{ xiaomi_gateway3_version }}.zip

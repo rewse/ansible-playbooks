@@ -164,9 +164,9 @@
   action:
     - service: switch.turn_off
       entity_id:
-        - switch.living_room_surveillance_plug
-        - switch.dads_room_surveillance_plug
-        - switch.moms_room_surveillance_plug
+        - switch.living_room_surveillance_plug_socket_1
+        - switch.dads_room_surveillance_plug_socket_1
+        - switch.moms_room_surveillance_plug_socket_1
 - id: automation.turn_on_surveillances
   alias: Turn on Surveillances
   trigger:
@@ -183,6 +183,6 @@
   action:
     - service: switch.turn_on
       entity_id:
-        - switch.living_room_surveillance_plug
-        - switch.dads_room_surveillance_plug
-        - switch.moms_room_surveillance_plug
+        - switch.living_room_surveillance_plug_socket_1
+        - switch.dads_room_surveillance_plug_socket_1
+        - switch.moms_room_surveillance_plug_socket_1
