@@ -18,6 +18,7 @@ dads_room_morning_scene:
     - scene.dads_room_relax
     - scene.dads_room_rest
     - scene.dads_room_nightlight
+    - scene.dads_room_city_of_love
   icon: mdi:weather-sunset-up
 dads_room_daytime_scene:
   name: Dad’s Room Daytime Scene
@@ -39,6 +40,7 @@ dads_room_daytime_scene:
     - scene.dads_room_relax
     - scene.dads_room_rest
     - scene.dads_room_nightlight
+    - scene.dads_room_city_of_love
   icon: mdi:weather-sunny
 dads_room_sunset_scene:
   name: Dad’s Room Sunset Scene
@@ -60,6 +62,7 @@ dads_room_sunset_scene:
     - scene.dads_room_relax
     - scene.dads_room_rest
     - scene.dads_room_nightlight
+    - scene.dads_room_city_of_love
   icon: mdi:weather-sunset
 dads_room_night_scene:
   name: Dad’s Room Night Scene
@@ -81,6 +84,7 @@ dads_room_night_scene:
     - scene.dads_room_relax
     - scene.dads_room_rest
     - scene.dads_room_nightlight
+    - scene.dads_room_city_of_love
   icon: mdi:brightness-2
 dads_room_midnight_scene:
   name: Dad’s Room Midnight Scene
@@ -102,4 +106,5 @@ dads_room_midnight_scene:
     - scene.dads_room_relax
     - scene.dads_room_rest
     - scene.dads_room_nightlight
+    - scene.dads_room_city_of_love
   icon: mdi:brightness-3
