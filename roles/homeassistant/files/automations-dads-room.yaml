@@ -90,7 +90,7 @@
   mode: single
   trigger:
     - platform: state
-      entity_id: sensor.filtered_dads_room_ac_plug_power
+      entity_id: sensor.average_of_dads_room_ac_plug_power
       below: 5
   condition:
     - condition: not
@@ -119,7 +119,7 @@
       entity_id: sensor.dads_room_humidity
       below: input_number.dads_room_ac_dry_turned_off_threshold
     - condition: numeric_state
-      entity_id: sensor.filtered_dads_room_ac_plug_power
+      entity_id: sensor.average_of_dads_room_ac_plug_power
       above: 5
     - condition: not
       conditions:
@@ -156,7 +156,7 @@
       entity_id: sensor.dads_room_temperature
       above: input_number.dads_room_ac_heat_turned_off_threshold
     - condition: numeric_state
-      entity_id: sensor.filtered_dads_room_ac_plug_power
+      entity_id: sensor.average_of_dads_room_ac_plug_power
       above: 5
     - condition: state
       entity_id: sensor.season
@@ -257,7 +257,7 @@
       entity_id: sensor.dads_room_wbgt
       above: input_number.dads_room_ac_dry_turned_on_threshold_wbgt
     - condition: numeric_state
-      entity_id: sensor.filtered_dads_room_ac_plug_power
+      entity_id: sensor.average_of_dads_room_ac_plug_power
       below: 5
     - condition: state
       entity_id: binary_sensor.dads_room_presence
@@ -296,7 +296,7 @@
       entity_id: binary_sensor.dads_room_presence
       state: "on"
     - condition: numeric_state
-      entity_id: sensor.filtered_dads_room_ac_plug_power
+      entity_id: sensor.average_of_dads_room_ac_plug_power
       below: 5
     - condition: state
       entity_id: sensor.season
