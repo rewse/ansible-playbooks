@@ -24,7 +24,7 @@
     variable_end_string: "%]"
   tags: [mhz19]
 
-- name: Copy enecoq2mqtt.cron
+- name: Copy mhz192mqtt.cron
   copy:
     src: mhz192mqtt.cron
     dest: /etc/cron.d/mhz192mqtt
