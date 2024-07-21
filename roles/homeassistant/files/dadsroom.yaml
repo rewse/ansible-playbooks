@@ -59,6 +59,8 @@ cards:
           name: Crocus
         - entity: scene.dads_room_starlight
           name: Starlight
+        - entity: scene.dads_room_city_of_love
+          name: City of Love
         - entity: scene.dads_room_energize
           name: Energize
         - entity: scene.dads_room_concentrate
