@@ -178,7 +178,7 @@
   alias: Sync Moms’s Room AC Power Off
   mode: single
   trigger:
-    - platform: state
+    - platform: numeric_state
       entity_id: sensor.average_of_moms_room_ac_plug_power_improvoed
       below: 5
   condition:
