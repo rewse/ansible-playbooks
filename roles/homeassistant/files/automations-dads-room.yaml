@@ -89,7 +89,7 @@
   alias: Sync Dad’s Room AC Power Off
   mode: single
   trigger:
-    - platform: state
+    - platform: numeric_state
       entity_id: sensor.average_of_dads_room_ac_plug_power_improvoed
       below: 5
   condition:
