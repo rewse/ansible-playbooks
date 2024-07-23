@@ -59,10 +59,14 @@
   action:
     - variables:
         target: "{{ states('input_number.dads_room_ac_cool_target_temperature') | int + 1 }}"
+    - service: climate.turn_on
+      target:
+        entity_id: climate.dads_room_ac
     - service: climate.set_temperature
       target:
         entity_id: climate.dads_room_ac 
       data:
+        hvac_mode: cool
         temperature: "{{ target }}"
 - id: automation.raise_dads_room_ac_cool_at_night
   alias: Raise Dad’s Room AC Cool at Night
@@ -80,10 +84,14 @@
   action:
     - variables:
         target: "{{ states('input_number.dads_room_ac_cool_target_temperature') | int + 2 }}"
+    - service: climate.turn_on
+      target:
+        entity_id: climate.dads_room_ac
     - service: climate.set_temperature
       target:
         entity_id: climate.dads_room_ac
       data:
+        hvac_mode: cool
         temperature: "{{ target }}"
 - id: automation.sync_dads_room_ac_power_off
   alias: Sync Dad’s Room AC Power Off
@@ -99,11 +107,9 @@
           entity_id: climate.dads_room_ac
           state: "off"
   action:
-    - service: climate.set_hvac_mode
+    - service: climate.turn_off
       target:
         entity_id: climate.dads_room_ac
-      data:
-        hvac_mode: "off"
 - id: automation.turn_off_dads_room_ac_cool
   alias: Turn off Dad’s Room AC Cool
   mode: single
@@ -130,11 +136,9 @@
       entity_id: alarm_control_panel.dads_room_ac
       state: armed_home
   action:
-    - service: climate.set_hvac_mode
+    - service: climate.turn_off
       target:
         entity_id: climate.dads_room_ac
-      data:
-        hvac_mode: "off"
     - service: notify.all_devices
       data:
         message: "Turned off Dad’s Room AC Cool. Current: {{ states('sensor.dads_room_wbgt') }}°C, {{ states('sensor.dads_room_humidity') }}%"
@@ -165,11 +169,9 @@
       entity_id: alarm_control_panel.dads_room_ac
       state: armed_home
   action:
-    - service: climate.set_hvac_mode
+    - service: climate.turn_off
       target:
         entity_id: climate.dads_room_ac
-      data:
-        hvac_mode: "off"
     - service: notify.all_devices
       data:
         message: "Turned off Dad’s Room AC Heat. Current: {{ states('sensor.dads_room_temperature') }}°C"
@@ -197,6 +199,9 @@
       entity_id: alarm_control_panel.dads_room_ac
       state: armed_home
   action:
+    - service: climate.turn_on
+      target:
+        entity_id: climate.dads_room_ac
     - service: climate.set_temperature
       target:
         entity_id: climate.dads_room_ac
@@ -227,7 +232,10 @@
       entity_id: alarm_control_panel.dads_room_ac
       state: armed_home
   action:
-    - service: climate.set_hvac_mode
+    - service: climate.turn_on
+      target:
+        entity_id: climate.dads_room_ac
+    - service: climate.set_temperature
       target:
         entity_id: climate.dads_room_ac
       data:
@@ -266,7 +274,10 @@
       entity_id: alarm_control_panel.dads_room_ac
       state: armed_home
   action:
-    - service: climate.set_hvac_mode
+    - service: climate.turn_on
+      target:
+        entity_id: climate.dads_room_ac
+    - service: climate.climate.set_temperature
       target:
         entity_id: climate.dads_room_ac
       data:
@@ -305,7 +316,10 @@
       entity_id: alarm_control_panel.dads_room_ac
       state: armed_home
   action:
-    - service: climate.set_hvac_mode
+    - service: climate.turn_on
+      target:
+        entity_id: climate.dads_room_ac
+    - service: climate.set_temperature
       target:
         entity_id: climate.dads_room_ac
       data:
