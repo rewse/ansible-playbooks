@@ -148,7 +148,7 @@ moms_room_ac_cool_target_temperature:
   max: 28
   unit_of_measurement: °C
   icon: mdi:thermometer-check
-mos_room_ac_heat_target_temperature:
+moms_room_ac_heat_target_temperature:
   name: Mom’s Room AC Heat Target Temperature
   min: 24
   max: 28
