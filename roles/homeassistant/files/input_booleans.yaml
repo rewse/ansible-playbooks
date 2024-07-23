@@ -1,4 +1,0 @@
-living_room_ceiling_fans_state:
-  name: Living Room Ceiling Fans State
-  initial: on
-  icon: mdi:ceiling-fan

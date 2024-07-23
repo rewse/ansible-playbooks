@@ -221,25 +221,10 @@
   notify: Restart homeassistant
   tags: [homeassistant, homeassistant-component]
 
-- name: Config input_boolean
-  lineinfile:
-    path: /etc/homeassistant/configuration.yaml
-    insertafter: '^fan:'
-    regexp: '^input_boolean:'
-    line: "input_boolean: !include input_booleans.yaml"
-  notify: Restart homeassistant
-  tags: [homeassistant, homeassistant-input-boolean]
-
-- name: Copy input_booleans.yaml
-  copy:
-    src: input_booleans.yaml
-    dest: /etc/homeassistant
-  tags: [homeassistant, homeassistant-input-boolean]
-
 - name: Config homekit
   lineinfile:
     path: /etc/homeassistant/configuration.yaml
-    insertafter: '^input_boolean:'
+    insertafter: '^cover:'
     regexp: '^homekit:'
     line: "homekit: !include homekit.yaml"
   notify: Restart homeassistant
