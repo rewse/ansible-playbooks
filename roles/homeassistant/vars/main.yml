@@ -6,7 +6,7 @@ card_mod_version: 3.4.3
 gmail:
   address: "{{ vault_gmail.address }}"
   password: "{{ vault_gmail.password }}"
-ha_switchbot_remote_version: 1.2.1
+ha_switchbot_remote_version: 1.2.2
 homeassistant_token: "{{ vault_homeassistant_token }}"
 latlng:
   home:
