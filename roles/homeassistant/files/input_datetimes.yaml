@@ -6,6 +6,10 @@ dads_room_turned_down_time:
   name: Dad’s Room Turned down Time
   has_time: true
   icon: mdi:brightness-2
+dads_room_waking_up_time:
+  name: Dad’s Room Waking up Time
+  has_time: true
+  icon: mdi:bed-clock
 living_area_turned_down_more_time:
   name: Living Area Turned down More Time
   has_time: true
