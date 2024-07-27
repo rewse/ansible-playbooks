@@ -511,6 +511,18 @@
         entity_id: "{{ states('input_select.dads_room_midnight_scene') }}"
       data:
         transition: 300
+- id: automation.turn_on_dads_room_light_to_wake_up
+  alias: Turn on Dad’s Room Light to Wake up
+  mode: single
+  trigger:
+    - platform: time
+      at: input_datetime.dads_room_waking_up_time
+  action:
+    - service: hue.activate_scene
+      target:
+        entity_id: "{{ states('input_select.dads_room_morning_scene') }}"
+      data:
+        transition: 900
 - id: automation.turn_on_dads_room_light_with_morning_scene
   alias: Turn on Dad’s Room Light with Morning Scene
   mode: single
