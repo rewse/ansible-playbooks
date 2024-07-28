@@ -26,18 +26,14 @@ views:
           - entity: binary_sensor.regza
           - entity: binary_sensor.sesamemodule
           - entity: binary_sensor.switchbothub2
-          - entity: binary_sensor.switchbothubmini_liv
-          - entity: binary_sensor.switchbothubmini_dad
-          - entity: binary_sensor.switchbothubmini_mom
+          - entity: binary_sensor.switchbothubmini
+          - entity: binary_sensor.tuyaplug_dad_sur
           - entity: binary_sensor.tuyaplug_ent_ses
           - entity: binary_sensor.tuyaplug_kit_ric
           - entity: binary_sensor.tuyaplug_liv_foo
           - entity: binary_sensor.tuyaplug_liv_fox
           - entity: binary_sensor.tuyaplug_liv_hum
           - entity: binary_sensor.tuyaplug_liv_sur
-          - entity: binary_sensor.tuyaplug_dad_ac
-          - entity: binary_sensor.tuyaplug_dad_sur
-          - entity: binary_sensor.tuyaplug_mom_ac
           - entity: binary_sensor.tuyaplug_mom_sur
           - entity: binary_sensor.xiaomigateway
         hours_to_show: 12
