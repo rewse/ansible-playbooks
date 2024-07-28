@@ -256,7 +256,7 @@ cards:
         features:
           - type: climate-hvac-modes
             hvac_modes:
-              - auto
+              - heat_cool
               - cool
               - dry
               - heat
@@ -343,7 +343,7 @@ cards:
         features:
           - type: climate-hvac-modes
             hvac_modes:
-              - auto
+              - heat_cool
               - cool
               - dry
               - heat
