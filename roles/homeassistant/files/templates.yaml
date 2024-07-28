@@ -47,6 +47,13 @@
     device_class: temperature
     state_class: measurement
     unit_of_measurement: °C
+  - name: Dad’s Room AC Target
+    unique_id: sensor.dads_room_ac_target
+    state: "{{ state_attr('climate.dads_room_ac', 'temperature') }}"
+    icon: mdi:thermometer-check
+    device_class: temperature
+    state_class: measurement
+    unit_of_measurement: °C
   - name: Dad’s Room Humidity Difference
     unique_id: sensor.dads_room_humidity_difference
     state: "{{ (states('sensor.dads_room_humidity') | float(50) - states('sensor.dads_room_switchbot_meter_humidity') | float(50)) | round(2) | abs }}"
@@ -63,6 +70,13 @@
     unique_id: sensor.dads_room_wbgt
     state: "{{ ((states('sensor.dads_room_temperature') | float(25) - 30.5) * 0.90739 + (states('sensor.dads_room_humidity') | float(50) - 60.0) * 0.14775 + (states('sensor.dads_room_temperature') | float(25) - 30.5) * (states('sensor.dads_room_humidity') | float(50) - 60.0) * 0.003655 + 27.77) | round(2) }}"
     icon: mdi:thermometer-water
+    device_class: temperature
+    state_class: measurement
+    unit_of_measurement: °C
+  - name: Living Room AC Target
+    unique_id: sensor.living_room_ac_target
+    state: "{{ state_attr('climate.living_room_ac', 'temperature') }}"
+    icon: mdi:thermometer-check
     device_class: temperature
     state_class: measurement
     unit_of_measurement: °C
@@ -89,6 +103,13 @@
     unique_id: sensor.living_room_wbgt
     state: "{{ ((states('sensor.living_room_temperature') | float(25) - 30.5) * 0.90739 + (states('sensor.living_room_humidity') | float(50) - 60.0) * 0.14775 + (states('sensor.living_room_temperature') | float(25) - 30.5) * (states('sensor.living_room_humidity') | float(50) - 60.0) * 0.003655 + 27.77) | round(2) }}"
     icon: mdi:thermometer-water
+    device_class: temperature
+    state_class: measurement
+    unit_of_measurement: °C
+  - name: Mom’s Room AC Target
+    unique_id: sensor.moms_room_ac_target
+    state: "{{ state_attr('climate.moms_room_ac', 'temperature') }}"
+    icon: mdi:thermometer-check
     device_class: temperature
     state_class: measurement
     unit_of_measurement: °C
