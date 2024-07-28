@@ -136,13 +136,6 @@ cards:
               - fan_only
               - 'off'
           - type: target-temperature
-          - type: climate-preset-modes
-            style: icons
-            preset_modes:
-              - none
-              - away
-              - eco
-              - boost
       - type: entities
         title: Living Room Appliances
         entities:
