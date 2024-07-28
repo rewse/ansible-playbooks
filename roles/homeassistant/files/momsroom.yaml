@@ -28,7 +28,7 @@ cards:
         features:
           - type: climate-hvac-modes
             hvac_modes:
-              - auto
+              - heat_cool
               - cool
               - dry
               - heat
@@ -47,6 +47,15 @@ cards:
   - type: entities
     title: Dad’s Room Climate Automations
     entities:
+      - entity: automation.decrease_living_room_ac_cool_target
+        name: Decrease AC Cool Target
+        secondary_info: last-triggered
+      - entity: automation.increase_living_room_ac_cool_target
+        name: Increase AC Cool Target
+        secondary_info: last-triggered
+      - entity: automation.plan_to_turn_on_moms_room_ac_internal_clean
+        name: Plan to Turn on AC Internal Clean
+        secondary_info: last-triggered
       - entity: automation.turn_off_moms_room_ac_cool
         name: Turn off AC Cool
         secondary_info: last-triggered
@@ -56,6 +65,9 @@ cards:
         name: Turned off AC Dry Threshold
       - entity: automation.turn_off_moms_room_ac_heat
         name: Turn off AC Heat
+        secondary_info: last-triggered
+      - entity: automation.turn_off_moms_room_ac_internal_clean
+        name: Turn off AC Internal Clean
         secondary_info: last-triggered
       - entity: input_number.moms_room_ac_heat_turned_off_threshold
         name: Turned off AC Cool Threshold
@@ -87,6 +99,9 @@ cards:
         name: Turned on AC Heat Threshold
       - entity: input_number.moms_room_ac_heat_target_temperature
         name: AC Heat Target Temperature
+      - entity: automation.turn_on_moms_room_ac_internal_clean
+        name: Turn on AC Internal Clean
+        secondary_info: last-triggered
     show_header_toggle: false
   - type: entities
     title: Mom’s Room Appliances Automations

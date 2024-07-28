@@ -44,6 +44,66 @@
             interruption-level: time-sensitive
     - delay:
         hours: 8
+- id: automation.decrease_dads_room_ac_cool_target
+  alias: Decrease Dad’s Room AC Cool Target
+  trigger:
+    - platform: state
+      entity_id: binary_sensor.dads_room_motion
+      to: "on"
+    - platform: time_pattern
+      minutes: "/5"
+      seconds: 35
+  condition:
+    - condition: state
+      entity_id: climate.dads_room_ac
+      state: cool
+      for:
+        minutes: 30
+    - "{{ states('sensor.dads_room_temperature') | float(26) - (states('input_number.dads_room_ac_cool_target_temperature') | float(26) + 0.5) > 0.5 }}"
+    - condition: state
+      entity_id: alarm_control_panel.dads_room_ac
+      state: armed_home
+  action:
+    - variables:
+        target: "{{ state_attr('climate.dads_room_ac', 'temperature') | int(26) - 1 }}"
+    - service: climate.set_temperature
+      target:
+        entity_id: climate.dads_room_ac 
+      data:
+        hvac_mode: cool
+        temperature: "{{ target }}"
+    - delay:
+        minutes: 30
+- id: automation.increase_dads_room_ac_cool_target
+  alias: Increase Dad’s Room AC Cool Target
+  trigger:
+    - platform: state
+      entity_id: binary_sensor.dads_room_motion
+      to: "on"
+    - platform: time_pattern
+      minutes: "/5"
+      seconds: 47
+  condition:
+    - condition: state
+      entity_id: climate.dads_room_ac
+      state: cool
+      for:
+        minutes: 10
+    - "{{ states('sensor.dads_room_temperature') | float(26) - (states('input_number.dads_room_ac_cool_target_temperature') | float(26) + 0.5) < -0.5 }}"
+    - condition: state
+      entity_id: alarm_control_panel.dads_room_ac
+      state: armed_home
+  action:
+    - variables:
+        target: "{{ state_attr('climate.dads_room_ac', 'temperature') | int(26) + 1 }}"
+    - service: climate.set_temperature
+      target:
+        entity_id: climate.dads_room_ac 
+      data:
+        hvac_mode: cool
+        temperature: "{{ target }}"
+    - delay:
+        minutes: 30
 - id: automation.plan_to_turn_on_dads_room_ac_internal_clean
   alias: Plan to Turn on Dad’s Room AC Internal Clean
   trigger:
@@ -53,7 +113,7 @@
       for:
         minutes: 5
     - platform: state
-      entity_id: climate.living_room_ac
+      entity_id: climate.dads_room_ac
       to: cool
       for:
         minutes: 5
@@ -67,12 +127,14 @@
       target:
         entity_id:
           - automation.turn_on_dads_room_ac_internal_clean
-- id: automation.raise_dads_room_ac_cool_at_sunset
-  alias: Raise Dad’s Room AC Cool at Sunset
+- id: automation.reset_dads_room_ac_cool_target
+  alias: Reset Dad’s Room AC Cool Target
   trigger:
-    - platform: sun
-      event: sunset
-      offset: "01:00:00"
+    - platform: numeric_state
+      entity_id: sensor.dads_room_light_level
+      above: 10
+      for:
+        minutes: 30
   condition:
     - condition: state
       entity_id: climate.dads_room_ac
@@ -82,32 +144,7 @@
       state: armed_home
   action:
     - variables:
-        target: "{{ states('input_number.dads_room_ac_cool_target_temperature') | int + 1 }}"
-    - service: climate.set_temperature
-      target:
-        entity_id: climate.dads_room_ac 
-      data:
-        hvac_mode: cool
-        temperature: "{{ target }}"
-- id: automation.raise_dads_room_ac_cool_at_night
-  alias: Raise Dad’s Room AC Cool at Night
-  trigger:
-    - platform: sun
-      event: sunset
-      offset: "04:00:00"
-  condition:
-    - condition: state
-      entity_id: climate.dads_room_ac
-      state: cool
-    - condition: state
-      entity_id: alarm_control_panel.dads_room_ac
-      state: armed_home
-  action:
-    - variables:
-        target: "{{ states('input_number.dads_room_ac_cool_target_temperature') | int + 2 }}"
-    - service: climate.turn_on
-      target:
-        entity_id: climate.dads_room_ac
+        target: "{{ states('input_number.dads_room_ac_cool_target_temperature') | float(26) }}"
     - service: climate.set_temperature
       target:
         entity_id: climate.dads_room_ac
@@ -196,14 +233,12 @@
         hours: 2
   condition:
     - condition: state
-      entity_id: alarm_control_panel.living_room_ac
+      entity_id: alarm_control_panel.dads_room_ac
       state: armed_home
   action:
-    - service: climate.set_hvac_mode
+    - service: climate.turn_off
       target:
         entity_id: climate.dads_room_ac
-      data:
-        hvac_mode: "off"
     - service: automation.turn_off
       target:
         entity_id:
@@ -359,7 +394,7 @@
   alias: Turn on Dad’s Room AC Internal Clean
   trigger:
     - platform: state
-      entity_id: climate.living_room_ac
+      entity_id: climate.dads_room_ac
       to: "off"
   action:
     - delay:

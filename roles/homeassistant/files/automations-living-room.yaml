@@ -43,6 +43,78 @@
             interruption-level: time-sensitive
     - delay:
         hours: 8
+- id: automation.decrease_living_room_ac_cool_target
+  alias: Decrease Living Room AC Cool Target
+  trigger:
+    - platform: state
+      entity_id: binary_sensor.living_room_motion
+      to: "on"
+    - platform: state
+      entity_id: binary_sensor.study_motion
+      to: "on"
+    - platform: state
+      entity_id: binary_sensor.dining_room_motion
+      to: "on"
+    - platform: time_pattern
+      minutes: "/5"
+      seconds: 4
+  condition:
+    - condition: state
+      entity_id: climate.living_room_ac
+      state: cool
+      for:
+        minutes: 30
+    - "{{ states('sensor.living_room_temperature') | float(26) - (states('input_number.living_room_ac_cool_target_temperature') | float(26) + 0.5) > 0.5 }}"
+    - condition: state
+      entity_id: alarm_control_panel.living_room_ac
+      state: armed_home
+  action:
+    - variables:
+        target: "{{ state_attr('climate.living_room_ac', 'temperature') | int(26) - 1 }}"
+    - service: climate.set_temperature
+      target:
+        entity_id: climate.living_room_ac 
+      data:
+        hvac_mode: cool
+        temperature: "{{ target }}"
+    - delay:
+        minutes: 30
+- id: automation.increase_living_room_ac_cool_target
+  alias: Increase Living Room AC Cool Target
+  trigger:
+    - platform: state
+      entity_id: binary_sensor.living_room_motion
+      to: "on"
+    - platform: state
+      entity_id: binary_sensor.study_motion
+      to: "on"
+    - platform: state
+      entity_id: binary_sensor.dining_room_motion
+      to: "on"
+    - platform: time_pattern
+      minutes: "/5"
+      seconds: 12
+  condition:
+    - condition: state
+      entity_id: climate.living_room_ac
+      state: cool
+      for:
+        minutes: 10
+    - "{{ states('sensor.living_room_temperature') | float(26) - (states('input_number.living_room_ac_cool_target_temperature') | float(26) + 0.5) < -0.5 }}"
+    - condition: state
+      entity_id: alarm_control_panel.living_room_ac
+      state: armed_home
+  action:
+    - variables:
+        target: "{{ state_attr('climate.living_room_ac', 'temperature') | int(26) + 1 }}"
+    - service: climate.set_temperature
+      target:
+        entity_id: climate.living_room_ac 
+      data:
+        hvac_mode: cool
+        temperature: "{{ target }}"
+    - delay:
+        minutes: 30
 - id: automation.info_living_room_humidity_is_too_high
   alias: "INFO: Living Room Humidity is Too High"
   mode: single
@@ -227,12 +299,14 @@
       target:
         entity_id:
           - automation.turn_on_living_room_ac_internal_clean
-- id: automation.raise_living_room_ac_cool_at_sunset
-  alias: Raise Living Room AC Cool at Sunset
+- id: automation.reset_living_room_ac_cool_target
+  alias: Reset Living Room AC Cool Target
   trigger:
-    - platform: sun
-      event: sunset
-      offset: "01:00:00"
+    - platform: numeric_state
+      entity_id: sensor.living_room_light_level
+      above: 10
+      for:
+        minutes: 30
   condition:
     - condition: state
       entity_id: climate.living_room_ac
@@ -242,32 +316,12 @@
       state: armed_home
   action:
     - variables:
-        target: "{{ states('input_number.living_room_ac_cool_target_temperature') | int + 1 }}"
-    - service: climate.set_temperature
-      target:
-        entity_id: climate.living_room_ac 
-      data:
-        temperature: "{{ target }}"
-- id: automation.raise_living_room_ac_cool_at_night
-  alias: Raise Living Room AC Cool at Night
-  trigger:
-    - platform: sun
-      event: sunset
-      offset: "04:00:00"
-  condition:
-    - condition: state
-      entity_id: climate.living_room_ac
-      state: cool
-    - condition: state
-      entity_id: alarm_control_panel.living_room_ac
-      state: armed_home
-  action:
-    - variables:
-        target: "{{ states('input_number.living_room_ac_cool_target_temperature') | int + 2 }}"
+        target: "{{ states('input_number.living_room_ac_cool_target_temperature') | float(26) }}"
     - service: climate.set_temperature
       target:
         entity_id: climate.living_room_ac
       data:
+        hvac_mode: cool
         temperature: "{{ target }}"
 - id: automation.turn_off_living_area_floor_heating
   alias: Turn off Living Area Floor Heating
@@ -333,11 +387,9 @@
       entity_id: alarm_control_panel.living_room_ac
       state: armed_home
   action:
-    - service: climate.set_hvac_mode
+    - service: climate.turn_off
       target:
         entity_id: climate.living_room_ac
-      data:
-        hvac_mode: "off"
     - service: notify.all_devices
       data:
         message: "Turned off Living Room AC. Current: {{ states('sensor.living_room_wbgt') }}°C, {{ states('sensor.living_room_humidity') }}%"
@@ -361,11 +413,9 @@
       entity_id: alarm_control_panel.living_room_ac
       state: armed_home
   action:
-    - service: climate.set_hvac_mode
+    - service: climate.turn_off
       target:
         entity_id: climate.living_room_ac
-      data:
-        hvac_mode: "off"
     - service: automation.turn_off
       target:
         entity_id:
