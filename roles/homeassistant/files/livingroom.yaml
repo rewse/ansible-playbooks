@@ -71,14 +71,14 @@ cards:
   - type: entities
     title: Living Room Climate Automations
     entities:
+      - entity: automation.decrease_living_room_ac_cool_target
+        name: Decrease AC Cool Target
+        secondary_info: last-triggered
+      - entity: automation.increase_living_room_ac_cool_target
+        name: Increase AC Cool Target
+        secondary_info: last-triggered
       - entity: automation.plan_to_turn_on_living_room_ac_internal_clean
         name: Plan to Turn on AC Internal Clean
-        secondary_info: last-triggered
-      - entity: automation.raise_living_room_ac_cool_at_night
-        name: Raise AC Cool at Night
-        secondary_info: last-triggered
-      - entity: automation.raise_living_room_ac_cool_at_sunset
-        name: Raise AC Cool at Sunset
         secondary_info: last-triggered
       - entity: automation.turn_off_living_area_floor_heating
         name: Turn off Floor Heatings
