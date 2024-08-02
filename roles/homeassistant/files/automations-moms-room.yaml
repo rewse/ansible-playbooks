@@ -240,30 +240,6 @@
       target:
         entity_id:
           - automation.turn_on_moms_room_ac_internal_clean
-- id: automation.reset_moms_room_ac_cool_target
-  alias: Reset Mom’s Room AC Cool Target
-  trigger:
-    - platform: numeric_state
-      entity_id: sensor.moms_room_light_level
-      above: 10
-      for:
-        minutes: 30
-  condition:
-    - condition: state
-      entity_id: climate.moms_room_ac
-      state: cool
-    - condition: state
-      entity_id: alarm_control_panel.moms_room_ac
-      state: armed_home
-  action:
-    - variables:
-        target: "{{ states('input_number.moms_room_ac_cool_target_temperature') | float(26) }}"
-    - service: climate.set_temperature
-      target:
-        entity_id: climate.moms_room_ac
-      data:
-        hvac_mode: cool
-        temperature: "{{ target }}"
 - id: automation.turn_off_moms_room_ac_cool
   alias: Turn off Mom’s Room AC Cool
   mode: single
