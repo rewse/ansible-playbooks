@@ -24,6 +24,15 @@ cards:
       - entity: light.dads_room_chest_light
         name: Chest Light
   - type: entities
+    title: Dad’s Room Light Automations
+    entities:
+      - entity: automation.turn_on_dads_room_light_to_wake_up
+        name: Turn on Light to Wake up
+        secondary_info: last-triggered
+      - entity: input_datetime.dads_room_waking_up_time
+        name: Waking up Time
+    show_header_toggle: false
+  - type: entities
     title: Dad’s Room Scene
     entities:
         - entity: input_select.dads_room_morning_scene
@@ -157,15 +166,6 @@ cards:
       - entity: automation.turn_on_dads_room_ac_internal_clean
         name: Turn on AC Internal Clean
         secondary_info: last-triggered
-    show_header_toggle: false
-  - type: entities
-    title: Dad’s Room Light Automations
-    entities:
-      - entity: automation.turn_on_dads_room_light_to_wake_up
-        name: Turn on Light to Wake up
-        secondary_info: last-triggered
-      - entity: input_datetime.dads_room_waking_up_time
-        name: Waking up Time
     show_header_toggle: false
   - type: picture-entity
     name: Dad’s Room Camera
