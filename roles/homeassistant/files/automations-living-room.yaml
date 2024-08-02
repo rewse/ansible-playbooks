@@ -299,30 +299,6 @@
       target:
         entity_id:
           - automation.turn_on_living_room_ac_internal_clean
-- id: automation.reset_living_room_ac_cool_target
-  alias: Reset Living Room AC Cool Target
-  trigger:
-    - platform: numeric_state
-      entity_id: sensor.living_room_light_level
-      above: 10
-      for:
-        minutes: 30
-  condition:
-    - condition: state
-      entity_id: climate.living_room_ac
-      state: cool
-    - condition: state
-      entity_id: alarm_control_panel.living_room_ac
-      state: armed_home
-  action:
-    - variables:
-        target: "{{ states('input_number.living_room_ac_cool_target_temperature') | float(26) }}"
-    - service: climate.set_temperature
-      target:
-        entity_id: climate.living_room_ac
-      data:
-        hvac_mode: cool
-        temperature: "{{ target }}"
 - id: automation.turn_off_living_area_floor_heating
   alias: Turn off Living Area Floor Heating
   trigger:
@@ -870,7 +846,7 @@
       seconds: 39
   condition:
     - condition: state
-      entity_id: alarm_control_panel.living_room_tv
+      entity_id: alarm_control_panel.tv
       state: armed_away
     - condition: template
       value_template: "{{ as_timestamp(now()) - as_timestamp(states('sensor.uptime')) > 600 }}"
