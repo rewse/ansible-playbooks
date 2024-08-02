@@ -11,3 +11,5 @@ light.living_room_lights:
   assumed_state: true
 light.study_downlights:
   assumed_state: true
+media_player.living_room_fire_tv:
+  device_class: receiver

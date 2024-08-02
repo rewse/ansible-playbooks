@@ -332,6 +332,45 @@
             interruption-level: time-sensitive
     - delay:
         hours: 1
+- id: automation.turn_off_moms_room_tv
+  alias: Turn off Mom’s Room TV
+  trigger:
+    - platform: time_pattern
+      seconds: 52
+  condition:
+    - condition: state
+      entity_id: alarm_control_panel.tv
+      state: armed_away
+    - condition: template
+      value_template: "{{ as_timestamp(now()) - as_timestamp(states('sensor.uptime')) > 600 }}"
+    - condition: not
+      conditions:
+        - condition: state
+          entity_id: person.shibata_tats
+          state: home
+          for:
+            minutes: 10
+    - condition: not
+      conditions:
+        - condition: state
+          entity_id: person.shibata_akiko
+          state: home
+          for:
+            minutes: 10
+    - condition: state
+      entity_id: media_player.moms_room_fire_tv
+      state: idle
+  action:
+    - service: media_player.turn_off
+      target:
+        entity_id: media_player.moms_room_fire_tv
+    - service: notify.tats_devices
+      data:
+        message: "Turned off Mom’s Room TV"
+        data:
+          url: /lovelace/machines
+          push:
+            interruption-level: time-sensitive
 - id: automation.turn_on_moms_room_ac_cool
   alias: Turn on Mom’s Room AC Cool
   mode: single
