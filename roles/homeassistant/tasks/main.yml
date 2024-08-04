@@ -1,4 +1,10 @@
 ---
+- name: Install additional packages
+  apt:
+    name:
+      - apparmor-utils
+  tags: [homeassistant, homeassistant-docker]
+
 - name: Create bin dir
   file:
     path: /etc/homeassistant/bin
@@ -49,6 +55,20 @@
           restart: unless-stopped
           network_mode: host
   notify: Restart docker
+  tags: [homeassistant, homeassistant-docker]
+
+# Ref: https://github.com/home-assistant/core/issues/117768
+- name: Download docker-default
+  get_url:
+    url: https://github.com/home-assistant/core/files/9417617/docker-default.txt
+    dest: /etc/apparmor.d/docker-default
+  tags: [homeassistant, homeassistant-docker]
+
+- name: Copy aa-disable-homeassistant.service
+  copy:
+    src: aa-disable-homeassistant.service
+    dest: /etc/systemd/system
+  notify: Restart aa-disable-homeassistant
   tags: [homeassistant, homeassistant-docker]
 
 - name: Copy deafult configuration.yaml
