@@ -4,14 +4,20 @@
     name: apache2
     state: reloaded
 
+- name: Restart aa-disable-homeassistant
+  systemd:
+    name: aa-disable-homeassistant
+    state: restarted
+
 - name: Restart apache
   systemd:
     name: apache2
     state: restarted
 
 - name: Restart docker
-  community.docker.docker_compose:
-    project_src: /etc
+  systemd:
+    name: docker
+    state: restarted
 
 - name: Restart homeassistant
   uri:

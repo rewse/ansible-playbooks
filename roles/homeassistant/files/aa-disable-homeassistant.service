@@ -1,0 +1,11 @@
+[Unit]
+Description=Run aa-dsiable command after homeassistant container starts
+After=docker.service
+Wants=docker.service
+
+[Service]
+Type=oneshot
+ExecStart=/bin/bash -c 'while ! docker ps -q --filter "name=homeassistant"; do sleep 5; done; sleep 60; aa-disable /etc/apparmor.d/docker-default'
+
+[Install]
+WantedBy=multi-user.target
