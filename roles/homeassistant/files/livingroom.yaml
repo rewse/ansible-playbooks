@@ -177,16 +177,9 @@ cards:
           volume: true
           power_state: false
       - type: custom:mini-media-player
-        entity: media_player.firetv
+        entity: media_player.living_room_fire_tv
         artwork: material
         hide:
-          power_state: false
-      - type: custom:mini-media-player
-        entity: media_player.roam
-        artwork: material
-        hide:
-          controls: true
-          mute: true
           power_state: false
   - type: picture-entity
     name: Living Room Camera
