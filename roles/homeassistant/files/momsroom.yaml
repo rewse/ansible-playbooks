@@ -123,6 +123,12 @@ cards:
       - entity: input_datetime.moms_room_curtains_opened_time_workday
         name: Curtains Opened Time for Workday
     show_header_toggle: false
+  - type: custom:mini-media-player
+    entity: media_player.moms_room_fire_tv
+    artwork: material
+    hide:
+      volume: true
+      power_state: false
   - type: picture-entity
     name: Mom’s Room Camera
     entity: camera.moms_room_surveillance
