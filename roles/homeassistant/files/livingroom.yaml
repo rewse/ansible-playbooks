@@ -50,10 +50,10 @@ cards:
   - type: entities
     title: Living Room Appliances
     entities:
-      - entity: fan.living_room_fan
-        name: Fan
       - entity: light.living_area_dimming_downlights
         name: Dimming Downlights
+      - entity: fan.living_room_fan
+        name: Fan
       - entity: switch.living_area_floor_heatings
         name: Floor Heating
       - entity: switch.living_room_floor_heating
@@ -155,6 +155,12 @@ cards:
     entities:
       - entity: automation.start_roomba_combo
         name: Start Roomba Combo
+        secondary_info: last-triggered
+      - entity: automation.turn_off_living_room_fan
+        name: Turn off Fan
+        secondary_info: last-triggered
+      - entity: automation.turn_on_living_room_fan
+        name: Turn on Fan
         secondary_info: last-triggered
     show_header_toggle: false
   - type: vertical-stack
