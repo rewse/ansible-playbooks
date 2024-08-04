@@ -47,8 +47,8 @@
             interruption-level: time-sensitive
     - delay:
         hours: 8
-- id: automation.decrease_living_room_ac_cool_target
-  alias: Decrease Living Room AC Cool Target
+- id: automation.decrease_living_room_ac_cool_temperature
+  alias: Decrease Living Room AC Cool Temperature
   trigger:
     - platform: state
       entity_id: binary_sensor.living_room_motion
@@ -74,17 +74,17 @@
       state: armed_home
   action:
     - variables:
-        target: "{{ state_attr('climate.living_room_ac', 'temperature') | int(26) - 1 }}"
+        temp: "{{ state_attr('climate.living_room_ac', 'temperature') | int(26) - 1 }}"
     - service: climate.set_temperature
       target:
         entity_id: climate.living_room_ac 
       data:
         hvac_mode: cool
-        temperature: "{{ target }}"
+        temperature: "{{ temp }}"
     - delay:
         minutes: 30
-- id: automation.increase_living_room_ac_cool_target
-  alias: Increase Living Room AC Cool Target
+- id: automation.increase_living_room_ac_cool_temperature
+  alias: Increase Living Room AC Cool Temperature
   trigger:
     - platform: state
       entity_id: binary_sensor.living_room_motion
@@ -110,13 +110,13 @@
       state: armed_home
   action:
     - variables:
-        target: "{{ state_attr('climate.living_room_ac', 'temperature') | int(26) + 1 }}"
+        temp: "{{ state_attr('climate.living_room_ac', 'temperature') | int(26) + 1 }}"
     - service: climate.set_temperature
       target:
         entity_id: climate.living_room_ac 
       data:
         hvac_mode: cool
-        temperature: "{{ target }}"
+        temperature: "{{ temp }}"
     - delay:
         minutes: 30
 - id: automation.info_living_room_humidity_is_too_high
