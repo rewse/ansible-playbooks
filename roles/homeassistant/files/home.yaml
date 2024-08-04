@@ -119,6 +119,8 @@ cards:
             name: Entrance Light
           - entity: light.living_room_footlight
             name: Footlight
+          - entity: light.living_room_shelf_light
+            name: Shelf Light
         state_color: false
       - type: tile
         entity: climate.living_room_ac
