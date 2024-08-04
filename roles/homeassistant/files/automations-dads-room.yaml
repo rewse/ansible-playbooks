@@ -10,7 +10,9 @@
     - condition: numeric_state
       entity_id: sensor.average_of_dads_room_humidity_difference
       above: 10
-    - "{{ (states('sensor.dads_room_humidity') | float - states('sensor.dads_room_switchbot_meter_humidity') | float) | abs > 10 }}"
+    - condition: numeric_state
+      entity_id: sensor.dads_room_humidity_difference
+      above: 10
   action:
     - service: notify.tats_devices
       data:
@@ -32,7 +34,9 @@
     - condition: numeric_state
       entity_id: sensor.average_of_dads_room_temperature_difference
       above: 1
-    - "{{ (states('sensor.dads_room_temperature') | float - states('sensor.dads_room_switchbot_meter_temperature') | float) | abs > 1 }}"
+    - condition: numeric_state
+      entity_id: sensor.dads_room_temperature_difference
+      above: 1
   action:
     - service: notify.tats_devices
       data:

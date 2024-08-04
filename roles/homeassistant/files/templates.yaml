@@ -82,19 +82,19 @@
     unit_of_measurement: °C
   - name: Living Room Humidity Difference
     unique_id: sensor.living_room_humidity_difference
-    state: "{{ (states('sensor.living_room_humidity') | float(50) - states('sensor.living_room_switchbot_hub2_humidity') | float(50)) | round(2) | abs }}"
+    state: "{{ (states('sensor.living_room_humidity') | float(50) - states('sensor.living_room_switchbot_hub_2_humidity') | float(50)) | round(2) | abs }}"
     icon: mdi:water-percent-alert
     unit_of_measurement: pt
   - name: Living Room Temperature Difference
     unique_id: sensor.living_room_temperature_difference
-    state: "{{ (states('sensor.living_room_temperature') | float(25) - states('sensor.living_room_switchbot_hub2_temperature') | float(25)) | round(2) | abs }}"
+    state: "{{ (states('sensor.living_room_temperature') | float(25) - states('sensor.living_room_switchbot_hub_2_temperature') | float(25)) | round(2) | abs }}"
     icon: mdi:thermometer-alert
     device_class: temperature
     state_class: measurement
     unit_of_measurement: °C
   - name: Living Room Temperature Effect of Floor Heating
     unique_id: sensor.living_room_temperature_effect_of_floor_heating
-    state: "{{ states('sensor.living_room_floor_temperature') | float(25) - states('sensor.living_room_temperature') | float(25) }}"
+    state: "{{ (states('sensor.living_room_floor_temperature') | float(25) - states('sensor.living_room_temperature') | float(25)) | round(2) }}"
     icon: mdi:thermometer
     device_class: temperature
     state_class: measurement
