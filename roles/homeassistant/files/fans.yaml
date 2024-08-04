@@ -1,0 +1,15 @@
+- platform: template
+  fans:
+    living_room_fan:
+      friendly_name: "Living Room Fan"
+      unique_id: fan.living_room_fan
+      value_template: "{{ states('sensor.living_room_fan_plug_power') | float(0) > 5 }}"
+      availability_template: "{{ states('switch.living_room_fan_plug_socket_1') }}"
+      turn_on:
+        - service: fan.turn_on
+          target:
+            entity_id: fan.living_room_fan_remote
+      turn_off:
+        - service: fan.turn_off
+          target:
+            entity_id: fan.living_room_fan_remote

@@ -843,6 +843,32 @@
             interruption-level: time-sensitive
     - delay:
         hours: 1
+- id: automation.turn_off_living_room_fan
+  alias: Turn off Living Room Fan
+  mode: single
+  trigger:
+    - platform: state
+      entity_id: binary_sensor.study_motion
+      to: "on"
+  condition:
+    - condition: numeric_state
+      entity_id: sensor.count_of_study_motion
+      below: 10
+    - condition: numeric_state
+      entity_id: sensor.living_room_fan_plug_power
+      above: 5
+  action:
+    - service: fan.turn_off
+      entity_id: fan.living_room_fan
+    - service: notify.tats_devices
+      data:
+        message: "Turned off Living Room Fan"
+        data:
+          url: /lovelace/home
+          push:
+            interruption-level: time-sensitive
+    - delay:
+        hours: 1
 - id: automation.turn_off_living_room_tv
   alias: Turn off Living Room TV
   trigger:
@@ -894,3 +920,29 @@
           url: /lovelace/machines
           push:
             interruption-level: time-sensitive
+- id: automation.turn_on_living_room_fan
+  alias: Turn on Living Room Fan
+  mode: single
+  trigger:
+    - platform: state
+      entity_id: binary_sensor.study_motion
+      to: "on"
+  condition:
+    - condition: numeric_state
+      entity_id: sensor.count_of_study_motion
+      above: 10
+    - condition: numeric_state
+      entity_id: sensor.living_room_fan_plug_power
+      below: 5
+  action:
+    - service: fan.turn_on
+      entity_id: fan.living_room_fan
+    - service: notify.tats_devices
+      data:
+        message: "Turned on Living Room Fan"
+        data:
+          url: /lovelace/home
+          push:
+            interruption-level: time-sensitive
+    - delay:
+        hours: 1

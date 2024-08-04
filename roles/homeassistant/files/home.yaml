@@ -141,6 +141,8 @@ cards:
       - type: entities
         title: Living Room Appliances
         entities:
+          - entity: fan.living_room_fan
+            name: Fan
           - entity: light.living_area_dimming_downlights
             name: Dimming Lights
           - entity: switch.living_area_floor_heatings
