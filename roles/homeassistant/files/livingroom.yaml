@@ -43,13 +43,6 @@ cards:
               - fan_only
               - 'off'
           - type: target-temperature
-          - type: climate-preset-modes
-            style: icons
-            preset_modes:
-              - none
-              - away
-              - eco
-              - boost
       - type: alarm-panel
         entity: alarm_control_panel.living_room_ac
         states:
