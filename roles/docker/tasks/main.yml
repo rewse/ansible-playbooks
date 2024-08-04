@@ -2,19 +2,7 @@
 - name: Install additional packages
   apt:
     name:
-      - apparmor-utils
       - docker.io
       - docker-compose-v2
       - python3-docker
   tags: [docker, package]
-
-# Ref: https://github.com/home-assistant/core/issues/117768
-- name: Copy docker-default.txt
-  get_url:
-    url: https://github.com/home-assistant/core/files/9417617/docker-default.txt
-    dest: /etc/apparmor.d/docker-default
-  tags: [docker]
-
-- name: Disable docker-default
-  command: aa-disable /etc/apparmor.d/docker-default
-  tags: [docker]
