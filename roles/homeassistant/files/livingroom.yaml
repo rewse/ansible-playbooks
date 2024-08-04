@@ -23,6 +23,8 @@ cards:
         name: Entrance Light
       - entity: light.living_room_footlight
         name: Footlight
+      - entity: light.living_room_shelf_light
+        name: Shelf Light
   - type: vertical-stack
     cards:
       - type: tile
