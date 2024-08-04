@@ -47,11 +47,17 @@ cards:
   - type: entities
     title: Dad’s Room Climate Automations
     entities:
-      - entity: automation.decrease_living_room_ac_cool_target
-        name: Decrease AC Cool Target
+      - entity: automation.decrease_moms_room_ac_cool_temperature
+        name: Decrease AC Cool Temperature
         secondary_info: last-triggered
-      - entity: automation.increase_living_room_ac_cool_target
-        name: Increase AC Cool Target
+      - entity: automation.decrease_moms_room_ac_cool_temperature_in_sleep
+        name: Decrease AC Cool Temperature in Sleep
+        secondary_info: last-triggered
+      - entity: automation.increase_moms_room_ac_cool_temperature
+        name: Increase AC Cool Temperature
+        secondary_info: last-triggered
+      - entity: automation.increase_moms_room_ac_cool_temperature_in_sleep
+        name: Increase AC Cool Temperature in Sleep
         secondary_info: last-triggered
       - entity: automation.plan_to_turn_on_moms_room_ac_internal_clean
         name: Plan to Turn on AC Internal Clean

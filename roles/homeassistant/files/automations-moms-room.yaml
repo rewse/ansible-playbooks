@@ -48,8 +48,8 @@
             interruption-level: time-sensitive
     - delay:
         hours: 8
-- id: automation.decrease_moms_room_ac_cool_target
-  alias: Decrease Mom’s Room AC Cool Target
+- id: automation.decrease_moms_room_ac_cool_temperature
+  alias: Decrease Mom’s Room AC Cool Temperature
   trigger:
     - platform: state
       entity_id: binary_sensor.moms_room_motion
@@ -63,23 +63,59 @@
       state: cool
       for:
         minutes: 30
+    - condition: time
+      after: "08:00:00"
+      before: "23:30:00"
     - "{{ states('sensor.moms_room_temperature') | float(26) - (states('input_number.moms_room_ac_cool_target_temperature') | float(26) + 0.5) > 0.5 }}"
     - condition: state
       entity_id: alarm_control_panel.moms_room_ac
       state: armed_home
   action:
     - variables:
-        target: "{{ state_attr('climate.moms_room_ac', 'temperature') | int(26) - 1 }}"
+        temp: "{{ state_attr('climate.moms_room_ac', 'temperature') | int(26) - 1 }}"
     - service: climate.set_temperature
       target:
         entity_id: climate.moms_room_ac 
       data:
         hvac_mode: cool
-        temperature: "{{ target }}"
+        temperature: "{{ temp }}"
     - delay:
         minutes: 30
-- id: automation.increase_moms_room_ac_cool_target
-  alias: Increase Mom’s Room AC Cool Target
+- id: automation.decrease_moms_room_ac_cool_temperature_in_sleep
+  alias: Decrease Mom’s Room AC Cool Temperature in Sleep
+  trigger:
+    - platform: state
+      entity_id: binary_sensor.moms_room_motion
+      to: "on"
+    - platform: time_pattern
+      minutes: "/5"
+      seconds: 26
+  condition:
+    - condition: state
+      entity_id: climate.moms_room_ac
+      state: cool
+      for:
+        minutes: 30
+    - condition: time
+      after: "23:30:00"
+      before: "08:00:00"
+    - "{{ states('sensor.moms_room_temperature') | float(26) - (states('input_number.moms_room_ac_cool_target_temperature') | float(26) - 1 + 0.5) > 0.5 }}"
+    - condition: state
+      entity_id: alarm_control_panel.moms_room_ac
+      state: armed_home
+  action:
+    - variables:
+        temp: "{{ state_attr('climate.moms_room_ac', 'temperature') | int(26) - 1 }}"
+    - service: climate.set_temperature
+      target:
+        entity_id: climate.moms_room_ac 
+      data:
+        hvac_mode: cool
+        temperature: "{{ temp }}"
+    - delay:
+        minutes: 30
+- id: automation.increase_moms_room_ac_cool_temperature
+  alias: Increase Mom’s Room AC Cool Temeperature
   trigger:
     - platform: state
       entity_id: binary_sensor.moms_room_motion
@@ -93,19 +129,55 @@
       state: cool
       for:
         minutes: 10
+    - condition: time
+      after: "08:00:00"
+      before: "23:30:00"
     - "{{ states('sensor.moms_room_temperature') | float(26) - (states('input_number.moms_room_ac_cool_target_temperature') | float(26) + 0.5) < -0.5 }}"
     - condition: state
       entity_id: alarm_control_panel.moms_room_ac
       state: armed_home
   action:
     - variables:
-        target: "{{ state_attr('climate.moms_room_ac', 'temperature') | int(26) + 1 }}"
+        temp: "{{ state_attr('climate.moms_room_ac', 'temperature') | int(26) + 1 }}"
     - service: climate.set_temperature
       target:
         entity_id: climate.moms_room_ac 
       data:
         hvac_mode: cool
-        temperature: "{{ target }}"
+        temperature: "{{ temp }}"
+    - delay:
+        minutes: 30
+- id: automation.increase_moms_room_ac_cool_temperature_in_sleep
+  alias: Increase Mom’s Room AC Cool Temeperature in Sleep
+  trigger:
+    - platform: state
+      entity_id: binary_sensor.moms_room_motion
+      to: "on"
+    - platform: time_pattern
+      minutes: "/5"
+      seconds: 34
+  condition:
+    - condition: state
+      entity_id: climate.moms_room_ac
+      state: cool
+      for:
+        minutes: 10
+    - condition: time
+      after: "23:30:00"
+      before: "08:00:00"
+    - "{{ states('sensor.moms_room_temperature') | float(26) - (states('input_number.moms_room_ac_cool_target_temperature') | float(26) - 1 + 0.5) < -0.5 }}"
+    - condition: state
+      entity_id: alarm_control_panel.moms_room_ac
+      state: armed_home
+  action:
+    - variables:
+        temp: "{{ state_attr('climate.moms_room_ac', 'temperature') | int(26) + 1 }}"
+    - service: climate.set_temperature
+      target:
+        entity_id: climate.moms_room_ac 
+      data:
+        hvac_mode: cool
+        temperature: "{{ temp }}"
     - delay:
         minutes: 30
 - id: automation.info_moms_room_humidity_is_too_high
