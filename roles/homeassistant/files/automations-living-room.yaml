@@ -744,7 +744,7 @@
   action:
     - service: light.turn_off
       target:
-        entity_id: light.living_area_lights
+        entity_id: light.living_room_lights
     - service: notify.tats_devices
       data:
         message: Turned off Living Room Lights
