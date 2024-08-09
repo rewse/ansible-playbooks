@@ -41,13 +41,15 @@
 - name: Add to docker-compose.yml
   blockinfile:
     path: /etc/docker-compose.yml
-    block: |
-      services:
+    marker: "# {mark} ANSIBLE MANAGED BLOCK homeassistant"
+    block: |2
         homeassistant:
           container_name: homeassistant
           build:
             context: homeassistant
             dockerfile: Dockerfile
+          security_opt:
+            - apparmor:unconfined
           volumes:
             - /etc/homeassistant:/config
             - /etc/localtime:/etc/localtime:ro
@@ -279,13 +281,13 @@
     insertafter: '^homekit:'
     regexp: '^input_datetime:'
     line: "input_datetime: !include input_datetimes.yaml"
-  tags: [homeassistant, homeassistant-input-datetime]
+  tags: [homeassistant, homeassistant-component, homeassistant-input-datetime]
 
 - name: Copy input_datetimes.yaml
   copy:
     src: input_datetimes.yaml
     dest: /etc/homeassistant
-  tags: [homeassistant, homeassistant-input-datetime]
+  tags: [homeassistant, homeassistant-component, homeassistant-input-datetime]
 
 - name: Config input_number
   lineinfile:
@@ -293,13 +295,13 @@
     insertafter: '^input_datetime:'
     regexp: '^input_number:'
     line: "input_number: !include input_numbers.yaml"
-  tags: [homeassistant, homeassistant-input-number]
+  tags: [homeassistant, homeassistant-component, homeassistant-input-number]
 
 - name: Copy input_numbers.yaml
   copy:
     src: input_numbers.yaml
     dest: /etc/homeassistant
-  tags: [homeassistant, homeassistant-input-number]
+  tags: [homeassistant, homeassistant-component, homeassistant-input-number]
 
 - name: Config input_select
   lineinfile:
@@ -307,13 +309,13 @@
     insertafter: '^input_numbers:'
     regexp: '^input_select:'
     line: "input_select: !include input_selects.yaml"
-  tags: [homeassistant, homeassistant-input-select]
+  tags: [homeassistant, homeassistant-component, homeassistant-input-select]
 
 - name: Copy input_selects.yaml
   copy:
     src: input_selects.yaml
     dest: /etc/homeassistant
-  tags: [homeassistant, homeassistant-input-select]
+  tags: [homeassistant, homeassistant-component, homeassistant-input-select]
 
 - name: Config ios
   lineinfile:
@@ -322,7 +324,7 @@
     regexp: '^ios:'
     line: "ios: !include ios.yaml"
   notify: Restart homeassistant
-  tags: [homeassistant, homeassistant-component]
+  tags: [homeassistant, homeassistant-component, homeassistant-component]
 
 - name: Copy ios.yaml
   copy:
