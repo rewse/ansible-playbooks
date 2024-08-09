@@ -2,6 +2,7 @@
 dependencies:
   - {role: httpd}
   - {role: docker}
+  - {role: matter-server}
   - {role: sesame}
   - {role: sslcert}
   - {role: switchbot}
