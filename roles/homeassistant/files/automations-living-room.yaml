@@ -848,15 +848,16 @@
   mode: single
   trigger:
     - platform: state
-      entity_id: binary_sensor.study_motion
-      to: "on"
+      entity_id: sensor.count_of_study_motion
+    - platform: time_pattern
+      seconds: 42
   condition:
     - condition: numeric_state
       entity_id: sensor.count_of_study_motion
       below: 10
     - condition: numeric_state
       entity_id: sensor.living_room_fan_plug_power
-      above: 5
+      above: 3
   action:
     - service: fan.turn_off
       entity_id: fan.living_room_fan
@@ -933,7 +934,7 @@
       above: 10
     - condition: numeric_state
       entity_id: sensor.living_room_fan_plug_power
-      below: 5
+      below: 3
   action:
     - service: fan.turn_on
       entity_id: fan.living_room_fan
