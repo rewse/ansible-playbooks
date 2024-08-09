@@ -3,7 +3,7 @@
     living_room_fan:
       friendly_name: "Living Room Fan"
       unique_id: fan.living_room_fan
-      value_template: "{{ states('sensor.living_room_fan_plug_power') | float(0) > 5 }}"
+      value_template: "{{ states('sensor.living_room_fan_plug_power') | float(0) > 3 }}"
       availability_template: "{{ states('switch.living_room_fan_plug_socket_1') }}"
       turn_on:
         - service: fan.turn_on
