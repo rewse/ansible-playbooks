@@ -189,4 +189,4 @@ cards:
           power_state: false
   - type: picture-entity
     name: Living Room Camera
-    entity: camera.living_room_surveillance
+    entity: camera.living_room_camera
