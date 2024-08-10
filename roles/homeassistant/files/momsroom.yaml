@@ -131,4 +131,4 @@ cards:
       power_state: false
   - type: picture-entity
     name: Mom’s Room Camera
-    entity: camera.moms_room_surveillance
+    entity: camera.moms_room_camera

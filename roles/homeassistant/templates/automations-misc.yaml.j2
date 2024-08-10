@@ -148,8 +148,8 @@
         data:
           push:
             interruption-level: time-sensitive
-- id: automation.turn_off_surveillances
-  alias: Turn off Surveillances
+- id: automation.turn_off_surveillance
+  alias: Turn off Surveillance
   trigger:
     - platform: state
       entity_id: alarm_control_panel.surveillance
@@ -164,11 +164,11 @@
   action:
     - service: switch.turn_off
       entity_id:
-        - switch.living_room_surveillance_plug_socket_1
-        - switch.dads_room_surveillance_plug_socket_1
-        - switch.moms_room_surveillance_plug_socket_1
-- id: automation.turn_on_surveillances
-  alias: Turn on Surveillances
+        - switch.living_room_camera_plug_socket_1
+        - switch.dads_room_camera_plug_socket_1
+        - switch.moms_room_camera_plug_socket_1
+- id: automation.turn_on_surveillance
+  alias: Turn on Surveillance
   trigger:
     - platform: state
       entity_id: alarm_control_panel.surveillance
@@ -183,6 +183,6 @@
   action:
     - service: switch.turn_on
       entity_id:
-        - switch.living_room_surveillance_plug_socket_1
-        - switch.dads_room_surveillance_plug_socket_1
-        - switch.moms_room_surveillance_plug_socket_1
+        - switch.living_room_camera_plug_socket_1
+        - switch.dads_room_camera_plug_socket_1
+        - switch.moms_room_camera_plug_socket_1
