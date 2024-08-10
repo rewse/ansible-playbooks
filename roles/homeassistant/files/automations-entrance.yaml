@@ -26,11 +26,6 @@
     - service: lock.lock
       target:
         entity_id: lock.entrance_lock_bottom
-    - delay:
-        seconds: 30
-    - service: homeassistant.update_entity
-      target:
-        entity_id: sensor.entrance_lock_bottom_sensor
 - id: automation.auto_lock_entrance_lock_top_in_daytime
   alias: Auto-Lock Entrnace Lock Top in Daytime
   mode: single
@@ -59,11 +54,6 @@
     - service: lock.lock
       target:
         entity_id: lock.entrance_lock_top
-    - delay:
-        seconds: 30
-    - service: homeassistant.update_entity
-      target:
-        entity_id: sensor.entrance_lock_top_sensor
 - id: automation.auto_lock_entrance_lock_bottom_in_nighttime
   alias: Auto-Lock Entrance Lock Bottom in Nighttime
   mode: single
@@ -92,11 +82,6 @@
     - service: lock.lock
       target:
         entity_id: lock.entrance_lock_bottom
-    - delay:
-        seconds: 30
-    - service: homeassistant.update_entity
-      target:
-        entity_id: sensor.entrance_lock_bottom_sensor
 - id: automation.auto_lock_entrance_lock_top_in_nighttime
   alias: Auto-Lock Entrance Lock Top in Nighttime
   mode: single
@@ -125,11 +110,6 @@
     - service: lock.lock
       target:
         entity_id: lock.entrance_lock_top
-    - delay:
-        seconds: 30
-    - service: homeassistant.update_entity
-      target:
-        entity_id: sensor.entrance_lock_top_sensor
 - id: automation.info_entrance_auto_lock_is_off
   alias: "INFO: Entrance Auto-Lock is Off"
   trigger:
@@ -165,13 +145,6 @@
     - service: lock.lock
       target:
           entity_id: lock.entrance_locks
-    - delay:
-        seconds: 30
-    - service: homeassistant.update_entity
-      target:
-        entity_id:
-          - sensor.entrance_lock_bottom_sensor
-          - sensor.entrance_lock_top_sensor
 - id: automation.restart_entrance_sesamemodule_power
   alias: Restart Entrance sesamemodule Power
   mode: single
@@ -222,13 +195,6 @@
       target:
           entity_id: lock.entrance_locks
     - delay:
-        seconds: 30
-    - service: homeassistant.update_entity
-      target:
-        entity_id:
-          - sensor.entrance_lock_bottom_sensor
-          - sensor.entrance_lock_top_sensor
-    - delay:
         hours: 2
 - id: automation.turn_on_entrance_auto_lock
   alias: Turn on Entrance Auto-Lock
@@ -255,13 +221,6 @@
     - service: lock.unlock
       target:
         entity_id: lock.entrance_locks
-    - delay:
-        seconds: 30
-    - service: homeassistant.update_entity
-      target:
-        entity_id:
-          - sensor.entrance_lock_bottom_sensor
-          - sensor.entrance_lock_top_sensor
 - id: automation.unlock_entrance_lock_when_ios_action_fires
   alias: Unlock Entrance Lock when iOS Action Fires
   mode: single
@@ -295,13 +254,6 @@
             url: /lovelace-people/people
             push:
               interruption-level: time-sensitive
-      - delay:
-          seconds: 30
-      - service: homeassistant.update_entity
-        target:
-          entity_id:
-            - sensor.entrance_lock_bottom_sensor
-            - sensor.entrance_lock_top_sensor
     else:
       - service: notify.all_devices
         data:
@@ -311,19 +263,3 @@
             url: /lovelace-people/people
             push:
               interruption-level: time-sensitive
-- id: automation.update_entrace_lock_states
-  alias: Update Entrance Lock States
-  mode: restart
-  trigger:
-    - platform: state
-      entity_id: binary_sensor.entrance_door
-      from: "on"
-      to: "off"
-  action:
-    - delay:
-        seconds: 30
-    - service: homeassistant.update_entity
-      target:
-        entity_id:
-          - sensor.entrance_lock_bottom_sensor
-          - sensor.entrance_lock_top_sensor
