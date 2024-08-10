@@ -24,7 +24,7 @@ views:
           - entity: binary_sensor.eufy_mom
           - entity: binary_sensor.huebridge
           - entity: binary_sensor.regza
-          - entity: binary_sensor.sesamemodule
+          - entity: binary_sensor.sesamehub3
           - entity: binary_sensor.switchbothub2
           - entity: binary_sensor.switchbothubmini
           - entity: binary_sensor.tuyaplug_dad_sur
