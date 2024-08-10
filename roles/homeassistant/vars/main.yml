@@ -29,12 +29,6 @@ postgres:
 regza:
   username: "{{ vault_regza.username }}"
   password: "{{ vault_regza.password }}"
-sesame:
-  api_key: "{{ vault_sesame.api_key }}"
-  uuid_top: 6D69522A-6A63-72DC-75AE-4057CF142B8B
-  uuid_bottom: E0A1A177-9F37-CD6A-05F4-E65AB625C0AC
-  secret_top: "{{ vault_sesame.secret_top }}"
-  secret_bottom: "{{ vault_sesame.secret_bottom }}"
 simple_thermostat_version: 2.5.0
 simple_weather_card_version: 0.8.5
 uptime_card_version: 0.4.0

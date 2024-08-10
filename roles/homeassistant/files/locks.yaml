@@ -1,26 +1,18 @@
 - platform: template
-  unique_id: lock.entrance_lock_bottom
-  name: Entrance Lock Bottom
-  value_template: "{{ is_state('sensor.entrance_lock_bottom_sensor', 'locked') }}"
-  lock:
-    service: shell_command.lock_entrance_lock_bottom
-  unlock:
-    service: shell_command.unlock_entrance_lock_bottom
-- platform: template
-  unique_id: lock.entrance_lock_top
-  name: Entrance Lock Top
-  value_template: "{{ is_state('sensor.entrance_lock_top_sensor', 'locked') }}"
-  lock:
-    service: shell_command.lock_entrance_lock_top
-  unlock:
-    service: shell_command.unlock_entrance_lock_top
-- platform: template
   unique_id: lock.entrance_locks
   name: Entrance Locks
-  value_template: "{{ is_state('sensor.entrance_lock_top_sensor', 'locked') or is_state('sensor.entrance_lock_top_sensor', 'locked') }}"
+  value_template: "{{ is_state('lock.entrance_lock_top', 'locked') or is_state('lock.entrance_lock_bottom', 'locked') }}"
   lock:
-    - service: shell_command.lock_entrance_lock_top
-    - service: shell_command.lock_entrance_lock_bottom
+    - service: lock.lock
+      target:
+        entity_id: lock.entrance_lock_top
+    - service: lock.lock
+      target:
+        entity_id: lock.entrance_lock_bottom
   unlock:
-    - service: shell_command.unlock_entrance_lock_top
-    - service: shell_command.unlock_entrance_lock_bottom
+    - service: lock.unlock
+      target:
+        entity_id: lock.entrance_lock_top
+    - service: lock.unlock
+      target:
+        entity_id: lock.entrance_lock_bottom
