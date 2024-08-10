@@ -43,13 +43,6 @@
     - service: alarm_control_panel.alarm_disarm
       target:
         entity_id: alarm_control_panel.entrance_auto_lock
-    - delay:
-        seconds: 30
-    - service: homeassistant.update_entity
-      target:
-        entity_id:
-          - sensor.entrance_lock_bottom_sensor
-          - sensor.entrance_lock_top_sensor
 - id: automation.info_arrived_yotsuya_otsuka
   alias: "INFO: Arrived at Yotsuya-Otsuka"
   trigger:
