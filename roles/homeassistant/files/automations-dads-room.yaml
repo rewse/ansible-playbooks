@@ -48,6 +48,82 @@
             interruption-level: time-sensitive
     - delay:
         hours: 8
+- id: automation.change_dads_room_ac_mode_to_cool
+  alias: Change Dad’s Room AC Mode to Cool
+  trigger:
+    - platform: state
+      entity_id: binary_sensor.dads_room_motion
+      to: "on"
+    - platform: time_pattern
+      minutes: "/5"
+      seconds: 40
+  condition:
+    - condition: state
+      entity_id: climate.dads_room_ac
+      state: heat_cool
+    - "{{ states('sensor.dads_room_temperature') | float(26) > (states('input_number.dads_room_ac_cool_target_temperature') | float(26) + 0.5) }}"
+    - condition: state
+      entity_id: sensor.season
+      state: summer
+    - condition: state
+      entity_id: alarm_control_panel.dads_room_ac
+      state: armed_home
+  action:
+    - service: climate.set_hvac_mode
+      target:
+        entity_id: climate.dads_room_ac
+      data:
+        hvac_mode: cool
+- id: automation.change_dads_room_ac_mode_to_dry
+  alias: Change Dad’s Room AC Mode to Dry
+  trigger:
+    - platform: state
+      entity_id: binary_sensor.dads_room_motion
+      to: "on"
+    - platform: time_pattern
+      minutes: "/5"
+      seconds: 45
+  condition:
+    - condition: state
+      entity_id: climate.dads_room_ac
+      state: heat_cool
+    - "{{ states('sensor.dads_room_temperature') | float(26) < (states('input_number.dads_room_ac_cool_target_temperature') | float(26) + 0.5) }}"
+    - "{{ states('sensor.dads_room_temperature') | float(26) > (states('input_number.dads_room_ac_heat_target_temperature') | float(26) + 0.5) }}"
+    - condition: state
+      entity_id: alarm_control_panel.dads_room_ac
+      state: armed_home
+  action:
+    - service: climate.set_hvac_mode
+      target:
+        entity_id: climate.dads_room_ac
+      data:
+        hvac_mode: dry
+- id: automation.change_dads_room_ac_mode_to_heat
+  alias: Change Dad’s Room AC Mode to Heat
+  trigger:
+    - platform: state
+      entity_id: binary_sensor.dads_room_motion
+      to: "on"
+    - platform: time_pattern
+      minutes: "/5"
+      seconds: 18
+  condition:
+    - condition: state
+      entity_id: climate.dads_room_ac
+      state: heat_cool
+    - "{{ states('sensor.dads_room_temperature') | float(26) < (states('input_number.dads_room_ac_heat_target_temperature') | float(26) + 0.5) }}"
+    - condition: state
+      entity_id: sensor.season
+      state: winter
+    - condition: state
+      entity_id: alarm_control_panel.dads_room_ac
+      state: armed_home
+  action:
+    - service: climate.set_hvac_mode
+      target:
+        entity_id: climate.dads_room_ac
+      data:
+        hvac_mode: heat
 - id: automation.decrease_dads_room_ac_cool_temperature
   alias: Decrease Dad’s Room AC Cool Temeperature
   trigger:
