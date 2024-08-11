@@ -35,10 +35,10 @@ cards:
           action: more-info
         features:
           - type: climate-hvac-modes
-            AC_modes:
+            hvac_modes:
               - heat_cool
-              - dry
               - cool
+              - dry
               - heat
               - fan_only
               - 'off'
