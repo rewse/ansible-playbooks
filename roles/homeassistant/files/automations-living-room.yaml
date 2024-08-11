@@ -646,6 +646,10 @@
     - platform: state
       entity_id: climate.living_room_ac
       to: "off"
+  condition:
+    - condition: state
+      entity_id: alarm_control_panel.living_room_ac
+      state: armed_home
   action:
     - delay:
         seconds: 10
