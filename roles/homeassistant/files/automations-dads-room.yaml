@@ -452,6 +452,10 @@
     - platform: state
       entity_id: climate.dads_room_ac
       to: "off"
+  condition:
+    - condition: state
+      entity_id: alarm_control_panel.dads_room_ac
+      state: armed_home
   action:
     - delay:
         seconds: 10
