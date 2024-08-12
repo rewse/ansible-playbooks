@@ -314,12 +314,12 @@
             interruption-level: time-sensitive
     - delay:
         hours: 1
-- id: automation.alarm_switchbothub2_is_offline
-  alias: "ALARM: switchbothub2 is Offline"
+- id: automation.alarm_switchbothub_is_offline
+  alias: "ALARM: switchbothub is Offline"
   mode: single
   trigger:
     - platform: state
-      entity_id: binary_sensor.switchbothub2
+      entity_id: binary_sensor.switchbothub
       to: "off"
       for:
         minutes: 31
@@ -327,7 +327,7 @@
     - service: notify.tats_devices
       data:
         title: "⚠️ ALARM"
-        message: ️switchbothub2 is Offline
+        message: ️switchbothub is Offline
         data:
           url: /lovelace-machines/machines
           push:
