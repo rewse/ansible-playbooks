@@ -136,11 +136,24 @@
   mode: restart
   trigger:
     - platform: state
-      entity_id: sensor.entrance_1_button_switch_action
-      to: double
+      entity_id: event.entrance_1_button_switch_button
+      attribute: event_type
+      to: multi_press_complete
     - platform: state
-      entity_id: sensor.living_room_1_button_switch_action
-      to: double
+      entity_id: event.living_room_1_button_switch_button
+      attribute: event_type
+      to: multi_press_complete
+  condition:
+    - condition: or
+      conditions:
+        - condition: state
+          entity_id: event.entrance_1_button_switch_button
+          attribute: totalNumberOfPressesCounted
+          state: 2
+        - condition: state
+          entity_id: event.living_room_1_button_switch_button
+          attribute: totalNumberOfPressesCounted
+          state: 2
   action:
     - service: lock.lock
       target:
@@ -212,11 +225,24 @@
   mode: restart
   trigger:
     - platform: state
-      entity_id: sensor.entrance_1_button_switch_action
-      to: single
+      entity_id: event.entrance_1_button_switch_button
+      attribute: event_type
+      to: multi_press_complete
     - platform: state
-      entity_id: sensor.living_room_1_button_switch_action
-      to: single
+      entity_id: event.living_room_1_button_switch_button
+      attribute: event_type
+      to: multi_press_complete
+  condition:
+    - condition: or
+      conditions:
+        - condition: state
+          entity_id: event.entrance_1_button_switch_button
+          attribute: totalNumberOfPressesCounted
+          state: 1
+        - condition: state
+          entity_id: event.living_room_1_button_switch_button
+          attribute: totalNumberOfPressesCounted
+          state: 1
   action:
     - service: lock.unlock
       target:

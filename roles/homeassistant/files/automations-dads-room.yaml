@@ -487,8 +487,9 @@
   mode: single
   trigger:
     - platform: state
-      entity_id: sensor.dads_room_1_button_switch_action
-      to: hold
+      entity_id: event.dads_room_1_button_switch_button
+      attribute: event_type
+      to: long_press
   action:
     - service: scene.apply
       data:
@@ -520,8 +521,14 @@
     - platform: state
       entity_id: event.dads_room_4_button_switch_button_4
     - platform: state
-      entity_id: sensor.dads_room_1_button_switch_action
-      to: double
+      entity_id: event.dads_room_1_button_switch_button
+      attribute: event_type
+      to: multi_press_complete
+  condition:
+    - condition: state
+      entity_id: event.dads_room_1_button_switch_button
+      attribute: totalNumberOfPressesCounted
+      state: 2
   action:
     - service: light.turn_off
       target:
@@ -625,9 +632,14 @@
     - platform: state
       entity_id: event.dads_room_4_button_switch_button_1
     - platform: state
-      entity_id: sensor.dads_room_1_button_switch_action
-      to: single
+      entity_id: event.dads_room_1_button_switch_button
+      attribute: event_type
+      to: multi_press_complete
   condition:
+    - condition: state
+      entity_id: event.dads_room_1_button_switch_button
+      attribute: totalNumberOfPressesCounted
+      state: 1
     - condition: time
       after: "07:00:00"
       before: "10:00:00"
@@ -642,9 +654,14 @@
     - platform: state
       entity_id: event.dads_room_4_button_switch_button_1
     - platform: state
-      entity_id: sensor.dads_room_1_button_switch_action
-      to: single
+      entity_id: event.dads_room_1_button_switch_button
+      attribute: event_type
+      to: multi_press_complete
   condition:
+    - condition: state
+      entity_id: event.dads_room_1_button_switch_button
+      attribute: totalNumberOfPressesCounted
+      state: 1
     - condition: time
       after: "10:00:00"
       before: "20:00:00"
@@ -662,9 +679,14 @@
     - platform: state
       entity_id: event.dads_room_4_button_switch_button_1
     - platform: state
-      entity_id: sensor.dads_room_1_button_switch_action
-      to: single
+      entity_id: event.dads_room_1_button_switch_button
+      attribute: event_type
+      to: multi_press_complete
   condition:
+    - condition: state
+      entity_id: event.dads_room_1_button_switch_button
+      attribute: totalNumberOfPressesCounted
+      state: 1
     - condition: time
       after: "16:00:00"
       before: input_datetime.dads_room_turned_down_time
@@ -682,9 +704,14 @@
     - platform: state
       entity_id: event.dads_room_4_button_switch_button_1
     - platform: state
-      entity_id: sensor.dads_room_1_button_switch_action
-      to: single
+      entity_id: event.dads_room_1_button_switch_button
+      attribute: event_type
+      to: multi_press_complete
   condition:
+    - condition: state
+      entity_id: event.dads_room_1_button_switch_button
+      attribute: totalNumberOfPressesCounted
+      state: 1
     - condition: time
       after: input_datetime.dads_room_turned_down_time
       before: input_datetime.dads_room_turned_down_more_time
@@ -699,9 +726,14 @@
     - platform: state
       entity_id: event.dads_room_4_button_switch_button_1
     - platform: state
-      entity_id: sensor.dads_room_1_button_switch_action
-      to: single
+      entity_id: event.dads_room_1_button_switch_button
+      attribute: event_type
+      to: multi_press_complete
   condition:
+    - condition: state
+      entity_id: event.dads_room_1_button_switch_button
+      attribute: totalNumberOfPressesCounted
+      state: 1
     - condition: time
       after: input_datetime.dads_room_turned_down_more_time
       before: "07:00:00"

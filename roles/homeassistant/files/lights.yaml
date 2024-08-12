@@ -1,4 +1,10 @@
 - platform: group
+  unique_id: living_area_dimming_downlights
+  name: Living Area Dimming Downlights
+  entities:
+    - light.living_room_dimming_downlights
+    - light.study_dimming_downlights
+- platform: group
   unique_id: living_area_downlights
   name: Living Area Downlights
   entities:
@@ -29,17 +35,3 @@
     - light.bathroom_entrance_light
     - light.bathroom_left_light
     - light.bathroom_right_light
-- platform: template
-  lights:
-    living_area_dimming_downlights:
-      friendly_name: Living Area Dimming Downlights
-      turn_on:
-        - service: button.press
-          entity_id:
-            - button.living_room_dimming_downlights_brighter
-            - button.study_dimming_downlights_brighter
-      turn_off:
-        - service: button.press
-          entity_id:
-            - button.study_dimming_downlights_darker
-            - button.living_room_dimming_downlights_darker
