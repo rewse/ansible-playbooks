@@ -294,12 +294,12 @@
             interruption-level: time-sensitive
     - delay:
         hours: 1
-- id: automation.alarm_sesamemodule_is_offline
-  alias: "ALARM: sesamemodule is Offline"
+- id: automation.alarm_sesamehub_is_offline
+  alias: "ALARM: sesamehub is Offline"
   mode: single
   trigger:
     - platform: state
-      entity_id: binary_sensor.sesamemodule
+      entity_id: binary_sensor.sesamehub
       to: "off"
       for:
         minutes: 31
@@ -307,7 +307,7 @@
     - service: notify.tats_devices
       data:
         title: "⚠️ ALARM"
-        message: sesamemodule is Offline
+        message: sesamehub is Offline
         data:
           url: /lovelace-machines/machines
           push:
