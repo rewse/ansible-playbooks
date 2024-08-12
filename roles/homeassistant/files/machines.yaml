@@ -13,6 +13,7 @@ views:
           - entity: binary_sensor.fox
           - entity: binary_sensor.guppy
           - entity: binary_sensor.hotel
+          - entity: binary_sensor.aqarahub
           - entity: binary_sensor.aventage
           - entity: binary_sensor.brother
           - entity: binary_sensor.catloghome_liv
