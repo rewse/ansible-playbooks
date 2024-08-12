@@ -227,26 +227,10 @@
   notify: Restart homeassistant
   tags: [homeassistant, homeassistant-component]
 
-- name: Config cover
-  lineinfile:
-    path: /etc/homeassistant/configuration.yaml
-    insertafter: '^command_line:'
-    regexp: '^cover:'
-    line: "cover: !include covers.yaml"
-  notify: Restart homeassistant
-  tags: [homeassistant, homeassistant-component]
-
-- name: Copy covers.yaml
-  copy:
-    src: covers.yaml
-    dest: /etc/homeassistant
-  notify: Restart homeassistant
-  tags: [homeassistant, homeassistant-component]
-
 - name: Config fan
   lineinfile:
     path: /etc/homeassistant/configuration.yaml
-    insertafter: '^cover:'
+    insertafter: '^command_lines:'
     regexp: '^fan:'
     line: "fan: !include fans.yaml"
   notify: Restart homeassistant
@@ -503,36 +487,6 @@
     dest: /etc/homeassistant
   notify: Restart homeassistant
   tags: [homeassistant, homeassistant-component]
-
-- name: Download ha-switchbot-remote
-  unarchive:
-    src: https://github.com/KiraPC/ha-switchbot-remote/archive/refs/tags/{{ ha_switchbot_remote_version }}.zip
-    dest: /tmp
-    remote_src: yes
-  tags: [homeassistant, homeassistant-custom]
-
-- name: Copy ha-switchbot-remote
-  copy:
-    src: /tmp/ha-switchbot-remote-{{ ha_switchbot_remote_version }}/custom_components/switchbotremote
-    dest: /etc/homeassistant/custom_components
-    remote_src: yes
-  notify: Restart homeassistant
-  tags: [homeassistant, homeassistant-custom]
-
-- name: Download XiaomiGateway3
-  unarchive:
-    src: https://github.com/AlexxIT/XiaomiGateway3/archive/refs/tags/v{{ xiaomi_gateway3_version }}.zip
-    dest: /tmp
-    remote_src: yes
-  tags: [homeassistant, homeassistant-custom]
-
-- name: Copy XiaomiGateway3
-  copy:
-    src: /tmp/XiaomiGateway3-{{ xiaomi_gateway3_version }}/custom_components/xiaomi_gateway3
-    dest: /etc/homeassistant/custom_components
-    remote_src: yes
-  notify: Restart homeassistant
-  tags: [homeassistant, homeassistant-custom]
 
 - name: Create www dir
   file:
