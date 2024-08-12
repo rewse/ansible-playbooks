@@ -1,6 +1,0 @@
-- platform: group
-  unique_id: moms_room_curtains
-  name: Mom’s Room Curtains
-  entities:
-    - cover.moms_room_curtain_left
-    - cover.moms_room_curtain_right
