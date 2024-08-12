@@ -27,15 +27,16 @@ views:
           - entity: binary_sensor.sesamehub3
           - entity: binary_sensor.switchbothub
           - entity: binary_sensor.switchbothubmini
-          - entity: binary_sensor.tuyaplug_dad_sur
+          - entity: binary_sensor.tuyaplug_dad_cam
           - entity: binary_sensor.tuyaplug_ent_ses
           - entity: binary_sensor.tuyaplug_kit_ric
+          - entity: binary_sensor.tuyaplug_liv_cam
+          - entity: binary_sensor.tuyaplug_liv_fan
           - entity: binary_sensor.tuyaplug_liv_foo
           - entity: binary_sensor.tuyaplug_liv_fox
           - entity: binary_sensor.tuyaplug_liv_hum
-          - entity: binary_sensor.tuyaplug_liv_sur
-          - entity: binary_sensor.tuyaplug_mom_sur
-          - entity: binary_sensor.xiaomigateway
+          - entity: binary_sensor.tuyaplug_liv_she
+          - entity: binary_sensor.tuyaplug_mom_cam
         hours_to_show: 12
       - type: history-graph
         title: Device Tracker
