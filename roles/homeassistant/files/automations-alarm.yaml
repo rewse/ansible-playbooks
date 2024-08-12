@@ -394,6 +394,46 @@
             interruption-level: time-sensitive
     - delay:
         hours: 1
+- id: automation.alarm_tuyaplug_dad_cam_is_offline
+  alias: "ALARM: tuyaplug-dad-cam is Offline"
+  mode: single
+  trigger:
+    - platform: state
+      entity_id: binary_sensor.tuyaplug_dad_cam
+      to: "off"
+      for:
+        minutes: 31
+  action:
+    - service: notify.tats_devices
+      data:
+        title: "⚠️ ALARM"
+        message: ️tuyaplug-dad-cam is Offline
+        data:
+          url: /lovelace-machines/machines
+          push:
+            interruption-level: time-sensitive
+    - delay:
+        hours: 1
+- id: automation.alarm_tuyaplug_ent_ses_is_offline
+  alias: "ALARM: tuyaplug-ent-sec is Offline"
+  mode: single
+  trigger:
+    - platform: state
+      entity_id: binary_sensor.tuyaplug_ent_ses
+      to: "off"
+      for:
+        minutes: 31
+  action:
+    - service: notify.tats_devices
+      data:
+        title: "⚠️ ALARM"
+        message: ️tuyaplug-ent-ses is Offline
+        data:
+          url: /lovelace-machines/machines
+          push:
+            interruption-level: time-sensitive
+    - delay:
+        hours: 1
 - id: automation.alarm_tuyaplug_kit_ric_is_offline
   alias: "ALARM: tuyaplug-kit-ric is Offline"
   mode: single
@@ -414,12 +454,12 @@
             interruption-level: time-sensitive
     - delay:
         hours: 1
-- id: automation.alarm_tuyaplug_dad_ac_is_offline
-  alias: "ALARM: tuyaplug-dad-ac is Offline"
+- id: automation.alarm_tuyaplug_liv_cam_is_offline
+  alias: "ALARM: tuyaplug-liv-cam is Offline"
   mode: single
   trigger:
     - platform: state
-      entity_id: binary_sensor.tuyaplug_dad_ac
+      entity_id: binary_sensor.tuyaplug_liv_cam
       to: "off"
       for:
         minutes: 31
@@ -427,19 +467,19 @@
     - service: notify.tats_devices
       data:
         title: "⚠️ ALARM"
-        message: ️tuyaplug-dad-ac is Offline
+        message: ️tuyaplug-liv-cam is Offline
         data:
           url: /lovelace-machines/machines
           push:
             interruption-level: time-sensitive
     - delay:
         hours: 1
-- id: automation.alarm_tuyaplug_dad_sur_is_offline
-  alias: "ALARM: tuyaplug-dad-sur is Offline"
+- id: automation.alarm_tuyaplug_liv_fan_is_offline
+  alias: "ALARM: tuyaplug-liv-fan is Offline"
   mode: single
   trigger:
     - platform: state
-      entity_id: binary_sensor.tuyaplug_dad_sur
+      entity_id: binary_sensor.tuyaplug_liv_fan
       to: "off"
       for:
         minutes: 31
@@ -447,7 +487,27 @@
     - service: notify.tats_devices
       data:
         title: "⚠️ ALARM"
-        message: ️tuyaplug-dad-sur is Offline
+        message: ️tuyaplug-liv-fan is Offline
+        data:
+          url: /lovelace-machines/machines
+          push:
+            interruption-level: time-sensitive
+    - delay:
+        hours: 1
+- id: automation.alarm_tuyaplug_liv_foo_is_offline
+  alias: "ALARM: tuyaplug-liv-fox is Offline"
+  mode: single
+  trigger:
+    - platform: state
+      entity_id: binary_sensor.tuyaplug_liv_foo
+      to: "off"
+      for:
+        minutes: 31
+  action:
+    - service: notify.tats_devices
+      data:
+        title: "⚠️ ALARM"
+        message: ️tuyaplug-liv-foo is Offline
         data:
           url: /lovelace-machines/machines
           push:
@@ -494,12 +554,12 @@
             interruption-level: time-sensitive
     - delay:
         hours: 1
-- id: automation.alarm_tuyaplug_liv_sur_is_offline
-  alias: "ALARM: tuyaplug-liv-sur is Offline"
+- id: automation.alarm_tuyaplug_liv_she_is_offline
+  alias: "ALARM: tuyaplug-liv-she is Offline"
   mode: single
   trigger:
     - platform: state
-      entity_id: binary_sensor.tuyaplug_liv_sur
+      entity_id: binary_sensor.tuyaplug_liv_she
       to: "off"
       for:
         minutes: 31
@@ -507,19 +567,19 @@
     - service: notify.tats_devices
       data:
         title: "⚠️ ALARM"
-        message: ️tuyaplug-liv-sur is Offline
+        message: ️tuyaplug-liv-she is Offline
         data:
           url: /lovelace-machines/machines
           push:
             interruption-level: time-sensitive
     - delay:
         hours: 1
-- id: automation.alarm_tuyaplug_mom_ac_is_offline
-  alias: "ALARM: tuyaplug-mom-ac is Offline"
+- id: automation.alarm_tuyaplug_mom_cam_is_offline
+  alias: "ALARM: tuyaplug-mom-cam is Offline"
   mode: single
   trigger:
     - platform: state
-      entity_id: binary_sensor.tuyaplug_mom_ac
+      entity_id: binary_sensor.tuyaplug_mom_cam
       to: "off"
       for:
         minutes: 31
@@ -527,27 +587,7 @@
     - service: notify.tats_devices
       data:
         title: "⚠️ ALARM"
-        message: ️tuyaplug-mom-ac is Offline
-        data:
-          url: /lovelace-machines/machines
-          push:
-            interruption-level: time-sensitive
-    - delay:
-        hours: 1
-- id: automation.alarm_tuyaplug_mom_sur_is_offline
-  alias: "ALARM: tuyaplug-mom-sur is Offline"
-  mode: single
-  trigger:
-    - platform: state
-      entity_id: binary_sensor.tuyaplug_mom_sur
-      to: "off"
-      for:
-        minutes: 31
-  action:
-    - service: notify.tats_devices
-      data:
-        title: "⚠️ ALARM"
-        message: ️tuyaplug-mom-sur is Offline
+        message: ️tuyaplug-mom-cam is Offline
         data:
           url: /lovelace-machines/machines
           push:
