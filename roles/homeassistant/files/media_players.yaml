@@ -1,5 +1,5 @@
 - platform: universal
-  name: regza
+  name: Regza
   commands:
     turn_on:
       service: shell_command.control_toggle_regza
