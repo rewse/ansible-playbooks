@@ -5,73 +5,6 @@ views:
     icon: mdi:lan
     badges: []
     cards:
-      - type: history-graph
-        title: Ping Devices
-        entities:
-          - entity: binary_sensor.bravo
-          - entity: binary_sensor.charlie
-          - entity: binary_sensor.fox
-          - entity: binary_sensor.guppy
-          - entity: binary_sensor.hotel
-          - entity: binary_sensor.aqarahub
-          - entity: binary_sensor.aventage
-          - entity: binary_sensor.brother
-          - entity: binary_sensor.catloghome_liv
-          - entity: binary_sensor.catloghome_dad
-          - entity: binary_sensor.catloghome_mom
-          - entity: binary_sensor.daikinac_liv
-          - entity: binary_sensor.eufy_liv
-          - entity: binary_sensor.eufy_dad
-          - entity: binary_sensor.eufy_mom
-          - entity: binary_sensor.huebridge
-          - entity: binary_sensor.regza
-          - entity: binary_sensor.sesamehub
-          - entity: binary_sensor.switchbothub
-          - entity: binary_sensor.switchbothubmini
-          - entity: binary_sensor.tuyaplug_dad_cam
-          - entity: binary_sensor.tuyaplug_ent_ses
-          - entity: binary_sensor.tuyaplug_kit_ric
-          - entity: binary_sensor.tuyaplug_liv_cam
-          - entity: binary_sensor.tuyaplug_liv_fan
-          - entity: binary_sensor.tuyaplug_liv_foo
-          - entity: binary_sensor.tuyaplug_liv_fox
-          - entity: binary_sensor.tuyaplug_liv_hum
-          - entity: binary_sensor.tuyaplug_liv_she
-          - entity: binary_sensor.tuyaplug_mom_cam
-        hours_to_show: 12
-      - type: history-graph
-        title: Device Tracker
-        entities:
-          - entity: person.shibata_tats
-            name: Tats
-          - entity: device_tracker.ping_atom
-          - entity: device_tracker.atom
-          - entity: person.shibata_akiko
-          - entity: device_tracker.ping_ubiqu_iphone12mini
-          - entity: device_tracker.ubiqu_iphone12mini
-          - entity: person.shibata_kayano
-          - entity: device_tracker.ping_kijishiro
-          - entity: device_tracker.kijishiro
-        hours_to_show: 12
-      - type: vertical-stack
-        cards:
-          - type: history-graph
-            title: Count of Living Room Motion
-            entities:
-              - entity: sensor.count_of_living_room_motion
-              - entity: sensor.count_of_study_motion
-              - entity: sensor.count_of_dining_room_motion
-            hours_to_show: 12
-          - type: history-graph
-            title: Count of Dad’s Room Motion
-            entities:
-              - entity: sensor.count_of_dads_room_motion
-            hours_to_show: 12
-          - type: history-graph
-            title: Count of Mom’s Room Motion
-            entities:
-              - entity: sensor.count_of_moms_room_motion
-            hours_to_show: 12
       - type: vertical-stack
         cards:
           - type: history-graph
@@ -92,6 +25,25 @@ views:
               - entity: sensor.moms_room_temperature
               - entity: sensor.moms_room_ac_target
             hours_to_show: 24
+      - type: vertical-stack
+        cards:
+          - type: history-graph
+            title: Count of Living Room Motion
+            entities:
+              - entity: sensor.count_of_living_room_motion
+              - entity: sensor.count_of_study_motion
+              - entity: sensor.count_of_dining_room_motion
+            hours_to_show: 12
+          - type: history-graph
+            title: Count of Dad’s Room Motion
+            entities:
+              - entity: sensor.count_of_dads_room_motion
+            hours_to_show: 12
+          - type: history-graph
+            title: Count of Mom’s Room Motion
+            entities:
+              - entity: sensor.count_of_moms_room_motion
+            hours_to_show: 12
       - type: vertical-stack
         cards:
           - type: entities
@@ -174,6 +126,54 @@ views:
                 name: Humidity Difference
               - entity: sensor.average_of_balcony_humidity_difference
                 name: Average of Humidity Difference
+      - type: history-graph
+        title: Ping Devices
+        entities:
+          - entity: binary_sensor.bravo
+          - entity: binary_sensor.charlie
+          - entity: binary_sensor.fox
+          - entity: binary_sensor.guppy
+          - entity: binary_sensor.hotel
+          - entity: binary_sensor.aqarahub
+          - entity: binary_sensor.aventage
+          - entity: binary_sensor.brother
+          - entity: binary_sensor.catloghome_liv
+          - entity: binary_sensor.catloghome_dad
+          - entity: binary_sensor.catloghome_mom
+          - entity: binary_sensor.daikinac_liv
+          - entity: binary_sensor.eufy_liv
+          - entity: binary_sensor.eufy_dad
+          - entity: binary_sensor.eufy_mom
+          - entity: binary_sensor.huebridge
+          - entity: binary_sensor.regza
+          - entity: binary_sensor.sesamehub
+          - entity: binary_sensor.switchbothub
+          - entity: binary_sensor.switchbothubmini
+          - entity: binary_sensor.tuyaplug_dad_cam
+          - entity: binary_sensor.tuyaplug_ent_ses
+          - entity: binary_sensor.tuyaplug_kit_ric
+          - entity: binary_sensor.tuyaplug_liv_cam
+          - entity: binary_sensor.tuyaplug_liv_fan
+          - entity: binary_sensor.tuyaplug_liv_foo
+          - entity: binary_sensor.tuyaplug_liv_fox
+          - entity: binary_sensor.tuyaplug_liv_hum
+          - entity: binary_sensor.tuyaplug_liv_she
+          - entity: binary_sensor.tuyaplug_mom_cam
+        hours_to_show: 12
+      - type: history-graph
+        title: Device Tracker
+        entities:
+          - entity: person.shibata_tats
+            name: Tats
+          - entity: device_tracker.ping_atom
+          - entity: device_tracker.atom
+          - entity: person.shibata_akiko
+          - entity: device_tracker.ping_ubiqu_iphone12mini
+          - entity: device_tracker.ubiqu_iphone12mini
+          - entity: person.shibata_kayano
+          - entity: device_tracker.ping_kijishiro
+          - entity: device_tracker.kijishiro
+        hours_to_show: 12
       - type: alarm-panel
         name: TV
         entity: alarm_control_panel.tv
