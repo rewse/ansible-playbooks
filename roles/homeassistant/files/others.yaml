@@ -41,3 +41,6 @@ cards:
   - type: picture-entity
     name: Entrance Camera
     entity: camera.entrance_camera
+  - type: picture-entity
+    name: Balcony Camera
+    entity: camera.balcony_camera

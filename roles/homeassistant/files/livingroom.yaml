@@ -190,3 +190,6 @@ cards:
   - type: picture-entity
     name: Living Room Camera
     entity: camera.living_room_camera
+  - type: picture-entity
+    name: Study Camera
+    entity: camera.study_camera
