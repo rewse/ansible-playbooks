@@ -740,6 +740,22 @@
         entity_id: climate.moms_room_ac
       data:
         hvac_mode: fan_only
+- id: automation.turn_on_moms_room_ac_streamer
+  alias: Turn on Mom’s Room AC Streamer
+  trigger:
+    - platform: state
+      entity_id: climate.moms_room_ac
+      not_to: "off"
+      for:
+        seconds: 10
+  condition:
+    - condition: state
+      entity_id: alarm_control_panel.moms_room_ac
+      state: armed_home
+  action:
+    - service: switch.turn_on
+      target:
+        entity_id: switch.moms_room_ac_streamer
 
 # Lights
 
