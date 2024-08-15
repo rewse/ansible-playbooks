@@ -531,11 +531,9 @@
           light.dads_room:
             state: "on"
             brightness: "{{ new_brightness }}"
-- id: automation.turn_off_dads_room_light
+- id: automation.turn_off_dads_room_light_by_1_button_switch
   alias: Turn off Dad’s Room Light
   trigger:
-    - platform: state
-      entity_id: event.dads_room_4_button_switch_button_4
     - platform: state
       entity_id: event.dads_room_1_button_switch_button
       attribute: event_type
@@ -545,6 +543,15 @@
       entity_id: event.dads_room_1_button_switch_button
       attribute: totalNumberOfPressesCounted
       state: 2
+  action:
+    - service: light.turn_off
+      target:
+        entity_id: light.dads_room
+- id: automation.turn_off_dads_room_light_by_4_button_switch
+  alias: Turn off Dad’s Room Light
+  trigger:
+    - platform: state
+      entity_id: event.dads_room_4_button_switch_button_4
   action:
     - service: light.turn_off
       target:
@@ -641,12 +648,10 @@
         entity_id: "{{ states('input_select.dads_room_morning_scene') }}"
       data:
         transition: 900
-- id: automation.turn_on_dads_room_light_with_morning_scene
-  alias: Turn on Dad’s Room Light with Morning Scene
+- id: automation.turn_on_dads_room_light_with_morning_scene_by_1_button_switch
+  alias: Turn on Dad’s Room Light with Morning Scene by 1-Button Switch
   mode: single
   trigger:
-    - platform: state
-      entity_id: event.dads_room_4_button_switch_button_1
     - platform: state
       entity_id: event.dads_room_1_button_switch_button
       attribute: event_type
@@ -663,12 +668,24 @@
     - service: scene.turn_on
       target:
         entity_id: "{{ states('input_select.dads_room_morning_scene') }}"
-- id: automation.turn_on_dads_room_light_with_daytime_scene
-  alias: Turn on Dad’s Room Light with Daytime Scene
+- id: automation.turn_on_dads_room_light_with_morning_scene_by_4_button_switch
+  alias: Turn on Dad’s Room Light with Morning Scene by 4-Button Switch
   mode: single
   trigger:
     - platform: state
       entity_id: event.dads_room_4_button_switch_button_1
+  condition:
+    - condition: time
+      after: "07:00:00"
+      before: "10:00:00"
+  action:
+    - service: scene.turn_on
+      target:
+        entity_id: "{{ states('input_select.dads_room_morning_scene') }}"
+- id: automation.turn_on_dads_room_light_with_daytime_scene_by_1_button_switch
+  alias: Turn on Dad’s Room Light with Daytime Scene by 1-Button Swtich
+  mode: single
+  trigger:
     - platform: state
       entity_id: event.dads_room_1_button_switch_button
       attribute: event_type
@@ -688,12 +705,27 @@
     - service: scene.turn_on
       target:
         entity_id: "{{ states('input_select.dads_room_daytime_scene') }}"
-- id: automation.turn_on_dads_room_light_with_sunset_scene
-  alias: Turn on Dad’s Room Light with Sunset Scene
+- id: automation.turn_on_dads_room_light_with_daytime_scene_by_4_button_switch
+  alias: Turn on Dad’s Room Light with Daytime Scene by 4-Button Switch
   mode: single
   trigger:
     - platform: state
       entity_id: event.dads_room_4_button_switch_button_1
+  condition:
+    - condition: time
+      after: "10:00:00"
+      before: "20:00:00"
+    - condition: state
+      entity_id: sun.sun
+      state: above_horizon
+  action:
+    - service: scene.turn_on
+      target:
+        entity_id: "{{ states('input_select.dads_room_daytime_scene') }}"
+- id: automation.turn_on_dads_room_light_with_sunset_scene_by_1_button_switch
+  alias: Turn on Dad’s Room Light with Sunset Scene by 1-Button Switch
+  mode: single
+  trigger:
     - platform: state
       entity_id: event.dads_room_1_button_switch_button
       attribute: event_type
@@ -713,12 +745,27 @@
     - service: scene.turn_on
       target:
         entity_id: "{{ states('input_select.dads_room_sunset_scene') }}"
-- id: automation.turn_on_dads_room_light_with_night_scene
-  alias: Turn on Dad’s Room Light with Night Scene
+- id: automation.turn_on_dads_room_light_with_sunset_scene_by_4_button_switch
+  alias: Turn on Dad’s Room Light with Sunset Scene by 4-Button Switch
   mode: single
   trigger:
     - platform: state
       entity_id: event.dads_room_4_button_switch_button_1
+  condition:
+    - condition: time
+      after: "16:00:00"
+      before: input_datetime.dads_room_turned_down_time
+    - condition: state
+      entity_id: sun.sun
+      state: below_horizon
+  action:
+    - service: scene.turn_on
+      target:
+        entity_id: "{{ states('input_select.dads_room_sunset_scene') }}"
+- id: automation.turn_on_dads_room_light_with_night_scene_by_1_button_switch
+  alias: Turn on Dad’s Room Light with Night Scene by 1-Button Switch
+  mode: single
+  trigger:
     - platform: state
       entity_id: event.dads_room_1_button_switch_button
       attribute: event_type
@@ -735,12 +782,24 @@
     - service: scene.turn_on
       target:
         entity_id: "{{ states('input_select.dads_room_night_scene') }}"
-- id: automation.turn_on_dads_room_light_with_midnight_scene
-  alias: Turn on Dad’s Room Light with Midnight Scene
+- id: automation.turn_on_dads_room_light_with_night_scene_by_4_button_switch
+  alias: Turn on Dad’s Room Light with Night Scene by 4-Button Switch
   mode: single
   trigger:
     - platform: state
       entity_id: event.dads_room_4_button_switch_button_1
+  condition:
+    - condition: time
+      after: input_datetime.dads_room_turned_down_time
+      before: input_datetime.dads_room_turned_down_more_time
+  action:
+    - service: scene.turn_on
+      target:
+        entity_id: "{{ states('input_select.dads_room_night_scene') }}"
+- id: automation.turn_on_dads_room_light_with_midnight_scene_by_1_button_switch
+  alias: Turn on Dad’s Room Light with Midnight Scene by 1-Button Switch
+  mode: single
+  trigger:
     - platform: state
       entity_id: event.dads_room_1_button_switch_button
       attribute: event_type
@@ -750,6 +809,20 @@
       entity_id: event.dads_room_1_button_switch_button
       attribute: totalNumberOfPressesCounted
       state: 1
+    - condition: time
+      after: input_datetime.dads_room_turned_down_more_time
+      before: "07:00:00"
+  action:
+    - service: scene.turn_on
+      target:
+        entity_id: "{{ states('input_select.dads_room_midnight_scene') }}"
+- id: automation.turn_on_dads_room_light_with_midnight_scene_by_4_button_switch
+  alias: Turn on Dad’s Room Light with Midnight Scene by 4-Button Switch
+  mode: single
+  trigger:
+    - platform: state
+      entity_id: event.dads_room_4_button_switch_button_1
+  condition:
     - condition: time
       after: input_datetime.dads_room_turned_down_more_time
       before: "07:00:00"
