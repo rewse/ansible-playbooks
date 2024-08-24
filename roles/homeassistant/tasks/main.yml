@@ -144,12 +144,10 @@
     dest: /etc/homeassistant/automations
   tags: [homeassistant, homeassistant-automation]
 
-- name: Copy automations-misc.yaml.j2
-  template:
-    src: automations-misc.yaml.j2
-    dest: /etc/homeassistant/automations/automations-misc.yaml
-    variable_start_string: "[%"
-    variable_end_string: "%]"
+- name: Copy automations-misc.yaml
+  copy:
+    src: automations-misc.yaml
+    dest: /etc/homeassistant/automations
   tags: [homeassistant, homeassistant-automation]
 
 - name: Copy secrets.yaml
@@ -407,11 +405,9 @@
   tags: [homeassistant, homeassistant-component]
 
 - name: Copy sensors.yaml
-  template:
-    src: sensors.yaml.j2
-    dest: /etc/homeassistant/sensors.yaml
-    variable_start_string: "[%"
-    variable_end_string: "%]"
+  copy:
+    src: sensors.yaml
+    dest: /etc/homeassistant
   notify: Restart homeassistant
   tags: [homeassistant, homeassistant-component]
 
