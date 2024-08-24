@@ -4,3 +4,31 @@
   entities:
     - switch.living_room_floor_heating
     - switch.study_floor_heating
+- platform: template
+  switches:
+    living_room_floor_heating:
+      friendly_name: Living Room Floor Heating
+      unique_id: switch.living_room_floor_heating
+      value_template: "{{ states('sensor.living_room_temperature_effect_of_floor_heating') | float(0) > 2 }}"
+      turn_on:
+        service: switch.toggle
+        target:
+          entity_id: switch.living_room_floor_heating_switch
+      turn_off:
+        service: switch.toggle
+        target:
+          entity_id: switch.living_room_floor_heating_switch
+      icon_template: mdi:heating-coil
+    study_floor_heating:
+      friendly_name: Study Floor Heating
+      unique_id: switch.study_floor_heating
+      value_template: "{{ states('sensor.living_room_temperature_effect_of_floor_heating') | float(0) > 2 }}"
+      turn_on:
+        service: switch.toggle
+        target:
+          entity_id: switch.study_floor_heating_switch
+      turn_off:
+        service: switch.toggle
+        target:
+          entity_id: switch.study_floor_heating_switch
+      icon_template: mdi:heating-coil
