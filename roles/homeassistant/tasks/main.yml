@@ -505,6 +505,17 @@
   notify: Restart homeassistant
   tags: [homeassistant, homeassistant-custom]
 
+- name: Add Lovelace Card Mod
+  blockinfile:
+    path: /etc/homeassistant/configuration.yaml
+    marker: "# {mark} ANSIBLE MANAGED BLOCK card-mod"
+    insertafter: '^  themes:'
+    block: |2
+        extra_module_url:
+          - /local/card-mod.js
+  notify: Restart homeassistant
+  tags: [homeassistant, homeassistant-custom]
+
 - name: Copy Lovelace Mini Graph Card
   get_url:
     url: https://github.com/kalkih/mini-graph-card/releases/download/v{{ mini_graph_card_version }}/mini-graph-card-bundle.js
@@ -550,9 +561,6 @@
         external_url: https://hass.rewse.jp/
         internal_url: https://hass.rewse.jp/
         customize: !include customize.yaml
-      frontend:
-        extra_module_url:
-          - /local/card-mod.js
       http:
         use_x_forwarded_for: true
         trusted_proxies:
