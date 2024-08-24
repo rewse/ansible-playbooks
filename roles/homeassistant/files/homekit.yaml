@@ -8,6 +8,5 @@
         - light.living_room_lights
         - light.living_room_footlight
         - light.living_room_shelf_light
-        - lock.entrance_locks
         - sensor.dads_room_co2
         - sensor.living_room_co2
