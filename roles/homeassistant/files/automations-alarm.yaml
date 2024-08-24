@@ -196,46 +196,6 @@
             interruption-level: time-sensitive
     - delay:
         hours: 1
-- id: automation.alarm_tuyaplug_ent_ses_is_offline
-  alias: "ALARM: tuyaplug-ent-ses is Offline"
-  mode: single
-  trigger:
-    - platform: state
-      entity_id: binary_sensor.tuyaplug_ent_ses
-      to: "off"
-      for:
-        minutes: 31
-  action:
-    - service: notify.tats_devices
-      data:
-        title: "⚠️ ALARM"
-        message: ️tuyaplug-ent-ses is Offline
-        data:
-          url: /lovelace-machines/machines
-          push:
-            interruption-level: time-sensitive
-    - delay:
-        hours: 1
-- id: automation.alarm_tuyaplug_liv_foo_is_offline
-  alias: "ALARM: tuyaplug-liv-foo is Offline"
-  mode: single
-  trigger:
-    - platform: state
-      entity_id: binary_sensor.tuyaplug_liv_foo
-      to: "off"
-      for:
-        minutes: 31
-  action:
-    - service: notify.tats_devices
-      data:
-        title: "⚠️ ALARM"
-        message: ️tuyaplug-liv-foo is Offline
-        data:
-          url: /lovelace-machines/machines
-          push:
-            interruption-level: time-sensitive
-    - delay:
-        hours: 1
 - id: automation.alarm_kijishiro_wifi_might_be_off
   alias: "ALARM: kijishiro WiFi might be Off"
   mode: single
