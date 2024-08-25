@@ -17,6 +17,8 @@ cards:
     entities:
       - entity: light.moms_room_light
         name: Light
+      - entity: input_datetime.moms_room_turned_down_time
+        name: Turned Down Time
   - type: vertical-stack
     cards:
       - type: tile
@@ -45,7 +47,7 @@ cards:
       - entity: cover.moms_room_curtains
         name: Curtains
   - type: entities
-    title: Dad’s Room Climate Automations
+    title: Mom’s Room Climate Automations
     entities:
       - entity: automation.decrease_moms_room_ac_cool_temperature
         name: Decrease AC Cool Temperature
