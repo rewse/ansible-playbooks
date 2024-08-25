@@ -56,11 +56,16 @@
       to: "on"
     - platform: time_pattern
       minutes: "/5"
-      seconds: 40
+      seconds: 37
   condition:
-    - condition: state
-      entity_id: climate.dads_room_ac
-      state: heat_cool
+    - condition: or
+      conditions:
+        - condition: state
+          entity_id: climate.dads_room_ac
+          state: heat_cool
+        - condition: state
+          entity_id: climate.dads_room_ac
+          state: dry
     - "{{ states('sensor.dads_room_temperature') | float(26) > (states('input_number.dads_room_ac_cool_target_temperature') | float(26) + 0.5) }}"
     - condition: state
       entity_id: sensor.season
@@ -74,6 +79,13 @@
         entity_id: climate.dads_room_ac
       data:
         hvac_mode: cool
+    - service: notify.tats_devices
+      data:
+        message: "Changed Dad’s Room AC Mode to Cool. Current: {{ states('sensor.dads_room_temperature') }}°C"
+        data:
+          url: /lovelace/home
+          push:
+            interruption-level: time-sensitive
 - id: automation.change_dads_room_ac_mode_to_dry
   alias: Change Dad’s Room AC Mode to Dry
   trigger:
@@ -82,7 +94,7 @@
       to: "on"
     - platform: time_pattern
       minutes: "/5"
-      seconds: 45
+      seconds: 22
   condition:
     - condition: state
       entity_id: climate.dads_room_ac
@@ -98,6 +110,13 @@
         entity_id: climate.dads_room_ac
       data:
         hvac_mode: dry
+    - service: notify.tats_devices
+      data:
+        message: "Changed Dad’s Room AC Mode to Dry. Current: {{ states('sensor.dads_room_temperature') }}°C"
+        data:
+          url: /lovelace/home
+          push:
+            interruption-level: time-sensitive
 - id: automation.change_dads_room_ac_mode_to_heat
   alias: Change Dad’s Room AC Mode to Heat
   trigger:
