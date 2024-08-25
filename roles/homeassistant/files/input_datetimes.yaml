@@ -26,6 +26,10 @@ moms_room_curtains_opened_time_workday:
   name: Mom’s Room Curtains Opened Time for Workday
   has_time: true
   icon: mdi:curtains
+moms_room_turned_down_time:
+  name: Mom’s Room Turned down Time
+  has_time: true
+  icon: mdi:brightness-2
 roomba_combo_finished_time:
   name: Roomba Combo Finished Time
   has_date: true
