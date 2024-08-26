@@ -7,12 +7,13 @@
 - name: Install packages
   apt:
     name:
-      - zabbix-server-mysql
+      - zabbix-server-pgsql
       - zabbix-frontend-php
       - zabbix-apache-conf
       - zabbix-get
       - fonts-noto-cjk
       - mosquitto-clients
+      - php-pgsql
     update_cache: yes
   notify: Restart apache
   tags: [zabbix-server, package, zabbix-frontend]
@@ -99,10 +100,10 @@
 - name: Copy zaibbx-frontend conf
   template:
     src: zabbix.conf.php.j2
-    dest: /etc/zabbix/web/zabbix.conf.php
-    owner: root
+    dest: /usr/share/zabbix/conf/zabbix.conf.php
+    owner: www-data
     group: www-data
-    mode: 0660
+    mode: 0600
   tags: [zabbix-server, zabbix-frontend]
 
 - name: Change font for graphs
