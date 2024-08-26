@@ -24,7 +24,7 @@ notify_title_k: "{{ vault_notify_title_k }}"
 postgres:
   username: "{{ vault_postgres.username }}"
   password: "{{ vault_postgres.password }}"
-  hostname: homeassistant-db.rewse.jp
+  hostname: rewse-pg.rewse.jp
   db: homeassistant
 regza:
   username: "{{ vault_regza.username }}"
