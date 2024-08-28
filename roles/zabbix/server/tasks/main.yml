@@ -18,6 +18,19 @@
   notify: Restart apache
   tags: [zabbix-server, package, zabbix-frontend]
 
+- name: Create zabbix-server.service.d
+  file:
+    path: /etc/systemd/system/zabbix-server.service.d
+    state: directory
+  tags: [zabbix-server]
+
+- name: Copy override.conf
+  copy:
+    src: override.conf
+    dest: /etc/systemd/system/zabbix-server.service.d
+  notify: Restart zabbix-server
+  tags: [zabbix-server]
+
 - name: Change permission of zabbix_server.conf
   file:
     path: /etc/zabbix/zabbix_server.conf
