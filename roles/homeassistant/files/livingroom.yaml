@@ -110,8 +110,8 @@ cards:
         secondary_info: last-triggered
       - entity: input_number.living_room_ac_cool_turned_on_threshold
         name: Turned on AC Cool Threshold
-      - entity: input_number.living_room_ac_cool_target_temperature
-        name: AC Cool Target Temperature
+      - entity: input_number.living_room_ac_cool_target_wbgt
+        name: AC Cool Target WBGT
       - entity: automation.turn_on_living_room_ac_cool_forcibly
         name: Turn on AC Cool Forcibly
         secondary_info: last-triggered
