@@ -66,7 +66,7 @@
         - condition: state
           entity_id: climate.moms_room_ac
           state: dry
-    - "{{ states('sensor.moms_room_temperature') | float(26) > (states('input_number.moms_room_ac_cool_target_temperature') | float(26) + 0.5) }}"
+    - "{{ states('sensor.moms_room_wbgt') | float(25) > (states('input_number.moms_room_ac_cool_target_wbgt') | float(25) + 0.5) }}"
     - condition: state
       entity_id: alarm_control_panel.moms_room_ac
       state: armed_home
@@ -78,7 +78,7 @@
         hvac_mode: cool
     - service: notify.tats_devices
       data:
-        message: "Changed Mom’s Room AC Mode to Cool. Current: {{ states('sensor.moms_room_temperature') }}°C"
+        message: "Changed Mom’s Room AC Mode to Cool. Current: {{ states('sensor.moms_room_wbgt') }}°C"
         data:
           url: /lovelace/home
           push:
@@ -96,8 +96,11 @@
     - condition: state
       entity_id: climate.moms_room_ac
       state: heat_cool
-    - "{{ states('sensor.moms_room_temperature') | float(26) < (states('input_number.moms_room_ac_cool_target_temperature') | float(26) + 0.5) }}"
-    - "{{ states('sensor.moms_room_temperature') | float(26) > (states('input_number.moms_room_ac_heat_target_temperature') | float(26) + 0.5) }}"
+    - "{{ states('sensor.moms_room_wbgt') | float(25) < (states('input_number.moms_room_ac_cool_target_wbgt') | float(25) + 0.5) }}"
+    - not:
+      - condition: state
+        entity_id: sensor.season
+        state: winter
     - condition: state
       entity_id: alarm_control_panel.moms_room_ac
       state: armed_home
@@ -109,7 +112,7 @@
         hvac_mode: dry
     - service: notify.tats_devices
       data:
-        message: "Changed Mom’s Room AC Mode to Dry. Current: {{ states('sensor.moms_room_temperature') }}°C"
+        message: "Changed Mom’s Room AC Mode to Dry. Current: {{ states('sensor.moms_room_wbgt') }}°C"
         data:
           url: /lovelace/home
           push:
@@ -127,7 +130,7 @@
     - condition: state
       entity_id: climate.moms_room_ac
       state: heat_cool
-    - "{{ states('sensor.moms_room_temperature') | float(26) < (states('input_number.moms_room_ac_heat_target_temperature') | float(26) + 0.5) }}"
+    - "{{ states('sensor.moms_room_wbgt') | float(25) < (states('input_number.moms_room_ac_heat_target_wbgt') | float(25) + 0.5) }}"
     - condition: state
       entity_id: sensor.season
       state: winter
@@ -140,6 +143,13 @@
         entity_id: climate.moms_room_ac
       data:
         hvac_mode: heat
+    - service: notify.tats_devices
+      data:
+        message: "Changed Mom’s Room AC Mode to Heat. Current: {{ states('sensor.moms_room_wbgt') }}°C"
+        data:
+          url: /lovelace/home
+          push:
+            interruption-level: time-sensitive
 - id: automation.decrease_moms_room_ac_cool_temperature
   alias: Decrease Mom’s Room AC Cool Temperature
   trigger:
@@ -158,7 +168,7 @@
     - condition: time
       after: input_datetime.moms_room_curtains_opened_time_workday
       before: input_datetime.moms_room_turned_down_time
-    - "{{ states('sensor.moms_room_temperature') | float(26) - (states('input_number.moms_room_ac_cool_target_temperature') | float(26) + 0.5) > 0.5 }}"
+    - "{{ states('sensor.moms_room_wbgt') | float(25) - (states('input_number.moms_room_ac_cool_target_wbgt') | float(25)) > 0.5 }}"
     - condition: state
       entity_id: alarm_control_panel.moms_room_ac
       state: armed_home
@@ -191,7 +201,7 @@
     - condition: time
       after: input_datetime.moms_room_turned_down_time
       before: input_datetime.moms_room_curtains_opened_time_workday
-    - "{{ states('sensor.moms_room_temperature') | float(26) - (states('input_number.moms_room_ac_cool_target_temperature') | float(26) - 1 + 0.5) > 0.5 }}"
+    - "{{ states('sensor.moms_room_wbgt') | float(25) - (states('input_number.moms_room_ac_cool_target_wbgt') | float(26) - 1) > 0.5 }}"
     - condition: state
       entity_id: alarm_control_panel.moms_room_ac
       state: armed_home
@@ -224,7 +234,7 @@
     - condition: time
       after: input_datetime.moms_room_curtains_opened_time_workday
       before: input_datetime.moms_room_turned_down_time
-    - "{{ states('sensor.moms_room_temperature') | float(26) - (states('input_number.moms_room_ac_cool_target_temperature') | float(26) + 0.5) < -0.5 }}"
+    - "{{ states('sensor.moms_room_wbgt') | float(25) - (states('input_number.moms_room_ac_cool_target_wbgt') | float(25)) < -0.5 }}"
     - condition: state
       entity_id: alarm_control_panel.moms_room_ac
       state: armed_home
@@ -257,7 +267,7 @@
     - condition: time
       after: input_datetime.moms_room_turned_down_time
       before: input_datetime.moms_room_curtains_opened_time_workday
-    - "{{ states('sensor.moms_room_temperature') | float(26) - (states('input_number.moms_room_ac_cool_target_temperature') | float(26) - 1 + 0.5) < -0.5 }}"
+    - "{{ states('sensor.moms_room_wbgt') | float(25) - (states('input_number.moms_room_ac_cool_target_wbgt') | float(25) - 1) < -0.5 }}"
     - condition: state
       entity_id: alarm_control_panel.moms_room_ac
       state: armed_home

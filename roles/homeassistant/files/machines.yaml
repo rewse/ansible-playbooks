@@ -10,19 +10,19 @@ views:
           - type: history-graph
             title: Living Room AC Target
             entities:
-              - entity: sensor.living_room_temperature
+              - entity: sensor.living_room_wbgt
               - entity: sensor.living_room_ac_target
             hours_to_show: 24
           - type: history-graph
             title: Dad’s Room AC Target
             entities:
-              - entity: sensor.dads_room_temperature
+              - entity: sensor.dads_room_wbgt
               - entity: sensor.dads_room_ac_target
             hours_to_show: 24
           - type: history-graph
             title: Mom’s Room AC Target
             entities:
-              - entity: sensor.moms_room_temperature
+              - entity: sensor.moms_room_wbgt
               - entity: sensor.moms_room_ac_target
             hours_to_show: 24
       - type: vertical-stack

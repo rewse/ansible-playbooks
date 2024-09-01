@@ -113,10 +113,10 @@ cards:
   - type: entities
     title: Dad’s Room Climate Automations
     entities:
-      - entity: automation.decrease_living_room_ac_cool_temperature
+      - entity: automation.decrease_dads_room_ac_cool_temperature
         name: Decrease AC Cool Temperature
         secondary_info: last-triggered
-      - entity: automation.increase_living_room_ac_cool_temperature
+      - entity: automation.increase_dads_room_ac_cool_temperature
         name: Increase AC Cool Temperature
         secondary_info: last-triggered
       - entity: automation.plan_to_turn_on_dads_room_ac_internal_clean
@@ -142,8 +142,8 @@ cards:
         secondary_info: last-triggered
       - entity: input_number.dads_room_ac_cool_turned_on_threshold
         name: Turned on AC Cool Threshold
-      - entity: input_number.dads_room_ac_cool_target_temperature
-        name: AC Cool Target Temperature
+      - entity: input_number.dads_room_ac_cool_target_wbgt
+        name: AC Cool Target WBGT
       - entity: automation.turn_on_dads_room_ac_cool_forcibly
         name: Turn on AC Cool Forcibly
         secondary_info: last-triggered
@@ -161,8 +161,8 @@ cards:
         secondary_info: last-triggered
       - entity: input_number.dads_room_ac_heat_turned_on_threshold
         name: Turned on AC Heat Threshold
-      - entity: input_number.dads_room_ac_heat_target_temperature
-        name: AC Heat Target Temperature
+      - entity: input_number.dads_room_ac_heat_target_wbgt
+        name: AC Heat Target WBGT
       - entity: automation.turn_on_dads_room_ac_internal_clean
         name: Turn on AC Internal Clean
         secondary_info: last-triggered
