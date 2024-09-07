@@ -66,7 +66,7 @@
         - condition: state
           entity_id: climate.moms_room_ac
           state: dry
-    - "{{ states('sensor.moms_room_wbgt') | float(25) > (states('input_number.moms_room_ac_cool_target_wbgt') | float(25) + 0.5) }}"
+    - "{{ states('sensor.moms_room_wbgt') | float(24) > (states('input_number.moms_room_ac_cool_target_wbgt') | float(24) + 0.5) }}"
     - condition: state
       entity_id: alarm_control_panel.moms_room_ac
       state: armed_home
@@ -96,7 +96,7 @@
     - condition: state
       entity_id: climate.moms_room_ac
       state: heat_cool
-    - "{{ states('sensor.moms_room_wbgt') | float(25) < (states('input_number.moms_room_ac_cool_target_wbgt') | float(25) + 0.5) }}"
+    - "{{ states('sensor.moms_room_wbgt') | float(24) < (states('input_number.moms_room_ac_cool_target_wbgt') | float(24) + 0.5) }}"
     - not:
       - condition: state
         entity_id: sensor.season
@@ -130,7 +130,7 @@
     - condition: state
       entity_id: climate.moms_room_ac
       state: heat_cool
-    - "{{ states('sensor.moms_room_wbgt') | float(25) < (states('input_number.moms_room_ac_heat_target_wbgt') | float(25) + 0.5) }}"
+    - "{{ states('sensor.moms_room_wbgt') | float(24) < (states('input_number.moms_room_ac_heat_target_wbgt') | float(24) + 0.5) }}"
     - condition: state
       entity_id: sensor.season
       state: winter
@@ -168,7 +168,7 @@
     - condition: time
       after: input_datetime.moms_room_curtains_opened_time_workday
       before: input_datetime.moms_room_turned_down_time
-    - "{{ states('sensor.moms_room_wbgt') | float(25) - (states('input_number.moms_room_ac_cool_target_wbgt') | float(25)) > 0.5 }}"
+    - "{{ states('sensor.moms_room_wbgt') | float(24) - (states('input_number.moms_room_ac_cool_target_wbgt') | float(24) + 0.5) > 0.5 }}"
     - condition: state
       entity_id: alarm_control_panel.moms_room_ac
       state: armed_home
@@ -201,7 +201,7 @@
     - condition: time
       after: input_datetime.moms_room_turned_down_time
       before: input_datetime.moms_room_curtains_opened_time_workday
-    - "{{ states('sensor.moms_room_wbgt') | float(25) - (states('input_number.moms_room_ac_cool_target_wbgt') | float(26) - 1) > 0.5 }}"
+    - "{{ states('sensor.moms_room_wbgt') | float(24) - (states('input_number.moms_room_ac_cool_target_wbgt') | float(24) - 1 + 0.5) > 0.5 }}"
     - condition: state
       entity_id: alarm_control_panel.moms_room_ac
       state: armed_home
@@ -234,7 +234,7 @@
     - condition: time
       after: input_datetime.moms_room_curtains_opened_time_workday
       before: input_datetime.moms_room_turned_down_time
-    - "{{ states('sensor.moms_room_wbgt') | float(25) - (states('input_number.moms_room_ac_cool_target_wbgt') | float(25)) < -0.5 }}"
+    - "{{ states('sensor.moms_room_wbgt') | float(24) - (states('input_number.moms_room_ac_cool_target_wbgt') | float(24) + 0.5) < -0.5 }}"
     - condition: state
       entity_id: alarm_control_panel.moms_room_ac
       state: armed_home
@@ -267,7 +267,7 @@
     - condition: time
       after: input_datetime.moms_room_turned_down_time
       before: input_datetime.moms_room_curtains_opened_time_workday
-    - "{{ states('sensor.moms_room_wbgt') | float(25) - (states('input_number.moms_room_ac_cool_target_wbgt') | float(25) - 1) < -0.5 }}"
+    - "{{ states('sensor.moms_room_wbgt') | float(24) - (states('input_number.moms_room_ac_cool_target_wbgt') | float(24) - 1 + 0.5) < -0.5 }}"
     - condition: state
       entity_id: alarm_control_panel.moms_room_ac
       state: armed_home
