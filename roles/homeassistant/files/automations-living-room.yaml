@@ -71,7 +71,7 @@
         - condition: state
           entity_id: climate.living_room_ac
           state: dry
-    - "{{ states('sensor.living_room_wbgt') | float(25) > (states('input_number.living_room_ac_cool_target_wbgt') | float(26) + 0.5) }}"
+    - "{{ states('sensor.living_room_wbgt') | float(24) > (states('input_number.living_room_ac_cool_target_wbgt') | float(24) + 0.5) }}"
     - condition: state
       entity_id: alarm_control_panel.living_room_ac
       state: armed_home
@@ -147,7 +147,7 @@
       state: cool
       for:
         minutes: 30
-    - "{{ states('sensor.living_room_wbgt') | float(25) - (states('input_number.living_room_ac_cool_target_wbgt') | float(25)) > 0.5 }}"
+    - "{{ states('sensor.living_room_wbgt') | float(24) - (states('input_number.living_room_ac_cool_target_wbgt') | float(24) + 0.5) > 0.5 }}"
     - condition: state
       entity_id: alarm_control_panel.living_room_ac
       state: armed_home
@@ -183,7 +183,7 @@
       state: cool
       for:
         minutes: 10
-    - "{{ states('sensor.living_room_wbgt') | float(25) - (states('input_number.living_room_ac_cool_target_wbgt') | float(25)) < -0.5 }}"
+    - "{{ states('sensor.living_room_wbgt') | float(24) - (states('input_number.living_room_ac_cool_target_wbgt') | float(24) + 0.5) < -0.5 }}"
     - condition: state
       entity_id: alarm_control_panel.living_room_ac
       state: armed_home
