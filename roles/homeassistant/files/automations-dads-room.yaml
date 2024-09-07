@@ -66,7 +66,7 @@
         - condition: state
           entity_id: climate.dads_room_ac
           state: dry
-    - "{{ states('sensor.dads_room_wbgt') | float(25) > (states('input_number.dads_room_ac_cool_target_wbgt') | float(25) + 0.5) }}"
+    - "{{ states('sensor.dads_room_wbgt') | float(24) > (states('input_number.dads_room_ac_cool_target_wbgt') | float(24) + 0.5) }}"
     - condition: state
       entity_id: sensor.season
       state: summer
@@ -99,7 +99,7 @@
     - condition: state
       entity_id: climate.dads_room_ac
       state: heat_cool
-    - "{{ states('sensor.dads_room_wbgt') | float(25) < (states('input_number.dads_room_ac_cool_target_wbgt') | float(25) + 0.5) }}"
+    - "{{ states('sensor.dads_room_wbgt') | float(24) < (states('input_number.dads_room_ac_cool_target_wbgt') | float(24) + 0.5) }}"
     - not:
       - condition: state
         entity_id: sensor.season
@@ -133,7 +133,7 @@
     - condition: state
       entity_id: climate.dads_room_ac
       state: heat_cool
-    - "{{ states('sensor.dads_room_wbgt') | float(25) < (states('input_number.dads_room_ac_heat_target_wbgt') | float(25) + 0.5) }}"
+    - "{{ states('sensor.dads_room_wbgt') | float(24) < (states('input_number.dads_room_ac_heat_target_wbgt') | float(24) + 0.5) }}"
     - condition: state
       entity_id: sensor.season
       state: winter
@@ -168,7 +168,7 @@
       state: cool
       for:
         minutes: 30
-    - "{{ states('sensor.dads_room_wbgt') | float(25) - (states('input_number.dads_room_ac_cool_target_wbgt') | float(26)) > 0.5 }}"
+    - "{{ states('sensor.dads_room_wbgt') | float(24) - (states('input_number.dads_room_ac_cool_target_wbgt') | float(24) + 0.5) > 0.5 }}"
     - condition: state
       entity_id: alarm_control_panel.dads_room_ac
       state: armed_home
@@ -198,7 +198,7 @@
       state: cool
       for:
         minutes: 10
-    - "{{ states('sensor.dads_room_wbgt') | float(25) - (states('input_number.dads_room_ac_cool_target_wbgt') | float(25)) < -0.5 }}"
+    - "{{ states('sensor.dads_room_wbgt') | float(24) - (states('input_number.dads_room_ac_cool_target_wbgt') | float(24) + 0.5) < -0.5 }}"
     - condition: state
       entity_id: alarm_control_panel.dads_room_ac
       state: armed_home
