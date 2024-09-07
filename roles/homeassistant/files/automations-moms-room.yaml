@@ -48,6 +48,29 @@
             interruption-level: time-sensitive
     - delay:
         hours: 8
+- id: automation.arm_moms_room_ac
+  alias: Arm Mom’s Room AC
+  trigger:
+    - platform: time_pattern
+      minutes: "/5"
+      seconds: 42
+  condition:
+    - condition: state
+      entity_id: alarm_control_panel.moms_room_ac
+      state: disarmed
+      for:
+        hours: 4
+  action:
+    - service: alarm_control_panel.alarm_arm_home
+      target:
+        entity_id: alarm_control_panel.moms_room_ac
+    - service: notify.tats_devices
+      data:
+        message: "Armed Mom’s Room AC"
+        data:
+          url: /lovelace/home
+          push:
+            interruption-level: time-sensitive
 - id: automation.change_moms_room_ac_mode_to_cool
   alias: Change Mom’s Room AC Mode to Cool
   trigger:
