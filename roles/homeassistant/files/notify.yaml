@@ -6,11 +6,11 @@
     - service: mobile_app_atom
     - service: mobile_app_chemical
     - service: mobile_app_global
-    - service: mobile_app_ubiqu_iphone12mini
+    - service: mobile_app_ubiqu_personal
 - name: ubiqu_devices
   platform: group
   services:
-    - service: mobile_app_ubiqu_iphone12mini
+    - service: mobile_app_ubiqu_personal
 - name: tats_devices
   platform: group
   services:
