@@ -119,7 +119,7 @@
     - condition: state
       entity_id: climate.moms_room_ac
       state: heat_cool
-    - "{{ states('sensor.moms_room_wbgt') | float(24) < (states('input_number.moms_room_ac_cool_target_wbgt') | float(24) + 0.5) }}"
+    - "{{ states('sensor.moms_room_wbgt') | float(24) < (states('input_number.moms_room_ac_cool_target_wbgt') | float(24) - 1 + 0.5) }}"
     - not:
       - condition: state
         entity_id: sensor.season
