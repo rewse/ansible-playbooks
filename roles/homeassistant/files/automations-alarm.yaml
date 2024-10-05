@@ -554,8 +554,8 @@
             interruption-level: time-sensitive
     - delay:
         hours: 1
-- id: automation.alarm_ubiqu_iphone12mini_wifi_might_be_off
-  alias: "ALARM: ubiqu_iphone12mini WiFi might be Off"
+- id: automation.alarm_ubiqu_personal_wifi_might_be_off
+  alias: "ALARM: ubiqu_personal WiFi might be Off"
   mode: single
   trigger:
     - platform: state
@@ -569,12 +569,12 @@
       to: "on"
   condition:
     - condition: state
-      entity_id: device_tracker.ping_ubiqu_iphone12mini
+      entity_id: device_tracker.ping_ubiqu_personal
       state: not_home
       for:
         hours: 2
     - condition: state
-      entity_id: device_tracker.ubiqu_iphone12mini
+      entity_id: device_tracker.ubiqu_personal
       state: home
       for:
         hours: 2
@@ -585,7 +585,7 @@
     - service: notify.ubiqu_devices
       data:
         title: "⚠️ ALARM"
-        message: ubiqu_iphone12mini WiFi might be off
+        message: ubiqu_personal WiFi might be off
         data:
           url: /lovelace-machines/machines
           push:
