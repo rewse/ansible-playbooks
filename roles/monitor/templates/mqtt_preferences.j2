@@ -1,0 +1,31 @@
+# ---------------------------
+#								
+# MOSQUITTO PREFERENCES
+#								
+# ---------------------------
+
+# IP ADDRESS OR HOSTNAME OF MQTT BROKER
+mqtt_address='hass.rewse.jp'
+
+# MQTT BROKER USERNAME
+mqtt_user='pub_client'
+
+# MQTT BROKER PASSWORD
+mqtt_password='{{ mosquitto_password }}'
+
+# MQTT PUBLISH TOPIC ROOT 
+mqtt_topicpath='monitor'
+
+# PUBLISHER IDENTITY 
+mqtt_publisher_identity='{{ location }}'
+
+# MQTT PORT 
+mqtt_port='8883'
+
+# MQTT CERTIFICATE FILE
+mqtt_certificate_path='/etc/ssl/certs/ISRG_Root_X1.pem'
+
+#MQTT VERSION (EXAMPLE: 'mqttv311')
+mqtt_version=''
+
+
