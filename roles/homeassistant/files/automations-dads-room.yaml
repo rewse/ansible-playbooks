@@ -692,8 +692,8 @@
   alias: Turn on Dad’s Room Light to Wake up
   mode: single
   trigger:
-    - platform: time
-      at: input_datetime.dads_room_waking_up_time
+    - platform: template
+      value_template: "{{ (now() - timedelta(minutes = 15)).strftime('%H:%M:00') == states('input_datetime.dads_room_waking_up_time') }}"
   action:
     - service: hue.activate_scene
       target:
