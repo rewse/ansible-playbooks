@@ -1,0 +1,17 @@
+---
+- name: Enable proxy_http
+  ansible.builtin.command: a2enmod proxy_http
+  notify: Restart apache
+  tags: [autodiscover]
+
+- name: Copy autodiscover.conf
+  ansible.builtin.copy:
+    src: autodiscover.conf
+    dest: /etc/apache2/conf-available
+  notify: Reload apache
+  tags: [autodiscover]
+
+- name: Enable autodiscover.conf
+  ansible.builtin.command: a2enconf autodiscover
+  notify: Reload apache
+  tags: [autodiscover]
