@@ -39,6 +39,7 @@
       - apt-file
       - at
       - bc
+      - curl
       - dphys-swapfile
       - dnsutils
       - etckeeper
