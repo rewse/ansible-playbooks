@@ -131,6 +131,8 @@ cards:
             name: Living Room Floor Heating
           - entity: switch.study_floor_heating
             name: Study Floor Heating
+          - entity: switch.living_room_humidifier
+            name: Humidifier
           - entity: vacuum.roomba_combo
             name: Roomba Combo
         state_color: false

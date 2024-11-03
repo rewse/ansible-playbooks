@@ -780,6 +780,8 @@
     - condition: state
       entity_id: switch.living_room_humidifier
       state: "off"
+      for:
+        minutes: 30
     - condition: state
       entity_id: binary_sensor.living_room_window
       state: "off"
@@ -798,11 +800,6 @@
     - condition: state
       entity_id: binary_sensor.living_room_presence
       state: "on"
-    - condition: state
-      entity_id: switch.living_room_humidifier
-      state: "off"
-      for:
-        minutes: 30
   action:
     - service: switch.turn_on
       entity_id: switch.living_room_humidifier
