@@ -60,6 +60,10 @@ cards:
         name: Living Room Floor Heating
       - entity: switch.study_floor_heating
         name: Study Floor Heating
+      - entity: switch.living_room_humidifier
+        name: Humidifier
+      - entity: vacuum.roomba_combo
+        name: Roomba Combo
     show_header_toggle: false
   - type: alarm-panel
     entity: alarm_control_panel.surveillance
