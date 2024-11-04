@@ -166,13 +166,14 @@ views:
           - entity: person.shibata_tats
             name: Tats
           - entity: device_tracker.ping_atom
-          - entity: device_tracker.atom
+          - entity: device_tracker.monitor_atom
           - entity: person.shibata_akiko
           - entity: device_tracker.ping_ubiqu_personal
-          - entity: device_tracker.ubiqu_personal
+          - entity: device_tracker.monitor_ubiqu_personal
           - entity: person.shibata_kayano
           - entity: device_tracker.ping_kijishiro
-          - entity: device_tracker.kijishiro
+          - entity: device_tracker.monitor_kijishiro
+          - entity: device_tracker.gps_kijishiro
         hours_to_show: 12
       - type: alarm-panel
         name: TV
