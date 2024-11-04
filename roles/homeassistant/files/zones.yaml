@@ -3,6 +3,11 @@
   longitude: !secret latlng_home_lng
   radius: 250
   icon: mdi:home
+- name: !secret latlng_t_name
+  latitude: !secret latlng_t_lat
+  longitude: !secret latlng_t_lng
+  radius: 100
+  icon: mdi:lead-pencil
 - name: !secret latlng_y_name
   latitude: !secret latlng_y_lat
   longitude: !secret latlng_y_lng
