@@ -273,9 +273,9 @@
     - condition: numeric_state
       entity_id: sensor.dads_room_humidity
       below: input_number.dads_room_ac_dry_turned_off_threshold
-    - condition: numeric_state
-      entity_id: sensor.average_of_dads_room_ac_plug_power_improvoed
-      above: 5
+    - condition: state
+      entity_id: climate.dads_room_ac
+      state: cool
     - condition: not
       conditions:
         - condition: state
@@ -308,9 +308,9 @@
     - condition: numeric_state
       entity_id: sensor.dads_room_temperature
       above: input_number.dads_room_ac_heat_turned_off_threshold
-    - condition: numeric_state
-      entity_id: sensor.average_of_dads_room_ac_plug_power_improvoed
-      above: 5
+    - condition: state
+      entity_id: climate.dads_room_ac
+      state: heat
     - condition: state
       entity_id: sensor.season
       state: winter
@@ -434,9 +434,9 @@
     - condition: numeric_state
       entity_id: sensor.dads_room_wbgt
       above: input_number.dads_room_ac_dry_turned_on_threshold_wbgt
-    - condition: numeric_state
-      entity_id: sensor.average_of_dads_room_ac_plug_power_improvoed
-      below: 5
+    - condition: state
+      entity_id: climate.dads_room_ac
+      state: "off"
     - condition: state
       entity_id: binary_sensor.dads_room_presence
       state: "on"
@@ -473,9 +473,9 @@
     - condition: state
       entity_id: binary_sensor.dads_room_presence
       state: "on"
-    - condition: numeric_state
-      entity_id: sensor.average_of_dads_room_ac_plug_power_improvoed
-      below: 5
+    - condition: state
+      entity_id: climate.dads_room_ac
+      state: "off"
     - condition: state
       entity_id: sensor.season
       state: winter
