@@ -12,6 +12,10 @@ latlng:
   home:
     lat: "{{ vault_latlng.home.lat }}"
     lng: "{{ vault_latlng.home.lng }}"
+  t:
+    name: "{{ vault_latlng.t.name }}"
+    lat: "{{ vault_latlng.t.lat }}"
+    lng: "{{ vault_latlng.t.lng }}"
   y:
     name: "{{ vault_latlng.y.name }}"
     lat: "{{ vault_latlng.y.lat }}"
