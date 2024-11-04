@@ -14,8 +14,8 @@
   tags: [monitor, package]
 
 - name: Copy monitor.service
-  template:
-    src: monitor.service.j2
+  copy:
+    src: monitor.service
     dest: /etc/systemd/system/monitor.service
   tags: [monitor]
 
@@ -61,6 +61,5 @@
     daemon_reload: yes
   with_items:
     - bluetooth
-    - hciuart
     - monitor
   tags: [monitor]
