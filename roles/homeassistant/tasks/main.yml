@@ -5,19 +5,6 @@
       - apparmor-utils
   tags: [homeassistant, homeassistant-docker]
 
-- name: Create bin dir
-  file:
-    path: /etc/homeassistant/bin
-    state: directory
-  tags: [homeassistant]
-
-- name: Copy sesame
-  copy:
-    src: /usr/local/bin/sesame
-    dest: /etc/homeassistant/bin
-    remote_src: yes
-  tags: [homeassistant]
-
 - name: Create certs dir
   file:
     path: /etc/homeassistant/certs
