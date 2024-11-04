@@ -43,6 +43,36 @@
     - service: alarm_control_panel.alarm_disarm
       target:
         entity_id: alarm_control_panel.entrance_auto_lock
+- id: automation.info_arrived_tomas
+  alias: "INFO: Arrived at TOMAS"
+  trigger:
+    - platform: state
+      entity_id: person.shibata_kayano
+      to: !secret latlng_t_name
+  action:
+    - service: notify.all_devices
+      data:
+        title: "[% notify_title_k %]"
+        message: Arrived at TOMAS
+        data:
+          url: /lovelace-people/people
+          push:
+            interruption-level: time-sensitive
+- id: automation.info_left_tomas
+  alias: "INFO: Left TOMAS"
+  trigger:
+    - platform: state
+      entity_id: person.shibata_kayano
+      from: !secret latlng_t_name
+  action:
+    - service: notify.all_devices
+      data:
+        title: "[% notify_title_k %]"
+        message: Left TOMAS
+        data:
+          url: /lovelace-people/people
+          push:
+            interruption-level: time-sensitive
 - id: automation.info_arrived_yotsuya_otsuka
   alias: "INFO: Arrived at Yotsuya-Otsuka"
   trigger:
