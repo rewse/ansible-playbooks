@@ -46,6 +46,8 @@ cards:
     entities:
       - entity: cover.moms_room_curtains
         name: Curtains
+      - entity: switch.moms_room_humidifier
+        name: Humidifier
   - type: entities
     title: Mom’s Room Climate Automations
     entities:
@@ -74,13 +76,16 @@ cards:
       - entity: automation.turn_off_moms_room_ac_heat
         name: Turn off AC Heat
         secondary_info: last-triggered
+      - entity: input_number.moms_room_ac_heat_turned_off_threshold
+        name: Turned off AC Cool Threshold
       - entity: automation.turn_off_moms_room_ac_internal_clean
         name: Turn off AC Internal Clean
         secondary_info: last-triggered
-      - entity: input_number.moms_room_ac_heat_turned_off_threshold
-        name: Turned off AC Cool Threshold
-      - entity: input_number.moms_room_humidifier_turned_on_threshold
-        name: Turned on Humidifier Threshold
+      - entity: automation.turn_off_moms_room_humidifier
+        name: Turn off Humidifier
+        secondary_info: last-triggered
+      - entity: input_number.moms_room_humidifier_turned_off_threshold
+        name: Turned off Humidifier Threshold
       - entity: automation.turn_on_moms_room_ac_cool
         name: Turn on AC Cool
         secondary_info: last-triggered
@@ -110,6 +115,11 @@ cards:
       - entity: automation.turn_on_moms_room_ac_internal_clean
         name: Turn on AC Internal Clean
         secondary_info: last-triggered
+      - entity: automation.turn_on_moms_room_humidifier
+        name: Turn on Humidifier
+        secondary_info: last-triggered
+      - entity: input_number.moms_room_humidifier_turned_on_threshold
+        name: Turned on Humidifier Threshold
     show_header_toggle: false
   - type: entities
     title: Mom’s Room Appliances Automations

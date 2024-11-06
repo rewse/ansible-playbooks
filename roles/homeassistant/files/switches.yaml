@@ -47,6 +47,20 @@
         target:
           entity_id: switch.living_room_humidifier
       icon_template: mdi:air-humidifier
+    moms_room_humidifier:
+      friendly_name: Mom’s Room humidifier
+      unique_id: switch.moms_room_humidifier
+      value_template: "{{ states('sensor.moms_room_humidifier_plug_power') | float(0) > 3 }}"
+      availability_template: "{{ states('switch.moms_room_humidifier_plug_socket_1') }}"
+      turn_on:
+        service: switch.toggle
+        target:
+          entity_id: switch.moms_room_humidifier
+      turn_off:
+        service: switch.toggle
+        target:
+          entity_id: switch.moms_room_humidifier
+      icon_template: mdi:air-humidifier
     study_floor_heating:
       friendly_name: Study Floor Heating
       unique_id: switch.study_floor_heating

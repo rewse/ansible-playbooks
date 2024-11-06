@@ -136,6 +136,12 @@ living_room_ac_dry_turned_on_threshold_wbgt:
   max: 30
   unit_of_measurement: °C
   icon: mdi:thermometer-chevron-up
+moms_room_humidifier_turned_off_threshold:
+  name: Mom’s Room Humidifier Turned off Threshold
+  min: 46
+  max: 54
+  unit_of_measurement: "%"
+  icon: mdi:water-percent-alert
 moms_room_humidifier_turned_on_threshold:
   name: Mom’s Room Humidifier Turned on Threshold
   min: 36
