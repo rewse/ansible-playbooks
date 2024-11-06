@@ -351,6 +351,32 @@
       target:
         entity_id:
           - automation.turn_on_dads_room_ac_internal_clean
+- id: automation.turn_off_dads_room_humidifier
+  alias: Turn off Dad’s Room Humidifier
+  mode: single
+  trigger:
+    - platform: state
+      entity_id: binary_sensor.dads_room_motion
+      to: "on"
+  condition:
+    - condition: numeric_state
+      entity_id: sensor.dads_room_humidity
+      above: input_number.dads_room_humidifier_turned_off_threshold
+    - condition: state
+      entity_id: switch.dads_room_humidifier
+      state: "on"
+  action:
+    - service: switch.turn_off
+      entity_id: switch.dads_room_humidifier
+    - service: notify.tats_devices
+      data:
+        message: "Turned off Dad’s Room Humidifier. Current: {{ states('sensor.dads_room_humidity') }}%"
+        data:
+          url: /lovelace/home
+          push:
+            interruption-level: time-sensitive
+    - delay:
+        hours: 1
 - id: automation.turn_on_dads_room_ac_cool
   alias: Turn on Dad’s Room AC Cool
   mode: single
@@ -532,6 +558,37 @@
     - service: switch.turn_on
       target:
         entity_id: switch.dads_room_ac_streamer
+- id: automation.turn_on_dads_room_humidifier
+  alias: Turn on Dad’s Room Humidifier
+  mode: single
+  trigger:
+    - platform: state
+      entity_id: binary_sensor.dads_room_motion
+      to: "on"
+  condition:
+    - condition: numeric_state
+      entity_id: sensor.dads_room_humidity
+      below: input_number.dads_room_humidifier_turned_on_threshold
+    - condition: state
+      entity_id: switch.living_room_humidifier
+      state: "off"
+      for:
+        minutes: 30
+    - condition: state
+      entity_id: binary_sensor.dads_room_presence
+      state: "on"
+  action:
+    - service: switch.turn_on
+      entity_id: switch.dads_room_humidifier
+    - service: notify.tats_devices
+      data:
+        message: "Turned on Dad’s Room Humidifier. Current: {{ states('sensor.dads_room_humidity') }}%"
+        data:
+          url: /lovelace/home
+          push:
+            interruption-level: time-sensitive
+    - delay:
+        hours: 1
 
 # Lights
 
