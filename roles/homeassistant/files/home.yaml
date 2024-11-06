@@ -249,6 +249,11 @@ cards:
               - fan_only
               - 'off'
           - type: target-temperature
+      - type: entities
+        title: Dad’s Room Appliances
+        entities:
+          - entity: switch.dads_room_humidifier
+            name: Humidifier
   - type: vertical-stack
     cards:
       - type: custom:mini-graph-card
