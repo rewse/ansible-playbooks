@@ -533,6 +533,32 @@
             interruption-level: time-sensitive
     - delay:
         hours: 1
+- id: automation.turn_off_moms_room_humidifier
+  alias: Turn off Mom’s Room Humidifier
+  mode: single
+  trigger:
+    - platform: state
+      entity_id: binary_sensor.moms_room_motion
+      to: "on"
+  condition:
+    - condition: numeric_state
+      entity_id: sensor.moms_room_humidity
+      above: input_number.moms_room_humidifier_turned_off_threshold
+    - condition: state
+      entity_id: switch.moms_room_humidifier
+      state: "on"
+  action:
+    - service: switch.turn_off
+      entity_id: switch.moms_room_humidifier
+    - service: notify.all_devices
+      data:
+        message: "Turned off Mom’s Room Humidifier. Current: {{ states('sensor.moms_room_humidity') }}%"
+        data:
+          url: /lovelace/home
+          push:
+            interruption-level: time-sensitive
+    - delay:
+        hours: 1
 - id: automation.turn_off_moms_room_tv
   alias: Turn off Mom’s Room TV
   trigger:
@@ -805,6 +831,47 @@
     - service: switch.turn_on
       target:
         entity_id: switch.moms_room_ac_streamer
+- id: automation.turn_on_moms_room_humidifier
+  alias: Turn on Mom’s Room Humidifier
+  mode: single
+  trigger:
+    - platform: state
+      entity_id: binary_sensor.moms_room_motion
+      to: "on"
+  condition:
+    - condition: numeric_state
+      entity_id: sensor.moms_room_humidity
+      below: input_number.moms_room_humidifier_turned_on_threshold
+    - condition: state
+      entity_id: switch.moms_room_humidifier
+      state: "off"
+      for:
+        minutes: 30
+    - condition: state
+      entity_id: binary_sensor.moms_room_window_n
+      state: "off"
+      for:
+        minutes: 30
+    - condition: state
+      entity_id: binary_sensor.moms_room_window_s
+      state: "off"
+      for:
+        minutes: 30
+    - condition: state
+      entity_id: binary_sensor.moms_room_presence
+      state: "on"
+  action:
+    - service: switch.turn_on
+      entity_id: switch.moms_room_humidifier
+    - service: notify.all_devices
+      data:
+        message: "Turned on Mom’s Room Humidifier. Current: {{ states('sensor.moms_room_humidity') }}%"
+        data:
+          url: /lovelace/home
+          push:
+            interruption-level: time-sensitive
+    - delay:
+        hours: 1
 
 # Lights
 

@@ -346,6 +346,8 @@ cards:
         entities:
           - entity: cover.moms_room_curtains
             name: Curtains
+          - entity: switch.moms_room_humidifier
+            name: Humidifier
   - type: vertical-stack
     cards:
       - type: custom:mini-graph-card
