@@ -560,6 +560,7 @@
         default: warning
         logs:
           androidtv.adb_manager.adb_manager_async: error
+          custom_components.localtuya.common: error
           homeassistant.components.androidtv.media_player: error
           homeassistant.components.imap_email_content.sensor: warning
       lovelace:
