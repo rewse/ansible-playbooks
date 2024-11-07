@@ -138,22 +138,11 @@
     - platform: state
       entity_id: event.entrance_1_button_switch_button
       attribute: event_type
-      to: multi_press_complete
+      to: multi_press_2
     - platform: state
       entity_id: event.living_room_1_button_switch_button
       attribute: event_type
-      to: multi_press_complete
-  condition:
-    - condition: or
-      conditions:
-        - condition: state
-          entity_id: event.entrance_1_button_switch_button
-          attribute: totalNumberOfPressesCounted
-          state: 2
-        - condition: state
-          entity_id: event.living_room_1_button_switch_button
-          attribute: totalNumberOfPressesCounted
-          state: 2
+      to: multi_press_2
   action:
     - service: lock.lock
       target:
@@ -248,22 +237,11 @@
     - platform: state
       entity_id: event.entrance_1_button_switch_button
       attribute: event_type
-      to: multi_press_complete
+      to: multi_press_1
     - platform: state
       entity_id: event.living_room_1_button_switch_button
       attribute: event_type
-      to: multi_press_complete
-  condition:
-    - condition: or
-      conditions:
-        - condition: state
-          entity_id: event.entrance_1_button_switch_button
-          attribute: totalNumberOfPressesCounted
-          state: 1
-        - condition: state
-          entity_id: event.living_room_1_button_switch_button
-          attribute: totalNumberOfPressesCounted
-          state: 1
+      to: multi_press_1
   action:
     - service: lock.unlock
       target:
