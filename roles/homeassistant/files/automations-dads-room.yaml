@@ -570,7 +570,7 @@
       entity_id: sensor.dads_room_humidity
       below: input_number.dads_room_humidifier_turned_on_threshold
     - condition: state
-      entity_id: switch.living_room_humidifier
+      entity_id: switch.dads_room_humidifier
       state: "off"
       for:
         minutes: 30
