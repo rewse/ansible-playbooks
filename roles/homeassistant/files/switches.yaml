@@ -14,11 +14,11 @@
       turn_on:
         service: switch.toggle
         target:
-          entity_id: switch.dads_room_humidifier
+          entity_id: switch.dads_room_humidifier_switch
       turn_off:
         service: switch.toggle
         target:
-          entity_id: switch.dads_room_humidifier
+          entity_id: switch.dads_room_humidifier_switch
       icon_template: mdi:air-humidifier
     living_room_floor_heating:
       friendly_name: Living Room Floor Heating
@@ -55,11 +55,11 @@
       turn_on:
         service: switch.toggle
         target:
-          entity_id: switch.moms_room_humidifier
+          entity_id: switch.moms_room_humidifier_switch
       turn_off:
         service: switch.toggle
         target:
-          entity_id: switch.moms_room_humidifier
+          entity_id: switch.moms_room_humidifier_switch
       icon_template: mdi:air-humidifier
     study_floor_heating:
       friendly_name: Study Floor Heating
