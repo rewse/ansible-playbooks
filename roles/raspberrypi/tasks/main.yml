@@ -97,6 +97,14 @@
   notify: Run ifmetric
   tags: [raspberrypi]
 
+# ssh stuck at expecting SSH2_MSG_KEX_ECDH_REPLY - Unix & Linux Stack Exchange
+# https://unix.stackexchange.com/questions/722954/ssh-stuck-at-expecting-ssh2-msg-kex-ecdh-reply
+- name: Copy kex_algorithms.conf
+  copy:
+    src: kex_algorithms.conf
+    dest: /etc/ssh/ssh_config.d
+  tags: [raspberrypi]
+
 - name: Create /mnt/bak
   file:
     path: /mnt/bak
