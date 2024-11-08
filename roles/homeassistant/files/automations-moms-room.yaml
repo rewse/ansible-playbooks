@@ -880,8 +880,11 @@
   trigger:
     - platform: state
       entity_id: event.moms_room_1_button_switch_button
+  condition:
+    - condition: state
+      entity_id: event.moms_room_1_button_switch_button
       attribute: event_type
-      to: multi_press_2
+      state: multi_press_2
   action:
     - service: light.turn_off
       target:
@@ -891,8 +894,11 @@
   trigger:
     - platform: state
       entity_id: event.moms_room_1_button_switch_button
+  condition:
+    - condition: state
+      entity_id: event.moms_room_1_button_switch_button
       attribute: event_type
-      to: multi_press_1
+      state: multi_press_1
   action:
     - service: light.turn_on
       target:

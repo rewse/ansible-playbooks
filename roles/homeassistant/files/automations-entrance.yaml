@@ -137,12 +137,18 @@
   trigger:
     - platform: state
       entity_id: event.entrance_1_button_switch_button
-      attribute: event_type
-      to: multi_press_2
     - platform: state
       entity_id: event.living_room_1_button_switch_button
-      attribute: event_type
-      to: multi_press_2
+  condition:
+    or:
+      - condition: state
+        entity_id: event.entrance_1_button_switch_button
+        attribute: event_type
+        state: multi_press_2
+      - condition: state
+        entity_id: event.living_room_1_button_switch_button
+        attribute: event_type
+        state: multi_press_2
   action:
     - service: lock.lock
       target:
@@ -236,12 +242,18 @@
   trigger:
     - platform: state
       entity_id: event.entrance_1_button_switch_button
-      attribute: event_type
-      to: multi_press_1
     - platform: state
       entity_id: event.living_room_1_button_switch_button
-      attribute: event_type
-      to: multi_press_1
+  condition:
+    or:
+      - condition: state
+        entity_id: event.entrance_1_button_switch_button
+        attribute: event_type
+        state: multi_press_1
+      - condition: state
+        entity_id: event.living_room_1_button_switch_button
+        attribute: event_type
+        state: multi_press_1
   action:
     - service: lock.unlock
       target:
