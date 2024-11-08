@@ -641,7 +641,7 @@
             state: "on"
             brightness: "{{ new_brightness }}"
 - id: automation.turn_off_dads_room_light_by_1_button_switch
-  alias: Turn off Dad’s Room Light
+  alias: Turn off Dad’s Room Light by 1-Button Switch
   trigger:
     - platform: state
       entity_id: event.dads_room_1_button_switch_button
@@ -652,7 +652,7 @@
       target:
         entity_id: light.dads_room
 - id: automation.turn_off_dads_room_light_by_4_button_switch
-  alias: Turn off Dad’s Room Light
+  alias: Turn off Dad’s Room Light by 4-Button Switch
   trigger:
     - platform: state
       entity_id: event.dads_room_4_button_switch_button_4
