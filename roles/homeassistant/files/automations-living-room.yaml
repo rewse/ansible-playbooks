@@ -524,7 +524,7 @@
       state: "on"
   action:
     - service: switch.turn_off
-      entity_id: switch.living_room_humidifier
+      entity_id: switch.living_room_humidifier_switch
     - service: notify.all_devices
       data:
         message: "Turned off Living Room Humidifier. Current: {{ states('sensor.living_room_humidity') }}%"
@@ -802,7 +802,7 @@
       state: "on"
   action:
     - service: switch.turn_on
-      entity_id: switch.living_room_humidifier
+      entity_id: switch.living_room_humidifier_switch
     - service: notify.all_devices
       data:
         message: "Turned on Living Room Humidifier. Current: {{ states('sensor.living_room_humidity') }}%"
