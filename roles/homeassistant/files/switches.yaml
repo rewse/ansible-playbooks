@@ -41,11 +41,11 @@
       turn_on:
         service: switch.toggle
         target:
-          entity_id: switch.living_room_humidifier
+          entity_id: switch.living_room_humidifier_switch
       turn_off:
         service: switch.toggle
         target:
-          entity_id: switch.living_room_humidifier
+          entity_id: switch.living_room_humidifier_switch
       icon_template: mdi:air-humidifier
     moms_room_humidifier:
       friendly_name: Mom’s Room humidifier
