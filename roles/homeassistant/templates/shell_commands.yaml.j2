@@ -2,3 +2,5 @@ control_toggle_regza: curl --digest --user '[% regza.username %]:[% regza.passwo
 control_volume_up_regza: curl --digest --user '[% regza.username %]:[% regza.password %]' http://regza.rewse.jp/remote/remote.htm?key=40BF1A
 control_volume_down_regza: curl --digest --user '[% regza.username %]:[% regza.password %]' http://regza.rewse.jp/remote/remote.htm?key=40BF1E
 control_mute_regza: curl --digest --user '[% regza.username %]:[% regza.password %]' http://regza.rewse.jp/remote/remote.htm?key=40BF10
+fancysyncbox_scene_color: tuya-cli set --ip [% fancysyncbox.ip %] --id [% fancysyncbox.id %] --key [% fancysyncbox.key %] --dps 25 --set 97000000000000000000000000000000 --raw-value 97000000000000000000000000000000 --protocol-version 3.4 
+fancysyncbox_scene_sync_medium: tuya-cli set --ip [% fancysyncbox.ip %] --id [% fancysyncbox.id %] --key [% fancysyncbox.key %] --dps 25 --set 81000000000000000000000000000000 --raw-value 81000000000000000000000000000000 --protocol-version 3.4 
