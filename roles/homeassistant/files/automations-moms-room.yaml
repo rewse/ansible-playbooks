@@ -559,6 +559,36 @@
             interruption-level: time-sensitive
     - delay:
         hours: 1
+- id: automation.turn_off_moms_room_humidifier_due_to_nobody
+  alias: Turn off Mom’s Room Humidifier Due to Nobody
+  trigger:
+    - platform: time_pattern
+      minutes: "/5"
+      seconds: 4
+  condition:
+    - condition: state
+      entity_id: binary_sensor.moms_room_presence
+      state: "off"
+      for:
+        hours: 1
+    - condition: state
+      entity_id: sun.sun
+      state: above_horizon
+    - condition: state
+      entity_id: switch.moms_room_humidifier
+      state: "on"
+  action:
+    - service: switch.turn_off
+      entity_id: switch.moms_room_humidifier_switch
+    - service: notify.all_devices
+      data:
+        message: "Turned off Mom’s Room Humidifier Due to Nobody. Current: {{ states('sensor.moms_room_humidity') }}%"
+        data:
+          url: /lovelace/home
+          push:
+            interruption-level: time-sensitive
+    - delay:
+        hours: 1
 - id: automation.turn_off_moms_room_tv
   alias: Turn off Mom’s Room TV
   trigger:
