@@ -244,10 +244,24 @@
   notify: Restart homeassistant
   tags: [homeassistant, homeassistant-component]
 
-- name: Config input_datetime
+- name: Config input_boolean
   lineinfile:
     path: /etc/homeassistant/configuration.yaml
     insertafter: '^homekit:'
+    regexp: '^input_boolean:'
+    line: "input_boolean: !include input_booleans.yaml"
+  tags: [homeassistant, homeassistant-component, homeassistant-input-boolean]
+
+- name: Copy input_booleans.yaml
+  copy:
+    src: input_booleans.yaml
+    dest: /etc/homeassistant
+  tags: [homeassistant, homeassistant-component, homeassistant-input-boolean]
+
+- name: Config input_datetime
+  lineinfile:
+    path: /etc/homeassistant/configuration.yaml
+    insertafter: '^input_boolean:'
     regexp: '^input_datetime:'
     line: "input_datetime: !include input_datetimes.yaml"
   tags: [homeassistant, homeassistant-component, homeassistant-input-datetime]
