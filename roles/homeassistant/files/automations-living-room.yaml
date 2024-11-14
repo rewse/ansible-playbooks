@@ -989,15 +989,11 @@
         - condition: state
           entity_id: person.shibata_tats
           state: home
-          for:
-            minutes: 10
     - condition: not
       conditions:
         - condition: state
           entity_id: person.shibata_akiko
           state: home
-          for:
-            minutes: 10
     - condition: or
       conditions:
         - condition: state
