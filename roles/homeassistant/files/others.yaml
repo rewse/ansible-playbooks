@@ -38,6 +38,10 @@ cards:
         entity: alarm_control_panel.entrance_auto_lock
         states:
           - arm_home
+  - type: alarm-panel
+    entity: alarm_control_panel.surveillance
+    states:
+      - arm_away
   - type: picture-entity
     name: Entrance Camera
     entity: camera.entrance_camera

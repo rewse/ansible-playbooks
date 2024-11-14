@@ -65,10 +65,6 @@ cards:
       - entity: vacuum.roomba_combo
         name: Roomba Combo
     show_header_toggle: false
-  - type: alarm-panel
-    entity: alarm_control_panel.surveillance
-    states:
-      - arm_away
   - type: entities
     title: Living Room Climate Automations
     entities:
