@@ -17,14 +17,11 @@ views:
           - entity: sensor.mamorail_balance
             name: Balance
       - type: entities
-        title: Anshin-Smile
+        title: Family
         entities:
-          - entity: sensor.anshin_smile_action
-            name: Action
-          - entity: sensor.anshin_smile_time
-            name: Time
-      - type: history-graph
-        title: Kayano
-        entities:
+          - entity: person.shibata_tats
+            name: Tats
+          - entity: person.shibata_akiko
+            name: Akiko
           - entity: person.shibata_kayano
-        hours_to_show: 12
+            name: Kayano
