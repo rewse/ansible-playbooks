@@ -187,6 +187,10 @@ cards:
         artwork: material
         hide:
           power_state: false
+      - type: alarm-panel
+        entity: alarm_control_panel.tv
+        states:
+          - arm_away
   - type: picture-entity
     name: Living Room Camera
     entity: camera.living_room_camera
