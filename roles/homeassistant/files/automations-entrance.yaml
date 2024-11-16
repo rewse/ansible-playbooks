@@ -149,6 +149,9 @@
         entity_id: event.living_room_1_button_switch_button
         attribute: event_type
         state: multi_press_2
+    - condition: state
+      entity_id: lock.entrance_locks
+      state: unlocked
   action:
     - service: lock.lock
       target:
@@ -254,6 +257,9 @@
         entity_id: event.living_room_1_button_switch_button
         attribute: event_type
         state: multi_press_1
+    - condition: state
+      entity_id: lock.entrance_locks
+      state: locked
   action:
     - service: lock.unlock
       target:
