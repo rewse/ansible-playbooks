@@ -178,6 +178,13 @@
     - platform: state
       entity_id: input_boolean.shortcut_atom
       to: "off"
+    - platform: time_pattern
+      minutes: "/5"
+      seconds: 59
+  condition:
+    - condition: state
+      entity_id: input_boolean.shortcut_atom
+      state: "off"
   action:
     - service: device_tracker.see
       data:
@@ -190,6 +197,13 @@
     - platform: state
       entity_id: input_boolean.shortcut_kijishiro
       to: "off"
+    - platform: time_pattern
+      minutes: "/5"
+      seconds: 42
+  condition:
+    - condition: state
+      entity_id: input_boolean.shortcut_kijishiro
+      state: "off"
   action:
     - service: device_tracker.see
       data:
@@ -202,6 +216,13 @@
     - platform: state
       entity_id: input_boolean.shortcut_ubiqu_personal
       to: "off"
+    - platform: time_pattern
+      minutes: "/5"
+      seconds: 57
+  condition:
+    - condition: state
+      entity_id: input_boolean.shortcut_ubiqu_personal
+      state: "off"
   action:
     - service: device_tracker.see
       data:
@@ -319,6 +340,13 @@
     - platform: state
       entity_id: input_boolean.shortcut_atom
       to: "on"
+    - platform: time_pattern
+      minutes: "/5"
+      seconds: 24
+  condition:
+    - condition: state
+      entity_id: input_boolean.shortcut_atom
+      state: "on"
   action:
     - service: device_tracker.see
       data:
@@ -331,6 +359,13 @@
     - platform: state
       entity_id: input_boolean.shortcut_kijishiro
       to: "on"
+    - platform: time_pattern
+      minutes: "/5"
+      seconds: 48
+  condition:
+    - condition: state
+      entity_id: input_boolean.shortcut_kijishiro
+      state: "on"
   action:
     - service: device_tracker.see
       data:
@@ -343,6 +378,13 @@
     - platform: state
       entity_id: input_boolean.shortcut_ubiqu_personal
       to: "on"
+    - platform: time_pattern
+      minutes: "/5"
+      seconds: 5
+  condition:
+    - condition: state
+      entity_id: input_boolean.shortcut_ubiqu_personal
+      state: "on"
   action:
     - service: device_tracker.see
       data:
