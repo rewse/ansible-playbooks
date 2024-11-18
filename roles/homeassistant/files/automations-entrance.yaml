@@ -140,7 +140,7 @@
     - platform: state
       entity_id: event.living_room_1_button_switch_button
   condition:
-    or:
+    - or:
       - condition: state
         entity_id: event.entrance_1_button_switch_button
         attribute: event_type
@@ -248,7 +248,7 @@
     - platform: state
       entity_id: event.living_room_1_button_switch_button
   condition:
-    or:
+    - or:
       - condition: state
         entity_id: event.entrance_1_button_switch_button
         attribute: event_type
