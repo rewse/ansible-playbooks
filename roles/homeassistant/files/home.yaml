@@ -507,6 +507,10 @@ cards:
       - entity: binary_sensor.entrance_door
         name: Entrance
         secondary_info: last-changed
+  - type: alarm-panel
+    entity: alarm_control_panel.surveillance
+    states:
+      - arm_away
   - type: vertical-stack
     cards:
       - type: custom:simple-weather-card
