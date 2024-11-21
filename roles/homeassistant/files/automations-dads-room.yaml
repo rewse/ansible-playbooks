@@ -647,7 +647,7 @@
     - condition: state
       entity_id: event.dads_room_1_button_switch_button
       attribute: event_type
-      state: long_press
+      state: long_release
   action:
     - service: scene.apply
       data:
