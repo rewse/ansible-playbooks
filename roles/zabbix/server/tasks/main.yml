@@ -84,19 +84,15 @@
   notify: Restart zabbix-server
   tags: [zabbix-server]
 
-- name: Set php_value
-  lineinfile:
-    dest: /etc/zabbix/apache.conf
-    insertafter: "# php_value date.timezone"
-    regexp: "^ *php_value date.timezone"
-    line: "        php_value date.timezone Asia/Tokyo"
+- name: Enable zabbix.conf
+  command: a2enconf zabbix
   notify: Reload apache
   tags: [zabbix-server, zabbix-frontend]
 
 - name: Copy zaibbx-frontend conf
   template:
     src: zabbix.conf.php.j2
-    dest: /usr/share/zabbix/conf/zabbix.conf.php
+    dest: /etc/zabbix/web/zabbix.conf.php
     owner: www-data
     group: www-data
     mode: 0600
