@@ -68,22 +68,6 @@
   notify: Reload apache
   tags: [httpd]
 
-- name: Disable ErrorLog in 000-default.conf
-  lineinfile:
-    dest: /etc/apache2/sites-enabled/000-default.conf
-    regexp: "^	ErrorLog "
-    line: "	#ErrorLog ${APACHE_LOG_DIR}/error.log"
-  notify: Reload apache
-  tags: [httpd]
-
-- name: Disable ErrorLog in default-ssl.conf
-  lineinfile:
-    dest: /etc/apache2/sites-enabled/default-ssl.conf
-    regexp: "^		ErrorLog "
-    line: "		#ErrorLog ${APACHE_LOG_DIR}/error.log"
-  notify: Reload apache
-  tags: [httpd]
-
 - name: Set ErrorLog
   lineinfile:
     dest: /etc/apache2/apache2.conf
@@ -97,14 +81,6 @@
     dest: /etc/apache2/apache2.conf
     regexp: "^LogLevel "
     line: "LogLevel notice"
-  notify: Reload apache
-  tags: [httpd]
-
-- name: Set LogFormat for combined
-  lineinfile:
-    dest: /etc/apache2/apache2.conf
-    regexp: "^LogFormat ..* combined$"
-    line: 'LogFormat "%{X-Forwarded-For}i %h %l %u %t \"%r\" %>s %b \"%{Referer}i\" \"%{User-Agent}i\"" combined'
   notify: Reload apache
   tags: [httpd]
 
