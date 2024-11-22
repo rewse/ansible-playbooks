@@ -6,13 +6,11 @@ zoom.local
 
 [ubuntu]
 bravo.rewse.jp
-charlie.rewse.jp
 fox.rewse.jp
 hotel.rewse.jp
 
 [ec2]
 bravo.rewse.jp
-charlie.rewse.jp
 
 [internal]
 fox.rewse.jp
@@ -24,9 +22,6 @@ hotel.rewse.jp
 
 [singleton_ext1]
 bravo.rewse.jp
-
-[singleton_ext2]
-charlie.rewse.jp
 
 [singleton_int1]
 fox.rewse.jp

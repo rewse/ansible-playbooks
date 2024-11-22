@@ -3,11 +3,16 @@
   become: yes
   remote_user: ubuntu
   roles:
+    - autodiscover
     - docker
     - homeassistant
     - httpd
     - matter-server
     - mosquitto
+    - nextcloud
     - sesame
     - switchbot
     - syslogd
+    - wordpress
+    - zabbix/server
+    - zabbix/money/market
