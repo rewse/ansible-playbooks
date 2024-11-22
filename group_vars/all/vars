@@ -4,8 +4,8 @@ email:
   primary: "{{vault_email.primary}}"
   secondary: "{{vault_email.secondary}}"
 global_ip:
-  home: 124.213.127.141/32
-  home_ip: 124.213.127.141
+  home: 124.213.108.199/32
+  home_ip: 124.213.108.199
   office: 27.0.0.0/22
 ipv6:
   home: 240f:78:31e9:1::/64
