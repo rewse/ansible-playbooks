@@ -4,4 +4,3 @@
   remote_user: ubuntu
   roles:
     - mhz19
-    - monitor
