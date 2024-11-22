@@ -1,2 +1,4 @@
 ---
 secondary_diskname: nvme1n1
+zabbix:
+  server: zabbix.rewse.jp
