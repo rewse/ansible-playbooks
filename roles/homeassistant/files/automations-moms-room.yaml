@@ -570,12 +570,12 @@
       conditions:
         - condition: state
           entity_id: binary_sensor.moms_room_window_n
-          state: "on"
+          state: "off"
           for:
             minutes: 30
         - condition: state
           entity_id: binary_sensor.moms_room_window_s
-          state: "on"
+          state: "off"
           for:
             minutes: 30
     - condition: state
