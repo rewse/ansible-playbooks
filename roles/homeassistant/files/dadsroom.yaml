@@ -26,11 +26,16 @@ cards:
   - type: entities
     title: Dad’s Room Light Automations
     entities:
-      - entity: automation.turn_on_dads_room_light_to_wake_up
-        name: Turn on Light to Wake up
+      - entity: automation.turn_on_dads_room_light_to_wake_up_temporarily
+        name: Turn on Light to Wake up Temporarily
         secondary_info: last-triggered
       - entity: input_datetime.dads_room_waking_up_time
-        name: Waking up Time
+        name: Waking up Time Temporarily
+      - entity: automation.turn_on_dads_room_light_to_wake_up_workday
+        name: Turn on Light to Wake up for Workday
+        secondary_info: last-triggered
+      - entity: input_datetime.dads_room_waking_up_time_workday
+        name: Waking up Time for Workday
     show_header_toggle: false
   - type: entities
     title: Dad’s Room Scene
