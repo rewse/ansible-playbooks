@@ -545,17 +545,17 @@
       conditions:
         - condition: state
           entity_id: binary_sensor.living_room_window
-          state: "off"
+          state: "on"
           for:
             minutes: 30
         - condition: state
           entity_id: binary_sensor.study_window_n
-          state: "off"
+          state: "on"
           for:
             minutes: 30
         - condition: state
           entity_id: binary_sensor.study_window_s
-          state: "off"
+          state: "on"
           for:
             minutes: 30
     - condition: state
