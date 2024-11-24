@@ -559,6 +559,40 @@
             interruption-level: time-sensitive
     - delay:
         hours: 1
+- id: automation.turn_off_moms_room_humidifier_due_to_opening_window
+  alias: Turn off Mom’s Room Humidifier Due to Opening Window
+  trigger:
+    - platform: time_pattern
+      minutes: "/5"
+      seconds: 40
+  condition:
+    - condition: or
+      conditions:
+        - condition: state
+          entity_id: binary_sensor.moms_room_window_n
+          state: "on"
+          for:
+            minutes: 30
+        - condition: state
+          entity_id: binary_sensor.moms_room_window_s
+          state: "on"
+          for:
+            minutes: 30
+    - condition: state
+      entity_id: switch.moms_room_humidifier
+      state: "on"
+  action:
+    - service: switch.turn_off
+      entity_id: switch.moms_room_humidifier_switch
+    - service: notify.all_devices
+      data:
+        message: "Turned off Mom’s Room Humidifier Due to Opening Window. Current: {{ states('sensor.moms_room_humidity') }}%"
+        data:
+          url: /lovelace/home
+          push:
+            interruption-level: time-sensitive
+    - delay:
+        hours: 1
 - id: automation.turn_off_moms_room_humidifier_due_to_nobody
   alias: Turn off Mom’s Room Humidifier Due to Nobody
   trigger:
