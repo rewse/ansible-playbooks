@@ -776,12 +776,28 @@
         entity_id: "{{ states('input_select.dads_room_midnight_scene') }}"
       data:
         transition: 300
-- id: automation.turn_on_dads_room_light_to_wake_up
-  alias: Turn on Dad’s Room Light to Wake up
+- id: automation.turn_on_dads_room_light_to_wake_up_temporarily
+  alias: Turn on Dad’s Room Light to Wake up Temporarily
   mode: single
   trigger:
     - platform: template
-      value_template: "{{ (now() + timedelta(minutes = 15)).strftime('%H:%M:00') == states('input_datetime.dads_room_waking_up_time') }}"
+      value_template: "{{ (now() + timedelta(minutes = 15)).strftime('%H:%M:00') == states('input_datetime.dads_room_waking_up_time_temporarily') }}"
+  action:
+    - service: hue.activate_scene
+      target:
+        entity_id: "{{ states('input_select.dads_room_morning_scene') }}"
+      data:
+        transition: 900
+- id: automation.turn_on_dads_room_light_to_wake_up_workday
+  alias: Turn on Dad’s Room Light to Wake up for Workday
+  mode: single
+  trigger:
+    - platform: template
+      value_template: "{{ (now() + timedelta(minutes = 15)).strftime('%H:%M:00') == states('input_datetime.dads_room_waking_up_time_workday') }}"
+  condition:
+    - condition: state
+      entity_id: binary_sensor.workday_sensor
+      state: "on"
   action:
     - service: hue.activate_scene
       target:
