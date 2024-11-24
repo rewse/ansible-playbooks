@@ -534,6 +534,45 @@
             interruption-level: time-sensitive
     - delay:
         hours: 1
+- id: automation.turn_off_living_room_humidifier_due_to_opening_window
+  alias: Turn off Living Room Humidifier Due to Opening Window
+  trigger:
+    - platform: time_pattern
+      minutes: "/5"
+      seconds: 37
+  condition:
+    - condition: or
+      conditions:
+        - condition: state
+          entity_id: binary_sensor.living_room_window
+          state: "on"
+          for:
+            minutes: 30
+        - condition: state
+          entity_id: binary_sensor.study_window_n
+          state: "on"
+          for:
+            minutes: 30
+        - condition: state
+          entity_id: binary_sensor.study_window_s
+          state: "on"
+          for:
+            minutes: 30
+    - condition: state
+      entity_id: switch.living_room_humidifier
+      state: "on"
+  action:
+    - service: switch.turn_off
+      entity_id: switch.living_room_humidifier_switch
+    - service: notify.all_devices
+      data:
+        message: "Turned off Living Room Humidifier Due to Opening Window. Current: {{ states('sensor.moms_room_humidity') }}%"
+        data:
+          url: /lovelace/home
+          push:
+            interruption-level: time-sensitive
+    - delay:
+        hours: 1
 - id: automation.turn_on_living_area_floor_heating
   alias: Turn on Living Area Floor Heating
   mode: single
