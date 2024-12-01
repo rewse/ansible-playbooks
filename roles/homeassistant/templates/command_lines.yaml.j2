@@ -1,10 +1,4 @@
 - binary_sensor:
-    name: REGZA State
-    unique_id: binary_sensor.regza_state
-    command: curl --digest --user '[% regza.username %]:[% regza.password %]' http://regza.rewse.jp/v2/remote/play/status | jq -r .content_type | sed 's/external/other/'
-    payload_on: broadcast
-    payload_off: other
-- binary_sensor:
     name: REGZA Volume Muted
     unique_id: binary_sensor.regza_volume_muted
     command: curl --digest --user '[% regza.username %]:[% regza.password %]' http://regza/v2/remote/status/mute | jq -r .mute

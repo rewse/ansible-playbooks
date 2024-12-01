@@ -95,6 +95,8 @@ cards:
             name: Downlights
           - entity: light.living_room_tv_light
             name: TV Light
+          - entity: select.living_room_tv_light_scene
+            name: TV Light Scene
           - entity: light.living_room_entrance_light
             name: Entrance Light
           - entity: light.living_room_footlight
