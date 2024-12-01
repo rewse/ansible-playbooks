@@ -485,6 +485,27 @@
   notify: Restart homeassistant
   tags: [homeassistant, homeassistant-component]
 
+- name: Create custom_components dir
+  file:
+    path: /etc/homeassistant/custom_components
+    state: directory
+  tags: [homeassistant, homeassistant-custom]
+
+- name: Download tuya-local
+  unarchive:
+    src: https://github.com/make-all/tuya-local/archive/refs/tags/{{ tuya_local_version }}.zip
+    dest: /tmp
+    remote_src: yes
+  tags: [homeassistant, homeassistant-custom]
+
+- name: Copy tuya-local
+  copy:
+    src: /tmp/tuya-local-{{ tuya_local_version }}/custom_components/tuya_local
+    dest: /etc/homeassistant/custom_components
+    remote_src: yes
+  notify: Restart homeassistant
+  tags: [homeassistant, homeassistant-custom]
+
 - name: Create www dir
   file:
     path: /etc/homeassistant/www
@@ -574,7 +595,6 @@
         default: warning
         logs:
           androidtv.adb_manager.adb_manager_async: error
-          custom_components.localtuya.common: error
           homeassistant.components.androidtv.media_player: error
           homeassistant.components.imap_email_content.sensor: warning
       lovelace:

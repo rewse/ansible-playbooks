@@ -3,10 +3,6 @@ alexa_client:
   id: "{{ vault_alexa_client.id }}"
   secret: "{{ vault_alexa_client.secret }}"
 card_mod_version: 3.4.3
-fancysyncbox:
-  ip: "{{ vault_fancysyncbox.ip }}"
-  id: "{{ vault_fancysyncbox.id }}"
-  key: "{{ vault_fancysyncbox.key }}"
 gmail:
   address: "{{ vault_gmail.address }}"
   password: "{{ vault_gmail.password }}"
@@ -39,4 +35,5 @@ regza:
   password: "{{ vault_regza.password }}"
 simple_thermostat_version: 2.5.0
 simple_weather_card_version: 0.8.5
+tuya_local_version: 2024.11.4
 uptime_card_version: 0.4.0
