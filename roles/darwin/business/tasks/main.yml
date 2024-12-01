@@ -1,9 +1,4 @@
 ---
-- name: Tap brew repos
-  homebrew_tap:
-    name: homebrew/cask
-  tags: [darwin-business, package, homebrew, cask]
-
 - name: Install packages by homebrew_cask
   homebrew_cask:
     name: 
