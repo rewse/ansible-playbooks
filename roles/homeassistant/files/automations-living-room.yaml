@@ -894,6 +894,41 @@
           url: /lovelace/home
           push:
             interruption-level: time-sensitive
+- id: automation.turn_off_living_room_tv_light_during_daytime
+  alias: Turn off Living Room TV Light during Daytime
+  trigger:
+    - platform: state
+      entity_id: media_player.regza
+      to: "off"
+  condition:
+    - condition: state
+      entity_id: light.living_room_tv_light
+      state: "on"
+    - condition: state
+      entity_id: sun.sun
+      state: above_horizon
+  action:
+    - service: light.turn_off
+      entity_id: light.living_room_tv_light
+- id: automation.turn_off_living_room_tv_light_during_nighttime
+  alias: Turn off Living Room TV Light during Nighttime
+  trigger:
+    - platform: state
+      entity_id: media_player.regza
+      to: "off"
+  condition:
+    - condition: state
+      entity_id: light.living_room_tv_light
+      state: "on"
+    - condition: state
+      entity_id: sun.sun
+      state: below_horizon
+  action:
+    - service: select.select_option
+      target:
+        entity_id: select.living_room_tv_light_scene
+      data:
+        option: Scene (Color) - Pure
 - id: automation.turn_on_living_area_downlights
   alias: Turn on Living Area Downlights
   mode: single
@@ -936,6 +971,18 @@
   action:
     - service: light.turn_on
       entity_id: light.living_area_downlights
+    - service: light.turn_on
+      entity_id: light.living_room_footlight
+    - service: light.turn_on
+      entity_id: light.living_room_shelf_light
+    - service: light.turn_on
+      target:
+        entity_id: light.living_room_tv_light
+      data:
+        hs_color:
+          - 20
+          - 72
+        brightness_pct: 100
     - service: notify.tats_devices
       data:
         message: "Turned on Living Area Downlights due to {{ trigger.id }}. Current: {{ states('sensor.living_room_light_level') }}lx"
@@ -945,6 +992,60 @@
             interruption-level: time-sensitive
     - delay:
         hours: 1
+- id: automation.turn_on_living_room_tv_light_for_broadcast
+  alias: Turn on Living Room TV Light for Broadcast
+  trigger:
+    - platform: state
+      entity_id: media_player.regza
+      to: "on"
+    - platform: state
+      entity_id: sensor.regza_content_type
+      to: broadcast
+  condition:
+    - condition: state
+      entity_id: sensor.regza_content_type
+      state: broadcast
+  action:
+    - service: light.turn_on
+      target:
+        entity_id: light.living_room_tv_light
+      data:
+        hs_color:
+          - 20
+          - 72
+        brightness_pct: 100
+    - service: select.select_option
+      target:
+        entity_id: select.living_room_tv_light_scene
+      data:
+        option: Scene (Color) - Pure
+- id: automation.turn_on_living_room_tv_light_for_external
+  alias: Turn on Living Room TV Light for External
+  trigger:
+    - platform: state
+      entity_id: media_player.regza
+      to: "on"
+    - platform: state
+      entity_id: sensor.regza_content_type
+      to: external
+  condition:
+    - condition: state
+      entity_id: sensor.regza_content_type
+      state: external
+  action:
+    - service: light.turn_on
+      target:
+        entity_id: light.living_room_tv_light
+      data:
+        hs_color:
+          - 20
+          - 72
+        brightness_pct: 100
+    - service: select.select_option
+      target:
+        entity_id: select.living_room_tv_light_scene
+      data:
+        option: Sync - Recreation
 
 # Others
 

@@ -13,6 +13,6 @@
       service: shell_command.control_mute_regza
   attributes:
       is_volume_muted: binary_sensor.regza_volume_muted
-      state: binary_sensor.regza_state
+      state: switch.living_room_tv
       source: sensor.regza_channel
   device_class: tv

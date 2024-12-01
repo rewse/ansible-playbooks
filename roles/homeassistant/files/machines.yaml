@@ -173,6 +173,7 @@ views:
           - entity: binary_sensor.tuyaplug_liv_foo
           - entity: binary_sensor.tuyaplug_liv_hum
           - entity: binary_sensor.tuyaplug_liv_she
+          - entity: binary_sensor.tuyaplug_liv_tv
           - entity: binary_sensor.tuyaplug_mom_cam
           - entity: binary_sensor.tuyaplug_mom_hum
         hours_to_show: 12
