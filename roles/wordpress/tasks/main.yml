@@ -318,6 +318,13 @@
     line: '                        <img src="<?php echo esc_url( $custom_logo_url ); ?>" alt="Rewse Lab." width="2048" height="2048" />'
   tags: [wordpress]
 
+- name: Remove user-scalable
+  ansible.builtin.lineinfile:
+    path: /srv/www/wordpress/wp-content/themes/fukasawa/header.php
+    regexp: '<meta name="viewport".*'
+    line: '        <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0" >'
+  tags: [wordpress]
+
 - name: Add pochipp_assist
   ansible.builtin.unarchive:
     src: https://pochipp.com/download/?p=assist
