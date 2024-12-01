@@ -311,6 +311,13 @@
     group: www-data
   tags: [wordpress]
 
+- name: Add attributes to blog-logo
+  ansible.builtin.lineinfile:
+    path: /srv/www/wordpress/wp-content/themes/fukasawa/header.php
+    regexp: '<img src="<\?php echo esc_url\( \$custom_logo_url \); \?>.*'
+    line: '                        <img src="<?php echo esc_url( $custom_logo_url ); ?>" alt="Rewse Lab." width="2048" height="2048" />'
+  tags: [wordpress]
+
 - name: Add pochipp_assist
   ansible.builtin.unarchive:
     src: https://pochipp.com/download/?p=assist
