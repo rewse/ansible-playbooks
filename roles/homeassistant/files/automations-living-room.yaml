@@ -854,6 +854,56 @@
 
 # Lights
 
+- id: automation.reset_living_room_tv_light
+  alias: Reset Living Room TV Light
+  trigger:
+    - platform: state
+      entity_id: media_player.regza
+      to: "off"
+  condition:
+    - condition: sun
+      after: sunset
+    - condition: time
+      before: input_datetime.living_area_turned_down_more_time
+  action:
+    - service: select.select_option
+      target:
+        entity_id: select.living_room_tv_light_scene
+      data:
+        option: Scene (Color) - Pure
+    - service: light.turn_on
+      target:
+        entity_id: light.living_room_tv_light
+      data:
+        hs_color:
+          - 20
+          - 72
+        brightness_pct: 100
+- id: automation.reset_living_room_tv_light_turned_down_more
+  alias: Reset Living Room TV Light Turned Down More
+  trigger:
+    - platform: state
+      entity_id: media_player.regza
+      to: "off"
+  condition:
+    - condition: time
+      after: input_datetime.living_area_turned_down_more_time
+    - condition: sun
+      before: sunrise
+  action:
+    - service: select.select_option
+      target:
+        entity_id: select.living_room_tv_light_scene
+      data:
+        option: Scene (Color) - Pure
+    - service: light.turn_on
+      target:
+        entity_id: light.living_room_tv_light
+      data:
+        hs_color:
+          - 20
+          - 72
+        brightness_pct: input_number.living_room_tv_light_brightness_turned_down_more
 - id: automation.turn_down_living_area
   alias: Turn down Living Area
   trigger:
@@ -894,8 +944,8 @@
           url: /lovelace/home
           push:
             interruption-level: time-sensitive
-- id: automation.turn_off_living_room_tv_light_during_daytime
-  alias: Turn off Living Room TV Light during Daytime
+- id: automation.turn_off_living_room_tv_light
+  alias: Turn off Living Room TV Light
   trigger:
     - platform: state
       entity_id: media_player.regza
@@ -910,25 +960,26 @@
   action:
     - service: light.turn_off
       entity_id: light.living_room_tv_light
-- id: automation.turn_off_living_room_tv_light_during_nighttime
-  alias: Turn off Living Room TV Light during Nighttime
+- id: automation.turn_on_living_area_lights_due_to_sunset
+  alias: Turn on Living Area Lights due to Sunset
   trigger:
-    - platform: state
-      entity_id: media_player.regza
-      to: "off"
-  condition:
-    - condition: state
-      entity_id: light.living_room_tv_light
-      state: "on"
-    - condition: state
-      entity_id: sun.sun
-      state: below_horizon
+    - platform: sun
+      event: sunset
   action:
-    - service: select.select_option
+    - service: light.turn_on
+      entity_id: light.living_area_downlights
+    - service: light.turn_on
+      entity_id: light.living_room_footlight
+    - service: light.turn_on
+      entity_id: light.living_room_shelf_light
+    - service: light.turn_on
       target:
-        entity_id: select.living_room_tv_light_scene
+        entity_id: light.living_room_tv_light
       data:
-        option: Scene (Color) - Pure
+        hs_color:
+          - 20
+          - 72
+        brightness_pct: 100
 - id: automation.turn_on_living_area_downlights
   alias: Turn on Living Area Downlights
   mode: single
@@ -971,18 +1022,6 @@
   action:
     - service: light.turn_on
       entity_id: light.living_area_downlights
-    - service: light.turn_on
-      entity_id: light.living_room_footlight
-    - service: light.turn_on
-      entity_id: light.living_room_shelf_light
-    - service: light.turn_on
-      target:
-        entity_id: light.living_room_tv_light
-      data:
-        hs_color:
-          - 20
-          - 72
-        brightness_pct: 100
     - service: notify.tats_devices
       data:
         message: "Turned on Living Area Downlights due to {{ trigger.id }}. Current: {{ states('sensor.living_room_light_level') }}lx"
@@ -1005,6 +1044,39 @@
     - condition: state
       entity_id: sensor.regza_content_type
       state: broadcast
+    - condition: time
+      before: input_datetime.living_area_turned_down_more_time
+  action:
+    - service: light.turn_on
+      target:
+        entity_id: light.living_room_tv_light
+      data:
+        hs_color:
+          - 20
+          - 72
+        brightness_pct: 100
+    - service: select.select_option
+      target:
+        entity_id: select.living_room_tv_light_scene
+      data:
+        option: Scene (Color) - Pure
+- id: automation.turn_on_living_room_tv_light_for_broadcast_turned_down
+  alias: Turn on Living Room TV Light for Broadcast Turned Down
+  trigger:
+    - platform: state
+      entity_id: media_player.regza
+      to: "on"
+    - platform: state
+      entity_id: sensor.regza_content_type
+      to: broadcast
+  condition:
+    - condition: state
+      entity_id: sensor.regza_content_type
+      state: broadcast
+    - condition: time
+      after: input_datetime.living_area_turned_down_more_time
+    - condition: sun
+      before: sunrise
   action:
     - service: light.turn_on
       target:
@@ -1032,6 +1104,8 @@
     - condition: state
       entity_id: sensor.regza_content_type
       state: external
+    - condition: time
+      before: input_datetime.living_area_turned_down_more_time
   action:
     - service: light.turn_on
       target:
@@ -1041,6 +1115,37 @@
           - 20
           - 72
         brightness_pct: 100
+    - service: select.select_option
+      target:
+        entity_id: select.living_room_tv_light_scene
+      data:
+        option: Sync - Recreation
+- id: automation.turn_on_living_room_tv_light_for_external_turned_down
+  alias: Turn on Living Room TV Light for External Turned Down
+  trigger:
+    - platform: state
+      entity_id: media_player.regza
+      to: "on"
+    - platform: state
+      entity_id: sensor.regza_content_type
+      to: external
+  condition:
+    - condition: state
+      entity_id: sensor.regza_content_type
+      state: external
+    - condition: time
+      after: input_datetime.living_area_turned_down_more_time
+    - condition: sun
+      before: sunrise
+  action:
+    - service: light.turn_on
+      target:
+        entity_id: light.living_room_tv_light
+      data:
+        hs_color:
+          - 20
+          - 72
+        brightness_pct: input_number.living_room_tv_brightness_turned_down_more
     - service: select.select_option
       target:
         entity_id: select.living_room_tv_light_scene
