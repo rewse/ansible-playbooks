@@ -136,6 +136,11 @@ living_room_ac_dry_turned_on_threshold_wbgt:
   max: 30
   unit_of_measurement: °C
   icon: mdi:thermometer-chevron-up
+living_room_tv_light_brightness_turned_down_more:
+  name: Living Room TV Light Brightness Turned Down More
+  min: 0
+  max: 100
+  icon: mdi:brightness-percent
 moms_room_humidifier_turned_off_threshold:
   name: Mom’s Room Humidifier Turned off Threshold
   min: 46
