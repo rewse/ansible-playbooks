@@ -24,6 +24,8 @@
             interruption-level: time-sensitive
     - delay:
         hours: 8
+  trace:
+    stored_traces: 100
 - id: automation.alarm_moms_room_temperature_difference_is_too_large
   alias: "ALARM: Mom’s Room Temperature Difference is Too Large"
   mode: single
@@ -48,6 +50,8 @@
             interruption-level: time-sensitive
     - delay:
         hours: 8
+  trace:
+    stored_traces: 100
 - id: automation.arm_moms_room_ac
   alias: Arm Mom’s Room AC
   trigger:
@@ -71,6 +75,8 @@
           url: /lovelace/home
           push:
             interruption-level: time-sensitive
+  trace:
+    stored_traces: 100
 - id: automation.change_moms_room_ac_mode_to_cool
   alias: Change Mom’s Room AC Mode to Cool
   trigger:
@@ -106,6 +112,8 @@
           url: /lovelace/home
           push:
             interruption-level: time-sensitive
+  trace:
+    stored_traces: 100
 - id: automation.change_moms_room_ac_mode_to_dry
   alias: Change Mom’s Room AC Mode to Dry
   trigger:
@@ -140,6 +148,8 @@
           url: /lovelace/home
           push:
             interruption-level: time-sensitive
+  trace:
+    stored_traces: 100
 - id: automation.change_moms_room_ac_mode_to_heat
   alias: Change Mom’s Room AC Mode to Heat
   trigger:
@@ -173,6 +183,8 @@
           url: /lovelace/home
           push:
             interruption-level: time-sensitive
+  trace:
+    stored_traces: 100
 - id: automation.decrease_moms_room_ac_cool_temperature
   alias: Decrease Mom’s Room AC Cool Temperature
   trigger:
@@ -206,6 +218,8 @@
         temperature: "{{ temp }}"
     - delay:
         minutes: 30
+  trace:
+    stored_traces: 100
 - id: automation.decrease_moms_room_ac_cool_temperature_in_sleep
   alias: Decrease Mom’s Room AC Cool Temperature in Sleep
   trigger:
@@ -239,6 +253,8 @@
         temperature: "{{ temp }}"
     - delay:
         minutes: 30
+  trace:
+    stored_traces: 100
 - id: automation.decrease_moms_room_ac_heat_temperature
   alias: Decrease Mom’s Room AC Heat Temperature
   trigger:
@@ -342,6 +358,8 @@
         temperature: "{{ temp }}"
     - delay:
         minutes: 30
+  trace:
+    stored_traces: 100
 - id: automation.increase_moms_room_ac_cool_temperature_in_sleep
   alias: Increase Mom’s Room AC Cool Temeperature in Sleep
   trigger:
@@ -375,6 +393,8 @@
         temperature: "{{ temp }}"
     - delay:
         minutes: 30
+  trace:
+    stored_traces: 100
 - id: automation.increase_moms_room_ac_heat_temperature
   alias: Increase Mom’s Room AC Heat Temeperature
   trigger:
@@ -490,6 +510,8 @@
             interruption-level: time-sensitive
     - delay:
         hours: 2
+  trace:
+    stored_traces: 100
 - id: automation.info_moms_room_humidity_is_too_low
   alias: "INFO: Mom’s Room Humidity is Too Low"
   mode: single
@@ -516,6 +538,8 @@
             interruption-level: time-sensitive
     - delay:
         hours: 2
+  trace:
+    stored_traces: 100
 - id: automation.info_moms_room_wbgt_is_too_high
   alias: "INFO: Mom’s Room WBGT is Too High"
   mode: single
@@ -558,6 +582,8 @@
             interruption-level: time-sensitive
     - delay:
         hours: 2
+  trace:
+    stored_traces: 100
 - id: automation.plan_to_turn_on_moms_room_ac_internal_clean
   alias: Plan to Turn on Mom’s Room AC Internal Clean
   trigger:
@@ -581,6 +607,8 @@
       target:
         entity_id:
           - automation.turn_on_moms_room_ac_internal_clean
+  trace:
+    stored_traces: 100
 - id: automation.turn_off_moms_room_ac_cool
   alias: Turn off Mom’s Room AC Cool
   mode: single
@@ -654,6 +682,8 @@
             interruption-level: time-sensitive
     - delay:
         hours: 1
+  trace:
+    stored_traces: 100
 - id: automation.turn_off_moms_room_ac_internal_clean
   alias: Turn Off Mom’s Room AC Internal Clean
   mode: single
@@ -703,6 +733,8 @@
             interruption-level: time-sensitive
     - delay:
         hours: 1
+  trace:
+    stored_traces: 100
 - id: automation.turn_off_moms_room_humidifier_due_to_opening_window
   alias: Turn off Mom’s Room Humidifier Due to Opening Window
   trigger:
@@ -737,6 +769,8 @@
             interruption-level: time-sensitive
     - delay:
         hours: 1
+  trace:
+    stored_traces: 100
 - id: automation.turn_off_moms_room_humidifier_due_to_nobody
   alias: Turn off Mom’s Room Humidifier Due to Nobody
   trigger:
@@ -815,6 +849,8 @@
             interruption-level: time-sensitive
     - delay:
         hours: 1
+  trace:
+    stored_traces: 100
 - id: automation.turn_on_moms_room_ac_cool_forcibly
   alias: Turn on Mom’s Room AC Cool Forcibly
   mode: single
@@ -858,6 +894,8 @@
             interruption-level: time-sensitive
     - delay:
         hours: 1
+  trace:
+    stored_traces: 100
 - id: automation.turn_on_moms_room_ac_dry
   alias: Turn on Mom’s Room AC Dry
   mode: single
@@ -910,6 +948,8 @@
             interruption-level: time-sensitive
     - delay:
         hours: 1
+  trace:
+    stored_traces: 100
 - id: automation.turn_on_moms_room_ac_heat
   alias: Turn on Mom’s Room AC Heat
   mode: single
@@ -962,6 +1002,8 @@
             interruption-level: time-sensitive
     - delay:
         hours: 1
+  trace:
+    stored_traces: 100
 - id: automation.turn_on_moms_room_ac_internal_clean
   alias: Turn on Mom’s Room AC Internal Clean
   trigger:
@@ -980,6 +1022,8 @@
         entity_id: climate.moms_room_ac
       data:
         hvac_mode: fan_only
+  trace:
+    stored_traces: 100
 - id: automation.turn_on_moms_room_ac_streamer
   alias: Turn on Mom’s Room AC Streamer
   trigger:
@@ -996,6 +1040,8 @@
     - service: switch.turn_on
       target:
         entity_id: switch.moms_room_ac_streamer
+  trace:
+    stored_traces: 100
 - id: automation.turn_on_moms_room_humidifier
   alias: Turn on Mom’s Room Humidifier
   mode: single
@@ -1037,6 +1083,8 @@
             interruption-level: time-sensitive
     - delay:
         hours: 1
+  trace:
+    stored_traces: 100
 
 # Lights
 
@@ -1054,6 +1102,8 @@
     - service: light.turn_off
       target:
         entity_id: light.moms_room_light
+  trace:
+    stored_traces: 100
 - id: automation.turn_on_moms_room_light
   alias: Turn on Mom’s Room Light
   trigger:
@@ -1068,6 +1118,8 @@
     - service: light.turn_on
       target:
         entity_id: light.moms_room_light
+  trace:
+    stored_traces: 100
 
 # Others
 
@@ -1080,6 +1132,8 @@
     - service: cover.open_cover
       target:
         entity_id: cover.moms_room_curtains
+  trace:
+    stored_traces: 100
 - id: automation.open_moms_room_curtains_workday
   alias: Open Mom’s Room Curtains Workday
   description: Open the curtains in the moms_room every workday
@@ -1094,6 +1148,8 @@
     - service: cover.open_cover
       target:
         entity_id: cover.moms_room_curtains
+  trace:
+    stored_traces: 100
 - id: automation.turn_off_moms_room_tv
   alias: Turn off Mom’s Room TV
   trigger:
