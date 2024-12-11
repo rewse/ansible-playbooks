@@ -850,7 +850,6 @@
         hvac_mode: cool
         temperature: input_number.moms_room_ac_cool_target_temperature
     - service: notify.all_devices
-    - service: notify.all_devices
       data:
         message: "Turned on Mom’s Room AC Cool Forcibly. Current: {{ states('sensor.moms_room_wbgt') }}°C"
         data:
