@@ -619,27 +619,8 @@
             interruption-level: time-sensitive
     - delay:
         hours: 1
-- id: automation.turn_off_moms_room_ac_internal_clean
-  alias: Turn Off Mom’s Room AC Internal Clean
-  mode: single
-  trigger:
-    - platform: state
-      entity_id: climate.moms_room_ac
-      to: fan_only
-      for:
-        hours: 2
-  condition:
-    - condition: state
-      entity_id: alarm_control_panel.moms_room_ac
-      state: armed_home
-  action:
-    - service: climate.turn_off
-      target:
-        entity_id: climate.moms_room_ac
-    - service: automation.turn_off
-      target:
-        entity_id:
-          - automation.turn_on_moms_room_ac_internal_clean
+  trace:
+    stored_traces: 100
 - id: automation.turn_off_moms_room_ac_heat
   alias: Turn off Mom’s Room AC Heat
   mode: single
@@ -673,6 +654,29 @@
             interruption-level: time-sensitive
     - delay:
         hours: 1
+- id: automation.turn_off_moms_room_ac_internal_clean
+  alias: Turn Off Mom’s Room AC Internal Clean
+  mode: single
+  trigger:
+    - platform: state
+      entity_id: climate.moms_room_ac
+      to: fan_only
+      for:
+        hours: 2
+  condition:
+    - condition: state
+      entity_id: alarm_control_panel.moms_room_ac
+      state: armed_home
+  action:
+    - service: climate.turn_off
+      target:
+        entity_id: climate.moms_room_ac
+    - service: automation.turn_off
+      target:
+        entity_id:
+          - automation.turn_on_moms_room_ac_internal_clean
+  trace:
+    stored_traces: 100
 - id: automation.turn_off_moms_room_humidifier
   alias: Turn off Mom’s Room Humidifier
   mode: single
