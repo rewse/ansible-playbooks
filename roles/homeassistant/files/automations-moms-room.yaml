@@ -941,11 +941,6 @@
       entity_id: sensor.season
       state: winter
     - condition: state
-      entity_id: cover.moms_room_curtains
-      state: opening
-      for:
-        hours: 1
-    - condition: state
       entity_id: alarm_control_panel.moms_room_ac
       state: armed_home
   action:
