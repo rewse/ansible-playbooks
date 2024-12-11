@@ -649,7 +649,7 @@
       to: "on"
   condition:
     - condition: numeric_state
-      entity_id: sensor.moms_room_temperature
+      entity_id: sensor.moms_room_wbgt
       above: input_number.moms_room_ac_heat_turned_off_threshold
     - condition: state
       entity_id: climate.moms_room_ac
@@ -666,7 +666,7 @@
         entity_id: climate.moms_room_ac
     - service: notify.all_devices
       data:
-        message: "Turned off Mom’s Room AC Heat. Current: {{ states('sensor.moms_room_temperature') }}°C"
+        message: "Turned off Mom’s Room AC Heat. Current: {{ states('sensor.moms_room_wbgt') }}°C"
         data:
           url: /lovelace/home
           push:
@@ -953,7 +953,7 @@
       to: "on"
   condition:
     - condition: numeric_state
-      entity_id: sensor.moms_room_temperature
+      entity_id: sensor.moms_room_wbgt
       below: input_number.moms_room_ac_heat_turned_on_threshold
     - condition: state
       entity_id: binary_sensor.moms_room_window_n
@@ -994,7 +994,7 @@
         temperature: input_number.moms_room_ac_heat_target_temperature
     - service: notify.all_devices
       data:
-        message: "Turned on Mom’s Room AC Heat. Current: {{ states('sensor.moms_room_temperature') }}°C"
+        message: "Turned on Mom’s Room AC Heat. Current: {{ states('sensor.moms_room_wbgt') }}°C"
         data:
           url: /lovelace/home
           push:
