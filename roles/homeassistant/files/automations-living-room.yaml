@@ -587,13 +587,11 @@
       to: "on"
   condition:
     - condition: numeric_state
-      entity_id: sensor.living_room_temperature
+      entity_id: sensor.living_room_wbgt
       below: input_number.living_room_floor_heating_turned_on_threshold
     - condition: state
       entity_id: switch.living_area_floor_heatings
       state: "off"
-    - condition: sun
-      after: sunrise
     - condition: numeric_state
       entity_id: sensor.balcony_temperature
       below: 15
@@ -971,6 +969,11 @@
       entity_id: light.living_room_footlight
     - service: light.turn_on
       entity_id: light.living_room_shelf_light
+    - service: select.select_option
+      target:
+        entity_id: select.living_room_tv_light_scene
+      data:
+        option: Scene (Color) - Pure
     - service: light.turn_on
       target:
         entity_id: light.living_room_tv_light
