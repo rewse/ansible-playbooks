@@ -128,10 +128,9 @@
       entity_id: climate.moms_room_ac
       state: heat_cool
     - "{{ states('sensor.moms_room_wbgt') | float(24) < (states('input_number.moms_room_ac_cool_target_wbgt') | float(24) - 1 + 0.5) }}"
-    - not:
-      - condition: state
-        entity_id: sensor.season
-        state: winter
+    - condition: numeric_state
+      entity_id: sensor.balcony_temperature
+      above: 20
     - condition: state
       entity_id: alarm_control_panel.moms_room_ac
       state: armed_home
@@ -164,9 +163,9 @@
       entity_id: climate.moms_room_ac
       state: heat_cool
     - "{{ states('sensor.moms_room_wbgt') | float(24) < (states('input_number.moms_room_ac_heat_target_wbgt') | float(24) + 0.5) }}"
-    - condition: state
-      entity_id: sensor.season
-      state: winter
+    - condition: numeric_state
+      entity_id: sensor.balcony_temperature
+      below: 15
     - condition: state
       entity_id: alarm_control_panel.moms_room_ac
       state: armed_home
@@ -626,11 +625,9 @@
     - condition: state
       entity_id: climate.moms_room_ac
       state: cool
-    - condition: not
-      conditions:
-        - condition: state
-          entity_id: sensor.season
-          state: winter
+    - condition: numeric_state
+      entity_id: sensor.balcony_temperature
+      above: 20
     - condition: state
       entity_id: alarm_control_panel.moms_room_ac
       state: armed_home
@@ -663,9 +660,9 @@
     - condition: state
       entity_id: climate.moms_room_ac
       state: heat
-    - condition: state
-      entity_id: sensor.season
-      state: winter
+    - condition: numeric_state
+      entity_id: sensor.balcony_temperature
+      below: 15
     - condition: state
       entity_id: alarm_control_panel.moms_room_ac
       state: armed_home
@@ -977,9 +974,9 @@
     - condition: state
       entity_id: climate.moms_room_ac
       state: "off"
-    - condition: state
-      entity_id: sensor.season
-      state: winter
+    - condition: numeric_state
+      entity_id: sensor.balcony_temperature
+      below: 15
     - condition: state
       entity_id: alarm_control_panel.moms_room_ac
       state: armed_home
