@@ -127,10 +127,9 @@
       entity_id: climate.living_room_ac
       state: heat_cool
     - "{{ states('sensor.living_room_wbgt') | float(26) < (states('input_number.living_room_ac_cool_target_wbgt') | float(26) + 0.5) }}"
-    - not:
-      - condition: state
-        entity_id: sensor.season
-        state: winter
+    - condition: numeric_state
+      entity_id: sensor.balcony_temperature
+      above: 20
     - condition: state
       entity_id: alarm_control_panel.living_room_ac
       state: armed_home
@@ -595,9 +594,9 @@
       state: "off"
     - condition: sun
       after: sunrise
-    - condition: state
-      entity_id: sensor.season
-      state: winter
+    - condition: numeric_state
+      entity_id: sensor.balcony_temperature
+      below: 15
     - condition: state
       entity_id: binary_sensor.living_room_window
       state: "off"
