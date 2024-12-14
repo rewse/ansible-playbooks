@@ -68,25 +68,20 @@ cards:
         name: Roomba Combo
     show_header_toggle: false
   - type: entities
-    title: Living Room Climate Automations
+    title: Living Room AC Cool/Dry Automations
     entities:
+      - entity: automation.change_living_room_ac_mode_to_cool
+        name: Change AC Mode to Cool
+        secondary_info: last-triggered
+      - entity: automation.change_living_room_ac_mode_to_dry
+        name: Change AC Mode to Dry
+        secondary_info: last-triggered
       - entity: automation.decrease_living_room_ac_cool_temperature
         name: Decrease AC Cool Temperature
         secondary_info: last-triggered
       - entity: automation.increase_living_room_ac_cool_temperature
         name: Increase AC Cool Temperature
         secondary_info: last-triggered
-      - entity: automation.plan_to_turn_on_living_room_ac_internal_clean
-        name: Plan to Turn on AC Internal Clean
-        secondary_info: last-triggered
-      - entity: automation.turn_off_living_area_floor_heating
-        name: Turn off Floor Heatings
-        secondary_info: last-triggered
-      - entity: automation.turn_off_living_room_humidifier
-        name: Turn off Humidifier
-        secondary_info: last-triggered
-      - entity: input_number.living_room_humidifier_turned_off_threshold
-        name: Turned off Humidifier Threshold
       - entity: automation.turn_off_living_room_ac
         name: Turn off AC
         secondary_info: last-triggered
@@ -94,19 +89,6 @@ cards:
         name: Turned off AC Cool Threshold
       - entity: input_number.living_room_ac_dry_turned_off_threshold
         name: Turned off AC Dry Threshold
-      - entity: automation.turn_off_living_room_ac_internal_clean
-        name: Turn off AC Internal Clean
-        secondary_info: last-triggered
-      - entity: automation.turn_off_living_room_humidifier
-        name: Turn off Humidifier
-        secondary_info: last-triggered
-      - entity: automation.turn_on_living_area_floor_heating
-        name: Turn on Floor Heatings
-        secondary_info: last-triggered
-      - entity: input_number.living_room_floor_heating_turned_on_threshold
-        name: Turned on Floor Heatings Threshold
-      - entity: input_number.living_room_humidifier_turned_on_threshold
-        name: Turned on Humidifier Threshold
       - entity: automation.turn_on_living_room_ac_cool
         name: Turn on AC Cool
         secondary_info: last-triggered
@@ -126,11 +108,47 @@ cards:
         name: Turned on AC Dry Threshold WBGT
       - entity: input_number.living_room_ac_dry_turned_on_threshold_humidity
         name: Turned on AC Dry Threshold Humidity
-      - entity: automation.turn_on_living_room_ac_internal_clean
-        name: Turn on AC Internal Clean
+    show_header_toggle: false
+  - type: entities
+    title: Living Room Floor Heating Automations
+    entities:
+      - entity: automation.turn_off_living_area_floor_heating
+        name: Turn off Floor Heatings
+        secondary_info: last-triggered
+      - entity: automation.turn_on_living_area_floor_heating
+        name: Turn on Floor Heatings
+        secondary_info: last-triggered
+      - entity: input_number.living_room_floor_heating_turned_on_threshold
+        name: Turned on Floor Heatings Threshold
+    show_header_toggle: false
+  - type: entities
+    title: Living Room AC Humidifier Automations
+    entities:
+      - entity: automation.turn_off_living_room_humidifier
+        name: Turn off Humidifier
+        secondary_info: last-triggered
+      - entity: input_number.living_room_humidifier_turned_off_threshold
+        name: Turned off Humidifier Threshold
+      - entity: automation.turn_off_living_room_humidifier_due_to_opening_window
+        name: Turn off Humidifier Due to Opening Window
         secondary_info: last-triggered
       - entity: automation.turn_on_living_room_humidifier
         name: Turn on Humidifier
+        secondary_info: last-triggered
+      - entity: input_number.living_room_humidifier_turned_on_threshold
+        name: Turned on Humidifier Threshold
+    show_header_toggle: false
+  - type: entities
+    title: Living Room AC Climate Automations
+    entities:
+      - entity: automation.plan_to_turn_on_living_room_ac_internal_clean
+        name: Plan to Turn on AC Internal Clean
+        secondary_info: last-triggered
+      - entity: automation.turn_off_living_room_ac_internal_clean
+        name: Turn off AC Internal Clean
+        secondary_info: last-triggered
+      - entity: automation.turn_on_living_room_ac_internal_clean
+        name: Turn on AC Internal Clean
         secondary_info: last-triggered
     show_header_toggle: false
   - type: entities
