@@ -134,6 +134,9 @@ cards:
         secondary_info: last-triggered
       - entity: input_number.living_room_humidifier_turned_off_threshold
         name: Turned off Humidifier Threshold
+      - entity: automation.turn_off_living_room_humidifier_due_to_nobody
+        name: Turn off Humidifier Due to Nobody
+        secondary_info: last-triggered
       - entity: automation.turn_off_living_room_humidifier_due_to_opening_window
         name: Turn off Humidifier Due to Opening Window
         secondary_info: last-triggered
