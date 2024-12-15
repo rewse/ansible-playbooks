@@ -22,3 +22,5 @@
             interruption-level: time-sensitive
     - delay:
         hours: 1
+  trace:
+    stored_traces: 100

@@ -24,6 +24,8 @@
             interruption-level: time-sensitive
     - delay:
         hours: 8
+  trace:
+    stored_traces: 100
 - id: automation.alarm_dads_room_temperature_difference_is_too_large
   alias: "ALARM: Dad’s Room Temperature Difference is Too Large"
   mode: single
@@ -48,6 +50,8 @@
             interruption-level: time-sensitive
     - delay:
         hours: 8
+  trace:
+    stored_traces: 100
 - id: automation.arm_dads_room_ac
   alias: Arm Dad’s Room AC
   trigger:
@@ -71,6 +75,8 @@
           url: /lovelace/home
           push:
             interruption-level: time-sensitive
+  trace:
+    stored_traces: 100
 - id: automation.change_dads_room_ac_mode_to_cool
   alias: Change Dad’s Room AC Mode to Cool
   trigger:
@@ -109,6 +115,8 @@
           url: /lovelace/home
           push:
             interruption-level: time-sensitive
+  trace:
+    stored_traces: 100
 - id: automation.change_dads_room_ac_mode_to_dry
   alias: Change Dad’s Room AC Mode to Dry
   trigger:
@@ -142,6 +150,8 @@
           url: /lovelace/home
           push:
             interruption-level: time-sensitive
+  trace:
+    stored_traces: 100
 - id: automation.change_dads_room_ac_mode_to_heat
   alias: Change Dad’s Room AC Mode to Heat
   trigger:
@@ -175,6 +185,8 @@
           url: /lovelace/home
           push:
             interruption-level: time-sensitive
+  trace:
+    stored_traces: 100
 - id: automation.decrease_dads_room_ac_cool_temperature
   alias: Decrease Dad’s Room AC Cool Temperature
   trigger:
@@ -205,6 +217,8 @@
         temperature: "{{ temp }}"
     - delay:
         minutes: 30
+  trace:
+    stored_traces: 100
 - id: automation.increase_dads_room_ac_cool_temperature
   alias: Increase Dad’s Room AC Cool Temperature
   trigger:
@@ -235,6 +249,8 @@
         temperature: "{{ temp }}"
     - delay:
         minutes: 30
+  trace:
+    stored_traces: 100
 - id: automation.plan_to_turn_on_dads_room_ac_internal_clean
   alias: Plan to Turn on Dad’s Room AC Internal Clean
   trigger:
@@ -258,6 +274,8 @@
       target:
         entity_id:
           - automation.turn_on_dads_room_ac_internal_clean
+  trace:
+    stored_traces: 100
 - id: automation.turn_off_dads_room_ac_cool
   alias: Turn off Dad’s Room AC Cool
   mode: single
@@ -294,6 +312,8 @@
             interruption-level: time-sensitive
     - delay:
         hours: 1
+  trace:
+    stored_traces: 100
 - id: automation.turn_off_dads_room_ac_heat
   alias: Turn off Dad’s Room AC Heat
   mode: single
@@ -327,6 +347,8 @@
             interruption-level: time-sensitive
     - delay:
         hours: 1
+  trace:
+    stored_traces: 100
 - id: automation.turn_off_dads_room_ac_internal_clean
   alias: Turn Off Dad’s Room AC Internal Clean
   mode: single
@@ -348,6 +370,8 @@
       target:
         entity_id:
           - automation.turn_on_dads_room_ac_internal_clean
+  trace:
+    stored_traces: 100
 - id: automation.turn_off_dads_room_humidifier
   alias: Turn off Dad’s Room Humidifier
   mode: single
@@ -374,6 +398,8 @@
             interruption-level: time-sensitive
     - delay:
         hours: 1
+  trace:
+    stored_traces: 100
 - id: automation.turn_off_dads_room_humidifier_due_to_nobody
   alias: Turn off Dad’s Room Humidifier Due to Nobody
   trigger:
@@ -404,6 +430,8 @@
             interruption-level: time-sensitive
     - delay:
         hours: 1
+  trace:
+    stored_traces: 100
 - id: automation.turn_on_dads_room_ac_cool
   alias: Turn on Dad’s Room AC Cool
   mode: single
@@ -440,6 +468,8 @@
             interruption-level: time-sensitive
     - delay:
         hours: 1
+  trace:
+    stored_traces: 100
 - id: automation.turn_on_dads_room_ac_cool_forcibly
   alias: Turn on Dad’s Room AC Cool Forcibly
   mode: single
@@ -473,6 +503,8 @@
             interruption-level: time-sensitive
     - delay:
         hours: 1
+  trace:
+    stored_traces: 100
 - id: automation.turn_on_dads_room_ac_dry
   alias: Turn on Dad’s Room AC Dry
   mode: single
@@ -512,6 +544,8 @@
             interruption-level: time-sensitive
     - delay:
         hours: 1
+  trace:
+    stored_traces: 100
 - id: automation.turn_on_dads_room_ac_heat
   alias: Turn on Dad’s Room AC Heat
   mode: single
@@ -551,6 +585,8 @@
             interruption-level: time-sensitive
     - delay:
         hours: 1
+  trace:
+    stored_traces: 100
 - id: automation.turn_on_dads_room_ac_internal_clean
   alias: Turn on Dad’s Room AC Internal Clean
   trigger:
@@ -569,6 +605,8 @@
         entity_id: climate.dads_room_ac
       data:
         hvac_mode: fan_only
+  trace:
+    stored_traces: 100
 - id: automation.turn_on_dads_room_ac_streamer
   alias: Turn on Dad’s Room AC Streamer
   trigger:
@@ -585,6 +623,8 @@
     - service: switch.turn_on
       target:
         entity_id: switch.dads_room_ac_streamer
+  trace:
+    stored_traces: 100
 - id: automation.turn_on_dads_room_humidifier
   alias: Turn on Dad’s Room Humidifier
   mode: single
@@ -616,6 +656,8 @@
             interruption-level: time-sensitive
     - delay:
         hours: 1
+  trace:
+    stored_traces: 100
 
 # Lights
 
@@ -634,6 +676,8 @@
           light.dads_room:
             state: "on"
             brightness: "{{ new_brightness }}"
+  trace:
+    stored_traces: 100
 - id: automation.dim_dads_room_monitor_light
   alias: Dim Dad’s Room Monitor Light
   mode: single
@@ -655,6 +699,8 @@
           light.dads_room_footlight:
             state: "on"
             brightness: 10
+  trace:
+    stored_traces: 100
 - id: automation.increase_dads_room_light_brightness
   alias: Increase Dad’s Room Light Brightness
   mode: single
@@ -670,6 +716,8 @@
           light.dads_room:
             state: "on"
             brightness: "{{ new_brightness }}"
+  trace:
+    stored_traces: 100
 - id: automation.turn_off_dads_room_light_by_1_button_switch
   alias: Turn off Dad’s Room Light by 1-Button Switch
   trigger:
@@ -684,6 +732,8 @@
     - service: light.turn_off
       target:
         entity_id: light.dads_room
+  trace:
+    stored_traces: 100
 - id: automation.turn_off_dads_room_light_by_4_button_switch
   alias: Turn off Dad’s Room Light by 4-Button Switch
   trigger:
@@ -693,6 +743,8 @@
     - service: light.turn_off
       target:
         entity_id: light.dads_room
+  trace:
+    stored_traces: 100
 - id: automation.transition_dads_room_light_to_morning_scene
   alias: Transition Dad’s Room Light to Morning Scene
   mode: single
@@ -709,6 +761,8 @@
         entity_id: "{{ states('input_select.dads_room_morning_scene') }}"
       data:
         transition: 300
+  trace:
+    stored_traces: 100
 - id: automation.transition_dads_room_light_to_daytime_scene
   alias: Transition Dad’s Room Light to Daytime Scene
   mode: single
@@ -725,6 +779,8 @@
         entity_id: "{{ states('input_select.dads_room_daytime_scene') }}"
       data:
         transition: 300
+  trace:
+    stored_traces: 100
 - id: automation.transition_dads_room_light_to_sunset_scene
   alias: Transition Dad’s Room Light to Sunset Scene
   mode: single
@@ -741,6 +797,8 @@
         entity_id: "{{ states('input_select.dads_room_sunset_scene') }}"
       data:
         transition: 300
+  trace:
+    stored_traces: 100
 - id: automation.transition_dads_room_light_to_night_scene
   alias: Transition Dad’s Room Light to Night Scene
   mode: single
@@ -757,6 +815,8 @@
         entity_id: "{{ states('input_select.dads_room_night_scene') }}"
       data:
         transition: 300
+  trace:
+    stored_traces: 100
 - id: automation.transition_dads_room_light_to_midnight_scene
   alias: Transition Dad’s Room Light to Midnight Scene
   mode: single
@@ -773,6 +833,8 @@
         entity_id: "{{ states('input_select.dads_room_midnight_scene') }}"
       data:
         transition: 300
+  trace:
+    stored_traces: 100
 - id: automation.turn_on_dads_room_light_to_wake_up_temporarily
   alias: Turn on Dad’s Room Light to Wake up Temporarily
   mode: single
@@ -785,6 +847,8 @@
         entity_id: "{{ states('input_select.dads_room_morning_scene') }}"
       data:
         transition: 900
+  trace:
+    stored_traces: 100
 - id: automation.turn_on_dads_room_light_to_wake_up_workday
   alias: Turn on Dad’s Room Light to Wake up for Workday
   mode: single
@@ -801,6 +865,8 @@
         entity_id: "{{ states('input_select.dads_room_morning_scene') }}"
       data:
         transition: 900
+  trace:
+    stored_traces: 100
 - id: automation.turn_on_dads_room_light_with_morning_scene_by_1_button_switch
   alias: Turn on Dad’s Room Light with Morning Scene by 1-Button Switch
   mode: single
@@ -819,6 +885,8 @@
     - service: scene.turn_on
       target:
         entity_id: "{{ states('input_select.dads_room_morning_scene') }}"
+  trace:
+    stored_traces: 100
 - id: automation.turn_on_dads_room_light_with_morning_scene_by_4_button_switch
   alias: Turn on Dad’s Room Light with Morning Scene by 4-Button Switch
   mode: single
@@ -833,6 +901,8 @@
     - service: scene.turn_on
       target:
         entity_id: "{{ states('input_select.dads_room_morning_scene') }}"
+  trace:
+    stored_traces: 100
 - id: automation.turn_on_dads_room_light_with_daytime_scene_by_1_button_switch
   alias: Turn on Dad’s Room Light with Daytime Scene by 1-Button Swtich
   mode: single
@@ -854,6 +924,8 @@
     - service: scene.turn_on
       target:
         entity_id: "{{ states('input_select.dads_room_daytime_scene') }}"
+  trace:
+    stored_traces: 100
 - id: automation.turn_on_dads_room_light_with_daytime_scene_by_4_button_switch
   alias: Turn on Dad’s Room Light with Daytime Scene by 4-Button Switch
   mode: single
@@ -871,6 +943,8 @@
     - service: scene.turn_on
       target:
         entity_id: "{{ states('input_select.dads_room_daytime_scene') }}"
+  trace:
+    stored_traces: 100
 - id: automation.turn_on_dads_room_light_with_sunset_scene_by_1_button_switch
   alias: Turn on Dad’s Room Light with Sunset Scene by 1-Button Switch
   mode: single
@@ -892,6 +966,8 @@
     - service: scene.turn_on
       target:
         entity_id: "{{ states('input_select.dads_room_sunset_scene') }}"
+  trace:
+    stored_traces: 100
 - id: automation.turn_on_dads_room_light_with_sunset_scene_by_4_button_switch
   alias: Turn on Dad’s Room Light with Sunset Scene by 4-Button Switch
   mode: single
@@ -909,6 +985,8 @@
     - service: scene.turn_on
       target:
         entity_id: "{{ states('input_select.dads_room_sunset_scene') }}"
+  trace:
+    stored_traces: 100
 - id: automation.turn_on_dads_room_light_with_night_scene_by_1_button_switch
   alias: Turn on Dad’s Room Light with Night Scene by 1-Button Switch
   mode: single
@@ -927,6 +1005,8 @@
     - service: scene.turn_on
       target:
         entity_id: "{{ states('input_select.dads_room_night_scene') }}"
+  trace:
+    stored_traces: 100
 - id: automation.turn_on_dads_room_light_with_night_scene_by_4_button_switch
   alias: Turn on Dad’s Room Light with Night Scene by 4-Button Switch
   mode: single
@@ -941,6 +1021,8 @@
     - service: scene.turn_on
       target:
         entity_id: "{{ states('input_select.dads_room_night_scene') }}"
+  trace:
+    stored_traces: 100
 - id: automation.turn_on_dads_room_light_with_midnight_scene_by_1_button_switch
   alias: Turn on Dad’s Room Light with Midnight Scene by 1-Button Switch
   mode: single
@@ -959,6 +1041,8 @@
     - service: scene.turn_on
       target:
         entity_id: "{{ states('input_select.dads_room_midnight_scene') }}"
+  trace:
+    stored_traces: 100
 - id: automation.turn_on_dads_room_light_with_midnight_scene_by_4_button_switch
   alias: Turn on Dad’s Room Light with Midnight Scene by 4-Button Switch
   mode: single
@@ -973,6 +1057,8 @@
     - service: scene.turn_on
       target:
         entity_id: "{{ states('input_select.dads_room_midnight_scene') }}"
+  trace:
+    stored_traces: 100
 - id: automation.turn_on_dads_room_light_with_natural_light
   alias: Turn on Dad’s Room Light with Natural Light
   mode: single
@@ -985,6 +1071,8 @@
     - service: scene.turn_on
       target:
         entity_id: scene.dads_room_natural_light
+  trace:
+    stored_traces: 100
 
 # Others
 
@@ -1010,3 +1098,5 @@
             interruption-level: time-sensitive
     - delay:
         hours: 1
+  trace:
+    stored_traces: 100

@@ -22,6 +22,8 @@
             interruption-level: time-sensitive
     - delay:
         hours: 8
+  trace:
+    stored_traces: 100
 - id: automation.alarm_balcony_temperature_difference_is_too_large
   alias: "ALARM: Balcony Temperature Difference is Too Large"
   mode: single
@@ -46,3 +48,5 @@
             interruption-level: time-sensitive
     - delay:
         hours: 8
+  trace:
+    stored_traces: 100
