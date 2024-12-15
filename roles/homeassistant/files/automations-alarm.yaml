@@ -18,6 +18,8 @@
             interruption-level: time-sensitive
     - delay:
         hours: 1
+  trace:
+    stored_traces: 100
 - id: automation.alarm_atom_wifi_might_be_off
   alias: "ALARM: atom WiFi might be Off"
   mode: single
@@ -56,6 +58,8 @@
             interruption-level: time-sensitive
     - delay:
         hours: 1
+  trace:
+    stored_traces: 100
 - id: automation.alarm_brother_is_offline
   alias: "ALARM: brother is Offline"
   mode: single
@@ -76,6 +80,8 @@
             interruption-level: time-sensitive
     - delay:
         hours: 1
+  trace:
+    stored_traces: 100
 - id: automation.alarm_catloghome_dad_is_offline
   alias: "ALARM: catloghome-dad is Offline"
   mode: single
@@ -96,6 +102,8 @@
             interruption-level: time-sensitive
     - delay:
         hours: 1
+  trace:
+    stored_traces: 100
 - id: automation.alarm_catloghome_liv_is_offline
   alias: "ALARM: catloghome-liv is Offline"
   mode: single
@@ -116,6 +124,8 @@
             interruption-level: time-sensitive
     - delay:
         hours: 1
+  trace:
+    stored_traces: 100
 - id: automation.alarm_catloghome_mom_is_offline
   alias: "ALARM: catloghome-mom is Offline"
   mode: single
@@ -136,6 +146,8 @@
             interruption-level: time-sensitive
     - delay:
         hours: 1
+  trace:
+    stored_traces: 100
 - id: automation.alarm_daikinac_is_offline
   alias: "ALARM: daikinac is Offline"
   mode: single
@@ -156,6 +168,8 @@
             interruption-level: time-sensitive
     - delay:
         hours: 1
+  trace:
+    stored_traces: 100
 - id: automation.alarm_guppy_is_offline
   alias: "ALARM: guppy is Offline"
   mode: single
@@ -176,6 +190,8 @@
             interruption-level: time-sensitive
     - delay:
         hours: 1
+  trace:
+    stored_traces: 100
 - id: automation.alarm_huebridge_is_offline
   alias: "ALARM: huebridge is Offline"
   mode: single
@@ -196,6 +212,8 @@
             interruption-level: time-sensitive
     - delay:
         hours: 1
+  trace:
+    stored_traces: 100
 - id: automation.alarm_kijishiro_wifi_might_be_off
   alias: "ALARM: kijishiro WiFi might be Off"
   mode: single
@@ -234,6 +252,8 @@
             interruption-level: time-sensitive
     - delay:
         hours: 1
+  trace:
+    stored_traces: 100
 - id: automation.alarm_regza_is_offline
   alias: "ALARM: regza is Offline"
   mode: single
@@ -254,6 +274,8 @@
             interruption-level: time-sensitive
     - delay:
         hours: 1
+  trace:
+    stored_traces: 100
 - id: automation.alarm_sesamehub_is_offline
   alias: "ALARM: sesamehub is Offline"
   mode: single
@@ -274,6 +296,8 @@
             interruption-level: time-sensitive
     - delay:
         hours: 1
+  trace:
+    stored_traces: 100
 - id: automation.alarm_switchbothub_is_offline
   alias: "ALARM: switchbothub is Offline"
   mode: single
@@ -294,6 +318,8 @@
             interruption-level: time-sensitive
     - delay:
         hours: 1
+  trace:
+    stored_traces: 100
 - id: automation.alarm_switchbothubmini_dad_is_offline
   alias: "ALARM: switchbothubmini-dad is Offline"
   mode: single
@@ -314,6 +340,8 @@
             interruption-level: time-sensitive
     - delay:
         hours: 1
+  trace:
+    stored_traces: 100
 - id: automation.alarm_switchbothubmini_liv_is_offline
   alias: "ALARM: switchbothubmini-liv is Offline"
   mode: single
@@ -334,6 +362,8 @@
             interruption-level: time-sensitive
     - delay:
         hours: 1
+  trace:
+    stored_traces: 100
 - id: automation.alarm_switchbothubmini_mom_is_offline
   alias: "ALARM: switchbothubmini-mom is Offline"
   mode: single
@@ -354,6 +384,8 @@
             interruption-level: time-sensitive
     - delay:
         hours: 1
+  trace:
+    stored_traces: 100
 - id: automation.alarm_tuyaplug_dad_cam_is_offline
   alias: "ALARM: tuyaplug-dad-cam is Offline"
   mode: single
@@ -374,6 +406,8 @@
             interruption-level: time-sensitive
     - delay:
         hours: 1
+  trace:
+    stored_traces: 100
 - id: automation.alarm_tuyaplug_ent_ses_is_offline
   alias: "ALARM: tuyaplug-ent-sec is Offline"
   mode: single
@@ -394,6 +428,8 @@
             interruption-level: time-sensitive
     - delay:
         hours: 1
+  trace:
+    stored_traces: 100
 - id: automation.alarm_tuyaplug_kit_ric_is_offline
   alias: "ALARM: tuyaplug-kit-ric is Offline"
   mode: single
@@ -414,6 +450,8 @@
             interruption-level: time-sensitive
     - delay:
         hours: 1
+  trace:
+    stored_traces: 100
 - id: automation.alarm_tuyaplug_liv_cam_is_offline
   alias: "ALARM: tuyaplug-liv-cam is Offline"
   mode: single
@@ -434,6 +472,8 @@
             interruption-level: time-sensitive
     - delay:
         hours: 1
+  trace:
+    stored_traces: 100
 - id: automation.alarm_tuyaplug_liv_fan_is_offline
   alias: "ALARM: tuyaplug-liv-fan is Offline"
   mode: single
@@ -454,6 +494,8 @@
             interruption-level: time-sensitive
     - delay:
         hours: 1
+  trace:
+    stored_traces: 100
 - id: automation.alarm_tuyaplug_liv_foo_is_offline
   alias: "ALARM: tuyaplug-liv-fox is Offline"
   mode: single
@@ -474,6 +516,8 @@
             interruption-level: time-sensitive
     - delay:
         hours: 1
+  trace:
+    stored_traces: 100
 - id: automation.alarm_tuyaplug_liv_fox_is_offline
   alias: "ALARM: tuyaplug-liv-fox is Offline"
   mode: single
@@ -494,6 +538,8 @@
             interruption-level: time-sensitive
     - delay:
         hours: 1
+  trace:
+    stored_traces: 100
 - id: automation.alarm_tuyaplug_liv_hum_is_offline
   alias: "ALARM: tuyaplug-liv-hum is Offline"
   mode: single
@@ -514,6 +560,8 @@
             interruption-level: time-sensitive
     - delay:
         hours: 1
+  trace:
+    stored_traces: 100
 - id: automation.alarm_tuyaplug_liv_she_is_offline
   alias: "ALARM: tuyaplug-liv-she is Offline"
   mode: single
@@ -534,6 +582,8 @@
             interruption-level: time-sensitive
     - delay:
         hours: 1
+  trace:
+    stored_traces: 100
 - id: automation.alarm_tuyaplug_mom_cam_is_offline
   alias: "ALARM: tuyaplug-mom-cam is Offline"
   mode: single
@@ -554,6 +604,8 @@
             interruption-level: time-sensitive
     - delay:
         hours: 1
+  trace:
+    stored_traces: 100
 - id: automation.alarm_ubiqu_personal_wifi_might_be_off
   alias: "ALARM: ubiqu_personal WiFi might be Off"
   mode: single
@@ -592,6 +644,8 @@
             interruption-level: time-sensitive
     - delay:
         hours: 1
+  trace:
+    stored_traces: 100
 - id: automation.alarm_xiaomigateway_is_offline
   alias: "ALARM: xiaomigateway is Offline"
   mode: single
@@ -612,3 +666,5 @@
             interruption-level: time-sensitive
     - delay:
         hours: 1
+  trace:
+    stored_traces: 100
