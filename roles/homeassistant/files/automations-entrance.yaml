@@ -26,6 +26,8 @@
     - service: lock.lock
       target:
         entity_id: lock.entrance_lock_bottom
+  trace:
+    stored_traces: 100
 - id: automation.auto_lock_entrance_lock_top_in_daytime
   alias: Auto-Lock Entrnace Lock Top in Daytime
   mode: single
@@ -54,6 +56,8 @@
     - service: lock.lock
       target:
         entity_id: lock.entrance_lock_top
+  trace:
+    stored_traces: 100
 - id: automation.auto_lock_entrance_lock_bottom_in_nighttime
   alias: Auto-Lock Entrance Lock Bottom in Nighttime
   mode: single
@@ -82,6 +86,8 @@
     - service: lock.lock
       target:
         entity_id: lock.entrance_lock_bottom
+  trace:
+    stored_traces: 100
 - id: automation.auto_lock_entrance_lock_top_in_nighttime
   alias: Auto-Lock Entrance Lock Top in Nighttime
   mode: single
@@ -110,6 +116,8 @@
     - service: lock.lock
       target:
         entity_id: lock.entrance_lock_top
+  trace:
+    stored_traces: 100
 - id: automation.info_entrance_auto_lock_is_off
   alias: "INFO: Entrance Auto-Lock is Off"
   trigger:
@@ -131,6 +139,8 @@
           url: /lovelace/home
           push:
             interruption-level: time-sensitive
+  trace:
+    stored_traces: 100
 - id: automation.lock_entrance_locks
   alias: Lock Entrance Locks
   mode: restart
@@ -156,6 +166,8 @@
     - service: lock.lock
       target:
           entity_id: lock.entrance_locks
+  trace:
+    stored_traces: 100
 - id: automation.restart_entrance_sesamemodule_power
   alias: Restart Entrance sesamemodule Power
   mode: single
@@ -207,6 +219,8 @@
           entity_id: lock.entrance_locks
     - delay:
         hours: 2
+  trace:
+    stored_traces: 100
 - id: automation.trigger_monitor_by_entrance_door
   alias: Trigger monitor by Entrance Door
   mode: restart
@@ -228,6 +242,8 @@
         topic: monitor/scan/depart
         payload: '{"identity": "automation.trigger_monitor_by_entrance_door"}'
         retain: true
+  trace:
+    stored_traces: 100
 - id: automation.turn_on_entrance_auto_lock
   alias: Turn on Entrance Auto-Lock
   trigger:
@@ -264,6 +280,8 @@
     - service: lock.unlock
       target:
         entity_id: lock.entrance_locks
+  trace:
+    stored_traces: 100
 - id: automation.unlock_entrance_lock_when_ios_action_fires
   alias: Unlock Entrance Lock when iOS Action Fires
   mode: single
@@ -306,3 +324,5 @@
             url: /lovelace-people/people
             push:
               interruption-level: time-sensitive
+  trace:
+    stored_traces: 100

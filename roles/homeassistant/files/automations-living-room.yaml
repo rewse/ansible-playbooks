@@ -23,6 +23,8 @@
             interruption-level: time-sensitive
     - delay:
         hours: 8
+  trace:
+    stored_traces: 100
 - id: automation.alarm_living_room_temperature_difference_is_too_large
   alias: "ALARM: Living Room Temperature Difference is Too Large"
   mode: single
@@ -47,6 +49,8 @@
             interruption-level: time-sensitive
     - delay:
         hours: 8
+  trace:
+    stored_traces: 100
 - id: automation.arm_living_room_ac
   alias: Arm Living Room AC
   trigger:
@@ -70,6 +74,8 @@
           url: /lovelace/home
           push:
             interruption-level: time-sensitive
+  trace:
+    stored_traces: 100
 - id: automation.change_living_room_ac_mode_to_cool
   alias: Change Living Room AC Mode to Cool
   trigger:
@@ -113,6 +119,8 @@
             interruption-level: time-sensitive
     - delay:
         hours: 2
+  trace:
+    stored_traces: 100
 - id: automation.change_living_room_ac_mode_to_dry
   alias: Change Living Room AC Mode to Dry
   trigger:
@@ -148,6 +156,8 @@
             interruption-level: time-sensitive
     - delay:
         hours: 2
+  trace:
+    stored_traces: 100
 - id: automation.decrease_living_room_ac_cool_temperature
   alias: Decrease Living Room AC Cool Temperature
   trigger:
@@ -184,6 +194,8 @@
         temperature: "{{ temp }}"
     - delay:
         minutes: 30
+  trace:
+    stored_traces: 100
 - id: automation.increase_living_room_ac_cool_temperature
   alias: Increase Living Room AC Cool Temperature
   trigger:
@@ -220,6 +232,8 @@
         temperature: "{{ temp }}"
     - delay:
         minutes: 30
+  trace:
+    stored_traces: 100
 - id: automation.info_living_room_humidity_is_too_high
   alias: "INFO: Living Room Humidity is Too High"
   mode: single
@@ -276,6 +290,8 @@
             interruption-level: time-sensitive
     - delay:
         hours: 2
+  trace:
+    stored_traces: 100
 - id: automation.info_living_room_humidity_is_too_low
   alias: "INFO: Living Room Humidity is Too Low"
   mode: single
@@ -331,6 +347,8 @@
             interruption-level: time-sensitive
     - delay:
         hours: 2
+  trace:
+    stored_traces: 100
 - id: automation.info_living_room_wbgt_is_too_high
   alias: "INFO: Living Room WBGT is Too High"
   mode: single
@@ -381,6 +399,8 @@
             interruption-level: time-sensitive
     - delay:
         hours: 2
+  trace:
+    stored_traces: 100
 - id: automation.plan_to_turn_on_living_room_ac_internal_clean
   alias: Plan to Turn on Living Room AC Internal Clean
   trigger:
@@ -404,6 +424,8 @@
       target:
         entity_id:
           - automation.turn_on_living_room_ac_internal_clean
+  trace:
+    stored_traces: 100
 - id: automation.turn_off_living_area_floor_heating
   alias: Turn off Living Area Floor Heating
   trigger:
@@ -433,6 +455,8 @@
           - switch.study_floor_heating
     - delay:
         hours: 2
+  trace:
+    stored_traces: 100
 - id: automation.turn_off_living_room_ac
   alias: Turn off Living Room AC
   mode: single
@@ -480,6 +504,8 @@
             interruption-level: time-sensitive
     - delay:
         hours: 1
+  trace:
+    stored_traces: 100
 - id: automation.turn_off_living_room_ac_internal_clean
   alias: Turn Off Living Room AC Internal Clean
   mode: single
@@ -501,6 +527,8 @@
       target:
         entity_id:
           - automation.turn_on_living_room_ac_internal_clean
+  trace:
+    stored_traces: 100
 - id: automation.turn_off_living_room_humidifier
   alias: Turn off Living Room Humidifier
   mode: single
@@ -533,6 +561,8 @@
             interruption-level: time-sensitive
     - delay:
         hours: 1
+  trace:
+    stored_traces: 100
 - id: automation.turn_off_living_room_humidifier_due_to_opening_window
   alias: Turn off Living Room Humidifier Due to Opening Window
   trigger:
@@ -572,6 +602,8 @@
             interruption-level: time-sensitive
     - delay:
         hours: 1
+  trace:
+    stored_traces: 100
 - id: automation.turn_on_living_area_floor_heating
   alias: Turn on Living Area Floor Heating
   mode: single
@@ -617,6 +649,8 @@
             interruption-level: time-sensitive
     - delay:
         hours: 1
+  trace:
+    stored_traces: 100
 - id: automation.turn_on_living_room_ac_cool
   alias: Turn on Living Room AC Cool
   mode: single
@@ -671,6 +705,8 @@
             interruption-level: time-sensitive
     - delay:
         hours: 1
+  trace:
+    stored_traces: 100
 - id: automation.turn_on_living_room_ac_cool_forcibly
   alias: Turn on Living Room AC Cool Forcibly
   mode: single
@@ -716,6 +752,8 @@
             interruption-level: time-sensitive
     - delay:
         hours: 1
+  trace:
+    stored_traces: 100
 - id: automation.turn_on_living_room_ac_dry
   alias: Turn on Living Room AC Dry
   mode: single
@@ -778,6 +816,8 @@
             interruption-level: time-sensitive
     - delay:
         hours: 1
+  trace:
+    stored_traces: 100
 - id: automation.turn_on_living_room_ac_internal_clean
   alias: Turn on Living Room AC Internal Clean
   trigger:
@@ -796,6 +836,8 @@
         entity_id: climate.living_room_ac
       data:
         hvac_mode: fan_only
+  trace:
+    stored_traces: 100
 - id: automation.turn_on_living_room_humidifier
   alias: Turn on Living Room Humidifier
   mode: single
@@ -848,6 +890,8 @@
             interruption-level: time-sensitive
     - delay:
         hours: 1
+  trace:
+    stored_traces: 100
 
 # Lights
 
@@ -876,6 +920,8 @@
           - 20
           - 72
         brightness_pct: 100
+  trace:
+    stored_traces: 100
 - id: automation.reset_living_room_tv_light_turned_down_more
   alias: Reset Living Room TV Light Turned Down More
   trigger:
@@ -901,6 +947,8 @@
           - 20
           - 72
         brightness_pct: input_number.living_room_tv_light_brightness_turned_down_more
+  trace:
+    stored_traces: 100
 - id: automation.turn_down_living_area
   alias: Turn down Living Area
   trigger:
@@ -911,6 +959,8 @@
       entity_id: scene.living_area_turned_down
     - service: light.turn_on
       entity_id: light.living_area_dimming_downlights
+  trace:
+    stored_traces: 100
 - id: automation.turn_down_living_area_more
   alias: Turn down Living Area More
   trigger:
@@ -921,6 +971,8 @@
       entity_id: scene.living_area_turned_down_more
     - service: light.turn_off
       entity_id: light.living_area_dimming_downlights
+  trace:
+    stored_traces: 100
 - id: automation.turn_off_living_area_lights
   alias: Turn off Living Room Area Lights
   trigger:
@@ -941,6 +993,8 @@
           url: /lovelace/home
           push:
             interruption-level: time-sensitive
+  trace:
+    stored_traces: 100
 - id: automation.turn_off_living_room_tv_light
   alias: Turn off Living Room TV Light
   trigger:
@@ -957,6 +1011,8 @@
   action:
     - service: light.turn_off
       entity_id: light.living_room_tv_light
+  trace:
+    stored_traces: 100
 - id: automation.turn_on_living_area_lights_due_to_sunset
   alias: Turn on Living Area Lights due to Sunset
   trigger:
@@ -982,6 +1038,8 @@
           - 20
           - 72
         brightness_pct: 100
+  trace:
+    stored_traces: 100
 - id: automation.turn_on_living_area_downlights
   alias: Turn on Living Area Downlights
   mode: single
@@ -1033,6 +1091,8 @@
             interruption-level: time-sensitive
     - delay:
         hours: 1
+  trace:
+    stored_traces: 100
 - id: automation.turn_on_living_room_tv_light_for_broadcast
   alias: Turn on Living Room TV Light for Broadcast
   trigger:
@@ -1062,6 +1122,8 @@
         entity_id: select.living_room_tv_light_scene
       data:
         option: Scene (Color) - Pure
+  trace:
+    stored_traces: 100
 - id: automation.turn_on_living_room_tv_light_for_broadcast_turned_down
   alias: Turn on Living Room TV Light for Broadcast Turned Down
   trigger:
@@ -1093,6 +1155,8 @@
         entity_id: select.living_room_tv_light_scene
       data:
         option: Scene (Color) - Pure
+  trace:
+    stored_traces: 100
 - id: automation.turn_on_living_room_tv_light_for_external
   alias: Turn on Living Room TV Light for External
   trigger:
@@ -1122,6 +1186,8 @@
         entity_id: select.living_room_tv_light_scene
       data:
         option: Sync - Recreation
+  trace:
+    stored_traces: 100
 - id: automation.turn_on_living_room_tv_light_for_external_turned_down
   alias: Turn on Living Room TV Light for External Turned Down
   trigger:
@@ -1153,6 +1219,8 @@
         entity_id: select.living_room_tv_light_scene
       data:
         option: Sync - Recreation
+  trace:
+    stored_traces: 100
 
 # Others
 
@@ -1193,6 +1261,8 @@
             interruption-level: time-sensitive
     - delay:
         hours: 1
+  trace:
+    stored_traces: 100
 - id: automation.turn_off_living_room_fan
   alias: Turn off Living Room Fan
   mode: single
@@ -1220,6 +1290,8 @@
             interruption-level: time-sensitive
     - delay:
         hours: 1
+  trace:
+    stored_traces: 100
 - id: automation.turn_off_living_room_tv
   alias: Turn off Living Room TV
   trigger:
@@ -1267,6 +1339,8 @@
           url: /lovelace/machines
           push:
             interruption-level: time-sensitive
+  trace:
+    stored_traces: 100
 - id: automation.turn_on_living_room_fan
   alias: Turn on Living Room Fan
   mode: single
@@ -1293,3 +1367,5 @@
             interruption-level: time-sensitive
     - delay:
         hours: 1
+  trace:
+    stored_traces: 100
