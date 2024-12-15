@@ -121,16 +121,19 @@ cards:
       - entity: switch.dads_room_humidifier
         name: Humidifier
   - type: entities
-    title: Dad’s Room Climate Automations
+    title: Dad’s Room AC Cool/Dry Automations
     entities:
+      - entity: automation.change_dads_room_ac_mode_to_cool
+        name: Change AC Mode to Cool
+        secondary_info: last-triggered
+      - entity: automation.change_dads_room_ac_mode_to_dry
+        name: Change AC Mode to Dry
+        secondary_info: last-triggered
       - entity: automation.decrease_dads_room_ac_cool_temperature
         name: Decrease AC Cool Temperature
         secondary_info: last-triggered
       - entity: automation.increase_dads_room_ac_cool_temperature
         name: Increase AC Cool Temperature
-        secondary_info: last-triggered
-      - entity: automation.plan_to_turn_on_dads_room_ac_internal_clean
-        name: Plan to Turn on AC Internal Clean
         secondary_info: last-triggered
       - entity: automation.turn_off_dads_room_ac_cool
         name: Turn off AC Cool
@@ -139,18 +142,6 @@ cards:
         name: Turned off AC Cool Threshold
       - entity: input_number.dads_room_ac_dry_turned_off_threshold
         name: Turned off AC Dry Threshold
-      - entity: automation.turn_off_dads_room_ac_heat
-        name: Turn off AC Heat
-        secondary_info: last-triggered
-      - entity: input_number.dads_room_ac_heat_turned_off_threshold
-        name: Turned off AC Cool Threshold
-      - entity: automation.turn_off_dads_room_ac_internal_clean
-        name: Turn off AC Internal Clean
-      - entity: automation.turn_off_dads_room_humidifier
-        name: Turn off Humidifier
-        secondary_info: last-triggered
-      - entity: input_number.dads_room_humidifier_turned_off_threshold
-        name: Turned off Humidifier Threshold
       - entity: automation.turn_on_dads_room_ac_cool
         name: Turn on AC Cool
         secondary_info: last-triggered
@@ -170,6 +161,18 @@ cards:
         name: Turned on AC Dry Threshold WBGT
       - entity: input_number.dads_room_ac_dry_turned_on_threshold_humidity
         name: Turned on AC Dry Threshold Humidity
+    show_header_toggle: false
+  - type: entities
+    title: Dad’s Room AC Heat Automations
+    entities:
+      - entity: automation.change_dads_room_ac_mode_to_heat
+        name: Change AC Mode to Heat
+        secondary_info: last-triggered
+      - entity: automation.turn_off_dads_room_ac_heat
+        name: Turn off AC Heat
+        secondary_info: last-triggered
+      - entity: input_number.dads_room_ac_heat_turned_off_threshold
+        name: Turned off AC Heat Threshold
       - entity: automation.turn_on_dads_room_ac_heat
         name: Turn on AC Heat
         secondary_info: last-triggered
@@ -177,14 +180,37 @@ cards:
         name: Turned on AC Heat Threshold
       - entity: input_number.dads_room_ac_heat_target_wbgt
         name: AC Heat Target WBGT
-      - entity: automation.turn_on_dads_room_ac_internal_clean
-        name: Turn on AC Internal Clean
+      - entity: input_number.dads_room_ac_heat_target_temperature
+        name: AC Heat Target Temperature
+    show_header_toggle: false
+  - type: entities
+    title: Dad’s Room Humidifier Automations
+    entities:
+      - entity: automation.turn_off_dads_room_humidifier
+        name: Turn off Humidifier
+        secondary_info: last-triggered
+      - entity: input_number.dads_room_humidifier_turned_off_threshold
+        name: Turned off Humidifier Threshold
+      - entity: automation.turn_off_dads_room_humidifier_due_to_nobody
+        name: Turn off Humidifier due to Nobody
         secondary_info: last-triggered
       - entity: automation.turn_on_dads_room_humidifier
         name: Turn on Humidifier
         secondary_info: last-triggered
       - entity: input_number.dads_room_humidifier_turned_on_threshold
         name: Turned on Humidifier Threshold
+    show_header_toggle: false
+  - type: entities
+    title: Dad’s Room Climate Automations
+    entities:
+      - entity: automation.plan_to_turn_on_dads_room_ac_internal_clean
+        name: Plan to Turn on AC Internal Clean
+        secondary_info: last-triggered
+      - entity: automation.turn_off_dads_room_ac_internal_clean
+        name: Turn off AC Internal Clean
+      - entity: automation.turn_on_dads_room_ac_internal_clean
+        name: Turn on AC Internal Clean
+        secondary_info: last-triggered
     show_header_toggle: false
   - type: picture-entity
     name: Dad’s Room Camera
