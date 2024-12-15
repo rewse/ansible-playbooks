@@ -82,12 +82,18 @@ living_area_downlights_turned_on_threshold:
   max: 25
   unit_of_measurement: lx
   icon: mdi:weather-sunset-down
+living_room_floor_heating_turned_off_threshold:
+  name: Living Room Floor Heating Turned off Threshold
+  min: 19
+  max: 23
+  unit_of_measurement: °C
+  icon: mdi:thermometer-chevron-down
 living_room_floor_heating_turned_on_threshold:
   name: Living Room Floor Heating Turned on Threshold
   min: 17
   max: 21
   unit_of_measurement: °C
-  icon: mdi:thermometer-chevron-down
+  icon: mdi:thermometer-chevron-up
 living_room_humidifier_turned_off_threshold:
   name: Living Room Humidifier Turned off Threshold
   min: 46

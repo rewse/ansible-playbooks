@@ -433,6 +433,35 @@
       minutes: "/5"
       seconds: 11
   condition:
+    - condition: numeric_state
+      entity_id: sensor.living_room_wbgt
+      above: input_number.living_room_floor_heating_turned_off_threshold
+    - condition: state
+      entity_id: switch.living_area_floor_heatings
+      state: "on"
+    - condition: numeric_state
+      entity_id: sensor.balcony_temperature
+      below: 15
+    - condition: state
+      entity_id: alarm_control_panel.surveillance
+      state: disarmed
+  action:
+    - service: switch.turn_off
+      target:
+        entity_id:
+          - switch.living_room_floor_heating
+          - switch.study_floor_heating
+    - delay:
+        hours: 2
+  trace:
+    stored_traces: 100
+- id: automation.turn_off_living_area_floor_heating_due_to_nobody
+  alias: Turn off Living Area Floor Heating Due to Nobody
+  trigger:
+    - platform: time_pattern
+      minutes: "/5"
+      seconds: 11
+  condition:
     - condition: state
       entity_id: switch.living_area_floor_heatings
       state: "on"
