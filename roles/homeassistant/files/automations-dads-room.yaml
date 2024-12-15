@@ -303,7 +303,7 @@
       to: "on"
   condition:
     - condition: numeric_state
-      entity_id: sensor.dads_room_temperature
+      entity_id: sensor.dads_room_wbgt
       above: input_number.dads_room_ac_heat_turned_off_threshold
     - condition: state
       entity_id: climate.dads_room_ac
@@ -521,7 +521,7 @@
       to: "on"
   condition:
     - condition: numeric_state
-      entity_id: sensor.dads_room_temperature
+      entity_id: sensor.dads_room_wbgt
       below: input_number.dads_room_ac_heat_turned_on_threshold
     - condition: state
       entity_id: binary_sensor.dads_room_presence
