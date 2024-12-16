@@ -1,4 +1,5 @@
 ---
 secondary_diskname: nvme1n1
+ssh_port: 22
 zabbix:
   server: zabbix.rewse.jp
