@@ -172,11 +172,19 @@
     follow: yes
   tags: [ubuntu, user]
 
-- name: "ssh : Copy authentication.conf"
+- name: Copy authentication.conf
   copy:
     src: authentication.conf
     dest: /etc/ssh/sshd_config.d
   notify: Restart ssh
+  tags: [ubuntu, ssh]
+
+- name: Change SSH port
+  lineinfile:
+    dest: /etc/systemd/system/ssh.service.requires/ssh.socket
+    regexp: 'ListenStream='
+    line: 'ListenStream={{ssh_port}}'
+  notify: Restart ssh.socket
   tags: [ubuntu, ssh]
 
 - name: Copy authorized_keys
