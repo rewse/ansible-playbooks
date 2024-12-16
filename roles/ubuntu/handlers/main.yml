@@ -3,3 +3,9 @@
   systemd:
     name: ssh
     state: restarted
+
+- name: Restart ssh.socket
+  systemd:
+    daemon_reload: true
+    name: ssh.socket
+    state: restarted
