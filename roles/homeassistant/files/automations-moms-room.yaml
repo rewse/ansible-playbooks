@@ -478,12 +478,6 @@
     - condition: numeric_state
       entity_id: sensor.moms_room_wbgt
       above: input_number.moms_room_ac_dry_turned_on_threshold_wbgt
-    - condition: state
-      entity_id: sun.sun
-      state: above_horizon
-    - condition: state
-      entity_id: binary_sensor.workday_sensor
-      state: "on"
     - condition: or
       conditions:
         - condition: state
@@ -522,8 +516,18 @@
     - condition: numeric_state
       entity_id: sensor.moms_room_humidity
       below: input_number.moms_room_humidifier_turned_on_threshold
-    - condition: sun
-      after: sunrise
+    - condition: or
+      conditions:
+        - condition: state
+          entity_id: binary_sensor.moms_room_window_n
+          state: "on"
+          for:
+            minutes: 30
+        - condition: state
+          entity_id: binary_sensor.moms_room_window_s
+          state: "on"
+          for:
+            minutes: 30
     - condition: state
       entity_id: binary_sensor.moms_room_presence
       state: "on"
