@@ -168,6 +168,12 @@ cards:
       - entity: automation.change_dads_room_ac_mode_to_heat
         name: Change AC Mode to Heat
         secondary_info: last-triggered
+      - entity: automation.decrease_dads_room_ac_heat_temperature
+        name: Decrease AC Heat Temperature
+        secondary_info: last-triggered
+      - entity: automation.increase_dads_room_ac_heat_temperature
+        name: Increase AC Heat Temperature
+        secondary_info: last-triggered
       - entity: automation.turn_off_dads_room_ac_heat
         name: Turn off AC Heat
         secondary_info: last-triggered
