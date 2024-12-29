@@ -22,7 +22,7 @@ my_exit() {
 # {{{ send_server_status
 
 send_server_status() {
-    curl -so $tmpfile http://$hostname/server-status
+    curl -so $tmpfile https://$hostname/server-status
 
     retval=$?
 
