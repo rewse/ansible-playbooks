@@ -258,6 +258,17 @@
         11
       );
 
+      /* https://docs.flyingpress.com/en/article/add-or-remove-urls-to-auto-purge-vjxmqs/ */
+      add_filter(
+        'flying_press_auto_purge_urls',
+        function ($urls, $post_id) {
+          $urls[] = 'https://rewse.jp/blog/';
+          return $urls;
+        },
+        10,
+        2
+      );
+
   tags: [wordpress]
 
 - name: Replace copyright
@@ -355,3 +366,16 @@
     dest: /srv/www/wordpress/wp-content/plugins
     remote_src: yes
   tags: [wordpress, wordpress-plugin]
+
+- name: Download wp-cli
+  get_url:
+    url: https://raw.githubusercontent.com/wp-cli/builds/gh-pages/phar/wp-cli.phar
+    dest: /usr/local/sbin/wp
+    mode: '0755'
+  tags: [wordpress]
+
+- name: Copy flyingpress.cron
+  copy:
+    src: flyingpress.cron
+    dest: /etc/cron.d/flyingpress
+  tags: [wordpress]

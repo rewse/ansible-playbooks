@@ -1,0 +1,5 @@
+SHELL=/bin/bash
+PATH=/usr/local/sbin:/usr/local/bin:/sbin:/bin:/usr/sbin:/usr/bin
+
+# https://docs.flyingpress.com/en/article/flyingpress-wp-cli-commands-189bywv/
+56 5 * * 6 www-data wp flying-press purge-everything --path='/srv/www/wordpress'; wp flying-press preload-cache --path='/srv/www/wordpress'
