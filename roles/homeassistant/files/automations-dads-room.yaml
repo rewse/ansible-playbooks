@@ -219,6 +219,38 @@
         minutes: 30
   trace:
     stored_traces: 100
+- id: automation.decrease_dads_room_ac_heat_temperature
+  alias: Decrease Dad’s Room AC Heat Temperature
+  trigger:
+    - platform: state
+      entity_id: binary_sensor.dads_room_motion
+      to: "on"
+    - platform: time_pattern
+      minutes: "/5"
+      seconds: 37
+  condition:
+    - condition: state
+      entity_id: climate.dads_room_ac
+      state: heat
+      for:
+        minutes: 30
+    - "{{ states('sensor.dads_room_wbgt') | float(24) - (states('input_number.dads_room_ac_heat_target_wbgt') | float(24) + 0.5) > 0.5 }}"
+    - condition: state
+      entity_id: alarm_control_panel.dads_room_ac
+      state: armed_home
+  action:
+    - variables:
+        temp: "{{ state_attr('climate.dads_room_ac', 'temperature') | int(24) - 1 }}"
+    - service: climate.set_temperature
+      target:
+        entity_id: climate.dads_room_ac 
+      data:
+        hvac_mode: heat
+        temperature: "{{ temp }}"
+    - delay:
+        minutes: 30
+  trace:
+    stored_traces: 100
 - id: automation.increase_dads_room_ac_cool_temperature
   alias: Increase Dad’s Room AC Cool Temperature
   trigger:
@@ -246,6 +278,38 @@
         entity_id: climate.dads_room_ac 
       data:
         hvac_mode: cool
+        temperature: "{{ temp }}"
+    - delay:
+        minutes: 30
+  trace:
+    stored_traces: 100
+- id: automation.increase_dads_room_ac_heat_temperature
+  alias: Increase Dad’s Room AC Heat Temperature
+  trigger:
+    - platform: state
+      entity_id: binary_sensor.dads_room_motion
+      to: "on"
+    - platform: time_pattern
+      minutes: "/5"
+      seconds: 34
+  condition:
+    - condition: state
+      entity_id: climate.dads_room_ac
+      state: heat
+      for:
+        minutes: 10
+    - "{{ states('sensor.dads_room_wbgt') | float(24) - (states('input_number.dads_room_ac_heat_target_wbgt') | float(24) + 0.5) < -0.5 }}"
+    - condition: state
+      entity_id: alarm_control_panel.dads_room_ac
+      state: armed_home
+  action:
+    - variables:
+        temp: "{{ state_attr('climate.dads_room_ac', 'temperature') | int(24) + 1 }}"
+    - service: climate.set_temperature
+      target:
+        entity_id: climate.dads_room_ac 
+      data:
+        hvac_mode: heat
         temperature: "{{ temp }}"
     - delay:
         minutes: 30
