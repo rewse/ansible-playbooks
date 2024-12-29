@@ -127,7 +127,7 @@ cards:
         name: Turned on Floor Heating Threshold
     show_header_toggle: false
   - type: entities
-    title: Living Room AC Humidifier Automations
+    title: Living Room Humidifier Automations
     entities:
       - entity: automation.turn_off_living_room_humidifier
         name: Turn off Humidifier
