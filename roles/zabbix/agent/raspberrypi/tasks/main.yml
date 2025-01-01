@@ -12,20 +12,6 @@
   notify: Restart zabbix-agent
   tags: [zabbix-agent-raspberrypi]
 
-- name: Copy wifi.sh
-  copy:
-    src: wifi.sh
-    dest: /usr/lib/zabbix/agentscripts
-    mode: 0755
-  tags: [zabbix-agent-raspberrypi]
-
-- name: Copy wifi.conf
-  copy:
-    src: wifi.conf
-    dest: /etc/zabbix/zabbix_agentd.d
-  notify: Restart zabbix-agent
-  tags: [zabbix-agent-raspberrypi]
-
 - name: Copy zabbix-agent.service
   copy:
     src: /usr/lib/systemd/system/zabbix-agent.service
