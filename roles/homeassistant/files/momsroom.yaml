@@ -130,6 +130,9 @@ cards:
         name: AC Heat Target WBGT
       - entity: input_number.moms_room_ac_heat_target_temperature
         name: AC Heat Target Temperature
+      - entity: automation.turn_on_moms_room_ac_heat_in_sleep
+        name: Turn on AC Heat in Sleep
+        secondary_info: last-triggered
     show_header_toggle: false
   - type: entities
     title: Mom’s Room Humidifier Automations
