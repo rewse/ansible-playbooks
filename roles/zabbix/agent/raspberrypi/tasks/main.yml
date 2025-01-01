@@ -58,23 +58,3 @@
     line: "AllowRoot=1"
   notify: Restart zabbix-agent
   tags: [zabbix-agent-raspberrypi]
-
-- name: Install speed-cloudflare-cli
-  community.general.npm:
-    name: speed-cloudflare-cli
-    global: yes
-  tags: [zabbix-agent-raspberrypi]
-
-- name: Copy speed-cloudflare.sh
-  copy:
-    src: speed-cloudflare.sh
-    dest: /usr/lib/zabbix/agentscripts
-    mode: 0755
-  tags: [zabbix-agent-raspberrypi]
-
-- name: Copy speed-cloudflare.conf
-  copy:
-    src: speed-cloudflare.conf
-    dest: /etc/zabbix/zabbix_agentd.d
-  notify: Restart zabbix-agent
-  tags: [zabbix-agent-raspberrypi]
