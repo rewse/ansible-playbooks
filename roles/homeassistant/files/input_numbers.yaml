@@ -36,8 +36,8 @@ dads_room_ac_cool_turned_on_threshold:
   icon: mdi:thermometer-chevron-up
 dads_room_ac_heat_target_temperature:
   name: Dad’s Room AC Heat Target Temperature
-  min: 22
-  max: 26
+  min: 18
+  max: 22
   unit_of_measurement: °C
   icon: mdi:thermometer-check
 dads_room_ac_heat_target_wbgt:
@@ -197,8 +197,8 @@ moms_room_ac_cool_turned_on_threshold:
   icon: mdi:thermometer-chevron-up
 moms_room_ac_heat_target_temperature:
   name: Mom’s Room AC Heat Target Temperature
-  min: 22
-  max: 26
+  min: 18
+  max: 22
   unit_of_measurement: °C
   icon: mdi:thermometer-check
 moms_room_ac_heat_target_wbgt:
