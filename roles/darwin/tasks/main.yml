@@ -3,7 +3,6 @@
   homebrew_tap:
     name: "{{ item }}"
   with_items:
-    - homebrew/cask-drivers
     - homebrew/cask-fonts
   tags: [darwin, package, homebrew]
 
