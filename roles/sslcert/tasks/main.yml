@@ -1,27 +1,37 @@
 ---
 - name: Install additional packages
-  apt:
+  ansible.builtin.apt:
     name:
-      - snapd
+      - python3
+      - python3-venv
+      - libaugeas0
   tags: [sslcert]
 
-- name: Insall packages
-  community.general.snap:
+- name: Create /var/lib/python/certbot
+  ansible.builtin.file:
+    path: /var/lib/python/certbot
+    state: directory
+  tags: [sslcert]
+
+- name: Create venv
+  ansible.builtin.command: python3 -m venv /var/lib/python/certbot
+  tags: [sslcert]
+
+- name: Install certbot
+  ansible.builtin.pip:
     name:
       - certbot
-    classic: yes
-  tags: [sslcert]
-
-- name: Confirm certbot plugin containment level
-  ansible.builtin.command: |
-    snap set certbot trust-plugin-with-root=ok
-  tags: [sslcert]
-
-- name: Insall plugin package
-  community.general.snap:
-    name:
+      - certbot-apache
       - certbot-dns-route53
-    classic: yes
+      - pip-review
+    virtualenv: /var/lib/python/certbot
+  tags: [sslcert]
+
+- name: Copy certbot.cron
+  ansible.builtin.copy:
+    src: certbot.cron
+    dest: /etc/cron.monthly/certbot
+    mode: 0644
   tags: [sslcert]
 
 - name: Copy AWS credential
