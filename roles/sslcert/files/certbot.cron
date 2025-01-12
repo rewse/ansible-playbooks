@@ -1,0 +1,9 @@
+#!/bin/bash
+
+source /var/lib/python/certbot/bin/activate
+
+pip-review -a
+
+certbot renew -q
+
+systemctl restart apache2
