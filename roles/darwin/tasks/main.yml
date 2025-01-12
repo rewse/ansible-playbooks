@@ -81,7 +81,7 @@
       - microsoft-edge
       - obsbot-webcam
       - obsidian
-      - ollama
+      # - ollama
       - prowritingaid
       - slack
       - sony-ps-remote-play
