@@ -1163,10 +1163,18 @@
     - platform: state
       entity_id: sensor.regza_content_type
       to: broadcast
-  condition:
-    - condition: state
+    - platform: state
       entity_id: sensor.regza_content_type
-      state: broadcast
+      to: recorded
+  condition:
+    - condition: or
+      conditions:
+        - condition: state
+          entity_id: sensor.regza_content_type
+          state: broadcast
+        - condition: state
+          entity_id: sensor.regza_content_type
+          state: recorded
     - condition: time
       before: input_datetime.living_area_turned_down_more_time
   action:
@@ -1194,10 +1202,18 @@
     - platform: state
       entity_id: sensor.regza_content_type
       to: broadcast
-  condition:
-    - condition: state
+    - platform: state
       entity_id: sensor.regza_content_type
-      state: broadcast
+      to: recorded
+  condition:
+    - condition: or
+      conditions:
+        - condition: state
+          entity_id: sensor.regza_content_type
+          state: broadcast
+        - condition: state
+          entity_id: sensor.regza_content_type
+          state: recorded
     - condition: time
       after: input_datetime.living_area_turned_down_more_time
     - condition: sun
