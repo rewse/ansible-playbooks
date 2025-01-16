@@ -44,3 +44,10 @@
     line: "AllowRoot=1"
   notify: Restart zabbix-agent
   tags: [zabbix-agent-raspberrypi]
+
+- name: Copy bluetooth-devices.conf
+  copy:
+    src: bluetooth-devices.conf
+    dest: /etc/zabbix/zabbix_agentd.d
+  notify: Restart zabbix-agent
+  tags: [zabbix-agent-raspberrypi]

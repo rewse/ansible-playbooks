@@ -101,3 +101,9 @@
     path: /usr/lib/zabbix/agentscripts
     state: directory
   tags: [zabbix-agent-ubuntu]
+
+- name: Copy for sudo
+  copy:
+    src: zabbix.sudo
+    dest: /etc/sudoers.d/zabbix
+  tags: [zabbix-agent-ubuntu]
