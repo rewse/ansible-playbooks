@@ -83,6 +83,7 @@
       - obsidian
       # - ollama
       - prowritingaid
+      - rectangle-pro
       - slack
       - sony-ps-remote-play
       - steermouse
@@ -101,7 +102,6 @@
     - 1512372293  # 3DMark
     - 545519333   # Amazon Prime Video
     - 1168254295  # AmorphousDiskMark
-    - 417375580   # BetterSnapTool
     - 425264550   # Blackmagic Disk Speed Test
     - 6474268307  # Enchanted LLM
     - 1044629456  # GFXBench Metal
