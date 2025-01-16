@@ -7,7 +7,7 @@
 - platform: template
   switches:
     dads_room_humidifier:
-      friendly_name: Dad’s Room humidifier
+      friendly_name: Dad’s Room Humidifier
       unique_id: switch.dads_room_humidifier
       value_template: "{{ states('sensor.dads_room_humidifier_plug_power') | float(0) > 3 }}"
       availability_template: "{{ states('switch.dads_room_humidifier_plug_socket_1') }}"
