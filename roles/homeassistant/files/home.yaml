@@ -254,6 +254,8 @@ cards:
       - type: entities
         title: Dad’s Room Appliances
         entities:
+          - entity: switch.dads_room_floor_heating
+            name: Floor Heating
           - entity: switch.dads_room_humidifier
             name: Humidifier
   - type: vertical-stack

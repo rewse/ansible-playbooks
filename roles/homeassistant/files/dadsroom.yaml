@@ -118,6 +118,8 @@ cards:
   - type: entities
     title: Dad’s Room Appliances
     entities:
+      - entity: switch.dads_room_floor_heating
+        name: Floor Heating
       - entity: switch.dads_room_humidifier
         name: Humidifier
   - type: entities
@@ -214,6 +216,10 @@ cards:
         secondary_info: last-triggered
       - entity: automation.turn_off_dads_room_ac_internal_clean
         name: Turn off AC Internal Clean
+        secondary_info: last-triggered
+      - entity: automation.turn_off_dads_room_floor_heating
+        name: Turn off Floor Heating
+        secondary_info: last-triggered
       - entity: automation.turn_on_dads_room_ac_internal_clean
         name: Turn on AC Internal Clean
         secondary_info: last-triggered

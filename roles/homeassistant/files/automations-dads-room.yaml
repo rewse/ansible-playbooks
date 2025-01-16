@@ -436,6 +436,36 @@
           - automation.turn_on_dads_room_ac_internal_clean
   trace:
     stored_traces: 100
+- id: automation.turn_off_dads_room_floor_heating
+  alias: Turn off Dad’s Room Floor Heating
+  trigger:
+    - platform: state
+      entity_id: binary_sensor.dads_room_presence
+      to: "off"
+    - platform: time_pattern
+      minutes: "/5"
+      seconds: 39
+  condition:
+    - condition: state
+      entity_id: binary_sensor.dads_room_presence
+      state: "off"
+    - condition: state
+      entity_id: switch.dads_room_floor_heating
+      state: "on"
+  action:
+    - service: switch.turn_off
+      entity_id: switch.dads_room_floor_heating
+    - service: notify.tats_devices
+      data:
+        message: "Turned off Dad’s Room Floor Heating"
+        data:
+          url: /lovelace/home
+          push:
+            interruption-level: time-sensitive
+    - delay:
+        hours: 1
+  trace:
+    stored_traces: 100
 - id: automation.turn_off_dads_room_humidifier
   alias: Turn off Dad’s Room Humidifier
   mode: single
