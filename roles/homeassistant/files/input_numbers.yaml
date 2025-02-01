@@ -34,28 +34,28 @@ dads_room_ac_cool_turned_on_threshold:
   max: 32
   unit_of_measurement: °C
   icon: mdi:thermometer-chevron-up
-dads_room_ac_heat_target_temperature:
-  name: Dad’s Room AC Heat Target Temperature
+dads_room_ac_heat_remote_temperature:
+  name: Dad’s Room AC Heat Remote Temperature
   min: 18
   max: 22
   unit_of_measurement: °C
   icon: mdi:thermometer-check
-dads_room_ac_heat_target_wbgt:
-  name: Dad’s Room AC Heat Target WBGT
-  min: 18
-  max: 22
+dads_room_ac_heat_target_temperature:
+  name: Dad’s Room AC Heat Target Temperature
+  min: 22
+  max: 26
   unit_of_measurement: °C
   icon: mdi:thermometer-check
 dads_room_ac_heat_turned_off_threshold:
   name: Dad’s Room AC Heat Turned off Threshold
-  min: 19
-  max: 23
+  min: 24
+  max: 28
   unit_of_measurement: °C
   icon: mdi:thermometer-chevron-down
 dads_room_ac_heat_turned_on_threshold:
   name: Dad’s Room AC Heat Turned on Threshold
-  min: 17
-  max: 21
+  min: 21
+  max: 25
   unit_of_measurement: °C
   icon: mdi:thermometer-chevron-up
 dads_room_ac_dry_turned_off_threshold:
@@ -84,14 +84,14 @@ living_area_downlights_turned_on_threshold:
   icon: mdi:weather-sunset-down
 living_room_floor_heating_turned_off_threshold:
   name: Living Room Floor Heating Turned off Threshold
-  min: 19
-  max: 23
+  min: 24
+  max: 28
   unit_of_measurement: °C
   icon: mdi:thermometer-chevron-down
 living_room_floor_heating_turned_on_threshold:
   name: Living Room Floor Heating Turned on Threshold
-  min: 17
-  max: 21
+  min: 21
+  max: 25
   unit_of_measurement: °C
   icon: mdi:thermometer-chevron-up
 living_room_humidifier_turned_off_threshold:
@@ -195,28 +195,28 @@ moms_room_ac_cool_turned_on_threshold:
   max: 32
   unit_of_measurement: °C
   icon: mdi:thermometer-chevron-up
-moms_room_ac_heat_target_temperature:
-  name: Mom’s Room AC Heat Target Temperature
+moms_room_ac_heat_remote_temperature:
+  name: Mom’s Room AC Heat Remote Temperature
   min: 18
   max: 22
   unit_of_measurement: °C
   icon: mdi:thermometer-check
-moms_room_ac_heat_target_wbgt:
-  name: Mom’s Room AC Heat Target WBGT
-  min: 18
-  max: 22
+moms_room_ac_heat_target_temperature:
+  name: Mom’s Room AC Heat Target Temperature
+  min: 22
+  max: 26
   unit_of_measurement: °C
   icon: mdi:thermometer-check
 moms_room_ac_heat_turned_off_threshold:
   name: Mom’s Room AC Heat Turned off Threshold
-  min: 19
-  max: 23
+  min: 24
+  max: 28
   unit_of_measurement: °C
   icon: mdi:thermometer-chevron-down
 moms_room_ac_heat_turned_on_threshold:
   name: Mom’s Room AC Heat Turned on Threshold
-  min: 17
-  max: 21
+  min: 21
+  max: 25
   unit_of_measurement: °C
   icon: mdi:thermometer-chevron-up
 moms_room_ac_dry_turned_off_threshold:

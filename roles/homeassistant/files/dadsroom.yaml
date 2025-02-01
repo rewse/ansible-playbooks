@@ -186,10 +186,10 @@ cards:
         secondary_info: last-triggered
       - entity: input_number.dads_room_ac_heat_turned_on_threshold
         name: Turned on AC Heat Threshold
-      - entity: input_number.dads_room_ac_heat_target_wbgt
-        name: AC Heat Target WBGT
+      - entity: input_number.dads_room_ac_heat_remote_temperature
+        name: AC Heat Remote Temperature
       - entity: input_number.dads_room_ac_heat_target_temperature
-        name: AC Heat Target Temperature
+        name: AC Heat Target Temeprature
     show_header_toggle: false
   - type: entities
     title: Dad’s Room Humidifier Automations

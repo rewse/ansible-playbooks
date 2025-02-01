@@ -234,7 +234,7 @@
       state: heat
       for:
         minutes: 30
-    - "{{ states('sensor.dads_room_wbgt') | float(24) - (states('input_number.dads_room_ac_heat_target_wbgt') | float(24) + 0.5) > 0.5 }}"
+    - "{{ states('sensor.dads_room_temperature') | float(24) - (states('input_number.dads_room_ac_heat_target_temperature') | float(24) + 0.5) > 0.5 }}"
     - condition: state
       entity_id: alarm_control_panel.dads_room_ac
       state: armed_home
@@ -298,7 +298,7 @@
       state: heat
       for:
         minutes: 10
-    - "{{ states('sensor.dads_room_wbgt') | float(24) - (states('input_number.dads_room_ac_heat_target_wbgt') | float(24) + 0.5) < -0.5 }}"
+    - "{{ states('sensor.dads_room_temperature') | float(24) - (states('input_number.dads_room_ac_heat_target_temperature') | float(24) + 0.5) < -0.5 }}"
     - condition: state
       entity_id: alarm_control_panel.dads_room_ac
       state: armed_home
@@ -387,7 +387,7 @@
       to: "on"
   condition:
     - condition: numeric_state
-      entity_id: sensor.dads_room_wbgt
+      entity_id: sensor.dads_room_temperature
       above: input_number.dads_room_ac_heat_turned_off_threshold
     - condition: state
       entity_id: climate.dads_room_ac
@@ -649,7 +649,7 @@
       to: "on"
   condition:
     - condition: numeric_state
-      entity_id: sensor.dads_room_wbgt
+      entity_id: sensor.dads_room_temperature
       below: input_number.dads_room_ac_heat_turned_on_threshold
     - condition: state
       entity_id: binary_sensor.dads_room_presence
@@ -667,14 +667,17 @@
     - service: climate.turn_on
       target:
         entity_id: climate.dads_room_ac
+    - variables:
+        temp: "{{ states('input_number.dads_room_ac_heat_remote_temperature') }}"
     - service: climate.set_temperature
       target:
         entity_id: climate.dads_room_ac
       data:
         hvac_mode: heat
+        temperature: "{{ temp }}"
     - service: notify.tats_devices
       data:
-        message: "Turned on Dad’s Room AC Heat. Current: {{ states('sensor.dads_room_wbgt') }}°C"
+        message: "Turned on Dad’s Room AC Heat. Current: {{ states('sensor.dads_room_temperature') }}°C"
         data:
           url: /lovelace/home
           push:
@@ -936,7 +939,7 @@
   mode: single
   trigger:
     - platform: template
-      value_template: "{{ (now() + timedelta(minutes = 15)).strftime('%H:%M:00') == states('input_datetime.dads_room_waking_up_time_temporarily') }}"
+      value_template: "{{ (now() + timedelta(minutes = 15)).strftime('%H:%M:00') == states('input_datetime.dads_room_waking_up_time') }}"
   action:
     - service: hue.activate_scene
       target:

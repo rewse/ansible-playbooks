@@ -434,7 +434,7 @@
       seconds: 11
   condition:
     - condition: numeric_state
-      entity_id: sensor.living_room_wbgt
+      entity_id: sensor.living_room_temperature
       above: input_number.living_room_floor_heating_turned_off_threshold
     - condition: state
       entity_id: switch.living_area_floor_heatings
@@ -451,8 +451,15 @@
         entity_id:
           - switch.living_room_floor_heating
           - switch.study_floor_heating
+    - service: notify.all_devices
+      data:
+        message: "Turned off Living Area Floor Heating. Current: {{ states('sensor.living_room_temperature') }}°C"
+        data:
+          url: /lovelace/home
+          push:
+            interruption-level: time-sensitive
     - delay:
-        hours: 2
+        hours: 1
   trace:
     stored_traces: 100
 - id: automation.turn_off_living_area_floor_heating_due_to_nobody
@@ -482,8 +489,15 @@
         entity_id:
           - switch.living_room_floor_heating
           - switch.study_floor_heating
+    - service: notify.all_devices
+      data:
+        message: "Turned off Living Area Floor Heating due to Nobody"
+        data:
+          url: /lovelace/home
+          push:
+            interruption-level: time-sensitive
     - delay:
-        hours: 2
+        hours: 1
   trace:
     stored_traces: 100
 - id: automation.turn_off_living_room_ac
@@ -680,7 +694,7 @@
       to: "on"
   condition:
     - condition: numeric_state
-      entity_id: sensor.living_room_wbgt
+      entity_id: sensor.living_room_temperature
       below: input_number.living_room_floor_heating_turned_on_threshold
     - condition: state
       entity_id: switch.living_area_floor_heatings
@@ -703,7 +717,7 @@
         - switch.study_floor_heating
     - service: notify.all_devices
       data:
-        message: "Turned on Living Area Floor Heating. Current: {{ states('sensor.living_room_wbgt') }}°C"
+        message: "Turned on Living Area Floor Heating. Current: {{ states('sensor.living_room_temperature') }}°C"
         data:
           url: /lovelace/home
           push:
