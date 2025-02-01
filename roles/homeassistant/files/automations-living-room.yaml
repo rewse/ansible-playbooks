@@ -1041,6 +1041,10 @@
   trigger:
     - platform: time
       at: input_datetime.living_area_turned_down_more_time
+  condition:
+    - condition: numeric_state
+      entity_id: sensor.living_room_light_level
+      above: 2
   action:
     - service: scene.turn_on
       entity_id: scene.living_area_turned_down_more
