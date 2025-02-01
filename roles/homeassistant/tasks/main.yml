@@ -38,9 +38,12 @@
           security_opt:
             - apparmor:unconfined
           volumes:
+            - /dev/serial/by-id:/dev/serial/by-id
             - /etc/homeassistant:/config
             - /etc/localtime:/etc/localtime:ro
             - /run/dbus:/run/dbus:ro
+          devices:
+            - /dev/ttyUSB0:/dev/ttyUSB0
           restart: unless-stopped
           network_mode: host
   notify: Restart docker
@@ -612,6 +615,10 @@
       recorder:
         db_url: !secret postgres_connstr
         purge_keep_days: 450
+      zha:
+        zigpy_config:
+          ota:
+            ikea_provider: true
   notify: Restart homeassistant
   tags: [homeassistant, homeassistant-component, homeassistant-custom]
 
