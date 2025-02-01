@@ -83,7 +83,7 @@
       - microsoft-edge
       - obsbot-webcam
       - obsidian
-      # - ollama
+      - ollama
       - prowritingaid
       - rectangle-pro
       - slack
