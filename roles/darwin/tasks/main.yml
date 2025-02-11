@@ -14,7 +14,6 @@
       - gh
       - fontforge
       - fping
-      - jordanbaird-ice
       - jq
       - mas
       - node
@@ -71,7 +70,7 @@
       - handbrake
       - hhkb-keymap-tool
       - istat-menus
-      - jabra-direct
+      - jordanbaird-ice
       - karabiner-elements
       - keyboard-maestro
       - keycastr
