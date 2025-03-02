@@ -987,11 +987,16 @@
     - platform: state
       entity_id: media_player.regza
       to: "off"
+    - platform: time_pattern
+      seconds: 48
   condition:
     - condition: sun
       after: sunset
     - condition: time
       before: input_datetime.living_area_turned_down_more_time
+    - condition: state
+      entity_id: sensor.regza_content_type
+      state: "off"
   action:
     - service: select.select_option
       target:
@@ -1014,11 +1019,16 @@
     - platform: state
       entity_id: media_player.regza
       to: "off"
+    - platform: time_pattern
+      seconds: 10
   condition:
     - condition: time
       after: input_datetime.living_area_turned_down_more_time
     - condition: sun
       before: sunrise
+    - condition: state
+      entity_id: sensor.regza_content_type
+      state: "off"
   action:
     - service: select.select_option
       target:
@@ -1091,6 +1101,8 @@
     - platform: state
       entity_id: media_player.regza
       to: "off"
+    - platform: time_pattern
+      seconds: 52
   condition:
     - condition: state
       entity_id: light.living_room_tv_light
@@ -1098,6 +1110,9 @@
     - condition: state
       entity_id: sun.sun
       state: above_horizon
+    - condition: state
+      entity_id: sensor.regza_content_type
+      state: "off"
   action:
     - service: light.turn_off
       entity_id: light.living_room_tv_light
@@ -1195,6 +1210,8 @@
     - platform: state
       entity_id: sensor.regza_content_type
       to: recorded
+    - platform: time_pattern
+      seconds: 32
   condition:
     - condition: or
       conditions:
@@ -1206,6 +1223,11 @@
           state: recorded
     - condition: time
       before: input_datetime.living_area_turned_down_more_time
+    - condition: not
+      conditions:
+        - condition: state
+          entity_id: select.living_room_tv_light_scene
+          state: Sync (Color) - Pure
   action:
     - service: light.turn_on
       target:
@@ -1234,6 +1256,8 @@
     - platform: state
       entity_id: sensor.regza_content_type
       to: recorded
+    - platform: time_pattern
+      seconds: 48
   condition:
     - condition: or
       conditions:
@@ -1247,6 +1271,11 @@
       after: input_datetime.living_area_turned_down_more_time
     - condition: sun
       before: sunrise
+    - condition: not
+      conditions:
+        - condition: state
+          entity_id: select.living_room_tv_light_scene
+          state: Sync (Color) - Pure
   action:
     - service: light.turn_on
       target:
@@ -1272,12 +1301,19 @@
     - platform: state
       entity_id: sensor.regza_content_type
       to: external
+    - platform: time_pattern
+      seconds: 1
   condition:
     - condition: state
       entity_id: sensor.regza_content_type
       state: external
     - condition: time
       before: input_datetime.living_area_turned_down_more_time
+    - condition: not
+      conditions:
+        - condition: state
+          entity_id: select.living_room_tv_light_scene
+          state: Sync - Recreation
   action:
     - service: light.turn_on
       target:
@@ -1303,6 +1339,8 @@
     - platform: state
       entity_id: sensor.regza_content_type
       to: external
+    - platform: time_pattern
+      seconds: 15
   condition:
     - condition: state
       entity_id: sensor.regza_content_type
@@ -1311,6 +1349,11 @@
       after: input_datetime.living_area_turned_down_more_time
     - condition: sun
       before: sunrise
+    - condition: not
+      conditions:
+        - condition: state
+          entity_id: select.living_room_tv_light_scene
+          state: Sync - Recreation
   action:
     - service: light.turn_on
       target:
