@@ -97,13 +97,6 @@
   max_age:
     hours: 51
 - platform: statistics
-  name: Count of Mom’s Room Motion
-  unique_id: sensor.count_of_moms_room_motion
-  entity_id: binary_sensor.moms_room_motion
-  state_characteristic: count
-  max_age:
-    minutes: 30
-- platform: statistics
   name: Count of Study Motion
   unique_id: sensor.count_of_study_motion
   entity_id: binary_sensor.study_motion
