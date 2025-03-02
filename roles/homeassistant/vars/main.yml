@@ -2,7 +2,7 @@
 alexa_client:
   id: "{{ vault_alexa_client.id }}"
   secret: "{{ vault_alexa_client.secret }}"
-card_mod_version: 3.4.3
+card_mod_version: 3.4.4
 gmail:
   address: "{{ vault_gmail.address }}"
   password: "{{ vault_gmail.password }}"
