@@ -28,12 +28,6 @@
     deb: /usr/local/src/aws-schema-conversion-tool-{{ sct_version }}.deb
   tags: [database-client-gui, package, sct]
 
-- name: Unarchive sqldeveloper
-  unarchive:
-    src: sqldeveloper-{{ sqldeveloper_version }}-no-jre.zip
-    dest: /opt
-  tags: [database-client-gui, package, sqldeveloper]
-
 - name: Install dbeaver
   apt:
     deb: https://dbeaver.io/files/dbeaver-ce_latest_amd64.deb
