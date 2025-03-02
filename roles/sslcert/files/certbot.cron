@@ -1,6 +1,6 @@
 #!/bin/bash
 
-source /var/lib/python/certbot/bin/activate
+. /var/lib/python/certbot/bin/activate
 
 pip-review -a
 
