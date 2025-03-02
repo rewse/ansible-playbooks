@@ -81,7 +81,7 @@
   alias: Change Mom’s Room AC Mode to Cool
   trigger:
     - platform: state
-      entity_id: binary_sensor.moms_room_motion
+      entity_id: binary_sensor.moms_room_presence
       to: "on"
     - platform: time_pattern
       minutes: "/5"
@@ -118,7 +118,7 @@
   alias: Change Mom’s Room AC Mode to Dry
   trigger:
     - platform: state
-      entity_id: binary_sensor.moms_room_motion
+      entity_id: binary_sensor.moms_room_presence
       to: "on"
     - platform: time_pattern
       minutes: "/5"
@@ -153,7 +153,7 @@
   alias: Change Mom’s Room AC Mode to Heat
   trigger:
     - platform: state
-      entity_id: binary_sensor.moms_room_motion
+      entity_id: binary_sensor.moms_room_presence
       to: "on"
     - platform: time_pattern
       minutes: "/5"
@@ -188,7 +188,7 @@
   alias: Decrease Mom’s Room AC Cool Temperature
   trigger:
     - platform: state
-      entity_id: binary_sensor.moms_room_motion
+      entity_id: binary_sensor.moms_room_presence
       to: "on"
     - platform: time_pattern
       minutes: "/5"
@@ -223,7 +223,7 @@
   alias: Decrease Mom’s Room AC Cool Temperature in Sleep
   trigger:
     - platform: state
-      entity_id: binary_sensor.moms_room_motion
+      entity_id: binary_sensor.moms_room_presence
       to: "on"
     - platform: time_pattern
       minutes: "/5"
@@ -258,7 +258,7 @@
   alias: Decrease Mom’s Room AC Heat Temperature
   trigger:
     - platform: state
-      entity_id: binary_sensor.moms_room_motion
+      entity_id: binary_sensor.moms_room_presence
       to: "on"
     - platform: time_pattern
       minutes: "/5"
@@ -293,7 +293,7 @@
   alias: Decrease Mom’s Room AC Heat Temperature in Sleep
   trigger:
     - platform: state
-      entity_id: binary_sensor.moms_room_motion
+      entity_id: binary_sensor.moms_room_presence
       to: "on"
     - platform: time_pattern
       minutes: "/5"
@@ -328,7 +328,7 @@
   alias: Increase Mom’s Room AC Cool Temeperature
   trigger:
     - platform: state
-      entity_id: binary_sensor.moms_room_motion
+      entity_id: binary_sensor.moms_room_presence
       to: "on"
     - platform: time_pattern
       minutes: "/5"
@@ -363,7 +363,7 @@
   alias: Increase Mom’s Room AC Cool Temeperature in Sleep
   trigger:
     - platform: state
-      entity_id: binary_sensor.moms_room_motion
+      entity_id: binary_sensor.moms_room_presence
       to: "on"
     - platform: time_pattern
       minutes: "/5"
@@ -398,7 +398,7 @@
   alias: Increase Mom’s Room AC Heat Temeperature
   trigger:
     - platform: state
-      entity_id: binary_sensor.moms_room_motion
+      entity_id: binary_sensor.moms_room_presence
       to: "on"
     - platform: time_pattern
       minutes: "/5"
@@ -433,7 +433,7 @@
   alias: Increase Mom’s Room AC Heat Temeperature in Sleep
   trigger:
     - platform: state
-      entity_id: binary_sensor.moms_room_motion
+      entity_id: binary_sensor.moms_room_presence
       to: "on"
     - platform: time_pattern
       minutes: "/5"
@@ -469,8 +469,13 @@
   mode: single
   trigger:
     - platform: state
-      entity_id: binary_sensor.moms_room_motion
+      entity_id: binary_sensor.moms_room_presence
       to: "on"
+      for:
+        minutes: 3
+    - platform: time_pattern
+      minutes: "/5"
+      seconds: 21
   condition:
     - condition: numeric_state
       entity_id: sensor.moms_room_humidity
@@ -493,6 +498,8 @@
     - condition: state
       entity_id: binary_sensor.moms_room_presence
       state: "on"
+      for:
+        minutes: 3
   action:
     - service: notify.all_devices
       data:
@@ -510,8 +517,13 @@
   mode: single
   trigger:
     - platform: state
-      entity_id: binary_sensor.moms_room_motion
+      entity_id: binary_sensor.moms_room_presence
       to: "on"
+      for:
+        minutes: 3
+    - platform: time_pattern
+      minutes: "/5"
+      seconds: 38
   condition:
     - condition: numeric_state
       entity_id: sensor.moms_room_humidity
@@ -531,6 +543,8 @@
     - condition: state
       entity_id: binary_sensor.moms_room_presence
       state: "on"
+      for:
+        minutes: 3
   action:
     - service: notify.all_devices
       data:
@@ -548,8 +562,13 @@
   mode: single
   trigger:
     - platform: state
-      entity_id: binary_sensor.moms_room_motion
+      entity_id: binary_sensor.moms_room_presence
       to: "on"
+      for:
+        minutes: 3
+    - platform: time_pattern
+      minutes: "/5"
+      seconds: 53
   condition:
     - condition: numeric_state
       entity_id: sensor.moms_room_wbgt
@@ -575,6 +594,8 @@
     - condition: state
       entity_id: binary_sensor.moms_room_presence
       state: "on"
+      for:
+        minutes: 3
   action:
     - service: notify.all_devices
       data:
@@ -617,8 +638,13 @@
   mode: single
   trigger:
     - platform: state
-      entity_id: binary_sensor.moms_room_motion
+      entity_id: binary_sensor.moms_room_presence
       to: "on"
+      for:
+        minutes: 3
+    - platform: time_pattern
+      minutes: "/5"
+      seconds: 11
   condition:
     - condition: numeric_state
       entity_id: sensor.moms_room_wbgt
@@ -655,8 +681,13 @@
   mode: single
   trigger:
     - platform: state
-      entity_id: binary_sensor.moms_room_motion
+      entity_id: binary_sensor.moms_room_presence
       to: "on"
+      for:
+        minutes: 3
+    - platform: time_pattern
+      minutes: "/5"
+      seconds: 11
   condition:
     - condition: numeric_state
       entity_id: sensor.moms_room_temperature
@@ -713,8 +744,13 @@
   mode: single
   trigger:
     - platform: state
-      entity_id: binary_sensor.moms_room_motion
+      entity_id: binary_sensor.moms_room_presence
       to: "on"
+      for:
+        minutes: 3
+    - platform: time_pattern
+      minutes: "/5"
+      seconds: 2
   condition:
     - condition: numeric_state
       entity_id: sensor.moms_room_humidity
@@ -809,8 +845,13 @@
   mode: single
   trigger:
     - platform: state
-      entity_id: binary_sensor.moms_room_motion
+      entity_id: binary_sensor.moms_room_presence
       to: "on"
+      for:
+        minutes: 3
+    - platform: time_pattern
+      minutes: "/5"
+      seconds: 22
   condition:
     - condition: numeric_state
       entity_id: sensor.moms_room_wbgt
@@ -828,6 +869,8 @@
     - condition: state
       entity_id: binary_sensor.moms_room_presence
       state: "on"
+      for:
+        minutes: 3
     - condition: state
       entity_id: alarm_control_panel.moms_room_ac
       state: armed_home
@@ -902,8 +945,13 @@
   mode: single
   trigger:
     - platform: state
-      entity_id: binary_sensor.moms_room_motion
+      entity_id: binary_sensor.moms_room_presence
       to: "on"
+      for:
+        minutes: 3
+    - platform: time_pattern
+      minutes: "/5"
+      seconds: 40
   condition:
     - condition: numeric_state
       entity_id: sensor.moms_room_humidity
@@ -927,6 +975,8 @@
     - condition: state
       entity_id: binary_sensor.moms_room_presence
       state: "on"
+      for:
+        minutes: 3
     - condition: state
       entity_id: alarm_control_panel.moms_room_ac
       state: armed_home
@@ -956,8 +1006,13 @@
   mode: single
   trigger:
     - platform: state
-      entity_id: binary_sensor.moms_room_motion
+      entity_id: binary_sensor.moms_room_presence
       to: "on"
+      for:
+        minutes: 3
+    - platform: time_pattern
+      minutes: "/5"
+      seconds: 55
   condition:
     - condition: numeric_state
       entity_id: sensor.moms_room_temperature
@@ -975,12 +1030,17 @@
     - condition: state
       entity_id: binary_sensor.moms_room_presence
       state: "on"
+      for:
+        minutes: 3
     - condition: state
       entity_id: climate.moms_room_ac
       state: "off"
     - condition: numeric_state
       entity_id: sensor.balcony_temperature
       below: 15
+    - condition: time
+      after: input_datetime.moms_room_curtains_opened_time_workday
+      before: input_datetime.moms_room_turned_down_time
     - condition: state
       entity_id: alarm_control_panel.moms_room_ac
       state: armed_home
@@ -1010,16 +1070,16 @@
 - id: automation.turn_on_moms_room_ac_heat_in_sleep
   alias: Turn on Mom’s Room AC Heat in Sleep
   trigger:
+    - platform: state
+      entity_id: binary_sensor.moms_room_presence
+      to: "on"
+      for:
+        minutes: 3
     - platform: time_pattern
       minutes: "/5"
       seconds: 51
   condition:
-    - condition: time
-      after: "23:00:00"
-      before: "07:00:00"
-    - condition: numeric_state
-      entity_id: sensor.moms_room_temperature
-      below: input_number.moms_room_ac_heat_turned_on_threshold
+    - "{{ states('sensor.moms_room_temperature') | float(24) < states('input_number.moms_room_ac_heat_turned_on_threshold') | float(23) - 1 }}"
     - condition: state
       entity_id: binary_sensor.moms_room_window_n
       state: "off"
@@ -1033,9 +1093,17 @@
     - condition: state
       entity_id: climate.moms_room_ac
       state: "off"
+    - condition: state
+      entity_id: binary_sensor.moms_room_presence
+      state: "on"
+      for:
+        minutes: 3
     - condition: numeric_state
       entity_id: sensor.balcony_temperature
       below: 15
+    - condition: time
+      after: input_datetime.moms_room_turned_down_time
+      before: input_datetime.moms_room_curtains_opened_time_workday
     - condition: state
       entity_id: alarm_control_panel.moms_room_ac
       state: armed_home
@@ -1044,7 +1112,7 @@
       target:
         entity_id: climate.moms_room_ac
     - variables:
-        temp: "{{ states('input_number.moms_room_ac_heat_remote_temperature') }}"
+        temp: "{{ states('input_number.moms_room_ac_heat_remote_temperature') | float(20) - 1 }}"
     - service: climate.set_temperature
       target:
         entity_id: climate.moms_room_ac
@@ -1105,8 +1173,13 @@
   mode: single
   trigger:
     - platform: state
-      entity_id: binary_sensor.moms_room_motion
+      entity_id: binary_sensor.moms_room_presence
       to: "on"
+      for:
+        minutes: 3
+    - platform: time_pattern
+      minutes: "/5"
+      seconds: 25
   condition:
     - condition: numeric_state
       entity_id: sensor.moms_room_humidity
@@ -1129,6 +1202,8 @@
     - condition: state
       entity_id: binary_sensor.moms_room_presence
       state: "on"
+      for:
+        minutes: 3
   action:
     - service: switch.turn_on
       entity_id: switch.moms_room_humidifier
