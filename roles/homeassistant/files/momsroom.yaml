@@ -49,6 +49,12 @@ cards:
       - entity: switch.moms_room_humidifier
         name: Humidifier
   - type: entities
+    title: Mom’s Room Light Automations
+    entities:
+      - entity: automation.turn_off_moms_room_light_due_to_nobody
+        name: Turn off Mom’s Room Light Due to Nobody
+        secondary_info: last-triggered
+  - type: entities
     title: Mom’s Room AC Cool/Dry Automations
     entities:
       - entity: automation.change_moms_room_ac_mode_to_cool
