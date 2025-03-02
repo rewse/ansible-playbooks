@@ -53,13 +53,6 @@
     value: "{{ email.primary }}"
   tags: [dotfiles-linux, git]
 
-- name: "tmux : Copy tmux.conf"
-  copy:
-    src: /srv/git/dotfiles/tmux.conf
-    dest: /etc/tmux.conf
-    remote_src: yes
-  tags: [dotfiles-linux, tmux]
-
 - name: "vim : Copy vimfiles"
   copy:
     src: /srv/git/dotfiles/vim/vimrc

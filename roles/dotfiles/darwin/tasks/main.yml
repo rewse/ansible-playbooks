@@ -29,13 +29,6 @@
     remote_src: yes
   tags: [dotfiles-darwin, inputrc]
 
-- name: "tmux : Copy tmux.conf"
-  copy:
-    src: ~/Documents/git/dotfiles/tmux.conf
-    dest: ~/.tmux.conf
-    remote_src: yes
-  tags: [dotfiles-darwin, tmux]
-
 - name: "vim : Copy vimfiles"
   copy:
     src: ~/Documents/git/dotfiles/vim
