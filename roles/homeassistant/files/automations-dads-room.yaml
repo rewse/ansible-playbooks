@@ -81,7 +81,7 @@
   alias: Change Dad’s Room AC Mode to Cool
   trigger:
     - platform: state
-      entity_id: binary_sensor.dads_room_motion
+      entity_id: binary_sensor.dads_room_presence
       to: "on"
     - platform: time_pattern
       minutes: "/5"
@@ -121,7 +121,7 @@
   alias: Change Dad’s Room AC Mode to Dry
   trigger:
     - platform: state
-      entity_id: binary_sensor.dads_room_motion
+      entity_id: binary_sensor.dads_room_presence
       to: "on"
     - platform: time_pattern
       minutes: "/5"
@@ -156,7 +156,7 @@
   alias: Change Dad’s Room AC Mode to Heat
   trigger:
     - platform: state
-      entity_id: binary_sensor.dads_room_motion
+      entity_id: binary_sensor.dads_room_presence
       to: "on"
     - platform: time_pattern
       minutes: "/5"
@@ -191,7 +191,7 @@
   alias: Decrease Dad’s Room AC Cool Temperature
   trigger:
     - platform: state
-      entity_id: binary_sensor.dads_room_motion
+      entity_id: binary_sensor.dads_room_presence
       to: "on"
     - platform: time_pattern
       minutes: "/5"
@@ -223,7 +223,7 @@
   alias: Decrease Dad’s Room AC Heat Temperature
   trigger:
     - platform: state
-      entity_id: binary_sensor.dads_room_motion
+      entity_id: binary_sensor.dads_room_presence
       to: "on"
     - platform: time_pattern
       minutes: "/5"
@@ -255,7 +255,7 @@
   alias: Increase Dad’s Room AC Cool Temperature
   trigger:
     - platform: state
-      entity_id: binary_sensor.dads_room_motion
+      entity_id: binary_sensor.dads_room_presence
       to: "on"
     - platform: time_pattern
       minutes: "/5"
@@ -287,7 +287,7 @@
   alias: Increase Dad’s Room AC Heat Temperature
   trigger:
     - platform: state
-      entity_id: binary_sensor.dads_room_motion
+      entity_id: binary_sensor.dads_room_presence
       to: "on"
     - platform: time_pattern
       minutes: "/5"
@@ -345,8 +345,11 @@
   mode: single
   trigger:
     - platform: state
-      entity_id: binary_sensor.dads_room_motion
+      entity_id: binary_sensor.dads_room_presence
       to: "on"
+    - platform: time_pattern
+      minutes: "/5"
+      seconds: 9
   condition:
     - condition: numeric_state
       entity_id: sensor.dads_room_wbgt
@@ -383,8 +386,11 @@
   mode: single
   trigger:
     - platform: state
-      entity_id: binary_sensor.dads_room_motion
+      entity_id: binary_sensor.dads_room_presence
       to: "on"
+    - platform: time_pattern
+      minutes: "/5"
+      seconds: 28
   condition:
     - condition: numeric_state
       entity_id: sensor.dads_room_temperature
@@ -442,6 +448,8 @@
     - platform: state
       entity_id: binary_sensor.dads_room_presence
       to: "off"
+      for:
+        minutes: 20
     - platform: time_pattern
       minutes: "/5"
       seconds: 39
@@ -449,6 +457,8 @@
     - condition: state
       entity_id: binary_sensor.dads_room_presence
       state: "off"
+      for:
+        minutes: 20
     - condition: state
       entity_id: switch.dads_room_floor_heating
       state: "on"
@@ -471,8 +481,11 @@
   mode: single
   trigger:
     - platform: state
-      entity_id: binary_sensor.dads_room_motion
+      entity_id: binary_sensor.dads_room_presence
       to: "on"
+    - platform: time_pattern
+      minutes: "/5"
+      seconds: 28
   condition:
     - condition: numeric_state
       entity_id: sensor.dads_room_humidity
@@ -531,8 +544,13 @@
   mode: single
   trigger:
     - platform: state
-      entity_id: binary_sensor.dads_room_motion
+      entity_id: binary_sensor.dads_room_presence
       to: "on"
+      for:
+        minutes: 3
+    - platform: time_pattern
+      minutes: "/5"
+      seconds: 32
   condition:
     - condition: numeric_state
       entity_id: sensor.dads_room_wbgt
@@ -540,6 +558,8 @@
     - condition: state
       entity_id: binary_sensor.dads_room_presence
       state: "on"
+      for:
+        minutes: 3
     - condition: state
       entity_id: alarm_control_panel.dads_room_ac
       state: armed_home
@@ -604,8 +624,13 @@
   mode: single
   trigger:
     - platform: state
-      entity_id: binary_sensor.dads_room_motion
+      entity_id: binary_sensor.dads_room_presence
       to: "on"
+      for:
+        minutes: 3
+    - platform: time_pattern
+      minutes: "/5"
+      seconds: 11
   condition:
     - condition: numeric_state
       entity_id: sensor.dads_room_humidity
@@ -619,6 +644,8 @@
     - condition: state
       entity_id: binary_sensor.dads_room_presence
       state: "on"
+      for:
+        minutes: 3
     - condition: state
       entity_id: alarm_control_panel.dads_room_ac
       state: armed_home
@@ -645,8 +672,13 @@
   mode: single
   trigger:
     - platform: state
-      entity_id: binary_sensor.dads_room_motion
+      entity_id: binary_sensor.dads_room_presence
       to: "on"
+      for:
+        minutes: 3
+    - platform: time_pattern
+      minutes: "/5"
+      seconds: 18
   condition:
     - condition: numeric_state
       entity_id: sensor.dads_room_temperature
@@ -654,6 +686,8 @@
     - condition: state
       entity_id: binary_sensor.dads_room_presence
       state: "on"
+      for:
+        minutes: 3
     - condition: state
       entity_id: climate.dads_room_ac
       state: "off"
@@ -729,8 +763,13 @@
   mode: single
   trigger:
     - platform: state
-      entity_id: binary_sensor.dads_room_motion
+      entity_id: binary_sensor.dads_room_presence
       to: "on"
+      for:
+        minutes: 3
+    - platform: time_pattern
+      minutes: "/5"
+      seconds: 41
   condition:
     - condition: numeric_state
       entity_id: sensor.dads_room_humidity
@@ -743,6 +782,8 @@
     - condition: state
       entity_id: binary_sensor.dads_room_presence
       state: "on"
+      for:
+        minutes: 3
   action:
     - service: switch.turn_on
       entity_id: switch.dads_room_humidifier
@@ -932,6 +973,20 @@
         entity_id: "{{ states('input_select.dads_room_midnight_scene') }}"
       data:
         transition: 300
+  trace:
+    stored_traces: 100
+- id: automation.turn_off_dads_room_light_due_to_nobody
+  alias: Turn off Dad’s Room Light Due to Nobody
+  trigger:
+    - platform: state
+      entity_id: binary_sensor.dads_room_presence
+      to: "off"
+      for:
+        minutes: 30
+  action:
+    - service: light.turn_off
+      target:
+        entity_id: light.dads_room_light
   trace:
     stored_traces: 100
 - id: automation.turn_on_dads_room_light_to_wake_up_temporarily
@@ -1180,8 +1235,11 @@
   mode: single
   trigger:
     - platform: state
-      entity_id: binary_sensor.dads_room_motion
+      entity_id: binary_sensor.dads_room_presence
       to: "on"
+    - platform: time_pattern
+      minutes: "/5"
+      seconds: 55
   condition:
     - condition: numeric_state
       entity_id: sensor.dads_room_co2
