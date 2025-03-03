@@ -52,11 +52,6 @@ views:
               - entity: sensor.count_of_study_motion
               - entity: sensor.count_of_dining_room_motion
             hours_to_show: 12
-          - type: history-graph
-            title: Count of Dad’s Room Motion
-            entities:
-              - entity: sensor.count_of_dads_room_motion
-            hours_to_show: 12
       - type: vertical-stack
         cards:
           - type: entities
