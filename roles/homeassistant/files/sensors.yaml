@@ -62,13 +62,6 @@
   max_age:
     hours: 51
 - platform: statistics
-  name: Count of Dad’s Room Motion
-  unique_id: sensor.count_of_dads_room_motion
-  entity_id: binary_sensor.dads_room_motion
-  state_characteristic: count
-  max_age:
-    minutes: 30
-- platform: statistics
   name: Count of Dining Room Motion
   unique_id: sensor.count_of_dining_room_motion
   entity_id: binary_sensor.dining_room_motion
