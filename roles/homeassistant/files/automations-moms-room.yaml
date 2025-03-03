@@ -640,8 +640,6 @@
     - platform: state
       entity_id: binary_sensor.moms_room_presence
       to: "on"
-      for:
-        minutes: 3
     - platform: time_pattern
       minutes: "/5"
       seconds: 11
@@ -683,8 +681,6 @@
     - platform: state
       entity_id: binary_sensor.moms_room_presence
       to: "on"
-      for:
-        minutes: 3
     - platform: time_pattern
       minutes: "/5"
       seconds: 11
@@ -746,8 +742,6 @@
     - platform: state
       entity_id: binary_sensor.moms_room_presence
       to: "on"
-      for:
-        minutes: 3
     - platform: time_pattern
       minutes: "/5"
       seconds: 2
