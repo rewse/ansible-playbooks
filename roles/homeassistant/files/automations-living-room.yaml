@@ -80,13 +80,7 @@
   alias: Change Living Room AC Mode to Cool
   trigger:
     - platform: state
-      entity_id: binary_sensor.living_room_motion
-      to: "on"
-    - platform: state
-      entity_id: binary_sensor.study_motion
-      to: "on"
-    - platform: state
-      entity_id: binary_sensor.dining_room_motion
+      entity_id: binary_sensor.living_room_presence
       to: "on"
     - platform: time_pattern
       minutes: "/5"
@@ -125,7 +119,7 @@
   alias: Change Living Room AC Mode to Dry
   trigger:
     - platform: state
-      entity_id: binary_sensor.living_room_motion
+      entity_id: binary_sensor.living_room_presence
       to: "on"
     - platform: time_pattern
       minutes: "/5"
@@ -162,13 +156,7 @@
   alias: Decrease Living Room AC Cool Temperature
   trigger:
     - platform: state
-      entity_id: binary_sensor.living_room_motion
-      to: "on"
-    - platform: state
-      entity_id: binary_sensor.study_motion
-      to: "on"
-    - platform: state
-      entity_id: binary_sensor.dining_room_motion
+      entity_id: binary_sensor.living_room_presence
       to: "on"
     - platform: time_pattern
       minutes: "/5"
@@ -200,13 +188,7 @@
   alias: Increase Living Room AC Cool Temperature
   trigger:
     - platform: state
-      entity_id: binary_sensor.living_room_motion
-      to: "on"
-    - platform: state
-      entity_id: binary_sensor.study_motion
-      to: "on"
-    - platform: state
-      entity_id: binary_sensor.dining_room_motion
+      entity_id: binary_sensor.living_room_presence
       to: "on"
     - platform: time_pattern
       minutes: "/5"
@@ -239,14 +221,11 @@
   mode: single
   trigger:
     - platform: state
-      entity_id: binary_sensor.living_room_motion
+      entity_id: binary_sensor.living_room_presence
       to: "on"
-    - platform: state
-      entity_id: binary_sensor.study_motion
-      to: "on"
-    - platform: state
-      entity_id: binary_sensor.dining_room_motion
-      to: "on"
+    - platform: time_pattern
+      minutes: "/5"
+      seconds: 1
   condition:
     - condition: numeric_state
       entity_id: sensor.living_room_humidity
@@ -297,14 +276,11 @@
   mode: single
   trigger:
     - platform: state
-      entity_id: binary_sensor.living_room_motion
+      entity_id: binary_sensor.living_room_presence
       to: "on"
-    - platform: state
-      entity_id: binary_sensor.study_motion
-      to: "on"
-    - platform: state
-      entity_id: binary_sensor.dining_room_motion
-      to: "on"
+    - platform: time_pattern
+      minutes: "/5"
+      seconds: 16
   condition:
     - condition: numeric_state
       entity_id: sensor.living_room_humidity
@@ -354,14 +330,11 @@
   mode: single
   trigger:
     - platform: state
-      entity_id: binary_sensor.living_room_motion
+      entity_id: binary_sensor.living_room_presence
       to: "on"
-    - platform: state
-      entity_id: binary_sensor.study_motion
-      to: "on"
-    - platform: state
-      entity_id: binary_sensor.dining_room_motion
-      to: "on"
+    - platform: time_pattern
+      minutes: "/5"
+      seconds: 29
   condition:
     - condition: numeric_state
       entity_id: sensor.living_room_wbgt
@@ -505,14 +478,11 @@
   mode: single
   trigger:
     - platform: state
-      entity_id: binary_sensor.living_room_motion
+      entity_id: binary_sensor.living_room_presence
       to: "on"
-    - platform: state
-      entity_id: binary_sensor.study_motion
-      to: "on"
-    - platform: state
-      entity_id: binary_sensor.dining_room_motion
-      to: "on"
+    - platform: time_pattern
+      minutes: "/5"
+      seconds: 45
   condition:
     - condition: numeric_state
       entity_id: sensor.living_room_wbgt
@@ -577,14 +547,11 @@
   mode: single
   trigger:
     - platform: state
-      entity_id: binary_sensor.living_room_motion
+      entity_id: binary_sensor.living_room_presence
       to: "on"
-    - platform: state
-      entity_id: binary_sensor.study_motion
-      to: "on"
-    - platform: state
-      entity_id: binary_sensor.dining_room_motion
-      to: "on"
+    - platform: time_pattern
+      minutes: "/5"
+      seconds: 44
   condition:
     - condition: numeric_state
       entity_id: sensor.living_room_humidity
@@ -695,14 +662,13 @@
   mode: single
   trigger:
     - platform: state
-      entity_id: binary_sensor.living_room_motion
+      entity_id: binary_sensor.living_room_presence
       to: "on"
-    - platform: state
-      entity_id: binary_sensor.study_motion
-      to: "on"
-    - platform: state
-      entity_id: binary_sensor.dining_room_motion
-      to: "on"
+      for:
+        minutes: 3
+    - platform: time_pattern
+      minutes: "/5"
+      seconds: 21
   condition:
     - condition: numeric_state
       entity_id: sensor.living_room_temperature
@@ -721,6 +687,8 @@
     - condition: state
       entity_id: binary_sensor.living_room_presence
       state: "on"
+      for:
+        minutes: 3
   action:
     - service: switch.toggle
       entity_id: 
@@ -742,14 +710,13 @@
   mode: single
   trigger:
     - platform: state
-      entity_id: binary_sensor.living_room_motion
+      entity_id: binary_sensor.living_room_presence
       to: "on"
-    - platform: state
-      entity_id: binary_sensor.study_motion
-      to: "on"
-    - platform: state
-      entity_id: binary_sensor.dining_room_motion
-      to: "on"
+      for:
+        minutes: 3
+    - platform: time_pattern
+      minutes: "/5"
+      seconds: 35
   condition:
     - condition: numeric_state
       entity_id: sensor.living_room_wbgt
@@ -772,6 +739,8 @@
     - condition: state
       entity_id: binary_sensor.living_room_presence
       state: "on"
+      for:
+        minutes: 3
     - condition: state
       entity_id: alarm_control_panel.living_room_ac
       state: armed_home
@@ -845,14 +814,13 @@
   mode: single
   trigger:
     - platform: state
-      entity_id: binary_sensor.living_room_motion
+      entity_id: binary_sensor.living_room_presence
       to: "on"
-    - platform: state
-      entity_id: binary_sensor.study_motion
-      to: "on"
-    - platform: state
-      entity_id: binary_sensor.dining_room_motion
-      to: "on"
+      for:
+        minutes: 3
+    - platform: time_pattern
+      minutes: "/5"
+      seconds: 41
   condition:
     - condition: numeric_state
       entity_id: sensor.living_room_humidity
@@ -884,6 +852,8 @@
     - condition: state
       entity_id: binary_sensor.living_room_presence
       state: "on"
+      for:
+        minutes: 3
     - condition: state
       entity_id: alarm_control_panel.living_room_ac
       state: armed_home
@@ -929,14 +899,13 @@
   mode: single
   trigger:
     - platform: state
-      entity_id: binary_sensor.living_room_motion
+      entity_id: binary_sensor.living_room_presence
       to: "on"
-    - platform: state
-      entity_id: binary_sensor.study_motion
-      to: "on"
-    - platform: state
-      entity_id: binary_sensor.dining_room_motion
-      to: "on"
+      for:
+        minutes: 3
+    - platform: time_pattern
+      minutes: "/5"
+      seconds: 55
   condition:
     - condition: numeric_state
       entity_id: sensor.living_room_humidity
@@ -964,6 +933,8 @@
     - condition: state
       entity_id: binary_sensor.living_room_presence
       state: "on"
+      for:
+        minutes: 3
   action:
     - service: switch.turn_on
       entity_id: switch.living_room_humidifier_switch
@@ -1150,33 +1121,13 @@
   mode: single
   trigger:
     - platform: state
-      entity_id: binary_sensor.living_room_motion
+      entity_id: binary_sensor.living_room_presence
       to: "on"
-      id: Living Room Motion
-    - platform: state
-      entity_id: binary_sensor.study_motion
-      to: "on"
-      id: Study Motion
-    - platform: state
-      entity_id: binary_sensor.dining_room_motion
-      to: "on"
-      id: Dining Room Motion
-    - platform: sun
-      event: sunset
-      offset: "-00:30:00"
-      id: 30 min before Sunset
-    - platform: sun
-      event: sunset
-      offset: "-00:20:00"
-      id: 20 min before Sunset
-    - platform: sun
-      event: sunset
-      offset: "-00:10:00"
-      id: 10 min before Sunset
-    - platform: sun
-      event: sunset
-      offset: "-00:01:00"
-      id: 1 min before Sunset
+      for:
+        minutes: 3
+    - platform: time_pattern
+      minutes: "/5"
+      seconds: 57
   condition:
     - condition: numeric_state
       entity_id: sensor.living_room_light_level
@@ -1189,7 +1140,7 @@
       entity_id: light.living_area_downlights
     - service: notify.tats_devices
       data:
-        message: "Turned on Living Area Downlights due to {{ trigger.id }}. Current: {{ states('sensor.living_room_light_level') }}lx"
+        message: "Turned on Living Area Downlights. Current: {{ states('sensor.living_room_light_level') }}lx"
         data:
           url: /lovelace/home
           push:
@@ -1378,14 +1329,11 @@
   mode: single
   trigger:
     - platform: state
-      entity_id: binary_sensor.living_room_motion
+      entity_id: binary_sensor.living_room_presence
       to: "on"
-    - platform: state
-      entity_id: binary_sensor.study_motion
-      to: "on"
-    - platform: state
-      entity_id: binary_sensor.dining_room_motion
-      to: "on"
+    - platform: time_pattern
+      minutes: "/5"
+      seconds: 48
   condition:
     - condition: numeric_state
       entity_id: sensor.living_room_co2

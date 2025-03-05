@@ -45,15 +45,6 @@ views:
         hours_to_show: 12
       - type: vertical-stack
         cards:
-          - type: history-graph
-            title: Count of Living Room Motion
-            entities:
-              - entity: sensor.count_of_living_room_motion
-              - entity: sensor.count_of_study_motion
-              - entity: sensor.count_of_dining_room_motion
-            hours_to_show: 12
-      - type: vertical-stack
-        cards:
           - type: entities
             title: Living Room Humiture
             entities:
