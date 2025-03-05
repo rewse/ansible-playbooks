@@ -23,7 +23,7 @@
     living_room_floor_heating:
       friendly_name: Living Room Floor Heating
       unique_id: switch.living_room_floor_heating
-      value_template: "{{ states('sensor.living_room_temperature_effect_of_floor_heating') | float(0) > 2 }}"
+      value_template: "{{ states('sensor.living_room_temperature_effect_of_floor_heating') | float(0) > 1 }}"
       turn_on:
         service: switch.toggle
         target:
@@ -74,7 +74,7 @@
     study_floor_heating:
       friendly_name: Study Floor Heating
       unique_id: switch.study_floor_heating
-      value_template: "{{ states('sensor.living_room_temperature_effect_of_floor_heating') | float(0) > 2 }}"
+      value_template: "{{ states('sensor.living_room_temperature_effect_of_floor_heating') | float(0) > 1 }}"
       turn_on:
         service: switch.toggle
         target:
