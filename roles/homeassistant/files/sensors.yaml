@@ -62,13 +62,6 @@
   max_age:
     hours: 51
 - platform: statistics
-  name: Count of Dining Room Motion
-  unique_id: sensor.count_of_dining_room_motion
-  entity_id: binary_sensor.dining_room_motion
-  state_characteristic: count
-  max_age:
-    minutes: 30
-- platform: statistics
   name: Average of Living Room Humidity Difference
   unique_id: sensor.average_of_living_room_humidity_difference
   entity_id: sensor.living_room_humidity_difference
@@ -76,23 +69,9 @@
   max_age:
     hours: 51
 - platform: statistics
-  name: Count of Living Room Motion
-  unique_id: sensor.count_of_living_room_motion
-  entity_id: binary_sensor.living_room_motion
-  state_characteristic: count
-  max_age:
-    minutes: 30
-- platform: statistics
   name: Average of Living Room Temperature Difference
   unique_id: sensor.average_of_living_room_temperature_difference
   entity_id: sensor.living_room_temperature_difference
   state_characteristic: mean
   max_age:
     hours: 51
-- platform: statistics
-  name: Count of Study Motion
-  unique_id: sensor.count_of_study_motion
-  entity_id: binary_sensor.study_motion
-  state_characteristic: count
-  max_age:
-    minutes: 30
