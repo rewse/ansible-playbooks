@@ -118,7 +118,7 @@ cards:
   - type: entities
     title: Dad’s Room Appliances
     entities:
-      - entity: switch.dads_room_floor_heating
+      - entity: switch.dads_room_floor_heating_plug_socket_1
         name: Floor Heating
       - entity: switch.dads_room_humidifier
         name: Humidifier
