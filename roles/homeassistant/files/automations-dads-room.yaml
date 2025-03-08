@@ -460,11 +460,11 @@
       for:
         minutes: 20
     - condition: state
-      entity_id: switch.dads_room_floor_heating
+      entity_id: switch.dads_room_floor_heating_plug_socket_1
       state: "on"
   action:
     - service: switch.turn_off
-      entity_id: switch.dads_room_floor_heating
+      entity_id: switch.dads_room_floor_heating_plug_socket_1
     - service: notify.tats_devices
       data:
         message: "Turned off Dad’s Room Floor Heating"
