@@ -443,7 +443,7 @@
   action:
     - service: switch.turn_off
       entity_id:
-        - switch.living_room_camera_plug_socket_1
+        - switch.living_room_camera_plug
         - switch.dads_room_camera_plug_socket_1
         - switch.moms_room_camera_plug_socket_1
   trace:
@@ -464,7 +464,7 @@
   action:
     - service: switch.turn_on
       entity_id:
-        - switch.living_room_camera_plug_socket_1
+        - switch.living_room_camera_plug
         - switch.dads_room_camera_plug_socket_1
         - switch.moms_room_camera_plug_socket_1
   trace:
