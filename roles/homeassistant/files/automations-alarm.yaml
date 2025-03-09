@@ -214,8 +214,8 @@
         hours: 1
   trace:
     stored_traces: 100
-- id: automation.alarm_kijishiro_wifi_might_be_off
-  alias: "ALARM: kijishiro WiFi might be Off"
+- id: automation.alarm_kijitora_wifi_might_be_off
+  alias: "ALARM: kijitora WiFi might be Off"
   mode: single
   trigger:
     - platform: state
@@ -229,12 +229,12 @@
       to: "on"
   condition:
     - condition: state
-      entity_id: device_tracker.ping_kijishiro
+      entity_id: device_tracker.ping_kijitora
       state: not_home
       for:
         hours: 2
     - condition: state
-      entity_id: device_tracker.shortcut_kijishiro
+      entity_id: device_tracker.shortcut_kijitora
       state: home
       for:
         hours: 2
@@ -245,7 +245,7 @@
     - service: notify.tats_devices
       data:
         title: "⚠️ ALARM"
-        message: kijishiro WiFi might be off
+        message: kijitora WiFi might be off
         data:
           url: /lovelace-machines/machines
           push:
