@@ -39,9 +39,9 @@ views:
           - entity: device_tracker.ping_ubiqu_personal
           - entity: device_tracker.shortcut_ubiqu_personal
           - entity: person.shibata_kayano
-          - entity: device_tracker.ping_kijishiro
-          - entity: device_tracker.shortcut_kijishiro
-          - entity: device_tracker.gps_kijishiro
+          - entity: device_tracker.ping_kijitora
+          - entity: device_tracker.shortcut_kijitora
+          - entity: device_tracker.gps_kijitora
         hours_to_show: 12
       - type: vertical-stack
         cards:
