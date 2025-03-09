@@ -6,12 +6,12 @@
     - sensor.monitor_dads_room_atom
     - sensor.monitor_living_room_atom
 - platform: min_max
-  name: monitor kijishiro
+  name: monitor kijitora
   type: max
   round_digits: 0
   entity_ids:
-    - sensor.monitor_dads_room_kijishiro
-    - sensor.monitor_living_room_kijishiro
+    - sensor.monitor_dads_room_kijitora
+    - sensor.monitor_living_room_kijitora
 - platform: min_max
   name: monitor ubiqu-personal
   type: max

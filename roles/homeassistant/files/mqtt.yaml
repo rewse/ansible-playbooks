@@ -26,9 +26,9 @@ sensor:
     value_template: "{{ value_json.confidence }}"
     unit_of_measurement: "%"
     state_class: measurement
-  - unique_id: sensor.monitor_dads_room_kijishiro
-    name: monitor Dad’s Room kijishiro
-    state_topic: monitor/dads_room/kijishiro
+  - unique_id: sensor.monitor_dads_room_kijitora
+    name: monitor Dad’s Room kijitora
+    state_topic: monitor/dads_room/kijitora
     value_template: "{{ value_json.confidence }}"
     unit_of_measurement: "%"
     state_class: measurement
@@ -44,9 +44,9 @@ sensor:
     value_template: "{{ value_json.confidence }}"
     unit_of_measurement: "%"
     state_class: measurement
-  - unique_id: sensor.monitor_living_room_kijishiro
-    name: monitor Living Room kijishiro
-    state_topic: monitor/living_room/kijishiro
+  - unique_id: sensor.monitor_living_room_kijitora
+    name: monitor Living Room kijitora
+    state_topic: monitor/living_room/kijitora
     value_template: "{{ value_json.confidence }}"
     unit_of_measurement: "%"
     state_class: measurement

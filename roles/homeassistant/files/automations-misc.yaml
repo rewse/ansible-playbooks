@@ -144,23 +144,23 @@
         source_type: bluetooth
   trace:
     stored_traces: 100
-- id: automation.turn_off_monitor_kijishiro
-  alias: Turn off monitor kijishiro
+- id: automation.turn_off_monitor_kijitora
+  alias: Turn off monitor kijitora
   trigger:
     - platform: numeric_state
-      entity_id: sensor.monitor_kijishiro
+      entity_id: sensor.monitor_kijitora
       below: 10
     - platform: time_pattern
       minutes: "/5"
       seconds: 22
   condition:
     - condition: numeric_state
-      entity_id: sensor.monitor_kijishiro
+      entity_id: sensor.monitor_kijitora
       below: 10
   action:
     - service: device_tracker.see
       data:
-        dev_id: monitor_kijishiro
+        dev_id: monitor_kijitora
         location_name: not_home
         source_type: bluetooth
   trace:
@@ -207,23 +207,23 @@
         source_type: gps
   trace:
     stored_traces: 100
-- id: automation.turn_off_shortcut_kijishiro
-  alias: Turn off shortcut kijishiro
+- id: automation.turn_off_shortcut_kijitora
+  alias: Turn off shortcut kijitora
   trigger:
     - platform: state
-      entity_id: input_boolean.shortcut_kijishiro
+      entity_id: input_boolean.shortcut_kijitora
       to: "off"
     - platform: time_pattern
       minutes: "/5"
       seconds: 42
   condition:
     - condition: state
-      entity_id: input_boolean.shortcut_kijishiro
+      entity_id: input_boolean.shortcut_kijitora
       state: "off"
   action:
     - service: device_tracker.see
       data:
-        dev_id: shortcut_kijishiro
+        dev_id: shortcut_kijitora
         location_name: not_home
         source_type: gps
   trace:
@@ -322,23 +322,23 @@
         source_type: bluetooth
   trace:
     stored_traces: 100
-- id: automation.turn_on_monitor_kijishiro
-  alias: Turn on monitor kijishiro
+- id: automation.turn_on_monitor_kijitora
+  alias: Turn on monitor kijitora
   trigger:
     - platform: numeric_state
-      entity_id: sensor.monitor_kijishiro
+      entity_id: sensor.monitor_kijitora
       above: 10
     - platform: time_pattern
       minutes: "/5"
       seconds: 52
   condition:
     - condition: numeric_state
-      entity_id: sensor.monitor_kijishiro
+      entity_id: sensor.monitor_kijitora
       above: 10
   action:
     - service: device_tracker.see
       data:
-        dev_id: monitor_kijishiro
+        dev_id: monitor_kijitora
         location_name: home
         source_type: bluetooth
   trace:
@@ -385,23 +385,23 @@
         source_type: gps
   trace:
     stored_traces: 100
-- id: automation.turn_on_shorcut_kijishiro
-  alias: Turn on shortcut kijishiro
+- id: automation.turn_on_shorcut_kijitora
+  alias: Turn on shortcut kijitora
   trigger:
     - platform: state
-      entity_id: input_boolean.shortcut_kijishiro
+      entity_id: input_boolean.shortcut_kijitora
       to: "on"
     - platform: time_pattern
       minutes: "/5"
       seconds: 48
   condition:
     - condition: state
-      entity_id: input_boolean.shortcut_kijishiro
+      entity_id: input_boolean.shortcut_kijitora
       state: "on"
   action:
     - service: device_tracker.see
       data:
-        dev_id: shortcut_kijishiro
+        dev_id: shortcut_kijitora
         location_name: home
         source_type: gps
   trace:
