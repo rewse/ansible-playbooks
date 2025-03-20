@@ -24,15 +24,9 @@
   alias: "ALARM: atom WiFi might be Off"
   mode: single
   trigger:
-    - platform: state
-      entity_id: binary_sensor.living_room_motion
-      to: "on"
-    - platform: state
-      entity_id: binary_sensor.study_motion
-      to: "on"
-    - platform: state
-      entity_id: binary_sensor.dining_room_motion
-      to: "on"
+    - platform: time_pattern
+      minutes: "/5"
+      seconds: 52
   condition:
     - condition: state
       entity_id: device_tracker.ping_atom
@@ -218,15 +212,9 @@
   alias: "ALARM: kijitora WiFi might be Off"
   mode: single
   trigger:
-    - platform: state
-      entity_id: binary_sensor.living_room_motion
-      to: "on"
-    - platform: state
-      entity_id: binary_sensor.study_motion
-      to: "on"
-    - platform: state
-      entity_id: binary_sensor.dining_room_motion
-      to: "on"
+    - platform: time_pattern
+      minutes: "/5"
+      seconds: 12
   condition:
     - condition: state
       entity_id: device_tracker.ping_kijitora
@@ -610,15 +598,9 @@
   alias: "ALARM: ubiqu_personal WiFi might be Off"
   mode: single
   trigger:
-    - platform: state
-      entity_id: binary_sensor.living_room_motion
-      to: "on"
-    - platform: state
-      entity_id: binary_sensor.study_motion
-      to: "on"
-    - platform: state
-      entity_id: binary_sensor.dining_room_motion
-      to: "on"
+    - platform: time_pattern
+      minutes: "/5"
+      seconds: 23
   condition:
     - condition: state
       entity_id: device_tracker.ping_ubiqu_personal
