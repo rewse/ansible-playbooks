@@ -49,9 +49,9 @@ cards:
           - value: above_horizon
           - value: below_horizon
       - type: custom:mini-graph-card
-        name: Living Room Light Level
+        name: Living Room CO2
         entities:
-          - entity: sensor.living_room_light_level
+          - entity: sensor.living_room_co2
           - entity: sun.sun
             color: gray
             show_line: false
@@ -69,9 +69,9 @@ cards:
           - value: above_horizon
           - value: below_horizon
       - type: custom:mini-graph-card
-        name: Living Room CO2
+        name: Living Room Light Level
         entities:
-          - entity: sensor.living_room_co2
+          - entity: sensor.living_room_light_level
           - entity: sun.sun
             color: gray
             show_line: false
@@ -185,26 +185,6 @@ cards:
           - value: above_horizon
           - value: below_horizon
       - type: custom:mini-graph-card
-        name: Dad’s Room Light Level
-        entities:
-          - entity: sensor.dads_room_light_level
-          - entity: sun.sun
-            color: gray
-            show_line: false
-            show_points: false
-            y_axis: secondary
-        hours_to_show: 48
-        points_per_hour: 4
-        animate: true
-        height: 200
-        hour24: true
-        show:
-          legend: false
-          labels_secondary: false
-        state_map:
-          - value: above_horizon
-          - value: below_horizon
-      - type: custom:mini-graph-card
         name: Dad’s Room CO2
         entities:
           - entity: sensor.dads_room_co2
@@ -287,26 +267,6 @@ cards:
         name: Mom’s Room Humidity
         entities:
           - entity: sensor.moms_room_humidity
-          - entity: sun.sun
-            color: gray
-            show_line: false
-            show_points: false
-            y_axis: secondary
-        hours_to_show: 48
-        points_per_hour: 4
-        animate: true
-        height: 200
-        hour24: true
-        show:
-          legend: false
-          labels_secondary: false
-        state_map:
-          - value: above_horizon
-          - value: below_horizon
-      - type: custom:mini-graph-card
-        name: Mom’s Room Light Level
-        entities:
-          - entity: sensor.moms_room_light_level
           - entity: sun.sun
             color: gray
             show_line: false
