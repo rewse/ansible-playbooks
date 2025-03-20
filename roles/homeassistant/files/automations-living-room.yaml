@@ -1132,9 +1132,10 @@
     - condition: numeric_state
       entity_id: sensor.living_room_light_level
       below: input_number.living_area_downlights_turned_on_threshold
-    - condition: state
-      entity_id: sun.sun
-      state: above_horizon
+    - condition: sun
+      after: sunrise
+      after_offset: "+00:30:00"
+      before: sunset
   action:
     - service: light.turn_on
       entity_id: light.living_area_downlights
