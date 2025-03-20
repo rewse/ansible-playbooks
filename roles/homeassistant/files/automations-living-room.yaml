@@ -413,7 +413,7 @@
       entity_id: switch.living_area_floor_heatings
       state: "on"
     - condition: numeric_state
-      entity_id: sensor.balcony_temperature
+      entity_id: sensor.average_of_balcony_temperature
       below: 15
     - condition: state
       entity_id: alarm_control_panel.surveillance
@@ -677,7 +677,7 @@
       entity_id: switch.living_area_floor_heatings
       state: "off"
     - condition: numeric_state
-      entity_id: sensor.balcony_temperature
+      entity_id: sensor.average_of_balcony_temperature
       below: 15
     - condition: state
       entity_id: binary_sensor.living_room_window
