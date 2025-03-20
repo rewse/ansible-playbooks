@@ -164,7 +164,7 @@
       state: heat_cool
     - "{{ states('sensor.moms_room_wbgt') | float(24) < (states('input_number.moms_room_ac_heat_target_wbgt') | float(24) + 0.5) }}"
     - condition: numeric_state
-      entity_id: sensor.balcony_temperature
+      entity_id: sensor.average_of_balcony_temperature
       below: 15
     - condition: state
       entity_id: alarm_control_panel.moms_room_ac
@@ -692,7 +692,7 @@
       entity_id: climate.moms_room_ac
       state: heat
     - condition: numeric_state
-      entity_id: sensor.balcony_temperature
+      entity_id: sensor.average_of_balcony_temperature
       below: 15
     - condition: state
       entity_id: alarm_control_panel.moms_room_ac
@@ -1030,7 +1030,7 @@
       entity_id: climate.moms_room_ac
       state: "off"
     - condition: numeric_state
-      entity_id: sensor.balcony_temperature
+      entity_id: sensor.average_of_balcony_temperature
       below: 15
     - condition: time
       after: input_datetime.moms_room_curtains_opened_time_workday
@@ -1093,7 +1093,7 @@
       for:
         minutes: 3
     - condition: numeric_state
-      entity_id: sensor.balcony_temperature
+      entity_id: sensor.average_of_balcony_temperature
       below: 15
     - condition: time
       after: input_datetime.moms_room_turned_down_time
