@@ -469,7 +469,7 @@ cards:
     states:
       - arm_away
   - type: entities
-    title: Motion Sensors
+    title: Presence Sensors
     entities:
       - entity: binary_sensor.living_room_presence
         name: Living Room Presence
