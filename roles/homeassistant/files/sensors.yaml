@@ -27,6 +27,13 @@
   max_age:
     hours: 51
 - platform: statistics
+  name: Average of Balcony Temperature
+  unique_id: sensor.average_of_balcony_temperature
+  entity_id: sensor.balcony_temperature
+  state_characteristic: mean
+  max_age:
+    hours: 24
+- platform: statistics
   name: Average of Balcony Temperature Difference
   unique_id: sensor.average_of_balcony_temperature_difference
   entity_id: sensor.balcony_temperature_difference
