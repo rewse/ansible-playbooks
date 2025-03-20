@@ -432,7 +432,7 @@
           push:
             interruption-level: time-sensitive
     - delay:
-        hours: 1
+        hours: 2
   trace:
     stored_traces: 100
 - id: automation.turn_off_living_area_floor_heating_due_to_nobody
