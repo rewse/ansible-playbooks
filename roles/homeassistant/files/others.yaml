@@ -39,6 +39,18 @@ cards:
         states:
           - arm_home
   - type: entities
+    title: Presence Sensors
+    entities:
+      - entity: binary_sensor.living_room_presence
+        name: Living Room Presence
+        secondary_info: last-changed
+      - entity: binary_sensor.dads_room_presence
+        name: Dad’s Room Presence
+        secondary_info: last-changed
+      - entity: binary_sensor.moms_room_presence
+        name: Mom’s Room Presence
+        secondary_info: last-changed
+  - type: entities
     title: Other Automations
     entities:
       - entity: automation.turn_off_surveillance
