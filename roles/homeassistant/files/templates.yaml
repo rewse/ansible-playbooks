@@ -1,3 +1,13 @@
+- binary_sensor:
+  - name: Living Room Presence
+    unique_id: binary_sensor.living_room_presence
+    state: "{{ is_state('binary_sensor.living_room_presence_e', 'on') or is_state('binary_sensor.living_room_presence_s', 'on') }}"
+    icon: >
+      {% if is_state("binary_sensor.living_room_presence", "on") %}
+        mdi:home
+      {% else %}
+        mdi:home-outline
+      {% endif %}
 - sensor:
   - name: Balcony Humidity Difference
     unique_id: sensor.balcony_humidity_difference
