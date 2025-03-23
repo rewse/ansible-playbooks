@@ -434,6 +434,12 @@ cards:
       - entity: binary_sensor.living_room_presence
         name: Living Room Presence
         secondary_info: last-changed
+      - entity: binary_sensor.living_room_presence_e
+        name: Living Room Presence E
+        secondary_info: last-changed
+      - entity: binary_sensor.living_room_presence_s
+        name: Living Room Presence S
+        secondary_info: last-changed
       - entity: binary_sensor.dads_room_presence
         name: Dad’s Room Presence
         secondary_info: last-changed
