@@ -117,6 +117,8 @@ views:
                 name: Temperature Difference
               - entity: sensor.average_of_balcony_temperature_difference
                 name: Average of Temperature Difference
+              - entity: sensor.average_of_balcony_temperature
+                name: Average of Temperature
               - entity: sensor.balcony_humidity
                 name: Humidity
               - entity: sensor.balcony_switchbot_meter_humidity
