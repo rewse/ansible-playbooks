@@ -1,11 +1,4 @@
 ---
-- name: Tap brew repos
-  homebrew_tap:
-    name: "{{ item }}"
-  with_items:
-    - homebrew/cask-fonts
-  tags: [darwin, package, homebrew]
-
 - name: Install packages by homebrew
   homebrew:
     name: 
@@ -21,7 +14,6 @@
       - pv
       - pwgen
       - python3
-      - reattach-to-user-namespace
       - switchaudio-osx
       - telnet
       - source-highlight
@@ -44,12 +36,9 @@
       - arc
       - atok
       - calibre
-      - chromedriver
       - cinebench
       - corretto
       - cyberduck
-      - deepl
-      - evernote
       - firefox
       - fantastical
       - font-hackgen
@@ -58,26 +47,22 @@
       - font-sf-mono
       - font-sf-mono-for-powerline
       - font-sf-pro
-      - font-source-sans-pro
-      - font-source-serif-pro
+      - font-source-sans-3
+      - font-source-serif-4
       - geekbench
       - ghostty
       - gnucash
       - google-chrome
       - grandperspective
       - handbrake
-      - hhkb-keymap-tool
+      - hhkb
       - istat-menus
       - jordanbaird-ice
       - karabiner-elements
       - keyboard-maestro
       - keycastr
-      - kindle
       - lm-studio
-      - logitech-unifying
-      - macvim
       - messenger
-      - microsoft-edge
       - obsidian
       - ollama
       - prowritingaid
@@ -86,7 +71,6 @@
       - sony-ps-remote-play
       - steermouse
       - ticktick
-      - tigervnc-viewer
       - visual-studio-code
       - vlc
       - wireshark
@@ -98,6 +82,7 @@
   command: mas install {{item}}
   with_items:
     - 1512372293  # 3DMark
+    - 302584613   # Amazon Kindle
     - 545519333   # Amazon Prime Video
     - 1168254295  # AmorphousDiskMark
     - 425264550   # Blackmagic Disk Speed Test
@@ -110,7 +95,6 @@
     - 445189367   # PopClip
     - 1436994560  # Portal
     - 1449412482  # Reeder 4
-    - 1429033973  # RunCat
     - 1187772509  # stts
     - 899247664   # TestFlight
     - 425424353   # The Unarchiver
@@ -118,7 +102,6 @@
     - 494803304   # WiFi Explorer
     - 1451685025  # WireGuard
     - 1380563956  # 辞書 by 物書堂
-    - 599799247   # そら案内
   tags: [darwin, package, mas]
 
 - name: Create $HOME/.venv
@@ -134,24 +117,35 @@
 - name: Install packages by pip
   pip:
     name:
-      - beautifulsoup4
-      - jupyter
       - pip-review
-      - powerline-status
-      - requests
-      - selenium
     state: latest
     virtualenv: $HOME/.venv
   tags: [darwin, package, pip]
 
-- name: Download bizin-gothic
+- name: Create /Library/Fonts/Adobe
+  file:
+    path: /Library/Fonts/Adobe
+    state: directory
+  tags: [darwin, package, font]
+
+- name: Download source-han-mono
+  get_url:
+    url: https://github.com/adobe-fonts/source-han-mono/releases/download/{{ source_han_mono_version }}/SourceHanMono.ttc
+    dest: /Library/Fonts/Adobe
+  tags: [darwin, package, font]
+
+- name: Download source-han-sans
   unarchive:
-    src: https://github.com/yuru7/bizin-gothic/releases/download/v{{ bizin_gothic_version }}/{{ item }}_v{{ bizin_gothic_version }}.zip
-    dest: $HOME/Library/Fonts
+    src: https://github.com/adobe-fonts/source-han-sans/releases/download/{{ source_han_sans_version }}/SourceHanSans.ttc.zip
+    dest: /Library/Fonts/Adobe
     remote_src: yes
-  with_items:
-    - BizinGothic
-    - BizinGothicDiscord
+  tags: [darwin, package, font]
+
+- name: Download source-han-serif
+  unarchive:
+    src: https://github.com/adobe-fonts/source-han-serif/releases/download/{{ source_han_serif_version }}/01_SourceHanSerif.ttc.zip
+    dest: /Library/Fonts/Adobe
+    remote_src: yes
   tags: [darwin, package, font]
 
 # - name: Install rest of the apps
