@@ -18,7 +18,6 @@
 - name: Install packages by mas
   command: mas install {{item}}
   with_items:
-    - 973213640   # MSG Viewer for Outlook
     - 1639692859  # WattsConnected
   tags: [darwin-business, package, mas]
 

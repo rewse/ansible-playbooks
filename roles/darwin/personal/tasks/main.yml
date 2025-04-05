@@ -2,11 +2,10 @@
 - name: Install packages by homebrew_cask
   homebrew_cask:
     name: 
-      - android-file-transfer
       - charles
+      - deepl
       - epic-games
       - gog-galaxy
-      - izotope-product-portal
       - origin
       - microsoft-office
       - nextcloud-vfs
