@@ -1,0 +1,16 @@
+---
+- name: Create /var/lib/python/open-webui
+  file:
+    path: /var/lib/python/open-webui
+    state: directory
+  tags: [open-webui]
+
+- name: Create venv
+  command: python3 -m venv /var/lib/python/open-webui
+  tags: [open-webui]
+
+- name: Install open-webui
+  pip:
+    name: open-webui
+    virtualenv: /var/lib/python/open-webui
+  tags: [open-webui]
