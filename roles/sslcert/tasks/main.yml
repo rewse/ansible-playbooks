@@ -28,14 +28,16 @@
   tags: [sslcert]
 
 - name: Copy certbot.cron
-  ansible.builtin.copy:
-    src: certbot.cron
+  ansible.builtin.template:
+    src: certbot.cron.j2
     dest: /etc/cron.monthly/certbot
     mode: 0644
+    variable_start_string: "[%"
+    variable_end_string: "%]"
   tags: [sslcert]
 
 - name: Copy AWS credential
-  template:
+  ansible.builtin.template:
     src: config.j2
     dest: /root/.aws/config
     mode: 0600
