@@ -196,3 +196,17 @@
     group: "{{ admin }}"
     mode: 0600
   tags: [ubuntu, user]
+
+# Ref: https://ghostty.org/docs/help/terminfo
+- name: Copy xterm-ghostty
+  copy:
+    src: xterm-ghostty
+    dest: /usr/share/terminfo/x/xterm-ghostty
+  tags: [ubuntu, ghostty]
+
+- name: Create a link, ghostty
+  file:
+    src: ../x/xterm-ghostty
+    dest: /usr/share/terminfo/g/ghostty
+    state: link
+  tags: [ubuntu, ghostty]
