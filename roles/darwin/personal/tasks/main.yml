@@ -9,6 +9,7 @@
       - origin
       - microsoft-office
       - nextcloud-vfs
+      - ollama
       - raspberry-pi-imager
       - steam
       - steelseries-gg
