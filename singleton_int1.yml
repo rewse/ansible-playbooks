@@ -10,6 +10,7 @@
     - matter-server
     - mosquitto
     - nextcloud
+    - open-webui
     - sesame
     - switchbot
     - syslogd
