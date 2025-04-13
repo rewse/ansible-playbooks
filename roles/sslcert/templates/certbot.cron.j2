@@ -1,0 +1,51 @@
+#!/bin/bash
+
+. /var/lib/python/certbot/bin/activate
+
+pip-review -a
+
+aws route53 change-resource-record-sets \
+  --hosted-zone-id [% hosted_zone_id %] \
+  --change-batch '{
+    "Changes": [
+      {
+        "Action": "DELETE",
+        "ResourceRecordSet": {
+          "Name": "_acme-challenge.rewse.jp",
+          "Type": "CNAME",
+          "TTL": 300,
+          "ResourceRecords": [
+            {
+              "Value": "[% flyingcdn_acme_token %]"
+            }
+          ]
+        }
+      }
+    ]
+  }'
+
+sleep 10
+
+certbot renew -q
+
+aws route53 change-resource-record-sets \
+  --hosted-zone-id [% hosted_zone_id %] \
+  --change-batch '{
+    "Changes": [
+      {
+        "Action": "CREATE",
+        "ResourceRecordSet": {
+          "Name": "_acme-challenge.rewse.jp",
+          "Type": "CNAME",
+          "TTL": 300,
+          "ResourceRecords": [
+            {
+              "Value": "[% flyingcdn_acme_token %]"
+            }
+          ]
+        }
+      }
+    ]
+  }'
+
+systemctl restart apache2
