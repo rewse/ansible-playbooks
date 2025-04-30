@@ -21,6 +21,28 @@
     - 1639692859  # WattsConnected
   tags: [darwin-business, package, mas]
 
+# Install toolbox
+# Ref: https://docs.hub.amazon.dev/builder-toolbox/user-guide/getting-started/
+
+# Run `mwinit -o` before the command
+# Ref: https://w.amazon.com/bin/view/DevAccount/Docs
+- name: install ada
+  command: toolbox install ada
+  tags: [darwin-business, package, toolbox, ada]
+
+# Ref: https://w.amazon.com/bin/view/Isengard-cli/
+- name: register isengard-cli repository
+  command: toolbox registry add s3://buildertoolbox-registry-isengard-cli-us-west-2/tools.json
+  tags: [darwin-business, package, toolbox, isengard-cli]
+
+- name: install isengard-cli
+  command: toolbox install isengard-cli
+  tags: [darwin-business, package, toolbox, isengard-cli]
+
+- name: update toolbox
+  command: toolbox update
+  tags: [darwin-business, package, toolbox]
+
 # - name: Install rest of the apps
 #   install_yourself:
 #     - https://www.poly.com/us/en/products/services/cloud/poly-lens  # Poly Lens
