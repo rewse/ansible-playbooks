@@ -5,12 +5,12 @@ bcd074348424.local
 youth.local
 
 [ubuntu]
-bravo.rewse.jp
+alfa.rewse.jp
 fox.rewse.jp
 hotel.rewse.jp
 
 [ec2]
-bravo.rewse.jp
+alfa.rewse.jp
 
 [internal]
 fox.rewse.jp
@@ -21,7 +21,7 @@ fox.rewse.jp
 hotel.rewse.jp
 
 [singleton_ext1]
-bravo.rewse.jp
+alfa.rewse.jp
 
 [singleton_int1]
 fox.rewse.jp
