@@ -9,7 +9,6 @@
     - httpd
     - matter-server
     - mosquitto
-    - nextcloud
     - open-webui
     - sesame
     - switchbot
