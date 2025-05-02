@@ -179,19 +179,6 @@
   notify: Restart ssh
   tags: [ubuntu, ssh]
 
-- name: Create ssh.socket.d
-  file:
-    path: /etc/systemd/system/ssh.socket.d
-    state: directory
-  tags: [ubuntu, ssh]
-
-- name: Copy ssh.socket.d override.conf
-  template:
-    src: override.conf.j2
-    dest: /etc/systemd/system/ssh.socket.d/override.conf
-  notify: Restart ssh.socket
-  tags: [ubuntu, ssh]
-
 - name: Copy authorized_keys
   copy:
     src: /home/ubuntu/.ssh/authorized_keys

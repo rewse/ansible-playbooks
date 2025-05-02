@@ -105,6 +105,19 @@
     dest: /etc/ssh/ssh_config.d
   tags: [raspberrypi]
 
+- name: Create ssh.socket.d
+  file:
+    path: /etc/systemd/system/ssh.socket.d
+    state: directory
+  tags: [raspberrypi, ssh]
+
+- name: Copy ssh.socket.d override.conf
+  template:
+    src: override.conf.j2
+    dest: /etc/systemd/system/ssh.socket.d/override.conf
+  notify: Restart ssh.socket
+  tags: [raspberrypi, ssh]
+
 - name: Create /mnt/bak
   file:
     path: /mnt/bak
