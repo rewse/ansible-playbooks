@@ -1,16 +1,44 @@
 ---
-- name: Create /var/lib/python/open-webui
+- name: Create directory
   file:
-    path: /var/lib/python/open-webui
+    path: /srv/open-webui/data
     state: directory
   tags: [open-webui]
 
-- name: Create venv
-  command: python3 -m venv /var/lib/python/open-webui
+- name: Add to docker-compose.yml
+  blockinfile:
+    path: /etc/docker-compose.yml
+    marker: "# {mark} ANSIBLE MANAGED BLOCK open-webui"
+    block: |2
+        openwebui:
+          container_name: open-webui
+          image: ghcr.io/open-webui/open-webui:main
+          ports:
+            - "3000:8080"
+          volumes:
+            - /srv/open-webui/data:/app/backend/data
+          restart: unless-stopped
+  notify: Restart docker
   tags: [open-webui]
 
-- name: Install open-webui
-  pip:
-    name: open-webui
-    virtualenv: /var/lib/python/open-webui
-  tags: [open-webui]
+- name: Enable proxy
+  community.general.apache2_module:
+    name: "{{ item }}"
+  with_items:
+    - proxy
+    - proxy_http
+    - proxy_wstunnel
+  notify: Restart apache
+  tags: [open-webui, open-webui-apache]
+
+- name: Copy open-ebui.rewse.jp.conf
+  copy:
+    src: openwebui.rewse.jp.conf
+    dest: /etc/apache2/sites-available
+  notify: Reload apache
+  tags: [open-webui, open-webui-apache]
+
+- name: Enable openwebui.rewse.jp
+  command: a2ensite openwebui.rewse.jp
+  notify: Reload apache
+  tags: [open-webui, open-webui-apache]
