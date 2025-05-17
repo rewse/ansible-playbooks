@@ -5,9 +5,9 @@
     state: directory
   tags: [open-webui]
 
-- name: Add to docker-compose.yml
+- name: Add to compose.yml
   blockinfile:
-    path: /etc/docker-compose.yml
+    path: /etc/compose.yml
     marker: "# {mark} ANSIBLE MANAGED BLOCK open-webui"
     block: |2
         openwebui:
@@ -19,7 +19,7 @@
             - /srv/open-webui/data:/app/backend/data
           restart: unless-stopped
   notify: Restart docker
-  tags: [open-webui]
+  tags: [open-webui, open-webui-docker]
 
 - name: Enable proxy
   community.general.apache2_module:
