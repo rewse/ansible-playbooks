@@ -32,3 +32,23 @@
               url: /lovelace-people/people
               push:
                 interruption-level: time-sensitive
+- id: automation.info_mll
+  alias: "INFO: MLL"
+  trigger:
+    - platform: state
+      entity_id: sensor.mll
+  condition:
+    - condition: template
+      value_template: >-
+        {{ (as_timestamp(now()) - as_timestamp(state_attr('sensor.mll', 'Date'))) < 180 }}
+  action:
+    - delay:
+        seconds: 5
+    - service: notify.all_devices
+      data:
+        title: "[% notify_title_k %]"
+        message: "MLLを{{ states('sensor.mll_time') }}に{{ states('sensor.mll_action') }}しました"
+        data:
+          url: /lovelace-people/people
+          push:
+          interruption-level: time-sensitive
