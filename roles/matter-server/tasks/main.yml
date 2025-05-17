@@ -5,27 +5,19 @@
     state: directory
   tags: [matter-server]
 
-- name: Copy Dockerfile
-  copy:
-    src: Dockerfile
-    dest: /etc/matter-server
-  notify: Restart docker
-  tags: [matter-server]
-
-- name: Add to docker-compose.yml
+- name: Add to compose.yml
   blockinfile:
-    path: /etc/docker-compose.yml
+    path: /etc/compose.yml
     marker: "# {mark} ANSIBLE MANAGED BLOCK matter-server"
     block: |2
         matter-server:
           container_name: matter-server
-          build:
-            context: matter-server
-            dockerfile: Dockerfile
+          image: ghcr.io/home-assistant-libs/python-matter-server:stable
           security_opt:
             - apparmor:unconfined
           volumes:
-            - /etc/matter-server/data:/data
+            - /run/dbus:/run/dbus:ro
+            - /srv/matter-server/data:/data
           restart: unless-stopped
           network_mode: host
   notify: Restart docker
