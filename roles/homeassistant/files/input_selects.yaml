@@ -128,6 +128,13 @@ living_room_presence_mode:
     - Present
     - Absent
   icon: mdi:account-question
+living_room_regza_content_type_mode:
+  name: Living Room Regza Content Type Mode
+  options:
+    - Internal
+    - External
+    - "Off"
+  icon: mdi:video-input-hdmi
 living_room_scene:
   name: Living Room Scene
   options:

@@ -11,3 +11,4 @@
     name: REGZA Content Type
     unique_id: sensor.regza_content_type
     command: curl --digest --user '[% regza.username %]:[% regza.password %]' http://regza.rewse.jp/v2/remote/play/status | jq -r .content_type
+    scan_interval: 5
