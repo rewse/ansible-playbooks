@@ -12,13 +12,9 @@
   actions:
     - choose:
         - conditions:
-            - or:
-                - condition: state
-                  entity_id: input_select.living_room_light_mode
-                  state: Present Daytime
-                - condition: state
-                  entity_id: input_select.living_room_light_mode
-                  state: Absent Daytime
+            - condition: state
+              entity_id: input_select.living_room_light_mode
+              state: Daytime
           sequence:
             - action: input_select.select_option
               target: 
@@ -26,13 +22,9 @@
               data:
                 option: scene.living_room_daytime
         - conditions:
-            - or:
-                - condition: state
-                  entity_id: input_select.living_room_light_mode
-                  state: Present Twilight
-                - condition: state
-                  entity_id: input_select.living_room_light_mode
-                  state: Absent Twilight
+            - condition: state
+              entity_id: input_select.living_room_light_mode
+              state: Twilight
           sequence:
             - action: input_select.select_option
               target: 
@@ -40,13 +32,9 @@
               data:
                 option: scene.living_room_twilight
         - conditions:
-            - or:
-                - condition: state
-                  entity_id: input_select.living_room_light_mode
-                  state: Present Night
-                - condition: state
-                  entity_id: input_select.living_room_light_mode
-                  state: Absent Night
+            - condition: state
+              entity_id: input_select.living_room_light_mode
+              state: Night
             - not:
                 - condition: state
                   entity_id: input_select.living_room_scene
@@ -58,13 +46,9 @@
               data:
                 option: scene.living_room_night
         - conditions:
-            - or:
-                - condition: state
-                  entity_id: input_select.living_room_light_mode
-                  state: Present Late Night
-                - condition: state
-                  entity_id: input_select.living_room_light_mode
-                  state: Absent Late Night
+            - condition: state
+              entity_id: input_select.living_room_light_mode
+              state: Late Night
             - not:
                 - condition: state
                   entity_id: input_select.living_room_scene
@@ -76,13 +60,9 @@
               data:
                 option: scene.living_room_late_night
         - conditions:
-            - or:
-                - condition: state
-                  entity_id: input_select.living_room_light_mode
-                  state: Present Midnight
-                - condition: state
-                  entity_id: input_select.living_room_light_mode
-                  state: Absent Midnight
+            - condition: state
+              entity_id: input_select.living_room_light_mode
+              state: Midnight
             - not:
                 - condition: state
                   entity_id: input_select.living_room_scene
