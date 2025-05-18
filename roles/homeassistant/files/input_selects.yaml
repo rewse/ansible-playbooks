@@ -156,16 +156,11 @@ dads_room_midnight_scene:
 living_room_light_mode:
   name: Living Room Light Mode
   options:
-    - Present Daytime
-    - Present Twilight
-    - Present Night
-    - Present Late Night
-    - Present Midnight
-    - Absent Daytime
-    - Absent Twilight
-    - Absent Night
-    - Absent Late Night
-    - Absent Midnight
+    - Daytime
+    - Twilight
+    - Night
+    - Late Night
+    - Midnight
   icon: mdi:lightbulb-auto
 living_room_presence_mode:
   name: Living Room Presence Mode
