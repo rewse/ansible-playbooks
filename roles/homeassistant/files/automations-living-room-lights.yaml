@@ -1,0 +1,102 @@
+- id: automation.turn_on_living_room_scene
+  alias: Turn on Living Room Scene
+  triggers:
+    - trigger: state
+      entity_id: input_select.living_room_scene
+    - trigger: homeassistant
+      event: start
+  actions:
+    - action: scene.turn_on
+      target: 
+        entity_id: "{{ states('input_select.living_room_scene') }}"
+  trace:
+    stored_traces: 100
+- id: automation.select_living_room_scene
+  alias: Select Living Room Scene
+  triggers:
+    - trigger: state
+      entity_id: input_select.living_room_light_mode
+    - trigger: state
+      entity_id: input_select.living_room_scene
+      for:
+        hours: 1
+    - trigger: homeassistant
+      event: start
+  actions:
+    - choose:
+        - conditions:
+            - or:
+                - condition: state
+                  entity_id: input_select.living_room_light_mode
+                  state: Present Daytime
+                - condition: state
+                  entity_id: input_select.living_room_light_mode
+                  state: Absent Daytime
+          sequence:
+            - action: input_select.select_option
+              target: 
+                entity_id: input_select.living_room_scene
+              data:
+                option: scene.living_room_daytime
+        - conditions:
+            - or:
+                - condition: state
+                  entity_id: input_select.living_room_light_mode
+                  state: Present Twilight
+                - condition: state
+                  entity_id: input_select.living_room_light_mode
+                  state: Absent Twilight
+          sequence:
+            - action: input_select.select_option
+              target: 
+                entity_id: input_select.living_room_scene
+              data:
+                option: scene.living_room_twilight
+        - conditions:
+            - or:
+                - condition: state
+                  entity_id: input_select.living_room_light_mode
+                  state: Present Night
+                - condition: state
+                  entity_id: input_select.living_room_light_mode
+                  state: Absent Night
+          sequence:
+            - action: input_select.select_option
+              target: 
+                entity_id: input_select.living_room_scene
+              data:
+                option: scene.living_room_night
+        - conditions:
+            - or:
+                - condition: state
+                  entity_id: input_select.living_room_light_mode
+                  state: Present Late Night
+                - condition: state
+                  entity_id: input_select.living_room_light_mode
+                  state: Absent Late Night
+          sequence:
+            - action: input_select.select_option
+              target: 
+                entity_id: input_select.living_room_scene
+              data:
+                option: scene.living_room_late_night
+        - conditions:
+            - or:
+                - condition: state
+                  entity_id: input_select.living_room_light_mode
+                  state: Present Midnight
+                - condition: state
+                  entity_id: input_select.living_room_light_mode
+                  state: Absent Midnight
+            - not:
+                - condition: state
+                  entity_id: input_select.living_room_scene
+                  state: scene.living_room_dark
+          sequence:
+            - action: input_select.select_option
+              target: 
+                entity_id: input_select.living_room_scene
+              data:
+                option: scene.living_room_midnight
+  trace:
+    stored_traces: 100

@@ -108,3 +108,42 @@ dads_room_midnight_scene:
     - scene.dads_room_nightlight
     - scene.dads_room_city_of_love
   icon: mdi:brightness-3
+living_room_light_mode:
+  name: Living Room Light Mode
+  options:
+    - Present Daytime
+    - Present Twilight
+    - Present Night
+    - Present Late Night
+    - Present Midnight
+    - Absent Daytime
+    - Absent Twilight
+    - Absent Night
+    - Absent Late Night
+    - Absent Midnight
+  icon: mdi:lightbulb-auto
+living_room_presence_mode:
+  name: Living Room Presence Mode
+  options:
+    - Present
+    - Absent
+  icon: mdi:account-question
+living_room_scene:
+  name: Living Room Scene
+  options:
+    - scene.living_room_daytime
+    - scene.living_room_twilight
+    - scene.living_room_night
+    - scene.living_room_late_night
+    - scene.living_room_midnight
+    - scene.living_room_dark
+  icon: mdi:form-select
+time_mode:
+  name: Time Mode
+  options:
+    - Daytime
+    - Twilight
+    - Night
+    - Late Night
+    - Midnight
+  icon: mdi:sun-clock
