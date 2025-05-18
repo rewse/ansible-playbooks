@@ -1,0 +1,113 @@
+- id: automation.select_dads_room_scene
+  alias: Select Dad’s Room Scene
+  triggers:
+    - trigger: state
+      entity_id: input_select.dads_room_light_mode
+    - trigger: state
+      entity_id: input_select.dads_room_scene
+      for:
+        hours: 1
+    - trigger: homeassistant
+      event: start
+  actions:
+    - choose:
+        - conditions:
+            - condition: state
+              entity_id: input_select.dads_room_light_mode
+              state: Present Daytime
+          sequence:
+            - action: input_select.select_option
+              target: 
+                entity_id: input_select.dads_room_scene
+              data:
+                option: scene.dads_room_arise
+        - conditions:
+            - condition: state
+              entity_id: input_select.dads_room_light_mode
+              state: Present Twilight
+          sequence:
+            - action: input_select.select_option
+              target: 
+                entity_id: input_select.dads_room_scene
+              data:
+                option: scene.dads_room_shine
+        - conditions:
+            - condition: state
+              entity_id: input_select.dads_room_light_mode
+              state: Present Night
+            - not:
+                - condition: state
+                  entity_id: input_select.dads_room_scene
+                  state: scene.dads_room_dark
+          sequence:
+            - action: input_select.select_option
+              target: 
+                entity_id: input_select.dads_room_scene
+              data:
+                option: scene.dads_room_storybook
+        - conditions:
+            - condition: state
+              entity_id: input_select.dads_room_light_mode
+              state: Present Late Night
+            - not:
+                - condition: state
+                  entity_id: input_select.dads_room_scene
+                  state: scene.dads_room_dark
+          sequence:
+            - action: input_select.select_option
+              target: 
+                entity_id: input_select.dads_room_scene
+              data:
+                option: scene.dads_room_unwind
+        - conditions:
+            - condition: state
+              entity_id: input_select.dads_room_light_mode
+              state: Present Midnight
+            - not:
+                - condition: state
+                  entity_id: input_select.dads_room_scene
+                  state: scene.dads_room_dark
+          sequence:
+            - action: input_select.select_option
+              target: 
+                entity_id: input_select.dads_room_scene
+              data:
+                option: scene.dads_room_city_of_love
+        - conditions:
+            - or:
+                - condition: state
+                  entity_id: input_select.dads_room_light_mode
+                  state: Absent Daytime
+                - condition: state
+                  entity_id: input_select.dads_room_light_mode
+                  state: Absent Twilight
+                - condition: state
+                  entity_id: input_select.dads_room_light_mode
+                  state: Absent Night
+                - condition: state
+                  entity_id: input_select.dads_room_light_mode
+                  state: Absent Late Night
+                - condition: state
+                  entity_id: input_select.dads_room_light_mode
+                  state: Absent Midnight
+          sequence:
+            - action: input_select.select_option
+              target: 
+                entity_id: input_select.dads_room_scene
+              data:
+                option: scene.dads_room_dark
+  trace:
+    stored_traces: 100
+- id: automation.turn_on_dads_room_scene
+  alias: Turn on Dad’s Room Scene
+  triggers:
+    - trigger: state
+      entity_id: input_select.dads_room_scene
+    - trigger: homeassistant
+      event: start
+  actions:
+    - action: scene.turn_on
+      target: 
+        entity_id: "{{ states('input_select.dads_room_scene') }}"
+  trace:
+    stored_traces: 100
