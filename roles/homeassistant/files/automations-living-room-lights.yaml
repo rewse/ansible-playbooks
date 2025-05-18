@@ -11,6 +11,30 @@
         entity_id: "{{ states('input_select.living_room_scene') }}"
   trace:
     stored_traces: 100
+- id: automation.turn_on_living_room_tv_light_scene
+  alias: Turn on Living Room TV Light Scene
+  triggers:
+    - trigger: state
+      entity_id: select.living_room_tv_light_scene
+    - trigger: homeassistant
+      event: start
+  actions:
+    - if:
+        - not:
+            - condition: state
+              entity_id: input_select.living_room_regza_content_type_mode
+              state: "Off"
+      then:
+        # The scene is auto-appled when automation.select_living_room_scene is actioned
+        - action: light.turn_on
+          target:
+            entity_id: light.living_room_tv_light
+      else:
+          - action: automation.trigger
+            target:
+              entity_id: automation.turn_on_living_room_scene
+  trace:
+    stored_traces: 100
 - id: automation.select_living_room_scene
   alias: Select Living Room Scene
   triggers:
@@ -98,5 +122,44 @@
                 entity_id: input_select.living_room_scene
               data:
                 option: scene.living_room_midnight
+  trace:
+    stored_traces: 100
+- id: automation.select_living_room_tv_light_scene
+  alias: Select Living Room TV Light Scene
+  triggers:
+    - trigger: state
+      entity_id: input_select.living_room_regza_content_type_mode
+    - trigger: state
+      entity_id: select.living_room_tv_light_scene
+      for:
+        hours: 1
+    - trigger: homeassistant
+      event: start
+  actions:
+    - choose:
+        - conditions:
+            - or:
+                - condition: state
+                  entity_id: input_select.living_room_regza_content_type_mode
+                  state: Internal
+                - condition: state
+                  entity_id: input_select.living_room_regza_content_type_mode
+                  state: "Off"
+          sequence:
+            - service: select.select_option
+              target:
+                entity_id: select.living_room_tv_light_scene
+              data:
+                option: Scene (Color) - Pure
+        - conditions:
+            - condition: state
+              entity_id: input_select.living_room_regza_content_type_mode
+              state: External
+          sequence:
+            - service: select.select_option
+              target:
+                entity_id: select.living_room_tv_light_scene
+              data:
+                option: Sync - Recreation
   trace:
     stored_traces: 100
