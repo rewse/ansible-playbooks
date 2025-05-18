@@ -16,6 +16,10 @@
             - condition: numeric_state
               entity_id: sensor.living_room_light_level
               above: 21
+            - not:
+                - condition: state
+                  entity_id: input_select.time_mode
+                  state: Twilight
           sequence:
             - action: input_select.select_option
               target: 
