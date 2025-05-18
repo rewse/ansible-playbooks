@@ -75,9 +75,13 @@
               data:
                 option: Turned on Midnight
         - conditions:
-            - condition: state
-              entity_id: input_select.dads_room_light_remote_mode
-              state: Turned off
+            - or:
+                - condition: state
+                  entity_id: input_select.dads_room_light_remote_mode
+                  state: Turned off
+                - condtion: state
+                  entity_id: input_select.dads_room_presence_mode
+                  state: Absent
           sequence:
             - action: input_select.select_option
               target: 
@@ -170,14 +174,12 @@
   alias: Select Dad’s Room Presence Mode
   triggers:
     - trigger: state
-      entity_id:
-        - binary_sensor.dads_room_presence
+      entity_id: binary_sensor.dads_room_presence
       to: "on"
       for:
         minutes: 5
     - trigger: state
-      entity_id:
-        - binary_sensor.dads_room_presence
+      entity_id: binary_sensor.dads_room_presence
       to: "off"
       for:
         minutes: 20
