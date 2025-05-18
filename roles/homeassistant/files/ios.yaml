@@ -7,14 +7,6 @@ actions:
     icon:
       icon: mdi:door
       color: "#ffffff"
-  - name: turn_off_living_room_lights
-    background_color: "#202f55"
-    label:
-      text: Turn off Living Room Lights
-      color: "#ffffff"
-    icon:
-      icon: mdi:weather-night
-      color: "#ffffff"
   - name: turn_on_surveillance
     background_color: "#736d71"
     label:
