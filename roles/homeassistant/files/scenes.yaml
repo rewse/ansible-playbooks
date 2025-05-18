@@ -1,3 +1,15 @@
+- id: scene.dads_room_dark
+  name: Dad’s Room Dark
+  entities:
+    light.dads_room_pendant_light:
+      state: "off"
+    light.dads_room_monitor_light:
+      state: "off"
+    light.dads_room_chest_light:
+      state: "off"
+    light.dads_room_footlight:
+      state: "off"
+  icon: mdi:bed
 - id: scene.living_room_daytime
   name: Living Room Daytime
   entities:
