@@ -2,17 +2,17 @@
   alias: Select Dad’s Room Light Mode
   triggers:
     - trigger: state
-      entity_id:
-        - input_select.dads_room_presence_mode
-        - input_select.time_mode
+      entity_id: input_select.dads_room_light_remote_mode
+    - trigger: state
+      entity_id: input_select.time_mode
     - trigger: homeassistant
       event: start
   actions:
     - choose:
         - conditions:
             - condition: state
-              entity_id: input_select.dads_room_presence_mode
-              state: Present
+              entity_id: input_select.dads_room_light_remote_mode
+              state: Turned on
             - condition: state
               entity_id: input_select.time_mode
               state: Daytime
@@ -21,11 +21,11 @@
               target: 
                 entity_id: input_select.dads_room_light_mode
               data:
-                option: Present Daytime
+                option: Turned on Daytime
         - conditions:
             - condition: state
-              entity_id: input_select.dads_room_presence_mode
-              state: Present
+              entity_id: input_select.dads_room_light_remote_mode
+              state: Turned on
             - condition: state
               entity_id: input_select.time_mode
               state: Twilight
@@ -34,11 +34,11 @@
               target: 
                 entity_id: input_select.dads_room_light_mode
               data:
-                option: Present Twilight
+                option: Turned on Twilight
         - conditions:
             - condition: state
-              entity_id: input_select.dads_room_presence_mode
-              state: Present
+              entity_id: input_select.dads_room_light_remote_mode
+              state: Turned on
             - condition: state
               entity_id: input_select.time_mode
               state: Night
@@ -47,11 +47,11 @@
               target: 
                 entity_id: input_select.dads_room_light_mode
               data:
-                option: Present Night
+                option: Turned on Night
         - conditions:
             - condition: state
-              entity_id: input_select.dads_room_presence_mode
-              state: Present
+              entity_id: input_select.dads_room_light_remote_mode
+              state: Turned on
             - condition: state
               entity_id: input_select.time_mode
               state: Late Night
@@ -60,11 +60,11 @@
               target: 
                 entity_id: input_select.dads_room_light_mode
               data:
-                option: Present Late Night
+                option: Turned on Late Night
         - conditions:
             - condition: state
-              entity_id: input_select.dads_room_presence_mode
-              state: Present
+              entity_id: input_select.dads_room_light_remote_mode
+              state: Turned on
             - condition: state
               entity_id: input_select.time_mode
               state: Midnight
@@ -73,72 +73,97 @@
               target: 
                 entity_id: input_select.dads_room_light_mode
               data:
-                option: Present Midnight
+                option: Turned on Midnight
         - conditions:
             - condition: state
-              entity_id: input_select.dads_room_presence_mode
-              state: Absent
+              entity_id: input_select.dads_room_light_remote_mode
+              state: Turned off
+          sequence:
+            - action: input_select.select_option
+              target: 
+                entity_id: input_select.dads_room_light_mode
+              data:
+                option: Dark
+        - conditions:
+            - condition: state
+              entity_id: input_select.dads_room_light_remote_mode
+              state: Idle
             - condition: state
               entity_id: input_select.time_mode
               state: Daytime
+            - condition: state
+              entity_id: light.dads_room_pendant_light
+              state: "on"
           sequence:
             - action: input_select.select_option
               target: 
                 entity_id: input_select.dads_room_light_mode
               data:
-                option: Absent Daytime
+                option: Daytime
         - conditions:
             - condition: state
-              entity_id: input_select.dads_room_presence_mode
-              state: Absent
+              entity_id: input_select.dads_room_light_remote_mode
+              state: Idle
             - condition: state
               entity_id: input_select.time_mode
               state: Twilight
+            - condition: state
+              entity_id: light.dads_room_pendant_light
+              state: "on"
           sequence:
             - action: input_select.select_option
               target: 
                 entity_id: input_select.dads_room_light_mode
               data:
-                option: Absent Twilight
+                option: Twilight
         - conditions:
             - condition: state
-              entity_id: input_select.dads_room_presence_mode
-              state: Absent
+              entity_id: input_select.dads_room_light_remote_mode
+              state: Idle
             - condition: state
               entity_id: input_select.time_mode
               state: Night
+            - condition: state
+              entity_id: light.dads_room_pendant_light
+              state: "on"
           sequence:
             - action: input_select.select_option
               target: 
                 entity_id: input_select.dads_room_light_mode
               data:
-                option: Absent Night
+                option: Night
         - conditions:
             - condition: state
-              entity_id: input_select.dads_room_presence_mode
-              state: Absent
+              entity_id: input_select.dads_room_light_remote_mode
+              state: Idle
             - condition: state
               entity_id: input_select.time_mode
               state: Late Night
+            - condition: state
+              entity_id: light.dads_room_pendant_light
+              state: "on"
           sequence:
             - action: input_select.select_option
               target: 
                 entity_id: input_select.dads_room_light_mode
               data:
-                option: Absent Late Night
+                option: Late Night
         - conditions:
             - condition: state
-              entity_id: input_select.dads_room_presence_mode
-              state: Absent
+              entity_id: input_select.dads_room_light_remote_mode
+              state: Idle
             - condition: state
               entity_id: input_select.time_mode
               state: Midnight
+            - condition: state
+              entity_id: light.dads_room_pendant_light
+              state: "on"
           sequence:
             - action: input_select.select_option
               target: 
                 entity_id: input_select.dads_room_light_mode
               data:
-                option: Absent Midnight
+                option: Midnight
   trace:
     stored_traces: 100
 - id: automation.select_dads_room_presence_mode

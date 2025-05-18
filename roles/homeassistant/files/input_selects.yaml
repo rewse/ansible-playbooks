@@ -1,19 +1,25 @@
 dads_room_light_mode:
   name: Dad’s Room Light Mode
   options:
-    - Present Daytime
-    - Present Twilight
-    - Present Night
-    - Present Late Night
-    - Present Midnight
-    - Present Dark
-    - Absent Daytime
-    - Absent Twilight
-    - Absent Night
-    - Absent Late Night
-    - Absent Midnight
-    - Absent Dark
+    - Turned on Daytime
+    - Turned on Twilight
+    - Turned on Night
+    - Turned on Late Night
+    - Turned on Midnight
+    - Daytime
+    - Twilight
+    - Night
+    - Late Night
+    - Midnight
+    - Dark
   icon: mdi:lightbulb-auto
+dads_room_light_remote_mode:
+  name: Dad’s Room Light Remote Mode
+  options:
+    - Turned on
+    - Turned off
+    - Idle
+  icon: mdi:remote
 dads_room_presence_mode:
   name: Dad’s Room Presence Mode
   options:
