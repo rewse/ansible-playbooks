@@ -49,116 +49,23 @@ dads_room_scene:
     - scene.dads_room_city_of_love
     - scene.dads_room_dark
   icon: mdi:form-select
-dads_room_morning_scene:
-  name: Dad’s Room Morning Scene
+home_mode:
+  name: Home Mode
   options:
-    - scene.dads_room_bright
-    - scene.dads_room_dimmed
-    - scene.dads_room_arise
-    - scene.dads_room_shine
-    - scene.dads_room_storybook
-    - scene.dads_room_unwind
-    - scene.dads_room_nighttime
-    - scene.dads_room_blossom
-    - scene.dads_room_crocus
-    - scene.dads_room_starlight
-    - scene.dads_room_energize
-    - scene.dads_room_concentrate
-    - scene.dads_room_read
-    - scene.dads_room_dimmed_read
-    - scene.dads_room_relax
-    - scene.dads_room_rest
-    - scene.dads_room_nightlight
-    - scene.dads_room_city_of_love
-  icon: mdi:weather-sunset-up
-dads_room_daytime_scene:
-  name: Dad’s Room Daytime Scene
+    - Home
+    - Away
+    - Vacation
+    - Disarmed
+  icon: mdi:shield-home
+living_room_climate_mode:
+  name: Living Room Climate Mode
   options:
-    - scene.dads_room_bright
-    - scene.dads_room_dimmed
-    - scene.dads_room_arise
-    - scene.dads_room_shine
-    - scene.dads_room_storybook
-    - scene.dads_room_unwind
-    - scene.dads_room_nighttime
-    - scene.dads_room_blossom
-    - scene.dads_room_crocus
-    - scene.dads_room_starlight
-    - scene.dads_room_energize
-    - scene.dads_room_concentrate
-    - scene.dads_room_read
-    - scene.dads_room_dimmed_read
-    - scene.dads_room_relax
-    - scene.dads_room_rest
-    - scene.dads_room_nightlight
-    - scene.dads_room_city_of_love
-  icon: mdi:weather-sunny
-dads_room_sunset_scene:
-  name: Dad’s Room Sunset Scene
-  options:
-    - scene.dads_room_bright
-    - scene.dads_room_dimmed
-    - scene.dads_room_arise
-    - scene.dads_room_shine
-    - scene.dads_room_storybook
-    - scene.dads_room_unwind
-    - scene.dads_room_nighttime
-    - scene.dads_room_blossom
-    - scene.dads_room_crocus
-    - scene.dads_room_starlight
-    - scene.dads_room_energize
-    - scene.dads_room_concentrate
-    - scene.dads_room_read
-    - scene.dads_room_dimmed_read
-    - scene.dads_room_relax
-    - scene.dads_room_rest
-    - scene.dads_room_nightlight
-    - scene.dads_room_city_of_love
-  icon: mdi:weather-sunset
-dads_room_night_scene:
-  name: Dad’s Room Night Scene
-  options:
-    - scene.dads_room_bright
-    - scene.dads_room_dimmed
-    - scene.dads_room_arise
-    - scene.dads_room_shine
-    - scene.dads_room_storybook
-    - scene.dads_room_unwind
-    - scene.dads_room_nighttime
-    - scene.dads_room_blossom
-    - scene.dads_room_crocus
-    - scene.dads_room_starlight
-    - scene.dads_room_energize
-    - scene.dads_room_concentrate
-    - scene.dads_room_read
-    - scene.dads_room_dimmed_read
-    - scene.dads_room_relax
-    - scene.dads_room_rest
-    - scene.dads_room_nightlight
-    - scene.dads_room_city_of_love
-  icon: mdi:brightness-2
-dads_room_midnight_scene:
-  name: Dad’s Room Midnight Scene
-  options:
-    - scene.dads_room_bright
-    - scene.dads_room_dimmed
-    - scene.dads_room_arise
-    - scene.dads_room_shine
-    - scene.dads_room_storybook
-    - scene.dads_room_unwind
-    - scene.dads_room_nighttime
-    - scene.dads_room_blossom
-    - scene.dads_room_crocus
-    - scene.dads_room_starlight
-    - scene.dads_room_energize
-    - scene.dads_room_concentrate
-    - scene.dads_room_read
-    - scene.dads_room_dimmed_read
-    - scene.dads_room_relax
-    - scene.dads_room_rest
-    - scene.dads_room_nightlight
-    - scene.dads_room_city_of_love
-  icon: mdi:brightness-3
+    - Present Summer
+    - Present Winter
+    - Absent Summer
+    - Absent Winter
+    - Vent
+  icon: mdi:thermostat-auto
 living_room_light_mode:
   name: Living Room Light Mode
   options:
