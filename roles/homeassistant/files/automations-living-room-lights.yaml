@@ -84,6 +84,10 @@
                 - condition: state
                   entity_id: input_select.living_room_light_mode
                   state: Absent Night
+            - not:
+                - condition: state
+                  entity_id: input_select.living_room_scene
+                  state: scene.living_room_dark
           sequence:
             - action: input_select.select_option
               target: 
@@ -98,6 +102,10 @@
                 - condition: state
                   entity_id: input_select.living_room_light_mode
                   state: Absent Late Night
+            - not:
+                - condition: state
+                  entity_id: input_select.living_room_scene
+                  state: scene.living_room_dark
           sequence:
             - action: input_select.select_option
               target: 
