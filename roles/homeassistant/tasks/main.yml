@@ -120,6 +120,12 @@
     dest: /srv/homeassistant/config/automations
   tags: [homeassistant, homeassistant-automation]
 
+- name: Copy automations-living-room-lights.yaml
+  copy:
+    src: automations-living-room-lights.yaml
+    dest: /srv/homeassistant/config/automations
+  tags: [homeassistant, homeassistant-automation]
+
 - name: Copy automations-moms-room.yaml
   copy:
     src: automations-moms-room.yaml
@@ -129,6 +135,12 @@
 - name: Copy automations-misc.yaml
   copy:
     src: automations-misc.yaml
+    dest: /srv/homeassistant/config/automations
+  tags: [homeassistant, homeassistant-automation]
+
+- name: Copy automations-modes.yaml
+  copy:
+    src: automations-modes.yaml
     dest: /srv/homeassistant/config/automations
   tags: [homeassistant, homeassistant-automation]
 
@@ -404,8 +416,7 @@
   copy:
     src: scenes.yaml
     dest: /srv/homeassistant/config
-  notify: Restart homeassistant
-  tags: [homeassistant, homeassistant-component]
+  tags: [homeassistant, homeassistant-scene]
 
 - name: Config sensor
   lineinfile:
