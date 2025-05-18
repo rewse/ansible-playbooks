@@ -1,0 +1,271 @@
+- id: automation.select_living_room_light_mode
+  alias: Select Living Room Light Mode
+  triggers:
+    - trigger: state
+      entity_id:
+        - input_select.living_room_presence_mode
+        - input_select.time_mode
+    - trigger: homeassistant
+      event: start
+  actions:
+    - choose:
+        - conditions:
+            - condition: state
+              entity_id: input_select.living_room_presence_mode
+              state: Present
+            - condition: state
+              entity_id: input_select.time_mode
+              state: Daytime
+          sequence:
+            - action: input_select.select_option
+              target: 
+                entity_id: input_select.living_room_light_mode
+              data:
+                option: Present Daytime
+        - conditions:
+            - condition: state
+              entity_id: input_select.living_room_presence_mode
+              state: Present
+            - condition: state
+              entity_id: input_select.time_mode
+              state: Twilight
+          sequence:
+            - action: input_select.select_option
+              target: 
+                entity_id: input_select.living_room_light_mode
+              data:
+                option: Present Twilight
+        - conditions:
+            - condition: state
+              entity_id: input_select.living_room_presence_mode
+              state: Present
+            - condition: state
+              entity_id: input_select.time_mode
+              state: Night
+          sequence:
+            - action: input_select.select_option
+              target: 
+                entity_id: input_select.living_room_light_mode
+              data:
+                option: Present Night
+        - conditions:
+            - condition: state
+              entity_id: input_select.living_room_presence_mode
+              state: Present
+            - condition: state
+              entity_id: input_select.time_mode
+              state: Late Night
+          sequence:
+            - action: input_select.select_option
+              target: 
+                entity_id: input_select.living_room_light_mode
+              data:
+                option: Present Late Night
+        - conditions:
+            - condition: state
+              entity_id: input_select.living_room_presence_mode
+              state: Present
+            - condition: state
+              entity_id: input_select.time_mode
+              state: Midnight
+          sequence:
+            - action: input_select.select_option
+              target: 
+                entity_id: input_select.living_room_light_mode
+              data:
+                option: Present Midnight
+        - conditions:
+            - condition: state
+              entity_id: input_select.living_room_presence_mode
+              state: Absent
+            - condition: state
+              entity_id: input_select.time_mode
+              state: Daytime
+          sequence:
+            - action: input_select.select_option
+              target: 
+                entity_id: input_select.living_room_light_mode
+              data:
+                option: Absent Daytime
+        - conditions:
+            - condition: state
+              entity_id: input_select.living_room_presence_mode
+              state: Absent
+            - condition: state
+              entity_id: input_select.time_mode
+              state: Twilight
+          sequence:
+            - action: input_select.select_option
+              target: 
+                entity_id: input_select.living_room_light_mode
+              data:
+                option: Absent Twilight
+        - conditions:
+            - condition: state
+              entity_id: input_select.living_room_presence_mode
+              state: Absent
+            - condition: state
+              entity_id: input_select.time_mode
+              state: Night
+          sequence:
+            - action: input_select.select_option
+              target: 
+                entity_id: input_select.living_room_light_mode
+              data:
+                option: Absent Night
+        - conditions:
+            - condition: state
+              entity_id: input_select.living_room_presence_mode
+              state: Absent
+            - condition: state
+              entity_id: input_select.time_mode
+              state: Late Night
+          sequence:
+            - action: input_select.select_option
+              target: 
+                entity_id: input_select.living_room_light_mode
+              data:
+                option: Absent Late Night
+        - conditions:
+            - condition: state
+              entity_id: input_select.living_room_presence_mode
+              state: Absent
+            - condition: state
+              entity_id: input_select.time_mode
+              state: Midnight
+          sequence:
+            - action: input_select.select_option
+              target: 
+                entity_id: input_select.living_room_light_mode
+              data:
+                option: Absent Midnight
+  trace:
+    stored_traces: 100
+- id: automation.select_living_room_presence_mode
+  alias: Select Living Room Presence Mode
+  triggers:
+    - trigger: state
+      entity_id:
+        - binary_sensor.living_room_presence_e
+        - binary_sensor.living_room_presence_s
+      for:
+        minutes: 5
+    - trigger: time_pattern
+      minutes: "/5"
+      seconds: 35
+    - trigger: homeassistant
+      event: start
+  actions:
+    - choose:
+        - conditions:
+            - or:
+                - condition: state
+                  entity_id: binary_sensor.living_room_presence_e
+                  state: "on"
+                  for:
+                    minutes: 5
+                - condition: state
+                  entity_id: binary_sensor.living_room_presence_s
+                  state: "on"
+                  for:
+                    minutes: 5
+          sequence:
+            - action: input_select.select_option
+              target: 
+                entity_id: input_select.living_room_presence_mode
+              data:
+                option: Present
+        - conditions:
+            - or:
+                - condition: state
+                  entity_id: binary_sensor.living_room_presence_e
+                  state: "off"
+                  for:
+                    minutes: 5
+                - condition: state
+                  entity_id: binary_sensor.living_room_presence_s
+                  state: "off"
+                  for:
+                    minutes: 5
+          sequence:
+            - action: input_select.select_option
+              target: 
+                entity_id: input_select.living_room_presence_mode
+              data:
+                option: Absent
+  trace:
+    stored_traces: 100
+- id: automation.select_time_mode
+  alias: Select Time Mode
+  triggers:
+    - trigger: time_pattern
+      minutes: "/5"
+      seconds: 18
+    - trigger: homeassistant
+      event: start
+  actions:
+    - choose:
+        - conditions:
+            - condition: sun
+              after: sunrise
+              after_offset: "00:30:00"
+              before: sunset
+            - condition: numeric_state
+              entity_id: sensor.living_room_light_level
+              above: 21
+          sequence:
+            - action: input_select.select_option
+              target: 
+                entity_id: input_select.time_mode
+              data:
+                option: Daytime
+        - conditions:
+            - condition: sun
+              after: sunrise
+              after_offset: "00:30:00"
+              before: sunset
+            - condition: numeric_state
+              entity_id: sensor.living_room_light_level
+              below: 21
+          sequence:
+            - action: input_select.select_option
+              target: 
+                entity_id: input_select.time_mode
+              data:
+                option: Twilight
+        - conditions:
+            - condition: sun
+              after: sunset
+            - condition: time
+              before: "22:30:00"
+          sequence:
+            - action: input_select.select_option
+              target: 
+                entity_id: input_select.time_mode
+              data:
+                option: Night
+        - conditions:
+            - condition: time
+              after: "22:30:00"
+              before: "23:30:00"
+          sequence:
+            - action: input_select.select_option
+              target: 
+                entity_id: input_select.time_mode
+              data:
+                option: Late Night
+        - conditions:
+            - or:
+                - condition: time
+                  after: "23:30:00"
+                - condition: sun
+                  before: sunrise
+                  before_offset: "00:30:00"
+          sequence:
+            - action: input_select.select_option
+              target: 
+                entity_id: input_select.time_mode
+              data:
+                option: Midnight
+  trace:
+    stored_traces: 100

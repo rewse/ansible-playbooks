@@ -1,0 +1,111 @@
+- id: scenen.living_room_daytime
+  name: Living Room Daytime
+  entities:
+    light.living_room_downlights:
+      state: "off"
+    light.study_downlights:
+      state: "off"
+    light.living_room_entrance_light:
+      state: "off"
+    light.living_room_tv_light:
+      state: "off"
+    light.living_room_footlight:
+      state: "off"
+    light.living_room_shelf_light:
+      state: "off"
+  icon: mdi:weather-sunny
+- id: scenen.living_room_twilight
+  name: Living Room Twilight
+  entities:
+    light.living_room_downlights:
+      state: "on"
+    light.study_downlights:
+      state: "on"
+    light.living_room_entrance_light:
+      state: "off"
+    light.living_room_tv_light:
+      state: "off"
+    light.living_room_footlight:
+      state: "off"
+    light.living_room_shelf_light:
+      state: "off"
+  icon: mdi:weather-sunset
+- id: scenen.living_room_night
+  name: Living Room Night
+  entities:
+    light.living_room_downlights:
+      state: "on"
+    light.study_downlights:
+      state: "on"
+    light.living_room_entrance_light:
+      brightness: 255
+      state: "on"
+    light.living_room_tv_light:
+      brightness: 255
+      hs_color:
+        - 20
+        - 72
+      state: "on"
+    light.living_room_footlight:
+      state: "on"
+    light.living_room_shelf_light:
+      state: "on"
+  icon: mdi:weather-night
+- id: scenen.living_room_late_night
+  name: Living Room Late Night
+  entities:
+    light.living_room_dimming_downlights:
+      state: "on"
+    light.study_dimming_downlights:
+      state: "on"
+    light.living_room_entrance_light:
+      brightness: 128
+      state: "on"
+    light.living_room_tv_light:
+      brightness: 128
+      hs_color:
+        - 20
+        - 72
+      state: "on"
+    light.living_room_footlight:
+      state: "on"
+    light.living_room_shelf_light:
+      state: "on"
+  icon: mdi:brightness-2
+- id: scenen.living_room_midnight
+  name: Living Room Midnight
+  entities:
+    light.living_room_dimming_downlights:
+      state: "off"
+    light.study_dimming_downlights:
+      state: "off"
+    light.living_room_entrance_light:
+      brightness: 3
+      state: "on"
+    light.living_room_tv_light:
+      brightness: 3
+      hs_color:
+        - 20
+        - 72
+      state: "on"
+    light.living_room_footlight:
+      state: "on"
+    light.living_room_shelf_light:
+      state: "on"
+  icon: mdi:brightness-3
+- id: scenen.living_room_dark
+  name: Living Room Dark
+  entities:
+    light.living_room_dimming_downlights:
+      state: "off"
+    light.study_dimming_downlights:
+      state: "off"
+    light.living_room_entrance_light:
+      state: "off"
+    light.living_room_tv_light:
+      state: "off"
+    light.living_room_footlight:
+      state: "off"
+    light.living_room_shelf_light:
+      state: "off"
+  icon: mdi:bed
