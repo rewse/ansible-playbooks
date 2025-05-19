@@ -214,6 +214,9 @@
             - condition: state
               entity_id: input_select.dads_room_light_mode
               state: Dark
+            - condition: template
+              value_template: "{{ as_timestamp(now()) - as_timestamp(as_datetime(state_attr('automation.select_dads_room_light_mode', 'last_triggered'))) > 1 }}"
+              alias: input_select.dads_room_scene was changed but input_select.select_dads_room_light_mode was not changed. Basically, user changed input_select.dads_room_scene directly
       then:
         - action: scene.turn_on
           target: 
