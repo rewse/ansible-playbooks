@@ -79,7 +79,7 @@
                 - condition: state
                   entity_id: input_select.dads_room_light_remote_mode
                   state: Turned off
-                - condtion: state
+                - condition: state
                   entity_id: input_select.dads_room_presence_mode
                   state: Absent
           sequence:
