@@ -79,9 +79,13 @@
                 - condition: state
                   entity_id: input_select.dads_room_light_remote_mode
                   state: Turned off
-                - condition: state
-                  entity_id: input_select.dads_room_presence_mode
-                  state: Absent
+                - and:
+                    - condition: state
+                      entity_id: input_select.dads_room_light_remote_mode
+                      state: Idle
+                    - condition: state
+                      entity_id: input_select.dads_room_presence_mode
+                      state: Absent
           sequence:
             - action: input_select.select_option
               target: 
@@ -89,9 +93,6 @@
               data:
                 option: Dark
         - conditions:
-            - condition: state
-              entity_id: input_select.dads_room_light_remote_mode
-              state: Idle
             - condition: state
               entity_id: input_select.time_mode
               state: Daytime
@@ -106,9 +107,6 @@
                 option: Daytime
         - conditions:
             - condition: state
-              entity_id: input_select.dads_room_light_remote_mode
-              state: Idle
-            - condition: state
               entity_id: input_select.time_mode
               state: Twilight
             - condition: state
@@ -121,9 +119,6 @@
               data:
                 option: Twilight
         - conditions:
-            - condition: state
-              entity_id: input_select.dads_room_light_remote_mode
-              state: Idle
             - condition: state
               entity_id: input_select.time_mode
               state: Night
@@ -138,9 +133,6 @@
                 option: Night
         - conditions:
             - condition: state
-              entity_id: input_select.dads_room_light_remote_mode
-              state: Idle
-            - condition: state
               entity_id: input_select.time_mode
               state: Late Night
             - condition: state
@@ -153,9 +145,6 @@
               data:
                 option: Late Night
         - conditions:
-            - condition: state
-              entity_id: input_select.dads_room_light_remote_mode
-              state: Idle
             - condition: state
               entity_id: input_select.time_mode
               state: Midnight
