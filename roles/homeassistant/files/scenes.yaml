@@ -17,10 +17,6 @@
       state: "off"
     light.study_downlights:
       state: "off"
-    light.living_room_dimming_downlights:
-      state: "off"
-    light.study_dimming_downlights:
-      state: "off"
     light.living_room_entrance_light:
       state: "off"
     light.living_room_tv_light:
@@ -115,10 +111,6 @@
     light.living_room_downlights:
       state: "off"
     light.study_downlights:
-      state: "off"
-    light.living_room_dimming_downlights:
-      state: "off"
-    light.study_dimming_downlights:
       state: "off"
     light.living_room_entrance_light:
       state: "off"
