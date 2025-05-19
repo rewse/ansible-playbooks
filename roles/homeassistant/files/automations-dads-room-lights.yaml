@@ -120,14 +120,6 @@
                 - condition: state
                   entity_id: input_select.dads_room_light_mode
                   state: Daytime
-          sequence:
-            - action: input_select.select_option
-              target: 
-                entity_id: input_select.dads_room_scene
-              data:
-                option: scene.dads_room_arise
-        - conditions:
-            - or:
                 - condition: state
                   entity_id: input_select.dads_room_light_mode
                   state: Turned on Twilight
@@ -139,7 +131,7 @@
               target: 
                 entity_id: input_select.dads_room_scene
               data:
-                option: scene.dads_room_shine
+                option: scene.dads_room_arise
         - conditions:
             - or:
                 - condition: state
@@ -153,7 +145,7 @@
               target: 
                 entity_id: input_select.dads_room_scene
               data:
-                option: scene.dads_room_storybook
+                option: scene.dads_room_shine
         - conditions:
             - or:
                 - condition: state
@@ -167,7 +159,7 @@
               target: 
                 entity_id: input_select.dads_room_scene
               data:
-                option: scene.dads_room_unwind
+                option: scene.dads_room_storybook
         - conditions:
             - or:
                 - condition: state
