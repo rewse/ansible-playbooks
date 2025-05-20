@@ -1,0 +1,9 @@
+select_scene_living_room_dark:
+  alias: Select Scene Living Room Dark
+  sequence:
+    - action: input_select.select_option
+      target: 
+        entity_id: input_select.living_room_scene
+      data:
+        option: scene.living_room_dark
+  icon: mdi:bed
