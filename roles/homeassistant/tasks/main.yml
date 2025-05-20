@@ -436,10 +436,25 @@
     dest: /srv/homeassistant/config
   tags: [homeassistant, homeassistant-scene]
 
-- name: Config sensor
+- name: Config script
   lineinfile:
     path: /srv/homeassistant/config/configuration.yaml
     insertafter: '^scene:'
+    regexp: '^script:'
+    line: "script: !include scripts.yaml"
+  notify: Restart homeassistant
+  tags: [homeassistant, homeassistant-component]
+
+- name: Copy sensors.yaml
+  copy:
+    src: scripts.yaml
+    dest: /srv/homeassistant/config
+  tags: [homeassistant, homeassistant-script]
+
+- name: Config sensor
+  lineinfile:
+    path: /srv/homeassistant/config/configuration.yaml
+    insertafter: '^script:'
     regexp: '^sensor:'
     line: "sensor: !include sensors.yaml"
   notify: Restart homeassistant
