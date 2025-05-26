@@ -31,8 +31,24 @@
   notify: Reload apache
   tags: [httpd]
 
-- name: Enable SSL conf
-  command: a2ensite default-ssl
+- name: Copy default-ssl.conf to rename
+  file:
+    src: /etc/apache2/sites-available/default-ssl.conf
+    dest: /etc/apache2/sites-available/000-default-ssl.conf
+    state: hard
+
+- name: Enable 000-default-ssl
+  command: a2ensite 000-default-ssl
+  notify: Reload apache
+  tags: [httpd]
+
+- name: Remove default-ssl.conf
+  file:
+    path: "{{item}}"
+    state: absent
+  with_items:
+    - /etc/apache2/sites-available/default-ssl.conf
+    - /etc/apache2/sites-enabled/default-ssl.conf
   notify: Reload apache
   tags: [httpd]
 
@@ -45,7 +61,7 @@
 
 - name: Set ServerName
   lineinfile:
-    dest: /etc/apache2/sites-enabled/000-default.conf
+    dest: /etc/apache2/sites-available/000-default.conf
     insertafter: "^	#ServerName"
     regexp: "^	ServerName "
     line: "	ServerName rewse.jp:80"
@@ -54,7 +70,7 @@
 
 - name: Set ServerAdmin for http
   lineinfile:
-    dest: /etc/apache2/sites-enabled/000-default.conf
+    dest: /etc/apache2/sites-available/000-default.conf
     regexp: "^	ServerAdmin "
     line: "	ServerAdmin hostmaster@rewse.jp"
   notify: Reload apache
@@ -62,9 +78,18 @@
 
 - name: Set ServerAdmin for https
   lineinfile:
-    dest: /etc/apache2/sites-enabled/default-ssl.conf
-    regexp: "^		ServerAdmin "
-    line: "		ServerAdmin hostmaster@rewse.jp"
+    dest: /etc/apache2/sites-available/000-default-ssl.conf
+    regexp: "^	ServerAdmin "
+    line: "	ServerAdmin hostmaster@rewse.jp"
+  notify: Reload apache
+  tags: [httpd]
+
+- name: Set ServerName for https
+  lineinfile:
+    dest: /etc/apache2/sites-available/000-default-ssl.conf
+    insertafter: "^	ServerAdmin"
+    regexp: "^	ServerName "
+    line: "	ServerName rewse.jp"
   notify: Reload apache
   tags: [httpd]
 
