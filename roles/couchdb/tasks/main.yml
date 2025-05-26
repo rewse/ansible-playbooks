@@ -1,0 +1,56 @@
+---
+- name: Create directory
+  file:
+    path: "{{item}}"
+    state: directory
+  with_items:
+    - /srv/couchdb/data
+    - /srv/couchdb/etc/local.d
+  tags: [couchdb]
+
+- name: Add to compose.yml
+  blockinfile:
+    path: /etc/compose.yml
+    marker: "# {mark} ANSIBLE MANAGED BLOCK couchdb"
+    block: |2
+        couchdb:
+          container_name: couchdb
+          image: apache/couchdb
+          environment:
+            - COUCHDB_USER=tats
+            - COUCHDB_PASSWORD={{ couchdb_password }}
+          volumes:
+            - /srv/couchdb/data:/opt/couchdb/data
+            - /srv/couchdb/etc/local.d:/opt/couchdb/etc/local.d
+          ports:
+            - 5984:5984
+          restart: unless-stopped
+  notify: Restart docker
+  tags: [couchdb]
+
+- name: Download couchdb-init
+  get_url:
+    url: https://raw.githubusercontent.com/vrtmrz/obsidian-livesync/main/utils/couchdb/couchdb-init.sh
+    dest: /tmp
+    mode: 0755
+  tags: [couchdb]
+
+- name: Run couchdb-init
+  command: /tmp/couchdb-init.sh
+  environment:
+    hostname: localhost:5984
+    username: tats
+    password: "{{ couchdb_password }}"
+  tags: [couchdb]
+
+- name: Copy couchdb.rewse.jp.conf
+  copy:
+    src: couchdb.rewse.jp.conf
+    dest: /etc/apache2/sites-available
+  notify: Reload apache
+  tags: [couchdb]
+
+- name: Enable couchdb.rewse.jp
+  command: a2ensite couchdb.rewse.jp
+  notify: Reload apache
+  tags: [couchdb]
