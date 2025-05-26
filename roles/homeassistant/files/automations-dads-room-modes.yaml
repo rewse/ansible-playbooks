@@ -83,9 +83,13 @@
                     - condition: state
                       entity_id: input_select.dads_room_light_remote_mode
                       state: Idle
+                      for:
+                        minutes: 20
                     - condition: state
                       entity_id: input_select.dads_room_presence_mode
                       state: Absent
+                      for:
+                        minutes: 20
           sequence:
             - action: input_select.select_option
               target: 
@@ -196,7 +200,7 @@
               entity_id: binary_sensor.dads_room_presence
               state: "off"
               for:
-                minutes: 20
+                minutes: 5
           sequence:
             - action: input_select.select_option
               target: 
