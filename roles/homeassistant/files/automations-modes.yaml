@@ -9,9 +9,9 @@
   actions:
     - choose:
         - conditions:
+            - condition: template
+              value_template: "{{ state_attr('sun.sun', 'elevation') > 6 }}"
             - condition: sun
-              after: sunrise
-              after_offset: "00:30:00"
               before: sunset
             - condition: numeric_state
               entity_id: sensor.living_room_light_level
@@ -65,9 +65,8 @@
             - or:
                 - condition: time
                   after: "23:30:00"
-                - condition: sun
-                  before: sunrise
-                  before_offset: "00:30:00"
+                - condition: template
+                  value_template: "{{ state_attr('sun.sun', 'elevation') < 6 }}"
           sequence:
             - action: input_select.select_option
               target: 
