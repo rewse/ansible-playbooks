@@ -131,7 +131,7 @@
               target: 
                 entity_id: input_select.dads_room_scene
               data:
-                option: scene.dads_room_arise
+                option: "{{ states('input_select.dads_room_scene_daytime') }}"
         - conditions:
             - or:
                 - condition: state
@@ -145,7 +145,7 @@
               target: 
                 entity_id: input_select.dads_room_scene
               data:
-                option: scene.dads_room_shine
+                option: "{{ states('input_select.dads_room_scene_night') }}"
         - conditions:
             - or:
                 - condition: state
@@ -159,7 +159,7 @@
               target: 
                 entity_id: input_select.dads_room_scene
               data:
-                option: scene.dads_room_storybook
+                option: "{{ states('input_select.dads_room_scene_late_night') }}"
         - conditions:
             - or:
                 - condition: state
@@ -173,7 +173,7 @@
               target: 
                 entity_id: input_select.dads_room_scene
               data:
-                option: scene.dads_room_city_of_love
+                option: "{{ states('input_select.dads_room_scene_midnight') }}"
         - conditions:
             - condition: state
               entity_id: input_select.dads_room_light_mode
