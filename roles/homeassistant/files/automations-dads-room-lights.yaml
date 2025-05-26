@@ -221,6 +221,8 @@
         - action: scene.turn_on
           target: 
             entity_id: "{{ states('input_select.dads_room_scene') }}"
+        - delay:
+            seconds: 1
         - action: input_select.select_option
           target: 
             entity_id: input_select.dads_room_light_remote_mode
