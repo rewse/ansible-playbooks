@@ -76,6 +76,13 @@ dads_room_ac_dry_turned_on_threshold_wbgt:
   max: 30
   unit_of_measurement: °C
   icon: mdi:thermometer-chevron-up
+dads_room_light_auto_off_minutes:
+  name: Dad’s Room Light Auto-off Minutes
+  min: 0
+  max: 60
+  initial: 20
+  unit_of_measurement: min
+  icon: mdi:lightbulb-group-off
 living_area_downlights_turned_on_threshold:
   name: Living Area Downlights Turned on Threshold
   min: 17

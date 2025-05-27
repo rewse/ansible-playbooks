@@ -84,12 +84,12 @@
                       entity_id: input_select.dads_room_light_remote_mode
                       state: Idle
                       for:
-                        minutes: 20
+                        minutes: "{{ states('input_number.dads_room_light_auto_off_minutes') }}"
                     - condition: state
                       entity_id: input_select.dads_room_presence_mode
                       state: Absent
                       for:
-                        minutes: 20
+                        minutes: "{{ states('input_number.dads_room_light_auto_off_minutes') }}"
           sequence:
             - action: input_select.select_option
               target: 
@@ -168,17 +168,6 @@
   triggers:
     - trigger: state
       entity_id: binary_sensor.dads_room_presence
-      to: "on"
-      for:
-        minutes: 5
-    - trigger: state
-      entity_id: binary_sensor.dads_room_presence
-      to: "off"
-      for:
-        minutes: 20
-    - trigger: time_pattern
-      minutes: "/5"
-      seconds: 58
     - trigger: homeassistant
       event: start
   actions:
@@ -187,8 +176,6 @@
             - condition: state
               entity_id: binary_sensor.dads_room_presence
               state: "on"
-              for:
-                minutes: 5
           sequence:
             - action: input_select.select_option
               target: 
@@ -199,8 +186,6 @@
             - condition: state
               entity_id: binary_sensor.dads_room_presence
               state: "off"
-              for:
-                minutes: 5
           sequence:
             - action: input_select.select_option
               target: 
