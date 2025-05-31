@@ -13,12 +13,12 @@
         matter-server:
           container_name: matter-server
           image: ghcr.io/home-assistant-libs/python-matter-server:stable
-          security_opt:
-            - apparmor:unconfined
           volumes:
             - /run/dbus:/run/dbus:ro
             - /srv/matter-server/data:/data
-          restart: unless-stopped
+          security_opt:
+            - apparmor:unconfined
           network_mode: host
+          restart: unless-stopped
   notify: Restart docker
   tags: [matter-server]
