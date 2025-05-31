@@ -9,13 +9,13 @@
   actions:
     - choose:
         - conditions:
-            - condition: template
-              value_template: "{{ state_attr('sun.sun', 'elevation') > float(states('input_number.sunrise_elevation'), 6) }}"
             - condition: sun
+              after: sunrise
+              after_offset: "1:15:00"
               before: sunset
             - condition: numeric_state
               entity_id: sensor.living_room_light_level
-              above: 21
+              above: input_number.time_mode_twilight_light_level
             - not:
                 - condition: state
                   entity_id: input_select.time_mode
@@ -29,11 +29,11 @@
         - conditions:
             - condition: sun
               after: sunrise
-              after_offset: "00:30:00"
+              after_offset: "1:15:00"
               before: sunset
             - condition: numeric_state
               entity_id: sensor.living_room_light_level
-              below: 21
+              below: input_number.time_mode_twilight_light_level
           sequence:
             - action: input_select.select_option
               target: 
@@ -64,9 +64,10 @@
         - conditions:
             - or:
                 - condition: time
-                  after: "23:30:00"
-                - condition: template
-                  value_template: "{{ state_attr('sun.sun', 'elevation') < float(states('input_number.sunrise_elevation'), 6) }}"
+                  after: input_datetime.time_mode_midnight
+                - condition: sun
+                  before: sunrise
+                  before_offset: "1:15:00"
           sequence:
             - action: input_select.select_option
               target: 
