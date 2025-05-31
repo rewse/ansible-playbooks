@@ -32,11 +32,19 @@
   notify: Reload apache
   tags: [httpd]
 
+- name: Check if default-ssl.conf exists
+  stat:
+    path: /etc/apache2/sites-available/default-ssl.conf
+  register: default_ssl_conf_exists
+
 - name: Copy default-ssl.conf to rename
   file:
     src: /etc/apache2/sites-available/default-ssl.conf
     dest: /etc/apache2/sites-available/000-default-ssl.conf
     state: hard
+  when: default_ssl_conf_exists.stat.exists
+  notify: Reload apache
+  tags: [httpd]
 
 - name: Enable 000-default-ssl
   command: a2ensite 000-default-ssl
