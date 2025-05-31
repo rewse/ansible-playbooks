@@ -26,18 +26,18 @@
         homeassistant:
           container_name: homeassistant
           image: ghcr.io/home-assistant/home-assistant:stable
-          security_opt:
-            - apparmor:unconfined
+          devices:
+            - /dev/ttyUSB0:/dev/ttyUSB0
           volumes:
             - /dev/serial/by-id:/dev/serial/by-id
             - /etc/localtime:/etc/localtime:ro
             - /run/dbus:/run/dbus:ro
             - /srv/homeassistant/config:/config
-          devices:
-            - /dev/ttyUSB0:/dev/ttyUSB0
-          restart: unless-stopped
-          privileged: true
+          security_opt:
+            - apparmor:unconfined
           network_mode: host
+          privileged: true
+          restart: unless-stopped
   notify: Restart docker
   tags: [homeassistant, homeassistant-docker]
 
