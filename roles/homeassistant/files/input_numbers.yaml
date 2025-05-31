@@ -244,10 +244,10 @@ moms_room_ac_dry_turned_on_threshold_wbgt:
   max: 30
   unit_of_measurement: °C
   icon: mdi:thermometer-chevron-up
-sunrise_elevation:
-  name: Sunrise Elevation
+time_mode_twilight_light_level:
+  name: Time Mode Twilight Light Level
   min: 0
-  max: 12
-  initial: 6
-  unit_of_measurement: °
-  icon: mdi:weather-sunset-up
+  max: 100
+  initial: 20
+  unit_of_measurement: lx
+  icon: mdi:brightness-5
