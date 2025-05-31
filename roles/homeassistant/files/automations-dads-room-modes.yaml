@@ -5,6 +5,16 @@
       entity_id: input_select.dads_room_light_remote_mode
     - trigger: state
       entity_id: input_select.time_mode
+    - trigger: state
+      entity_id: input_select.dads_room_light_remote_mode
+      to: Idle
+      for:
+        minutes: "{{ states('input_number.dads_room_light_auto_off_minutes') }}"
+    - trigger: state
+      entity_id: input_select.dads_room_presence_mode
+      to: Absent
+      for:
+        minutes: "{{ states('input_number.dads_room_light_auto_off_minutes') }}"
     - trigger: homeassistant
       event: start
   actions:
