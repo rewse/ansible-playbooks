@@ -20,7 +20,7 @@ latlng:
     name: "{{ vault_latlng.y.name }}"
     lat: "{{ vault_latlng.y.lat }}"
     lng: "{{ vault_latlng.y.lng }}"
-mini_graph_card_version: 0.12.1
+mini_graph_card_version: 0.13.0
 mini_media_player_version: 1.16.9
 mosquitto_password: "{{ vault_mosquitto_password }}"
 nfs_server: guppy.rewse.jp
