@@ -63,14 +63,14 @@
 
 - name: Set the cert
   ansible.builtin.lineinfile:
-    path: /etc/apache2/sites-available/default-ssl.conf
+    path: /etc/apache2/sites-available/000-default-ssl.conf
     regexp: '^\s+SSLCertificateFile'
     line: '        SSLCertificateFile /etc/letsencrypt/live/rewse.jp/fullchain.pem'
   tags: [sslcert]
 
 - name: Set the private key
   ansible.builtin.lineinfile:
-    path: /etc/apache2/sites-available/default-ssl.conf
+    path: /etc/apache2/sites-available/000-default-ssl.conf
     regexp: '^\s+SSLCertificateKeyFile'
     line: '        SSLCertificateKeyFile /etc/letsencrypt/live/rewse.jp/privkey.pem'
   tags: [sslcert]
