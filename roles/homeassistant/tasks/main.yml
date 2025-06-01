@@ -550,7 +550,7 @@
     src: customize.yaml
     dest: /srv/homeassistant/config
   notify: Restart homeassistant
-  tags: [homeassistant, homeassistant-component]
+  tags: [homeassistant, homeassistant-customize]
 
 - name: Create custom_components dir
   file:
