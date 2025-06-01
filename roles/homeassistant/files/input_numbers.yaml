@@ -244,6 +244,13 @@ moms_room_ac_dry_turned_on_threshold_wbgt:
   max: 30
   unit_of_measurement: °C
   icon: mdi:thermometer-chevron-up
+moms_room_light_auto_off_minutes:
+  name: Mom’s Room Light Auto-off Minutes
+  min: 0
+  max: 60
+  initial: 20
+  unit_of_measurement: min
+  icon: mdi:lightbulb-group-off
 time_mode_twilight_light_level:
   name: Time Mode Twilight Light Level
   min: 0

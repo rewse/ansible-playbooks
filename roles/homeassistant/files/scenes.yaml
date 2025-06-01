@@ -121,3 +121,9 @@
     light.living_room_shelf_light:
       state: "off"
   icon: mdi:bed
+- id: scene.moms_room_dark
+  name: Mom’s Room Dark
+  entities:
+    light.moms_room_light:
+      state: "off"
+  icon: mdi:bed
