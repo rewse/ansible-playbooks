@@ -1,5 +1,4 @@
 ---
 zabbix:
   server: zabbix.rewse.jp
-  version: 7.0
-  release_revision: 2
+  version: 7.2
