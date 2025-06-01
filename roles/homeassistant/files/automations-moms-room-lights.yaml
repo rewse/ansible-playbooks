@@ -1,0 +1,399 @@
+- id: automation.push_moms_room_1_button_switch
+  alias: Push Mom’s Room 1-Button Switch
+  triggers:
+    - trigger: state
+      entity_id: event.moms_room_1_button_switch_button
+  actions:
+    - choose:
+        - conditions:
+            - condition: state
+              entity_id: event.moms_room_1_button_switch_button
+              attribute: event_type
+              state: multi_press_1
+          sequence:
+            - action: input_select.select_option
+              target: 
+                entity_id: input_select.moms_room_light_remote_mode
+              data:
+                option: Turned on
+        - conditions:
+            - condition: state
+              entity_id: event.moms_room_1_button_switch_button
+              attribute: event_type
+              state: multi_press_2
+          sequence:
+            - action: input_select.select_option
+              target: 
+                entity_id: input_select.moms_room_light_remote_mode
+              data:
+                option: Turned off
+  trace:
+    stored_traces: 100
+- id: automation.push_moms_room_4_button_switch
+  alias: Push Mom’s Room 4-Button Switch
+  triggers:
+    - trigger: state
+      entity_id: event.moms_room_4_button_switch_button_1
+      id: event.moms_room_4_button_switch_button_1
+    - trigger: state
+      entity_id: event.moms_room_4_button_switch_button_2
+      id: event.moms_room_4_button_switch_button_2
+    - trigger: state
+      entity_id: event.moms_room_4_button_switch_button_3
+      id: event.moms_room_4_button_switch_button_3
+    - trigger: state
+      entity_id: event.moms_room_4_button_switch_button_4
+      id: event.moms_room_4_button_switch_button_4
+  actions:
+    - choose:
+        - conditions:
+            - condition: trigger
+              id: event.moms_room_4_button_switch_button_1
+          sequence:
+            - action: input_select.select_option
+              target: 
+                entity_id: input_select.moms_room_light_remote_mode
+              data:
+                option: Turned on
+        - conditions:
+            - condition: trigger
+              id: event.moms_room_4_button_switch_button_2
+          sequence:
+            - action: input_select.select_option
+              target: 
+                entity_id: input_select.moms_room_light_mode
+              data:
+                option: Turned on Daytime
+        - conditions:
+            - condition: trigger
+              id: event.moms_room_4_button_switch_button_3
+          sequence:
+            - action: input_select.select_option
+              target: 
+                entity_id: input_select.moms_room_light_mode
+              data:
+                option: Turned on Midnight
+        - conditions:
+            - condition: trigger
+              id: event.moms_room_4_button_switch_button_4
+          sequence:
+            - action: input_select.select_option
+              target: 
+                entity_id: input_select.moms_room_light_remote_mode
+              data:
+                option: Turned off
+  trace:
+    stored_traces: 100
+- id: automation.select_moms_room_light_mode
+  alias: Select Mom’s Room Light Mode
+  triggers:
+    - trigger: state
+      entity_id: input_select.moms_room_light_remote_mode
+    - trigger: state
+      entity_id: input_select.time_mode
+    - trigger: state
+      entity_id: input_select.moms_room_light_remote_mode
+      to: Idle
+      for:
+        minutes: "{{ states('input_number.moms_room_light_auto_off_minutes') }}"
+    - trigger: state
+      entity_id: input_select.moms_room_presence_mode
+      to: Absent
+      for:
+        minutes: "{{ states('input_number.moms_room_light_auto_off_minutes') }}"
+    - trigger: homeassistant
+      event: start
+  actions:
+    - choose:
+        - conditions:
+            - condition: state
+              entity_id: input_select.moms_room_light_remote_mode
+              state: Turned on
+            - condition: state
+              entity_id: input_select.time_mode
+              state: Daytime
+          sequence:
+            - action: input_select.select_option
+              target: 
+                entity_id: input_select.moms_room_light_mode
+              data:
+                option: Turned on Daytime
+        - conditions:
+            - condition: state
+              entity_id: input_select.moms_room_light_remote_mode
+              state: Turned on
+            - condition: state
+              entity_id: input_select.time_mode
+              state: Twilight
+          sequence:
+            - action: input_select.select_option
+              target: 
+                entity_id: input_select.moms_room_light_mode
+              data:
+                option: Turned on Twilight
+        - conditions:
+            - condition: state
+              entity_id: input_select.moms_room_light_remote_mode
+              state: Turned on
+            - condition: state
+              entity_id: input_select.time_mode
+              state: Night
+          sequence:
+            - action: input_select.select_option
+              target: 
+                entity_id: input_select.moms_room_light_mode
+              data:
+                option: Turned on Night
+        - conditions:
+            - condition: state
+              entity_id: input_select.moms_room_light_remote_mode
+              state: Turned on
+            - condition: state
+              entity_id: input_select.time_mode
+              state: Late Night
+          sequence:
+            - action: input_select.select_option
+              target: 
+                entity_id: input_select.moms_room_light_mode
+              data:
+                option: Turned on Late Night
+        - conditions:
+            - condition: state
+              entity_id: input_select.moms_room_light_remote_mode
+              state: Turned on
+            - condition: state
+              entity_id: input_select.time_mode
+              state: Midnight
+          sequence:
+            - action: input_select.select_option
+              target: 
+                entity_id: input_select.moms_room_light_mode
+              data:
+                option: Turned on Midnight
+        - conditions:
+            - or:
+                - condition: state
+                  entity_id: input_select.moms_room_light_remote_mode
+                  state: Turned off
+                - and:
+                    - condition: state
+                      entity_id: input_select.moms_room_light_remote_mode
+                      state: Idle
+                      for:
+                        minutes: "{{ states('input_number.moms_room_light_auto_off_minutes') }}"
+                    - condition: state
+                      entity_id: input_select.moms_room_presence_mode
+                      state: Absent
+                      for:
+                        minutes: "{{ states('input_number.moms_room_light_auto_off_minutes') }}"
+          sequence:
+            - action: input_select.select_option
+              target: 
+                entity_id: input_select.moms_room_light_mode
+              data:
+                option: Dark
+        - conditions:
+            - condition: state
+              entity_id: input_select.time_mode
+              state: Daytime
+            - condition: state
+              entity_id: light.moms_room_light
+              state: "on"
+          sequence:
+            - action: input_select.select_option
+              target: 
+                entity_id: input_select.moms_room_light_mode
+              data:
+                option: Daytime
+        - conditions:
+            - condition: state
+              entity_id: input_select.time_mode
+              state: Twilight
+            - condition: state
+              entity_id: light.moms_room_light
+              state: "on"
+          sequence:
+            - action: input_select.select_option
+              target: 
+                entity_id: input_select.moms_room_light_mode
+              data:
+                option: Twilight
+        - conditions:
+            - condition: state
+              entity_id: input_select.time_mode
+              state: Night
+            - condition: state
+              entity_id: light.moms_room_light
+              state: "on"
+          sequence:
+            - action: input_select.select_option
+              target: 
+                entity_id: input_select.moms_room_light_mode
+              data:
+                option: Night
+        - conditions:
+            - condition: state
+              entity_id: input_select.time_mode
+              state: Late Night
+            - condition: state
+              entity_id: light.moms_room_light
+              state: "on"
+          sequence:
+            - action: input_select.select_option
+              target: 
+                entity_id: input_select.moms_room_light_mode
+              data:
+                option: Late Night
+        - conditions:
+            - condition: state
+              entity_id: input_select.time_mode
+              state: Midnight
+            - condition: state
+              entity_id: light.moms_room_light
+              state: "on"
+          sequence:
+            - action: input_select.select_option
+              target: 
+                entity_id: input_select.moms_room_light_mode
+              data:
+                option: Midnight
+  trace:
+    stored_traces: 100
+- id: automation.select_moms_room_scene
+  alias: Select Mom’s Room Scene
+  triggers:
+    - trigger: state
+      entity_id: input_select.moms_room_light_mode
+    - trigger: state
+      entity_id: input_select.moms_room_scene
+      for:
+        hours: 1
+    - trigger: homeassistant
+      event: start
+  actions:
+    - choose:
+        - conditions:
+            - or:
+                - condition: state
+                  entity_id: input_select.moms_room_light_mode
+                  state: Turned on Daytime
+                - condition: state
+                  entity_id: input_select.moms_room_light_mode
+                  state: Daytime
+                - condition: state
+                  entity_id: input_select.moms_room_light_mode
+                  state: Turned on Twilight
+                - condition: state
+                  entity_id: input_select.moms_room_light_mode
+                  state: Twilight
+          sequence:
+            - action: input_select.select_option
+              target: 
+                entity_id: input_select.moms_room_scene
+              data:
+                option: "{{ states('input_select.moms_room_scene_daytime') }}"
+        - conditions:
+            - or:
+                - condition: state
+                  entity_id: input_select.moms_room_light_mode
+                  state: Turned on Night
+                - condition: state
+                  entity_id: input_select.moms_room_light_mode
+                  state: Night
+          sequence:
+            - action: input_select.select_option
+              target: 
+                entity_id: input_select.moms_room_scene
+              data:
+                option: "{{ states('input_select.moms_room_scene_night') }}"
+        - conditions:
+            - or:
+                - condition: state
+                  entity_id: input_select.moms_room_light_mode
+                  state: Turned on Late Night
+                - condition: state
+                  entity_id: input_select.moms_room_light_mode
+                  state: Late Night
+          sequence:
+            - action: input_select.select_option
+              target: 
+                entity_id: input_select.moms_room_scene
+              data:
+                option: "{{ states('input_select.moms_room_scene_late_night') }}"
+        - conditions:
+            - or:
+                - condition: state
+                  entity_id: input_select.moms_room_light_mode
+                  state: Turned on Midnight
+                - condition: state
+                  entity_id: input_select.moms_room_light_mode
+                  state: Midnight
+          sequence:
+            - action: input_select.select_option
+              target: 
+                entity_id: input_select.moms_room_scene
+              data:
+                option: "{{ states('input_select.moms_room_scene_midnight') }}"
+        - conditions:
+            - condition: state
+              entity_id: input_select.moms_room_light_mode
+              state: Dark
+          sequence:
+            - action: input_select.select_option
+              target: 
+                entity_id: input_select.moms_room_scene
+              data:
+                option: scene.moms_room_dark
+  trace:
+    stored_traces: 100
+- id: automation.turn_on_moms_room_scene
+  alias: Turn on Mom’s Room Scene
+  triggers:
+    - trigger: state
+      entity_id: input_select.moms_room_scene
+    - trigger: homeassistant
+      event: start
+  actions:
+    - if: 
+        - or:
+            - condition: state
+              entity_id: input_select.moms_room_light_mode
+              state: Turned on Daytime
+            - condition: state
+              entity_id: input_select.moms_room_light_mode
+              state: Turned on Twilight
+            - condition: state
+              entity_id: input_select.moms_room_light_mode
+              state: Turned on Night
+            - condition: state
+              entity_id: input_select.moms_room_light_mode
+              state: Turned on Late Night
+            - condition: state
+              entity_id: input_select.moms_room_light_mode
+              state: Turned on Midnight
+            - condition: state
+              entity_id: input_select.moms_room_light_mode
+              state: Dark
+            - condition: template
+              value_template: "{{ as_timestamp(now()) - as_timestamp(as_datetime(state_attr('automation.select_moms_room_light_mode', 'last_triggered'))) > 1 }}"
+              alias: input_select.moms_room_scene was changed but input_select.select_moms_room_light_mode was not changed. Basically, user changed input_select.moms_room_scene directly
+      then:
+        - action: scene.turn_on
+          target: 
+            entity_id: "{{ states('input_select.moms_room_scene') }}"
+        - delay:
+            seconds: 1
+        - action: input_select.select_option
+          target: 
+            entity_id: input_select.moms_room_light_remote_mode
+          data:
+            option: Idle
+      else:
+        - action: hue.activate_scene
+          target: 
+            entity_id: "{{ states('input_select.moms_room_scene') }}"
+          data:
+            transition: 300
+  mode: restart
+  trace:
+    stored_traces: 100
