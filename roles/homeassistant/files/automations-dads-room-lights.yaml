@@ -112,8 +112,8 @@
       for:
         minutes: "{{ states('input_number.dads_room_light_auto_off_minutes') }}"
     - trigger: state
-      entity_id: input_select.dads_room_presence_mode
-      to: Absent
+      entity_id: input_boolean.dads_room_presence_mode
+      to: "off"
       for:
         minutes: "{{ states('input_number.dads_room_light_auto_off_minutes') }}"
     - trigger: homeassistant
@@ -197,8 +197,8 @@
                       for:
                         minutes: "{{ states('input_number.dads_room_light_auto_off_minutes') }}"
                     - condition: state
-                      entity_id: input_select.dads_room_presence_mode
-                      state: Absent
+                      entity_id: input_boolean.dads_room_presence_mode
+                      state: "off"
                       for:
                         minutes: "{{ states('input_number.dads_room_light_auto_off_minutes') }}"
           sequence:

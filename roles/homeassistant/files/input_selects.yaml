@@ -20,12 +20,6 @@ dads_room_light_remote_mode:
     - Turned off
     - Idle
   icon: mdi:remote
-dads_room_presence_mode:
-  name: Dad’s Room Presence Mode
-  options:
-    - Present
-    - Absent
-  icon: mdi:account-question
 dads_room_scene:
   name: Dad’s Room Scene
   options:
@@ -171,12 +165,6 @@ living_room_light_mode:
     - Late Night
     - Midnight
   icon: mdi:lightbulb-auto
-living_room_presence_mode:
-  name: Living Room Presence Mode
-  options:
-    - Present
-    - Absent
-  icon: mdi:account-question
 living_room_regza_content_type_mode:
   name: Living Room Regza Content Type Mode
   options:
@@ -261,12 +249,6 @@ moms_room_scene_midnight:
     - scene.moms_room_rest
     - scene.moms_room_dark
   icon: mdi:brightness-3
-moms_room_presence_mode:
-  name: Mom’s Room Presence Mode
-  options:
-    - Present
-    - Absent
-  icon: mdi:account-question
 time_mode:
   name: Time Mode
   options:
