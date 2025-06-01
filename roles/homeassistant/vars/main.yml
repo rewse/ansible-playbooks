@@ -35,5 +35,5 @@ regza:
   password: "{{ vault_regza.password }}"
 simple_thermostat_version: 2.5.0
 simple_weather_card_version: 0.8.5
-tuya_local_version: 2024.11.4
+tuya_local_version: 2025.5.1
 uptime_card_version: 0.4.0
