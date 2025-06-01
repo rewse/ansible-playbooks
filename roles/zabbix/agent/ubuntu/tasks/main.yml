@@ -1,16 +1,7 @@
 ---
-- name: Install zabbix-release for amd64
+- name: Install zabbix-release
   apt:
-    deb: https://repo.zabbix.com/zabbix/{{ zabbix.version }}/ubuntu/pool/main/z/zabbix-release/zabbix-release_{{ zabbix.version }}-{{ zabbix.release_revision }}+ubuntu24.04_all.deb
-  when:
-    ansible_architecture == "x86_64"
-  tags: [zabbix-agent-ubuntu, package]
-
-- name: Install zabbix-release for arm64
-  apt:
-    deb: https://repo.zabbix.com/zabbix/{{ zabbix.version }}/ubuntu-arm64/pool/main/z/zabbix-release/zabbix-release_{{ zabbix.version }}-{{ zabbix.release_revision }}+ubuntu24.04_all.deb
-  when:
-    ansible_architecture == "aarch64"
+    deb: https://repo.zabbix.com/zabbix/{{ zabbix.version }}/release/ubuntu/pool/main/z/zabbix-release/zabbix-release_latest_{{ zabbix.version }}+ubuntu24.04_all.deb
   tags: [zabbix-agent-ubuntu, package]
 
 - name: Install zabbix agent
