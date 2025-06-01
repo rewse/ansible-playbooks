@@ -4,6 +4,9 @@
     - trigger: time_pattern
       minutes: "/5"
       seconds: 18
+    - trigger: state
+      entity_id: binary_sensor.living_room_motion
+      to: "on"
     - trigger: homeassistant
       event: start
   actions:
@@ -11,7 +14,7 @@
         - conditions:
             - condition: sun
               after: sunrise
-              after_offset: "1:15:00"
+              after_offset: "2:00:00"
               before: sunset
             - condition: numeric_state
               entity_id: sensor.living_room_light_level
@@ -27,10 +30,18 @@
               data:
                 option: Daytime
         - conditions:
-            - condition: sun
-              after: sunrise
-              after_offset: "1:15:00"
-              before: sunset
+            - or:
+                - condition: sun
+                  after: sunrise
+                  after_offset: "2:00:00"
+                  before: sunset
+                - and:
+                    - condition: sun
+                      after: sunrise
+                      before: sunset
+                    - condition: state
+                      entity_id: binary_sensor.living_room_motion
+                      state: "on" 
             - condition: numeric_state
               entity_id: sensor.living_room_light_level
               below: input_number.time_mode_twilight_light_level
@@ -67,7 +78,6 @@
                   after: input_datetime.time_mode_midnight
                 - condition: sun
                   before: sunrise
-                  before_offset: "1:15:00"
           sequence:
             - action: input_select.select_option
               target: 
@@ -75,4 +85,4 @@
               data:
                 option: Midnight
   trace:
-    stored_traces: 100
+    stored_traces: 1000
