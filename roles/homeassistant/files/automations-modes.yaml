@@ -12,10 +12,18 @@
   actions:
     - choose:
         - conditions:
-            - condition: sun
-              after: sunrise
-              after_offset: "2:00:00"
-              before: sunset
+            - or:
+                - condition: sun
+                  after: sunrise
+                  after_offset: "2:00:00"
+                  before: sunset
+                - and:
+                    - condition: sun
+                      after: sunrise
+                      before: sunset
+                    - condition: state
+                      entity_id: binary_sensor.living_room_motion
+                      state: "on" 
             - condition: numeric_state
               entity_id: sensor.living_room_light_level
               above: input_number.time_mode_twilight_light_level
