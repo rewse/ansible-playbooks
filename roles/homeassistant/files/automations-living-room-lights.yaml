@@ -150,13 +150,11 @@
   actions:
     - choose:
         - conditions:
-            - or:
-                - condition: state
-                  entity_id: input_select.living_room_regza_content_type_mode
-                  state: Internal
-                - condition: state
-                  entity_id: input_select.living_room_regza_content_type_mode
-                  state: "Off"
+            - condition: state
+              entity_id: input_select.living_room_regza_content_type_mode
+              state:
+                - Internal
+                - "Off"
           sequence:
             - service: select.select_option
               target:
