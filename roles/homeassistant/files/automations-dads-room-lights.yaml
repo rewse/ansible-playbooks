@@ -190,13 +190,17 @@
                 - condition: state
                   entity_id: input_select.dads_room_light_remote_mode
                   state: Turned off
-                - condition: state
-                  entity_id: 
-                    - input_select.dads_room_light_remote_mode
-                    - input_boolean.dads_room_presence_mode
-                  state: Idle
-                  for:
-                    minutes: "{{ states('input_number.dads_room_light_auto_off_minutes') }}"
+                - and:
+                    - condition: state
+                      entity_id: input_select.dads_room_light_remote_mode
+                      state: "Idle"
+                      for:
+                        minutes: "{{ states('input_number.dads_room_light_auto_off_minutes') }}"
+                    - condition: state
+                      entity_id: input_boolean.dads_room_presence_mode
+                      state: "off"
+                      for:
+                        minutes: "{{ states('input_number.dads_room_light_auto_off_minutes') }}"
           sequence:
             - action: input_select.select_option
               target: 
