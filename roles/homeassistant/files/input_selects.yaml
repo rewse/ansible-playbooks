@@ -1,260 +1,281 @@
 dads_room_light_mode:
-  name: Dad’s Room Light Mode
+  name: "Dad’s Room Light Mode"
   options:
-    - Turned on Daytime
-    - Turned on Twilight
-    - Turned on Night
-    - Turned on Late Night
-    - Turned on Midnight
-    - Daytime
-    - Twilight
-    - Night
-    - Late Night
-    - Midnight
-    - Dark
-  icon: mdi:lightbulb-auto
+    - "Turned on Daytime"
+    - "Turned on Twilight"
+    - "Turned on Night"
+    - "Turned on Late Night"
+    - "Turned on Midnight"
+    - "Daytime"
+    - "Twilight"
+    - "Night"
+    - "Late Night"
+    - "Midnight"
+    - "Dark"
+  icon: "mdi:lightbulb-auto"
 dads_room_light_remote_mode:
-  name: Dad’s Room Light Remote Mode
+  name: "Dad’s Room Light Remote Mode"
   options:
-    - Turned on
-    - Turned off
-    - Idle
-  icon: mdi:remote
+    - "Turned on"
+    - "Turned off"
+    - "Idle"
+  icon: "mdi:remote"
 dads_room_scene:
-  name: Dad’s Room Scene
+  name: "Dad’s Room Scene"
   options:
-    - scene.dads_room_bright
-    - scene.dads_room_dimmed
-    - scene.dads_room_arise
-    - scene.dads_room_shine
-    - scene.dads_room_storybook
-    - scene.dads_room_unwind
-    - scene.dads_room_nighttime
-    - scene.dads_room_blossom
-    - scene.dads_room_crocus
-    - scene.dads_room_starlight
-    - scene.dads_room_energize
-    - scene.dads_room_concentrate
-    - scene.dads_room_read
-    - scene.dads_room_dimmed_read
-    - scene.dads_room_relax
-    - scene.dads_room_rest
-    - scene.dads_room_nightlight
-    - scene.dads_room_city_of_love
-    - scene.dads_room_dark
-  icon: mdi:form-select
+    - "scene.dads_room_bright"
+    - "scene.dads_room_dimmed"
+    - "scene.dads_room_arise"
+    - "scene.dads_room_shine"
+    - "scene.dads_room_storybook"
+    - "scene.dads_room_unwind"
+    - "scene.dads_room_nighttime"
+    - "scene.dads_room_blossom"
+    - "scene.dads_room_crocus"
+    - "scene.dads_room_starlight"
+    - "scene.dads_room_energize"
+    - "scene.dads_room_concentrate"
+    - "scene.dads_room_read"
+    - "scene.dads_room_dimmed_read"
+    - "scene.dads_room_relax"
+    - "scene.dads_room_rest"
+    - "scene.dads_room_nightlight"
+    - "scene.dads_room_city_of_love"
+    - "scene.dads_room_dark"
+  icon: "mdi:form-select"
 dads_room_scene_daytime:
-  name: Dad’s Room Scene Daytime
+  name: "Dad’s Room Scene Daytime"
   options:
-    - scene.dads_room_bright
-    - scene.dads_room_dimmed
-    - scene.dads_room_arise
-    - scene.dads_room_shine
-    - scene.dads_room_storybook
-    - scene.dads_room_unwind
-    - scene.dads_room_nighttime
-    - scene.dads_room_blossom
-    - scene.dads_room_crocus
-    - scene.dads_room_starlight
-    - scene.dads_room_energize
-    - scene.dads_room_concentrate
-    - scene.dads_room_read
-    - scene.dads_room_dimmed_read
-    - scene.dads_room_relax
-    - scene.dads_room_rest
-    - scene.dads_room_nightlight
-    - scene.dads_room_city_of_love
-    - scene.dads_room_dark
-  initial: scene.dads_room_arise 
-  icon: mdi:weather-sunny
+    - "scene.dads_room_bright"
+    - "scene.dads_room_dimmed"
+    - "scene.dads_room_arise"
+    - "scene.dads_room_shine"
+    - "scene.dads_room_storybook"
+    - "scene.dads_room_unwind"
+    - "scene.dads_room_nighttime"
+    - "scene.dads_room_blossom"
+    - "scene.dads_room_crocus"
+    - "scene.dads_room_starlight"
+    - "scene.dads_room_energize"
+    - "scene.dads_room_concentrate"
+    - "scene.dads_room_read"
+    - "scene.dads_room_dimmed_read"
+    - "scene.dads_room_relax"
+    - "scene.dads_room_rest"
+    - "scene.dads_room_nightlight"
+    - "scene.dads_room_city_of_love"
+    - "scene.dads_room_dark"
+  initial: "scene.dads_room_arise"
+  icon: "mdi:weather-sunny"
 dads_room_scene_night:
-  name: Dad’s Room Scene Night
+  name: "Dad’s Room Scene Night"
   options:
-    - scene.dads_room_bright
-    - scene.dads_room_dimmed
-    - scene.dads_room_arise
-    - scene.dads_room_shine
-    - scene.dads_room_storybook
-    - scene.dads_room_unwind
-    - scene.dads_room_nighttime
-    - scene.dads_room_blossom
-    - scene.dads_room_crocus
-    - scene.dads_room_starlight
-    - scene.dads_room_energize
-    - scene.dads_room_concentrate
-    - scene.dads_room_read
-    - scene.dads_room_dimmed_read
-    - scene.dads_room_relax
-    - scene.dads_room_rest
-    - scene.dads_room_nightlight
-    - scene.dads_room_city_of_love
-    - scene.dads_room_dark
-  initial: scene.dads_room_shine
-  icon: mdi:weather-night
+    - "scene.dads_room_bright"
+    - "scene.dads_room_dimmed"
+    - "scene.dads_room_arise"
+    - "scene.dads_room_shine"
+    - "scene.dads_room_storybook"
+    - "scene.dads_room_unwind"
+    - "scene.dads_room_nighttime"
+    - "scene.dads_room_blossom"
+    - "scene.dads_room_crocus"
+    - "scene.dads_room_starlight"
+    - "scene.dads_room_energize"
+    - "scene.dads_room_concentrate"
+    - "scene.dads_room_read"
+    - "scene.dads_room_dimmed_read"
+    - "scene.dads_room_relax"
+    - "scene.dads_room_rest"
+    - "scene.dads_room_nightlight"
+    - "scene.dads_room_city_of_love"
+    - "scene.dads_room_dark"
+  initial: "scene.dads_room_shine"
+  icon: "mdi:weather-night"
 dads_room_scene_late_night:
-  name: Dad’s Room Scene Late Night
+  name: "Dad’s Room Scene Late Night"
   options:
-    - scene.dads_room_bright
-    - scene.dads_room_dimmed
-    - scene.dads_room_arise
-    - scene.dads_room_shine
-    - scene.dads_room_storybook
-    - scene.dads_room_unwind
-    - scene.dads_room_nighttime
-    - scene.dads_room_blossom
-    - scene.dads_room_crocus
-    - scene.dads_room_starlight
-    - scene.dads_room_energize
-    - scene.dads_room_concentrate
-    - scene.dads_room_read
-    - scene.dads_room_dimmed_read
-    - scene.dads_room_relax
-    - scene.dads_room_rest
-    - scene.dads_room_nightlight
-    - scene.dads_room_city_of_love
-    - scene.dads_room_dark
-  initial: scene.dads_room_storybook
-  icon: mdi:brightness-2
+    - "scene.dads_room_bright"
+    - "scene.dads_room_dimmed"
+    - "scene.dads_room_arise"
+    - "scene.dads_room_shine"
+    - "scene.dads_room_storybook"
+    - "scene.dads_room_unwind"
+    - "scene.dads_room_nighttime"
+    - "scene.dads_room_blossom"
+    - "scene.dads_room_crocus"
+    - "scene.dads_room_starlight"
+    - "scene.dads_room_energize"
+    - "scene.dads_room_concentrate"
+    - "scene.dads_room_read"
+    - "scene.dads_room_dimmed_read"
+    - "scene.dads_room_relax"
+    - "scene.dads_room_rest"
+    - "scene.dads_room_nightlight"
+    - "scene.dads_room_city_of_love"
+    - "scene.dads_room_dark"
+  initial: "scene.dads_room_storybook"
+  icon: "mdi:brightness-2"
 dads_room_scene_midnight:
-  name: Dad’s Room Scene Midnight
+  name: "Dad’s Room Scene Midnight"
   options:
-    - scene.dads_room_bright
-    - scene.dads_room_dimmed
-    - scene.dads_room_arise
-    - scene.dads_room_shine
-    - scene.dads_room_storybook
-    - scene.dads_room_unwind
-    - scene.dads_room_nighttime
-    - scene.dads_room_blossom
-    - scene.dads_room_crocus
-    - scene.dads_room_starlight
-    - scene.dads_room_energize
-    - scene.dads_room_concentrate
-    - scene.dads_room_read
-    - scene.dads_room_dimmed_read
-    - scene.dads_room_relax
-    - scene.dads_room_rest
-    - scene.dads_room_nightlight
-    - scene.dads_room_city_of_love
-    - scene.dads_room_dark
-  initial: scene.dads_room_city_of_love
-  icon: mdi:brightness-3
+    - "scene.dads_room_bright"
+    - "scene.dads_room_dimmed"
+    - "scene.dads_room_arise"
+    - "scene.dads_room_shine"
+    - "scene.dads_room_storybook"
+    - "scene.dads_room_unwind"
+    - "scene.dads_room_nighttime"
+    - "scene.dads_room_blossom"
+    - "scene.dads_room_crocus"
+    - "scene.dads_room_starlight"
+    - "scene.dads_room_energize"
+    - "scene.dads_room_concentrate"
+    - "scene.dads_room_read"
+    - "scene.dads_room_dimmed_read"
+    - "scene.dads_room_relax"
+    - "scene.dads_room_rest"
+    - "scene.dads_room_nightlight"
+    - "scene.dads_room_city_of_love"
+    - "scene.dads_room_dark"
+  initial: "scene.dads_room_city_of_love"
+  icon: "mdi:brightness-3"
 home_mode:
-  name: Home Mode
+  name: "Home Mode"
   options:
-    - Home
-    - Away
-    - Vacation
-    - Disarmed
-  icon: mdi:shield-home
+    - "Home"
+    - "Away"
+    - "Vacation"
+    - "Disarmed"
+  icon: "mdi:shield-home"
 living_room_climate_mode:
-  name: Living Room Climate Mode
+  name: "Living Room Climate Mode"
   options:
-    - Present Summer
-    - Present Winter
-    - Absent Summer
-    - Absent Winter
-    - Vent
-  icon: mdi:thermostat-auto
+    - "Present Summer"
+    - "Present Winter"
+    - "Absent Summer"
+    - "Absent Winter"
+    - "Vent"
+  icon: "mdi:thermostat-auto"
 living_room_light_mode:
-  name: Living Room Light Mode
+  name: "Living Room Light Mode"
   options:
-    - Daytime
-    - Twilight
-    - Night
-    - Late Night
-    - Midnight
-  icon: mdi:lightbulb-auto
+    - "Daytime"
+    - "Twilight"
+    - "Night"
+    - "Late Night"
+    - "Midnight"
+  icon: "mdi:lightbulb-auto"
 living_room_regza_content_type_mode:
-  name: Living Room Regza Content Type Mode
+  name: "Living Room Regza Content Type Mode"
   options:
-    - Internal
-    - External
+    - "Internal"
+    - "External"
     - "Off"
-  icon: mdi:video-input-hdmi
+  icon: "mdi:video-input-hdmi"
 living_room_scene:
-  name: Living Room Scene
+  name: "Living Room Scene"
   options:
-    - scene.living_room_daytime
-    - scene.living_room_twilight
-    - scene.living_room_night
-    - scene.living_room_late_night
-    - scene.living_room_midnight
-    - scene.living_room_dark
-  icon: mdi:form-select
+    - "scene.living_room_daytime"
+    - "scene.living_room_twilight"
+    - "scene.living_room_night"
+    - "scene.living_room_late_night"
+    - "scene.living_room_midnight"
+    - "scene.living_room_dark"
+  icon: "mdi:form-select"
+living_room_window_mode:
+  name: "Living Room Window Mode"
+  options:
+    - "Open"
+    - "Closed"
+  icon: "mdi:window-closed-variant"
+moms_room_climate_mode:
+  name: "Mom’s Room Climate Mode"
+  options:
+    - "Present Summer"
+    - "Present Winter"
+    - "Absent Summer"
+    - "Absent Winter"
+    - "Vent"
+  icon: "mdi:thermostat-auto"
 moms_room_light_mode:
-  name: Mom’s Room Light Mode
+  name: "Mom’s Room Light Mode"
   options:
-    - Turned on Daytime
-    - Turned on Twilight
-    - Turned on Night
-    - Turned on Late Night
-    - Turned on Midnight
-    - Daytime
-    - Twilight
-    - Night
-    - Late Night
-    - Midnight
-    - Dark
-  icon: mdi:lightbulb-auto
+    - "Turned on Daytime"
+    - "Turned on Twilight"
+    - "Turned on Night"
+    - "Turned on Late Night"
+    - "Turned on Midnight"
+    - "Daytime"
+    - "Twilight"
+    - "Night"
+    - "Late Night"
+    - "Midnight"
+    - "Dark"
+  icon: "mdi:lightbulb-auto"
 moms_room_light_remote_mode:
-  name: Mom’s Room Light Remote Mode
+  name: "Mom’s Room Light Remote Mode"
   options:
-    - Turned on
-    - Turned off
-    - Idle
-  icon: mdi:remote
+    - "Turned on"
+    - "Turned off"
+    - "Idle"
+  icon: "mdi:remote"
 moms_room_scene:
-  name: Mom’s Room Scene
+  name: "Mom’s Room Scene"
   options:
-    - scene.moms_room_bright
-    - scene.moms_room_nightlight
-    - scene.moms_room_relax
-    - scene.moms_room_rest
-    - scene.moms_room_dark
-  icon: mdi:form-select
+    - "scene.moms_room_bright"
+    - "scene.moms_room_nightlight"
+    - "scene.moms_room_relax"
+    - "scene.moms_room_rest"
+    - "scene.moms_room_dark"
+  icon: "mdi:form-select"
 moms_room_scene_daytime:
-  name: Mom’s Room Scene Daytime
+  name: "Mom’s Room Scene Daytime"
   options:
-    - scene.moms_room_bright
-    - scene.moms_room_nightlight
-    - scene.moms_room_relax
-    - scene.moms_room_rest
-    - scene.moms_room_dark
-  icon: mdi:weather-sunny
+    - "scene.moms_room_bright"
+    - "scene.moms_room_nightlight"
+    - "scene.moms_room_relax"
+    - "scene.moms_room_rest"
+    - "scene.moms_room_dark"
+  icon: "mdi:weather-sunny"
 moms_room_scene_night:
-  name: Mom’s Room Scene Night
+  name: "Mom’s Room Scene Night"
   options:
-    - scene.moms_room_bright
-    - scene.moms_room_nightlight
-    - scene.moms_room_relax
-    - scene.moms_room_rest
-    - scene.moms_room_dark
-  icon: mdi:weather-night
+    - "scene.moms_room_bright"
+    - "scene.moms_room_nightlight"
+    - "scene.moms_room_relax"
+    - "scene.moms_room_rest"
+    - "scene.moms_room_dark"
+  icon: "mdi:weather-night"
 moms_room_scene_late_night:
-  name: Mom’s Room Scene Late Night
+  name: "Mom’s Room Scene Late Night"
   options:
-    - scene.moms_room_bright
-    - scene.moms_room_nightlight
-    - scene.moms_room_relax
-    - scene.moms_room_rest
-    - scene.moms_room_dark
-  icon: mdi:brightness-2
+    - "scene.moms_room_bright"
+    - "scene.moms_room_nightlight"
+    - "scene.moms_room_relax"
+    - "scene.moms_room_rest"
+    - "scene.moms_room_dark"
+  icon: "mdi:brightness-2"
 moms_room_scene_midnight:
-  name: Mom’s Room Scene Midnight
+  name: "Mom’s Room Scene Midnight"
   options:
-    - scene.moms_room_bright
-    - scene.moms_room_nightlight
-    - scene.moms_room_relax
-    - scene.moms_room_rest
-    - scene.moms_room_dark
-  icon: mdi:brightness-3
+    - "scene.moms_room_bright"
+    - "scene.moms_room_nightlight"
+    - "scene.moms_room_relax"
+    - "scene.moms_room_rest"
+    - "scene.moms_room_dark"
+  icon: "mdi:brightness-3"
+season_mode:
+  name: "Season Mode"
+  options:
+    - "Summer"
+    - "Winter"
+  icon: "mdi:sun-snowflake-variant"
 time_mode:
-  name: Time Mode
+  name: "Time Mode"
   options:
-    - Daytime
-    - Twilight
-    - Night
-    - Late Night
-    - Midnight
-  icon: mdi:sun-clock
+    - "Daytime"
+    - "Twilight"
+    - "Night"
+    - "Late Night"
+    - "Midnight"
+  icon: "mdi:sun-clock"

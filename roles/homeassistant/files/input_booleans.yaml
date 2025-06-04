@@ -1,9 +1,9 @@
 dads_room_presence_mode:
-  name: Dad’s Room Presence Mode
-  icon: mdi:home-account
+  name: "Dad’s Room Presence Mode"
+  icon: "mdi:home-account"
 moms_room_presence_mode:
-  name: Mom’s Room Presence Mode
-  icon: mdi:home-account
+  name: "Mom’s Room Presence Mode"
+  icon: "mdi:home-account"
 shortcut_atom:
   name: Shortcut atom
   icon: mdi:layers

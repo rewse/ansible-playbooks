@@ -1,5 +1,5 @@
 - id: automation.select_time_mode
-  alias: Select Time Mode
+  alias: "Select Time Mode"
   triggers:
     - trigger: time_pattern
       minutes: "/5"
@@ -30,13 +30,13 @@
             - not:
                 - condition: state
                   entity_id: input_select.time_mode
-                  state: Twilight
+                  state: "Twilight"
           sequence:
             - action: input_select.select_option
               target: 
                 entity_id: input_select.time_mode
               data:
-                option: Daytime
+                option: "Daytime"
         - conditions:
             - or:
                 - condition: sun
@@ -58,7 +58,7 @@
               target: 
                 entity_id: input_select.time_mode
               data:
-                option: Twilight
+                option: "Twilight"
         - conditions:
             - condition: sun
               after: sunset
@@ -69,7 +69,7 @@
               target: 
                 entity_id: input_select.time_mode
               data:
-                option: Night
+                option: "Night"
         - conditions:
             - condition: time
               after: input_datetime.time_mode_late_night
@@ -79,7 +79,7 @@
               target: 
                 entity_id: input_select.time_mode
               data:
-                option: Late Night
+                option: "Late Night"
         - conditions:
             - or:
                 - condition: time
@@ -91,6 +91,6 @@
               target: 
                 entity_id: input_select.time_mode
               data:
-                option: Midnight
+                option: "Midnight"
   trace:
     stored_traces: 1000
