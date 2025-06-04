@@ -1,5 +1,5 @@
 - id: automation.push_dads_room_1_button_switch
-  alias: Push Dad’s Room 1-Button Switch
+  alias: "Push Dad’s Room 1-Button Switch"
   triggers:
     - trigger: state
       entity_id: event.dads_room_1_button_switch_button
@@ -9,29 +9,29 @@
             - condition: state
               entity_id: event.dads_room_1_button_switch_button
               attribute: event_type
-              state: multi_press_1
+              state: "multi_press_1"
           sequence:
             - action: input_select.select_option
               target: 
                 entity_id: input_select.dads_room_light_remote_mode
               data:
-                option: Turned on
+                option: "Turned on"
         - conditions:
             - condition: state
               entity_id: event.dads_room_1_button_switch_button
               attribute: event_type
-              state: multi_press_2
+              state: "multi_press_2"
           sequence:
             - action: input_select.select_option
               target: 
                 entity_id: input_select.dads_room_light_remote_mode
               data:
-                option: Turned off
+                option: "Turned off"
         - conditions:
             - condition: state
               entity_id: event.dads_room_1_button_switch_button
               attribute: event_type
-              state: long_press
+              state: "long_press"
           sequence:
               - service: scene.apply
                 data:
@@ -45,7 +45,7 @@
   trace:
     stored_traces: 100
 - id: automation.push_dads_room_4_button_switch
-  alias: Push Dad’s Room 4-Button Switch
+  alias: "Push Dad’s Room 4-Button Switch"
   triggers:
     - trigger: state
       entity_id: event.dads_room_4_button_switch_button_1
@@ -69,7 +69,7 @@
               target: 
                 entity_id: input_select.dads_room_light_remote_mode
               data:
-                option: Turned on
+                option: "Turned on"
         - conditions:
             - condition: trigger
               id: event.dads_room_4_button_switch_button_2
@@ -78,7 +78,7 @@
               target: 
                 entity_id: input_select.dads_room_light_mode
               data:
-                option: Turned on Daytime
+                option: "Turned on Daytime"
         - conditions:
             - condition: trigger
               id: event.dads_room_4_button_switch_button_3
@@ -87,7 +87,7 @@
               target: 
                 entity_id: input_select.dads_room_light_mode
               data:
-                option: Turned on Midnight
+                option: "Turned on Midnight"
         - conditions:
             - condition: trigger
               id: event.dads_room_4_button_switch_button_4
@@ -96,11 +96,11 @@
               target: 
                 entity_id: input_select.dads_room_light_remote_mode
               data:
-                option: Turned off
+                option: "Turned off"
   trace:
     stored_traces: 100
 - id: automation.select_dads_room_light_mode
-  alias: Select Dad’s Room Light Mode
+  alias: "Select Dad’s Room Light Mode"
   triggers:
     - trigger: state
       entity_id: input_select.dads_room_light_remote_mode
@@ -108,7 +108,7 @@
       entity_id: input_select.time_mode
     - trigger: state
       entity_id: input_select.dads_room_light_remote_mode
-      to: Idle
+      to: "Idle"
       for:
         minutes: "{{ states('input_number.dads_room_light_auto_off_minutes') }}"
     - trigger: state
@@ -123,68 +123,68 @@
         - conditions:
             - condition: state
               entity_id: input_select.dads_room_light_remote_mode
-              state: Turned on
+              state: "Turned on"
             - condition: state
               entity_id: input_select.time_mode
-              state: Daytime
+              state: "Daytime"
           sequence:
             - action: input_select.select_option
               target: 
                 entity_id: input_select.dads_room_light_mode
               data:
-                option: Turned on Daytime
+                option: "Turned on Daytime"
         - conditions:
             - condition: state
               entity_id: input_select.dads_room_light_remote_mode
-              state: Turned on
+              state: "Turned on"
             - condition: state
               entity_id: input_select.time_mode
-              state: Twilight
+              state: "Twilight"
           sequence:
             - action: input_select.select_option
               target: 
                 entity_id: input_select.dads_room_light_mode
               data:
-                option: Turned on Twilight
+                option: "Turned on Twilight"
         - conditions:
             - condition: state
               entity_id: input_select.dads_room_light_remote_mode
-              state: Turned on
+              state: "Turned on"
             - condition: state
               entity_id: input_select.time_mode
-              state: Night
+              state: "Night"
           sequence:
             - action: input_select.select_option
               target: 
                 entity_id: input_select.dads_room_light_mode
               data:
-                option: Turned on Night
+                option: "Turned on Night"
         - conditions:
             - condition: state
               entity_id: input_select.dads_room_light_remote_mode
-              state: Turned on
+              state: "Turned on"
             - condition: state
               entity_id: input_select.time_mode
-              state: Late Night
+              state: "Late Night"
           sequence:
             - action: input_select.select_option
               target: 
                 entity_id: input_select.dads_room_light_mode
               data:
-                option: Turned on Late Night
+                option: "Turned on Late Night"
         - conditions:
             - condition: state
               entity_id: input_select.dads_room_light_remote_mode
-              state: Turned on
+              state: "Turned on"
             - condition: state
               entity_id: input_select.time_mode
-              state: Midnight
+              state: "Midnight"
           sequence:
             - action: input_select.select_option
               target: 
                 entity_id: input_select.dads_room_light_mode
               data:
-                option: Turned on Midnight
+                option: "Turned on Midnight"
         - conditions:
             - or:
                 - condition: state
@@ -206,11 +206,11 @@
               target: 
                 entity_id: input_select.dads_room_light_mode
               data:
-                option: Dark
+                option: "Dark"
         - conditions:
             - condition: state
               entity_id: input_select.time_mode
-              state: Daytime
+              state: "Daytime"
             - condition: state
               entity_id: light.dads_room_pendant_light
               state: "on"
@@ -219,11 +219,11 @@
               target: 
                 entity_id: input_select.dads_room_light_mode
               data:
-                option: Daytime
+                option: "Daytime"
         - conditions:
             - condition: state
               entity_id: input_select.time_mode
-              state: Twilight
+              state: "Twilight"
             - condition: state
               entity_id: light.dads_room_pendant_light
               state: "on"
@@ -232,11 +232,11 @@
               target: 
                 entity_id: input_select.dads_room_light_mode
               data:
-                option: Twilight
+                option: "Twilight"
         - conditions:
             - condition: state
               entity_id: input_select.time_mode
-              state: Night
+              state: "Night"
             - condition: state
               entity_id: light.dads_room_pendant_light
               state: "on"
@@ -245,11 +245,11 @@
               target: 
                 entity_id: input_select.dads_room_light_mode
               data:
-                option: Night
+                option: "Night"
         - conditions:
             - condition: state
               entity_id: input_select.time_mode
-              state: Late Night
+              state: "Late Night"
             - condition: state
               entity_id: light.dads_room_pendant_light
               state: "on"
@@ -258,11 +258,11 @@
               target: 
                 entity_id: input_select.dads_room_light_mode
               data:
-                option: Late Night
+                option: "Late Night"
         - conditions:
             - condition: state
               entity_id: input_select.time_mode
-              state: Midnight
+              state: "Midnight"
             - condition: state
               entity_id: light.dads_room_pendant_light
               state: "on"
@@ -271,11 +271,11 @@
               target: 
                 entity_id: input_select.dads_room_light_mode
               data:
-                option: Midnight
+                option: "Midnight"
   trace:
     stored_traces: 100
 - id: automation.select_dads_room_scene
-  alias: Select Dad’s Room Scene
+  alias: "Select Dad’s Room Scene"
   triggers:
     - trigger: state
       entity_id: input_select.dads_room_light_mode
@@ -291,10 +291,10 @@
             - condition: state
               entity_id: input_select.dads_room_light_mode
               state:
-                - Turned on Daytime
-                - Daytime
-                - Turned on Twilight
-                - Twilight
+                - "Turned on Daytime"
+                - "Daytime"
+                - "Turned on Twilight"
+                - "Twilight"
           sequence:
             - action: input_select.select_option
               target: 
@@ -305,8 +305,8 @@
             - condition: state
               entity_id: input_select.dads_room_light_mode
               state:
-                - Turned on Night
-                - Night
+                - "Turned on Night"
+                - "Night"
           sequence:
             - action: input_select.select_option
               target: 
@@ -317,8 +317,8 @@
             - condition: state
               entity_id: input_select.dads_room_light_mode
               state:
-                - Turned on Late Night
-                - Late Night
+                - "Turned on Late Night"
+                - "Late Night"
           sequence:
             - action: input_select.select_option
               target: 
@@ -329,8 +329,8 @@
             - condition: state
               entity_id: input_select.dads_room_light_mode
               state:
-                - Turned on Midnight
-                - Midnight
+                - "Turned on Midnight"
+                - "Midnight"
           sequence:
             - action: input_select.select_option
               target: 
@@ -340,7 +340,7 @@
         - conditions:
             - condition: state
               entity_id: input_select.dads_room_light_mode
-              state: Dark
+              state: "Dark"
           sequence:
             - action: input_select.select_option
               target: 
@@ -350,7 +350,7 @@
   trace:
     stored_traces: 100
 - id: automation.turn_on_dads_room_scene
-  alias: Turn on Dad’s Room Scene
+  alias: "Turn on Dad’s Room Scene"
   triggers:
     - trigger: state
       entity_id: input_select.dads_room_scene
@@ -362,14 +362,19 @@
             - condition: state
               entity_id: input_select.dads_room_light_mode
               state:
-                - Turned on Daytime
-                - Turned on Twilight
-                - Turned on Night
-                - Turned on Late Night
-                - Turned on Midnight
-                - Dark
+                - "Turned on Daytime"
+                - "Turned on Twilight"
+                - "Turned on Night"
+                - "Turned on Late Night"
+                - "Turned on Midnight"
+                - "Dark"
             - condition: template
-              value_template: "{{ as_timestamp(now()) - as_timestamp(as_datetime(state_attr('automation.select_dads_room_light_mode', 'last_triggered'))) > 1 }}"
+              value_template: >-
+                {{
+                  as_timestamp(now()) - as_timestamp(as_datetime(state_attr(
+                    'automation.select_dads_room_light_mode', 'last_triggered'
+                  ))) > 1
+                }}
       then:
         - action: scene.turn_on
           target: 
@@ -380,7 +385,7 @@
           target: 
             entity_id: input_select.dads_room_light_remote_mode
           data:
-            option: Idle
+            option: "Idle"
       else:
         - action: hue.activate_scene
           target: 

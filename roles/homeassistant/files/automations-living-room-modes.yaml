@@ -1,5 +1,5 @@
 - id: automation.select_living_room_regza_content_type_mode
-  alias: Select Living Room Regza Content Type Mode
+  alias: "Select Living Room Regza Content Type Mode"
   triggers:
     - trigger: state
       entity_id: sensor.regza_content_type
@@ -13,12 +13,12 @@
             - or:
                 - condition: state
                   entity_id: sensor.regza_content_type
-                  state: broadcast
+                  state: "broadcast"
                   for:
                     seconds: 5
                 - condition: state
                   entity_id: sensor.regza_content_type
-                  state: recorded
+                  state: "recorded"
                   for:
                     seconds: 5
           sequence:
@@ -26,11 +26,11 @@
               target: 
                 entity_id: input_select.living_room_regza_content_type_mode
               data:
-                option: Internal
+                option: "Internal"
         - conditions:
             - condition: state
               entity_id: sensor.regza_content_type
-              state: external
+              state: "external"
               for:
                 seconds: 5
           sequence:
@@ -38,7 +38,7 @@
               target: 
                 entity_id: input_select.living_room_regza_content_type_mode
               data:
-                option: External
+                option: "External"
       default:
         - action: input_select.select_option
           target: 
@@ -80,7 +80,7 @@
               target: 
                 entity_id: input_select.living_room_presence_mode
               data:
-                option: Present
+                option: "Present"
         - conditions:
             - or:
                 - condition: state
@@ -98,6 +98,6 @@
               target: 
                 entity_id: input_select.living_room_presence_mode
               data:
-                option: Absent
+                option: "Absent"
   trace:
     stored_traces: 100
