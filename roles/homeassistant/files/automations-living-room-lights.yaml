@@ -1,5 +1,5 @@
 - id: automation.select_living_room_light_mode
-  alias: Select Living Room Light Mode
+  alias: "Select Living Room Light Mode"
   triggers:
     - trigger: state
       entity_id: input_select.time_mode
@@ -10,33 +10,33 @@
         - conditions:
             - condition: state
               entity_id: input_select.time_mode
-              state: Daytime
+              state: "Daytime"
           sequence:
             - action: input_select.select_option
               target: 
                 entity_id: input_select.living_room_light_mode
               data:
-                option: Daytime
+                option: "Daytime"
         - conditions:
             - condition: state
               entity_id: input_select.time_mode
-              state: Twilight
+              state: "Twilight"
           sequence:
             - action: input_select.select_option
               target: 
                 entity_id: input_select.living_room_light_mode
               data:
-                option: Twilight
+                option: "Twilight"
         - conditions:
             - condition: state
               entity_id: input_select.time_mode
-              state: Night
+              state: "Night"
           sequence:
             - action: input_select.select_option
               target: 
                 entity_id: input_select.living_room_light_mode
               data:
-                option: Night
+                option: "Night"
         - conditions:
             - condition: state
               entity_id: input_select.time_mode
@@ -49,7 +49,7 @@
               target: 
                 entity_id: input_select.living_room_light_mode
               data:
-                option: Late Night
+                option: "Late Night"
         - conditions:
             - condition: state
               entity_id: input_select.time_mode
@@ -62,11 +62,11 @@
               target: 
                 entity_id: input_select.living_room_light_mode
               data:
-                option: Midnight
+                option: "Midnight"
   trace:
     stored_traces: 100
 - id: automation.select_living_room_scene
-  alias: Select Living Room Scene
+  alias: "Select Living Room Scene"
   triggers:
     - trigger: state
       entity_id: input_select.living_room_light_mode
@@ -81,7 +81,7 @@
         - conditions:
             - condition: state
               entity_id: input_select.living_room_light_mode
-              state: Daytime
+              state: "Daytime"
           sequence:
             - action: input_select.select_option
               target: 
@@ -91,7 +91,7 @@
         - conditions:
             - condition: state
               entity_id: input_select.living_room_light_mode
-              state: Twilight
+              state: "Twilight"
           sequence:
             - action: input_select.select_option
               target: 
@@ -131,7 +131,7 @@
   trace:
     stored_traces: 100
 - id: automation.select_living_room_tv_light_scene
-  alias: Select Living Room TV Light Scene
+  alias: "Select Living Room TV Light Scene"
   triggers:
     - trigger: state
       entity_id: input_select.living_room_regza_content_type_mode
@@ -147,28 +147,28 @@
             - condition: state
               entity_id: input_select.living_room_regza_content_type_mode
               state:
-                - Internal
+                - "Internal"
                 - "Off"
           sequence:
             - service: select.select_option
               target:
                 entity_id: select.living_room_tv_light_scene
               data:
-                option: Scene (Color) - Pure
+                option: "Scene (Color) - Pure"
         - conditions:
             - condition: state
               entity_id: input_select.living_room_regza_content_type_mode
-              state: External
+              state: "External"
           sequence:
             - service: select.select_option
               target:
                 entity_id: select.living_room_tv_light_scene
               data:
-                option: Sync - Recreation
+                option: "Sync - Recreation"
   trace:
     stored_traces: 100
 - id: automation.turn_on_living_room_scene
-  alias: Turn on Living Room Scene
+  alias: "Turn on Living Room Scene"
   triggers:
     - trigger: state
       entity_id: input_select.living_room_scene
@@ -181,7 +181,7 @@
   trace:
     stored_traces: 100
 - id: automation.turn_on_living_room_tv_light_scene
-  alias: Turn on Living Room TV Light Scene
+  alias: "Turn on Living Room TV Light Scene"
   triggers:
     - trigger: state
       entity_id: select.living_room_tv_light_scene
@@ -194,7 +194,7 @@
               entity_id: input_select.living_room_regza_content_type_mode
               state: "Off"
       then:
-        # The scene is auto-appled when automation.select_living_room_scene is actioned
+        # The scene is auto-applied when automation.select_living_room_scene is actioned
         - action: light.turn_on
           target:
             entity_id: light.living_room_tv_light

@@ -1,5 +1,5 @@
 - id: scene.dads_room_dark
-  name: Dad’s Room Dark
+  name: "Dad’s Room Dark"
   entities:
     light.dads_room_pendant_light:
       state: "off"
@@ -9,9 +9,9 @@
       state: "off"
     light.dads_room_footlight:
       state: "off"
-  icon: mdi:bed
+  icon: "mdi:bed"
 - id: scene.living_room_daytime
-  name: Living Room Daytime
+  name: "Living Room Daytime"
   entities:
     light.living_room_downlights:
       state: "off"
@@ -25,9 +25,9 @@
       state: "off"
     light.living_room_shelf_light:
       state: "off"
-  icon: mdi:weather-sunny
+  icon: "mdi:weather-sunny"
 - id: scene.living_room_twilight
-  name: Living Room Twilight
+  name: "Living Room Twilight"
   entities:
     light.living_room_downlights:
       state: "on"
@@ -41,9 +41,9 @@
       state: "off"
     light.living_room_shelf_light:
       state: "off"
-  icon: mdi:weather-sunset
+  icon: "mdi:weather-sunset"
 - id: scene.living_room_night
-  name: Living Room Night
+  name: "Living Room Night"
   entities:
     light.living_room_downlights:
       state: "on"
@@ -62,9 +62,9 @@
       state: "on"
     light.living_room_shelf_light:
       state: "on"
-  icon: mdi:weather-night
+  icon: "mdi:weather-night"
 - id: scene.living_room_late_night
-  name: Living Room Late Night
+  name: "Living Room Late Night"
   entities:
     light.living_room_dimming_downlights:
       state: "on"
@@ -83,19 +83,19 @@
       state: "on"
     light.living_room_shelf_light:
       state: "on"
-  icon: mdi:brightness-2
+  icon: "mdi:brightness-2"
 - id: scene.living_room_midnight
-  name: Living Room Midnight
+  name: "Living Room Midnight"
   entities:
     light.living_room_dimming_downlights:
       state: "off"
     light.study_dimming_downlights:
       state: "off"
     light.living_room_entrance_light:
-      brightness: 2
+      brightness: 8
       state: "on"
     light.living_room_tv_light:
-      brightness: 2
+      brightness: 8
       hs_color:
         - 20
         - 72
@@ -104,9 +104,9 @@
       state: "on"
     light.living_room_shelf_light:
       state: "on"
-  icon: mdi:brightness-3
+  icon: "mdi:brightness-3"
 - id: scene.living_room_dark
-  name: Living Room Dark
+  name: "Living Room Dark"
   entities:
     light.living_room_downlights:
       state: "off"
@@ -120,10 +120,10 @@
       state: "off"
     light.living_room_shelf_light:
       state: "off"
-  icon: mdi:bed
+  icon: "mdi:bed"
 - id: scene.moms_room_dark
-  name: Mom’s Room Dark
+  name: "Mom’s Room Dark"
   entities:
     light.moms_room_light:
       state: "off"
-  icon: mdi:bed
+  icon: "mdi:bed"

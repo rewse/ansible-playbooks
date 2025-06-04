@@ -1,5 +1,5 @@
 - id: automation.select_moms_room_presence_mode
-  alias: Select Mom’s Room Presence Mode
+  alias: "Select Mom’s Room Presence Mode"
   triggers:
     - trigger: state
       entity_id: binary_sensor.moms_room_presence
