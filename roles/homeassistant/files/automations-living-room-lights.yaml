@@ -40,7 +40,10 @@
         - conditions:
             - condition: state
               entity_id: input_select.time_mode
-              state: Late Night
+              state: "Late Night"
+            - condition: state
+              entity_id: light.living_room_shelf_light
+              state: "on"
           sequence:
             - action: input_select.select_option
               target: 
@@ -50,7 +53,10 @@
         - conditions:
             - condition: state
               entity_id: input_select.time_mode
-              state: Midnight
+              state: "Midnight"
+            - condition: state
+              entity_id: light.living_room_shelf_light
+              state: "on"
           sequence:
             - action: input_select.select_option
               target: 
@@ -95,11 +101,7 @@
         - conditions:
             - condition: state
               entity_id: input_select.living_room_light_mode
-              state: Night
-            - not:
-                - condition: state
-                  entity_id: input_select.living_room_scene
-                  state: scene.living_room_dark
+              state: "Night"
           sequence:
             - action: input_select.select_option
               target: 
@@ -109,11 +111,7 @@
         - conditions:
             - condition: state
               entity_id: input_select.living_room_light_mode
-              state: Late Night
-            - not:
-                - condition: state
-                  entity_id: input_select.living_room_scene
-                  state: scene.living_room_dark
+              state: "Late Night"
           sequence:
             - action: input_select.select_option
               target: 
@@ -123,11 +121,7 @@
         - conditions:
             - condition: state
               entity_id: input_select.living_room_light_mode
-              state: Midnight
-            - not:
-                - condition: state
-                  entity_id: input_select.living_room_scene
-                  state: scene.living_room_dark
+              state: "Midnight"
           sequence:
             - action: input_select.select_option
               target: 
