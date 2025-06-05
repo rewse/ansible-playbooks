@@ -1,3 +1,30 @@
+- id: automation.select_season_mode
+  alias: "Select Season Mode"
+  triggers:
+    - trigger: time_pattern
+      minutes: "/5"
+      seconds: 28
+    - trigger: homeassistant
+      event: start
+  actions:
+    - if:
+        - condition: numeric_state
+          entity_id: sensor.average_of_balcony_temperature
+          above: input_number.season_mode_temperature
+      then:
+        - action: input_select.select_option
+          target: 
+            entity_id: input_select.season_mode
+          data:
+            option: "Summer"
+      else:
+        - action: input_select.select_option
+          target: 
+            entity_id: input_select.season_mode
+          data:
+            option: "Winter"
+  trace:
+    stored_traces: 100
 - id: automation.select_time_mode
   alias: "Select Time Mode"
   triggers:

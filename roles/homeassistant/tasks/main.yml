@@ -94,6 +94,12 @@
     dest: /srv/homeassistant/config/automations
   tags: [homeassistant, homeassistant-automation]
 
+- name: Copy automations-dads-room-climates.yaml
+  copy:
+    src: automations-dads-room-climates.yaml
+    dest: /srv/homeassistant/config/automations
+  tags: [homeassistant, homeassistant-automation]
+
 - name: Copy automations-dads-room-lights.yaml
   copy:
     src: automations-dads-room-lights.yaml
