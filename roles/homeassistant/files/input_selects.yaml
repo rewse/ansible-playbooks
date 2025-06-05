@@ -65,7 +65,6 @@ dads_room_scene_daytime:
     - "scene.dads_room_nightlight"
     - "scene.dads_room_city_of_love"
     - "scene.dads_room_dark"
-  initial: "scene.dads_room_arise"
   icon: "mdi:weather-sunny"
 dads_room_scene_night:
   name: "Dad’s Room Scene Night"
@@ -89,7 +88,6 @@ dads_room_scene_night:
     - "scene.dads_room_nightlight"
     - "scene.dads_room_city_of_love"
     - "scene.dads_room_dark"
-  initial: "scene.dads_room_shine"
   icon: "mdi:weather-night"
 dads_room_scene_late_night:
   name: "Dad’s Room Scene Late Night"
@@ -113,7 +111,6 @@ dads_room_scene_late_night:
     - "scene.dads_room_nightlight"
     - "scene.dads_room_city_of_love"
     - "scene.dads_room_dark"
-  initial: "scene.dads_room_storybook"
   icon: "mdi:brightness-2"
 dads_room_scene_midnight:
   name: "Dad’s Room Scene Midnight"
@@ -137,7 +134,6 @@ dads_room_scene_midnight:
     - "scene.dads_room_nightlight"
     - "scene.dads_room_city_of_love"
     - "scene.dads_room_dark"
-  initial: "scene.dads_room_city_of_love"
   icon: "mdi:brightness-3"
 home_mode:
   name: "Home Mode"
