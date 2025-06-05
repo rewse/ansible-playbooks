@@ -76,12 +76,270 @@ dads_room_ac_dry_turned_on_threshold_wbgt:
   max: 30
   unit_of_measurement: °C
   icon: mdi:thermometer-chevron-up
+dads_room_climate_auto_off_minutes:
+  name: "Dad’s Room Climate Auto-off Minutes"
+  min: 0
+  max: 240
+  unit_of_measurement: "min"
+  icon: "mdi:hvac-off"
 dads_room_light_auto_off_minutes:
   name: "Dad’s Room Light Auto-off Minutes"
   min: 0
   max: 60
   unit_of_measurement: "min"
   icon: "mdi:lightbulb-group-off"
+dads_room_humidity_max_diff:
+  name: "Dad’s Room Humidity Max Diffirence"
+  min: 1
+  max: 50
+  unit_of_measurement: "pt"
+  icon: "mdi:arrow-collapse-up"
+dads_room_humidity_min_diff:
+  name: "Dad’s Room Humidity Min Diffirence"
+  min: 1
+  max: 50
+  unit_of_measurement: "pt"
+  icon: "mdi:arrow-collapse-down"
+dads_room_humidity_target:
+  name: "Dad’s Room Humidity Target"
+  min: 0
+  max: 100
+  unit_of_measurement: "%"
+  icon: "mdi:water-percent"
+dads_room_humidity_max_diff_present_summer:
+  name: "Dad’s Room Humidity Max Diffirence Present Summer"
+  min: 0
+  max: 50
+  unit_of_measurement: "pt"
+  icon: "mdi:arrow-collapse-up"
+dads_room_humidity_min_diff_present_summer:
+  name: "Dad’s Room Humidity Min Diffirence Present Summer"
+  min: 0
+  max: 50
+  unit_of_measurement: "pt"
+  icon: "mdi:arrow-collapse-down"
+dads_room_humidity_target_present_summer:
+  name: "Dad’s Room Humidity Target Present Summer"
+  min: 0
+  max: 100
+  unit_of_measurement: "%"
+  icon: "mdi:water-percent"
+dads_room_humidity_max_diff_present_winter:
+  name: "Dad’s Room Humidity Max Diffirence Present Winter"
+  min: 0
+  max: 50
+  unit_of_measurement: "pt"
+  icon: "mdi:arrow-collapse-up"
+dads_room_humidity_min_diff_present_winter:
+  name: "Dad’s Room Humidity Min Diffirence Present Winter"
+  min: 0
+  max: 50
+  unit_of_measurement: "pt"
+  icon: "mdi:arrow-collapse-down"
+dads_room_humidity_target_present_winter:
+  name: "Dad’s Room Humidity Target Present Winter"
+  min: 0
+  max: 100
+  unit_of_measurement: "%"
+  icon: "mdi:water-percent"
+dads_room_humidity_max_diff_present_summer_midnight:
+  name: "Dad’s Room Humidity Max Diffirence Present Summer Midnight"
+  min: 0
+  max: 50
+  unit_of_measurement: "pt"
+  icon: "mdi:arrow-collapse-up"
+dads_room_humidity_min_diff_present_summer_midnight:
+  name: "Dad’s Room Humidity Min Diffirence Present Summer Midnight"
+  min: 0
+  max: 50
+  unit_of_measurement: "pt"
+  icon: "mdi:arrow-collapse-down"
+dads_room_humidity_target_present_summer_midnight:
+  name: "Dad’s Room Humidity Target Present Summer Midnight"
+  min: 0
+  max: 100
+  unit_of_measurement: "%"
+  icon: "mdi:water-percent"
+dads_room_humidity_max_diff_present_winter_midnight:
+  name: "Dad’s Room Humidity Max Diffirence Present Winter Midnight"
+  min: 0
+  max: 50
+  unit_of_measurement: "pt"
+  icon: "mdi:arrow-collapse-up"
+dads_room_humidity_min_diff_present_winter_midnight:
+  name: "Dad’s Room Humidity Min Diffirence Present Winter Midnight"
+  min: 0
+  max: 50
+  unit_of_measurement: "pt"
+  icon: "mdi:arrow-collapse-down"
+dads_room_humidity_target_present_winter_midnight:
+  name: "Dad’s Room Humidity Target Present Winter Midnight"
+  min: 0
+  max: 100
+  unit_of_measurement: "%"
+  icon: "mdi:water-percent"
+dads_room_humidity_max_diff_absent_summer:
+  name: "Dad’s Room Humidity Max Diffirence Absent Summer"
+  min: 0
+  max: 50
+  unit_of_measurement: "pt"
+  icon: "mdi:arrow-collapse-up"
+dads_room_humidity_min_diff_absent_summer:
+  name: "Dad’s Room Humidity Min Diffirence Absent Summer"
+  min: 0
+  max: 50
+  unit_of_measurement: "pt"
+  icon: "mdi:arrow-collapse-down"
+dads_room_humidity_target_absent_summer:
+  name: "Dad’s Room Humidity Target Absent Summer"
+  min: 0
+  max: 100
+  unit_of_measurement: "%"
+  icon: "mdi:water-percent"
+dads_room_humidity_max_diff_absent_winter:
+  name: "Dad’s Room Humidity Max Diffirence Absent Winter"
+  min: 0
+  max: 50
+  unit_of_measurement: "pt"
+  icon: "mdi:arrow-collapse-up"
+dads_room_humidity_min_diff_absent_winter:
+  name: "Dad’s Room Humidity Min Diffirence Absent Winter"
+  min: 0
+  max: 50
+  unit_of_measurement: "pt"
+  icon: "mdi:arrow-collapse-down"
+dads_room_humidity_target_absent_winter:
+  name: "Dad’s Room Humidity Target Absent Winter"
+  min: 0
+  max: 100
+  unit_of_measurement: "%"
+  icon: "mdi:water-percent"
+dads_room_temp_max_diff:
+  name: "Dad’s Room Temperature Max Diffirence"
+  min: 1
+  max: 20
+  unit_of_measurement: "°C"
+  icon: "mdi:arrow-collapse-up"
+dads_room_temp_min_diff:
+  name: "Dad’s Room Temperature Min Diffirence"
+  min: 1
+  max: 20
+  unit_of_measurement: "°C"
+  icon: "mdi:arrow-collapse-down"
+dads_room_temp_target:
+  name: "Dad’s Room Temperature Target"
+  min: 10
+  max: 40
+  unit_of_measurement: "°C"
+  icon: "mdi:thermometer-check"
+dads_room_temp_max_diff_present_summer:
+  name: "Dad’s Room Temperature Max Diffirence Present Summer"
+  min: 1
+  max: 20
+  unit_of_measurement: "°C"
+  icon: "mdi:arrow-collapse-up"
+dads_room_temp_min_diff_present_summer:
+  name: "Dad’s Room Temperature Min Diffirence Present Summer"
+  min: 1
+  max: 20
+  unit_of_measurement: "°C"
+  icon: "mdi:arrow-collapse-down"
+dads_room_temp_target_present_summer:
+  name: "Dad’s Room Temperature Target Present Summer"
+  min: 10
+  max: 40
+  unit_of_measurement: "°C"
+  icon: "mdi:thermometer-plus"
+dads_room_temp_max_diff_present_winter:
+  name: "Dad’s Room Temperature Max Diffirence Present Winter"
+  min: 1
+  max: 20
+  unit_of_measurement: "°C"
+  icon: "mdi:arrow-collapse-up"
+dads_room_temp_min_diff_present_winter:
+  name: "Dad’s Room Temperature Min Diffirence Present Winter"
+  min: 1
+  max: 20
+  unit_of_measurement: "°C"
+  icon: "mdi:arrow-collapse-down"
+dads_room_temp_target_present_winter:
+  name: "Dad’s Room Temperature Target Present Winter"
+  min: 10
+  max: 40
+  unit_of_measurement: "°C"
+  icon: "mdi:thermometer-minus"
+dads_room_temp_max_diff_present_summer_midnight:
+  name: "Dad’s Room Temperature Max Diffirence Present Summer Midnight"
+  min: 1
+  max: 20
+  unit_of_measurement: "°C"
+  icon: "mdi:arrow-collapse-up"
+dads_room_temp_min_diff_present_summer_midnight:
+  name: "Dad’s Room Temperature Min Diffirence Present Summer Midnight"
+  min: 1
+  max: 20
+  unit_of_measurement: "°C"
+  icon: "mdi:arrow-collapse-down"
+dads_room_temp_target_present_summer_midnight:
+  name: "Dad’s Room Temperature Target Present Summer Midnight"
+  min: 10
+  max: 40
+  unit_of_measurement: "°C"
+  icon: "mdi:thermometer-plus"
+dads_room_temp_max_diff_present_winter_midnight:
+  name: "Dad’s Room Temperature Max Diffirence Present Winter Midnight"
+  min: 1
+  max: 20
+  unit_of_measurement: "°C"
+  icon: "mdi:arrow-collapse-up"
+dads_room_temp_min_diff_present_winter_midnight:
+  name: "Dad’s Room Temperature Min Diffirence Present Winter Midnight"
+  min: 1
+  max: 20
+  unit_of_measurement: "°C"
+  icon: "mdi:arrow-collapse-down"
+dads_room_temp_target_present_winter_midnight:
+  name: "Dad’s Room Temperature Target Present Winter Midnight"
+  min: 10
+  max: 40
+  unit_of_measurement: "°C"
+  icon: "mdi:thermometer-minus"
+dads_room_temp_max_diff_absent_summer:
+  name: "Dad’s Room Temperature Max Diffirence Absent Summer"
+  min: 1
+  max: 20
+  unit_of_measurement: "°C"
+  icon: "mdi:arrow-collapse-up"
+dads_room_temp_min_diff_absent_summer:
+  name: "Dad’s Room Temperature Min Diffirence Absent Summer"
+  min: 1
+  max: 20
+  unit_of_measurement: "°C"
+  icon: "mdi:arrow-collapse-down"
+dads_room_temp_target_absent_summer:
+  name: "Dad’s Room Temperature Target Absent Summer"
+  min: 10
+  max: 40
+  unit_of_measurement: "°C"
+  icon: "mdi:thermometer-plus"
+dads_room_temp_max_diff_absent_winter:
+  name: "Dad’s Room Temperature Max Diffirence Absent Winter"
+  min: 1
+  max: 20
+  unit_of_measurement: "°C"
+  icon: "mdi:arrow-collapse-up"
+dads_room_temp_min_diff_absent_winter:
+  name: "Dad’s Room Temperature Min Diffirence Absent Winter"
+  min: 1
+  max: 20
+  unit_of_measurement: "°C"
+  icon: "mdi:arrow-collapse-down"
+dads_room_temp_target_absent_winter:
+  name: "Dad’s Room Temperature Target Absent Winter"
+  min: 10
+  max: 40
+  unit_of_measurement: "°C"
+  icon: "mdi:thermometer-minus"
 living_area_downlights_turned_on_threshold:
   name: Living Area Downlights Turned on Threshold
   min: 17
@@ -249,6 +507,12 @@ moms_room_light_auto_off_minutes:
   max: 60
   unit_of_measurement: min
   icon: mdi:lightbulb-group-off
+season_mode_temperature:
+  name: "Season Mode Temperature"
+  min: 0
+  max: 30
+  unit_of_measurement: "°C"
+  icon: "mdi:thermometer-check"
 time_mode_twilight_light_level:
   name: Time Mode Twilight Light Level
   min: 0
