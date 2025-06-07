@@ -6,8 +6,8 @@
   max_age:
     hours: 51
 - platform: statistics
-  name: Average of Balcony Temperature
-  unique_id: sensor.average_of_balcony_temperature
+  unique_id: sensor.balcony_temp_average
+  name: "Balcony Temperature Average"
   entity_id: sensor.balcony_temperature
   state_characteristic: mean
   max_age:
