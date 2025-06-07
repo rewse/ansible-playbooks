@@ -82,6 +82,12 @@ dads_room_climate_auto_off_minutes:
   max: 240
   unit_of_measurement: "min"
   icon: "mdi:hvac-off"
+dads_room_climate_auto_on_minutes:
+  name: "Dad’s Room Climate Auto-on Minutes"
+  min: 0
+  max: 240
+  unit_of_measurement: "min"
+  icon: "mdi:hvac"
 dads_room_light_auto_off_minutes:
   name: "Dad’s Room Light Auto-off Minutes"
   min: 0
