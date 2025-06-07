@@ -501,7 +501,7 @@
         data:
           push:
             interruption-level: time-sensitive
-          tag: "automation.turn_on_dads_room_ac_cool"
+          tag: "automation.toggle_dads_room_ac_cool"
           url: "/lovelace/home"
     - delay:
         seconds: 10
@@ -580,7 +580,7 @@
         data:
           push:
             interruption-level: time-sensitive
-          tag: "automation.turn_off_dads_room_ac_dry"
+          tag: "automation.toggle_dads_room_ac_dry"
           url: "/lovelace/home"
     - delay:
         seconds: 10
@@ -641,9 +641,10 @@
           Turned {{ action }} Dad’s Room Humidifier.
           Current: {{ states('sensor.dads_room_humidity') }}%
         data:
-          url: /lovelace/home
           push:
             interruption-level: time-sensitive
+          tag: "automation.toggle_dads_room_humidifier"
+          url: "/lovelace/home"
     - delay:
         seconds: 10
   trace:
@@ -685,9 +686,10 @@
       data:
         message: "Turned off Dad’s Room Floor Heating"
         data:
-          url: /lovelace/home
           push:
             interruption-level: time-sensitive
+          tag: "automation.turn_off_dads_room_floor_heating"
+          url: "/lovelace/home"
   trace:
     stored_traces: 100
 - id: automation.turn_on_dads_room_ac_internal_clean
