@@ -29,8 +29,8 @@
     device_class: temperature
     state_class: measurement
     unit_of_measurement: °C
-  - name: Dad’s Room AC Target
-    unique_id: sensor.dads_room_ac_target
+  - name: Dad’s Room AC Temperature
+    unique_id: sensor.dads_room_ac_temp
     state: "{{ state_attr('climate.dads_room_ac', 'temperature') }}"
     icon: mdi:thermometer-check
     device_class: temperature
