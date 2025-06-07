@@ -315,7 +315,7 @@
         minutes: 30
   trace:
     stored_traces: 100
-- id: automation.plan_to_turn_on_dads_room_ac_internal_clean
+- id: automation.plan_to_turn_on_dads_room_ac_internal_clean_2
   alias: Plan to Turn on Dad’s Room AC Internal Clean
   trigger:
     - platform: state
@@ -419,7 +419,7 @@
         hours: 1
   trace:
     stored_traces: 100
-- id: automation.turn_off_dads_room_ac_internal_clean
+- id: automation.turn_off_dads_room_ac_internal_clean_2
   alias: Turn Off Dad’s Room AC Internal Clean
   mode: single
   trigger:
@@ -720,7 +720,7 @@
         hours: 1
   trace:
     stored_traces: 100
-- id: automation.turn_on_dads_room_ac_internal_clean
+- id: automation.turn_on_dads_room_ac_internal_clean_2
   alias: Turn on Dad’s Room AC Internal Clean
   trigger:
     - platform: state
