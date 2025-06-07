@@ -1,12 +1,12 @@
 - name: all_devices
   platform: group
   services:
-    - service: mobile_app_zoom
-    - service: mobile_app_bcd074348424
+    - service: mobile_app_youth
+    - service: mobile_app_7cf34ded5d65
     - service: mobile_app_atom
     - service: mobile_app_chemical
-    - service: mobile_app_global
     - service: mobile_app_ubiqu_personal
+    - service: mobile_app_kijitora
 - name: ubiqu_devices
   platform: group
   services:
@@ -14,14 +14,12 @@
 - name: tats_devices
   platform: group
   services:
-    - service: mobile_app_zoom
-    - service: mobile_app_bcd074348424
+    - service: mobile_app_youth
+    - service: mobile_app_7cf34ded5d65
     - service: mobile_app_atom
     - service: mobile_app_chemical
-    - service: mobile_app_global
 - name: tats_mobile_devices
   platform: group
   services:
     - service: mobile_app_atom
     - service: mobile_app_chemical
-    - service: mobile_app_global
