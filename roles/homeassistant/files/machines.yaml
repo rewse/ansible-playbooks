@@ -38,7 +38,7 @@ views:
           - entity: person.shibata_akiko
             name: Akiko
           - entity: device_tracker.ping_ubiqu_personal
-          - entity: device_tracker.shortcut_ubiqu_personal
+          - entity: device_tracker.ubiqu_personal
             name: Kayano
           - entity: person.shibata_kayano
           - entity: device_tracker.kijitora

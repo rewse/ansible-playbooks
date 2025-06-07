@@ -21,10 +21,7 @@ views:
         entities:
           - entity: person.shibata_tats
             name: Tats
-          - entity: input_boolean.shortcut_atom
           - entity: person.shibata_akiko
             name: Akiko
-          - entity: input_boolean.shortcut_ubiqu_personal
           - entity: person.shibata_kayano
             name: Kayano
-          - entity: input_boolean.shortcut_kijitora
