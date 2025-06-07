@@ -422,7 +422,7 @@
         entity_id: climate.dads_room_ac
       data:
         hvac_mode: "cool"
-        temperature: "{{ float(states('input_number.dads_room_temp_target')) }}"
+        temperature: "{{ int(states('input_number.dads_room_temp_target')) }}"
     - action: notify.tats_devices
       data:
         message: >-

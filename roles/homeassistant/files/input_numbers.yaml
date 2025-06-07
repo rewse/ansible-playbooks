@@ -224,126 +224,147 @@ dads_room_temp_max_diff:
   name: "Dad’s Room Temperature Max Diffirence"
   min: 1
   max: 20
+  step: 0.5
   unit_of_measurement: "°C"
   icon: "mdi:arrow-collapse-up"
 dads_room_temp_min_diff:
   name: "Dad’s Room Temperature Min Diffirence"
   min: 1
   max: 20
+  step: 0.5
   unit_of_measurement: "°C"
   icon: "mdi:arrow-collapse-down"
 dads_room_temp_target:
   name: "Dad’s Room Temperature Target"
   min: 10
   max: 40
+  step: 0.5
   unit_of_measurement: "°C"
   icon: "mdi:thermometer-check"
 dads_room_temp_max_diff_present_summer:
   name: "Dad’s Room Temperature Max Diffirence Present Summer"
   min: 1
   max: 20
+  step: 0.5
   unit_of_measurement: "°C"
   icon: "mdi:arrow-collapse-up"
 dads_room_temp_min_diff_present_summer:
   name: "Dad’s Room Temperature Min Diffirence Present Summer"
   min: 1
   max: 20
+  step: 0.5
   unit_of_measurement: "°C"
   icon: "mdi:arrow-collapse-down"
 dads_room_temp_target_present_summer:
   name: "Dad’s Room Temperature Target Present Summer"
   min: 10
   max: 40
+  step: 0.5
   unit_of_measurement: "°C"
   icon: "mdi:thermometer-plus"
 dads_room_temp_max_diff_present_winter:
   name: "Dad’s Room Temperature Max Diffirence Present Winter"
   min: 1
   max: 20
+  step: 0.5
   unit_of_measurement: "°C"
   icon: "mdi:arrow-collapse-up"
 dads_room_temp_min_diff_present_winter:
   name: "Dad’s Room Temperature Min Diffirence Present Winter"
   min: 1
   max: 20
+  step: 0.5
   unit_of_measurement: "°C"
   icon: "mdi:arrow-collapse-down"
 dads_room_temp_target_present_winter:
   name: "Dad’s Room Temperature Target Present Winter"
   min: 10
   max: 40
+  step: 0.5
   unit_of_measurement: "°C"
   icon: "mdi:thermometer-minus"
 dads_room_temp_max_diff_present_summer_midnight:
   name: "Dad’s Room Temperature Max Diffirence Present Summer Midnight"
   min: 1
   max: 20
+  step: 0.5
   unit_of_measurement: "°C"
   icon: "mdi:arrow-collapse-up"
 dads_room_temp_min_diff_present_summer_midnight:
   name: "Dad’s Room Temperature Min Diffirence Present Summer Midnight"
   min: 1
   max: 20
+  step: 0.5
   unit_of_measurement: "°C"
   icon: "mdi:arrow-collapse-down"
 dads_room_temp_target_present_summer_midnight:
   name: "Dad’s Room Temperature Target Present Summer Midnight"
   min: 10
   max: 40
+  step: 0.5
   unit_of_measurement: "°C"
   icon: "mdi:thermometer-plus"
 dads_room_temp_max_diff_present_winter_midnight:
   name: "Dad’s Room Temperature Max Diffirence Present Winter Midnight"
   min: 1
   max: 20
+  step: 0.5
   unit_of_measurement: "°C"
   icon: "mdi:arrow-collapse-up"
 dads_room_temp_min_diff_present_winter_midnight:
   name: "Dad’s Room Temperature Min Diffirence Present Winter Midnight"
   min: 1
   max: 20
+  step: 0.5
   unit_of_measurement: "°C"
   icon: "mdi:arrow-collapse-down"
 dads_room_temp_target_present_winter_midnight:
   name: "Dad’s Room Temperature Target Present Winter Midnight"
   min: 10
   max: 40
+  step: 0.5
   unit_of_measurement: "°C"
   icon: "mdi:thermometer-minus"
 dads_room_temp_max_diff_absent_summer:
   name: "Dad’s Room Temperature Max Diffirence Absent Summer"
   min: 1
   max: 20
+  step: 0.5
   unit_of_measurement: "°C"
   icon: "mdi:arrow-collapse-up"
 dads_room_temp_min_diff_absent_summer:
   name: "Dad’s Room Temperature Min Diffirence Absent Summer"
   min: 1
   max: 20
+  step: 0.5
   unit_of_measurement: "°C"
   icon: "mdi:arrow-collapse-down"
 dads_room_temp_target_absent_summer:
   name: "Dad’s Room Temperature Target Absent Summer"
   min: 10
   max: 40
+  step: 0.5
   unit_of_measurement: "°C"
   icon: "mdi:thermometer-plus"
 dads_room_temp_max_diff_absent_winter:
   name: "Dad’s Room Temperature Max Diffirence Absent Winter"
   min: 1
   max: 20
+  step: 0.5
   unit_of_measurement: "°C"
   icon: "mdi:arrow-collapse-up"
 dads_room_temp_min_diff_absent_winter:
   name: "Dad’s Room Temperature Min Diffirence Absent Winter"
   min: 1
   max: 20
+  step: 0.5
   unit_of_measurement: "°C"
   icon: "mdi:arrow-collapse-down"
 dads_room_temp_target_absent_winter:
   name: "Dad’s Room Temperature Target Absent Winter"
   min: 10
   max: 40
+  step: 0.5
   unit_of_measurement: "°C"
   icon: "mdi:thermometer-minus"
 living_area_downlights_turned_on_threshold:
