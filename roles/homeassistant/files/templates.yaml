@@ -35,7 +35,7 @@
     unit_of_measurement: "°C"
     state_class: measurement
     device_class: temperature
-    icon: mdi:thermometer-check
+    icon: "mdi:thermometer-check"
   - unique_id: sensor.dads_room_humidity_difference
     name: "Dad’s Room Humidity Difference"
     state: >-
@@ -45,9 +45,9 @@
           float(states('sensor.dads_room_switchbot_meter_humidity'))
         ) | abs
       }}
-    unit_of_measurement: pt
+    unit_of_measurement: "pt"
     state_class: measurement
-    icon: mdi:water-percent-alert
+    icon: "mdi:water-percent-alert"
   - unique_id: sensor.dads_room_temp_difference
     name: "Dad’s Room Temperature Difference"
     state: >-
@@ -57,10 +57,10 @@
           float(states('sensor.dads_room_switchbot_meter_temperature'))
         ) | abs
       }}
-    unit_of_measurement: °C
+    unit_of_measurement: "°C"
     state_class: measurement
     device_class: temperature
-    icon: mdi:thermometer-alert
+    icon: "mdi:thermometer-alert"
   - unique_id: sensor.dads_room_wbgt
     name: "Dad’s Room WBGT"
     state: >-
@@ -72,10 +72,10 @@
           (float(states('sensor.dads_room_humidity')) - 60.0) * 0.003655 + 27.77
         ) | round(2)
       }}
-    unit_of_measurement: °C
+    unit_of_measurement: "°C"
     state_class: measurement
     device_class: temperature
-    icon: mdi:thermometer-water
+    icon: "mdi:thermometer-water"
   - name: Living Room AC Target
     unique_id: sensor.living_room_ac_target
     state: "{{ state_attr('climate.living_room_ac', 'temperature') }}"
