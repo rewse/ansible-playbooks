@@ -29,6 +29,13 @@
     device_class: temperature
     state_class: measurement
     unit_of_measurement: °C
+  - unique_id: sensor.dads_room_ac_temp
+    name: "Dad’s Room AC Temperature"
+    state: "{{ state_attr('climate.dads_room_ac', 'temperature') }}"
+    unit_of_measurement: "°C"
+    state_class: measurement
+    device_class: temperature
+    icon: mdi:thermometer-check
   - unique_id: sensor.dads_room_humidity_difference
     name: "Dad’s Room Humidity Difference"
     state: >-
