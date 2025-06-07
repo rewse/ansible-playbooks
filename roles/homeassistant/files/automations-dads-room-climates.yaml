@@ -427,6 +427,69 @@
                     value: "{{ states(repeat.item.src) }}"
   trace:
     stored_traces: 100
+- id: automation.toggle_dads_room_humidifier
+  alias: "Toggle Dad’s Room Humidifier"
+  triggers:
+    - trigger: state
+      entity_id:
+        - input_number.dads_room_humidity_target
+        - input_number.dads_room_humidity_max_diff
+        - input_number.dads_room_humidity_min_diff
+    - trigger: time_pattern
+      minutes: "/5"
+      seconds: 54
+    - trigger: homeassistant
+      event: start
+  actions:
+    - variables:
+        action: "idle"
+    - choose:
+        - conditions:
+            - condition: template
+              value_template: >-
+                {{
+                  float(states('sensor.dads_room_humidity')) >
+                  float(states('input_number.dads_room_humidity_target')) +
+                  float(states('input_number.dads_room_humidity_max_diff'))
+                }}
+            - condition: state
+              entity_id: switch.dads_room_humidifier
+              state: "on"
+          sequence:
+            - variables:
+                action: "off"
+        - conditions:
+            - condition: template
+              value_template: >-
+                {{
+                  float(states('sensor.dads_room_humidity')) < 
+                  float(states('input_number.dads_room_humidity_target')) -
+                  float(states('input_number.dads_room_humidity_min_diff'))
+                }}
+            - condition: state
+              entity_id: switch.dads_room_humidifier
+              state: "off"
+          sequence:
+            - variables:
+                action: "on"
+    - if:
+        - "{{ action != 'idle' }}"
+      then:
+        - action: switch.toggle
+          entity_id: switch.dads_room_humidifier
+        - action: notify.tats_devices
+          data:
+            message: >-
+              Turned {{ action }} Dad’s Room Humidifier.
+              Current: {{ states('sensor.dads_room_humidity') }}%
+            data:
+              url: /lovelace/home
+              push:
+                interruption-level: time-sensitive
+        - delay:
+            seconds: 10
+  trace:
+    stored_traces: 100
 - id: automation.turn_off_dads_room_ac_cool
   alias: "Turn off Dad’s Room AC Cool"
   triggers:
@@ -530,6 +593,30 @@
       target:
         entity_id:
           - automation.turn_on_dads_room_ac_internal_clean
+  trace:
+    stored_traces: 100
+- id: automation.turn_off_dads_room_floor_heating
+  alias: "Turn off Dad’s Room Floor Heating"
+  trigger:
+    - platform: state
+      entity_id: input_select.dads_room_climate_mode
+      to:
+       - "Absent Summer"
+       - "Absent Winter"
+  condition:
+    - condition: state
+      entity_id: switch.dads_room_floor_heating_plug
+      state: "on"
+  action:
+    - service: switch.turn_off
+      entity_id: switch.dads_room_floor_heating_plug
+    - service: notify.tats_devices
+      data:
+        message: "Turned off Dad’s Room Floor Heating"
+        data:
+          url: /lovelace/home
+          push:
+            interruption-level: time-sensitive
   trace:
     stored_traces: 100
 - id: automation.turn_on_dads_room_ac_cool
