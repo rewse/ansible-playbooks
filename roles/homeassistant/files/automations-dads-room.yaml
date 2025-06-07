@@ -740,7 +740,7 @@
         hvac_mode: fan_only
   trace:
     stored_traces: 100
-- id: automation.turn_on_dads_room_ac_streamer
+- id: automation.turn_on_dads_room_ac_streamer_2
   alias: Turn on Dad’s Room AC Streamer
   trigger:
     - platform: state
