@@ -1,15 +1,3 @@
-dads_room_humidifier_turned_off_threshold:
-  name: Dad’s Room Humidifier Turned off Threshold
-  min: 46
-  max: 54
-  unit_of_measurement: "%"
-  icon: mdi:water-percent-alert
-dads_room_humidifier_turned_on_threshold:
-  name: Dad’s Room Humidifier Turned on Threshold
-  min: 36
-  max: 44
-  unit_of_measurement: "%"
-  icon: mdi:water-percent-alert
 dads_room_climate_auto_off_minutes:
   name: "Dad’s Room Climate Auto-off Minutes"
   min: 0
