@@ -52,32 +52,34 @@
         hours: 8
   trace:
     stored_traces: 100
-
-# Others
-
-- id: automation.alarm_dads_room_co2_is_too_high
-  alias: "ALARM: Dad’s Room CO2 is Too High"
-  mode: single
-  trigger:
-    - platform: state
-      entity_id: binary_sensor.dads_room_presence
+- id: automation.alarm_dads_room_co2
+  alias: "ALARM: Dad’s Room CO2"
+  triggers:
+    - trigger: state
+      entity_id: input_boolean.dads_room_presence_mode
       to: "on"
-    - platform: time_pattern
+    - trigger: time_pattern
       minutes: "/5"
       seconds: 55
-  condition:
+  conditions:
     - condition: numeric_state
       entity_id: sensor.dads_room_co2
       above: 1000
-  action:
-    - service: notify.tats_devices
+    - condition: state
+      entity_id: input_boolean.dads_room_presence_mode
+      state: "on"
+  actions:
+    - action: notify.tats_devices
       data:
         title: "⚠️ ALARM"
-        message: "Dad’s Room CO2 is too high. Current: {{ states('sensor.dads_room_co2') }}ppm"
+        message: >-
+          Dad’s Room CO2 is too high.
+          Current: {{ states('sensor.dads_room_co2') }}ppm
         data:
-          url: /lovelace/home
           push:
             interruption-level: time-sensitive
+          tag: "automation.alarm_dads_room_co2"
+          url: "/lovelace/home"
     - delay:
         hours: 1
   trace:
