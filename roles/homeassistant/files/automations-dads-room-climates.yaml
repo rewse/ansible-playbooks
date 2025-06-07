@@ -427,7 +427,7 @@
                     value: "{{ states(repeat.item.src) }}"
   trace:
     stored_traces: 100
-- id: automation.turn_off_dads_room_ac_cool_2
+- id: automation.turn_off_dads_room_ac_cool
   alias: "Turn off Dad’s Room AC Cool"
   triggers:
     - trigger: state
@@ -474,7 +474,7 @@
           url: "/lovelace/home"
   trace:
     stored_traces: 100
-- id: automation.turn_off_dads_room_ac_dry_2
+- id: automation.turn_off_dads_room_ac_dry
   alias: "Turn off Dad’s Room AC Dry"
   triggers:
     - trigger: state
@@ -532,7 +532,7 @@
           - automation.turn_on_dads_room_ac_internal_clean
   trace:
     stored_traces: 100
-- id: automation.turn_on_dads_room_ac_cool_2
+- id: automation.turn_on_dads_room_ac_cool
   alias: "Turn on Dad’s Room AC Cool"
   triggers:
     - trigger: state
@@ -578,7 +578,7 @@
           url: "/lovelace/home"
   trace:
     stored_traces: 100
-- id: automation.turn_on_dads_room_ac_dry_2
+- id: automation.turn_on_dads_room_ac_dry
   alias: "Turn on Dad’s Room AC Dry"
   triggers:
     - trigger: state
