@@ -1,24 +1,3 @@
-- platform: min_max
-  name: monitor atom
-  type: max
-  round_digits: 0
-  entity_ids:
-    - sensor.monitor_dads_room_atom
-    - sensor.monitor_living_room_atom
-- platform: min_max
-  name: monitor kijitora
-  type: max
-  round_digits: 0
-  entity_ids:
-    - sensor.monitor_dads_room_kijitora
-    - sensor.monitor_living_room_kijitora
-- platform: min_max
-  name: monitor ubiqu-personal
-  type: max
-  round_digits: 0
-  entity_ids:
-    - sensor.monitor_dads_room_ubiqu_personal
-    - sensor.monitor_living_room_ubiqu_personal
 - platform: statistics
   name: Average of Balcony Humidity Difference
   unique_id: sensor.average_of_balcony_humidity_difference

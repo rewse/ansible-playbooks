@@ -61,25 +61,6 @@
         hours: 2
   trace:
     stored_traces: 100
-- id: automation.trigger_monitor
-  alias: Trigger monitor
-  trigger:
-    - platform: time_pattern
-      minutes: "/5"
-      seconds: 33
-  action:
-    - service: mqtt.publish
-      data:
-        topic: monitor/scan/arrive
-        payload: '{"identity": "automation.trigger_monitor"}'
-        retain: true
-    - service: mqtt.publish
-      data:
-        topic: monitor/scan/depart
-        payload: '{"identity": "automation.trigger_monitor"}'
-        retain: true
-  trace:
-    stored_traces: 100
 - id: automation.turn_off_alarm_control_panel_surveillance
   alias: Turn off Alarm Control Panel Surveillance
   mode: single
@@ -128,69 +109,6 @@
             interruption-level: time-sensitive
     - delay:
         hours: 1
-  trace:
-    stored_traces: 100
-- id: automation.turn_off_monitor_atom
-  alias: Turn off monitor atom
-  trigger:
-    - platform: numeric_state
-      entity_id: sensor.monitor_atom
-      below: 10
-    - platform: time_pattern
-      minutes: "/5"
-      seconds: 36
-  condition:
-    - condition: numeric_state
-      entity_id: sensor.monitor_atom
-      below: 10
-  action:
-    - service: device_tracker.see
-      data:
-        dev_id: monitor_atom
-        location_name: not_home
-        source_type: bluetooth
-  trace:
-    stored_traces: 100
-- id: automation.turn_off_monitor_kijitora
-  alias: Turn off monitor kijitora
-  trigger:
-    - platform: numeric_state
-      entity_id: sensor.monitor_kijitora
-      below: 10
-    - platform: time_pattern
-      minutes: "/5"
-      seconds: 22
-  condition:
-    - condition: numeric_state
-      entity_id: sensor.monitor_kijitora
-      below: 10
-  action:
-    - service: device_tracker.see
-      data:
-        dev_id: monitor_kijitora
-        location_name: not_home
-        source_type: bluetooth
-  trace:
-    stored_traces: 100
-- id: automation.turn_off_monitor_ubiqu_personal
-  alias: Turn off monitor ubiqu-personal
-  trigger:
-    - platform: numeric_state
-      entity_id: sensor.monitor_ubiqu_personal
-      below: 10
-    - platform: time_pattern
-      minutes: "/5"
-      seconds: 22
-  condition:
-    - condition: numeric_state
-      entity_id: sensor.monitor_ubiqu_personal
-      below: 10
-  action:
-    - service: device_tracker.see
-      data:
-        dev_id: monitor_ubiqu_personal
-        location_name: not_home
-        source_type: bluetooth
   trace:
     stored_traces: 100
 - id: automation.turn_off_shortcut_atom
@@ -313,69 +231,6 @@
         data:
           push:
             interruption-level: time-sensitive
-  trace:
-    stored_traces: 100
-- id: automation.turn_on_monitor_atom
-  alias: Turn on monitor atom
-  trigger:
-    - platform: numeric_state
-      entity_id: sensor.monitor_atom
-      above: 10
-    - platform: time_pattern
-      minutes: "/5"
-      seconds: 24
-  condition:
-    - condition: numeric_state
-      entity_id: sensor.monitor_atom
-      above: 10
-  action:
-    - service: device_tracker.see
-      data:
-        dev_id: monitor_atom
-        location_name: home
-        source_type: bluetooth
-  trace:
-    stored_traces: 100
-- id: automation.turn_on_monitor_kijitora
-  alias: Turn on monitor kijitora
-  trigger:
-    - platform: numeric_state
-      entity_id: sensor.monitor_kijitora
-      above: 10
-    - platform: time_pattern
-      minutes: "/5"
-      seconds: 52
-  condition:
-    - condition: numeric_state
-      entity_id: sensor.monitor_kijitora
-      above: 10
-  action:
-    - service: device_tracker.see
-      data:
-        dev_id: monitor_kijitora
-        location_name: home
-        source_type: bluetooth
-  trace:
-    stored_traces: 100
-- id: automation.turn_on_monitor_ubiqu_personal
-  alias: Turn on monitor ubiqu-personal
-  trigger:
-    - platform: numeric_state
-      entity_id: sensor.monitor_ubiqu_personal
-      above: 10
-    - platform: time_pattern
-      minutes: "/5"
-      seconds: 52
-  condition:
-    - condition: numeric_state
-      entity_id: sensor.monitor_ubiqu_personal
-      above: 10
-  action:
-    - service: device_tracker.see
-      data:
-        dev_id: monitor_ubiqu_personal
-        location_name: home
-        source_type: bluetooth
   trace:
     stored_traces: 100
 - id: automation.turn_on_shortcut_atom
