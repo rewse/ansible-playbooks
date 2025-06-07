@@ -34,7 +34,7 @@
       for:
         hours: 2
     - condition: state
-      entity_id: device_tracker.shortcut_atom
+      entity_id: device_tracker.atom
       state: home
       for:
         hours: 2
@@ -222,7 +222,7 @@
       for:
         hours: 2
     - condition: state
-      entity_id: device_tracker.shortcut_kijitora
+      entity_id: device_tracker.kijitora
       state: home
       for:
         hours: 2
@@ -608,7 +608,7 @@
       for:
         hours: 2
     - condition: state
-      entity_id: device_tracker.shortcut_ubiqu_personal
+      entity_id: device_tracker.ubiqu_personal
       state: home
       for:
         hours: 2

@@ -4,12 +4,3 @@ dads_room_presence_mode:
 moms_room_presence_mode:
   name: "Mom’s Room Presence Mode"
   icon: "mdi:home-account"
-shortcut_atom:
-  name: Shortcut atom
-  icon: mdi:layers
-shortcut_kijitora:
-  name: Shortcut kijitora
-  icon: mdi:layers
-shortcut_ubiqu_personal:
-  name: Shortcut ubiqu-personal
-  icon: mdi:layers
