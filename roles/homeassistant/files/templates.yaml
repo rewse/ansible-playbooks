@@ -128,20 +128,6 @@
     device_class: temperature
     state_class: measurement
     unit_of_measurement: °C
-  - name: Average of Dad’s Room AC Plug Power Improved
-    unique_id: sensor.average_of_dads_room_ac_plug_power_improved
-    icon: mdi:flash-outline
-    device_class: power
-    state_class: measurement
-    unit_of_measurement: W
-    state: "{{ states('sensor.average_of_dads_room_ac_plug_power') if states('sensor.average_of_dads_room_ac_plug_power') | is_number else states('sensor.dads_room_ac_plug_power') }}"
-  - name: Average of Mom’s Room AC Plug Power Improved
-    unique_id: sensor.average_of_moms_room_ac_plug_power_improved
-    icon: mdi:flash-outline
-    device_class: power
-    state_class: measurement
-    unit_of_measurement: W
-    state: "{{ states('sensor.average_of_moms_room_ac_plug_power') if states('sensor.average_of_moms_room_ac_plug_power') | is_number else states('sensor.moms_room_ac_plug_power') }}"
 - trigger:
     - platform: event
       event_type: imap_content
