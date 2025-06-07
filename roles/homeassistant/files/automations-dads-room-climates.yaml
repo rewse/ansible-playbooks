@@ -137,7 +137,38 @@
   alias: "Select Dad’s Room Humiture Target"
   triggers:
     - trigger: state
-      entity_id: input_select.dads_room_climate_mode
+      entity_id:
+        - input_select.dads_room_climate_mode
+        - input_number.dads_room_temp_target_present_summer
+        - input_number.dads_room_temp_target_present_winter
+        - input_number.dads_room_temp_target_present_summer_midnight
+        - input_number.dads_room_temp_target_present_winter_midnight
+        - input_number.dads_room_temp_target_absent_winter
+        - input_number.dads_room_humidity_target_present_summer
+        - input_number.dads_room_humidity_target_present_winter
+        - input_number.dads_room_humidity_target_present_summer_midnight
+        - input_number.dads_room_humidity_target_present_winter_midnight
+        - input_number.dads_room_humidity_target_absent_winter
+        - input_number.dads_room_temp_max_diff_present_summer
+        - input_number.dads_room_temp_max_diff_present_winter
+        - input_number.dads_room_temp_max_diff_present_summer_midnight
+        - input_number.dads_room_temp_max_diff_present_winter_midnight
+        - input_number.dads_room_temp_max_diff_absent_winter
+        - input_number.dads_room_humidity_max_diff_present_summer
+        - input_number.dads_room_humidity_max_diff_present_winter
+        - input_number.dads_room_humidity_max_diff_present_summer_midnight
+        - input_number.dads_room_humidity_max_diff_present_winter_midnight
+        - input_number.dads_room_humidity_max_diff_absent_winter
+        - input_number.dads_room_temp_min_diff_present_summer
+        - input_number.dads_room_temp_min_diff_present_winter
+        - input_number.dads_room_temp_min_diff_present_summer_midnight
+        - input_number.dads_room_temp_min_diff_present_winter_midnight
+        - input_number.dads_room_temp_min_diff_absent_winter
+        - input_number.dads_room_humidity_min_diff_present_summer
+        - input_number.dads_room_humidity_min_diff_present_winter
+        - input_number.dads_room_humidity_min_diff_present_summer_midnight
+        - input_number.dads_room_humidity_min_diff_present_winter_midnight
+        - input_number.dads_room_humidity_min_diff_absent_winter
     - trigger: state
       entity_id:
         - input_number.dads_room_temp_max_diff
