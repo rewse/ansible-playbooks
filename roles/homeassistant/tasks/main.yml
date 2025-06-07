@@ -106,12 +106,6 @@
     dest: /srv/homeassistant/config/automations
   tags: [homeassistant, homeassistant-automation]
 
-- name: Copy automations-dads-room-modes.yaml
-  copy:
-    src: automations-dads-room-modes.yaml
-    dest: /srv/homeassistant/config/automations
-  tags: [homeassistant, homeassistant-automation]
-
 - name: Copy automations-entrance.yaml
   copy:
     src: automations-entrance.yaml
