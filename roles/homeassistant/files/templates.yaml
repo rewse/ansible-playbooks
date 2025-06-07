@@ -30,27 +30,45 @@
     state_class: measurement
     unit_of_measurement: °C
   - unique_id: sensor.dads_room_humidity_difference
-    state_class: measurement
-    unit_of_measurement: °C
-  - name: Dad’s Room Humidity Difference
-    unique_id: sensor.dads_room_humidity_difference
-    state: "{{ (states('sensor.dads_room_humidity') | float(50) - states('sensor.dads_room_switchbot_meter_humidity') | float(50)) | round(2) | abs }}"
-    icon: mdi:water-percent-alert
+    name: "Dad’s Room Humidity Difference"
+    state: >-
+      {{
+        (
+          float(states('sensor.dads_room_humidity')) -
+          float(states('sensor.dads_room_switchbot_meter_humidity'))
+        ) | abs
+      }}
     unit_of_measurement: pt
-  - name: Dad’s Room Temperature Difference
-    unique_id: sensor.dads_room_temperature_difference
-    state: "{{ (states('sensor.dads_room_temperature') | float(25) - states('sensor.dads_room_switchbot_meter_temperature') | float(25)) | round(2) | abs }}"
+    state_class: measurement
+    icon: mdi:water-percent-alert
+  - unique_id: sensor.dads_room_temp_difference
+    name: "Dad’s Room Temperature Difference"
+    state: >-
+      {{
+        (
+          float(states('sensor.dads_room_temperature')) -
+          float(states('sensor.dads_room_switchbot_meter_temperature'))
+        ) | abs
+      }}
+    unit_of_measurement: °C
+    state_class: measurement
+    device_class: temperature
     icon: mdi:thermometer-alert
+  - unique_id: sensor.dads_room_wbgt
+    name: "Dad’s Room WBGT"
+    state: >-
+      {{
+        (
+          (float(states('sensor.dads_room_temperature')) - 30.5) * 0.90739 +
+          (float(states('sensor.dads_room_humidity')) - 60.0) * 0.14775 +
+          (float(states('sensor.dads_room_temperature')) - 30.5) *
+          (float(states('sensor.dads_room_humidity')) - 60.0) * 0.003655 + 27.77
+        ) | round(2)
+      }}
+    unit_of_measurement: °C
     state_class: measurement
     device_class: temperature
-    unit_of_measurement: °C
-  - name: Dad’s Room WBGT
-    unique_id: sensor.dads_room_wbgt
-    state: "{{ ((states('sensor.dads_room_temperature') | float(25) - 30.5) * 0.90739 + (states('sensor.dads_room_humidity') | float(50) - 60.0) * 0.14775 + (states('sensor.dads_room_temperature') | float(25) - 30.5) * (states('sensor.dads_room_humidity') | float(50) - 60.0) * 0.003655 + 27.77) | round(2) }}"
     icon: mdi:thermometer-water
-    device_class: temperature
-    state_class: measurement
-    unit_of_measurement: °C
   - name: Living Room AC Target
     unique_id: sensor.living_room_ac_target
     state: "{{ state_attr('climate.living_room_ac', 'temperature') }}"
