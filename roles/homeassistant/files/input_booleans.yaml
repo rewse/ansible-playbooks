@@ -1,6 +1,9 @@
 dads_room_presence_mode:
   name: "Dad’s Room Presence Mode"
   icon: "mdi:home-account"
+living_room_presence_mode:
+  name: "Living Room Presence Mode"
+  icon: "mdi:home-account"
 moms_room_presence_mode:
   name: "Mom’s Room Presence Mode"
   icon: "mdi:home-account"
