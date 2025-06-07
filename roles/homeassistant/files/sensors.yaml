@@ -20,16 +20,16 @@
   max_age:
     hours: 51
 - platform: statistics
-  name: Average of Dad’s Room Humidity Difference
-  unique_id: sensor.average_of_dads_room_humidity_difference
+  unique_id: sensor.dads_room_humidity_difference_average
+  name: "Dad’s Room Humidity Difference Average"
   entity_id: sensor.dads_room_humidity_difference
   state_characteristic: mean
   max_age:
     hours: 51
 - platform: statistics
-  name: Average of Dad’s Room Temperature Difference
-  unique_id: sensor.average_of_dads_room_temperature_difference
-  entity_id: sensor.dads_room_temperature_difference
+  unique_id: sensor.average_of_dads_room_temp_difference
+  name: "Dad’s Room Temperature Difference Average"
+  entity_id: sensor.dads_room_temp_difference
   state_characteristic: mean
   max_age:
     hours: 51
