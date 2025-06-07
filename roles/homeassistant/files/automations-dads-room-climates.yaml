@@ -8,6 +8,8 @@
     - trigger: state
       entity_id: input_boolean.dads_room_presence_mode
       to: "on"
+      for:
+        minutes: "{{ states('input_number.dads_room_climate_auto_on_minutes') }}"
     - trigger: state
       entity_id: input_boolean.dads_room_presence_mode
       to: "off"
@@ -21,6 +23,8 @@
             - condition: state
               entity_id: input_boolean.dads_room_presence_mode
               state: "on"
+              for:
+                minutes: "{{ states('input_number.dads_room_climate_auto_on_minutes') }}"
             - condition: state
               entity_id: input_select.season_mode
               state: "Summer"
@@ -40,6 +44,8 @@
             - condition: state
               entity_id: input_boolean.dads_room_presence_mode
               state: "on"
+              for:
+                minutes: "{{ states('input_number.dads_room_climate_auto_on_minutes') }}"
             - condition: state
               entity_id: input_select.season_mode
               state: "Winter"
@@ -59,6 +65,8 @@
             - condition: state
               entity_id: input_boolean.dads_room_presence_mode
               state: "on"
+              for:
+                minutes: "{{ states('input_number.dads_room_climate_auto_on_minutes') }}"
             - condition: state
               entity_id: input_select.season_mode
               state: "Summer"
@@ -77,6 +85,8 @@
             - condition: state
               entity_id: input_boolean.dads_room_presence_mode
               state: "on"
+              for:
+                minutes: "{{ states('input_number.dads_room_climate_auto_on_minutes') }}"
             - condition: state
               entity_id: input_select.season_mode
               state: "Winter"
