@@ -29,7 +29,7 @@
               target:
                 entity_id: climate.dads_room_ac 
               data:
-                temperature: "{{ int(state_attr('climate.dads_room_ac', 'temperature')) + 1 }}"
+                temperature: "{{ int(states('sensor.dads_room_ac_temp')) + 1 }}"
             - delay:
                 minutes: 30
         - conditions:
@@ -43,7 +43,7 @@
               target:
                 entity_id: climate.dads_room_ac 
               data:
-                temperature: "{{ int(state_attr('climate.dads_room_ac', 'temperature')) - 1 }}"
+                temperature: "{{ int(states('sensor.dads_room_ac_temp')) - 1 }}"
             - delay:
                 minutes: 30
   trace:
