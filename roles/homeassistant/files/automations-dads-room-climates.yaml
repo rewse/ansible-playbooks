@@ -427,6 +427,87 @@
                     value: "{{ states(repeat.item.src) }}"
   trace:
     stored_traces: 100
+- id: automation.toggle_dads_room_ac_cool
+  alias: "Toggle Dad’s Room AC Cool"
+  triggers:
+    - trigger: state
+      entity_id:
+        - input_number.dads_room_temp_target
+        - input_number.dads_room_temp_max_diff
+        - input_number.dads_room_temp_min_diff
+    - trigger: time_pattern
+      minutes: "/5"
+      seconds: 31
+    - trigger: homeassistant
+      event: start
+  actions:
+    - variables:
+        action: "idle"
+    - choose:
+        - conditions:
+            - condition: template
+              value_template: >-
+                {{
+                  float(states('sensor.dads_room_temperature')) > 
+                  float(states('input_number.dads_room_temp_target')) +
+                  float(states('input_number.dads_room_temp_max_diff'))
+                }}
+            - not:
+                - condition: state
+                  entity_id: climate.dads_room_ac
+                  state:
+                    - "fan_only"
+                    - "cool"
+          sequence:
+            - action: climate.set_temperature
+              target:
+                entity_id: climate.dads_room_ac
+              data:
+                hvac_mode: "cool"
+                temperature: "{{ int(states('input_number.dads_room_temp_target')) }}"
+            - variables:
+                action: "on"
+        - conditions:
+            - condition: template
+              value_template: >-
+                {{
+                  float(states('sensor.dads_room_temperature')) < 
+                  float(states('input_number.dads_room_temp_target')) -
+                  float(states('input_number.dads_room_temp_max_diff'))
+                }} 
+            - condition: template
+              value_template: >-
+                {{
+                  float(states('sensor.dads_room_humidity')) <
+                  float(states('input_number.dads_room_humidity_target')) +
+                  float(states('input_number.dads_room_humidity_max_diff'))
+                }}
+            - condition: state
+              entity_id: climate.dads_room_ac
+              state: "cool"
+          sequence:
+            - action: climate.turn_off
+              target:
+                entity_id: climate.dads_room_ac
+            - variables:
+                action: "off"
+    - if:
+        - "{{ action != 'idle' }}"
+      then:
+        - action: notify.tats_devices
+          data:
+            message: >-
+              Turned {{ action }} Dad’s Room AC Cool.
+              Current: {{ states('sensor.dads_room_temperature') }}°C
+            data:
+              push:
+                interruption-level: time-sensitive
+              tag: "automation.turn_on_dads_room_ac_cool"
+              url: "/lovelace/home"
+        - delay:
+            seconds: 10
+  trace:
+    stored_traces: 100
 - id: automation.toggle_dads_room_humidifier
   alias: "Toggle Dad’s Room Humidifier"
   triggers:
@@ -488,53 +569,6 @@
                 interruption-level: time-sensitive
         - delay:
             seconds: 10
-  trace:
-    stored_traces: 100
-- id: automation.turn_off_dads_room_ac_cool
-  alias: "Turn off Dad’s Room AC Cool"
-  triggers:
-    - trigger: state
-      entity_id:
-        - input_number.dads_room_temp_target
-        - input_number.dads_room_temp_max_diff
-        - input_number.dads_room_temp_min_diff
-    - trigger: time_pattern
-      minutes: "/5"
-      seconds: 0
-    - trigger: homeassistant
-      event: start
-  conditions:
-    - condition: template
-      value_template: >-
-        {{
-          float(states('sensor.dads_room_temperature')) < 
-          float(states('input_number.dads_room_temp_target')) -
-          float(states('input_number.dads_room_temp_max_diff'))
-        }} 
-    - condition: template
-      value_template: >-
-        {{
-          float(states('sensor.dads_room_humidity')) <
-          float(states('input_number.dads_room_humidity_target')) +
-          float(states('input_number.dads_room_humidity_max_diff'))
-        }}
-    - condition: state
-      entity_id: climate.dads_room_ac
-      state: "cool"
-  actions:
-    - action: climate.turn_off
-      target:
-        entity_id: climate.dads_room_ac
-    - action: notify.tats_devices
-      data:
-        message: >-
-          Turned off Dad’s Room AC Cool.
-          Current: {{ states('sensor.dads_room_temperature') }}°C
-        data:
-          push:
-            interruption-level: time-sensitive
-          tag: "automation.turn_off_dads_room_ac_cool"
-          url: "/lovelace/home"
   trace:
     stored_traces: 100
 - id: automation.turn_off_dads_room_ac_dry
@@ -617,52 +651,6 @@
           url: /lovelace/home
           push:
             interruption-level: time-sensitive
-  trace:
-    stored_traces: 100
-- id: automation.turn_on_dads_room_ac_cool
-  alias: "Turn on Dad’s Room AC Cool"
-  triggers:
-    - trigger: state
-      entity_id:
-        - input_number.dads_room_temp_target
-        - input_number.dads_room_temp_max_diff
-        - input_number.dads_room_temp_min_diff
-    - trigger: time_pattern
-      minutes: "/5"
-      seconds: 31
-    - trigger: homeassistant
-      event: start
-  conditions:
-    - condition: template
-      value_template: >-
-        {{
-          float(states('sensor.dads_room_temperature')) > 
-          float(states('input_number.dads_room_temp_target')) +
-          float(states('input_number.dads_room_temp_max_diff'))
-        }}
-    - not:
-        - condition: state
-          entity_id: climate.dads_room_ac
-          state:
-            - "fan_only"
-            - "cool"
-  actions:
-    - action: climate.set_temperature
-      target:
-        entity_id: climate.dads_room_ac
-      data:
-        hvac_mode: "cool"
-        temperature: "{{ int(states('input_number.dads_room_temp_target')) }}"
-    - action: notify.tats_devices
-      data:
-        message: >-
-          Turned on Dad’s Room AC Cool.
-          Current: {{ states('sensor.dads_room_temperature') }}°C
-        data:
-          push:
-            interruption-level: time-sensitive
-          tag: "automation.turn_on_dads_room_ac_cool"
-          url: "/lovelace/home"
   trace:
     stored_traces: 100
 - id: automation.turn_on_dads_room_ac_dry
