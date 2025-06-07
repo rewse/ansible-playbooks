@@ -9,8 +9,8 @@
   actions:
     - if:
         - condition: numeric_state
-          entity_id: sensor.average_of_balcony_temperature
-          above: input_number.season_mode_temperature
+          entity_id: sensor.balcony_temp_average
+          above: input_number.season_mode_temp
       then:
         - action: input_select.select_option
           target: 

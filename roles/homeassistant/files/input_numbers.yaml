@@ -462,7 +462,7 @@ moms_room_light_auto_off_minutes:
   max: 60
   unit_of_measurement: min
   icon: mdi:lightbulb-group-off
-season_mode_temperature:
+season_mode_temp:
   name: "Season Mode Temperature"
   min: 0
   max: 30
