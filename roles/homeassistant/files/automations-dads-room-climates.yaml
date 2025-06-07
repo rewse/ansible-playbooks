@@ -1,3 +1,53 @@
+- id: automation.adjust_dads_room_ac_temp
+  alias: "Adjust Dad’s Room AC Temperature"
+  triggers:
+    - trigger: state
+      entity_id: input_number.dads_room_temp_target
+    - trigger: time_pattern
+      minutes: "/5"
+      seconds: 21
+    - trigger: homeassistant
+      event: start
+  conditions:
+    - condition: state
+      entity_id: climate.dads_room_ac
+      state:
+        - "cool"
+        - "heat"
+      for:
+        minutes: 10
+  actions:
+    - choose:
+        - conditions:
+            - >-
+              {{
+                float(states('sensor.dads_room_temperature')) -
+                float(states('input_number.dads_room_temp_target')) < -0.5
+              }}
+          sequence:
+            - service: climate.set_temperature
+              target:
+                entity_id: climate.dads_room_ac 
+              data:
+                temperature: "{{ int(states('sensor.dads_room_ac_temp')) + 1 }}"
+            - delay:
+                minutes: 30
+        - conditions:
+            - >-
+              {{
+                float(states('sensor.dads_room_temperature')) -
+                float(states('input_number.dads_room_temp_target')) > 0.5
+              }}
+          sequence:
+            - service: climate.set_temperature
+              target:
+                entity_id: climate.dads_room_ac 
+              data:
+                temperature: "{{ int(states('sensor.dads_room_ac_temp')) - 1 }}"
+            - delay:
+                minutes: 30
+  trace:
+    stored_traces: 100
 - id: automation.select_dads_room_climate_mode
   alias: "Select Dad’s Room Climate Mode"
   triggers:
