@@ -1213,55 +1213,6 @@
   trace:
     stored_traces: 100
 
-# Lights
-
-- id: automation.turn_off_moms_room_light
-  alias: Turn off Mom’s Room Light
-  trigger:
-    - platform: state
-      entity_id: event.moms_room_1_button_switch_button
-  condition:
-    - condition: state
-      entity_id: event.moms_room_1_button_switch_button
-      attribute: event_type
-      state: multi_press_2
-  action:
-    - service: light.turn_off
-      target:
-        entity_id: light.moms_room_light
-  trace:
-    stored_traces: 100
-- id: automation.turn_off_moms_room_light_due_to_nobody
-  alias: Turn off Mom’s Room Light Due to Nobody
-  trigger:
-    - platform: state
-      entity_id: binary_sensor.moms_room_presence
-      to: "off"
-      for:
-        minutes: 30
-  action:
-    - service: light.turn_off
-      target:
-        entity_id: light.moms_room_light
-  trace:
-    stored_traces: 100
-- id: automation.turn_on_moms_room_light
-  alias: Turn on Mom’s Room Light
-  trigger:
-    - platform: state
-      entity_id: event.moms_room_1_button_switch_button
-  condition:
-    - condition: state
-      entity_id: event.moms_room_1_button_switch_button
-      attribute: event_type
-      state: multi_press_1
-  action:
-    - service: light.turn_on
-      target:
-        entity_id: light.moms_room_light
-  trace:
-    stored_traces: 100
-
 # Others
 
 - id: automation.open_moms_room_curtains_temporarily
