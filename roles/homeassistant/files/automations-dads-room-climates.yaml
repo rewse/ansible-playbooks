@@ -24,6 +24,12 @@
             - condition: state
               entity_id: input_select.season_mode
               state: "Summer"
+            - not:
+                - condition: state
+                  entity_id: input_select.time_mode
+                  state: 
+                    - "Midnight"
+                    - "Dark"
           sequence:
             - action: input_select.select_option
               target: 
@@ -37,6 +43,12 @@
             - condition: state
               entity_id: input_select.season_mode
               state: "Winter"
+            - not:
+                - condition: state
+                  entity_id: input_select.time_mode
+                  state: 
+                    - "Midnight"
+                    - "Dark"
           sequence:
             - action: input_select.select_option
               target: 
