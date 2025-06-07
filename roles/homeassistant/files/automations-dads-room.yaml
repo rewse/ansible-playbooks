@@ -86,3 +86,30 @@
         hours: 1
   trace:
     stored_traces: 100
+- id: automation.select_dads_room_presence_mode
+  alias: "Select Dad’s Room Presence Mode"
+  triggers:
+    - trigger: state
+      entity_id: binary_sensor.dads_room_presence
+    - trigger: homeassistant
+      event: start
+  actions:
+    - choose:
+        - conditions:
+            - condition: state
+              entity_id: binary_sensor.dads_room_presence
+              state: "on"
+          sequence:
+            - action: input_boolean.turn_on
+              target: 
+                entity_id: input_boolean.dads_room_presence_mode
+        - conditions:
+            - condition: state
+              entity_id: binary_sensor.dads_room_presence
+              state: "off"
+          sequence:
+            - action: input_boolean.turn_off
+              target: 
+                entity_id: input_boolean.dads_room_presence_mode
+  trace:
+    stored_traces: 100
