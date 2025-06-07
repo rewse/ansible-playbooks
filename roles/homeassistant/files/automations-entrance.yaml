@@ -221,29 +221,6 @@
         hours: 2
   trace:
     stored_traces: 100
-- id: automation.trigger_monitor_by_entrance_door
-  alias: Trigger monitor by Entrance Door
-  mode: restart
-  trigger:
-    - platform: state
-      entity_id: binary_sensor.entrance_door
-      from: "on"
-      to: "off"
-  action:
-    - delay:
-        minutes: 1
-    - service: mqtt.publish
-      data:
-        topic: monitor/scan/arrive
-        payload: '{"identity": "automation.trigger_monitor_by_entrance_door"}'
-        retain: true
-    - service: mqtt.publish
-      data:
-        topic: monitor/scan/depart
-        payload: '{"identity": "automation.trigger_monitor_by_entrance_door"}'
-        retain: true
-  trace:
-    stored_traces: 100
 - id: automation.turn_on_entrance_auto_lock
   alias: Turn on Entrance Auto-Lock
   trigger:
