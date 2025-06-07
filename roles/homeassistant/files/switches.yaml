@@ -7,10 +7,10 @@
 - platform: template
   switches:
     dads_room_humidifier:
-      friendly_name: Dad’s Room Humidifier
+      friendly_name: "Dad’s Room Humidifier"
       unique_id: switch.dads_room_humidifier
       value_template: "{{ states('sensor.dads_room_humidifier_plug_power') | float(0) > 3 }}"
-      availability_template: "{{ states('switch.dads_room_humidifier_plug_socket_1') }}"
+      availability_template: "{{ states('switch.dads_room_humidifier_plug') }}"
       turn_on:
         service: switch.toggle
         target:
@@ -19,7 +19,7 @@
         service: switch.toggle
         target:
           entity_id: switch.dads_room_humidifier_switch
-      icon_template: mdi:air-humidifier
+      icon_template: "mdi:air-humidifier"
     living_room_floor_heating:
       friendly_name: Living Room Floor Heating
       unique_id: switch.living_room_floor_heating
