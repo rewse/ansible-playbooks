@@ -210,8 +210,8 @@
       event_data:
         sender: "miwada_studyroom@outlook.com"
   sensor:
-    - name: MLL
-      unique_id: sensor.mll
+    - unique_id: sensor.mll
+      name: "MLL"
       state: "{{ trigger.event.data['subject'] }}"
       attributes:
         Message: "{{ trigger.event.data['text'] }}"
@@ -226,22 +226,25 @@
         Return_Path: "{{ trigger.event.data['headers']['Return-Path'][0] }}"
         Received-first: "{{ trigger.event.data['headers']['Received'][0] }}"
         Received-last: "{{ trigger.event.data['headers']['Received'][-1] }}"
-      icon: mdi:school
-    - name: MLL Action
-      unique_id: sensor.mll_action
-      state: >
+      icon: "mdi:school"
+    - unique_id: sensor.mll_action
+      name: "MLL Action"
+      state: >-
         {% if is_state('sensor.mll', 'unavailable') %}
           unavailable
         {% else %}
           {{ states("sensor.mll") | regex_findall_index("入退室連絡_(..)") }}
         {% endif %}
-      icon: mdi:school
-    - name: MLL Time
-      unique_id: sensor.mll_time
-      state: >
+      icon: "mdi:school"
+    - unique_id: sensor.mll_time
+      name: "MLL Time"
+      state: >-
         {% if is_state('sensor.mll', 'unavailable') %}
           unavailable
         {% else %}
-          {{ states("sensor.mll") | regex_findall_index("([0-9][0-9]*時[0-9][0-9]*)分") | regex_replace("時", ":") }}
+          {{
+            states("sensor.mll") | regex_findall_index("([0-9][0-9]*時[0-9][0-9]*)分") |
+            regex_replace("時", ":")
+          }}
         {% endif %}
-      icon: mdi:clock
+      icon: "mdi:clock"
