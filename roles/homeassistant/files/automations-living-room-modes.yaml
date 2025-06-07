@@ -54,50 +54,30 @@
       entity_id:
         - binary_sensor.living_room_presence_e
         - binary_sensor.living_room_presence_s
-      for:
-        minutes: 5
-    - trigger: time_pattern
-      minutes: "/5"
-      seconds: 35
     - trigger: homeassistant
       event: start
   actions:
     - choose:
         - conditions:
-            - or:
-                - condition: state
-                  entity_id: binary_sensor.living_room_presence_e
-                  state: "on"
-                  for:
-                    minutes: 5
-                - condition: state
-                  entity_id: binary_sensor.living_room_presence_s
-                  state: "on"
-                  for:
-                    minutes: 5
+            - condition: state
+              entity_id:
+                - binary_sensor.living_room_presence_e
+                - binary_sensor.living_room_presence_s
+              match: any
+              state: "on"
           sequence:
-            - action: input_select.select_option
+            - action: input_boolean.turn_on
               target: 
-                entity_id: input_select.living_room_presence_mode
-              data:
-                option: "Present"
+                entity_id: input_boolean.living_room_presence_mode
         - conditions:
-            - or:
-                - condition: state
-                  entity_id: binary_sensor.living_room_presence_e
-                  state: "off"
-                  for:
-                    minutes: 5
-                - condition: state
-                  entity_id: binary_sensor.living_room_presence_s
-                  state: "off"
-                  for:
-                    minutes: 5
+            - condition: state
+              entity_id:
+                - binary_sensor.living_room_presence_e
+                - binary_sensor.living_room_presence_s
+              state: "off"
           sequence:
-            - action: input_select.select_option
+            - action: input_boolean.turn_off
               target: 
-                entity_id: input_select.living_room_presence_mode
-              data:
-                option: "Absent"
+                entity_id: input_boolean.living_room_presence_mode
   trace:
     stored_traces: 100
