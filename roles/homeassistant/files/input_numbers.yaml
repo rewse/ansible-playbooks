@@ -460,5 +460,5 @@ time_mode_twilight_light_level:
   name: Time Mode Twilight Light Level
   min: 0
   max: 100
-  unit_of_measurement: lx
-  icon: mdi:brightness-5
+  unit_of_measurement: "lx"
+  icon: "mdi:brightness-5"
