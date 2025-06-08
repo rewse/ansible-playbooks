@@ -48,7 +48,7 @@
   trace:
     stored_traces: 100
 - id: automation.select_living_room_presence_mode
-  alias: Select Living Room Presence Mode
+  alias: "Select Living Room Presence Mode"
   triggers:
     - trigger: state
       entity_id:
