@@ -76,13 +76,13 @@
     state_class: measurement
     device_class: temperature
     icon: "mdi:thermometer-water"
-  - name: Living Room AC Target
-    unique_id: sensor.living_room_ac_target
+  - unique_id: sensor.living_room_ac_temp
+    name: "Living Room AC Temperature"
     state: "{{ state_attr('climate.living_room_ac', 'temperature') }}"
-    icon: mdi:thermometer-check
-    device_class: temperature
+    unit_of_measurement: "°C"
     state_class: measurement
-    unit_of_measurement: °C
+    device_class: temperature
+    icon: "mdi:thermometer-check"
   - name: Living Room Humidity Difference
     unique_id: sensor.living_room_humidity_difference
     state: "{{ (states('sensor.living_room_humidity') | float(50) - states('sensor.living_room_switchbot_hub_2_humidity') | float(50)) | round(2) | abs }}"
