@@ -289,6 +289,291 @@ dads_room_temp_target_absent_winter:
   step: 0.5
   unit_of_measurement: "°C"
   icon: "mdi:thermometer-minus"
+living_room_climate_auto_off_minutes:
+  name: "Living Room Climate Auto-off Minutes"
+  min: 0
+  max: 240
+  unit_of_measurement: "min"
+  icon: "mdi:hvac-off"
+living_room_climate_auto_on_minutes:
+  name: "Living Room Climate Auto-on Minutes"
+  min: 0
+  max: 240
+  unit_of_measurement: "min"
+  icon: "mdi:hvac"
+living_room_humidity_max_diff:
+  name: "Living Room Humidity Max Diffirence"
+  min: 1
+  max: 50
+  unit_of_measurement: "pt"
+  icon: "mdi:arrow-collapse-up"
+living_room_humidity_min_diff:
+  name: "Living Room Humidity Min Diffirence"
+  min: 1
+  max: 50
+  unit_of_measurement: "pt"
+  icon: "mdi:arrow-collapse-down"
+living_room_humidity_target:
+  name: "Living Room Humidity Target"
+  min: 0
+  max: 100
+  unit_of_measurement: "%"
+  icon: "mdi:water-percent"
+living_room_humidity_max_diff_present_summer:
+  name: "Living Room Humidity Max Diffirence Present Summer"
+  min: 0
+  max: 50
+  unit_of_measurement: "pt"
+  icon: "mdi:arrow-collapse-up"
+living_room_humidity_min_diff_present_summer:
+  name: "Living Room Humidity Min Diffirence Present Summer"
+  min: 0
+  max: 50
+  unit_of_measurement: "pt"
+  icon: "mdi:arrow-collapse-down"
+living_room_humidity_target_present_summer:
+  name: "Living Room Humidity Target Present Summer"
+  min: 0
+  max: 100
+  unit_of_measurement: "%"
+  icon: "mdi:water-percent"
+living_room_humidity_max_diff_present_winter:
+  name: "Living Room Humidity Max Diffirence Present Winter"
+  min: 0
+  max: 50
+  unit_of_measurement: "pt"
+  icon: "mdi:arrow-collapse-up"
+living_room_humidity_min_diff_present_winter:
+  name: "Living Room Humidity Min Diffirence Present Winter"
+  min: 0
+  max: 50
+  unit_of_measurement: "pt"
+  icon: "mdi:arrow-collapse-down"
+living_room_humidity_target_present_winter:
+  name: "Living Room Humidity Target Present Winter"
+  min: 0
+  max: 100
+  unit_of_measurement: "%"
+  icon: "mdi:water-percent"
+living_room_humidity_max_diff_present_summer_midnight:
+  name: "Living Room Humidity Max Diffirence Present Summer Midnight"
+  min: 0
+  max: 50
+  unit_of_measurement: "pt"
+  icon: "mdi:arrow-collapse-up"
+living_room_humidity_min_diff_present_summer_midnight:
+  name: "Living Room Humidity Min Diffirence Present Summer Midnight"
+  min: 0
+  max: 50
+  unit_of_measurement: "pt"
+  icon: "mdi:arrow-collapse-down"
+living_room_humidity_target_present_summer_midnight:
+  name: "Living Room Humidity Target Present Summer Midnight"
+  min: 0
+  max: 100
+  unit_of_measurement: "%"
+  icon: "mdi:water-percent"
+living_room_humidity_max_diff_present_winter_midnight:
+  name: "Living Room Humidity Max Diffirence Present Winter Midnight"
+  min: 0
+  max: 50
+  unit_of_measurement: "pt"
+  icon: "mdi:arrow-collapse-up"
+living_room_humidity_min_diff_present_winter_midnight:
+  name: "Living Room Humidity Min Diffirence Present Winter Midnight"
+  min: 0
+  max: 50
+  unit_of_measurement: "pt"
+  icon: "mdi:arrow-collapse-down"
+living_room_humidity_target_present_winter_midnight:
+  name: "Living Room Humidity Target Present Winter Midnight"
+  min: 0
+  max: 100
+  unit_of_measurement: "%"
+  icon: "mdi:water-percent"
+living_room_humidity_max_diff_absent_summer:
+  name: "Living Room Humidity Max Diffirence Absent Summer"
+  min: 0
+  max: 50
+  unit_of_measurement: "pt"
+  icon: "mdi:arrow-collapse-up"
+living_room_humidity_min_diff_absent_summer:
+  name: "Living Room Humidity Min Diffirence Absent Summer"
+  min: 0
+  max: 50
+  unit_of_measurement: "pt"
+  icon: "mdi:arrow-collapse-down"
+living_room_humidity_target_absent_summer:
+  name: "Living Room Humidity Target Absent Summer"
+  min: 0
+  max: 100
+  unit_of_measurement: "%"
+  icon: "mdi:water-percent"
+living_room_humidity_max_diff_absent_winter:
+  name: "Living Room Humidity Max Diffirence Absent Winter"
+  min: 0
+  max: 50
+  unit_of_measurement: "pt"
+  icon: "mdi:arrow-collapse-up"
+living_room_humidity_min_diff_absent_winter:
+  name: "Living Room Humidity Min Diffirence Absent Winter"
+  min: 0
+  max: 50
+  unit_of_measurement: "pt"
+  icon: "mdi:arrow-collapse-down"
+living_room_humidity_target_absent_winter:
+  name: "Living Room Humidity Target Absent Winter"
+  min: 0
+  max: 100
+  unit_of_measurement: "%"
+  icon: "mdi:water-percent"
+living_room_temp_max_diff:
+  name: "Living Room Temperature Max Diffirence"
+  min: 1
+  max: 20
+  step: 0.5
+  unit_of_measurement: "°C"
+  icon: "mdi:arrow-collapse-up"
+living_room_temp_min_diff:
+  name: "Living Room Temperature Min Diffirence"
+  min: 1
+  max: 20
+  step: 0.5
+  unit_of_measurement: "°C"
+  icon: "mdi:arrow-collapse-down"
+living_room_temp_target:
+  name: "Living Room Temperature Target"
+  min: 10
+  max: 40
+  step: 0.5
+  unit_of_measurement: "°C"
+  icon: "mdi:thermometer-check"
+living_room_temp_max_diff_present_summer:
+  name: "Living Room Temperature Max Diffirence Present Summer"
+  min: 1
+  max: 20
+  step: 0.5
+  unit_of_measurement: "°C"
+  icon: "mdi:arrow-collapse-up"
+living_room_temp_min_diff_present_summer:
+  name: "Living Room Temperature Min Diffirence Present Summer"
+  min: 1
+  max: 20
+  step: 0.5
+  unit_of_measurement: "°C"
+  icon: "mdi:arrow-collapse-down"
+living_room_temp_target_present_summer:
+  name: "Living Room Temperature Target Present Summer"
+  min: 10
+  max: 40
+  step: 0.5
+  unit_of_measurement: "°C"
+  icon: "mdi:thermometer-plus"
+living_room_temp_max_diff_present_winter:
+  name: "Living Room Temperature Max Diffirence Present Winter"
+  min: 1
+  max: 20
+  step: 0.5
+  unit_of_measurement: "°C"
+  icon: "mdi:arrow-collapse-up"
+living_room_temp_min_diff_present_winter:
+  name: "Living Room Temperature Min Diffirence Present Winter"
+  min: 1
+  max: 20
+  step: 0.5
+  unit_of_measurement: "°C"
+  icon: "mdi:arrow-collapse-down"
+living_room_temp_target_present_winter:
+  name: "Living Room Temperature Target Present Winter"
+  min: 10
+  max: 40
+  step: 0.5
+  unit_of_measurement: "°C"
+  icon: "mdi:thermometer-minus"
+living_room_temp_max_diff_present_summer_midnight:
+  name: "Living Room Temperature Max Diffirence Present Summer Midnight"
+  min: 1
+  max: 20
+  step: 0.5
+  unit_of_measurement: "°C"
+  icon: "mdi:arrow-collapse-up"
+living_room_temp_min_diff_present_summer_midnight:
+  name: "Living Room Temperature Min Diffirence Present Summer Midnight"
+  min: 1
+  max: 20
+  step: 0.5
+  unit_of_measurement: "°C"
+  icon: "mdi:arrow-collapse-down"
+living_room_temp_target_present_summer_midnight:
+  name: "Living Room Temperature Target Present Summer Midnight"
+  min: 10
+  max: 40
+  step: 0.5
+  unit_of_measurement: "°C"
+  icon: "mdi:thermometer-plus"
+living_room_temp_max_diff_present_winter_midnight:
+  name: "Living Room Temperature Max Diffirence Present Winter Midnight"
+  min: 1
+  max: 20
+  step: 0.5
+  unit_of_measurement: "°C"
+  icon: "mdi:arrow-collapse-up"
+living_room_temp_min_diff_present_winter_midnight:
+  name: "Living Room Temperature Min Diffirence Present Winter Midnight"
+  min: 1
+  max: 20
+  step: 0.5
+  unit_of_measurement: "°C"
+  icon: "mdi:arrow-collapse-down"
+living_room_temp_target_present_winter_midnight:
+  name: "Living Room Temperature Target Present Winter Midnight"
+  min: 10
+  max: 40
+  step: 0.5
+  unit_of_measurement: "°C"
+  icon: "mdi:thermometer-minus"
+living_room_temp_max_diff_absent_summer:
+  name: "Living Room Temperature Max Diffirence Absent Summer"
+  min: 1
+  max: 20
+  step: 0.5
+  unit_of_measurement: "°C"
+  icon: "mdi:arrow-collapse-up"
+living_room_temp_min_diff_absent_summer:
+  name: "Living Room Temperature Min Diffirence Absent Summer"
+  min: 1
+  max: 20
+  step: 0.5
+  unit_of_measurement: "°C"
+  icon: "mdi:arrow-collapse-down"
+living_room_temp_target_absent_summer:
+  name: "Living Room Temperature Target Absent Summer"
+  min: 10
+  max: 40
+  step: 0.5
+  unit_of_measurement: "°C"
+  icon: "mdi:thermometer-plus"
+living_room_temp_max_diff_absent_winter:
+  name: "Living Room Temperature Max Diffirence Absent Winter"
+  min: 1
+  max: 20
+  step: 0.5
+  unit_of_measurement: "°C"
+  icon: "mdi:arrow-collapse-up"
+living_room_temp_min_diff_absent_winter:
+  name: "Living Room Temperature Min Diffirence Absent Winter"
+  min: 1
+  max: 20
+  step: 0.5
+  unit_of_measurement: "°C"
+  icon: "mdi:arrow-collapse-down"
+living_room_temp_target_absent_winter:
+  name: "Living Room Temperature Target Absent Winter"
+  min: 10
+  max: 40
+  step: 0.5
+  unit_of_measurement: "°C"
+  icon: "mdi:thermometer-minus"
 living_room_floor_heating_turned_off_threshold:
   name: Living Room Floor Heating Turned off Threshold
   min: 24
