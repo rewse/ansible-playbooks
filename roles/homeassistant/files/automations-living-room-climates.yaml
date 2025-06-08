@@ -77,10 +77,48 @@
   alias: "Notify Living Room Climate"
   triggers:
     - trigger: event
+      event_type: "living_room_humidity_too_high"
+      id: "living_room_humidity_too_high"
+    - trigger: event
+      event_type: "living_room_humidity_too_low"
+      id: "living_room_humidity_too_low"
+    - trigger: event
       event_type: "living_room_temp_too_high"
       id: "living_room_temp_too_high"
   actions:
     - choose:
+        - conditions:
+            - condition: trigger
+              id: "living_room_humidity_too_high"
+          sequence:
+            - action: notify.all_devices
+              data:
+                message: >-
+                  Living Room Humidity is Too High.
+                  Current: {{ states('sensor.living_room_humidity') }}%
+                data:
+                  push:
+                    interruption-level: time-sensitive
+                  tag: "automation.notify_living_room_climate"
+                  url: "/lovelace/home"
+            - delay:
+                hours: 2
+        - conditions:
+            - condition: trigger
+              id: "living_room_humidity_too_low"
+          sequence:
+            - action: notify.all_devices
+              data:
+                message: >-
+                  Living Room Humidity is Too Low.
+                  Current: {{ states('sensor.living_room_humidity') }}%
+                data:
+                  push:
+                    interruption-level: time-sensitive
+                  tag: "automation.notify_living_room_climate"
+                  url: "/lovelace/home"
+            - delay:
+                hours: 2
         - conditions:
             - condition: trigger
               id: "living_room_temp_too_high"
@@ -586,8 +624,12 @@
             - if:
                 - condition: state
                   entity_id: input_boolean.living_room_window_mode
-                  state: "off"
+                  state: "on"
+                  for:
+                    minutes: 10
               then:
+                - event: "living_room_humidity_too_high"
+              else:
                 - action: climate.set_hvac_mode
                   target:
                     entity_id: climate.living_room_ac
@@ -605,19 +647,6 @@
                       url: "/lovelace/home"
                 - delay:
                     seconds: 10
-              else:
-                - action: notify.all_devices
-                  data:
-                    message: >-
-                      Living Room Humidity is Too High.
-                      Current: {{ states('sensor.living_room_humidity') }}%
-                    data:
-                      push:
-                        interruption-level: time-sensitive
-                      tag: "automation.toggle_living_room_ac_dry"
-                      url: "/lovelace/home"
-                - delay:
-                    hours: 2
         - conditions:
             - condition: template
               value_template: >-
@@ -642,6 +671,84 @@
                   push:
                     interruption-level: time-sensitive
                   tag: "automation.toggle_living_room_ac_dry"
+                  url: "/lovelace/home"
+            - delay:
+                seconds: 10
+  trace:
+    stored_traces: 100
+- id: automation.toggle_living_room_humidifier
+  alias: "Toggle Living Room Humidifier"
+  triggers:
+    - trigger: state
+      entity_id:
+        - input_number.living_room_humidity_target
+        - input_number.living_room_humidity_max_diff
+        - input_number.living_room_humidity_min_diff
+    - trigger: time_pattern
+      minutes: "/5"
+      seconds: 43
+    - trigger: homeassistant
+      event: start
+  actions:
+    - choose:
+        - conditions:
+            - condition: template
+              value_template: >-
+                {{
+                  float(states('sensor.living_room_humidity')) < 
+                  float(states('input_number.living_room_humidity_target')) -
+                  float(states('input_number.living_room_humidity_min_diff'))
+                }}
+            - condition: state
+              entity_id: switch.living_room_humidifier
+              state: "off"
+          sequence:
+            - if:
+                - condition: state
+                  entity_id: input_boolean.living_room_window_mode
+                  state: "on"
+                  for:
+                    minutes: 10
+              then:
+                - event: "living_room_humidity_too_low"
+              else:
+                - action: switch.toggle
+                  entity_id: switch.living_room_humidifier
+                - action: notify.all_devices
+                  data:
+                    message: >-
+                      Turned on Living Room Humidifier.
+                      Current: {{ states('sensor.living_room_humidity') }}%
+                    data:
+                      push:
+                        interruption-level: time-sensitive
+                      tag: "automation.toggle_living_room_humidifier"
+                      url: "/lovelace/home"
+                - delay:
+                    seconds: 10
+        - conditions:
+            - condition: template
+              value_template: >-
+                {{
+                  float(states('sensor.living_room_humidity')) >
+                  float(states('input_number.living_room_humidity_target')) +
+                  float(states('input_number.living_room_humidity_max_diff'))
+                }}
+            - condition: state
+              entity_id: switch.living_room_humidifier
+              state: "on"
+          sequence:
+            - action: switch.toggle
+              entity_id: switch.living_room_humidifier
+            - action: notify.all_devices
+              data:
+                message: >-
+                  Turned off Living Room Humidifier.
+                  Current: {{ states('sensor.living_room_humidity') }}%
+                data:
+                  push:
+                    interruption-level: time-sensitive
+                  tag: "automation.toggle_living_room_humidifier"
                   url: "/lovelace/home"
             - delay:
                 seconds: 10
