@@ -542,7 +542,6 @@
         data:
           push:
             interruption-level: time-sensitive
-          tag: "automation.toggle_dads_room_ac_cool"
           url: "/lovelace/home"
     - delay:
         seconds: 10
@@ -621,7 +620,6 @@
         data:
           push:
             interruption-level: time-sensitive
-          tag: "automation.toggle_dads_room_ac_dry"
           url: "/lovelace/home"
     - delay:
         seconds: 10
@@ -684,7 +682,6 @@
         data:
           push:
             interruption-level: time-sensitive
-          tag: "automation.toggle_dads_room_humidifier"
           url: "/lovelace/home"
     - delay:
         seconds: 10
@@ -729,7 +726,6 @@
         data:
           push:
             interruption-level: time-sensitive
-          tag: "automation.turn_off_dads_room_floor_heating"
           url: "/lovelace/home"
   trace:
     stored_traces: 100
