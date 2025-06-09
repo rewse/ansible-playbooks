@@ -4,12 +4,6 @@ dads_room_climate_auto_off_minutes:
   max: 240
   unit_of_measurement: "min"
   icon: "mdi:hvac-off"
-dads_room_climate_auto_on_minutes:
-  name: "Dad’s Room Climate Auto-on Minutes"
-  min: 0
-  max: 240
-  unit_of_measurement: "min"
-  icon: "mdi:hvac"
 dads_room_humidity_max_diff:
   name: "Dad’s Room Humidity Max Diffirence"
   min: 1
@@ -142,6 +136,12 @@ dads_room_light_auto_off_minutes:
   max: 60
   unit_of_measurement: "min"
   icon: "mdi:lightbulb-group-off"
+dads_room_presence_sensitibity_minutes:
+  name: "Dad’s Room Presence Sensitivity Minutes"
+  min: 0
+  max: 60
+  unit_of_measurement: "min"
+  icon: "mdi:home-clock"
 dads_room_temp_max_diff:
   name: "Dad’s Room Temperature Max Diffirence"
   min: 1
@@ -295,12 +295,6 @@ living_room_climate_auto_off_minutes:
   max: 240
   unit_of_measurement: "min"
   icon: "mdi:hvac-off"
-living_room_climate_auto_on_minutes:
-  name: "Living Room Climate Auto-on Minutes"
-  min: 0
-  max: 240
-  unit_of_measurement: "min"
-  icon: "mdi:hvac"
 living_room_humidity_max_diff:
   name: "Living Room Humidity Max Diffirence"
   min: 1
@@ -427,6 +421,12 @@ living_room_humidity_target_absent_winter:
   max: 100
   unit_of_measurement: "%"
   icon: "mdi:water-percent"
+living_room_presence_sensitibity_minutes:
+  name: "Living Room Presence Sensitivity Minutes"
+  min: 0
+  max: 60
+  unit_of_measurement: "min"
+  icon: "mdi:home-clock"
 living_room_temp_max_diff:
   name: "Living Room Temperature Max Diffirence"
   min: 1
