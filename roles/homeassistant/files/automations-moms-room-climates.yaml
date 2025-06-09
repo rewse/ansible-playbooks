@@ -725,7 +725,6 @@
                 data:
                   push:
                     interruption-level: time-sensitive
-                  tag: "automation.toggle_moms_room_ac_dry"
                   url: "/lovelace/home"
             - delay:
                 seconds: 10
