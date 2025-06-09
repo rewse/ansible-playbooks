@@ -51,7 +51,7 @@
         hours: 8
   trace:
     stored_traces: 100
- id: automation.turn_off_living_area_floor_heating
+- id: automation.turn_off_living_area_floor_heating
   alias: Turn off Living Area Floor Heating
   trigger:
     - platform: time_pattern
