@@ -170,10 +170,30 @@
       to: "off"
       for:
         minutes: "{{ states('input_number.living_room_climate_auto_off_minutes') }}"
+    - trigger: state
+      entity_id: input_boolean.living_room_window_mode
+      to: "on"
+      for:
+        minutes: "{{ int(states('living_room_climate_auto_off_minutes_ventilated')) }}"
+    - trigger: state
+      entity_id: input_boolean.living_room_window_mode
+      to: "off"
     - trigger: homeassistant
       event: start
   actions:
     - choose:
+        - conditions:
+            - condition: state
+              entity_id: input_boolean.living_room_window_mode
+              state: "on"
+              for:
+                minutes: "{{ int(states('living_room_climate_auto_off_minutes_ventilated')) }}"
+          sequence:
+            - action: input_select.select_option
+              target: 
+                entity_id: input_select.living_room_climate_mode
+              data:
+                option: "Ventilated"
         - conditions:
             - condition: state
               entity_id: input_boolean.living_room_presence_mode
@@ -811,6 +831,50 @@
       target:
         entity_id:
           - automation.turn_on_living_room_ac_internal_clean
+  trace:
+    stored_traces: 100
+- id: automation.turn_off_living_room_climate_ventilated
+  alias: "Turn off Living Room Climate Ventilated"
+  triggers:
+    - trigger: state
+      entity_id: input_select.living_room_climate_mode
+      to: "Ventilated"
+  actions:
+    - variables:
+        actioned: false
+    - if:
+        - condition: state
+          entity_id: climate.living_room_ac
+          state:
+            - "cool"
+            - "dry"
+            - "heat"
+      then:
+        - action: climate.turn_off
+          target:
+            entity_id: climate.living_room_ac
+        - variables:
+            actioned: true
+    - if:
+        - condition: state
+          entity_id: switch.living_room_humidifier
+          state: "on"
+      then:
+        - action: switch.turn_off
+          target:
+            entity_id: switch.living_room_humidifier
+        - variables:
+            actioned: true
+    - if:
+        - "{{ actioned }}"
+      then:
+        - action: notify.all_devices
+          data:
+            message: "Turned off Living Room Climate Systems Due to Ventilating"
+            data:
+              push:
+                interruption-level: time-sensitive
+              url: "/lovelace/home"
   trace:
     stored_traces: 100
 - id: automation.turn_on_living_room_ac_internal_clean
