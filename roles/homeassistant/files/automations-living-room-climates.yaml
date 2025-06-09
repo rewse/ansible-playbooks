@@ -52,7 +52,7 @@
   alias: "Change Living Room AC from HeatCool"
   triggers:
     - trigger: state
-      entity_id: climate.dads_room_ac
+      entity_id: climate.living_room_ac
       to: "heat_cool"
   action:
     - if:
