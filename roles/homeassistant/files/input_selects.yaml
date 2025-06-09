@@ -162,6 +162,7 @@ living_room_climate_mode:
     - "Present Winter Midnight"
     - "Absent Summer"
     - "Absent Winter"
+    - "Ventilated"
   icon: "mdi:thermostat-auto"
 living_room_light_mode:
   name: "Living Room Light Mode"
@@ -198,6 +199,7 @@ moms_room_climate_mode:
     - "Present Winter Midnight"
     - "Absent Summer"
     - "Absent Winter"
+    - "Ventilated"
   icon: "mdi:thermostat-auto"
 moms_room_light_mode:
   name: "Mom’s Room Light Mode"
