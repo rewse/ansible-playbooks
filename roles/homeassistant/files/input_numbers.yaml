@@ -295,6 +295,12 @@ living_room_climate_auto_off_minutes:
   max: 240
   unit_of_measurement: "min"
   icon: "mdi:hvac-off"
+living_room_climate_auto_off_minutes_ventilated:
+  name: "Living Room Climate Auto-off Minutes Ventilated"
+  min: 0
+  max: 240
+  unit_of_measurement: "min"
+  icon: "mdi:weather-windy"
 living_room_humidity_max_diff:
   name: "Living Room Humidity Max Diffirence"
   min: 1
@@ -651,6 +657,12 @@ moms_room_climate_auto_off_minutes:
   max: 240
   unit_of_measurement: "min"
   icon: "mdi:hvac-off"
+moms_room_climate_auto_off_minutes_ventilated:
+  name: "Mom’s Room Climate Auto-off Minutes Ventilated"
+  min: 0
+  max: 240
+  unit_of_measurement: "min"
+  icon: "mdi:weather-windy"
 moms_room_humidity_max_diff:
   name: "Mom’s Room Humidity Max Diffirence"
   min: 1
