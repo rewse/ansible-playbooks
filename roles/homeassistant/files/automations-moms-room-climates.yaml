@@ -825,31 +825,6 @@
           - automation.turn_on_moms_room_ac_internal_clean
   trace:
     stored_traces: 100
-- id: automation.turn_off_moms_room_floor_heating
-  alias: "Turn off Mom’s Room Floor Heating"
-  triggers:
-    - trigger: state
-      entity_id: input_select.moms_room_climate_mode
-      to:
-       - "Absent Summer"
-       - "Absent Winter"
-  condition:
-    - condition: state
-      entity_id: switch.moms_room_floor_heating_plug
-      state: "on"
-  actions:
-    - action: switch.turn_off
-      entity_id: switch.moms_room_floor_heating_plug
-    - action: notify.tats_devices
-      data:
-        message: "Turned off Mom’s Room Floor Heating"
-        data:
-          push:
-            interruption-level: time-sensitive
-          tag: "automation.turn_off_moms_room_floor_heating"
-          url: "/lovelace/home"
-  trace:
-    stored_traces: 100
 - id: automation.turn_off_moms_room_climate_ventilated
   alias: "Turn off Mom’s Room Climate Ventilated"
   triggers:
