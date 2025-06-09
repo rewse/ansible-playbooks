@@ -99,7 +99,6 @@
                 data:
                   push:
                     interruption-level: time-sensitive
-                  tag: "automation.notify_living_room_climate"
                   url: "/lovelace/home"
             - delay:
                 hours: 2
@@ -115,7 +114,6 @@
                 data:
                   push:
                     interruption-level: time-sensitive
-                  tag: "automation.notify_living_room_climate"
                   url: "/lovelace/home"
             - delay:
                 hours: 2
@@ -131,7 +129,6 @@
                 data:
                   push:
                     interruption-level: time-sensitive
-                  tag: "automation.notify_living_room_climate"
                   url: "/lovelace/home"
             - delay:
                 hours: 2
@@ -605,7 +602,6 @@
                     data:
                       push:
                         interruption-level: time-sensitive
-                      tag: "automation.toggle_living_room_ac_cool"
                       url: "/lovelace/home"
                 - delay:
                     seconds: 10
@@ -639,7 +635,6 @@
                 data:
                   push:
                     interruption-level: time-sensitive
-                  tag: "automation.toggle_living_room_ac_cool"
                   url: "/lovelace/home"
             - delay:
                 seconds: 10
@@ -704,7 +699,6 @@
                     data:
                       push:
                         interruption-level: time-sensitive
-                      tag: "automation.toggle_living_room_ac_dry"
                       url: "/lovelace/home"
                 - delay:
                     seconds: 10
@@ -731,7 +725,6 @@
                 data:
                   push:
                     interruption-level: time-sensitive
-                  tag: "automation.toggle_living_room_ac_dry"
                   url: "/lovelace/home"
             - delay:
                 seconds: 10
@@ -783,7 +776,6 @@
                     data:
                       push:
                         interruption-level: time-sensitive
-                      tag: "automation.toggle_living_room_humidifier"
                       url: "/lovelace/home"
                 - delay:
                     seconds: 10
@@ -809,7 +801,6 @@
                 data:
                   push:
                     interruption-level: time-sensitive
-                  tag: "automation.toggle_living_room_humidifier"
                   url: "/lovelace/home"
             - delay:
                 seconds: 10
