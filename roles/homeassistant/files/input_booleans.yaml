@@ -10,3 +10,6 @@ living_room_window_mode:
 moms_room_presence_mode:
   name: "Mom’s Room Presence Mode"
   icon: "mdi:home-account"
+moms_room_window_mode:
+  name: "Mom’s Room Window Mode"
+  icon: "mdi:window-closed-variant"
