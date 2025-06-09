@@ -1,0 +1,765 @@
+- id: automation.adjust_moms_room_ac_temp
+  alias: "Adjust Mom’s Room AC Temperature"
+  triggers:
+    - trigger: state
+      entity_id: input_number.moms_room_temp_target
+    - trigger: time_pattern
+      minutes: "/5"
+      seconds: 21
+    - trigger: homeassistant
+      event: start
+  conditions:
+    - condition: state
+      entity_id: climate.moms_room_ac
+      state:
+        - "cool"
+        - "heat"
+      for:
+        minutes: 10
+  actions:
+    - choose:
+        - conditions:
+            - >-
+              {{
+                float(states('sensor.moms_room_temperature')) -
+                float(states('input_number.moms_room_temp_target')) < -0.5
+              }}
+          sequence:
+            - action: climate.set_temperature
+              target:
+                entity_id: climate.moms_room_ac 
+              data:
+                temperature: "{{ int(states('sensor.moms_room_ac_temp')) + 1 }}"
+            - delay:
+                minutes: 30
+        - conditions:
+            - >-
+              {{
+                float(states('sensor.moms_room_temperature')) -
+                float(states('input_number.moms_room_temp_target')) > 0.5
+              }}
+          sequence:
+            - action: climate.set_temperature
+              target:
+                entity_id: climate.moms_room_ac 
+              data:
+                temperature: "{{ int(states('sensor.moms_room_ac_temp')) - 1 }}"
+            - delay:
+                minutes: 30
+  trace:
+    stored_traces: 100
+- id: automation.change_moms_room_ac_from_heatcool
+  alias: "Change Mom’s Room AC from HeatCool"
+  triggers:
+    - trigger: state
+      entity_id: climate.moms_room_ac
+      to: "heat_cool"
+  action:
+    - if:
+        - condition: state
+          entity_id: input_select.season_mode
+          state: "Summer"
+      then:
+        variables:
+          hvac_mode: "cool"
+      else:
+        variables:
+          hvac_mode: "heat"
+    - action: climate.set_temperature
+      target:
+        entity_id: climate.moms_room_ac
+      data:
+        hvac_mode: "{{ hvac_mode }}"
+        temperature: "{{ int(states('input_number.moms_room_temp_target')) }}"
+  trace:
+    stored_traces: 100
+- id: automation.plan_to_turn_on_moms_room_ac_internal_clean
+  alias: "Plan to Turn on Mom’s Room AC Internal Clean"
+  triggers:
+    - trigger: state
+      entity_id: climate.moms_room_ac
+      to:
+        - "cool"
+        - "dry"
+      for:
+        minutes: 5
+  actions:
+    - action: automation.turn_on
+      target:
+        entity_id:
+          - automation.turn_on_moms_room_ac_internal_clean
+  trace:
+    stored_traces: 100
+- id: automation.select_moms_room_climate_mode
+  alias: "Select Mom’s Room Climate Mode"
+  triggers:
+    - trigger: state
+      entity_id:
+        - input_select.season_mode
+        - input_select.time_mode
+    - trigger: state
+      entity_id: input_boolean.moms_room_presence_mode
+      for:
+        minutes: "{{ states('input_number.moms_room_presence_sensitibity_minutes') }}"
+    - trigger: state
+      entity_id: input_boolean.moms_room_presence_mode
+      to: "off"
+      for:
+        minutes: "{{ states('input_number.moms_room_climate_auto_off_minutes') }}"
+    - trigger: homeassistant
+      event: start
+  actions:
+    - choose:
+        - conditions:
+            - condition: state
+              entity_id: input_boolean.moms_room_presence_mode
+              state: "on"
+              for:
+                minutes: "{{ states('input_number.moms_room_presence_sensitibity_minutes') }}"
+            - condition: state
+              entity_id: input_select.season_mode
+              state: "Summer"
+            - not:
+                - condition: state
+                  entity_id: input_select.time_mode
+                  state: 
+                    - "Midnight"
+                    - "Dark"
+          sequence:
+            - action: input_select.select_option
+              target: 
+                entity_id: input_select.moms_room_climate_mode
+              data:
+                option: "Present Summer"
+        - conditions:
+            - condition: state
+              entity_id: input_boolean.moms_room_presence_mode
+              state: "on"
+              for:
+                minutes: "{{ states('input_number.moms_room_presence_sensitibity_minutes') }}"
+            - condition: state
+              entity_id: input_select.season_mode
+              state: "Winter"
+            - not:
+                - condition: state
+                  entity_id: input_select.time_mode
+                  state: 
+                    - "Midnight"
+                    - "Dark"
+          sequence:
+            - action: input_select.select_option
+              target: 
+                entity_id: input_select.moms_room_climate_mode
+              data:
+                option: "Present Winter"
+        - conditions:
+            - condition: state
+              entity_id: input_boolean.moms_room_presence_mode
+              state: "on"
+              for:
+                minutes: "{{ states('input_number.moms_room_presence_sensitibity_minutes') }}"
+            - condition: state
+              entity_id: input_select.season_mode
+              state: "Summer"
+            - condition: state
+              entity_id: input_select.time_mode
+              state: 
+                - "Midnight"
+                - "Dark"
+          sequence:
+            - action: input_select.select_option
+              target: 
+                entity_id: input_select.moms_room_climate_mode
+              data:
+                option: "Present Summer Midnight"
+        - conditions:
+            - condition: state
+              entity_id: input_boolean.moms_room_presence_mode
+              state: "on"
+              for:
+                minutes: "{{ states('input_number.moms_room_presence_sensitibity_minutes') }}"
+            - condition: state
+              entity_id: input_select.season_mode
+              state: "Winter"
+            - condition: state
+              entity_id: input_select.time_mode
+              state: 
+                - "Midnight"
+                - "Dark"
+          sequence:
+            - action: input_select.select_option
+              target: 
+                entity_id: input_select.moms_room_climate_mode
+              data:
+                option: "Present Winter Midnight"
+        - conditions:
+            - or:
+                - and:
+                    - condition: state
+                      entity_id: climate.moms_room_ac
+                      state:
+                        - "fan_only"
+                        - "off"
+                    - condition: state
+                      entity_id: input_boolean.moms_room_presence_mode
+                      state: "off"
+                      for:
+                        minutes: "{{ states('input_number.moms_room_presence_sensitibity_minutes') }}"
+                    - condition: state
+                      entity_id: input_select.season_mode
+                      state: "Summer"
+                - and:
+                    - condition: state
+                      entity_id: climate.moms_room_ac
+                      state:
+                        - "cool"
+                        - "dry"
+                        - "heat"
+                    - condition: state
+                      entity_id: input_boolean.moms_room_presence_mode
+                      state: "off"
+                      for:
+                        minutes: "{{ states('input_number.moms_room_climate_auto_off_minutes') }}"
+                    - condition: state
+                      entity_id: input_select.season_mode
+                      state: "Summer"
+          sequence:
+            - action: input_select.select_option
+              target: 
+                entity_id: input_select.moms_room_climate_mode
+              data:
+                option: "Absent Summer"
+        - conditions:
+            - or:
+                - and:
+                    - condition: state
+                      entity_id: climate.moms_room_ac
+                      state: "off"
+                    - condition: state
+                      entity_id: input_boolean.moms_room_presence_mode
+                      state: "off"
+                      for:
+                        minutes: "{{ states('input_number.moms_room_presence_sensitibity_minutes') }}"
+                    - condition: state
+                      entity_id: input_select.season_mode
+                      state: "Winter"
+                - and:
+                    - condition: state
+                      entity_id: climate.moms_room_ac
+                      state:
+                        - "cool"
+                        - "dry"
+                        - "heat"
+                    - condition: state
+                      entity_id: input_boolean.moms_room_presence_mode
+                      state: "off"
+                      for:
+                        minutes: "{{ states('input_number.moms_room_climate_auto_off_minutes') }}"
+                    - condition: state
+                      entity_id: input_select.season_mode
+                      state: "Winter"
+          sequence:
+            - action: input_select.select_option
+              target: 
+                entity_id: input_select.moms_room_climate_mode
+              data:
+                option: "Absent Winter"
+  trace:
+    stored_traces: 100
+- id: automation.select_moms_room_humiture_target
+  alias: "Select Mom’s Room Humiture Target"
+  triggers:
+    - trigger: state
+      entity_id:
+        - input_select.moms_room_climate_mode
+        - input_number.moms_room_temp_target_present_summer
+        - input_number.moms_room_temp_target_present_winter
+        - input_number.moms_room_temp_target_present_summer_midnight
+        - input_number.moms_room_temp_target_present_winter_midnight
+        - input_number.moms_room_temp_target_absent_winter
+        - input_number.moms_room_humidity_target_present_summer
+        - input_number.moms_room_humidity_target_present_winter
+        - input_number.moms_room_humidity_target_present_summer_midnight
+        - input_number.moms_room_humidity_target_present_winter_midnight
+        - input_number.moms_room_humidity_target_absent_winter
+        - input_number.moms_room_temp_max_diff_present_summer
+        - input_number.moms_room_temp_max_diff_present_winter
+        - input_number.moms_room_temp_max_diff_present_summer_midnight
+        - input_number.moms_room_temp_max_diff_present_winter_midnight
+        - input_number.moms_room_temp_max_diff_absent_winter
+        - input_number.moms_room_humidity_max_diff_present_summer
+        - input_number.moms_room_humidity_max_diff_present_winter
+        - input_number.moms_room_humidity_max_diff_present_summer_midnight
+        - input_number.moms_room_humidity_max_diff_present_winter_midnight
+        - input_number.moms_room_humidity_max_diff_absent_winter
+        - input_number.moms_room_temp_min_diff_present_summer
+        - input_number.moms_room_temp_min_diff_present_winter
+        - input_number.moms_room_temp_min_diff_present_summer_midnight
+        - input_number.moms_room_temp_min_diff_present_winter_midnight
+        - input_number.moms_room_temp_min_diff_absent_winter
+        - input_number.moms_room_humidity_min_diff_present_summer
+        - input_number.moms_room_humidity_min_diff_present_winter
+        - input_number.moms_room_humidity_min_diff_present_summer_midnight
+        - input_number.moms_room_humidity_min_diff_present_winter_midnight
+        - input_number.moms_room_humidity_min_diff_absent_winter
+    - trigger: state
+      entity_id:
+        - input_number.moms_room_temp_max_diff
+        - input_number.moms_room_humidity_max_diff
+        - input_number.moms_room_temp_min_diff
+        - input_number.moms_room_humidity_min_diff
+        - input_number.moms_room_temp_target
+        - input_number.moms_room_humidity_target
+      for:
+        hours: 1
+    - trigger: homeassistant
+      event: start
+  actions:
+    - choose:
+        - conditions:
+            - condition: state
+              entity_id: input_select.moms_room_climate_mode
+              state: "Present Summer"
+          sequence:
+            repeat:
+              for_each:
+                - src: input_number.moms_room_temp_max_diff_present_summer
+                  dest: input_number.moms_room_temp_max_diff
+                - src: input_number.moms_room_humidity_max_diff_present_summer
+                  dest: input_number.moms_room_humidity_max_diff
+                - src: input_number.moms_room_temp_min_diff_present_summer
+                  dest: input_number.moms_room_temp_min_diff
+                - src: input_number.moms_room_humidity_min_diff_present_summer
+                  dest: input_number.moms_room_humidity_min_diff
+                - src: input_number.moms_room_temp_target_present_summer
+                  dest: input_number.moms_room_temp_target
+                - src: input_number.moms_room_humidity_target_present_summer
+                  dest: input_number.moms_room_humidity_target
+              sequence:
+                - action: input_number.set_value
+                  target: 
+                    entity_id: "{{ repeat.item.dest }}"
+                  data:
+                    value: "{{ states(repeat.item.src) }}"
+        - conditions:
+            - condition: state
+              entity_id: input_select.moms_room_climate_mode
+              state: "Present Winter"
+          sequence:
+            repeat:
+              for_each:
+                - src: input_number.moms_room_temp_max_diff_present_winter
+                  dest: input_number.moms_room_temp_max_diff
+                - src: input_number.moms_room_humidity_max_diff_present_winter
+                  dest: input_number.moms_room_humidity_max_diff
+                - src: input_number.moms_room_temp_min_diff_present_winter
+                  dest: input_number.moms_room_temp_min_diff
+                - src: input_number.moms_room_humidity_min_diff_present_winter
+                  dest: input_number.moms_room_humidity_min_diff
+                - src: input_number.moms_room_temp_target_present_winter
+                  dest: input_number.moms_room_temp_target
+                - src: input_number.moms_room_humidity_target_present_winter
+                  dest: input_number.moms_room_humidity_target
+              sequence:
+                - action: input_number.set_value
+                  target: 
+                    entity_id: "{{ repeat.item.dest }}"
+                  data:
+                    value: "{{ states(repeat.item.src) }}"
+        - conditions:
+            - condition: state
+              entity_id: input_select.moms_room_climate_mode
+              state: "Present Summer Midnight"
+          sequence:
+            repeat:
+              for_each:
+                - src: input_number.moms_room_temp_max_diff_present_summer_midnight
+                  dest: input_number.moms_room_temp_max_diff
+                - src: input_number.moms_room_humidity_max_diff_present_summer_midnight
+                  dest: input_number.moms_room_humidity_max_diff
+                - src: input_number.moms_room_temp_min_diff_present_summer_midnight
+                  dest: input_number.moms_room_temp_min_diff
+                - src: input_number.moms_room_humidity_min_diff_present_summer_midnight
+                  dest: input_number.moms_room_humidity_min_diff
+                - src: input_number.moms_room_temp_target_present_summer_midnight
+                  dest: input_number.moms_room_temp_target
+                - src: input_number.moms_room_humidity_target_present_summer_midnight
+                  dest: input_number.moms_room_humidity_target
+              sequence:
+                - action: input_number.set_value
+                  target: 
+                    entity_id: "{{ repeat.item.dest }}"
+                  data:
+                    value: "{{ states(repeat.item.src) }}"
+        - conditions:
+            - condition: state
+              entity_id: input_select.moms_room_climate_mode
+              state: "Present Winter Midnight"
+          sequence:
+            repeat:
+              for_each:
+                - src: input_number.moms_room_temp_max_diff_present_winter_midnight
+                  dest: input_number.moms_room_temp_max_diff
+                - src: input_number.moms_room_humidity_max_diff_present_winter_midnight
+                  dest: input_number.moms_room_humidity_max_diff
+                - src: input_number.moms_room_temp_min_diff_present_winter_midnight
+                  dest: input_number.moms_room_temp_min_diff
+                - src: input_number.moms_room_humidity_min_diff_present_winter_midnight
+                  dest: input_number.moms_room_humidity_min_diff
+                - src: input_number.moms_room_temp_target_present_winter_midnight
+                  dest: input_number.moms_room_temp_target
+                - src: input_number.moms_room_humidity_target_present_winter_midnight
+                  dest: input_number.moms_room_humidity_target
+              sequence:
+                - action: input_number.set_value
+                  target: 
+                    entity_id: "{{ repeat.item.dest }}"
+                  data:
+                    value: "{{ states(repeat.item.src) }}"
+        - conditions:
+            - condition: state
+              entity_id: input_select.moms_room_climate_mode
+              state: "Absent Summer"
+          sequence:
+            repeat:
+              for_each:
+                - src: input_number.moms_room_temp_max_diff_absent_summer
+                  dest: input_number.moms_room_temp_max_diff
+                - src: input_number.moms_room_humidity_max_diff_absent_summer
+                  dest: input_number.moms_room_humidity_max_diff
+                - src: input_number.moms_room_temp_min_diff_absent_summer
+                  dest: input_number.moms_room_temp_min_diff
+                - src: input_number.moms_room_humidity_min_diff_absent_summer
+                  dest: input_number.moms_room_humidity_min_diff
+                - src: input_number.moms_room_temp_target_absent_summer
+                  dest: input_number.moms_room_temp_target
+                - src: input_number.moms_room_humidity_target_absent_summer
+                  dest: input_number.moms_room_humidity_target
+              sequence:
+                - action: input_number.set_value
+                  target: 
+                    entity_id: "{{ repeat.item.dest }}"
+                  data:
+                    value: "{{ states(repeat.item.src) }}"
+        - conditions:
+            - condition: state
+              entity_id: input_select.moms_room_climate_mode
+              state: "Absent Winter"
+          sequence:
+            repeat:
+              for_each:
+                - src: input_number.moms_room_temp_max_diff_absent_winter
+                  dest: input_number.moms_room_temp_max_diff
+                - src: input_number.moms_room_humidity_max_diff_absent_winter
+                  dest: input_number.moms_room_humidity_max_diff
+                - src: input_number.moms_room_temp_min_diff_absent_winter
+                  dest: input_number.moms_room_temp_min_diff
+                - src: input_number.moms_room_humidity_min_diff_absent_winter
+                  dest: input_number.moms_room_humidity_min_diff
+                - src: input_number.moms_room_temp_target_absent_winter
+                  dest: input_number.moms_room_temp_target
+                - src: input_number.moms_room_humidity_target_absent_winter
+                  dest: input_number.moms_room_humidity_target
+              sequence:
+                - action: input_number.set_value
+                  target: 
+                    entity_id: "{{ repeat.item.dest }}"
+                  data:
+                    value: "{{ states(repeat.item.src) }}"
+  trace:
+    stored_traces: 100
+- id: automation.toggle_moms_room_ac_cool
+  alias: "Toggle Mom’s Room AC Cool"
+  triggers:
+    - trigger: state
+      entity_id:
+        - input_number.moms_room_temp_target
+        - input_number.moms_room_temp_max_diff
+        - input_number.moms_room_temp_min_diff
+    - trigger: time_pattern
+      minutes: "/5"
+      seconds: 31
+    - trigger: homeassistant
+      event: start
+  actions:
+    - variables:
+        action: "idle"
+    - choose:
+        - conditions:
+            - condition: template
+              value_template: >-
+                {{
+                  float(states('sensor.moms_room_temperature')) > 
+                  float(states('input_number.moms_room_temp_target')) +
+                  float(states('input_number.moms_room_temp_max_diff'))
+                }}
+            - not:
+                - condition: state
+                  entity_id: climate.moms_room_ac
+                  state:
+                    - "fan_only"
+                    - "cool"
+          sequence:
+            - action: climate.set_temperature
+              target:
+                entity_id: climate.moms_room_ac
+              data:
+                hvac_mode: "cool"
+                temperature: "{{ int(states('input_number.moms_room_temp_target')) }}"
+            - variables:
+                action: "on"
+        - conditions:
+            - condition: template
+              value_template: >-
+                {{
+                  float(states('sensor.moms_room_temperature')) < 
+                  float(states('input_number.moms_room_temp_target')) -
+                  float(states('input_number.moms_room_temp_max_diff'))
+                }} 
+            - condition: template
+              value_template: >-
+                {{
+                  float(states('sensor.moms_room_humidity')) <
+                  float(states('input_number.moms_room_humidity_target')) +
+                  float(states('input_number.moms_room_humidity_max_diff'))
+                }}
+            - condition: state
+              entity_id: climate.moms_room_ac
+              state: "cool"
+          sequence:
+            - action: climate.turn_off
+              target:
+                entity_id: climate.moms_room_ac
+            - variables:
+                action: "off"
+      default:
+        - stop: "sensor.moms_room_temperature is good"
+    - action: notify.tats_devices
+      data:
+        message: >-
+          Turned {{ action }} Mom’s Room AC Cool.
+          Current: {{ states('sensor.moms_room_temperature') }}°C
+        data:
+          push:
+            interruption-level: time-sensitive
+          tag: "automation.toggle_moms_room_ac_cool"
+          url: "/lovelace/home"
+    - delay:
+        seconds: 10
+  trace:
+    stored_traces: 100
+- id: automation.toggle_moms_room_ac_dry
+  alias: "Toggle Mom’s Room AC Dry"
+  triggers:
+    - trigger: state
+      entity_id:
+        - input_number.moms_room_humidity_target
+        - input_number.moms_room_humidity_max_diff
+        - input_number.moms_room_humidity_min_diff
+    - trigger: time_pattern
+      minutes: "/5"
+      seconds: 42
+    - trigger: homeassistant
+      event: start
+  action:
+    - variables:
+        action: "idle"
+    - choose:
+        - conditions:
+            - condition: template
+              value_template: >-
+                {{
+                  float(states('sensor.moms_room_humidity')) > 
+                  float(states('input_number.moms_room_humidity_target')) +
+                  float(states('input_number.moms_room_humidity_max_diff'))
+                }}
+            - condition: template
+              value_template: >-
+                {{
+                  float(states('sensor.moms_room_temperature')) <
+                  float(states('input_number.moms_room_temp_target')) +
+                  float(states('input_number.moms_room_temp_max_diff'))
+                }}
+            - not:
+                - condition: state
+                  entity_id: climate.moms_room_ac
+                  state:
+                    - "fan_only"
+                    - "dry"
+          sequence:
+            - action: climate.set_hvac_mode
+              target:
+                entity_id: climate.moms_room_ac
+              data:
+                hvac_mode: "dry"
+            - variables:
+                action: "on"
+        - conditions:
+            - condition: template
+              value_template: >-
+                {{
+                  float(states('sensor.moms_room_humidity')) < 
+                  float(states('input_number.moms_room_humidity_target')) -
+                  float(states('input_number.moms_room_humidity_min_diff'))
+                }}
+            - condition: state
+              entity_id: climate.moms_room_ac
+              state: "dry"
+          sequence:
+            - action: climate.turn_off
+              target:
+                entity_id: climate.moms_room_ac
+            - variables:
+                action: "off"
+      default:
+        - stop: "sensor.moms_room_humidity is good"
+    - action: notify.tats_devices
+      data:
+        message: >-
+          Turned {{ action }} Mom’s Room AC Dry.
+          Current: {{ states('sensor.moms_room_humidity') }}%
+        data:
+          push:
+            interruption-level: time-sensitive
+          tag: "automation.toggle_moms_room_ac_dry"
+          url: "/lovelace/home"
+    - delay:
+        seconds: 10
+  trace:
+    stored_traces: 100
+- id: automation.toggle_moms_room_humidifier
+  alias: "Toggle Mom’s Room Humidifier"
+  triggers:
+    - trigger: state
+      entity_id:
+        - input_number.moms_room_humidity_target
+        - input_number.moms_room_humidity_max_diff
+        - input_number.moms_room_humidity_min_diff
+    - trigger: time_pattern
+      minutes: "/5"
+      seconds: 54
+    - trigger: homeassistant
+      event: start
+  actions:
+    - variables:
+        action: "idle"
+    - choose:
+        - conditions:
+            - condition: template
+              value_template: >-
+                {{
+                  float(states('sensor.moms_room_humidity')) < 
+                  float(states('input_number.moms_room_humidity_target')) -
+                  float(states('input_number.moms_room_humidity_min_diff'))
+                }}
+            - condition: state
+              entity_id: switch.moms_room_humidifier
+              state: "off"
+          sequence:
+            - variables:
+                action: "on"
+        - conditions:
+            - condition: template
+              value_template: >-
+                {{
+                  float(states('sensor.moms_room_humidity')) >
+                  float(states('input_number.moms_room_humidity_target')) +
+                  float(states('input_number.moms_room_humidity_max_diff'))
+                }}
+            - condition: state
+              entity_id: switch.moms_room_humidifier
+              state: "on"
+          sequence:
+            - variables:
+                action: "off"
+      default:
+        - stop: "sensor.moms_room_humidity is good"
+    - action: switch.toggle
+      entity_id: switch.moms_room_humidifier
+    - action: notify.tats_devices
+      data:
+        message: >-
+          Turned {{ action }} Mom’s Room Humidifier.
+          Current: {{ states('sensor.moms_room_humidity') }}%
+        data:
+          push:
+            interruption-level: time-sensitive
+          tag: "automation.toggle_moms_room_humidifier"
+          url: "/lovelace/home"
+    - delay:
+        seconds: 10
+  trace:
+    stored_traces: 100
+- id: automation.turn_off_moms_room_ac_internal_clean
+  alias: "Turn Off Mom’s Room AC Internal Clean"
+  triggers:
+    - trigger: state
+      entity_id: climate.moms_room_ac
+      to: "fan_only"
+      for:
+        minutes: 120
+  actions:
+    - action: climate.turn_off
+      target:
+        entity_id: climate.moms_room_ac
+    - action: automation.turn_off
+      target:
+        entity_id:
+          - automation.turn_on_moms_room_ac_internal_clean
+  trace:
+    stored_traces: 100
+- id: automation.turn_off_moms_room_floor_heating
+  alias: "Turn off Mom’s Room Floor Heating"
+  triggers:
+    - trigger: state
+      entity_id: input_select.moms_room_climate_mode
+      to:
+       - "Absent Summer"
+       - "Absent Winter"
+  condition:
+    - condition: state
+      entity_id: switch.moms_room_floor_heating_plug
+      state: "on"
+  actions:
+    - action: switch.turn_off
+      entity_id: switch.moms_room_floor_heating_plug
+    - action: notify.tats_devices
+      data:
+        message: "Turned off Mom’s Room Floor Heating"
+        data:
+          push:
+            interruption-level: time-sensitive
+          tag: "automation.turn_off_moms_room_floor_heating"
+          url: "/lovelace/home"
+  trace:
+    stored_traces: 100
+- id: automation.turn_on_moms_room_ac_internal_clean
+  alias: "Turn on Mom’s Room AC Internal Clean"
+  triggers:
+    - trigger: state
+      entity_id: climate.moms_room_ac
+      to: "off"
+      for:
+        seconds: 10
+  actions:
+    - action: climate.set_hvac_mode
+      target:
+        entity_id: climate.moms_room_ac
+      data:
+        hvac_mode: "fan_only"
+  trace:
+    stored_traces: 100
+- id: automation.turn_on_moms_room_ac_streamer
+  alias: "Turn on Mom’s Room AC Streamer"
+  triggers:
+    - trigger: state
+      entity_id: climate.moms_room_ac
+      not_to: "off"
+      for:
+        seconds: 10
+  actions:
+    - action: switch.turn_on
+      target:
+        entity_id: switch.moms_room_ac_streamer
+  trace:
+    stored_traces: 100

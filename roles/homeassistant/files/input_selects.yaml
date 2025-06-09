@@ -194,9 +194,10 @@ moms_room_climate_mode:
   options:
     - "Present Summer"
     - "Present Winter"
+    - "Present Summer Midnight"
+    - "Present Winter Midnight"
     - "Absent Summer"
     - "Absent Winter"
-    - "Vent"
   icon: "mdi:thermostat-auto"
 moms_room_light_mode:
   name: "Mom’s Room Light Mode"

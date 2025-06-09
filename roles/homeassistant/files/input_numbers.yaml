@@ -645,96 +645,303 @@ living_room_tv_light_brightness_turned_down_more:
   min: 0
   max: 100
   icon: mdi:brightness-percent
-moms_room_humidifier_turned_off_threshold:
-  name: Mom’s Room Humidifier Turned off Threshold
-  min: 46
-  max: 54
+moms_room_climate_auto_off_minutes:
+  name: "Mom’s Room Climate Auto-off Minutes"
+  min: 0
+  max: 240
+  unit_of_measurement: "min"
+  icon: "mdi:hvac-off"
+moms_room_humidity_max_diff:
+  name: "Mom’s Room Humidity Max Diffirence"
+  min: 1
+  max: 50
+  unit_of_measurement: "pt"
+  icon: "mdi:arrow-collapse-up"
+moms_room_humidity_min_diff:
+  name: "Mom’s Room Humidity Min Diffirence"
+  min: 1
+  max: 50
+  unit_of_measurement: "pt"
+  icon: "mdi:arrow-collapse-down"
+moms_room_humidity_target:
+  name: "Mom’s Room Humidity Target"
+  min: 0
+  max: 100
   unit_of_measurement: "%"
-  icon: mdi:water-percent-alert
-moms_room_humidifier_turned_on_threshold:
-  name: Mom’s Room Humidifier Turned on Threshold
-  min: 36
-  max: 44
+  icon: "mdi:water-percent"
+moms_room_humidity_max_diff_present_summer:
+  name: "Mom’s Room Humidity Max Diffirence Present Summer"
+  min: 0
+  max: 50
+  unit_of_measurement: "pt"
+  icon: "mdi:arrow-collapse-up"
+moms_room_humidity_min_diff_present_summer:
+  name: "Mom’s Room Humidity Min Diffirence Present Summer"
+  min: 0
+  max: 50
+  unit_of_measurement: "pt"
+  icon: "mdi:arrow-collapse-down"
+moms_room_humidity_target_present_summer:
+  name: "Mom’s Room Humidity Target Present Summer"
+  min: 0
+  max: 100
   unit_of_measurement: "%"
-  icon: mdi:water-percent-alert
-moms_room_ac_cool_forcibly_turned_on_threshold:
-  name: Mom’s Room AC Cool Forcibly Turned on Threshold
-  min: 27
-  max: 35
-  unit_of_measurement: °C
-  icon: mdi:thermometer-alert
-moms_room_ac_cool_target_temperature:
-  name: Mom’s Room AC Cool Target Temperature
-  min: 24
-  max: 28
-  unit_of_measurement: °C
-  icon: mdi:thermometer-check
-moms_room_ac_cool_target_wbgt:
-  name: Mom’s Room AC Cool Target WBGT
-  min: 22
-  max: 26
-  unit_of_measurement: °C
-  icon: mdi:thermometer-check
-moms_room_ac_cool_turned_off_threshold:
-  name: Mom’s Room AC Cool Turned off Threshold
-  min: 22
-  max: 26
-  unit_of_measurement: °C
-  icon: mdi:thermometer-chevron-down
-moms_room_ac_cool_turned_on_threshold:
-  name: Mom’s Room AC Cool Turned on Threshold
-  min: 24
-  max: 32
-  unit_of_measurement: °C
-  icon: mdi:thermometer-chevron-up
-moms_room_ac_heat_remote_temperature:
-  name: Mom’s Room AC Heat Remote Temperature
-  min: 18
-  max: 22
-  unit_of_measurement: °C
-  icon: mdi:thermometer-check
-moms_room_ac_heat_target_temperature:
-  name: Mom’s Room AC Heat Target Temperature
-  min: 22
-  max: 26
-  unit_of_measurement: °C
-  icon: mdi:thermometer-check
-moms_room_ac_heat_turned_off_threshold:
-  name: Mom’s Room AC Heat Turned off Threshold
-  min: 24
-  max: 28
-  unit_of_measurement: °C
-  icon: mdi:thermometer-chevron-down
-moms_room_ac_heat_turned_on_threshold:
-  name: Mom’s Room AC Heat Turned on Threshold
-  min: 21
-  max: 25
-  unit_of_measurement: °C
-  icon: mdi:thermometer-chevron-up
-moms_room_ac_dry_turned_off_threshold:
-  name: Mom’s Room AC Dry Turned off Threshold
-  min: 52
+  icon: "mdi:water-percent"
+moms_room_humidity_max_diff_present_winter:
+  name: "Mom’s Room Humidity Max Diffirence Present Winter"
+  min: 0
+  max: 50
+  unit_of_measurement: "pt"
+  icon: "mdi:arrow-collapse-up"
+moms_room_humidity_min_diff_present_winter:
+  name: "Mom’s Room Humidity Min Diffirence Present Winter"
+  min: 0
+  max: 50
+  unit_of_measurement: "pt"
+  icon: "mdi:arrow-collapse-down"
+moms_room_humidity_target_present_winter:
+  name: "Mom’s Room Humidity Target Present Winter"
+  min: 0
+  max: 100
+  unit_of_measurement: "%"
+  icon: "mdi:water-percent"
+moms_room_humidity_max_diff_present_summer_midnight:
+  name: "Mom’s Room Humidity Max Diffirence Present Summer Midnight"
+  min: 0
+  max: 50
+  unit_of_measurement: "pt"
+  icon: "mdi:arrow-collapse-up"
+moms_room_humidity_min_diff_present_summer_midnight:
+  name: "Mom’s Room Humidity Min Diffirence Present Summer Midnight"
+  min: 0
+  max: 50
+  unit_of_measurement: "pt"
+  icon: "mdi:arrow-collapse-down"
+moms_room_humidity_target_present_summer_midnight:
+  name: "Mom’s Room Humidity Target Present Summer Midnight"
+  min: 0
+  max: 100
+  unit_of_measurement: "%"
+  icon: "mdi:water-percent"
+moms_room_humidity_max_diff_present_winter_midnight:
+  name: "Mom’s Room Humidity Max Diffirence Present Winter Midnight"
+  min: 0
+  max: 50
+  unit_of_measurement: "pt"
+  icon: "mdi:arrow-collapse-up"
+moms_room_humidity_min_diff_present_winter_midnight:
+  name: "Mom’s Room Humidity Min Diffirence Present Winter Midnight"
+  min: 0
+  max: 50
+  unit_of_measurement: "pt"
+  icon: "mdi:arrow-collapse-down"
+moms_room_humidity_target_present_winter_midnight:
+  name: "Mom’s Room Humidity Target Present Winter Midnight"
+  min: 0
+  max: 100
+  unit_of_measurement: "%"
+  icon: "mdi:water-percent"
+moms_room_humidity_max_diff_absent_summer:
+  name: "Mom’s Room Humidity Max Diffirence Absent Summer"
+  min: 0
+  max: 50
+  unit_of_measurement: "pt"
+  icon: "mdi:arrow-collapse-up"
+moms_room_humidity_min_diff_absent_summer:
+  name: "Mom’s Room Humidity Min Diffirence Absent Summer"
+  min: 0
+  max: 50
+  unit_of_measurement: "pt"
+  icon: "mdi:arrow-collapse-down"
+moms_room_humidity_target_absent_summer:
+  name: "Mom’s Room Humidity Target Absent Summer"
+  min: 0
+  max: 100
+  unit_of_measurement: "%"
+  icon: "mdi:water-percent"
+moms_room_humidity_max_diff_absent_winter:
+  name: "Mom’s Room Humidity Max Diffirence Absent Winter"
+  min: 0
+  max: 50
+  unit_of_measurement: "pt"
+  icon: "mdi:arrow-collapse-up"
+moms_room_humidity_min_diff_absent_winter:
+  name: "Mom’s Room Humidity Min Diffirence Absent Winter"
+  min: 0
+  max: 50
+  unit_of_measurement: "pt"
+  icon: "mdi:arrow-collapse-down"
+moms_room_humidity_target_absent_winter:
+  name: "Mom’s Room Humidity Target Absent Winter"
+  min: 0
+  max: 100
+  unit_of_measurement: "%"
+  icon: "mdi:water-percent"
+moms_room_light_auto_off_minutes:
+  name: "Mom’s Room Light Auto-off Minutes"
+  min: 0
   max: 60
-  unit_of_measurement: "%"
-  icon: mdi:water-percent-alert
-moms_room_ac_dry_turned_on_threshold_humidity:
-  name: Mom’s Room AC Dry Turned on Threshold Humidity
-  min: 56
-  max: 64
-  unit_of_measurement: "%"
-  icon: mdi:water-percent-alert
-moms_room_ac_dry_turned_on_threshold_wbgt:
-  name: Mom’s Room AC Dry Turned on Threshold WBGT
-  min: 22
-  max: 30
-  unit_of_measurement: °C
-  icon: mdi:thermometer-chevron-up
+  unit_of_measurement: "min"
+  icon: "mdi:lightbulb-group-off"
 moms_room_light_auto_off_minutes:
   name: Mom’s Room Light Auto-off Minutes
   min: 0
   max: 60
-  unit_of_measurement: min
-  icon: mdi:lightbulb-group-off
+  unit_of_measurement: "min"
+  icon: "mdi:lightbulb-group-off"
+moms_room_presence_sensitibity_minutes:
+  name: "Mom’s Room Presence Sensitivity Minutes"
+  min: 0
+  max: 60
+  unit_of_measurement: "min"
+  icon: "mdi:home-clock"
+moms_room_temp_max_diff:
+  name: "Mom’s Room Temperature Max Diffirence"
+  min: 1
+  max: 20
+  step: 0.5
+  unit_of_measurement: "°C"
+  icon: "mdi:arrow-collapse-up"
+moms_room_temp_min_diff:
+  name: "Mom’s Room Temperature Min Diffirence"
+  min: 1
+  max: 20
+  step: 0.5
+  unit_of_measurement: "°C"
+  icon: "mdi:arrow-collapse-down"
+moms_room_temp_target:
+  name: "Mom’s Room Temperature Target"
+  min: 10
+  max: 40
+  step: 0.5
+  unit_of_measurement: "°C"
+  icon: "mdi:thermometer-check"
+moms_room_temp_max_diff_present_summer:
+  name: "Mom’s Room Temperature Max Diffirence Present Summer"
+  min: 1
+  max: 20
+  step: 0.5
+  unit_of_measurement: "°C"
+  icon: "mdi:arrow-collapse-up"
+moms_room_temp_min_diff_present_summer:
+  name: "Mom’s Room Temperature Min Diffirence Present Summer"
+  min: 1
+  max: 20
+  step: 0.5
+  unit_of_measurement: "°C"
+  icon: "mdi:arrow-collapse-down"
+moms_room_temp_target_present_summer:
+  name: "Mom’s Room Temperature Target Present Summer"
+  min: 10
+  max: 40
+  step: 0.5
+  unit_of_measurement: "°C"
+  icon: "mdi:thermometer-plus"
+moms_room_temp_max_diff_present_winter:
+  name: "Mom’s Room Temperature Max Diffirence Present Winter"
+  min: 1
+  max: 20
+  step: 0.5
+  unit_of_measurement: "°C"
+  icon: "mdi:arrow-collapse-up"
+moms_room_temp_min_diff_present_winter:
+  name: "Mom’s Room Temperature Min Diffirence Present Winter"
+  min: 1
+  max: 20
+  step: 0.5
+  unit_of_measurement: "°C"
+  icon: "mdi:arrow-collapse-down"
+moms_room_temp_target_present_winter:
+  name: "Mom’s Room Temperature Target Present Winter"
+  min: 10
+  max: 40
+  step: 0.5
+  unit_of_measurement: "°C"
+  icon: "mdi:thermometer-minus"
+moms_room_temp_max_diff_present_summer_midnight:
+  name: "Mom’s Room Temperature Max Diffirence Present Summer Midnight"
+  min: 1
+  max: 20
+  step: 0.5
+  unit_of_measurement: "°C"
+  icon: "mdi:arrow-collapse-up"
+moms_room_temp_min_diff_present_summer_midnight:
+  name: "Mom’s Room Temperature Min Diffirence Present Summer Midnight"
+  min: 1
+  max: 20
+  step: 0.5
+  unit_of_measurement: "°C"
+  icon: "mdi:arrow-collapse-down"
+moms_room_temp_target_present_summer_midnight:
+  name: "Mom’s Room Temperature Target Present Summer Midnight"
+  min: 10
+  max: 40
+  step: 0.5
+  unit_of_measurement: "°C"
+  icon: "mdi:thermometer-plus"
+moms_room_temp_max_diff_present_winter_midnight:
+  name: "Mom’s Room Temperature Max Diffirence Present Winter Midnight"
+  min: 1
+  max: 20
+  step: 0.5
+  unit_of_measurement: "°C"
+  icon: "mdi:arrow-collapse-up"
+moms_room_temp_min_diff_present_winter_midnight:
+  name: "Mom’s Room Temperature Min Diffirence Present Winter Midnight"
+  min: 1
+  max: 20
+  step: 0.5
+  unit_of_measurement: "°C"
+  icon: "mdi:arrow-collapse-down"
+moms_room_temp_target_present_winter_midnight:
+  name: "Mom’s Room Temperature Target Present Winter Midnight"
+  min: 10
+  max: 40
+  step: 0.5
+  unit_of_measurement: "°C"
+  icon: "mdi:thermometer-minus"
+moms_room_temp_max_diff_absent_summer:
+  name: "Mom’s Room Temperature Max Diffirence Absent Summer"
+  min: 1
+  max: 20
+  step: 0.5
+  unit_of_measurement: "°C"
+  icon: "mdi:arrow-collapse-up"
+moms_room_temp_min_diff_absent_summer:
+  name: "Mom’s Room Temperature Min Diffirence Absent Summer"
+  min: 1
+  max: 20
+  step: 0.5
+  unit_of_measurement: "°C"
+  icon: "mdi:arrow-collapse-down"
+moms_room_temp_target_absent_summer:
+  name: "Mom’s Room Temperature Target Absent Summer"
+  min: 10
+  max: 40
+  step: 0.5
+  unit_of_measurement: "°C"
+  icon: "mdi:thermometer-plus"
+moms_room_temp_max_diff_absent_winter:
+  name: "Mom’s Room Temperature Max Diffirence Absent Winter"
+  min: 1
+  max: 20
+  step: 0.5
+  unit_of_measurement: "°C"
+  icon: "mdi:arrow-collapse-up"
+moms_room_temp_min_diff_absent_winter:
+  name: "Mom’s Room Temperature Min Diffirence Absent Winter"
+  min: 1
+  max: 20
+  step: 0.5
+  unit_of_measurement: "°C"
+  icon: "mdi:arrow-collapse-down"
+moms_room_temp_target_absent_winter:
+  name: "Mom’s Room Temperature Target Absent Winter"
+  min: 10
+  max: 40
+  step: 0.5
+  unit_of_measurement: "°C"
+  icon: "mdi:thermometer-minus"
 season_mode_temp:
   name: "Season Mode Temperature"
   min: 0
