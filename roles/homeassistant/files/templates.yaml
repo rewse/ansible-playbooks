@@ -109,13 +109,13 @@
     device_class: temperature
     state_class: measurement
     unit_of_measurement: °C
-  - name: Mom’s Room AC Target
-    unique_id: sensor.moms_room_ac_target
-    state: "{{ state_attr('climate.moms_room_ac', 'temperature') }}"
-    icon: mdi:thermometer-check
-    device_class: temperature
+  - unique_id: sensor.moms_room_ac_temp
+    name: "Mom’s Room AC Temperature"
+    state: "{{ state_attr('climate.dads_room_ac', 'temperature') }}"
+    unit_of_measurement: "°C"
     state_class: measurement
-    unit_of_measurement: °C
+    device_class: temperature
+    icon: "mdi:thermometer-check"
   - name: Mom’s Room Humidity Difference
     unique_id: sensor.moms_room_humidity_difference
     state: "{{ (states('sensor.moms_room_humidity') | float(50) - states('sensor.moms_room_switchbot_meter_humidity') | float(50)) | round(2) | abs }}"
