@@ -34,10 +34,10 @@
           entity_id: switch.living_room_floor_heating_switch
       icon_template: mdi:heating-coil
     living_room_humidifier:
-      friendly_name: Living Room humidifier
+      friendly_name: "Living Room Humidifier"
       unique_id: switch.living_room_humidifier
       value_template: "{{ states('sensor.living_room_humidifier_plug_power') | float(0) > 3 }}"
-      availability_template: "{{ states('switch.living_room_humidifier_plug_socket_1') }}"
+      availability_template: "{{ states('switch.living_room_humidifier_plug') }}"
       turn_on:
         service: switch.toggle
         target:
@@ -46,7 +46,7 @@
         service: switch.toggle
         target:
           entity_id: switch.living_room_humidifier_switch
-      icon_template: mdi:air-humidifier
+      icon_template: "mdi:air-humidifier"
     living_room_tv:
       friendly_name: Living Room TV
       unique_id: switch.living_room_tv
