@@ -151,18 +151,6 @@ views:
           - entity: binary_sensor.sesamehub
           - entity: binary_sensor.switchbothub
           - entity: binary_sensor.switchbothubmini
-          - entity: binary_sensor.tuyaplug_dad_cam
-          - entity: binary_sensor.tuyaplug_dad_hum
-          - entity: binary_sensor.tuyaplug_ent_ses
-          - entity: binary_sensor.tuyaplug_kit_ric
-          - entity: binary_sensor.tuyaplug_liv_cam
-          - entity: binary_sensor.tuyaplug_liv_fan
-          - entity: binary_sensor.tuyaplug_liv_foo
-          - entity: binary_sensor.tuyaplug_liv_hum
-          - entity: binary_sensor.tuyaplug_liv_she
-          - entity: binary_sensor.tuyaplug_liv_tv
-          - entity: binary_sensor.tuyaplug_mom_cam
-          - entity: binary_sensor.tuyaplug_mom_hum
         hours_to_show: 12
       - type: alarm-panel
         name: TV
