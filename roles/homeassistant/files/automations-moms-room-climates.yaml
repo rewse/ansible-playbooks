@@ -688,7 +688,7 @@
               else:
                 - action: climate.set_hvac_mode
                   target:
-                    entity_id: climate.living_room_ac
+                    entity_id: climate.moms_room_ac
                   data:
                     hvac_mode: "dry"
                 - action: notify.all_devices
