@@ -792,7 +792,7 @@
               state: "on"
           sequence:
             - action: switch.toggle
-              entity_id: switch.living_room_humidifier
+              entity_id: switch.moms_room_humidifier
             - action: notify.tats_devices
               data:
                 message: >-
