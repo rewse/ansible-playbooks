@@ -54,6 +54,8 @@
       entity_id:
         - binary_sensor.living_room_presence_e
         - binary_sensor.living_room_presence_s
+      for:
+        minutes: 1
     - trigger: homeassistant
       event: start
   actions:
@@ -65,6 +67,8 @@
                 - binary_sensor.living_room_presence_s
               match: any
               state: "on"
+              for:
+                minutes: 1
           sequence:
             - action: input_boolean.turn_on
               target: 
@@ -75,6 +79,8 @@
                 - binary_sensor.living_room_presence_e
                 - binary_sensor.living_room_presence_s
               state: "off"
+              for:
+                minutes: 1
           sequence:
             - action: input_boolean.turn_off
               target: 
