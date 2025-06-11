@@ -87,26 +87,41 @@
   alias: "Select Dad’s Room Presence Mode"
   triggers:
     - trigger: state
+      entity_id: sensor.dads_room_motion_count
+    - trigger: state
       entity_id: binary_sensor.dads_room_presence
+      for:
+        minutes: 1
     - trigger: homeassistant
       event: start
   actions:
     - choose:
         - conditions:
-            - condition: state
-              entity_id: binary_sensor.dads_room_presence
-              state: "on"
+            - or:
+                - condition: numeric_state
+                  entity_id: sensor.dads_room_motion_count
+                  above: 5
+                - condition: state
+                  entity_id: binary_sensor.dads_room_presence
+                  state: "on"
+                  for:
+                    minutes: 1
           sequence:
             - action: input_boolean.turn_on
               target: 
                 entity_id: input_boolean.dads_room_presence_mode
         - conditions:
+            - condition: numeric_state
+              entity_id: sensor.dads_room_motion_count
+              below: 6
             - condition: state
               entity_id: binary_sensor.dads_room_presence
               state: "off"
+              for:
+                minutes: 1
           sequence:
             - action: input_boolean.turn_off
               target: 
                 entity_id: input_boolean.dads_room_presence_mode
   trace:
-    stored_traces: 100
+    stored_traces: 1000

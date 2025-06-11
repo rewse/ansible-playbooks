@@ -27,6 +27,13 @@
   max_age:
     hours: 51
 - platform: statistics
+  unique_id: sensor.dads_room_motion_count
+  name: "Dad’s Room Motion Count"
+  entity_id: binary_sensor.dads_room_motion
+  state_characteristic: count
+  max_age:
+    minutes: 10
+- platform: statistics
   unique_id: sensor.average_of_dads_room_temp_difference
   name: "Dad’s Room Temperature Difference Average"
   entity_id: sensor.dads_room_temp_difference
