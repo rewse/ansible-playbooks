@@ -611,14 +611,14 @@
                 {{
                   float(states('sensor.moms_room_temperature')) < 
                   float(states('input_number.moms_room_temp_target')) -
-                  float(states('input_number.moms_room_temp_max_diff'))
+                  float(states('input_number.moms_room_temp_min_diff'))
                 }} 
             - condition: template
               value_template: >-
                 {{
                   float(states('sensor.moms_room_humidity')) <
                   float(states('input_number.moms_room_humidity_target')) +
-                  float(states('input_number.moms_room_humidity_max_diff'))
+                  float(states('input_number.moms_room_humidity_min_diff'))
                 }}
             - condition: state
               entity_id: climate.moms_room_ac
