@@ -3,6 +3,8 @@
   triggers:
     - trigger: state
       entity_id: binary_sensor.moms_room_presence
+      for:
+        minutes: 1
     - trigger: homeassistant
       event: start
   actions:
@@ -11,6 +13,8 @@
             - condition: state
               entity_id: binary_sensor.moms_room_presence
               state: "on"
+              for:
+                minutes: 1
           sequence:
             - action: input_boolean.turn_on
               target: 
@@ -19,6 +23,8 @@
             - condition: state
               entity_id: binary_sensor.moms_room_presence
               state: "off"
+              for:
+                minutes: 1
           sequence:
             - action: input_boolean.turn_off
               target: 
