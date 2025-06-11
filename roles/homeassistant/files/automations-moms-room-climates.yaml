@@ -171,7 +171,7 @@
       entity_id: input_boolean.moms_room_window_mode
       to: "on"
       for:
-        minutes: "{{ int(states('moms_room_climate_auto_off_minutes_ventilated')) }}"
+        minutes: "{{ states('input_number.moms_room_climate_auto_off_minutes_ventilated') }}"
     - trigger: state
       entity_id: input_boolean.moms_room_window_mode
       to: "off"
@@ -184,7 +184,7 @@
               entity_id: input_boolean.moms_room_window_mode
               state: "on"
               for:
-                minutes: "{{ int(states('moms_room_climate_auto_off_minutes_ventilated')) }}"
+                minutes: "{{ states('input_number.moms_room_climate_auto_off_minutes_ventilated') }}"
           sequence:
             - action: input_select.select_option
               target: 
