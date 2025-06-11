@@ -201,12 +201,12 @@
   action:
     - service: switch.turn_off
       target:
-        entity_id: switch.entrance_sesame_plug_socket_1
+        entity_id: switch.entrance_sesame_plug
     - delay:
         seconds: 5
     - service: switch.turn_on
       target:
-        entity_id: switch.entrance_sesame_plug_socket_1
+        entity_id: switch.entrance_sesame_plug
     - service: notify.tats_devices
       data:
         message: Restert Entrance sesamemodule Power
