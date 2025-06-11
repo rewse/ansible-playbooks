@@ -187,8 +187,8 @@
     - service: switch.turn_off
       entity_id:
         - switch.living_room_camera_plug
-        - switch.dads_room_camera_plug_socket_1
-        - switch.moms_room_camera_plug_socket_1
+        - switch.dads_room_camera_plug
+        - switch.moms_room_camera_plug
   trace:
     stored_traces: 100
 - id: automation.turn_on_surveillance
@@ -208,7 +208,7 @@
     - service: switch.turn_on
       entity_id:
         - switch.living_room_camera_plug
-        - switch.dads_room_camera_plug_socket_1
-        - switch.moms_room_camera_plug_socket_1
+        - switch.dads_room_camera_plug
+        - switch.moms_room_camera_plug
   trace:
     stored_traces: 100

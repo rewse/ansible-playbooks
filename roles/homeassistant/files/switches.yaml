@@ -61,7 +61,7 @@
       friendly_name: Mom’s Room humidifier
       unique_id: switch.moms_room_humidifier
       value_template: "{{ states('sensor.moms_room_humidifier_plug_power') | float(0) > 3 }}"
-      availability_template: "{{ states('switch.moms_room_humidifier_plug_socket_1') }}"
+      availability_template: "{{ states('switch.moms_room_humidifier_plug') }}"
       turn_on:
         service: switch.toggle
         target:
