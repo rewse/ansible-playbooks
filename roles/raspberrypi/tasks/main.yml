@@ -11,14 +11,14 @@
       - snmp-mibs-downloader
   tags: [raspberrypi, package]
 
-- name: Create /var/lib/python/raspberrypi
+- name: Create /opt/raspberrypi
   file:
-    path: /var/lib/python/ansible
+    path: /opt/raspberrypi
     state: directory
   tags: [raspberrypi, package]
 
 - name: Create venv
-  command: python3 -m venv /var/lib/python/raspberrypi
+  command: python3 -m venv /opt/raspberrypi
   tags: [raspberrypi, package]
 
 - name: Install packages with pip3
@@ -26,7 +26,7 @@
     name:
       - pydaikin
       - python-miio
-    virtualenv: /var/lib/python/raspberrypi
+    virtualenv: /opt/raspberrypi
   tags: [raspberrypi, package]
 
 - name: Add NTP servers

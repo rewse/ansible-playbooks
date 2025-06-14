@@ -1,18 +1,18 @@
 ---
-- name: Create /var/lib/python/mhz19
+- name: Create /opt/mhz19
   file:
-    path: /var/lib/python/mhz19
+    path: /opt/mhz19
     state: directory
   tags: [mhz19]
 
 - name: Create venv
-  command: python3 -m venv /var/lib/python/mhz19
+  command: python3 -m venv /opt/mhz19
   tags: [mhz19]
 
 - name: Install mh_z19
   pip:
     name: mh_z19
-    virtualenv: /var/lib/python/mhz19
+    virtualenv: /opt/mhz19
   tags: [mhz19]
 
 - name: Copy mhz192mqtt
