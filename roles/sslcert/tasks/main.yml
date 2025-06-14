@@ -7,14 +7,14 @@
       - libaugeas0
   tags: [sslcert]
 
-- name: Create /var/lib/python/certbot
+- name: Create /opt/certbot
   ansible.builtin.file:
-    path: /var/lib/python/certbot
+    path: /opt/certbot
     state: directory
   tags: [sslcert]
 
 - name: Create venv
-  ansible.builtin.command: python3 -m venv /var/lib/python/certbot
+  ansible.builtin.command: python3 -m venv /opt/certbot
   tags: [sslcert]
 
 - name: Install certbot
@@ -24,7 +24,7 @@
       - certbot-apache
       - certbot-dns-route53
       - pip-review
-    virtualenv: /var/lib/python/certbot
+    virtualenv: /opt/certbot
   tags: [sslcert]
 
 - name: Copy certbot.cron
