@@ -119,5 +119,20 @@
                 entity_id: input_select.time_mode
               data:
                 option: "Midnight"
+        - conditions:
+            - condition: sun
+              after: sunrise
+            - condition: sun
+              before: sunrise
+              before_offset: "2:00:00"
+            - condition: state
+              entity_id: input_select.time_mode
+              state: "Midnight"
+          sequence:
+            - action: input_select.select_option
+              target: 
+                entity_id: input_select.time_mode
+              data:
+                option: "Dark"
   trace:
     stored_traces: 1000
