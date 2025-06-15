@@ -1,86 +1,86 @@
 - platform: group
   unique_id: living_area_floor_heatings
-  name: Living Area Floor Heatings
+  name: "Living Area Floor Heatings"
   entities:
     - switch.living_room_floor_heating
     - switch.study_floor_heating
 - platform: template
   switches:
     dads_room_humidifier:
-      friendly_name: "Dad’s Room Humidifier"
       unique_id: switch.dads_room_humidifier
-      value_template: "{{ states('sensor.dads_room_humidifier_plug_power') | float(0) > 3 }}"
+      friendly_name: "Dad’s Room Humidifier"
+      value_template: "{{ float(states('sensor.dads_room_humidifier_plug_power')) > 3 }}"
       availability_template: "{{ states('switch.dads_room_humidifier_plug') }}"
       turn_on:
-        service: switch.toggle
+        action: switch.toggle
         target:
           entity_id: switch.dads_room_humidifier_switch
       turn_off:
-        service: switch.toggle
+        action: switch.toggle
         target:
           entity_id: switch.dads_room_humidifier_switch
       icon_template: "mdi:air-humidifier"
     living_room_floor_heating:
-      friendly_name: Living Room Floor Heating
       unique_id: switch.living_room_floor_heating
-      value_template: "{{ states('sensor.living_room_floor_heating_effect') | float(0) > 1 }}"
+      friendly_name: "Living Room Floor Heating"
+      value_template: "{{ float(states('sensor.living_room_floor_heating_effect')) > 1 }}"
       turn_on:
-        service: switch.toggle
+        action: switch.toggle
         target:
           entity_id: switch.living_room_floor_heating_switch
       turn_off:
-        service: switch.toggle
+        action: switch.toggle
         target:
           entity_id: switch.living_room_floor_heating_switch
-      icon_template: mdi:heating-coil
+      icon_template: "mdi:heating-coil"
     living_room_humidifier:
-      friendly_name: "Living Room Humidifier"
       unique_id: switch.living_room_humidifier
-      value_template: "{{ states('sensor.living_room_humidifier_plug_power') | float(0) > 3 }}"
+      friendly_name: "Living Room Humidifier"
+      value_template: "{{ float(states('sensor.living_room_humidifier_plug_power')) > 3 }}"
       availability_template: "{{ states('switch.living_room_humidifier_plug') }}"
       turn_on:
-        service: switch.toggle
+        action: switch.toggle
         target:
           entity_id: switch.living_room_humidifier_switch
       turn_off:
-        service: switch.toggle
+        action: switch.toggle
         target:
           entity_id: switch.living_room_humidifier_switch
       icon_template: "mdi:air-humidifier"
     living_room_tv:
-      friendly_name: Living Room TV
       unique_id: switch.living_room_tv
-      value_template: "{{ states('sensor.living_room_tv_plug_power') | float(0) > 50 }}"
+      friendly_name: "Living Room TV"
+      value_template: "{{ float(states('sensor.living_room_tv_plug_power')) > 50 }}"
       availability_template: "{{ states('switch.living_room_tv_plug') }}"
       turn_on:
-        service: shell_command.control_toggle_regza
+        action: shell_command.control_toggle_regza
       turn_off:
-        service: shell_command.control_toggle_regza
-      icon_template: mdi:television
+        action: shell_command.control_toggle_regza
+      icon_template: "mdi:television"
     moms_room_humidifier:
-      friendly_name: Mom’s Room humidifier
       unique_id: switch.moms_room_humidifier
-      value_template: "{{ states('sensor.moms_room_humidifier_plug_power') | float(0) > 3 }}"
+      friendly_name: "Mom’s Room humidifier"
+      value_template: "{{ float(states('sensor.moms_room_humidifier_plug_power')) > 3 }}"
       availability_template: "{{ states('switch.moms_room_humidifier_plug') }}"
       turn_on:
-        service: switch.toggle
+        action: switch.toggle
         target:
           entity_id: switch.moms_room_humidifier_switch
       turn_off:
-        service: switch.toggle
+        action: switch.toggle
         target:
           entity_id: switch.moms_room_humidifier_switch
-      icon_template: mdi:air-humidifier
+      icon_template: "mdi:air-humidifier"
     study_floor_heating:
-      friendly_name: Study Floor Heating
       unique_id: switch.study_floor_heating
-      value_template: "{{ states('sensor.living_room_floor_heating_effect') | float(0) > 1 }}"
+      friendly_name: "Study Floor Heating"
+      value_template: "{{ float(states('sensor.living_room_floor_heating_effect')) > 1 }}"
       turn_on:
-        service: switch.toggle
+        action: switch.toggle
         target:
           entity_id: switch.study_floor_heating_switch
       turn_off:
-        service: switch.toggle
+        action: switch.toggle
         target:
           entity_id: switch.study_floor_heating_switch
-      icon_template: mdi:heating-coil
+      icon_template: "mdi:heating-coil"

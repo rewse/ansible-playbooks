@@ -1,3 +1,5 @@
+# Dad’s Room
+
 dads_room_climate_mode:
   name: "Dad’s Room Climate Mode"
   options:
@@ -145,6 +147,9 @@ dads_room_scene_midnight:
     - "scene.dads_room_city_of_love"
     - "scene.dads_room_dark"
   icon: "mdi:brightness-3"
+
+# Home
+
 home_mode:
   name: "Home Mode"
   options:
@@ -153,6 +158,9 @@ home_mode:
     - "Vacation"
     - "Disarmed"
   icon: "mdi:shield-home"
+
+# Living Room
+
 living_room_climate_mode:
   name: "Living Room Climate Mode"
   options:
@@ -201,6 +209,9 @@ moms_room_climate_mode:
     - "Absent Winter"
     - "Ventilated"
   icon: "mdi:thermostat-auto"
+
+# Mom’s Room
+
 moms_room_light_mode:
   name: "Mom’s Room Light Mode"
   options:
@@ -268,12 +279,18 @@ moms_room_scene_midnight:
     - "scene.moms_room_rest"
     - "scene.moms_room_dark"
   icon: "mdi:brightness-3"
+
+# Season Mode
+
 season_mode:
   name: "Season Mode"
   options:
     - "Summer"
     - "Winter"
   icon: "mdi:sun-snowflake-variant"
+
+# Time Mode
+
 time_mode:
   name: "Time Mode"
   options:

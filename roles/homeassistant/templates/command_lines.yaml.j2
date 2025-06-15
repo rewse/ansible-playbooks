@@ -1,14 +1,20 @@
 - binary_sensor:
-    name: REGZA Volume Muted
     unique_id: binary_sensor.regza_volume_muted
-    command: curl --digest --user '[% regza.username %]:[% regza.password %]' http://regza/v2/remote/status/mute | jq -r .mute
+    name: "REGZA Volume Muted"
+    command: >-
+        curl --digest --user '[% regza.username %]:[% regza.password %]' \
+        http://regza/v2/remote/status/mute | jq -r .mute
 # Do not use value_template because it causes a warning message every time
 - sensor:
-    name: REGZA Channel
     unique_id: sensor.regza_channel
-    command: curl --digest --user '[% regza.username %]:[% regza.password %]' http://regza.rewse.jp/v2/remote/play/status | jq -r .epg_info_current.channel_name
+    name: "REGZA Channel"
+    command: >-
+        curl --digest --user '[% regza.username %]:[% regza.password %]' \
+        http://regza.rewse.jp/v2/remote/play/status | jq -r .epg_info_current.channel_name
 - sensor:
-    name: REGZA Content Type
     unique_id: sensor.regza_content_type
-    command: curl --digest --user '[% regza.username %]:[% regza.password %]' http://regza.rewse.jp/v2/remote/play/status | jq -r .content_type
+    name: "REGZA Content Type"
+    command: >-
+        curl --digest --user '[% regza.username %]:[% regza.password %]' \
+        http://regza.rewse.jp/v2/remote/play/status | jq -r .content_type
     scan_interval: 5

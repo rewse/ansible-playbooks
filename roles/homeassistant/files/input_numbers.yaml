@@ -1,3 +1,5 @@
+# Dad’s Room
+
 dads_room_climate_auto_off_minutes:
   name: "Dad’s Room Climate Auto-off Minutes"
   min: 0
@@ -289,6 +291,9 @@ dads_room_temp_target_absent_winter:
   step: 0.5
   unit_of_measurement: "°C"
   icon: "mdi:thermometer-minus"
+
+# Living Room
+
 living_room_climate_auto_off_minutes:
   name: "Living Room Climate Auto-off Minutes"
   min: 0
@@ -651,6 +656,9 @@ living_room_tv_light_brightness_turned_down_more:
   min: 0
   max: 100
   icon: mdi:brightness-percent
+
+# Mom’s Room
+
 moms_room_climate_auto_off_minutes:
   name: "Mom’s Room Climate Auto-off Minutes"
   min: 0
@@ -789,12 +797,6 @@ moms_room_humidity_target_absent_winter:
   max: 100
   unit_of_measurement: "%"
   icon: "mdi:water-percent"
-moms_room_light_auto_off_minutes:
-  name: "Mom’s Room Light Auto-off Minutes"
-  min: 0
-  max: 60
-  unit_of_measurement: "min"
-  icon: "mdi:lightbulb-group-off"
 moms_room_light_auto_off_minutes:
   name: Mom’s Room Light Auto-off Minutes
   min: 0
@@ -954,12 +956,18 @@ moms_room_temp_target_absent_winter:
   step: 0.5
   unit_of_measurement: "°C"
   icon: "mdi:thermometer-minus"
+
+# Season Mode
+
 season_mode_temp:
   name: "Season Mode Temperature"
   min: 0
   max: 30
   unit_of_measurement: "°C"
   icon: "mdi:thermometer-check"
+
+# Time Mode
+
 time_mode_twilight_light_level:
   name: Time Mode Twilight Light Level
   min: 0
