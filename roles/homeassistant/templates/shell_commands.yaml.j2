@@ -1,4 +1,12 @@
-control_toggle_regza: curl --digest --user '[% regza.username %]:[% regza.password %]' http://regza.rewse.jp/remote/remote.htm?key=40BF12
-control_volume_up_regza: curl --digest --user '[% regza.username %]:[% regza.password %]' http://regza.rewse.jp/remote/remote.htm?key=40BF1A
-control_volume_down_regza: curl --digest --user '[% regza.username %]:[% regza.password %]' http://regza.rewse.jp/remote/remote.htm?key=40BF1E
-control_mute_regza: curl --digest --user '[% regza.username %]:[% regza.password %]' http://regza.rewse.jp/remote/remote.htm?key=40BF10
+control_toggle_regza: >-
+    curl --digest --user '[% regza.username %]:[% regza.password %]' \
+    http://regza.rewse.jp/remote/remote.htm?key=40BF12
+control_volume_up_regza: >-
+    curl --digest --user '[% regza.username %]:[% regza.password %]' \
+    http://regza.rewse.jp/remote/remote.htm?key=40BF1A
+control_volume_down_regza: >-
+    curl --digest --user '[% regza.username %]:[% regza.password %]' \
+    http://regza.rewse.jp/remote/remote.htm?key=40BF1E
+control_mute_regza: >-
+    curl --digest --user '[% regza.username %]:[% regza.password %]' \
+    http://regza.rewse.jp/remote/remote.htm?key=40BF10

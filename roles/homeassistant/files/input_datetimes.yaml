@@ -1,3 +1,13 @@
+# Vacuum
+
+roomba_combo_finished_time:
+  name: Roomba Combo Finished Time
+  has_date: true
+  has_time: true
+  icon: mdi:robot-vacuum-alert
+
+# Time Mode
+
 time_mode_late_night:
   name: "Time Mode Late Night"
   has_time: true
@@ -6,44 +16,3 @@ time_mode_midnight:
   name: "Time Mode Midnight"
   has_time: true
   icon: "mdi:brightness-3"
-dads_room_turned_down_more_time:
-  name: Dad’s Room Turned down More Time
-  has_time: true
-  icon: mdi:brightness-3
-dads_room_turned_down_time:
-  name: Dad’s Room Turned down Time
-  has_time: true
-  icon: mdi:brightness-2
-dads_room_waking_up_time:
-  name: Dad’s Room Waking up Time
-  has_time: true
-  icon: mdi:bed-clock
-dads_room_waking_up_time_workday:
-  name: Dad’s Room Waking up Time for Workday
-  has_time: true
-  icon: mdi:bed-clock
-living_area_turned_down_more_time:
-  name: Living Area Turned down More Time
-  has_time: true
-  icon: mdi:brightness-3
-living_area_turned_down_time:
-  name: Living Area Turned down Time
-  has_time: true
-  icon: mdi:brightness-2
-moms_room_curtains_opened_time:
-  name: Mom’s Room Curtains Opened Time
-  has_time: true
-  icon: mdi:curtains
-moms_room_curtains_opened_time_workday:
-  name: Mom’s Room Curtains Opened Time for Workday
-  has_time: true
-  icon: mdi:curtains
-moms_room_turned_down_time:
-  name: Mom’s Room Turned down Time
-  has_time: true
-  icon: mdi:brightness-2
-roomba_combo_finished_time:
-  name: Roomba Combo Finished Time
-  has_date: true
-  has_time: true
-  icon: mdi:robot-vacuum-alert

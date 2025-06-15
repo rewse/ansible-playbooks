@@ -6,25 +6,14 @@ card_mod_version: 3.4.4
 gmail:
   address: "{{ vault_gmail.address }}"
   password: "{{ vault_gmail.password }}"
-ha_switchbot_remote_version: 1.2.2
 homeassistant_token: "{{ vault_homeassistant_token }}"
 latlng:
   home:
     lat: "{{ vault_latlng.home.lat }}"
     lng: "{{ vault_latlng.home.lng }}"
-  t:
-    name: "{{ vault_latlng.t.name }}"
-    lat: "{{ vault_latlng.t.lat }}"
-    lng: "{{ vault_latlng.t.lng }}"
-  y:
-    name: "{{ vault_latlng.y.name }}"
-    lat: "{{ vault_latlng.y.lat }}"
-    lng: "{{ vault_latlng.y.lng }}"
 mini_graph_card_version: 0.13.0
 mini_media_player_version: 1.16.9
 mosquitto_password: "{{ vault_mosquitto_password }}"
-nfs_server: guppy.rewse.jp
-notify_title_k: "{{ vault_notify_title_k }}"
 postgres:
   username: "{{ vault_postgres.username }}"
   password: "{{ vault_postgres.password }}"
@@ -36,4 +25,3 @@ regza:
 simple_thermostat_version: 2.5.0
 simple_weather_card_version: 0.8.5
 tuya_local_version: 2025.5.1
-uptime_card_version: 0.4.0

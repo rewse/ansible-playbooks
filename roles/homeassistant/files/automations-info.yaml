@@ -1,0 +1,72 @@
+- id: automation.info_mamorail
+  alias: "INFO: Mamorail"
+  triggers:
+    - trigger: state
+      entity_id: sensor.mamorail
+  conditions:
+    - condition: template
+      value_template: >-
+        {{ (as_timestamp(now()) - as_timestamp(state_attr('sensor.mamorail', 'Date'))) < 180 }}
+  actions:
+    - delay:
+        seconds: 5
+    - variables:
+        charge: ""
+        particle: ""
+    - if:
+        - condition: numeric_state
+          entity_id: sensor.mamorail_balance
+          below: 1000
+      then:
+        - variables:
+            charge: "【要チャージ】"
+    - if:
+        - condition: state
+          entity_id: sensor.mamorail_action
+          state: "入場"
+      then:
+        - variables:
+            particle: "に"
+      else:
+        - variables:
+            particle: "を"
+    - action: notify.all_devices
+      data:
+        title: "🐈 INFO"
+        message: "{{ charge }}{{ states('sensor.mamorail_station') }}{{ particle }}{{ states('sensor.mamorail_time') }}に{{ states('sensor.mamorail_action') }}しました。残高: {{ states('sensor.mamorail_balance') }}円"
+        data:
+          push:
+            interruption-level: time-sensitive
+          url: "/lovelace-people/people"
+- id: automation.info_mll
+  alias: "INFO: MLL"
+  triggers:
+    - trigger: state
+      entity_id: sensor.mll
+  conditions:
+    - condition: template
+      value_template: >-
+        {{ (as_timestamp(now()) - as_timestamp(state_attr('sensor.mll', 'Date'))) < 180 }}
+  actions:
+    - delay:
+        seconds: 5
+    - variables:
+        particle: ""
+    - if:
+        - condition: state
+          entity_id: sensor.mll_action
+          state: "入室"
+      then:
+        - variables:
+            particle: "に"
+      else:
+        - variables:
+            particle: "を"
+    - action: notify.all_devices
+      data:
+        title: "🐈 INFO"
+        message: "MLL{{ particle }}{{ states('sensor.mll_time') }}に{{ states('sensor.mll_action') }}しました"
+        data:
+          push:
+            interruption-level: time-sensitive
+          url: "/lovelace-people/people"

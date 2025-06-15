@@ -1,18 +1,22 @@
 - platform: template
   unique_id: lock.entrance_locks
-  name: Entrance Locks
-  value_template: "{{ is_state('lock.entrance_lock_top', 'locked') or is_state('lock.entrance_lock_bottom', 'locked') }}"
+  name: "Entrance Locks"
+  value_template: >-
+    {{
+      is_state('lock.entrance_lock_top', 'locked') or
+      is_state('lock.entrance_lock_bottom', 'locked')
+    }}
   lock:
-    - service: lock.lock
+    - action: lock.lock
       target:
         entity_id: lock.entrance_lock_top
-    - service: lock.lock
+    - action: lock.lock
       target:
         entity_id: lock.entrance_lock_bottom
   unlock:
-    - service: lock.unlock
+    - action: lock.unlock
       target:
         entity_id: lock.entrance_lock_top
-    - service: lock.unlock
+    - action: lock.unlock
       target:
         entity_id: lock.entrance_lock_bottom

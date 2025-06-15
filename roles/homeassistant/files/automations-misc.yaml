@@ -37,11 +37,6 @@
         state: not_home
         for:
           minutes: 10
-      - condition: state
-        entity_id: person.shibata_kayano
-        state: !secret latlng_y_name
-        for:
-          minutes: 10
     - condition: template
       value_template: "{{ (now().timestamp() - state_attr('input_datetime.roomba_combo_finished_time', 'timestamp')) / 60 / 60 > 48 }}"
     - condition: state

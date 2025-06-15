@@ -18,8 +18,3 @@
     - service: mobile_app_7cf34ded5d65
     - service: mobile_app_atom
     - service: mobile_app_chemical
-- name: tats_mobile_devices
-  platform: group
-  services:
-    - service: mobile_app_atom
-    - service: mobile_app_chemical
