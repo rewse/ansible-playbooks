@@ -629,7 +629,7 @@
                         interruption-level: time-sensitive
                       url: "/lovelace/home"
                 - delay:
-                    seconds: 10
+                    hours: 2
         - conditions:
             - condition: template
               value_template: >-
@@ -733,7 +733,7 @@
                         interruption-level: time-sensitive
                       url: "/lovelace/home"
                 - delay:
-                    seconds: 10
+                    hours: 2
         - conditions:
             - or:
                 - and:
@@ -912,7 +912,7 @@
                         interruption-level: time-sensitive
                       url: "/lovelace/home"
                 - delay:
-                    seconds: 10
+                    hours: 1
         - conditions:
             - condition: template
               value_template: >-
