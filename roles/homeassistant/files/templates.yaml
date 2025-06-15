@@ -1,34 +1,49 @@
-- binary_sensor:
-  - name: Living Room Presence
-    unique_id: binary_sensor.living_room_presence
-    state: "{{ is_state('binary_sensor.living_room_presence_e', 'on') or is_state('binary_sensor.living_room_presence_s', 'on') }}"
-    icon: >
-      {% if is_state("binary_sensor.living_room_presence", "on") %}
-        mdi:home
-      {% else %}
-        mdi:home-outline
-      {% endif %}
+# Balcony
+
 - sensor:
-  - name: Balcony Humidity Difference
-    unique_id: sensor.balcony_humidity_difference
-    state: "{{ (states('sensor.balcony_humidity') | float(50) - states('sensor.balcony_switchbot_meter_humidity') | float(50)) | round(2) | abs }}"
-    icon: mdi:water-percent-alert
+  - unique_id: sensor.balcony_humidity_difference
+    name: "Balcony Humidity Difference"
+    state: >-
+      {{
+        (
+          float(states('sensor.balcony_humidity')) -
+          float(states('sensor.balcony_switchbot_meter_humidity'))
+        ) | abs
+      }}
+    unit_of_measurement: "pt"
     state_class: measurement
-    unit_of_measurement: pt
-  - name: Balcony Temperature Difference
-    unique_id: sensor.balcony_temperature_difference
-    state: "{{ (states('sensor.balcony_temperature') | float(25) - states('sensor.balcony_switchbot_meter_temperature') | float(25)) | round(2) | abs }}"
-    icon: mdi:thermometer-alert
+    icon: "mdi:water-percent-alert"
+  - unique_id: sensor.balcony_temperature_difference
+    name: "Balcony Temperature Difference"
+    state: >-
+      {{
+        (
+          float(states('sensor.balcony_temperature')) -
+          float(states('sensor.balcony_switchbot_meter_temperature'))
+        ) | abs
+      }}
+    unit_of_measurement: "°C"
+    state_class: measurement
     device_class: temperature
+    icon: "mdi:thermometer-alert"
+  - unique_id: sensor.balcony_wbgt
+    name: "Balcony WBGT"
+    state: >-
+      {{
+        (
+          (states('sensor.balcony_temperature') | float(25) - 30.5) * 0.90739 +
+          (states('sensor.balcony_humidity') | float(50) - 60.0) * 0.14775 +
+          (states('sensor.balcony_temperature') | float(25) - 30.5) * 
+          (states('sensor.balcony_humidity') | float(50) - 60.0) * 0.003655 + 27.77
+        ) | round(2)
+       }}
+    unit_of_measurement: "°C"
     state_class: measurement
-    unit_of_measurement: °C
-  - name: Balcony WBGT
-    unique_id: sensor.balcony_wbgt
-    state: "{{ ((states('sensor.balcony_temperature') | float(25) - 30.5) * 0.90739 + (states('sensor.balcony_humidity') | float(50) - 60.0) * 0.14775 + (states('sensor.balcony_temperature') | float(25) - 30.5) * (states('sensor.balcony_humidity') | float(50) - 60.0) * 0.003655 + 27.77) | round(2) }}"
-    icon: mdi:thermometer-water
     device_class: temperature
-    state_class: measurement
-    unit_of_measurement: °C
+    icon: "mdi:thermometer-water"
+
+# Dad’s Room
+
   - unique_id: sensor.dads_room_ac_temp
     name: "Dad’s Room AC Temperature"
     state: "{{ state_attr('climate.dads_room_ac', 'temperature') }}"
@@ -66,16 +81,19 @@
     state: >-
       {{
         (
-          (float(states('sensor.dads_room_temperature')) - 30.5) * 0.90739 +
-          (float(states('sensor.dads_room_humidity')) - 60.0) * 0.14775 +
-          (float(states('sensor.dads_room_temperature')) - 30.5) *
-          (float(states('sensor.dads_room_humidity')) - 60.0) * 0.003655 + 27.77
+          (states('sensor.dads_room_temperature')) | float(25) - 30.5) * 0.90739 +
+          (states('sensor.dads_room_humidity')) | float(50) - 60.0) * 0.14775 +
+          (states('sensor.dads_room_temperature')) | float(25) - 30.5) *
+          (states('sensor.dads_room_humidity')) | float(50) - 60.0) * 0.003655 + 27.77
         ) | round(2)
       }}
     unit_of_measurement: "°C"
     state_class: measurement
     device_class: temperature
     icon: "mdi:thermometer-water"
+
+# Living Room
+
   - unique_id: sensor.living_room_ac_temp
     name: "Living Room AC Temperature"
     state: "{{ state_attr('climate.living_room_ac', 'temperature') }}"
@@ -83,32 +101,60 @@
     state_class: measurement
     device_class: temperature
     icon: "mdi:thermometer-check"
-  - name: Living Room Humidity Difference
-    unique_id: sensor.living_room_humidity_difference
-    state: "{{ (states('sensor.living_room_humidity') | float(50) - states('sensor.living_room_switchbot_hub_2_humidity') | float(50)) | round(2) | abs }}"
-    icon: mdi:water-percent-alert
-    unit_of_measurement: pt
-  - name: Living Room Temperature Difference
-    unique_id: sensor.living_room_temperature_difference
-    state: "{{ (states('sensor.living_room_temperature') | float(25) - states('sensor.living_room_switchbot_hub_2_temperature') | float(25)) | round(2) | abs }}"
-    icon: mdi:thermometer-alert
-    device_class: temperature
+  - unique_id: sensor.living_room_floor_heating_effect
+    name: Living Room Floor Heating Effect
+    state: >-
+      {{
+        float(states('sensor.living_room_floor_temperature')) -
+        float(states('sensor.living_room_temperature'))
+      }}
+    unit_of_measurement: "°C"
     state_class: measurement
-    unit_of_measurement: °C
-  - name: Living Room Temperature Effect of Floor Heating
-    unique_id: sensor.living_room_temperature_effect_of_floor_heating
-    state: "{{ (states('sensor.living_room_floor_temperature') | float(25) - states('sensor.living_room_temperature') | float(25)) | round(2) }}"
-    icon: mdi:thermometer
     device_class: temperature
+    icon: "mdi:thermometer"
+  - unique_id: sensor.living_room_humidity_difference
+    name: "Living Room Humidity Difference"
+    state: >-
+      {{
+        (
+          float(states('sensor.living_room_humidity')) -
+          float(states('sensor.living_room_switchbot_hub_2_humidity'))
+        ) | abs
+      }}
+    unit_of_measurement: "pt"
     state_class: measurement
-    unit_of_measurement: °C
-  - name: Living Room WBGT
-    unique_id: sensor.living_room_wbgt
-    state: "{{ ((states('sensor.living_room_temperature') | float(25) - 30.5) * 0.90739 + (states('sensor.living_room_humidity') | float(50) - 60.0) * 0.14775 + (states('sensor.living_room_temperature') | float(25) - 30.5) * (states('sensor.living_room_humidity') | float(50) - 60.0) * 0.003655 + 27.77) | round(2) }}"
-    icon: mdi:thermometer-water
+    icon: "mdi:water-percent-alert"
+  - unique_id: sensor.living_room_temp_difference
+    name: "Living Room Temperature Difference"
+    state: >-
+      {{
+        (
+          float((states('sensor.living_room_temperature')) -
+          float((states('sensor.living_room_switchbot_hub_2_temperature'))
+        ) | abs
+      }}
+    unit_of_measurement: "°C"
+    state_class: measurement
     device_class: temperature
+    icon: "mdi:thermometer-alert"
+  - unique_id: sensor.living_room_wbgt
+    name: "Living Room WBGT"
+    state: >-
+      {{
+        (
+          (states('sensor.living_room_temperature') | float(25) - 30.5) * 0.90739 +
+          (states('sensor.living_room_humidity') | float(50) - 60.0) * 0.14775 +
+          (states('sensor.living_room_temperature') | float(25) - 30.5) *
+          (states('sensor.living_room_humidity') | float(50) - 60.0) * 0.003655 + 27.77)
+        ) | round(2)
+      }}
+    unit_of_measurement: "°C"
     state_class: measurement
-    unit_of_measurement: °C
+    device_class: temperature
+    icon: "mdi:thermometer-water"
+
+# Mom’s Room
+
   - unique_id: sensor.moms_room_ac_temp
     name: "Mom’s Room AC Temperature"
     state: "{{ state_attr('climate.moms_room_ac', 'temperature') }}"
@@ -116,29 +162,52 @@
     state_class: measurement
     device_class: temperature
     icon: "mdi:thermometer-check"
-  - name: Mom’s Room Humidity Difference
-    unique_id: sensor.moms_room_humidity_difference
-    state: "{{ (states('sensor.moms_room_humidity') | float(50) - states('sensor.moms_room_switchbot_meter_humidity') | float(50)) | round(2) | abs }}"
-    icon: mdi:water-percent-alert
-    unit_of_measurement: pt
-  - name: Mom’s Room Temperature Difference
-    unique_id: sensor.moms_room_temperature_difference
-    state: "{{ (states('sensor.moms_room_temperature') | float(25) - states('sensor.moms_room_switchbot_meter_temperature') | float(25)) | round(2) | abs }}"
-    icon: mdi:thermometer-alert
-    device_class: temperature
+  - unique_id: sensor.moms_room_humidity_difference
+    name: "Mom’s Room Humidity Difference"
+    state: >-
+      {{
+        float(states('sensor.moms_room_humidity')) -
+        float(states('sensor.moms_room_switchbot_meter_humidity'))
+        | abs
+      }}
+    unit_of_measurement: "pt"
     state_class: measurement
-    unit_of_measurement: °C
-  - name: Mom’s Room WBGT
-    unique_id: sensor.moms_room_wbgt
-    state: "{{ ((states('sensor.moms_room_temperature') | float(25) - 30.5) * 0.90739 + (states('sensor.moms_room_humidity') | float(50) - 60.0) * 0.14775 + (states('sensor.moms_room_temperature') | float(25) - 30.5) * (states('sensor.moms_room_humidity') | float(50) - 60.0) * 0.003655 + 27.77) | round(2) }}"
-    icon: mdi:thermometer-water
-    device_class: temperature
+    icon: "mdi:water-percent-alert"
+  - unique_id: sensor.moms_room_temp_difference
+    name: "Mom’s Room Temperature Difference"
+    state: >-
+      {{
+        (
+          float(states('sensor.moms_room_temperature')) -
+          float(states('sensor.moms_room_switchbot_meter_temperature'))
+        ) | abs
+      }}
+    unit_of_measurement: "°C"
     state_class: measurement
-    unit_of_measurement: °C
-- trigger:
-    - platform: event
+    device_class: temperature
+    icon: "mdi:thermometer-alert"
+  - unique_id: sensor.moms_room_wbgt
+    name: "Mom’s Room WBGT"
+    state: >-
+      {{
+        (
+          (states('sensor.moms_room_temperature') | float(25) - 30.5) * 0.90739 +
+          (states('sensor.moms_room_humidity') | float(50) - 60.0) * 0.14775 +
+          (states('sensor.moms_room_temperature') | float(25) - 30.5) *
+          (states('sensor.moms_room_humidity') | float(50) - 60.0) * 0.003655 + 27.77
+        ) | round(2)
+      }}
+    unit_of_measurement: "°C"
+    state_class: measurement
+    device_class: temperature
+    icon: "mdi:thermometer-water"
+
+# IMAP
+
+- triggers:
+    - trigger: event
       event_type: imap_content
-      id: custom_event
+      id: "custom_event"
       event_data:
         sender: "info@mamorail.jp"
   sensor:
@@ -205,8 +274,8 @@
       icon: "mdi:clock"
 - trigger:
     - platform: event
-      event_type: imap_content
-      id: custom_event
+      event_type: "imap_content"
+      id: "custom_event"
       event_data:
         sender: "miwada_studyroom@outlook.com"
   sensor:
@@ -235,7 +304,7 @@
         {% else %}
           {{ states("sensor.mll") | regex_findall_index("入退室連絡_(..)") }}
         {% endif %}
-      icon: "mdi:school"
+      icon: "mdi:boom_gate"
     - unique_id: sensor.mll_time
       name: "MLL Time"
       state: >-

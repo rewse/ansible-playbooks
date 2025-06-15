@@ -1,51 +1,53 @@
-- id: automation.alarm_balcony_humidity_difference_is_too_large
-  alias: "ALARM: Balcony Humidity Difference is Too Large"
-  mode: single
-  trigger:
-    - platform: state
-      entity_id: sensor.balcony_switchbot_outdoor_meter_humidity
-  condition:
+- id: automation.alarm_balcony_humidity_difference
+  alias: "ALARM: Balcony Humidity Difference"
+  triggers:
+    - trigger: state
+      entity_id: sensor.balcony_switchbot_meter_humidity
+  conditions:
     - condition: numeric_state
-      entity_id: sensor.average_of_balcony_humidity_difference
+      entity_id:
+        - sensor.balcony_humidity_difference
+        - sensor.balcony_humidity_difference_average
       above: 10
-    - condition: numeric_state
-      entity_id: sensor.balcony_humidity_difference
-      above: 10
-  action:
-    - service: notify.tats_devices
+  actions:
+    - action: notify.tats_devices
       data:
         title: "⚠️ ALARM"
-        message: "Balcony Humidity Difference is Too Large. Current: {{ states('sensor.balcony_humidity') }}% / {{ states('sensor.balcony_switchbot_meter_humidity') }}%"
+        message: >-
+          Balcony Humidity Difference is Too Large.
+          Current: {{ states('sensor.balcony_humidity') }}% /
+          {{ states('sensor.balcony_switchbot_meter_humidity') }}%
         data:
-          url: /lovelace/home
           push:
             interruption-level: time-sensitive
+          url: "/lovelace/home"
     - delay:
         hours: 8
   trace:
     stored_traces: 100
-- id: automation.alarm_balcony_temperature_difference_is_too_large
-  alias: "ALARM: Balcony Temperature Difference is Too Large"
-  mode: single
-  trigger:
-    - platform: state
-      entity_id: sensor.balcony_switchbot_outdoor_meter_temperature
-  condition:
+- id: automation.alarm_balcony_temp_difference
+  alias: "ALARM: Balcony Temperature Difference"
+  triggers:
+    - trigger: state
+      entity_id: sensor.balcony_switchbot_meter_temperature
+  conditions:
     - condition: numeric_state
-      entity_id: sensor.average_of_balcony_temperature_difference
-      above: 1
-    - condition: numeric_state
-      entity_id: sensor.balcony_temperature_difference
-      above: 1
-  action:
-    - service: notify.tats_devices
+      entity_id:
+        - sensor.balcony_temp_difference
+        - sensor.balcony_temp_difference_average
+      above: 10
+  actions:
+    - action: notify.tats_devices
       data:
         title: "⚠️ ALARM"
-        message: "Balcony Temperature Difference is Too Large. Current: {{ states('sensor.balcony_switchbot_temperature') }}°C / {{ states('sensor.balcony_switchbot_meter_temperature') }}°C"
+        message: >-
+          Balcony Temperature Difference is Too Large.
+          Current: {{ states('sensor.balcony_temperature') }}°C /
+          {{ states('sensor.balcony_switchbot_meter_temperature') }}°C
         data:
-          url: /lovelace/home
           push:
             interruption-level: time-sensitive
+          url: "/lovelace/home"
     - delay:
         hours: 8
   trace:

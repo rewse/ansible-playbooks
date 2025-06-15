@@ -5,24 +5,6 @@
   arming_time: 0
   trigger_time: 0
 - platform: manual
-  name: Living Room AC
-  code_arm_required: false
-  delay_time: 0
-  arming_time: 0
-  trigger_time: 0
-- platform: manual
-  name: TV
-  code_arm_required: false
-  delay_time: 0
-  arming_time: 0
-  trigger_time: 0
-- platform: manual
-  name: Mom’s Room AC
-  code_arm_required: false
-  delay_time: 0
-  arming_time: 0
-  trigger_time: 0
-- platform: manual
   name: Surveillance
   code_arm_required: false
   delay_time: 0
