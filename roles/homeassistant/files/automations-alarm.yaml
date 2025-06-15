@@ -44,56 +44,54 @@
   mode: parallel
   trace:
     stored_traces: 100
-- id: automation.alarm_kijitora_wifi_might_be_off
-  alias: "ALARM: kijitora WiFi might be Off"
-  mode: single
-  trigger:
-    - platform: time_pattern
+- id: automation.alarm_device_wifi_kijitora
+  alias: "ALARM: Device WiFi"
+  triggers:
+    - trigger: time_pattern
       minutes: "/5"
       seconds: 12
-  condition:
-    - condition: state
-      entity_id: device_tracker.ping_kijitora
-      state: not_home
-      for:
-        hours: 2
+  conditions:
     - condition: state
       entity_id: device_tracker.kijitora
       state: home
+      for:
+        hours: 2
+    - condition: state
+      entity_id: device_tracker.ping_kijitora
+      state: not_home
       for:
         hours: 2
     - condition: time
       after: "22:00:00"
       before: "23:59:59"
   action:
-    - service: notify.tats_devices
+    - service: notify.all_devices
       data:
         title: "⚠️ ALARM"
-        message: kijitora WiFi might be off
+        message: "kijitora WiFi might be off"
         data:
-          url: /lovelace-machines/machines
+          url: "/lovelace-machines/machines"
           push:
             interruption-level: time-sensitive
     - delay:
         hours: 1
   trace:
     stored_traces: 100
-- id: automation.alarm_ubiqu_personal_wifi_might_be_off
-  alias: "ALARM: ubiqu_personal WiFi might be Off"
-  mode: single
+- id: automation.alarm_device_wifi_ubiqu_personal
+  alias: "ALARM: Device WiFi ubiqu_personal"
   trigger:
     - platform: time_pattern
       minutes: "/5"
       seconds: 23
   condition:
     - condition: state
-      entity_id: device_tracker.ping_ubiqu_personal
-      state: not_home
+      entity_id: device_tracker.ubiqu_personal
+      state: home
       for:
         hours: 2
     - condition: state
-      entity_id: device_tracker.ubiqu_personal
-      state: home
+      entity_id: device_tracker.ping_ubiqu_personal
+      state: not_home
       for:
         hours: 2
     - condition: time
@@ -103,9 +101,9 @@
     - service: notify.ubiqu_devices
       data:
         title: "⚠️ ALARM"
-        message: ubiqu_personal WiFi might be off
+        message: "ubiqu_personal WiFi might be off"
         data:
-          url: /lovelace-machines/machines
+          url: "/lovelace-machines/machines"
           push:
             interruption-level: time-sensitive
     - delay:
