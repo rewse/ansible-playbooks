@@ -1,22 +1,20 @@
-- id: automation.alarm_kitchen_rice_cooker_is_keeping_warm
-  alias: "ALARM: Kitchen Rice Cooker is keeping warm"
-  mode: single
-  trigger:
-    - platform: time
-      at: "22:30"
-    - platform: time
-      at: "23:00"
-    - platform: time
-      at: "23:30"
-  condition:
+- id: automation.alarm_kitchen_rice_cooker
+  alias: "ALARM: Kitchen Rice Cooker"
+  triggers:
+    - trigger: time
+      at:
+        - "22:30"
+        - "23:00"
+        - "23:30"
+  conditions:
     - condition: numeric_state
       entity_id: sensor.kitchen_rice_cooker_plug_power
       above: 40
-  action:
-    - service: notify.all_devices
+  actions:
+    - action: notify.all_devices
       data:
         title: "⚠️ ALARM"
-        message: ️Rice Cooker is Keeping Warm
+        message: ️"Rice Cooker is Keeping Warm"
         data:
           push:
             interruption-level: time-sensitive

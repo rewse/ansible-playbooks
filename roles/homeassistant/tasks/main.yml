@@ -144,12 +144,6 @@
     dest: /srv/homeassistant/config/automations
   tags: [homeassistant, homeassistant-automation]
 
-- name: Copy automations-living-room-modes.yaml
-  copy:
-    src: automations-living-room-modes.yaml
-    dest: /srv/homeassistant/config/automations
-  tags: [homeassistant, homeassistant-automation]
-
 - name: Copy automations-moms-room.yaml
   copy:
     src: automations-moms-room.yaml
@@ -165,12 +159,6 @@
 - name: Copy automations-moms-room-lights.yaml
   copy:
     src: automations-moms-room-lights.yaml
-    dest: /srv/homeassistant/config/automations
-  tags: [homeassistant, homeassistant-automation]
-
-- name: Copy automations-moms-room-modes.yaml
-  copy:
-    src: automations-moms-room-modes.yaml
     dest: /srv/homeassistant/config/automations
   tags: [homeassistant, homeassistant-automation]
 

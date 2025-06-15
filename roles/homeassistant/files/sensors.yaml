@@ -1,6 +1,8 @@
+# Balcony
+
 - platform: statistics
-  name: Average of Balcony Humidity Difference
-  unique_id: sensor.average_of_balcony_humidity_difference
+  unique_id: sensor.balcony_humidity_difference_average
+  name: "Balcony Humidity Difference Average"
   entity_id: sensor.balcony_humidity_difference
   state_characteristic: mean
   max_age:
@@ -13,12 +15,15 @@
   max_age:
     hours: 24
 - platform: statistics
-  name: Average of Balcony Temperature Difference
-  unique_id: sensor.average_of_balcony_temperature_difference
-  entity_id: sensor.balcony_temperature_difference
+  unique_id: sensor.balcony_temp_difference_average
+  name: "Balcony Temperature Difference Average"
+  entity_id: sensor.balcony_temp_difference
   state_characteristic: mean
   max_age:
     hours: 51
+
+# Dad’s Room
+
 - platform: statistics
   unique_id: sensor.dads_room_humidity_difference_average
   name: "Dad’s Room Humidity Difference Average"
@@ -34,37 +39,43 @@
   max_age:
     minutes: 10
 - platform: statistics
-  unique_id: sensor.average_of_dads_room_temp_difference
+  unique_id: sensor.dads_room_temp_difference_average
   name: "Dad’s Room Temperature Difference Average"
   entity_id: sensor.dads_room_temp_difference
   state_characteristic: mean
   max_age:
     hours: 51
+
+# Living Room
+
 - platform: statistics
-  name: Average of Mom’s Room Humidity Difference
-  unique_id: sensor.average_of_moms_room_humidity_difference
-  entity_id: sensor.moms_room_humidity_difference
-  state_characteristic: mean
-  max_age:
-    hours: 51
-- platform: statistics
-  name: Average of Mom’s Room Temperature Difference
-  unique_id: sensor.average_of_moms_room_temperature_difference
-  entity_id: sensor.moms_room_temperature_difference
-  state_characteristic: mean
-  max_age:
-    hours: 51
-- platform: statistics
-  name: Average of Living Room Humidity Difference
-  unique_id: sensor.average_of_living_room_humidity_difference
+  unique_id: sensor.living_room_humidity_difference_average
+  name: "Living Room Humidity Difference Average"
   entity_id: sensor.living_room_humidity_difference
   state_characteristic: mean
   max_age:
     hours: 51
 - platform: statistics
-  name: Average of Living Room Temperature Difference
-  unique_id: sensor.average_of_living_room_temperature_difference
-  entity_id: sensor.living_room_temperature_difference
+  unique_id: sensor.living_room_temp_difference_average
+  name: "Living Room Temperature Difference Average"
+  entity_id: sensor.living_room_temp_difference
+  state_characteristic: mean
+  max_age:
+    hours: 51
+
+# Mom’s Room
+
+- platform: statistics
+  unique_id: sensor.moms_room_humidity_difference_average
+  name: "Mom’s Room Humidity Difference Average"
+  entity_id: sensor.moms_room_humidity_difference
+  state_characteristic: mean
+  max_age:
+    hours: 51
+- platform: statistics
+  unique_id: sensor.moms_room_temp_difference_average
+  name: "Mom’s Room Temperature Difference Average"
+  entity_id: sensor.moms_room_temp_difference
   state_characteristic: mean
   max_age:
     hours: 51

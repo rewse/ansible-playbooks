@@ -6,11 +6,11 @@
   conditions:
     - condition: numeric_state
       entity_id:
-        - sensor.dads_room_humidity_difference_average
         - sensor.dads_room_humidity_difference
+        - sensor.dads_room_humidity_difference_average
       above: 10
-  action:
-    - service: notify.tats_devices
+  actions:
+    - action: notify.tats_devices
       data:
         title: "⚠️ ALARM"
         message: >-
@@ -30,14 +30,14 @@
   triggers:
     - trigger: state
       entity_id: sensor.dads_room_switchbot_meter_temperature
-  condition:
+  conditions:
     - condition: numeric_state
       entity_id:
-        - sensor.dads_room_temperature_difference_average
         - sensor.dads_room_temperature_difference
+        - sensor.dads_room_temperature_difference_average
       above: 1
-  action:
-    - service: notify.tats_devices
+  actions:
+    - action: notify.tats_devices
       data:
         title: "⚠️ ALARM"
         message: >-
@@ -55,9 +55,6 @@
 - id: automation.alarm_dads_room_co2
   alias: "ALARM: Dad’s Room CO2"
   triggers:
-    - trigger: state
-      entity_id: input_boolean.dads_room_presence_mode
-      to: "on"
     - trigger: time_pattern
       minutes: "/5"
       seconds: 55
@@ -72,9 +69,7 @@
     - action: notify.tats_devices
       data:
         title: "⚠️ ALARM"
-        message: >-
-          Dad’s Room CO2 is too high.
-          Current: {{ states('sensor.dads_room_co2') }}ppm
+        message: "Dad’s Room CO2 is too high. Current: {{ states('sensor.dads_room_co2') }}ppm"
         data:
           push:
             interruption-level: time-sensitive
