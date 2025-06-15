@@ -8,7 +8,6 @@
   arming_states:
     - armed_home
     - armed_night
-  icon: "mdi:shield-home"
 - platform: manual
   unique_id: alarm_control_panel.home
   name: "Home Alarm Control Panel"
@@ -22,4 +21,3 @@
     - armed_vacation
   armed_vacation:
     arming_time: 600
-  icon: "mdi:lock-clock"
