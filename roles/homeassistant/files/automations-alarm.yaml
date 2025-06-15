@@ -64,8 +64,8 @@
     - condition: time
       after: "22:00:00"
       before: "23:59:59"
-  action:
-    - service: notify.all_devices
+  actions:
+    - action: notify.all_devices
       data:
         title: "⚠️ ALARM"
         message: "kijitora WiFi might be off"
@@ -79,11 +79,11 @@
     stored_traces: 100
 - id: automation.alarm_device_wifi_ubiqu_personal
   alias: "ALARM: Device WiFi ubiqu_personal"
-  trigger:
-    - platform: time_pattern
+  triggers:
+    - trigger: time_pattern
       minutes: "/5"
       seconds: 23
-  condition:
+  conditions:
     - condition: state
       entity_id: device_tracker.ubiqu_personal
       state: home
@@ -97,8 +97,8 @@
     - condition: time
       after: "22:00:00"
       before: "23:59:59"
-  action:
-    - service: notify.ubiqu_devices
+  actions:
+    - action: notify.ubiqu_devices
       data:
         title: "⚠️ ALARM"
         message: "ubiqu_personal WiFi might be off"

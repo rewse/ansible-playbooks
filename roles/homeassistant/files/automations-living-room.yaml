@@ -1,64 +1,61 @@
-# Climates
-- id: automation.alarm_living_room_humidity_difference_is_too_large
-  alias: "ALARM: Living Room Humidity Difference is Too Large"
-  mode: single
-  trigger:
-    - platform: state
+- id: automation.alarm_living_room_humidity_difference
+  alias: "ALARM: Living Room Humidity Difference"
+  triggers:
+    - trigger: state
       entity_id: sensor.living_room_switchbot_hub_2_humidity
-  condition:
+  conditions:
     - condition: numeric_state
-      entity_id: sensor.average_of_living_room_humidity_difference
+      entity_id:
+        - sensor.living_room_humidity_difference
+        - sensor.living_room_humidity_difference_average
       above: 10
-    - condition: numeric_state
-      entity_id: sensor.living_room_humidity_difference
-      above: 10
-  action:
-    - service: notify.tats_devices
+  actions:
+    - action: notify.tats_devices
       data:
         title: "⚠️ ALARM"
-        message: "Living Room Humidity Difference is Too Large. Current: {{ states('sensor.living_room_humidity') }}% / {{ states('sensor.living_room_switchbot_hub_2_humidity') }}%"
+        message: >-
+          Living Room Humidity Difference is Too Large.
+          Current: {{ states('sensor.living_room_humidity') }}% /
+          {{ states('sensor.living_room_switchbot_hub_2_humidity') }}%
         data:
-          url: /lovelace/home
           push:
             interruption-level: time-sensitive
+          url: "/lovelace/home"
     - delay:
         hours: 8
   trace:
     stored_traces: 100
-- id: automation.alarm_living_room_temperature_difference_is_too_large
-  alias: "ALARM: Living Room Temperature Difference is Too Large"
-  mode: single
-  trigger:
-    - platform: state
+- id: automation.alarm_living_room_temperature_difference
+  alias: "ALARM: Living Room Temperature Difference"
+  triggers:
+    - trigger: state
       entity_id: sensor.living_room_switchbot_hub_2_temperature
-  condition:
+  conditions:
     - condition: numeric_state
-      entity_id: sensor.average_of_living_room_temperature_difference
+      entity_id:
+        - sensor.living_room_temp_difference
+        - sensor.living_room_temp_difference_average
       above: 1
-    - condition: numeric_state
-      entity_id: sensor.living_room_temperature_difference
-      above: 1
-  action:
-    - service: notify.tats_devices
+  actions:
+    - action: notify.tats_devices
       data:
         title: "⚠️ ALARM"
-        message: "Living Room Temperature Difference is Too Large. Current: {{ states('sensor.living_room_temperature') }}°C / {{ states('sensor.living_room_switchbot_hub_2_temperature') }}°C"
+        message: >-
+          Living Room Temperature Difference is Too Large.
+          Current: {{ states('sensor.living_room_temperature') }}°C /
+          {{ states('sensor.living_room_switchbot_hub_2_temperature') }}°C"
         data:
-          url: /lovelace/home
           push:
             interruption-level: time-sensitive
+          url: "/lovelace/home"
     - delay:
         hours: 8
   trace:
     stored_traces: 100
-- id: automation.alarm_living_room_co2_is_too_high
-  alias: "ALARM: Living Room CO2 is Too High"
-  mode: single
-  trigger:
-    - platform: state
-      entity_id: binary_sensor.living_room_presence
-      to: "on"
-    - platform: time_pattern
+- id: automation.alarm_living_room_co2
+  alias: "ALARM: Living Room CO2"
+  triggers:
+    - trigger: time_pattern
       minutes: "/5"
       seconds: 48
   condition:
@@ -66,130 +63,147 @@
       entity_id: sensor.living_room_co2
       above: 1000
     - condition: state
-      entity_id: binary_sensor.living_room_window
+      entity_id:
+        - binary_sensor.living_room_window
+        - binary_sensor.study_window_n
+        - binary_sensor.study_window_s
       state: "off"
-    - condition: state
-      entity_id: binary_sensor.study_window_n
-      state: "off"
-    - condition: state
-      entity_id: binary_sensor.study_window_s
-      state: "off"
-  action:
-    - service: notify.all_devices
+  actions:
+    - action: notify.all_devices
       data:
         title: "⚠️ ALARM"
         message: "Living Room CO2 is too high. Current: {{ states('sensor.living_room_co2') }}ppm"
         data:
-          url: /lovelace/home
           push:
             interruption-level: time-sensitive
+          url: "/lovelace/home"
     - delay:
         hours: 1
   trace:
     stored_traces: 100
-- id: automation.turn_off_living_room_fan
-  alias: Turn off Living Room Fan
-  mode: single
-  trigger:
-    - platform: state
-      entity_id: sensor.count_of_study_motion
-    - platform: time_pattern
-      seconds: 42
-  condition:
-    - condition: numeric_state
-      entity_id: sensor.count_of_study_motion
-      below: 10
-    - condition: numeric_state
-      entity_id: sensor.living_room_fan_plug_power
-      above: 3
-  action:
-    - service: fan.turn_off
-      entity_id: fan.living_room_fan
-    - service: notify.tats_devices
-      data:
-        message: "Turned off Living Room Fan"
-        data:
-          url: /lovelace/home
-          push:
-            interruption-level: time-sensitive
-    - delay:
-        hours: 1
+- id: automation.select_living_room_regza_content_type_mode
+  alias: "Select Living Room Regza Content Type Mode"
+  triggers:
+    - trigger: state
+      entity_id: sensor.regza_content_type
+      for:
+        seconds: 5
+    - trigger: homeassistant
+      event: start
+  actions:
+    - choose:
+        - conditions:
+            - or:
+                - condition: state
+                  entity_id: sensor.regza_content_type
+                  state: "broadcast"
+                  for:
+                    seconds: 5
+                - condition: state
+                  entity_id: sensor.regza_content_type
+                  state: "recorded"
+                  for:
+                    seconds: 5
+          sequence:
+            - action: input_select.select_option
+              target: 
+                entity_id: input_select.living_room_regza_content_type_mode
+              data:
+                option: "Internal"
+        - conditions:
+            - condition: state
+              entity_id: sensor.regza_content_type
+              state: "external"
+              for:
+                seconds: 5
+          sequence:
+            - action: input_select.select_option
+              target: 
+                entity_id: input_select.living_room_regza_content_type_mode
+              data:
+                option: "External"
+      default:
+        - action: input_select.select_option
+          target: 
+            entity_id: input_select.living_room_regza_content_type_mode
+          data:
+            option: "Off"
   trace:
     stored_traces: 100
-- id: automation.turn_off_living_room_tv
-  alias: Turn off Living Room TV
-  trigger:
-    - platform: time_pattern
-      seconds: 39
-  condition:
-    - condition: state
-      entity_id: alarm_control_panel.tv
-      state: armed_away
-    - condition: template
-      value_template: "{{ as_timestamp(now()) - as_timestamp(states('sensor.uptime')) > 600 }}"
-    - condition: not
-      conditions:
-        - condition: state
-          entity_id: person.shibata_tats
-          state: home
-    - condition: not
-      conditions:
-        - condition: state
-          entity_id: person.shibata_akiko
-          state: home
-    - condition: or
-      conditions:
-        - condition: state
-          entity_id: sensor.regza_content_type
-          state: broadcast
-          for:
-            seconds: 5
-        - condition: state
-          entity_id: sensor.regza_content_type
-          state: external
-          for:
-            seconds: 5
-        - condition: state
-          entity_id: sensor.regza_content_type
-          state: recorded
-          for:
-            seconds: 5
-  action:
-    - service: shell_command.control_toggle_regza
-    - service: notify.tats_devices
-      data:
-        message: "Turned off Living Room TV"
-        data:
-          url: /lovelace/machines
-          push:
-            interruption-level: time-sensitive
+- id: automation.select_living_room_presence_mode
+  alias: "Select Living Room Presence Mode"
+  triggers:
+    - trigger: state
+      entity_id:
+        - binary_sensor.living_room_presence_e
+        - binary_sensor.living_room_presence_s
+      for:
+        minutes: 1
+    - trigger: homeassistant
+      event: start
+  actions:
+    - choose:
+        - conditions:
+            - condition: state
+              entity_id:
+                - binary_sensor.living_room_presence_e
+                - binary_sensor.living_room_presence_s
+              match: any
+              state: "on"
+              for:
+                minutes: 1
+          sequence:
+            - action: input_boolean.turn_on
+              target: 
+                entity_id: input_boolean.living_room_presence_mode
+        - conditions:
+            - condition: state
+              entity_id:
+                - binary_sensor.living_room_presence_e
+                - binary_sensor.living_room_presence_s
+              state: "off"
+              for:
+                minutes: 1
+          sequence:
+            - action: input_boolean.turn_off
+              target: 
+                entity_id: input_boolean.living_room_presence_mode
   trace:
     stored_traces: 100
-- id: automation.turn_on_living_room_fan
-  alias: Turn on Living Room Fan
-  mode: single
-  trigger:
-    - platform: state
-      entity_id: binary_sensor.study_motion
-      to: "on"
-  condition:
-    - condition: numeric_state
-      entity_id: sensor.count_of_study_motion
-      above: 10
-    - condition: numeric_state
-      entity_id: sensor.living_room_fan_plug_power
-      below: 3
-  action:
-    - service: fan.turn_on
-      entity_id: fan.living_room_fan
-    - service: notify.tats_devices
-      data:
-        message: "Turned on Living Room Fan"
-        data:
-          url: /lovelace/home
-          push:
-            interruption-level: time-sensitive
-    - delay:
-        hours: 1
+- id: automatic.select_living_room_window_mode
+  alias: "Select Living Room Window Mode"
+  triggers:
+    - trigger: state
+      entity_id:
+        - binary_sensor.living_room_window
+        - binary_sensor.study_window_n
+        - binary_sensor.study_window_s
+    - trigger: homeassistant
+      event: start
+  actions:
+    - choose:
+        - conditions:
+            - condition: state
+              entity_id:
+                - binary_sensor.living_room_window
+                - binary_sensor.study_window_n
+                - binary_sensor.study_window_s
+              match: any
+              state: "on"
+          sequence:
+            - action: input_boolean.turn_on
+              target: 
+                entity_id: input_boolean.living_room_window_mode
+        - conditions:
+            - condition: state
+              entity_id:
+                - binary_sensor.living_room_window
+                - binary_sensor.study_window_n
+                - binary_sensor.study_window_s
+              state: "off"
+          sequence:
+            - action: input_boolean.turn_off
+              target: 
+                entity_id: input_boolean.living_room_window_mode
   trace:
     stored_traces: 100

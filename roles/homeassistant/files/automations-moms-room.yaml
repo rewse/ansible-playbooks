@@ -1,120 +1,121 @@
-- id: automation.alarm_moms_room_humidity_difference_is_too_large
-  alias: "ALARM: Mom’s Room Humidity Difference is Too Large"
-  mode: single
-  trigger:
-    - platform: state
+- id: automation.alarm_moms_room_humidity_difference
+  alias: "ALARM: Mom’s Room Humidity Difference"
+  triggers:
+    - trigger: state
       entity_id: sensor.moms_room_switchbot_meter_humidity
-  condition:
+  conditions:
     - condition: numeric_state
-      entity_id: sensor.average_of_moms_room_humidity_difference
+      entity_id:
+        - sensor.moms_room_humidity_difference
+        - sensor.moms_room_humidity_difference_average
       above: 10
-    - condition: numeric_state
-      entity_id: sensor.moms_room_humidity_difference
-      above: 10
-  action:
-    - service: notify.tats_devices
+  actions:
+    - action: notify.tats_devices
       data:
         title: "⚠️ ALARM"
-        message: "Mom’s Room Humidity Difference is Too Large. Current: {{ states('sensor.moms_room_humidity') }}% / {{ states('sensor.moms_room_switchbot_meter_humidity') }}%"
+        message: >-
+          Mom’s Room Humidity Difference is Too Large.
+          Current: {{ states('sensor.moms_room_humidity') }}% /
+          {{ states('sensor.moms_room_switchbot_meter_humidity') }}%
         data:
-          url: /lovelace/home
           push:
             interruption-level: time-sensitive
+          url: "/lovelace/home"
     - delay:
         hours: 8
   trace:
     stored_traces: 100
-- id: automation.alarm_moms_room_temperature_difference_is_too_large
-  alias: "ALARM: Mom’s Room Temperature Difference is Too Large"
-  mode: single
-  trigger:
-    - platform: state
+- id: automation.alarm_moms_room_temp_difference
+  alias: "ALARM: Mom’s Room Temperature Difference"
+  triggers:
+    - trigger: state
       entity_id: sensor.moms_room_switchbot_meter_temperature
-  condition:
+  conditions:
     - condition: numeric_state
-      entity_id: sensor.average_of_moms_room_temperature_difference
+      entity_id:
+        - sensor.moms_room_temperature_difference
+        - sensor.moms_room_temperature_difference_average
       above: 1
-    - condition: numeric_state
-      entity_id: sensor.moms_room_temperature_difference
-      above: 1
-  action:
-    - service: notify.tats_devices
+  actions:
+    - action: notify.tats_devices
       data:
         title: "⚠️ ALARM"
-        message: "Mom’s Room Temperature Difference is Too Large. Current: {{ states('sensor.moms_room_temperature') }}°C / {{ states('sensor.moms_room_switchbot_meter_temperature') }}°C"
+        message: >-
+          Mom’s Room Temperature Difference is Too Large.
+          Current: {{ states('sensor.moms_room_temperature') }}°C /
+          {{ states('sensor.moms_room_switchbot_meter_temperature') }}°C
         data:
-          url: /lovelace/home
           push:
             interruption-level: time-sensitive
+          url: "/lovelace/home"
     - delay:
         hours: 8
   trace:
     stored_traces: 100
-- id: automation.open_moms_room_curtains_temporarily
-  alias: Open Mom’s Room Curtains Temporarily
-  trigger:
-    - platform: time
-      at: input_datetime.moms_room_curtains_opened_time
-  action:
-    - service: cover.open_cover
-      target:
-        entity_id: cover.moms_room_curtains
+- id: automation.select_moms_room_presence_mode
+  alias: "Select Mom’s Room Presence Mode"
+  triggers:
+    - trigger: state
+      entity_id: binary_sensor.moms_room_presence
+      for:
+        minutes: 1
+    - trigger: homeassistant
+      event: start
+  actions:
+    - choose:
+        - conditions:
+            - condition: state
+              entity_id: binary_sensor.moms_room_presence
+              state: "on"
+              for:
+                minutes: 1
+          sequence:
+            - action: input_boolean.turn_on
+              target: 
+                entity_id: input_boolean.moms_room_presence_mode
+        - conditions:
+            - condition: state
+              entity_id: binary_sensor.moms_room_presence
+              state: "off"
+              for:
+                minutes: 1
+          sequence:
+            - action: input_boolean.turn_off
+              target: 
+                entity_id: input_boolean.moms_room_presence_mode
   trace:
     stored_traces: 100
-- id: automation.open_moms_room_curtains_workday
-  alias: Open Mom’s Room Curtains Workday
-  description: Open the curtains in the moms_room every workday
-  trigger:
-    - platform: time
-      at: input_datetime.moms_room_curtains_opened_time_workday
-  condition:
-    - condition: state
-      entity_id: binary_sensor.workday_sensor
-      state: "on"
-  action:
-    - service: cover.open_cover
-      target:
-        entity_id: cover.moms_room_curtains
-  trace:
-    stored_traces: 100
-- id: automation.turn_off_moms_room_tv
-  alias: Turn off Mom’s Room TV
-  trigger:
-    - platform: time_pattern
-      seconds: 52
-  condition:
-    - condition: state
-      entity_id: alarm_control_panel.tv
-      state: armed_away
-    - condition: template
-      value_template: "{{ as_timestamp(now()) - as_timestamp(states('sensor.uptime')) > 600 }}"
-    - condition: not
-      conditions:
-        - condition: state
-          entity_id: person.shibata_tats
-          state: home
-          for:
-            minutes: 10
-    - condition: not
-      conditions:
-        - condition: state
-          entity_id: person.shibata_akiko
-          state: home
-          for:
-            minutes: 10
-    - condition: state
-      entity_id: media_player.moms_room_fire_tv
-      state: idle
-  action:
-    - service: media_player.turn_off
-      target:
-        entity_id: media_player.moms_room_fire_tv
-    - service: notify.tats_devices
-      data:
-        message: "Turned off Mom’s Room TV"
-        data:
-          url: /lovelace/machines
-          push:
-            interruption-level: time-sensitive
+- id: automatic.select_moms_room_window_mode
+  alias: "Select Mom’s Room Window Mode"
+  triggers:
+    - trigger: state
+      entity_id:
+        - binary_sensor.moms_room_window_n
+        - binary_sensor.moms_room_window_s
+    - trigger: homeassistant
+      event: start
+  actions:
+    - choose:
+        - conditions:
+            - condition: state
+              entity_id:
+                - binary_sensor.moms_room_window_n
+                - binary_sensor.moms_room_window_s
+              match: any
+              state: "on"
+          sequence:
+            - action: input_boolean.turn_on
+              target: 
+                entity_id: input_boolean.moms_room_window_mode
+        - conditions:
+            - condition: state
+              entity_id:
+                - binary_sensor.moms_room_window_n
+                - binary_sensor.moms_room_window_s
+              state: "off"
+          sequence:
+            - action: input_boolean.turn_off
+              target: 
+                entity_id: input_boolean.moms_room_window_mode
   trace:
     stored_traces: 100
