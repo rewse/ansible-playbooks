@@ -544,7 +544,7 @@
             interruption-level: time-sensitive
           url: "/lovelace/home"
     - delay:
-        seconds: 10
+        hours: 2
   trace:
     stored_traces: 100
 - id: automation.toggle_dads_room_ac_dry
@@ -635,7 +635,7 @@
             interruption-level: time-sensitive
           url: "/lovelace/home"
     - delay:
-        seconds: 10
+        hours: 2
   trace:
     stored_traces: 100
 - id: automation.toggle_dads_room_humidifier
@@ -697,7 +697,7 @@
             interruption-level: time-sensitive
           url: "/lovelace/home"
     - delay:
-        seconds: 10
+        hours: 1
   trace:
     stored_traces: 100
 - id: automation.turn_off_dads_room_ac_internal_clean
