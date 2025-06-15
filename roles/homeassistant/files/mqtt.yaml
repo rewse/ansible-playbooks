@@ -1,22 +1,22 @@
 sensor:
   # Do not use mhz19 integration because it cannot the correct value
   - unique_id: sensor.dads_room_co2
-    name: Dad’s Room CO2
-    state_topic: mhz19/dads_room/co2
+    name: "Dad’s Room CO2"
+    state_topic: "mhz19/dads_room/co2"
     value_template: "{{ value_json.co2 }}"
-    unit_of_measurement: ppm
+    availability:
+      - topic: "mhz19/dads_room/state"
+    unit_of_measurement: "ppm"
     state_class: measurement
     device_class: carbon_dioxide
-    availability:
-      - topic: mhz19/dads_room/state
-    icon: mdi:molecule-co2
+    icon: "mdi:molecule-co2"
   - unique_id: sensor.living_room_co2
-    name: Living Room CO2
-    state_topic: mhz19/living_room/co2
+    name: "Living Room CO2"
+    state_topic: "mhz19/living_room/co2"
     value_template: "{{ value_json.co2 }}"
-    unit_of_measurement: ppm
+    availability:
+      - topic: "mhz19/living_room/state"
+    unit_of_measurement: "ppm"
     state_class: measurement
     device_class: carbon_dioxide
-    availability:
-      - topic: mhz19/living_room/state
-    icon: mdi:molecule-co2
+    icon: "mdi:molecule-co2"

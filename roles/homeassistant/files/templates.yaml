@@ -13,7 +13,7 @@
     unit_of_measurement: "pt"
     state_class: measurement
     icon: "mdi:water-percent-alert"
-  - unique_id: sensor.balcony_temperature_difference
+  - unique_id: sensor.balcony_temp_difference
     name: "Balcony Temperature Difference"
     state: >-
       {{
@@ -81,10 +81,10 @@
     state: >-
       {{
         (
-          (states('sensor.dads_room_temperature')) | float(25) - 30.5) * 0.90739 +
-          (states('sensor.dads_room_humidity')) | float(50) - 60.0) * 0.14775 +
-          (states('sensor.dads_room_temperature')) | float(25) - 30.5) *
-          (states('sensor.dads_room_humidity')) | float(50) - 60.0) * 0.003655 + 27.77
+          (states('sensor.dads_room_temperature') | float(25) - 30.5) * 0.90739 +
+          (states('sensor.dads_room_humidity') | float(50) - 60.0) * 0.14775 +
+          (states('sensor.dads_room_temperature') | float(25) - 30.5) *
+          (states('sensor.dads_room_humidity') | float(50) - 60.0) * 0.003655 + 27.77
         ) | round(2)
       }}
     unit_of_measurement: "°C"
@@ -129,8 +129,8 @@
     state: >-
       {{
         (
-          float((states('sensor.living_room_temperature')) -
-          float((states('sensor.living_room_switchbot_hub_2_temperature'))
+          float(states('sensor.living_room_temperature')) -
+          float(states('sensor.living_room_switchbot_hub_2_temperature'))
         ) | abs
       }}
     unit_of_measurement: "°C"
@@ -145,7 +145,7 @@
           (states('sensor.living_room_temperature') | float(25) - 30.5) * 0.90739 +
           (states('sensor.living_room_humidity') | float(50) - 60.0) * 0.14775 +
           (states('sensor.living_room_temperature') | float(25) - 30.5) *
-          (states('sensor.living_room_humidity') | float(50) - 60.0) * 0.003655 + 27.77)
+          (states('sensor.living_room_humidity') | float(50) - 60.0) * 0.003655 + 27.77
         ) | round(2)
       }}
     unit_of_measurement: "°C"

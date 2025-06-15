@@ -2,4 +2,4 @@
   latitude: !secret latlng_home_lat
   longitude: !secret latlng_home_lng
   radius: 250
-  icon: mdi:home
+  icon: "mdi:home"

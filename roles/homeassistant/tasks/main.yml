@@ -112,12 +112,10 @@
     dest: /srv/homeassistant/config/automations
   tags: [homeassistant, homeassistant-automation]
 
-- name: Copy automations-info.yaml.j2
-  template:
-    src: automations-info.yaml.j2
-    dest: /srv/homeassistant/config/automations/automations-info.yaml
-    variable_start_string: "[%"
-    variable_end_string: "%]"
+- name: Copy automations-info.yaml
+  copy:
+    src: automations-info.yaml
+    dest: /srv/homeassistant/config/automations
   tags: [homeassistant, homeassistant-automation]
 
 - name: Copy automations-kitchen.yaml
@@ -320,22 +318,6 @@
     src: input_selects.yaml
     dest: /srv/homeassistant/config
   tags: [homeassistant, homeassistant-component, homeassistant-input-select]
-
-- name: Config ios
-  lineinfile:
-    path: /srv/homeassistant/config/configuration.yaml
-    insertafter: '^input_number:'
-    regexp: '^ios:'
-    line: "ios: !include ios.yaml"
-  notify: Restart homeassistant
-  tags: [homeassistant, homeassistant-component, homeassistant-component]
-
-- name: Copy ios.yaml
-  copy:
-    src: ios.yaml
-    dest: /srv/homeassistant/config
-  notify: Restart homeassistant
-  tags: [homeassistant, homeassistant-component]
 
 - name: Config light
   lineinfile:
@@ -603,13 +585,6 @@
   notify: Restart homeassistant
   tags: [homeassistant, homeassistant-custom]
 
-- name: Copy Lovelace Uptime Card
-  get_url:
-    url: https://github.com/dylandoamaral/uptime-card/releases/download/v{{ uptime_card_version }}/uptime-card.js
-    dest: /srv/homeassistant/config/www
-  notify: Restart homeassistant
-  tags: [homeassistant, homeassistant-custom]
-
 - name: Copy Lovelace Simeple Weather Card
   get_url:
     url: https://github.com/kalkih/simple-weather-card/releases/download/v{{ simple_weather_card_version }}/simple-weather-card-bundle.js
@@ -622,26 +597,26 @@
     path: /srv/homeassistant/config/configuration.yaml
     block: |
       homeassistant:
-        name: Home
+        name: "Home"
         latitude: !secret latlng_home_lat
         longitude: !secret latlng_home_lng
         elevation: 40
         unit_system: metric
         temperature_unit: C
-        time_zone: Asia/Tokyo
-        country: JP
-        currency: JPY
-        external_url: https://hass.rewse.jp/
-        internal_url: https://hass.rewse.jp/
+        time_zone: "Asia/Tokyo"
+        country: "JP"
+        currency: "JPY"
+        external_url: "https://hass.rewse.jp/"
+        internal_url: "https://hass.rewse.jp/"
         customize: !include customize.yaml
       http:
         use_x_forwarded_for: true
         trusted_proxies:
-          - 127.0.0.0/8
-          - 192.168.0.0/24
-          - ::1/128
-          - fe80::/10
-          - 240f:78:31e9:1::/64
+          - "127.0.0.0/8"
+          - "192.168.0.0/24"
+          - "::1/128"
+          - "fe80::/10"
+          - "240f:78:31e9:1::/64"
       logger:
         default: warning
         logs:
@@ -652,13 +627,11 @@
         mode: yaml
         dashboards: !include dashboards.yaml
         resources:
-          - url: /local/mini-graph-card-bundle.js?v={{ mini_graph_card_version }}
+          - url: "/local/mini-graph-card-bundle.js?v={{ mini_graph_card_version }}"
             type: module
-          - url: /local/mini-media-player-bundle.js?v={{ mini_media_player_version }}
+          - url: "/local/mini-media-player-bundle.js?v={{ mini_media_player_version }}"
             type: module
-          - url: /local/simple-weather-card-bundle.js?v={{ simple_weather_card_version }}
-            type: module
-          - url: /local/uptime-card.js
+          - url: "/local/simple-weather-card-bundle.js?v={{ simple_weather_card_version }}"
             type: module
       recorder:
         db_url: !secret postgres_connstr
