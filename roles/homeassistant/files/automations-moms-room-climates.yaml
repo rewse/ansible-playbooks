@@ -652,7 +652,7 @@
             - action: climate.turn_off
               target:
                 entity_id: climate.moms_room_ac
-            - action: notify.tats_devices
+            - action: notify.all_devices
               data:
                 message: >-
                   Turned off Mom’s Room AC Cool.
@@ -762,7 +762,7 @@
             - action: climate.turn_off
               target:
                 entity_id: climate.moms_room_ac
-            - action: notify.tats_devices
+            - action: notify.all_devices
               data:
                 message: >-
                   Turned off Mom’s Room AC Dry.
@@ -927,7 +927,7 @@
           sequence:
             - action: switch.toggle
               entity_id: switch.moms_room_humidifier
-            - action: notify.tats_devices
+            - action: notify.all_devices
               data:
                 message: >-
                   Turned off Mom’s Room Humidifier.
