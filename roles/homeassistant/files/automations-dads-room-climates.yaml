@@ -481,6 +481,10 @@
       seconds: 31
     - trigger: homeassistant
       event: start
+  conditions:
+    condition: state
+    entity_id: input_select.season_mode
+    state: "Summer"
   actions:
     - variables:
         action: "idle"
@@ -560,6 +564,10 @@
       seconds: 42
     - trigger: homeassistant
       event: start
+  conditions:
+    condition: state
+    entity_id: input_select.season_mode
+    state: "Summer"
   action:
     - variables:
         action: "idle"

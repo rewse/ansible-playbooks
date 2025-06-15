@@ -562,6 +562,10 @@
       seconds: 31
     - trigger: homeassistant
       event: start
+  conditions:
+    condition: state
+    entity_id: input_select.season_mode
+    state: "Summer"
   actions:
     - choose:
         - conditions:
@@ -653,6 +657,10 @@
       seconds: 42
     - trigger: homeassistant
       event: start
+  conditions:
+    condition: state
+    entity_id: input_select.season_mode
+    state: "Summer"
   action:
     - choose:
         - conditions:
