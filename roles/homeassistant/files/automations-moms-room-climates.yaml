@@ -85,6 +85,9 @@
     - trigger: event
       event_type: "moms_room_temp_too_high"
       id: "moms_room_temp_too_high"
+    - trigger: event
+      event_type: "moms_room_temp_too_low"
+      id: "moms_room_temp_too_low"
   actions:
     - choose:
         - conditions:
@@ -125,6 +128,21 @@
               data:
                 message: >-
                   Mom’s Room Temperature is Too High.
+                  Current: {{ states('sensor.moms_room_temperature') }}°C
+                data:
+                  push:
+                    interruption-level: time-sensitive
+                  url: "/lovelace/home"
+            - delay:
+                hours: 2
+        - conditions:
+            - condition: trigger
+              id: "moms_room_temp_too_low"
+          sequence:
+            - action: notify.all_devices
+              data:
+                message: >-
+                  Mom’s Room Temperature is Too Low.
                   Current: {{ states('sensor.moms_room_temperature') }}°C
                 data:
                   push:
@@ -743,6 +761,95 @@
                 message: >-
                   Turned off Mom’s Room AC Dry.
                   Current: {{ states('sensor.moms_room_humidity') }}%
+                data:
+                  push:
+                    interruption-level: time-sensitive
+                  url: "/lovelace/home"
+            - delay:
+                hours: 2
+  trace:
+    stored_traces: 100
+- id: automation.toggle_moms_room_ac_heat
+  alias: "Toggle Mom’s Room AC Heat"
+  triggers:
+    - trigger: state
+      entity_id:
+        - input_number.moms_room_temp_target
+        - input_number.moms_room_temp_max_diff
+        - input_number.moms_room_temp_min_diff
+    - trigger: state
+      entity_id: input_boolean.moms_room_window_mode
+      to: "off"
+    - trigger: time_pattern
+      minutes: "/5"
+      seconds: 48
+    - trigger: homeassistant
+      event: start
+  conditions:
+    condition: state
+    entity_id: input_select.season_mode
+    state: "Winter"
+  actions:
+    - choose:
+        - conditions:
+            - condition: template
+              value_template: >-
+                {{
+                  float(states('sensor.moms_room_temperature')) < 
+                  float(states('input_number.moms_room_temp_target')) +
+                  float(states('input_number.moms_room_temp_max_diff'))
+                }}
+            - not:
+                - condition: state
+                  entity_id: climate.moms_room_ac
+                  state: "heat"
+          sequence:
+            - if:
+                - condition: state
+                  entity_id: input_boolean.moms_room_window_mode
+                  state: "on"
+                  for:
+                    minutes: 10
+              then:
+                - event: "moms_room_temp_too_low"
+              else:
+                - action: climate.set_temperature
+                  target:
+                    entity_id: climate.moms_room_ac
+                  data:
+                    hvac_mode: "heat"
+                    temperature: "{{ int(states('input_number.moms_room_temp_target')) }}"
+                - action: notify.all_devices
+                  data:
+                    message: >-
+                      Turned on Mom’s Room AC Heat.
+                      Current: {{ states('sensor.moms_room_temperature') }}°C
+                    data:
+                      push:
+                        interruption-level: time-sensitive
+                      url: "/lovelace/home"
+                - delay:
+                    seconds: 10
+        - conditions:
+            - condition: template
+              value_template: >-
+                {{
+                  float(states('sensor.moms_room_temperature')) > 
+                  float(states('input_number.moms_room_temp_target')) -
+                  float(states('input_number.moms_room_temp_min_diff'))
+                }} 
+            - condition: state
+              entity_id: climate.moms_room_ac
+              state: "heat"
+          sequence:
+            - action: climate.turn_off
+              target:
+                entity_id: climate.moms_room_ac
+            - action: notify.all_devices
+              data:
+                message: >-
+                  Turned off Mom’s Room AC heat.
+                  Current: {{ states('sensor.moms_room_temperature') }}°C
                 data:
                   push:
                     interruption-level: time-sensitive
