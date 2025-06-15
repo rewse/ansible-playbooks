@@ -1,5 +1,0 @@
-- platform: generic_thermostat
-  name: Living Area Floor Heating
-  heater: switch.living_area_floor_heatings
-  target_sensor: sensor.living_room_temperature
-  target_temp: 25

@@ -215,22 +215,6 @@
   notify: Restart homeassistant
   tags: [homeassistant, homeassistant-component]
 
-- name: Config climate
-  lineinfile:
-    path: /srv/homeassistant/config/configuration.yaml
-    insertafter: '^alexa:'
-    regexp: '^climate:'
-    line: "climate: !include climates.yaml"
-  notify: Restart homeassistant
-  tags: [homeassistant, homeassistant-component]
-
-- name: Copy climates.yaml
-  copy:
-    src: climates.yaml
-    dest: /srv/homeassistant/config
-  notify: Restart homeassistant
-  tags: [homeassistant, homeassistant-component]
-
 - name: Config command_line
   lineinfile:
     path: /srv/homeassistant/config/configuration.yaml
