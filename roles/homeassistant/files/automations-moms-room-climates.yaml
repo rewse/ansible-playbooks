@@ -575,6 +575,9 @@
         - input_number.moms_room_temp_target
         - input_number.moms_room_temp_max_diff
         - input_number.moms_room_temp_min_diff
+    - trigger: state
+      entity_id: input_boolean.moms_room_window_mode
+      to: "off"
     - trigger: time_pattern
       minutes: "/5"
       seconds: 31
@@ -670,6 +673,9 @@
         - input_number.moms_room_humidity_target
         - input_number.moms_room_humidity_max_diff
         - input_number.moms_room_humidity_min_diff
+    - trigger: state
+      entity_id: input_boolean.moms_room_window_mode
+      to: "off"
     - trigger: time_pattern
       minutes: "/5"
       seconds: 42
