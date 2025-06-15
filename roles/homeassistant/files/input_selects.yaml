@@ -148,17 +148,6 @@ dads_room_scene_midnight:
     - "scene.dads_room_dark"
   icon: "mdi:brightness-3"
 
-# Home
-
-home_mode:
-  name: "Home Mode"
-  options:
-    - "Home"
-    - "Away"
-    - "Vacation"
-    - "Disarmed"
-  icon: "mdi:shield-home"
-
 # Living Room
 
 living_room_climate_mode:

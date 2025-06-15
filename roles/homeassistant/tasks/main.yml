@@ -172,6 +172,12 @@
     dest: /srv/homeassistant/config/automations
   tags: [homeassistant, homeassistant-automation]
 
+- name: Copy automations-securities.yaml
+  copy:
+    src: automations-securities.yaml
+    dest: /srv/homeassistant/config/automations
+  tags: [homeassistant, homeassistant-automation]
+
 - name: Copy secrets.yaml
   template:
     src: secrets.yaml.j2
