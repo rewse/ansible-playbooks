@@ -1,0 +1,101 @@
+- id: automation.select_home_alarm_control
+  alias: "Select Home Alarm Control"
+  triggers:
+    - trigger: state
+      entity_id:
+        - person.shibata_tats
+        - person.shibata_akiko
+        - person.shibata_kayano
+    - trigger: homeassistant
+      event: start
+  actions:
+    - choose:
+        - conditions:
+            - condition: state
+              entity_id:
+                - person.shibata_tats
+                - person.shibata_akiko
+                - person.shibata_kayano
+              match: any
+              state: "home"
+          sequence:
+            - action: alarm_control_panel.alarm_arm_home
+              target:
+                entity_id: alarm_control_panel.home
+        - conditions:
+            - condition: state
+              entity_id:
+                - person.shibata_tats
+                - person.shibata_akiko
+                - person.shibata_kayano
+              state: "not_home"
+            - not:
+                - condition: state
+                  entity_id: alarm_control_panel.home
+                  state: "armed_vacation"
+          sequence:
+            - action: alarm_control_panel.alarm_arm_away
+              target:
+                entity_id: alarm_control_panel.home
+- id: automation.toggle_camera_plugs
+  alias: "Toggle Camera Plugs"
+  triggers:
+    - trigger: state
+      entity_id: alarm_control_panel.home
+    - trigger: homeassistant
+      event: start
+  actions:
+    - variables:
+        action: ""
+    - choose:
+        - conditions:
+            - condition: state
+              entity_id: alarm_control_panel.home
+              state:
+                - "armed_away"
+                - "armed_vacation"
+            - condition: state
+              entity_id:
+                - switch.living_room_camera_plug
+                - switch.dads_room_camera_plug
+                - switch.moms_room_camera_plug
+              match: any
+              state: "off"
+          sequence:
+            - action: switch.turn_on
+              target:
+                entity_id:
+                  - switch.living_room_camera_plug
+                  - switch.dads_room_camera_plug
+                  - switch.moms_room_camera_plug
+            - variables:
+                action: "on"
+        - conditions:
+            - condition: state
+              entity_id: alarm_control_panel.home
+              state: "armed_home"
+            - condition: state
+              entity_id:
+                - switch.living_room_camera_plug
+                - switch.dads_room_camera_plug
+                - switch.moms_room_camera_plug
+              match: any
+              state: "on"
+          sequence:
+            - action: switch.turn_off
+              target:
+                entity_id:
+                  - switch.living_room_camera_plug
+                  - switch.dads_room_camera_plug
+                  - switch.moms_room_camera_plug
+            - variables:
+                action: "off"
+      default:
+        - stop: "No action"
+    - action: notify.all_devices
+      data:
+        message: "Turned {{ action }} Surveillance"
+        data:
+          push:
+            interruption-level: time-sensitive
+          url: "/lovelace/home"

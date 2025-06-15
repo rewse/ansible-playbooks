@@ -1,12 +1,25 @@
 - platform: manual
-  name: Entrance Auto-Lock
+  unique_id: alarm_control_panel.entrance
+  name: "Entrance Alarm Control Panel"
   code_arm_required: false
   delay_time: 0
   arming_time: 0
   trigger_time: 0
+  arming_states:
+    - armed_home
+    - armed_night
+  icon: "mdi:shield-home"
 - platform: manual
-  name: Surveillance
+  unique_id: alarm_control_panel.home
+  name: "Home Alarm Control Panel"
   code_arm_required: false
   delay_time: 0
   arming_time: 0
   trigger_time: 0
+  arming_states:
+    - armed_home
+    - armed_away
+    - armed_vacation
+  armed_vacation:
+    arming_time: 600
+  icon: "mdi:lock-clock"
