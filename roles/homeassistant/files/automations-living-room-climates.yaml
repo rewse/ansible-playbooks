@@ -726,6 +726,10 @@
                   state:
                     - "fan_only"
                     - "cool"
+            - not:
+                - condition: state
+                  entity_id: input_select.time_mode
+                  state: "Midnight"
           sequence:
             - choose:
                 - conditions:
@@ -842,6 +846,10 @@
                   state:
                     - "fan_only"
                     - "dry"
+            - not:
+                - condition: state
+                  entity_id: input_select.time_mode
+                  state: "Midnight"
           sequence:
             - choose:
                 - conditions:
@@ -953,6 +961,10 @@
             - condition: state
               entity_id: switch.living_area_floor_heatings
               state: "off"
+            - not:
+                - condition: state
+                  entity_id: input_select.time_mode
+                  state: "Midnight"
           sequence:
             - choose:
                 - conditions:
@@ -1048,6 +1060,10 @@
             - condition: state
               entity_id: switch.living_room_humidifier
               state: "off"
+            - not:
+                - condition: state
+                  entity_id: input_select.time_mode
+                  state: "Midnight"
           sequence:
             - choose:
                 - conditions:
