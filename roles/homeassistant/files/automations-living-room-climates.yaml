@@ -707,14 +707,13 @@
     - trigger: homeassistant
       event: start
   conditions:
-    condition: state
-    entity_id: input_select.season_mode
-    state: "Summer"
+    - condition: state
+      entity_id: input_select.season_mode
+      state: "Summer"
   actions:
     - choose:
         - conditions:
-            - condition: template
-              value_template: >-
+            - >-
                 {{
                   float(states('sensor.living_room_temperature')) > 
                   float(states('input_number.living_room_temp_target')) +
@@ -769,15 +768,13 @@
                     - delay:
                         hours: 2
         - conditions:
-            - condition: template
-              value_template: >-
+            - >-
                 {{
                   float(states('sensor.living_room_temperature')) < 
                   float(states('input_number.living_room_temp_target')) -
                   float(states('input_number.living_room_temp_min_diff'))
                 }} 
-            - condition: template
-              value_template: >-
+            - >-
                 {{
                   float(states('sensor.living_room_humidity')) <
                   float(states('input_number.living_room_humidity_target')) +
@@ -820,21 +817,19 @@
     - trigger: homeassistant
       event: start
   conditions:
-    condition: state
-    entity_id: input_select.season_mode
-    state: "Summer"
+    - condition: state
+      entity_id: input_select.season_mode
+      state: "Summer"
   action:
     - choose:
         - conditions:
-            - condition: template
-              value_template: >-
+            - >-
                 {{
                   float(states('sensor.living_room_humidity')) > 
                   float(states('input_number.living_room_humidity_target')) +
                   float(states('input_number.living_room_humidity_max_diff'))
                 }}
-            - condition: template
-              value_template: >-
+            - >-
                 {{
                   float(states('sensor.living_room_temperature')) <
                   float(states('input_number.living_room_temp_target')) +
@@ -890,8 +885,7 @@
         - conditions:
             - or:
                 - and:
-                    - condition: template
-                      value_template: >-
+                    - >-
                         {{
                           float(states('sensor.living_room_humidity')) < 
                           float(states('input_number.living_room_humidity_target')) -
@@ -901,8 +895,7 @@
                       entity_id: climate.living_room_ac
                       state: "dry"
                 - and:
-                    - condition: template
-                      value_template: >-
+                    - >-
                         {{
                           float(states('sensor.living_room_temperature')) < 
                           float(states('input_number.living_room_temp_target')) -
@@ -945,14 +938,13 @@
     - trigger: homeassistant
       event: start
   conditions:
-    condition: state
-    entity_id: input_select.season_mode
-    state: "Winter"
+    - condition: state
+      entity_id: input_select.season_mode
+      state: "Winter"
   actions:
     - choose:
         - conditions:
-            - condition: template
-              value_template: >-
+            - >-
                 {{
                   float(states('sensor.living_room_temperature')) < 
                   float(states('input_number.living_room_temp_target')) +
@@ -1004,8 +996,7 @@
                     - delay:
                         hours: 2
         - conditions:
-            - condition: template
-              value_template: >-
+            - >-
                 {{
                   float(states('sensor.living_room_temperature')) >
                   float(states('input_number.living_room_temp_target')) -
@@ -1014,6 +1005,8 @@
             - condition: state
               entity_id: switch.living_area_floor_heatings
               state: "on"
+              for:
+                hours: 2
           sequence:
             - action: switch.turn_off
               target:
@@ -1050,8 +1043,7 @@
   actions:
     - choose:
         - conditions:
-            - condition: template
-              value_template: >-
+            - >-
                 {{
                   float(states('sensor.living_room_humidity')) < 
                   float(states('input_number.living_room_humidity_target')) -
@@ -1099,8 +1091,7 @@
                     - delay:
                         hours: 1
         - conditions:
-            - condition: template
-              value_template: >-
+            - >-
                 {{
                   float(states('sensor.living_room_humidity')) >
                   float(states('input_number.living_room_humidity_target')) +
