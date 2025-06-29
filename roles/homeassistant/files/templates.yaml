@@ -44,6 +44,10 @@
 
 # Dad’s Room
 
+  - unique_id: sensor.dads_room_ac_mode
+    name: "Dad’s Room AC Mode"
+    state: "{{ states('climate.dads_room_ac') }}"
+    icon: "mdi:thermostat"
   - unique_id: sensor.dads_room_ac_temp
     name: "Dad’s Room AC Temperature"
     state: "{{ state_attr('climate.dads_room_ac', 'temperature') }}"
@@ -94,6 +98,10 @@
 
 # Living Room
 
+  - unique_id: sensor.living_room_ac_mode
+    name: "Living Room AC Mode"
+    state: "{{ states('climate.living_room_ac') }}"
+    icon: "mdi:thermostat"
   - unique_id: sensor.living_room_ac_temp
     name: "Living Room AC Temperature"
     state: "{{ state_attr('climate.living_room_ac', 'temperature') }}"
@@ -155,6 +163,10 @@
 
 # Mom’s Room
 
+  - unique_id: sensor.moms_room_ac_mode
+    name: "Mom’s Room AC Mode"
+    state: "{{ states('climate.moms_room_ac') }}"
+    icon: "mdi:thermostat"
   - unique_id: sensor.moms_room_ac_temp
     name: "Mom’s Room AC Temperature"
     state: "{{ state_attr('climate.moms_room_ac', 'temperature') }}"
