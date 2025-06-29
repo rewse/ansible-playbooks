@@ -18,6 +18,7 @@
 - name: Install packages by mas
   command: mas install {{item}}
   with_items:
+    - 1212616790  # Microsoft To Do
     - 1639692859  # WattsConnected
   tags: [darwin-business, package, mas]
 
