@@ -62,6 +62,13 @@
   state_characteristic: mean
   max_age:
     hours: 51
+- platform: statistics
+  unique_id: sensor.study_motion_count
+  name: "Study Motion Count"
+  entity_id: binary_sensor.study_motion
+  state_characteristic: count
+  max_age:
+    minutes: 10
 
 # Mom’s Room
 
