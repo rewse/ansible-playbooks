@@ -727,32 +727,43 @@
                     - "fan_only"
                     - "cool"
           sequence:
-            - if:
-                - condition: state
-                  entity_id: input_boolean.living_room_window_mode
-                  state: "on"
-                  for:
-                    minutes: 10
-              then:
-                - event: "living_room_temp_too_high"
-              else:
-                - action: climate.set_temperature
-                  target:
-                    entity_id: climate.living_room_ac
-                  data:
-                    hvac_mode: "cool"
-                    temperature: "{{ int(states('input_number.living_room_temp_target')) }}"
-                - action: notify.all_devices
-                  data:
-                    message: >-
-                      Turned on Living Room AC Cool.
-                      Current: {{ states('sensor.living_room_temperature') }}°C
-                    data:
-                      push:
-                        interruption-level: time-sensitive
-                      url: "/lovelace/home"
-                - delay:
-                    hours: 2
+            - choose:
+                - conditions:
+                    - or:
+                        - condition: state
+                          entity_id: input_boolean.living_room_window_mode
+                          state: "on"
+                          for:
+                            minutes: 10
+                        - condition: state
+                          entity_id: input_select.time_mode
+                          state: "Late Night"
+                  sequence:
+                    - event: "living_room_temp_too_high"
+                - conditions:
+                    - condition: state
+                      entity_id: input_boolean.living_room_window_mode
+                      state: "off"
+                      for:
+                        minutes: 10
+                  sequence:
+                    - action: climate.set_temperature
+                      target:
+                        entity_id: climate.living_room_ac
+                      data:
+                        hvac_mode: "cool"
+                        temperature: "{{ int(states('input_number.living_room_temp_target')) }}"
+                    - action: notify.all_devices
+                      data:
+                        message: >-
+                          Turned on Living Room AC Cool.
+                          Current: {{ states('sensor.living_room_temperature') }}°C
+                        data:
+                          push:
+                            interruption-level: time-sensitive
+                          url: "/lovelace/home"
+                    - delay:
+                        hours: 2
         - conditions:
             - condition: template
               value_template: >-
@@ -832,31 +843,42 @@
                     - "fan_only"
                     - "dry"
           sequence:
-            - if:
-                - condition: state
-                  entity_id: input_boolean.living_room_window_mode
-                  state: "on"
-                  for:
-                    minutes: 10
-              then:
-                - event: "living_room_humidity_too_high"
-              else:
-                - action: climate.set_hvac_mode
-                  target:
-                    entity_id: climate.living_room_ac
-                  data:
-                    hvac_mode: "dry"
-                - action: notify.all_devices
-                  data:
-                    message: >-
-                      Turned on Living Room AC Dry.
-                      Current: {{ states('sensor.living_room_humidity') }}%
-                    data:
-                      push:
-                        interruption-level: time-sensitive
-                      url: "/lovelace/home"
-                - delay:
-                    hours: 2
+            - choose:
+                - conditions:
+                    - or:
+                        - condition: state
+                          entity_id: input_boolean.living_room_window_mode
+                          state: "on"
+                          for:
+                            minutes: 10
+                        - condition: state
+                          entity_id: input_select.time_mode
+                          state: "Late Night"
+                  sequence:
+                    - event: "living_room_humidity_too_high"
+                - conditions:
+                    - condition: state
+                      entity_id: input_boolean.living_room_window_mode
+                      state: "off"
+                      for:
+                        minutes: 10
+                  sequence:
+                    - action: climate.set_hvac_mode
+                      target:
+                        entity_id: climate.living_room_ac
+                      data:
+                        hvac_mode: "dry"
+                    - action: notify.all_devices
+                      data:
+                        message: >-
+                          Turned on Living Room AC Dry.
+                          Current: {{ states('sensor.living_room_humidity') }}%
+                        data:
+                          push:
+                            interruption-level: time-sensitive
+                          url: "/lovelace/home"
+                    - delay:
+                        hours: 2
         - conditions:
             - or:
                 - and:
@@ -932,32 +954,43 @@
               entity_id: switch.living_area_floor_heatings
               state: "off"
           sequence:
-            - if:
-                - condition: state
-                  entity_id: input_boolean.living_room_window_mode
-                  state: "on"
-                  for:
-                    minutes: 10
-              then:
-                - event: "living_room_temp_too_low"
-              else:
-                - action: switch.turn_on
-                  target:
-                    entity_id: switch.living_room_floor_heating
-                - action: switch.turn_on
-                  target:
-                    entity_id: switch.study_floor_heating
-                - action: notify.all_devices
-                  data:
-                    message: >-
-                      Turned on Living Area Floor Heating.
-                      Current: {{ states('sensor.living_room_temperature') }}°C
-                    data:
-                      push:
-                        interruption-level: time-sensitive
-                      url: "/lovelace/home"
-                - delay:
-                    hours: 2
+            - choose:
+                - conditions:
+                    - or:
+                        - condition: state
+                          entity_id: input_boolean.living_room_window_mode
+                          state: "on"
+                          for:
+                            minutes: 10
+                        - condition: state
+                          entity_id: input_select.time_mode
+                          state: "Late Night"
+                  sequence:
+                    - event: "living_room_temp_too_low"
+                - conditions:
+                    - condition: state
+                      entity_id: input_boolean.living_room_window_mode
+                      state: "off"
+                      for:
+                        minutes: 10
+                  sequence:
+                    - action: switch.turn_on
+                      target:
+                        entity_id: switch.living_room_floor_heating
+                    - action: switch.turn_on
+                      target:
+                        entity_id: switch.study_floor_heating
+                    - action: notify.all_devices
+                      data:
+                        message: >-
+                          Turned on Living Area Floor Heating.
+                          Current: {{ states('sensor.living_room_temperature') }}°C
+                        data:
+                          push:
+                            interruption-level: time-sensitive
+                          url: "/lovelace/home"
+                    - delay:
+                        hours: 2
         - conditions:
             - condition: template
               value_template: >-
@@ -1016,28 +1049,39 @@
               entity_id: switch.living_room_humidifier
               state: "off"
           sequence:
-            - if:
-                - condition: state
-                  entity_id: input_boolean.living_room_window_mode
-                  state: "on"
-                  for:
-                    minutes: 10
-              then:
-                - event: "living_room_humidity_too_low"
-              else:
-                - action: switch.toggle
-                  entity_id: switch.living_room_humidifier
-                - action: notify.all_devices
-                  data:
-                    message: >-
-                      Turned on Living Room Humidifier.
-                      Current: {{ states('sensor.living_room_humidity') }}%
-                    data:
-                      push:
-                        interruption-level: time-sensitive
-                      url: "/lovelace/home"
-                - delay:
-                    hours: 1
+            - choose:
+                - conditions:
+                    - or:
+                        - condition: state
+                          entity_id: input_boolean.living_room_window_mode
+                          state: "on"
+                          for:
+                            minutes: 10
+                        - condition: state
+                          entity_id: input_select.time_mode
+                          state: "Late Night"
+                  sequence:
+                    - event: "living_room_humidity_too_low"
+                - conditions:
+                    - condition: state
+                      entity_id: input_boolean.living_room_window_mode
+                      state: "off"
+                      for:
+                        minutes: 10
+                  sequence:
+                    - action: switch.toggle
+                      entity_id: switch.living_room_humidifier
+                    - action: notify.all_devices
+                      data:
+                        message: >-
+                          Turned on Living Room Humidifier.
+                          Current: {{ states('sensor.living_room_humidity') }}%
+                        data:
+                          push:
+                            interruption-level: time-sensitive
+                          url: "/lovelace/home"
+                    - delay:
+                        hours: 1
         - conditions:
             - condition: template
               value_template: >-
