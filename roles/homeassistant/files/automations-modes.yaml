@@ -53,7 +53,17 @@
                       state: "on" 
             - condition: numeric_state
               entity_id: sensor.living_room_light_level
-              above: input_number.time_mode_twilight_light_level
+              below: input_number.time_mode_twilight_light_level
+          sequence:
+            - action: input_select.select_option
+              target: 
+                entity_id: input_select.time_mode
+              data:
+                option: "Twilight"
+        - conditions:
+            - condition: sun
+              after: sunrise
+              before: sunset
             - not:
                 - condition: state
                   entity_id: input_select.time_mode
@@ -64,28 +74,6 @@
                 entity_id: input_select.time_mode
               data:
                 option: "Daytime"
-        - conditions:
-            - or:
-                - condition: sun
-                  after: sunrise
-                  after_offset: "2:00:00"
-                  before: sunset
-                - and:
-                    - condition: sun
-                      after: sunrise
-                      before: sunset
-                    - condition: state
-                      entity_id: binary_sensor.living_room_motion
-                      state: "on" 
-            - condition: numeric_state
-              entity_id: sensor.living_room_light_level
-              below: input_number.time_mode_twilight_light_level
-          sequence:
-            - action: input_select.select_option
-              target: 
-                entity_id: input_select.time_mode
-              data:
-                option: "Twilight"
         - conditions:
             - condition: sun
               after: sunset
@@ -119,20 +107,5 @@
                 entity_id: input_select.time_mode
               data:
                 option: "Midnight"
-        - conditions:
-            - condition: sun
-              after: sunrise
-            - condition: sun
-              before: sunrise
-              before_offset: "2:00:00"
-            - condition: state
-              entity_id: input_select.time_mode
-              state: "Midnight"
-          sequence:
-            - action: input_select.select_option
-              target: 
-                entity_id: input_select.time_mode
-              data:
-                option: "Dark"
   trace:
     stored_traces: 1000
