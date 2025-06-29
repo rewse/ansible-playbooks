@@ -6,6 +6,11 @@
         - person.shibata_tats
         - person.shibata_akiko
         - person.shibata_kayano
+    - trigger: state
+      entity_id:
+        - person.shibata_tats
+        - person.shibata_akiko
+        - person.shibata_kayano
       for:
         minutes: 10
     - trigger: homeassistant
