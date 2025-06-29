@@ -637,16 +637,15 @@
     - trigger: homeassistant
       event: start
   conditions:
-    condition: state
-    entity_id: input_select.season_mode
-    state: "Summer"
+    - condition: state
+      entity_id: input_select.season_mode
+      state: "Summer"
   actions:
     - variables:
         action: "idle"
     - choose:
         - conditions:
-            - condition: template
-              value_template: >-
+            - >-
                 {{
                   float(states('sensor.dads_room_temperature')) > 
                   float(states('input_number.dads_room_temp_target')) +
@@ -668,15 +667,13 @@
             - variables:
                 action: "on"
         - conditions:
-            - condition: template
-              value_template: >-
+            - >-
                 {{
                   float(states('sensor.dads_room_temperature')) < 
                   float(states('input_number.dads_room_temp_target')) -
                   float(states('input_number.dads_room_temp_min_diff'))
                 }} 
-            - condition: template
-              value_template: >-
+            - >-
                 {{
                   float(states('sensor.dads_room_humidity')) <
                   float(states('input_number.dads_room_humidity_target')) +
@@ -720,23 +717,21 @@
     - trigger: homeassistant
       event: start
   conditions:
-    condition: state
-    entity_id: input_select.season_mode
-    state: "Summer"
+    - condition: state
+      entity_id: input_select.season_mode
+      state: "Summer"
   action:
     - variables:
         action: "idle"
     - choose:
         - conditions:
-            - condition: template
-              value_template: >-
+            - >-
                 {{
                   float(states('sensor.dads_room_humidity')) > 
                   float(states('input_number.dads_room_humidity_target')) +
                   float(states('input_number.dads_room_humidity_max_diff'))
                 }}
-            - condition: template
-              value_template: >-
+            - >-
                 {{
                   float(states('sensor.dads_room_temperature')) <
                   float(states('input_number.dads_room_temp_target')) +
@@ -759,8 +754,7 @@
         - conditions:
             - or:
                 - and:
-                    - condition: template
-                      value_template: >-
+                    - >-
                         {{
                           float(states('sensor.dads_room_humidity')) < 
                           float(states('input_number.dads_room_humidity_target')) -
@@ -770,8 +764,7 @@
                       entity_id: climate.dads_room_ac
                       state: "dry"
                 - and:
-                    - condition: template
-                      value_template: >-
+                    - >-
                         {{
                           float(states('sensor.dads_room_temperature')) < 
                           float(states('input_number.dads_room_temp_target')) -
@@ -815,16 +808,15 @@
     - trigger: homeassistant
       event: start
   conditions:
-    condition: state
-    entity_id: input_select.season_mode
-    state: "Winter"
+    - condition: state
+      entity_id: input_select.season_mode
+      state: "Winter"
   actions:
     - variables:
         action: "idle"
     - choose:
         - conditions:
-            - condition: template
-              value_template: >-
+            - >-
                 {{
                   float(states('sensor.dads_room_temperature')) < 
                   float(states('input_number.dads_room_temp_target')) +
@@ -844,8 +836,7 @@
             - variables:
                 action: "on"
         - conditions:
-            - condition: template
-              value_template: >-
+            - >-
                 {{
                   float(states('sensor.dads_room_temperature')) > 
                   float(states('input_number.dads_room_temp_target')) -
@@ -893,8 +884,7 @@
         action: "idle"
     - choose:
         - conditions:
-            - condition: template
-              value_template: >-
+            - >-
                 {{
                   float(states('sensor.dads_room_humidity')) < 
                   float(states('input_number.dads_room_humidity_target')) -
@@ -907,8 +897,7 @@
             - variables:
                 action: "on"
         - conditions:
-            - condition: template
-              value_template: >-
+            - >-
                 {{
                   float(states('sensor.dads_room_humidity')) >
                   float(states('input_number.dads_room_humidity_target')) +
