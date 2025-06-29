@@ -1014,8 +1014,6 @@
             - condition: state
               entity_id: climate.moms_room_ac
               state: "heat"
-              for:
-                hours: 2
           sequence:
             - action: climate.turn_off
               target:
