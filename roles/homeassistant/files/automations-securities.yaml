@@ -6,6 +6,8 @@
         - person.shibata_tats
         - person.shibata_akiko
         - person.shibata_kayano
+      for:
+        minutes: 10
     - trigger: homeassistant
       event: start
   actions:
@@ -29,6 +31,8 @@
                 - person.shibata_akiko
                 - person.shibata_kayano
               state: "not_home"
+              for:
+                minutes: 10
             - not:
                 - condition: state
                   entity_id: alarm_control_panel.home
