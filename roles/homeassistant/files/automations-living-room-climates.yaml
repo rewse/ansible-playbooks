@@ -1005,8 +1005,6 @@
             - condition: state
               entity_id: switch.living_area_floor_heatings
               state: "on"
-              for:
-                hours: 2
           sequence:
             - action: switch.turn_off
               target:
