@@ -70,10 +70,6 @@
   triggers:
     - trigger: state
       entity_id: input_select.living_room_light_mode
-    - trigger: state
-      entity_id: input_select.living_room_scene
-      for:
-        hours: 1
     - trigger: homeassistant
       event: start
   actions:
