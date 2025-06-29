@@ -13,6 +13,7 @@
       - sony-ps-remote-play
       - steam
       - steelseries-gg
+      - ticktick
     update_homebrew: yes
   tags: [darwin-personal, package, cask]
 
