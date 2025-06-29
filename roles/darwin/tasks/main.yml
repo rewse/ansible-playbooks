@@ -59,6 +59,8 @@
       - istat-menus
       - jordanbaird-ice
       - karabiner-elements
+      - keka
+      - kekaexternalhelper
       - keyboard-maestro
       - keycastr
       - lm-studio
@@ -93,7 +95,6 @@
     - 1449412482  # Reeder 4
     - 1187772509  # stts
     - 899247664   # TestFlight
-    - 425424353   # The Unarchiver
     - 1385561119  # Ubiquiti WiFiman
     - 494803304   # WiFi Explorer
     - 1295203466  # Windows App
