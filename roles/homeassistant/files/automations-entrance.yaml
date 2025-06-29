@@ -1,5 +1,5 @@
 - id: automation.auto_lock_entrance_locks
-  alias: "Auto-Lock Entrnace Locks"
+  alias: "Auto-Lock Entrance Locks"
   triggers:
     - trigger: time_pattern
       minutes: "/5"
@@ -9,6 +9,7 @@
       entity_id:
         - lock.entrance_lock_bottom
         - lock.entrance_lock_top
+      match: any
       state: "unlocked"
       for:
         minutes: "{{ int(states('input_number.entrance_auto_lock_minutes')) }}"
