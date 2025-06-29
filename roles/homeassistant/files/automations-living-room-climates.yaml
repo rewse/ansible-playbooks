@@ -152,6 +152,129 @@
                 hours: 2
   trace:
     stored_traces: 100
+- id: automation.change_living_room_ac_mode
+  alias: "Change Living Room AC Mode"
+  triggers:
+    - trigger: time_pattern
+      minutes: "/5"
+      seconds: 30
+    - trigger: homeassistant
+      event: start
+  conditions:
+    - condition: state
+      entity_id: climate.living_room_ac
+      state:
+        - "cool"
+        - "dry"
+      for:
+        minutes: 10
+  actions:
+    - choose:
+        - conditions:
+            - condition: state
+              entity_id: climate.living_room_ac
+              state: "dry"
+            - or:
+                - and:
+                    - >-
+                        {{
+                          float(states('sensor.living_room_temperature')) <
+                          float(states('input_number.living_room_temp_target'))
+                        }}
+                    - >-
+                        {{
+                          float(states('sensor.living_room_humidity')) <
+                          float(states('input_number.living_room_humidity_target'))
+                        }}
+                - and:
+                    - >-
+                        {{
+                          float(states('sensor.living_room_temperature')) <
+                          float(states('input_number.living_room_temp_target'))
+                        }}
+                    - >-
+                        {{
+                          float(states('sensor.living_room_humidity')) >
+                          float(states('input_number.living_room_humidity_target'))
+                        }}
+                    - >-
+                        {{
+                          (
+                            float(states('input_number.living_room_temp_target')) -
+                            float(states('sensor.living_room_temperature')) 
+                          ) / float(states('input_number.living_room_temp_min_diff')) >
+                          (
+                            float(states('sensor.living_room_humidity')) - 
+                            float(states('input_number.living_room_humidity_target'))
+                          ) / float(states('input_number.living_room_humidity_max_diff'))
+                        }}
+          sequence:
+            - action: climate.set_hvac_mode
+              target:
+                entity_id: climate.living_room_ac 
+              data:
+                hvac_mode: "cool"
+            - delay:
+                seconds: 5
+            - action: climate.set_temperature
+              target:
+                entity_id: climate.living_room_ac 
+              data:
+                temperature: "{{ int(states('sensor.living_room_ac_temp')) + 1 }}"
+            - delay:
+                minutes: 29
+        - conditions:
+            - >-
+              {{
+                float(states('sensor.living_room_temperature')) >
+                float(states('input_number.living_room_temp_target'))
+              }}
+            - >-
+              {{
+                (
+                  float(states('sensor.living_room_temperature')) - 
+                  float(states('input_number.living_room_temp_target'))
+                ) / float(states('input_number.living_room_temp_max_diff')) >
+                (
+                  float(states('sensor.living_room_humidity')) - 
+                  float(states('input_number.living_room_humidity_target'))
+                ) / float(states('input_number.living_room_humidity_max_diff'))
+              }}
+          sequence:
+            - action: climate.set_hvac_mode
+              target:
+                entity_id: climate.living_room_ac 
+              data:
+                hvac_mode: "cool"
+            - delay:
+                minutes: 29
+        - conditions:
+            - >-
+              {{
+                float(states('sensor.living_room_humidity')) >
+                float(states('input_number.living_room_humidity_target'))
+              }}
+            - >-
+              {{
+                (
+                  float(states('sensor.living_room_temperature')) - 
+                  float(states('input_number.living_room_temp_target'))
+                ) / float(states('input_number.living_room_temp_max_diff')) <
+                (
+                  float(states('sensor.living_room_humidity')) - 
+                  float(states('input_number.living_room_humidity_target'))
+                ) / float(states('input_number.living_room_humidity_max_diff'))
+              }}
+          sequence:
+            - action: climate.set_hvac_mode
+              target:
+                entity_id: climate.living_room_ac 
+              data:
+                hvac_mode: "dry"
+            - delay:
+                minutes: 29
+  trace:
+    stored_traces: 100
 - id: automation.plan_to_turn_on_living_room_ac_internal_clean
   alias: "Plan to Turn on Living Room AC Internal Clean"
   triggers:
