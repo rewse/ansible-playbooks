@@ -73,6 +73,38 @@
         temperature: "{{ int(states('input_number.moms_room_temp_target')) }}"
   trace:
     stored_traces: 100
+- id: automation.change_moms_room_ac_fan_mode
+  alias: "Change Mom’s Room AC Fan Mode"
+  triggers:
+    - trigger: state
+      entity_id: climate.moms_room_ac
+      not_to:
+        - "off"
+    - trigger: state
+      entity_id: input_select.time_mode
+  actions:
+    - delay:
+        seconds: 3
+    - if:
+        - condition: state
+          entity_id: input_select.time_mode
+          state:
+            - "Late Night"
+            - "Midnight"
+      then:
+        - action: climate.set_fan_mode
+          target:
+            entity_id: climate.moms_room_ac
+          data:
+            fan_mode: "Silence"
+      else:
+        - action: climate.set_fan_mode
+          target:
+            entity_id: climate.moms_room_ac
+          data:
+            fan_mode: "Auto"
+  trace:
+    stored_traces: 100
 - id: automation.notify_moms_room_climate
   alias: "Notify Mom’s Room Climate"
   triggers:
