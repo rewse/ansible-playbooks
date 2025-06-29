@@ -4,9 +4,7 @@
     - trigger: state
       entity_id: sensor.mamorail
   conditions:
-    - condition: template
-      value_template: >-
-        {{ (as_timestamp(now()) - as_timestamp(state_attr('sensor.mamorail', 'Date'))) < 180 }}
+    - "{{ (as_timestamp(now()) - as_timestamp(state_attr('sensor.mamorail', 'Date'))) < 180 }}"
   actions:
     - delay:
         seconds: 5
@@ -44,9 +42,7 @@
     - trigger: state
       entity_id: sensor.mll
   conditions:
-    - condition: template
-      value_template: >-
-        {{ (as_timestamp(now()) - as_timestamp(state_attr('sensor.mll', 'Date'))) < 180 }}
+    - "{{ (as_timestamp(now()) - as_timestamp(state_attr('sensor.mll', 'Date'))) < 180 }}"
   actions:
     - delay:
         seconds: 5
