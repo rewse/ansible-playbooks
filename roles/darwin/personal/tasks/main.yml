@@ -10,6 +10,7 @@
       - microsoft-office
       - ollama
       - raspberry-pi-imager
+      - sony-ps-remote-play
       - steam
       - steelseries-gg
     update_homebrew: yes
