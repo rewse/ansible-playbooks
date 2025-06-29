@@ -297,7 +297,7 @@ dads_room_temp_target_absent_winter:
 entrance_auto_lock_minutes:
   name: "Entrance Auto-Lock Minutes"
   min: 0
-  max: 60
+  max: 1440
   unit_of_measurement: "min"
   icon: "mdi:lock-clock"
 entrance_auto_lock_minutes_daytime:
