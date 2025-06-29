@@ -370,8 +370,7 @@
                 - "Turned on Late Night"
                 - "Turned on Midnight"
                 - "Dark"
-            - condition: template
-              value_template: >-
+            - >-
                 {{
                   as_timestamp(now()) - as_timestamp(as_datetime(state_attr(
                     'automation.select_dads_room_light_mode', 'last_triggered'
