@@ -921,6 +921,42 @@
                 hours: 2
   trace:
     stored_traces: 100
+- id: automation.toggle_living_room_fan
+  alias: "Toggle Living Room Fan"
+  triggers:
+    - trigger: time_pattern
+      minutes: "/5"
+      seconds: 4
+    - trigger: homeassistant
+      event: start
+  action:
+    - choose:
+        - conditions:
+            - condition: numeric_state
+              entity_id: sensor.study_motion_count
+              above: 10
+            - condition: state
+              entity_id: fan.living_room_fan
+              state: "off"
+          sequence:
+            - action: fan.turn_on
+              target:
+                entity_id: fan.living_rom_fan
+        - conditions:
+            - condition: numeric_state
+              entity_id: sensor.study_motion_count
+              below: 10
+            - condition: state
+              entity_id: fan.living_room_fan
+              state: "on"
+              for:
+                minutes: 20
+          sequence:
+            - action: fan.turn_off
+              target:
+                entity_id: fan.living_rom_fan
+  trace:
+    stored_traces: 100
 - id: automation.toggle_living_area_floor_heating
   alias: "Toggle Living Area Floor Heating"
   triggers:
