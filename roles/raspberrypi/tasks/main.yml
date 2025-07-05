@@ -11,24 +11,6 @@
       - snmp-mibs-downloader
   tags: [raspberrypi, package]
 
-- name: Create /opt/raspberrypi
-  file:
-    path: /opt/raspberrypi
-    state: directory
-  tags: [raspberrypi, package]
-
-- name: Create venv
-  command: python3 -m venv /opt/raspberrypi
-  tags: [raspberrypi, package]
-
-- name: Install packages with pip3
-  pip:
-    name:
-      - pydaikin
-      - python-miio
-    virtualenv: /opt/raspberrypi
-  tags: [raspberrypi, package]
-
 - name: Add NTP servers
   lineinfile:
     dest: /etc/systemd/timesyncd.conf
