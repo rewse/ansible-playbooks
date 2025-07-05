@@ -1,4 +1,11 @@
 ---
+- name: Install packages by homebrew
+  homebrew:
+    name: 
+      - gemini-cli
+    update_homebrew: yes
+  tags: [darwin, package, homebrew]
+
 - name: Install packages by homebrew_cask
   homebrew_cask:
     name: 
