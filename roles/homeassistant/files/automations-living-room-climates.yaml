@@ -934,27 +934,27 @@
         - conditions:
             - condition: numeric_state
               entity_id: sensor.study_motion_count
-              above: 10
+              above: 5
             - condition: state
               entity_id: fan.living_room_fan
               state: "off"
           sequence:
             - action: fan.turn_on
               target:
-                entity_id: fan.living_rom_fan
+                entity_id: fan.living_room_fan
         - conditions:
             - condition: numeric_state
               entity_id: sensor.study_motion_count
-              below: 10
+              below: 5
             - condition: state
               entity_id: fan.living_room_fan
               state: "on"
               for:
-                minutes: 20
+                minutes: 60
           sequence:
             - action: fan.turn_off
               target:
-                entity_id: fan.living_rom_fan
+                entity_id: fan.living_room_fan
   trace:
     stored_traces: 100
 - id: automation.toggle_living_area_floor_heating
