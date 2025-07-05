@@ -466,7 +466,7 @@
         - input_number.dads_room_temp_target
         - input_number.dads_room_humidity_target
       for:
-        hours: 1
+        hours: 2
     - trigger: homeassistant
       event: start
   actions:
