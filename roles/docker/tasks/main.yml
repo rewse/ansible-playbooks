@@ -7,15 +7,15 @@
       - python3-docker
   tags: [docker, package]
 
-- name: Create a docker-compose.yml
+- name: Create a compose.yml
   file:
-    path: /etc/docker-compose.yml
+    path: /etc/compose.yml
     state: touch
   tags: [docker]
 
 - name: Add service
   lineinfile:
-    path: /etc/docker-compose.yml
+    path: /etc/compose.yml
     insertbefore: BOF
     regexp: '^services:'
     line: 'services:'
