@@ -26,19 +26,20 @@
 # Ref: https://docs.hub.amazon.dev/builder-toolbox/user-guide/getting-started/
 
 # Run `mwinit -o` before the command
-# Ref: https://w.amazon.com/bin/view/DevAccount/Docs
-- name: install ada
-  command: toolbox install ada
-  tags: [darwin-business, package, toolbox, ada]
 
 # Ref: https://w.amazon.com/bin/view/Isengard-cli/
 - name: register isengard-cli repository
   command: toolbox registry add s3://buildertoolbox-registry-isengard-cli-us-west-2/tools.json
-  tags: [darwin-business, package, toolbox, isengard-cli]
+  tags: [darwin-business, package, toolbox]
 
-- name: install isengard-cli
-  command: toolbox install isengard-cli
-  tags: [darwin-business, package, toolbox, isengard-cli]
+# Ref: https://w.amazon.com/bin/view/DevAccount/Docs
+- name: install with toolbox
+  command: toolbox install {{ item }}
+  with_items:
+    - ada
+    - isengard-cli
+    - q
+  tags: [darwin-business, package, toolbox]
 
 - name: update toolbox
   command: toolbox update
