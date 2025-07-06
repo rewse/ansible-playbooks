@@ -1,9 +1,25 @@
-select_scene_living_room_dark:
-  alias: "Select Scene Living Room Dark"
+darken_living_room:
+  alias: "Darken Living Room"
   sequence:
     - action: input_select.select_option
       target: 
         entity_id: input_select.living_room_scene
       data:
         option: scene.living_room_dark
+    - if:
+        - not:
+            - condition: state
+              entity_id: climate.living_room_ac
+              state: "off"
+      then:
+        - action: climate.turn_off
+          target:
+            entity_id: climate.living_room_ac
+        - action: notify.tats_devices
+          data:
+            message: "Turned off Living Room AC"
+            data:
+              push:
+                interruption-level: time-sensitive
+              url: "/lovelace/home"
   icon: "mdi:bed"
