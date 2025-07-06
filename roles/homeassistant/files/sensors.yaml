@@ -68,7 +68,7 @@
   entity_id: binary_sensor.study_motion
   state_characteristic: count
   max_age:
-    minutes: 10
+    minutes: 60
 
 # Mom’s Room
 
