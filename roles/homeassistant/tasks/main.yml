@@ -112,6 +112,12 @@
     dest: /srv/homeassistant/config/automations
   tags: [homeassistant, homeassistant-automation]
 
+- name: Copy automations-frontend.yaml
+  copy:
+    src: automations-frontend.yaml
+    dest: /srv/homeassistant/config/automations
+  tags: [homeassistant, homeassistant-automation]
+
 - name: Copy automations-info.yaml
   copy:
     src: automations-info.yaml
@@ -544,6 +550,36 @@
     remote_src: yes
   notify: Restart homeassistant
   tags: [homeassistant, homeassistant-custom]
+
+- name: Create themes dir
+  file:
+    path: /srv/homeassistant/config/themes
+    state: directory
+  tags: [homeassistant, homeassistant-theme]
+
+- name: Download frosted-glass
+  unarchive:
+    src: https://github.com/wessamlauf/homeassistant-frosted-glass-themes/archive/refs/tags/v{{ frosted_glass_version }}.zip
+    dest: /tmp
+    remote_src: yes
+  tags: [homeassistant, homeassistant-theme]
+
+- name: Copy Frosted Glass Themes
+  copy:
+    src: /tmp/homeassistant-frosted-glass-themes-{{ frosted_glass_version }}/themes/{{ item }}
+    dest: /srv/homeassistant/config/themes
+    remote_src: yes
+  with_items:
+    - Frosted Glass Dark.yaml
+    - Frosted Glass Light.yaml
+  tags: [homeassistant, homeassistant-theme]
+
+- name: Copy Frosted Glass www
+  copy:
+    src: /tmp/homeassistant-frosted-glass-themes-{{ frosted_glass_version }}/www/frosted-glass
+    dest: /srv/homeassistant/config/www
+    remote_src: yes
+  tags: [homeassistant, homeassistant-theme]
 
 - name: Create www dir
   file:

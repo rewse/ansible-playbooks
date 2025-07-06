@@ -1,0 +1,24 @@
+- id: automation.set_theme
+  alias: "Set Theme"
+  triggers:
+    - trigger: state
+      entity_id: input_select.time_mode
+    - trigger: homeassistant
+      event: start
+  actions:
+    - if:
+        - condition: state
+          entity_id: input_select.time_mode
+          state:
+            - "Daytime"
+            - "Twilight"
+      then:
+        - action: frontend.set_theme
+          data:
+            name: "Frosted Glass Light"
+      else:
+        - action: frontend.set_theme
+          data:
+            name: "Frosted Glass Dark"
+  trace:
+    stored_traces: 100
