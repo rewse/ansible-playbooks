@@ -949,8 +949,6 @@
             - condition: state
               entity_id: fan.living_room_fan
               state: "on"
-              for:
-                minutes: 60
           sequence:
             - action: fan.turn_off
               target:
