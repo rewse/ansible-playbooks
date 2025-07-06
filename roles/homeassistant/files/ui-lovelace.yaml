@@ -1,7 +1,0 @@
-title: Overview
-views:
-  - !include ui/home.yaml
-  - !include ui/livingroom.yaml
-  - !include ui/dadsroom.yaml
-  - !include ui/momsroom.yaml
-  - !include ui/others.yaml
