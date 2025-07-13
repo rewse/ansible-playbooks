@@ -782,6 +782,8 @@
             - condition: state
               entity_id: climate.living_room_ac
               state: "cool"
+              for:
+                minutes: 30
           sequence:
             - action: climate.turn_off
               target:
@@ -893,6 +895,8 @@
                     - condition: state
                       entity_id: climate.living_room_ac
                       state: "dry"
+                      for:
+                        minutes: 30
                 - and:
                     - >-
                         {{
@@ -903,6 +907,8 @@
                     - condition: state
                       entity_id: climate.living_room_ac
                       state: "dry"
+                      for:
+                        minutes: 30
           sequence:
             - action: climate.turn_off
               target:
@@ -1038,6 +1044,8 @@
             - condition: state
               entity_id: switch.living_area_floor_heatings
               state: "on"
+              for:
+                minutes: 30
           sequence:
             - action: switch.turn_off
               target:

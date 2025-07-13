@@ -681,6 +681,8 @@
             - condition: state
               entity_id: climate.dads_room_ac
               state: "cool"
+              for:
+                minutes: 30
           sequence:
             - action: climate.turn_off
               target:
@@ -762,6 +764,8 @@
                     - condition: state
                       entity_id: climate.dads_room_ac
                       state: "dry"
+                      for:
+                        minutes: 30
                 - and:
                     - >-
                         {{
@@ -772,6 +776,8 @@
                     - condition: state
                       entity_id: climate.dads_room_ac
                       state: "dry"
+                      for:
+                        minutes: 30
           sequence:
             - action: climate.turn_off
               target:
@@ -844,6 +850,8 @@
             - condition: state
               entity_id: climate.dads_room_ac
               state: "heat"
+              for:
+                minutes: 30
           sequence:
             - action: climate.turn_off
               target:
