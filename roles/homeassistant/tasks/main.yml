@@ -435,7 +435,7 @@
   notify: Restart homeassistant
   tags: [homeassistant, homeassistant-component]
 
-- name: Copy sensors.yaml
+- name: Copy script.yaml
   copy:
     src: scripts.yaml
     dest: /srv/homeassistant/config
@@ -570,15 +570,9 @@
     dest: /srv/homeassistant/config/themes
     remote_src: yes
   with_items:
+    - Frosted Glass.yaml
     - Frosted Glass Dark.yaml
     - Frosted Glass Light.yaml
-  tags: [homeassistant, homeassistant-theme]
-
-- name: Copy Frosted Glass www
-  copy:
-    src: /tmp/homeassistant-frosted-glass-themes-{{ frosted_glass_version }}/www/frosted-glass
-    dest: /srv/homeassistant/config/www
-    remote_src: yes
   tags: [homeassistant, homeassistant-theme]
 
 - name: Create www dir
@@ -666,15 +660,7 @@
           homeassistant.components.androidtv.media_player: error
           homeassistant.components.imap_email_content.sensor: warning
       lovelace:
-        mode: yaml
-        dashboards: !include dashboards.yaml
-        resources:
-          - url: "/local/mini-graph-card-bundle.js?v={{ mini_graph_card_version }}"
-            type: module
-          - url: "/local/mini-media-player-bundle.js?v={{ mini_media_player_version }}"
-            type: module
-          - url: "/local/simple-weather-card-bundle.js?v={{ simple_weather_card_version }}"
-            type: module
+        mode: storage
       recorder:
         db_url: !secret postgres_connstr
         purge_keep_days: 450
