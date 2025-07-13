@@ -60,17 +60,16 @@
           entity_id: input_select.season_mode
           state: "Summer"
       then:
-        variables:
-          hvac_mode: "cool"
+        - action: automation.trigger
+          target:
+            entity_id: automation.change_moms_room_ac_mode
       else:
-        variables:
-          hvac_mode: "heat"
-    - action: climate.set_temperature
-      target:
-        entity_id: climate.moms_room_ac
-      data:
-        hvac_mode: "{{ hvac_mode }}"
-        temperature: "{{ int(states('input_number.moms_room_temp_target')) }}"
+        - action: climate.set_temperature
+          target:
+            entity_id: climate.moms_room_ac
+          data:
+            hvac_mode: "heat"
+            temperature: "{{ int(states('input_number.moms_room_temp_target')) }}"
   trace:
     stored_traces: 100
 - id: automation.change_moms_room_ac_fan_mode
