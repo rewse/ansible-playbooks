@@ -753,9 +753,7 @@
             - not:
                 - condition: state
                   entity_id: climate.moms_room_ac
-                  state:
-                    - "fan_only"
-                    - "cool"
+                  state: "cool"
           sequence:
             - choose:
                 - conditions:
