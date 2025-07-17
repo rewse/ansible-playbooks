@@ -653,9 +653,7 @@
             - not:
                 - condition: state
                   entity_id: climate.dads_room_ac
-                  state:
-                    - "fan_only"
-                    - "cool"
+                  state: "cool"
           sequence:
             - action: climate.set_temperature
               target:
