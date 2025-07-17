@@ -721,9 +721,7 @@
             - not:
                 - condition: state
                   entity_id: climate.living_room_ac
-                  state:
-                    - "fan_only"
-                    - "cool"
+                  state: "cool"
             - not:
                 - condition: state
                   entity_id: input_select.time_mode
