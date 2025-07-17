@@ -214,6 +214,19 @@
     device_class: temperature
     icon: "mdi:thermometer-water"
 
+# Others
+
+  - unique_id: sensor.tomihisacho_rainsnow
+    name: "Tomihisacho RainSnow"
+    state: >-
+      {{
+        float(states('sensor.tomihisacho_rain')) + float(states('sensor.tomihisacho_snow'))
+      }}
+    unit_of_measurement: "mm/h"
+    state_class: measurement
+    device_class: precipitation_intensity
+    icon: "mdi:weather-pouring"
+
 # IMAP
 
 - triggers:
