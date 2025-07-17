@@ -323,6 +323,23 @@
           - automation.turn_on_moms_room_ac_internal_clean
   trace:
     stored_traces: 100
+- id: automation.recover_moms_room_ac_manual_internal_clean
+  alias: "Recover from Mom’s Room AC Manual Internal Clean"
+  triggers:
+    - trigger: time
+      at: input_datetime.moms_room_ac_manual_internal_clean
+  actions:
+    - action: automation.turn_on
+      target:
+        entity_id:
+          - automation.adjust_moms_room_ac_temperature
+          - automation.change_moms_room_ac_mode
+          - automation.toggle_moms_room_ac_cool
+          - automation.toggle_moms_room_ac_dry
+          - automation.toggle_moms_room_ac_heat
+          - automation.turn_on_moms_room_ac_internal_clean
+  trace:
+    stored_traces: 100
 - id: automation.select_moms_room_climate_mode
   alias: "Select Mom’s Room Climate Mode"
   triggers:
