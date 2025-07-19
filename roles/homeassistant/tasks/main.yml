@@ -225,21 +225,19 @@
   notify: Restart homeassistant
   tags: [homeassistant, homeassistant-component]
 
-- name: Config command_line
+- name: Config binary_sensor
   lineinfile:
     path: /srv/homeassistant/config/configuration.yaml
-    insertafter: '^climate:'
-    regexp: '^command_line:'
-    line: "command_line: !include command_lines.yaml"
+    insertafter: '^alexa:'
+    regexp: '^binary_sensor:'
+    line: "binary_sensor: !include binary_sensors.yaml"
   notify: Restart homeassistant
   tags: [homeassistant, homeassistant-component]
 
-- name: Copy command_lines.yaml
-  template:
-    src: command_lines.yaml.j2
-    dest: /srv/homeassistant/config/command_lines.yaml
-    variable_start_string: "[%"
-    variable_end_string: "%]"
+- name: Copy binary_sensors.yaml
+  copy:
+    src: binary_sensors.yaml
+    dest: /srv/homeassistant/config
   notify: Restart homeassistant
   tags: [homeassistant, homeassistant-component]
 
@@ -444,7 +442,7 @@
 - name: Config sensor
   lineinfile:
     path: /srv/homeassistant/config/configuration.yaml
-    insertafter: '^script:'
+    insertafter: '^binary_sensor:'
     regexp: '^sensor:'
     line: "sensor: !include sensors.yaml"
   notify: Restart homeassistant
