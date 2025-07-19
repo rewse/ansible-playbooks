@@ -19,10 +19,21 @@
 - hosts: ubuntu
   become: yes
   remote_user: ubuntu
+  tags: [ubuntu]
   roles:
     - ubuntu
     - postfix/client
     - dotfiles/linux
+```
+
+タスク例：
+```yaml
+- name: Install required packages
+  ansible.builtin.apt:
+    name: "{{ item }}"
+    state: present
+  loop: "{{ required_packages }}"
+  tags: [ubuntu, package]
 ```
 
 ## ロール構造
@@ -45,10 +56,12 @@
 - **変数**: スネークケース（アンダースコア付きの小文字）を使用
 - **ロール**: その目的を反映した説明的な名前を使用
 - **タグ**: ロール名をプレフィックスとしてカテゴリを続ける（例：`ubuntu,package`）
+- **タグのフォーマット**: タグは配列形式で記述する（例：`tags: [ubuntu, package]`）
 
 ## ベストプラクティス
 - 関連するロールをサブディレクトリに整理する（例：`zabbix/agent/ubuntu`）
 - 選択的な実行のためにタグを一貫して使用する
+- タグは常に配列形式で記述する（例：`tags: [ubuntu, package]`）
 - ロールは単一の責任に焦点を当てる
 - サービスの再起動やその他のトリガーされるアクションにはハンドラーを活用する
 - 動的構成ファイルにはテンプレートを使用する
