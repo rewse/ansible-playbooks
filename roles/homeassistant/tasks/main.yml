@@ -442,7 +442,7 @@
 - name: Config sensor
   lineinfile:
     path: /srv/homeassistant/config/configuration.yaml
-    insertafter: '^binary_sensor:'
+    insertafter: '^script:'
     regexp: '^sensor:'
     line: "sensor: !include sensors.yaml"
   notify: Restart homeassistant
