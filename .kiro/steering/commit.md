@@ -107,12 +107,43 @@ BREAKING CHANGE: This version requires new database schema.
 
 ## 便利なGitコマンド
 
-### ステージングされた変更の確認
+### 出力表示の確実性を高めるためのパイプ
 
-ステージングされた変更を確認する際は、`git diff --staged` の代わりに以下のコマンドを使用してください：
+以下のGitコマンドは、出力が表示されない場合があります。確実に標準出力に結果を表示するために、`cat` コマンドにパイプすることをお勧めします：
+
+#### ステージングされた変更の確認
 
 ```bash
 git diff --staged | cat
 ```
 
-これにより、標準出力に結果が確実に表示されます。`git diff --staged` だけでは結果が表示されない場合があります。
+#### コミット内容の表示
+
+```bash
+git show | cat
+git show HEAD | cat
+git show <commit-hash> | cat
+```
+
+#### コミット履歴の表示
+
+```bash
+git log | cat
+git log -p | cat
+git log --stat | cat
+git log --oneline | cat
+```
+
+#### ブランチ間の差分
+
+```bash
+git diff branch1..branch2 | cat
+```
+
+#### ファイルの変更履歴
+
+```bash
+git blame <file> | cat
+```
+
+これらのコマンドに `cat` をパイプすることで、ページャー（less/more）を経由せずに直接標準出力に結果が表示され、出力が確実に見えるようになります。特にスクリプトやエイリアス内でGitコマンドを使用する場合に有用です。
