@@ -9,3 +9,4 @@
   password: !secret regza_password
   value_template: "{{ value_json.mute == 'on' }}"
   device_class: sound
+  icon: "mdi:television-speaker-off"
