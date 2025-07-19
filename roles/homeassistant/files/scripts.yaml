@@ -23,6 +23,37 @@ darken_living_room:
                 interruption-level: time-sensitive
               url: "/lovelace/home"
   icon: "mdi:bed"
+force_entrance_door:
+  alias: "Force Entrance Door"
+  sequence:
+    - action: lock.unlock
+      target:
+        entity_id: lock.entrance_locks
+  icon: "mdi:lock-alert"
+open_entrance_door:
+  alias: "Open Entrance Door"
+  sequence:
+    - if:
+        - condition: state
+          entity_id:
+            - person.shibata_tats
+            - person.shibata_akiko
+            - person.shibata_kayano
+          match: any
+          state: home
+      then:
+        - action: lock.unlock
+          target:
+            entity_id: lock.entrance_locks
+      else:
+        - action: notify.all_devices
+          data:
+            title: "⚠️ ALARM"
+            message: "Nobody is in Home"
+            data:
+              push:
+                interruption-level: time-sensitive
+  icon: "mdi:door-open"
 prepare_for_dads_room_ac_manual_internal_clean:
   alias: "Prepare for Dad's Room AC Manual Internal Clean"
   sequence:
