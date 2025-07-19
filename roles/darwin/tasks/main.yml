@@ -8,6 +8,7 @@
       - fontforge
       - fping
       - jq
+      - kiro
       - mas
       - node
       - php
