@@ -21,6 +21,7 @@
       - tmux
       - tree
       - watch
+      - yamllint
       - zsh-vi-mode
     update_homebrew: yes
   tags: [darwin, package, homebrew]
