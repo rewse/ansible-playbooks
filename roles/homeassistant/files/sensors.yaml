@@ -48,25 +48,6 @@
 
 # Living Room
 
-- platform: rest
-  name: "REGZA Channel"
-  unique_id: sensor.regza_channel
-  resource: http://regza.rewse.jp/v2/remote/play/status
-  authentication: digest
-  username: !secret regza_username
-  password: !secret regza_password
-  value_template: "{{ value_json.epg_info_current.channel_name }}"
-  icon: "mdi:television-shimmer"
-- platform: rest
-  name: "REGZA Content Type"
-  unique_id: sensor.regza_content_type
-  resource: http://regza.rewse.jp/v2/remote/play/status
-  authentication: digest
-  username: !secret regza_username
-  password: !secret regza_password
-  value_template: "{{ value_json.content_type }}"
-  scan_interval: 5
-  icon: "mdi:radio-tower"
 - platform: statistics
   unique_id: sensor.living_room_humidity_difference_average
   name: "Living Room Humidity Difference Average"

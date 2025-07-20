@@ -1,3 +1,31 @@
+# Living Room
+
+- resource: http://regza.rewse.jp/v2/remote/play/status
+  scan_interval: 5
+  authentication: digest
+  username: !secret regza_username
+  password: !secret regza_password
+  sensor:
+    - unique_id: sensor.regza_channel
+      name: "REGZA Channel"
+      value_template: "{{ value_json.epg_info_current.channel_name }}"
+      icon: "mdi:television-shimmer"
+    - unique_id: sensor.regza_content_type
+      name: "REGZA Content Type"
+      value_template: "{{ value_json.content_type }}"
+      icon: "mdi:radio-tower"
+- resource: http://regza.rewse.jp/v2/remote/status/mute
+  authentication: digest
+  username: !secret regza_username
+  password: !secret regza_password
+  sensor:
+    - unique_id: binary_sensor.regza_volume_muted
+      name: "REGZA Volume Muted"
+      value_template: "{{ value_json.mute == 'on' }}"
+      icon: "mdi:television-speaker-off"
+
+# Others
+
 - resource: "https://weather.tsukumijima.net/api/forecast/city/130010"
   scan_interval: 3600
   headers:
