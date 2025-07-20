@@ -1,0 +1,27 @@
+---
+mcp_servers:
+  amzn-mcp:
+    command: "amzn-mcp"
+    args: []
+    disabled: false
+    autoApprove: []
+  aws-knowledge-mcp-server:
+    command: "npx"
+    args:
+      - "mcp-remote"
+      - "https://knowledge-mcp.global.api.aws"
+    disabled: false
+    autoApprove: []
+  builder-mcp:
+    command: "builder-mcp"
+    args: []
+    disabled: false
+    autoApprove: []
+  obsidian:
+    command: "npx"
+    args:
+      - "-y"
+      - "mcp-obsidian"
+      - "/Users/shibtats/Obsidian/vault"
+    disabled: false
+    autoApprove: []
