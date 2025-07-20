@@ -226,6 +226,41 @@
     state_class: measurement
     device_class: precipitation_intensity
     icon: "mdi:weather-pouring"
+  - unique_id: sensor.tomihisacho_weather_rich
+    name: "Tomihisacho Weather Rich"
+    state: "{{ states('sensor.tomihisacho_weather') }}"
+    icon: >-
+      {% if int(states('sensor.tomihisacho_weather_code')) >= 803 %}
+        mdi:weather-cloudy
+      {% elif int(states('sensor.tomihisacho_weather_code')) >= 801 %}
+        mdi:weather-partly-cloudy
+      {% elif int(states('sensor.tomihisacho_weather_code')) >= 800 %}
+        mdi:weather-sunny
+      {% elif int(states('sensor.tomihisacho_weather_code')) >= 700 %}
+        mdi:weather-fog
+      {% elif int(states('sensor.tomihisacho_weather_code')) >= 620 %}
+        mdi:weather-snowy-heavy
+      {% elif int(states('sensor.tomihisacho_weather_code')) >= 611 %}
+        mdi:weather-partly-snowy-rainy
+      {% elif int(states('sensor.tomihisacho_weather_code')) >= 600 %}
+        mdi:weather-snowy
+      {% elif int(states('sensor.tomihisacho_weather_code')) >= 520 %}
+        mdi:weather-rainy
+      {% elif int(states('sensor.tomihisacho_weather_code')) >= 511 %}
+        mdi:weather-snowy-rainy
+      {% elif int(states('sensor.tomihisacho_weather_code')) >= 500 %}
+        mdi:weather-partly-rainy
+      {% elif int(states('sensor.tomihisacho_weather_code')) >= 300 %}
+        mdi:weather-pouring
+      {% elif int(states('sensor.tomihisacho_weather_code')) >= 230 %}
+        mdi:weather-lightning-rainy
+      {% elif int(states('sensor.tomihisacho_weather_code')) >= 210 %}
+        mdi:weather-lightning
+      {% elif int(states('sensor.tomihisacho_weather_code')) >= 200 %}
+        mdi:weather-lightning-rainy
+      {% else %}
+        mdi:weather-partly-cloudy
+      {% endif %}
 
 # IMAP
 
