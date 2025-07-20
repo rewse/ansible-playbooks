@@ -225,26 +225,10 @@
   notify: Restart homeassistant
   tags: [homeassistant, homeassistant-component]
 
-- name: Config binary_sensor
-  lineinfile:
-    path: /srv/homeassistant/config/configuration.yaml
-    insertafter: '^alexa:'
-    regexp: '^binary_sensor:'
-    line: "binary_sensor: !include binary_sensors.yaml"
-  notify: Restart homeassistant
-  tags: [homeassistant, homeassistant-component]
-
-- name: Copy binary_sensors.yaml
-  copy:
-    src: binary_sensors.yaml
-    dest: /srv/homeassistant/config
-  notify: Restart homeassistant
-  tags: [homeassistant, homeassistant-component]
-
 - name: Config fan
   lineinfile:
     path: /srv/homeassistant/config/configuration.yaml
-    insertafter: '^command_lines:'
+    insertafter: '^alexa:'
     regexp: '^fan:'
     line: "fan: !include fans.yaml"
   notify: Restart homeassistant
