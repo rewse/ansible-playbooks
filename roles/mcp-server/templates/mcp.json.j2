@@ -1,0 +1,21 @@
+{
+  "mcpServers": {
+{% for server_name, server_config in mcp_servers.items() %}
+{% if not loop.first %},
+{% endif %}    "{{ server_name }}": {
+      "command": "{{ server_config.command }}",
+      "args": {{ server_config.args | to_json }},
+{% if server_config.env is defined %}
+      "env": {{ server_config.env | to_json }},
+{% endif %}
+{% if server_config.workingDir is defined %}
+      "workingDir": "{{ server_config.workingDir }}",
+{% endif %}
+      "disabled": {{ server_config.disabled | default(false) | lower }},
+      "autoApprove": {{ server_config.autoApprove | default([]) | to_json }}
+    }
+{% endfor %}
+  }{% if mcp_additional_config is defined %},
+{{ mcp_additional_config | indent(2) }}
+{% endif %}
+}
