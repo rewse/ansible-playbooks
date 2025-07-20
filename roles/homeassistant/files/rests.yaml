@@ -30,6 +30,7 @@
   scan_interval: 3600
   headers:
     Accept: "application/json"
+    User-Agent: "Home Assistant"
   sensor:
     - name: "Tokyo Weather"
       unique_id: "sensor.tokyo_weather"
