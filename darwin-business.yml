@@ -5,3 +5,4 @@
     - darwin
     - darwin/business
     - dotfiles/darwin
+    - { role: mcp-server, tags: [mcp-server, mcp-server-business] }

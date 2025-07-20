@@ -1,0 +1,10 @@
+---
+mcp_servers_personal:
+  obsidian:
+    command: "npx"
+    args:
+      - "-y"
+      - "mcp-obsidian"
+      - "/Users/tats/Obsidian/vault"
+    disabled: false
+    autoApprove: []
