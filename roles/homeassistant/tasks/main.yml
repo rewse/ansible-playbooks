@@ -409,10 +409,26 @@
   notify: Restart homeassistant
   tags: [homeassistant, homeassistant-component]
 
-- name: Config scene
+- name: Config rest
   lineinfile:
     path: /srv/homeassistant/config/configuration.yaml
     insertafter: '^notify:'
+    regexp: '^rest:'
+    line: "rest: !include rests.yaml"
+  notify: Restart homeassistant
+  tags: [homeassistant, homeassistant-component]
+
+- name: Copy rests.yaml
+  copy:
+    src: rests.yaml
+    dest: /srv/homeassistant/config
+  notify: Restart homeassistant
+  tags: [homeassistant, homeassistant-component]
+
+- name: Config scene
+  lineinfile:
+    path: /srv/homeassistant/config/configuration.yaml
+    insertafter: '^rest:'
     regexp: '^scene:'
     line: "scene: !include scenes.yaml"
   notify: Restart homeassistant
@@ -690,4 +706,3 @@
   command: a2ensite hass.rewse.jp
   notify: Reload apache
   tags: [homeassistant, homeassistant-apache]
-  
