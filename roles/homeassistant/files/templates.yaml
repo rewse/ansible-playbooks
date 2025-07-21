@@ -226,6 +226,51 @@
     state_class: measurement
     device_class: precipitation_intensity
     icon: "mdi:weather-pouring"
+  - unique_id: sensor.tomihisacho_wind_direction
+    name: "Tomihisacho Wind Direction"
+    state: >-
+      {%
+        if int(states('sensor.tomihisacho_wind_bearing')) >= 337.5 or
+        int(states('sensor.tomihisacho_wind_bearing')) < 22.5
+      %}
+        N
+      {%
+        elif int(states('sensor.tomihisacho_wind_bearing')) >= 22.5 and
+        int(states('sensor.tomihisacho_wind_bearing')) < 67.5
+      %}
+        NE
+      {%
+        elif int(states('sensor.tomihisacho_wind_bearing')) >= 67.5 and
+        int(states('sensor.tomihisacho_wind_bearing')) < 112.5
+      %}
+        E
+      {%
+        elif int(states('sensor.tomihisacho_wind_bearing')) >= 112.5 and
+        int(states('sensor.tomihisacho_wind_bearing')) < 157.5
+      %}
+        SE
+      {%
+        elif int(states('sensor.tomihisacho_wind_bearing')) >= 157.5 and
+        int(states('sensor.tomihisacho_wind_bearing')) < 202.5
+      %}
+        S
+      {%
+        elif int(states('sensor.tomihisacho_wind_bearing')) >= 202.5 and
+        int(states('sensor.tomihisacho_wind_bearing')) < 247.5
+      %}
+        SW
+      {%
+        elif int(states('sensor.tomihisacho_wind_bearing')) >= 247.5 and
+        int(states('sensor.tomihisacho_wind_bearing')) < 292.5
+      %}
+        W
+      {%
+        elif int(states('sensor.tomihisacho_wind_bearing')) >= 292.5 and
+        int(states('sensor.tomihisacho_wind_bearing')) < 337.5
+      %}
+        NW
+      {% endif %}
+    icon: "mdi:weather-windy"
   - unique_id: sensor.tomihisacho_weather_rich
     name: "Tomihisacho Weather Rich"
     state: "{{ states('sensor.tomihisacho_weather') }}"
