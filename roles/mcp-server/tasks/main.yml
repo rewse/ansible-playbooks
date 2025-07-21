@@ -5,20 +5,27 @@
   when: "'mcp-server-business' in ansible_run_tags"
   tags: [mcp-server-business]
 
-- name: Merge MCP server configurations
-  set_fact:
-    mcp_servers: "{{ mcp_servers_common | combine(mcp_servers_business | default({})) }}"
-  tags: [mcp-server, mcp-server-business, config]
-
 - name: Include personal environment variables
   include_vars:
     file: personal.yml
   when: "'mcp-server-personal' in ansible_run_tags"
   tags: [mcp-server-personal]
 
-- name: Merge MCP server configurations
+- name: Initialize merged MCP server configurations with common servers
   set_fact:
-    mcp_servers: "{{ mcp_servers_common | combine(mcp_servers_personal | default({})) }}"
+    mcp_servers: "{{ mcp_servers_common }}"
+  tags: [mcp-server, mcp-server-business, mcp-server-personal, config]
+
+- name: Merge business MCP server configurations if applicable
+  set_fact:
+    mcp_servers: "{{ mcp_servers | combine(mcp_servers_business | default({})) }}"
+  when: "'mcp-server-business' in ansible_run_tags"
+  tags: [mcp-server, mcp-server-business, config]
+
+- name: Merge personal MCP server configurations if applicable
+  set_fact:
+    mcp_servers: "{{ mcp_servers | combine(mcp_servers_personal | default({})) }}"
+  when: "'mcp-server-personal' in ansible_run_tags"
   tags: [mcp-server, mcp-server-personal, config]
 
 - name: Install uv package manager
