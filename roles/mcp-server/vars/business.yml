@@ -1,5 +1,5 @@
 ---
-mcp_servers:
+mcp_servers_business:
   amzn-mcp:
     command: "amzn-mcp"
     args: []
