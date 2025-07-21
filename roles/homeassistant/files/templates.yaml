@@ -216,6 +216,34 @@
 
 # Others
 
+  - unique_id: sensor.tokyo_weather_rain_chance_max
+    name: "Tokyo Weather Rain Chance Max"
+    state: >-
+      {{
+        max([
+          states('sensor.tokyo_weather_rain_chance_00_06') | int(0),
+          states('sensor.tokyo_weather_rain_chance_06_12') | int(0),
+          states('sensor.tokyo_weather_rain_chance_12_18') | int(0),
+          states('sensor.tokyo_weather_rain_chance_18_24') | int(0)
+        ])
+      }}
+    unit_of_measurement: "%"
+    state_class: measurement
+    icon: "mdi:weather-rainy"
+  - unique_id: sensor.tokyo_weather_rain_chance_max_1
+    name: "Tokyo Weather Rain Chance Max Day 1"
+    state: >-
+      {{
+        max([
+          states('sensor.tokyo_weather_rain_chance_00_06_1') | int(0),
+          states('sensor.tokyo_weather_rain_chance_06_12_1') | int(0),
+          states('sensor.tokyo_weather_rain_chance_12_18_1') | int(0),
+          states('sensor.tokyo_weather_rain_chance_18_24_1') | int(0)
+        ])
+      }}
+    unit_of_measurement: "%"
+    state_class: measurement
+    icon: "mdi:weather-rainy"
   - unique_id: sensor.tomihisacho_rainsnow
     name: "Tomihisacho RainSnow"
     state: >-
