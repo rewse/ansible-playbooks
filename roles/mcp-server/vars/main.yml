@@ -21,6 +21,13 @@ mcp_servers_common:
     disabled: false
     autoApprove:
       - "brave_web_search"
+  fetch:
+    command: "uvx"
+    args:
+      - "mcp-server-fetch"
+      - "--ignore-robots-txt"
+    disabled: false
+    autoApprove: []
   playwright:
     command: "npx"
     args:
