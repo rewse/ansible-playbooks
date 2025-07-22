@@ -27,7 +27,8 @@ mcp_servers_common:
       - "mcp-server-fetch"
       - "--ignore-robots-txt"
     disabled: false
-    autoApprove: []
+    autoApprove:
+      - fetch
   playwright:
     command: "npx"
     args:
