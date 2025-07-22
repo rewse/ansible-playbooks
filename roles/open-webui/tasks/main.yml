@@ -18,6 +18,15 @@
           volumes:
             - /srv/open-webui/data:/app/backend/data
           restart: unless-stopped
+        mcpo:
+          container_name: mcpo
+          image: ghcr.io/open-webui/mcpo:latest
+          ports:
+            - "8000:8000"
+          volumes:
+            - /root/.config/mcp.json:/app/config.json
+          command: --config /app/config.json --port 8000 --api-key {{ vault_mcpo_api_key }}
+          restart: unless-stopped
   notify: Restart docker
   tags: [open-webui, open-webui-docker]
 
