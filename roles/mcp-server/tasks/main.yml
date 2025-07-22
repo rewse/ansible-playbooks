@@ -29,11 +29,15 @@
   tags: [mcp-server, mcp-server-personal, config]
 
 - name: Install uv package manager
-  ansible.builtin.pip:
-    name:
-      - uv
-      - uvx
+  shell: curl -LsSf https://astral.sh/uv/install.sh | sh
   tags: [mcp-server, mcp-server-personal, mcp-server-business, install, uv]
+
+- name: Copy local-bin.sh
+  copy:
+    src: local-bin.sh
+    dest: /etc/profile.d
+  when: ansible_distribution == "Ubuntu"
+  tags: [mcp-server, mcp-server-personal, mcp-server-business, install, local-bin]
 
 - name: Ensure MCP config directory exists
   file:
