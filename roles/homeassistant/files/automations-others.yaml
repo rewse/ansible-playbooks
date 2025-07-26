@@ -1,0 +1,47 @@
+- id: automation.update_roomba_combo_next_date
+  alias: "Update Roomba Combo Next Date"
+  triggers:
+    - trigger: state
+      entity_id: vacuum.roomba_combo
+      to: cleaning
+      for:
+        minutes: 30
+  actions:
+    - action: input_datetime.set_datetime
+      target:
+        entity_id: input_datetime.roomba_combo_next
+      data:
+        datetime: "{{ now() + timedelta(days = 2) }}"
+  trace:
+    stored_traces: 100
+- id: automation.start_roomba_combo
+  alias: "Start Roomba Combo"
+  triggers:
+    - trigger: time_pattern
+      minutes: "/5"
+      seconds: 8
+  conditions:
+    - condition: state
+      entity_id:
+        - person.shibata_tats
+        - person.shibata_akiko
+        - person.shibata_kayano
+      state: not_home
+      for:
+        minutes: 10
+    - condition: state
+      entity_id: vacuum.roomba_combo
+      state: docked
+    - "{{ now().timestamp() > state_attr('input_datetime.roomba_combo_next', 'timestamp') }}"
+  actions:
+    - action: vacuum.start
+      target:
+        entity_id: vacuum.roomba_combo
+    - action: notify.tats_devices
+      data:
+        message: "Start Roomba Combo"
+        data:
+          push:
+            interruption-level: time-sensitive
+  trace:
+    stored_traces: 100
