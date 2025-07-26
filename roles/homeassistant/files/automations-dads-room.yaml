@@ -10,6 +10,14 @@
         - sensor.dads_room_humidity_difference_average
       above: 10
   actions:
+    - action: automation.turn_off
+      target:
+        entity_id:
+          - automation.adjust_dads_room_ac_temperature
+          - automation.change_dads_room_ac_mode
+          - automation.toggle_dads_room_ac_cool
+          - automation.toggle_dads_room_ac_dry
+          - automation.toggle_dads_room_ac_heat
     - action: notify.tats_devices
       data:
         title: "⚠️ ALARM"
@@ -37,6 +45,14 @@
         - sensor.dads_room_temp_difference_average
       above: 1
   actions:
+    - action: automation.turn_off
+      target:
+        entity_id:
+          - automation.adjust_dads_room_ac_temperature
+          - automation.change_dads_room_ac_mode
+          - automation.toggle_dads_room_ac_cool
+          - automation.toggle_dads_room_ac_dry
+          - automation.toggle_dads_room_ac_heat
     - action: notify.tats_devices
       data:
         title: "⚠️ ALARM"
