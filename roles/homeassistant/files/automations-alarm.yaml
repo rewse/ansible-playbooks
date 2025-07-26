@@ -1,29 +1,44 @@
-- id: automation.alarm_device_is_offline
-  alias: "ALARM: Device is Offline"
+- id: automation.alarm_device_battery_level
+  alias: "ALARM: Device Battery Level"
   triggers:
-    - trigger: state
+    - trigger: numeric_state
       entity_id: 
-        - binary_sensor.aqarahub
-        - binary_sensor.aventage
-        - binary_sensor.brother
-        - binary_sensor.catloghome_dad
-        - binary_sensor.catloghome_liv
-        - binary_sensor.catloghome_mom
-        - binary_sensor.daikinac_dad
-        - binary_sensor.daikinac_liv
-        - binary_sensor.daikinac_mom
-        - binary_sensor.eufy_ent
-        - binary_sensor.fancysyncbox
-        - binary_sensor.firetv_liv
-        - binary_sensor.firetv_liv_beta
-        - binary_sensor.firetv_mom
-        - binary_sensor.guppy
-        - binary_sensor.huebridge
-        - binary_sensor.regza
-        - binary_sensor.sesamehub
-        - binary_sensor.switchbothub
-        - binary_sensor.switchbothubmini
-      to: "off"
+        - sensor.balcony_camera_battery
+        - sensor.balcony_switchbot_meter_battery
+        - sensor.balcony_switchbot_outdoor_meter_battery
+        - sensor.bathroom_motion_sensor_battery
+        - sensor.cage_camera_battery
+        - sensor.dads_room_1_button_switch_battery
+        - sensor.dads_room_4_button_switch_battery
+        - sensor.dads_room_humidifier_battery
+        - sensor.dads_room_motion_sensor_battery
+        - sensor.dads_room_switchbot_meter_battery
+        - sensor.dads_room_thermometer_battery
+        - sensor.entrance_1_button_switch_battery
+        - sensor.entrance_door_sensor_battery
+        - sensor.living_room_1_button_switch_battery
+        - sensor.living_room_floor_heating_battery
+        - sensor.living_room_floor_thermometer_battery
+        - sensor.living_room_humidifer_battery
+        - sensor.living_room_motion_sensor_battery
+        - sensor.living_room_thermometer_battery
+        - sensor.living_room_window_sensor_battery
+        - sensor.moms_room_1_button_switch_battery
+        - sensor.moms_room_4_button_switch_battery
+        - sensor.moms_room_curtain_left_battery 
+        - sensor.moms_room_curtain_right_battery
+        - sensor.moms_room_curtains_remote_battery
+        - sensor.moms_room_humidifier_battery
+        - sensor.moms_room_switchbot_meter_battery
+        - sensor.moms_room_thermometer_battery
+        - sensor.moms_room_window_sensor_n_battery
+        - sensor.moms_room_window_sensor_s_battery
+        - sensor.roomba_combo_battery
+        - sensor.study_floor_heating_switch_battery
+        - sensor.study_motion_sensor_battery
+        - sensor.study_window_sensor_n_battery
+        - sensor.study_window_sensor_s_battery
+      below: 20
       for:
         minutes: 31
   actions:
@@ -34,7 +49,8 @@
           {{
             trigger.to_state.attributes.friendly_name or
             trigger.entity_id.split('.')[1]
-          }} is Offline
+          }}’s battery level is low
+          Current: {{ trigger.to_state.state }}%
         data:
           url: "/lovelace-machines/machines"
           push:
