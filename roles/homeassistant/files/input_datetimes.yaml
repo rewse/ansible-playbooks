@@ -24,8 +24,8 @@ moms_room_ac_manual_internal_clean:
 
 # Vacuum
 
-roomba_combo_finished_time:
-  name: Roomba Combo Finished Time
+roomba_combo_next:
+  name: "Roomba Combo Next"
   has_date: true
   has_time: true
   icon: mdi:robot-vacuum-alert
