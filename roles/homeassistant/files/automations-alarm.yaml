@@ -45,7 +45,7 @@
   trace:
     stored_traces: 100
 - id: automation.alarm_device_wifi_kijitora
-  alias: "ALARM: Device WiFi"
+  alias: "ALARM: Device WiFi kijitora"
   triggers:
     - trigger: time_pattern
       minutes: "/5"
