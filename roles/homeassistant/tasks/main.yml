@@ -112,12 +112,6 @@
     dest: /srv/homeassistant/config/automations
   tags: [homeassistant, homeassistant-automation]
 
-- name: Copy automations-frontend.yaml
-  copy:
-    src: automations-frontend.yaml
-    dest: /srv/homeassistant/config/automations
-  tags: [homeassistant, homeassistant-automation]
-
 - name: Copy automations-info.yaml
   copy:
     src: automations-info.yaml
