@@ -126,3 +126,26 @@
         hours: 1
   trace:
     stored_traces: 100
+- id: automation.alarm_kitchen_rice_cooker
+  alias: "ALARM: Kitchen Rice Cooker"
+  triggers:
+    - trigger: time
+      at:
+        - "22:30"
+        - "23:00"
+        - "23:30"
+  conditions:
+    - condition: numeric_state
+      entity_id: sensor.kitchen_rice_cooker_plug_power
+      above: 40
+  actions:
+    - action: notify.all_devices
+      data:
+        title: "⚠️ ALARM"
+        message: ️"Rice Cooker is Keeping Warm"
+        data:
+          push:
+            interruption-level: time-sensitive
+  trace:
+    stored_traces: 100
+
