@@ -27,7 +27,7 @@
             - /root/.config/mcp.json:/app/config.json
           command: --config /app/config.json --port 8000 --api-key {{ vault_mcpo_api_key }}
           restart: unless-stopped
-  notify: Restart docker
+  notify: Restart open-webui
   tags: [open-webui, open-webui-docker]
 
 - name: Enable proxy
