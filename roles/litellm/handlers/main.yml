@@ -1,0 +1,5 @@
+---
+- name: Restart litellm
+  ansible.builtin.command: docker compose -f /etc/compose.yml restart litellm
+  register: litellm_restart_result
+  failed_when: litellm_restart_result.rc != 0
