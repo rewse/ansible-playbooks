@@ -3,7 +3,7 @@ alexa_client:
   id: "{{ vault_alexa_client.id }}"
   secret: "{{ vault_alexa_client.secret }}"
 card_mod_version: 3.4.5
-frosted_glass_version: 1.1.6
+frosted_glass_version: 1.1.9
 gmail:
   address: "{{ vault_gmail.address }}"
   password: "{{ vault_gmail.password }}"
@@ -25,4 +25,4 @@ regza:
   password: "{{ vault_regza.password }}"
 simple_thermostat_version: 2.5.0
 simple_weather_card_version: 0.8.5
-tuya_local_version: 2025.6.1
+tuya_local_version: 2025.7.1
