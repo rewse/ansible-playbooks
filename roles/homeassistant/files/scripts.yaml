@@ -41,6 +41,8 @@ open_entrance_door:
             - person.shibata_kayano
           match: any
           state: home
+          for:
+            minutes: 10
       then:
         - action: lock.unlock
           target:
