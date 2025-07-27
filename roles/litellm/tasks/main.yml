@@ -1,0 +1,40 @@
+---
+- name: Create LiteLLM configuration directory
+  ansible.builtin.file:
+    path: /srv/litellm
+    state: directory
+    owner: root
+    group: root
+  tags: [litellm, config]
+
+- name: Generate LiteLLM configuration file
+  ansible.builtin.template:
+    src: config.yaml.j2
+    dest: /srv/litellm/config.yaml
+    owner: root
+    group: root
+  notify: Restart litellm
+  tags: [litellm, config]
+
+- name: Add LiteLLM service to Docker Compose
+  ansible.builtin.blockinfile:
+    path: /etc/compose.yml
+    marker: "# {mark} ANSIBLE MANAGED BLOCK litellm"
+    block: |2
+        litellm:
+          container_name: litellm
+          image: ghcr.io/berriai/litellm:main-stable
+          ports:
+            - "4000:4000"
+          volumes:
+            - /srv/litellm/config.yaml:/app/config.yaml:ro
+          environment:
+            - AWS_ACCESS_KEY_ID={{ litellm_aws_access_key_id }}
+            - AWS_SECRET_ACCESS_KEY={{ litellm_aws_secret_access_key }}
+            - AWS_REGION_NAME=us-east-1
+            - LITELLM_MASTER_KEY={{ litellm_master_key }}
+            - LITELLM_SALT_KEY={{ litellm_salt_key }}
+          restart: unless-stopped
+          command: ["--config", "/app/config.yaml", "--port", "4000"]
+  notify: Restart litellm
+  tags: [litellm, docker]

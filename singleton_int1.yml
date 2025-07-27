@@ -8,6 +8,7 @@
     - docker
     - homeassistant
     - httpd
+    - litellm
     - matter-server
     - mcp-server
     - mosquitto
