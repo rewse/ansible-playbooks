@@ -117,7 +117,7 @@
         data:
           push:
             interruption-level: time-sensitive
-          url: "/lovelace-machines/machines"
+          url: "/dashboard-securities/securities"
     - delay:
         seconds: 10
     - action: lock.lock
