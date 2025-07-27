@@ -14,14 +14,8 @@
     name: apache2
     state: restarted
 
-- name: Restart docker
-  systemd:
-    name: docker
-    state: restarted
-
 - name: Restart homeassistant
-  uri:
-    url: https://hass.rewse.jp/api/services/homeassistant/restart
-    method: POST
-    headers:
-      Authorization: Bearer {{ homeassistant_token }}
+  community.docker.docker_compose_v2:
+    project_src: /etc
+    services: homeassistant
+    state: restarted

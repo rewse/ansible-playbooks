@@ -1,5 +1,6 @@
 ---
-- name: Restart docker
-  systemd:
-    name: docker
+- name: Restart matter-server
+  community.docker.docker_compose_v2:
+    project_src: /etc
+    services: matter-server
     state: restarted
