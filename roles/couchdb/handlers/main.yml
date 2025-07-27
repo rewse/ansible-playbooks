@@ -9,7 +9,8 @@
     name: apache2
     state: restarted
 
-- name: Restart docker
-  systemd:
-    name: docker
+- name: Restart couchdb
+  community.docker.docker_compose_v2:
+    project_src: /etc
+    services: couchdb
     state: restarted

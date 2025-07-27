@@ -20,5 +20,5 @@
             - apparmor:unconfined
           network_mode: host
           restart: unless-stopped
-  notify: Restart docker
+  notify: Restart matter-server
   tags: [matter-server]

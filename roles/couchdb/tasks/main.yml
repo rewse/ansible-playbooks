@@ -25,7 +25,7 @@
             - COUCHDB_USER=tats
             - COUCHDB_PASSWORD={{ couchdb_password }}
           restart: unless-stopped
-  notify: Restart docker
+  notify: Restart couchdb
   tags: [couchdb]
 
 - name: Download couchdb-init

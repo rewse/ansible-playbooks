@@ -38,7 +38,7 @@
           network_mode: host
           privileged: true
           restart: unless-stopped
-  notify: Restart docker
+  notify: Restart homeassistant
   tags: [homeassistant, homeassistant-docker]
 
 # Ref: https://github.com/home-assistant/core/issues/117768
