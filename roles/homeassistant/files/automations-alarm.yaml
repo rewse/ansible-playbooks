@@ -52,7 +52,7 @@
           }}’s battery level is low
           Current: {{ trigger.to_state.state }}%
         data:
-          url: "/lovelace-machines/machines"
+          url: "/dashboard-internal/internal"
           push:
             interruption-level: time-sensitive
     - delay:
@@ -86,7 +86,7 @@
         title: "⚠️ ALARM"
         message: "kijitora WiFi might be off"
         data:
-          url: "/lovelace-machines/machines"
+          url: "/dashboard-internal/internal"
           push:
             interruption-level: time-sensitive
     - delay:
@@ -119,7 +119,7 @@
         title: "⚠️ ALARM"
         message: "ubiqu_personal WiFi might be off"
         data:
-          url: "/lovelace-machines/machines"
+          url: "/dashboard-internal/internal"
           push:
             interruption-level: time-sensitive
     - delay:

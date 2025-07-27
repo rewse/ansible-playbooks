@@ -256,7 +256,7 @@
                 data:
                   push:
                     interruption-level: time-sensitive
-                  url: "/lovelace/home"
+                  url: "/lovelace/overview"
             - delay:
                 hours: 2
         - conditions:
@@ -271,7 +271,7 @@
                 data:
                   push:
                     interruption-level: time-sensitive
-                  url: "/lovelace/home"
+                  url: "/lovelace/overview"
             - delay:
                 hours: 2
         - conditions:
@@ -286,7 +286,7 @@
                 data:
                   push:
                     interruption-level: time-sensitive
-                  url: "/lovelace/home"
+                  url: "/lovelace/overview"
             - delay:
                 hours: 2
         - conditions:
@@ -301,7 +301,7 @@
                 data:
                   push:
                     interruption-level: time-sensitive
-                  url: "/lovelace/home"
+                  url: "/lovelace/overview"
             - delay:
                 hours: 2
   trace:
@@ -802,7 +802,7 @@
                         data:
                           push:
                             interruption-level: time-sensitive
-                          url: "/lovelace/home"
+                          url: "/lovelace/overview"
                     - delay:
                         hours: 2
         - conditions:
@@ -835,7 +835,7 @@
                 data:
                   push:
                     interruption-level: time-sensitive
-                  url: "/lovelace/home"
+                  url: "/lovelace/overview"
             - delay:
                 hours: 2
   trace:
@@ -911,7 +911,7 @@
                         data:
                           push:
                             interruption-level: time-sensitive
-                          url: "/lovelace/home"
+                          url: "/lovelace/overview"
                     - delay:
                         hours: 2
         - conditions:
@@ -952,7 +952,7 @@
                 data:
                   push:
                     interruption-level: time-sensitive
-                  url: "/lovelace/home"
+                  url: "/lovelace/overview"
             - delay:
                 hours: 2
   trace:
@@ -1023,7 +1023,7 @@
                         data:
                           push:
                             interruption-level: time-sensitive
-                          url: "/lovelace/home"
+                          url: "/lovelace/overview"
                     - delay:
                         seconds: 10
         - conditions:
@@ -1048,7 +1048,7 @@
                 data:
                   push:
                     interruption-level: time-sensitive
-                  url: "/lovelace/home"
+                  url: "/lovelace/overview"
             - delay:
                 hours: 2
   trace:
@@ -1105,7 +1105,7 @@
                         data:
                           push:
                             interruption-level: time-sensitive
-                          url: "/lovelace/home"
+                          url: "/lovelace/overview"
                     - delay:
                         hours: 1
         - conditions:
@@ -1129,7 +1129,7 @@
                 data:
                   push:
                     interruption-level: time-sensitive
-                  url: "/lovelace/home"
+                  url: "/lovelace/overview"
             - delay:
                 hours: 1
   trace:
@@ -1193,7 +1193,7 @@
             data:
               push:
                 interruption-level: time-sensitive
-              url: "/lovelace/home"
+              url: "/lovelace/overview"
   trace:
     stored_traces: 100
 - id: automation.turn_on_moms_room_ac_internal_clean

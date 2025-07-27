@@ -20,7 +20,7 @@
         data:
           push:
             interruption-level: time-sensitive
-          url: "/lovelace/home"
+          url: "/lovelace/overview"
     - delay:
         hours: 8
   trace:
@@ -47,7 +47,7 @@
         data:
           push:
             interruption-level: time-sensitive
-          url: "/lovelace/home"
+          url: "/lovelace/overview"
     - delay:
         hours: 8
   trace:
