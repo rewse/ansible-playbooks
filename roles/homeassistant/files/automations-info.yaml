@@ -35,7 +35,7 @@
         data:
           push:
             interruption-level: time-sensitive
-          url: "/lovelace-people/people"
+          url: "/lovelace/others"
 - id: automation.info_mll
   alias: "INFO: MLL"
   triggers:
@@ -65,4 +65,4 @@
         data:
           push:
             interruption-level: time-sensitive
-          url: "/lovelace-people/people"
+          url: "/lovelace/others"

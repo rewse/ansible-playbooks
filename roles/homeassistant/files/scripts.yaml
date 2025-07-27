@@ -21,7 +21,7 @@ darken_living_room:
             data:
               push:
                 interruption-level: time-sensitive
-              url: "/lovelace/home"
+              url: "/lovelace/overview"
   icon: "mdi:bed"
 force_entrance_door:
   alias: "Force Entrance Door"
