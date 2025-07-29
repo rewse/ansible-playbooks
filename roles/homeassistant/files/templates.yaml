@@ -1,3 +1,34 @@
+# Dad’s Room
+
+- binary_sensor:
+  - unique_id: binary_sensor.dads_room_ac_cooldry
+    name: "Dad’s Room AC CoolDry"
+    state: >-
+      {{
+        states('climate.dads_room_ac') == 'cool' or
+        states('climate.dads_room_ac') == 'dry'
+      }}
+    device_class: cold
+    icon: "mdi:mdi:snowflake"
+  - unique_id: binary_sensor.living_room_ac_cooldry
+    name: "Living Room AC CoolDry"
+    state: >-
+      {{
+        states('climate.living_room_ac') == 'cool' or
+        states('climate.living_room_ac') == 'dry'
+      }}
+    device_class: cold
+    icon: "mdi:mdi:snowflake"
+  - unique_id: binary_sensor.moms_room_ac_cooldry
+    name: "Mom’s Room AC CoolDry"
+    state: >-
+      {{
+        states('climate.moms_room_ac') == 'cool' or
+        states('climate.moms_room_ac') == 'dry'
+      }}
+    device_class: cold
+    icon: "mdi:mdi:snowflake"
+
 # Balcony
 
 - sensor:

@@ -819,8 +819,8 @@
                   float(states('input_number.moms_room_humidity_min_diff'))
                 }}
             - condition: state
-              entity_id: climate.moms_room_ac
-              state: "cool"
+              entity_id: binary_sensor.moms_room_ac_cooldry
+              state: "on"
               for:
                 minutes: 30
           sequence:
@@ -915,31 +915,23 @@
                     - delay:
                         hours: 2
         - conditions:
-            - or:
-                - and:
-                    - >-
-                        {{
-                          float(states('sensor.moms_room_humidity')) < 
-                          float(states('input_number.moms_room_humidity_target')) -
-                          float(states('input_number.moms_room_humidity_min_diff'))
-                        }}
-                    - condition: state
-                      entity_id: climate.moms_room_ac
-                      state: "dry"
-                      for:
-                        minutes: 30
-                - and:
-                    - >-
-                        {{
-                          float(states('sensor.moms_room_temperature')) < 
-                          float(states('input_number.moms_room_temp_target')) -
-                          float(states('input_number.moms_room_temp_min_diff'))
-                        }}
-                    - condition: state
-                      entity_id: climate.moms_room_ac
-                      state: "dry"
-                      for:
-                        minutes: 30
+            - >-
+                {{
+                  float(states('sensor.moms_room_temperature')) < 
+                  float(states('input_number.moms_room_temp_target')) -
+                  float(states('input_number.moms_room_temp_min_diff'))
+                }} 
+            - >-
+                {{
+                  float(states('sensor.moms_room_humidity')) <
+                  float(states('input_number.moms_room_humidity_target')) +
+                  float(states('input_number.moms_room_humidity_min_diff'))
+                }}
+            - condition: state
+              entity_id: binary_sensor.moms_room_ac_cooldry
+              state: "on"
+              for:
+                minutes: 30
           sequence:
             - action: climate.turn_off
               target:
