@@ -1,5 +1,6 @@
 ---
 litellm_aws_access_key_id: "{{ vault_litellm.aws.access_key }}"
 litellm_aws_secret_access_key: "{{ vault_litellm.aws.secret_access_key }}"
+litellm_gemini_api_key: "{{ vault_litellm.gemini.api_key }}"
 litellm_master_key: "{{ vault_litellm.master_key }}"
 litellm_salt_key: "{{ vault_litellm.salt_key }}"

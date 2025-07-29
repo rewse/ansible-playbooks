@@ -32,6 +32,7 @@
             - AWS_ACCESS_KEY_ID={{ litellm_aws_access_key_id }}
             - AWS_SECRET_ACCESS_KEY={{ litellm_aws_secret_access_key }}
             - AWS_REGION_NAME=us-east-1
+            - GEMINI_API_KEY={{ litellm_gemini_api_key }}
             - LITELLM_MASTER_KEY={{ litellm_master_key }}
             - LITELLM_SALT_KEY={{ litellm_salt_key }}
           restart: unless-stopped
