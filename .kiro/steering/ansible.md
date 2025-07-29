@@ -448,6 +448,24 @@ Ansible 2.10以降、モジュールは完全修飾コレクション名（Fully
 9. **デフォルト値を省略する**: デフォルト値と同じ設定は記述しない
 10. **シンプルな表記を優先する**: 可能な限り簡潔で読みやすい構文を使用する
 
+## Vault コマンド
+
+### Vault ファイルの操作
+
+```bash
+# Vault ファイルを編集
+ansible-vault edit group_vars/all/vault
+
+# 新しい Vault ファイルを作成
+ansible-vault create new_vault_file.yml
+
+# 既存のファイルを暗号化
+ansible-vault encrypt plain_file.yml
+
+# Vault ファイルの内容を確認
+ansible-vault view group_vars/all/vault | cat
+```
+
 ## 参考資料
 
 - [Ansible YAML Syntax](https://docs.ansible.com/ansible/latest/reference_appendices/YAMLSyntax.html)
