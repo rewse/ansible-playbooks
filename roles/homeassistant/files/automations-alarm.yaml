@@ -60,6 +60,52 @@
   mode: parallel
   trace:
     stored_traces: 100
+- id: automation.alarm_device_offline
+  alias: "ALARM: Device is Offline"
+  triggers:
+    - trigger: state
+      entity_id: 
+        - binary_sensor.aqarahub
+        - binary_sensor.aventage
+        - binary_sensor.brother
+        - binary_sensor.catloghome_dad
+        - binary_sensor.catloghome_liv
+        - binary_sensor.catloghome_mom
+        - binary_sensor.daikinac_dad
+        - binary_sensor.daikinac_liv
+        - binary_sensor.daikinac_mom
+        - binary_sensor.eufy_ent
+        - binary_sensor.fancysyncbox
+        - binary_sensor.firetv_liv
+        - binary_sensor.firetv_liv_beta
+        - binary_sensor.firetv_mom
+        - binary_sensor.guppy
+        - binary_sensor.huebridge
+        - binary_sensor.regza
+        - binary_sensor.sesamehub
+        - binary_sensor.switchbothub
+        - binary_sensor.switchbothubmini
+      to: "off"
+      for:
+        minutes: 31
+  actions:
+    - action: notify.tats_devices
+      data:
+        title: "⚠️ ALARM"
+        message: >-
+          {{
+            trigger.to_state.attributes.friendly_name or
+            trigger.entity_id.split('.')[1]
+          }} is Offline
+        data:
+          url: "/dashboard-internal/internal"
+          push:
+            interruption-level: time-sensitive
+    - delay:
+        hours: 1
+  mode: parallel
+  trace:
+    stored_traces: 100
 - id: automation.alarm_device_wifi_kijitora
   alias: "ALARM: Device WiFi kijitora"
   triggers:
