@@ -36,9 +36,9 @@ open_entrance_door:
     - if:
         - condition: state
           entity_id:
-            - person.shibata_tats
-            - person.shibata_akiko
-            - person.shibata_kayano
+            - device_tracker.ping_atom
+            - device_tracker.ping_ubiqu_personal
+            - device_tracker.ping_kijitora
           match: any
           state: home
           for:
