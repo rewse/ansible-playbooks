@@ -27,7 +27,7 @@
           sequence:
             - action: climate.set_temperature
               target:
-                entity_id: climate.living_room_ac 
+                entity_id: climate.living_room_ac
               data:
                 temperature: "{{ int(states('sensor.living_room_ac_temp')) + 1 }}"
             - delay:
@@ -41,7 +41,7 @@
           sequence:
             - action: climate.set_temperature
               target:
-                entity_id: climate.living_room_ac 
+                entity_id: climate.living_room_ac
               data:
                 temperature: "{{ int(states('sensor.living_room_ac_temp')) - 1 }}"
             - delay:
@@ -200,24 +200,24 @@
                         {{
                           (
                             float(states('input_number.living_room_temp_target')) -
-                            float(states('sensor.living_room_temperature')) 
+                            float(states('sensor.living_room_temperature'))
                           ) / float(states('input_number.living_room_temp_min_diff')) >
                           (
-                            float(states('sensor.living_room_humidity')) - 
+                            float(states('sensor.living_room_humidity')) -
                             float(states('input_number.living_room_humidity_target'))
                           ) / float(states('input_number.living_room_humidity_max_diff'))
                         }}
           sequence:
             - action: climate.set_hvac_mode
               target:
-                entity_id: climate.living_room_ac 
+                entity_id: climate.living_room_ac
               data:
                 hvac_mode: "cool"
             - delay:
                 seconds: 5
             - action: climate.set_temperature
               target:
-                entity_id: climate.living_room_ac 
+                entity_id: climate.living_room_ac
               data:
                 temperature: "{{ int(states('sensor.living_room_ac_temp')) + 1 }}"
             - delay:
@@ -231,18 +231,18 @@
             - >-
               {{
                 (
-                  float(states('sensor.living_room_temperature')) - 
+                  float(states('sensor.living_room_temperature')) -
                   float(states('input_number.living_room_temp_target'))
                 ) / float(states('input_number.living_room_temp_max_diff')) >
                 (
-                  float(states('sensor.living_room_humidity')) - 
+                  float(states('sensor.living_room_humidity')) -
                   float(states('input_number.living_room_humidity_target'))
                 ) / float(states('input_number.living_room_humidity_max_diff'))
               }}
           sequence:
             - action: climate.set_hvac_mode
               target:
-                entity_id: climate.living_room_ac 
+                entity_id: climate.living_room_ac
               data:
                 hvac_mode: "cool"
             - delay:
@@ -256,18 +256,18 @@
             - >-
               {{
                 (
-                  float(states('sensor.living_room_temperature')) - 
+                  float(states('sensor.living_room_temperature')) -
                   float(states('input_number.living_room_temp_target'))
                 ) / float(states('input_number.living_room_temp_max_diff')) <
                 (
-                  float(states('sensor.living_room_humidity')) - 
+                  float(states('sensor.living_room_humidity')) -
                   float(states('input_number.living_room_humidity_target'))
                 ) / float(states('input_number.living_room_humidity_max_diff'))
               }}
           sequence:
             - action: climate.set_hvac_mode
               target:
-                entity_id: climate.living_room_ac 
+                entity_id: climate.living_room_ac
               data:
                 hvac_mode: "dry"
             - delay:
@@ -344,7 +344,7 @@
                 minutes: "{{ states('input_number.living_room_climate_auto_off_minutes_ventilated') }}"
           sequence:
             - action: input_select.select_option
-              target: 
+              target:
                 entity_id: input_select.living_room_climate_mode
               data:
                 option: "Ventilated"
@@ -360,12 +360,12 @@
             - not:
                 - condition: state
                   entity_id: input_select.time_mode
-                  state: 
+                  state:
                     - "Midnight"
                     - "Dark"
           sequence:
             - action: input_select.select_option
-              target: 
+              target:
                 entity_id: input_select.living_room_climate_mode
               data:
                 option: "Present Summer"
@@ -381,12 +381,12 @@
             - not:
                 - condition: state
                   entity_id: input_select.time_mode
-                  state: 
+                  state:
                     - "Midnight"
                     - "Dark"
           sequence:
             - action: input_select.select_option
-              target: 
+              target:
                 entity_id: input_select.living_room_climate_mode
               data:
                 option: "Present Winter"
@@ -401,12 +401,12 @@
               state: "Summer"
             - condition: state
               entity_id: input_select.time_mode
-              state: 
+              state:
                 - "Midnight"
                 - "Dark"
           sequence:
             - action: input_select.select_option
-              target: 
+              target:
                 entity_id: input_select.living_room_climate_mode
               data:
                 option: "Present Summer Midnight"
@@ -421,12 +421,12 @@
               state: "Winter"
             - condition: state
               entity_id: input_select.time_mode
-              state: 
+              state:
                 - "Midnight"
                 - "Dark"
           sequence:
             - action: input_select.select_option
-              target: 
+              target:
                 entity_id: input_select.living_room_climate_mode
               data:
                 option: "Present Winter Midnight"
@@ -463,7 +463,7 @@
                       state: "Summer"
           sequence:
             - action: input_select.select_option
-              target: 
+              target:
                 entity_id: input_select.living_room_climate_mode
               data:
                 option: "Absent Summer"
@@ -498,7 +498,7 @@
                       state: "Winter"
           sequence:
             - action: input_select.select_option
-              target: 
+              target:
                 entity_id: input_select.living_room_climate_mode
               data:
                 option: "Absent Winter"
@@ -575,7 +575,7 @@
                   dest: input_number.living_room_humidity_target
               sequence:
                 - action: input_number.set_value
-                  target: 
+                  target:
                     entity_id: "{{ repeat.item.dest }}"
                   data:
                     value: "{{ states(repeat.item.src) }}"
@@ -600,7 +600,7 @@
                   dest: input_number.living_room_humidity_target
               sequence:
                 - action: input_number.set_value
-                  target: 
+                  target:
                     entity_id: "{{ repeat.item.dest }}"
                   data:
                     value: "{{ states(repeat.item.src) }}"
@@ -625,7 +625,7 @@
                   dest: input_number.living_room_humidity_target
               sequence:
                 - action: input_number.set_value
-                  target: 
+                  target:
                     entity_id: "{{ repeat.item.dest }}"
                   data:
                     value: "{{ states(repeat.item.src) }}"
@@ -650,7 +650,7 @@
                   dest: input_number.living_room_humidity_target
               sequence:
                 - action: input_number.set_value
-                  target: 
+                  target:
                     entity_id: "{{ repeat.item.dest }}"
                   data:
                     value: "{{ states(repeat.item.src) }}"
@@ -675,7 +675,7 @@
                   dest: input_number.living_room_humidity_target
               sequence:
                 - action: input_number.set_value
-                  target: 
+                  target:
                     entity_id: "{{ repeat.item.dest }}"
                   data:
                     value: "{{ states(repeat.item.src) }}"
@@ -700,7 +700,7 @@
                   dest: input_number.living_room_humidity_target
               sequence:
                 - action: input_number.set_value
-                  target: 
+                  target:
                     entity_id: "{{ repeat.item.dest }}"
                   data:
                     value: "{{ states(repeat.item.src) }}"
@@ -729,12 +729,9 @@
   actions:
     - choose:
         - conditions:
-            - >-
-                {{
-                  float(states('sensor.living_room_temperature')) > 
-                  float(states('input_number.living_room_temp_target')) +
-                  float(states('input_number.living_room_temp_max_diff'))
-                }}
+            - condition: state
+              entity_id: binary_sensor.living_room_temp_high
+              state: "on"
             - not:
                 - condition: state
                   entity_id: climate.living_room_ac
@@ -782,18 +779,12 @@
                     - delay:
                         hours: 2
         - conditions:
-            - >-
-                {{
-                  float(states('sensor.living_room_humidity')) > 
-                  float(states('input_number.living_room_humidity_target')) +
-                  float(states('input_number.living_room_humidity_max_diff'))
-                }}
-            - >-
-                {{
-                  float(states('sensor.living_room_temperature')) <
-                  float(states('input_number.living_room_temp_target')) +
-                  float(states('input_number.living_room_temp_max_diff'))
-                }}
+            - condition: state
+              entity_id: binary_sensor.living_room_humidity_high
+              state: "on"
+            - condition: state
+              entity_id: binary_sensor.living_room_temp_high
+              state: "off"
             - not:
                 - condition: state
                   entity_id: climate.living_room_ac
@@ -845,10 +836,10 @@
             - condition: template
               value_template: >-
                 {{
-                  float(states('sensor.living_room_temperature')) < 
+                  float(states('sensor.living_room_temperature')) <
                   float(states('input_number.living_room_temp_target')) -
                   float(states('input_number.living_room_temp_min_diff'))
-                }} 
+                }}
               for:
                 hours: 1
             - condition: template
@@ -940,12 +931,9 @@
   actions:
     - choose:
         - conditions:
-            - >-
-                {{
-                  float(states('sensor.living_room_temperature')) < 
-                  float(states('input_number.living_room_temp_target')) +
-                  float(states('input_number.living_room_temp_max_diff'))
-                }}
+            - condition: state
+              entity_id: binary_sensor.living_room_temp_high
+              state: "off"
             - condition: state
               entity_id: switch.living_area_floor_heatings
               state: "off"
@@ -992,17 +980,16 @@
                     - delay:
                         hours: 2
         - conditions:
-            - >-
-                {{
-                  float(states('sensor.living_room_temperature')) >
-                  float(states('input_number.living_room_temp_target')) -
-                  float(states('input_number.living_room_temp_min_diff'))
-                }} 
+            - condition: state
+              entity_id: binary_sensor.living_room_temp_high
+              state: "on"
+              for:
+                hours: 1
             - condition: state
               entity_id: switch.living_area_floor_heatings
               state: "on"
               for:
-                minutes: 30
+                hours: 1
           sequence:
             - action: switch.turn_off
               target:
@@ -1039,12 +1026,9 @@
   actions:
     - choose:
         - conditions:
-            - >-
-                {{
-                  float(states('sensor.living_room_humidity')) < 
-                  float(states('input_number.living_room_humidity_target')) -
-                  float(states('input_number.living_room_humidity_min_diff'))
-                }}
+            - condition: state
+              entity_id: binary_sensor.living_room_humidity_high
+              state: "off"
             - condition: state
               entity_id: switch.living_room_humidifier
               state: "off"
@@ -1087,12 +1071,9 @@
                     - delay:
                         hours: 1
         - conditions:
-            - >-
-                {{
-                  float(states('sensor.living_room_humidity')) >
-                  float(states('input_number.living_room_humidity_target')) +
-                  float(states('input_number.living_room_humidity_max_diff'))
-                }}
+            - condition: state
+              entity_id: binary_sensor.living_room_humidity_high
+              state: "on"
             - condition: state
               entity_id: switch.living_room_humidifier
               state: "on"
