@@ -783,8 +783,8 @@
               entity_id: binary_sensor.living_room_humidity_high
               state: "on"
             - condition: state
-              entity_id: binary_sensor.living_room_temp_high
-              state: "off"
+              entity_id: binary_sensor.living_room_temp_low
+              state: "on"
             - not:
                 - condition: state
                   entity_id: climate.living_room_ac
@@ -833,22 +833,14 @@
                     - delay:
                         hours: 2
         - conditions:
-            - condition: template
-              value_template: >-
-                {{
-                  float(states('sensor.living_room_temperature')) <
-                  float(states('input_number.living_room_temp_target')) -
-                  float(states('input_number.living_room_temp_min_diff'))
-                }}
+            - condition: state
+              entity_id: binary_sensor.living_room_temp_low
+              state: "on"
               for:
                 hours: 1
-            - condition: template
-              value_template: >-
-                {{
-                  float(states('sensor.living_room_humidity')) <
-                  float(states('input_number.living_room_humidity_target')) +
-                  float(states('input_number.living_room_humidity_min_diff'))
-                }}
+            - condition: state
+              entity_id: binary_sensor.living_room_humidity_low
+              state: "on"
               for:
                 hours: 1
             - condition: state
@@ -932,8 +924,8 @@
     - choose:
         - conditions:
             - condition: state
-              entity_id: binary_sensor.living_room_temp_high
-              state: "off"
+              entity_id: binary_sensor.living_room_temp_low
+              state: "on"
             - condition: state
               entity_id: switch.living_area_floor_heatings
               state: "off"
@@ -1027,8 +1019,8 @@
     - choose:
         - conditions:
             - condition: state
-              entity_id: binary_sensor.living_room_humidity_high
-              state: "off"
+              entity_id: binary_sensor.living_room_humidity_low
+              state: "on"
             - condition: state
               entity_id: switch.living_room_humidifier
               state: "off"
