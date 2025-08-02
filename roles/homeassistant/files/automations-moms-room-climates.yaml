@@ -738,8 +738,8 @@
                     value: "{{ states(repeat.item.src) }}"
   trace:
     stored_traces: 100
-- id: automation.toggle_moms_room_ac_cool
-  alias: "Toggle Mom’s Room AC Cool"
+- id: automation.toggle_moms_room_ac_cooldry
+  alias: "Toggle Mom’s Room AC CoolDry"
   triggers:
     - trigger: state
       entity_id:
@@ -808,21 +808,79 @@
         - conditions:
             - >-
                 {{
+                  float(states('sensor.moms_room_humidity')) > 
+                  float(states('input_number.moms_room_humidity_target')) +
+                  float(states('input_number.moms_room_humidity_max_diff'))
+                }}
+            - >-
+                {{
+                  float(states('sensor.moms_room_temperature')) <
+                  float(states('input_number.moms_room_temp_target')) +
+                  float(states('input_number.moms_room_temp_max_diff'))
+                }}
+            - not:
+                - condition: state
+                  entity_id: climate.moms_room_ac
+                  state:
+                    - "fan_only"
+                    - "dry"
+          sequence:
+            - choose:
+                - conditions:
+                    - condition: state
+                      entity_id: input_boolean.moms_room_window_mode
+                      state: "on"
+                      for:
+                        minutes: 10
+                  sequence:
+                    - event: "moms_room_humidity_too_high"
+                - conditions:
+                    - condition: state
+                      entity_id: input_boolean.moms_room_window_mode
+                      state: "off"
+                      for:
+                        minutes: 10
+                  sequence:
+                    - action: climate.set_hvac_mode
+                      target:
+                        entity_id: climate.moms_room_ac
+                      data:
+                        hvac_mode: "dry"
+                    - action: notify.all_devices
+                      data:
+                        message: >-
+                          Turned on Mom’s Room AC Dry.
+                          Current: {{ states('sensor.moms_room_humidity') }}%
+                        data:
+                          push:
+                            interruption-level: time-sensitive
+                          url: "/lovelace/overview"
+                    - delay:
+                        hours: 2
+        - conditions:
+            - condition: template
+              value_template: >-
+                {{
                   float(states('sensor.moms_room_temperature')) < 
                   float(states('input_number.moms_room_temp_target')) -
                   float(states('input_number.moms_room_temp_min_diff'))
                 }} 
-            - >-
+              for:
+                hours: 1
+            - condition: template
+              value_template: >-
                 {{
                   float(states('sensor.moms_room_humidity')) <
                   float(states('input_number.moms_room_humidity_target')) +
                   float(states('input_number.moms_room_humidity_min_diff'))
                 }}
+              for:
+                hours: 1
             - condition: state
               entity_id: binary_sensor.moms_room_ac_cooldry
               state: "on"
               for:
-                minutes: 30
+                hours: 1
           sequence:
             - action: climate.turn_off
               target:
@@ -830,8 +888,9 @@
             - action: notify.all_devices
               data:
                 message: >-
-                  Turned off Mom’s Room AC Cool.
+                  Turned off Mom’s Room AC.
                   Current: {{ states('sensor.moms_room_temperature') }}°C
+                  {{ states('sensor.moms_room_humidity') }}%
                 data:
                   push:
                     interruption-level: time-sensitive
