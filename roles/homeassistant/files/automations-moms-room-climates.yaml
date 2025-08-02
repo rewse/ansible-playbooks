@@ -31,7 +31,7 @@
               data:
                 temperature: "{{ int(states('sensor.moms_room_ac_temp')) + 1 }}"
             - delay:
-                minutes: 29
+                minutes: 10
         - conditions:
             - >-
               {{
@@ -45,7 +45,7 @@
               data:
                 temperature: "{{ int(states('sensor.moms_room_ac_temp')) - 1 }}"
             - delay:
-                minutes: 29
+                minutes: 10
   trace:
     stored_traces: 100
 - id: automation.change_moms_room_ac_from_heatcool
