@@ -27,7 +27,7 @@
           sequence:
             - action: climate.set_temperature
               target:
-                entity_id: climate.dads_room_ac 
+                entity_id: climate.dads_room_ac
               data:
                 temperature: "{{ int(states('sensor.dads_room_ac_temp')) + 1 }}"
             - delay:
@@ -41,7 +41,7 @@
           sequence:
             - action: climate.set_temperature
               target:
-                entity_id: climate.dads_room_ac 
+                entity_id: climate.dads_room_ac
               data:
                 temperature: "{{ int(states('sensor.dads_room_ac_temp')) - 1 }}"
             - delay:
@@ -153,24 +153,24 @@
                         {{
                           (
                             float(states('input_number.dads_room_temp_target')) -
-                            float(states('sensor.dads_room_temperature')) 
+                            float(states('sensor.dads_room_temperature'))
                           ) / float(states('input_number.dads_room_temp_min_diff')) >
                           (
-                            float(states('sensor.dads_room_humidity')) - 
+                            float(states('sensor.dads_room_humidity')) -
                             float(states('input_number.dads_room_humidity_target'))
                           ) / float(states('input_number.dads_room_humidity_max_diff'))
                         }}
           sequence:
             - action: climate.set_hvac_mode
               target:
-                entity_id: climate.dads_room_ac 
+                entity_id: climate.dads_room_ac
               data:
                 hvac_mode: "cool"
             - delay:
                 seconds: 5
             - action: climate.set_temperature
               target:
-                entity_id: climate.dads_room_ac 
+                entity_id: climate.dads_room_ac
               data:
                 temperature: "{{ int(states('sensor.dads_room_ac_temp')) + 1 }}"
             - delay:
@@ -184,18 +184,18 @@
             - >-
               {{
                 (
-                  float(states('sensor.dads_room_temperature')) - 
+                  float(states('sensor.dads_room_temperature')) -
                   float(states('input_number.dads_room_temp_target'))
                 ) / float(states('input_number.dads_room_temp_max_diff')) >
                 (
-                  float(states('sensor.dads_room_humidity')) - 
+                  float(states('sensor.dads_room_humidity')) -
                   float(states('input_number.dads_room_humidity_target'))
                 ) / float(states('input_number.dads_room_humidity_max_diff'))
               }}
           sequence:
             - action: climate.set_hvac_mode
               target:
-                entity_id: climate.dads_room_ac 
+                entity_id: climate.dads_room_ac
               data:
                 hvac_mode: "cool"
             - delay:
@@ -209,18 +209,18 @@
             - >-
               {{
                 (
-                  float(states('sensor.dads_room_temperature')) - 
+                  float(states('sensor.dads_room_temperature')) -
                   float(states('input_number.dads_room_temp_target'))
                 ) / float(states('input_number.dads_room_temp_max_diff')) <
                 (
-                  float(states('sensor.dads_room_humidity')) - 
+                  float(states('sensor.dads_room_humidity')) -
                   float(states('input_number.dads_room_humidity_target'))
                 ) / float(states('input_number.dads_room_humidity_max_diff'))
               }}
           sequence:
             - action: climate.set_hvac_mode
               target:
-                entity_id: climate.dads_room_ac 
+                entity_id: climate.dads_room_ac
               data:
                 hvac_mode: "dry"
             - delay:
@@ -293,12 +293,12 @@
             - not:
                 - condition: state
                   entity_id: input_select.time_mode
-                  state: 
+                  state:
                     - "Midnight"
                     - "Dark"
           sequence:
             - action: input_select.select_option
-              target: 
+              target:
                 entity_id: input_select.dads_room_climate_mode
               data:
                 option: "Present Summer"
@@ -314,12 +314,12 @@
             - not:
                 - condition: state
                   entity_id: input_select.time_mode
-                  state: 
+                  state:
                     - "Midnight"
                     - "Dark"
           sequence:
             - action: input_select.select_option
-              target: 
+              target:
                 entity_id: input_select.dads_room_climate_mode
               data:
                 option: "Present Winter"
@@ -334,12 +334,12 @@
               state: "Summer"
             - condition: state
               entity_id: input_select.time_mode
-              state: 
+              state:
                 - "Midnight"
                 - "Dark"
           sequence:
             - action: input_select.select_option
-              target: 
+              target:
                 entity_id: input_select.dads_room_climate_mode
               data:
                 option: "Present Summer Midnight"
@@ -354,12 +354,12 @@
               state: "Winter"
             - condition: state
               entity_id: input_select.time_mode
-              state: 
+              state:
                 - "Midnight"
                 - "Dark"
           sequence:
             - action: input_select.select_option
-              target: 
+              target:
                 entity_id: input_select.dads_room_climate_mode
               data:
                 option: "Present Winter Midnight"
@@ -396,7 +396,7 @@
                       state: "Summer"
           sequence:
             - action: input_select.select_option
-              target: 
+              target:
                 entity_id: input_select.dads_room_climate_mode
               data:
                 option: "Absent Summer"
@@ -431,7 +431,7 @@
                       state: "Winter"
           sequence:
             - action: input_select.select_option
-              target: 
+              target:
                 entity_id: input_select.dads_room_climate_mode
               data:
                 option: "Absent Winter"
@@ -508,7 +508,7 @@
                   dest: input_number.dads_room_humidity_target
               sequence:
                 - action: input_number.set_value
-                  target: 
+                  target:
                     entity_id: "{{ repeat.item.dest }}"
                   data:
                     value: "{{ states(repeat.item.src) }}"
@@ -533,7 +533,7 @@
                   dest: input_number.dads_room_humidity_target
               sequence:
                 - action: input_number.set_value
-                  target: 
+                  target:
                     entity_id: "{{ repeat.item.dest }}"
                   data:
                     value: "{{ states(repeat.item.src) }}"
@@ -558,7 +558,7 @@
                   dest: input_number.dads_room_humidity_target
               sequence:
                 - action: input_number.set_value
-                  target: 
+                  target:
                     entity_id: "{{ repeat.item.dest }}"
                   data:
                     value: "{{ states(repeat.item.src) }}"
@@ -583,7 +583,7 @@
                   dest: input_number.dads_room_humidity_target
               sequence:
                 - action: input_number.set_value
-                  target: 
+                  target:
                     entity_id: "{{ repeat.item.dest }}"
                   data:
                     value: "{{ states(repeat.item.src) }}"
@@ -608,7 +608,7 @@
                   dest: input_number.dads_room_humidity_target
               sequence:
                 - action: input_number.set_value
-                  target: 
+                  target:
                     entity_id: "{{ repeat.item.dest }}"
                   data:
                     value: "{{ states(repeat.item.src) }}"
@@ -633,7 +633,7 @@
                   dest: input_number.dads_room_humidity_target
               sequence:
                 - action: input_number.set_value
-                  target: 
+                  target:
                     entity_id: "{{ repeat.item.dest }}"
                   data:
                     value: "{{ states(repeat.item.src) }}"
@@ -662,12 +662,9 @@
         mode: "idle"
     - choose:
         - conditions:
-            - >-
-                {{
-                  float(states('sensor.dads_room_temperature')) > 
-                  float(states('input_number.dads_room_temp_target')) +
-                  float(states('input_number.dads_room_temp_max_diff'))
-                }}
+            - state:
+                entity_id: binary_sensor.dads_room_temp_high
+                state: "on"
             - not:
                 - condition: state
                   entity_id: climate.dads_room_ac
@@ -683,18 +680,12 @@
                 action: "on"
                 mode: "Cool"
         - conditions:
-            - >-
-                {{
-                  float(states('sensor.dads_room_humidity')) > 
-                  float(states('input_number.dads_room_humidity_target')) +
-                  float(states('input_number.dads_room_humidity_max_diff'))
-                }}
-            - >-
-                {{
-                  float(states('sensor.dads_room_temperature')) <
-                  float(states('input_number.dads_room_temp_target')) +
-                  float(states('input_number.dads_room_temp_max_diff'))
-                }}
+            - state:
+                entity_id: binary_sensor.dads_room_humidity_high
+                state: "on"
+            - state:
+                entity_id: binary_sensor.dads_room_temp_high
+                state: "off"
             - not:
                 - condition: state
                   entity_id: climate.dads_room_ac
@@ -711,22 +702,14 @@
                 action: "on"
                 mode: "Dry"
         - conditions:
-            - condition: template
-              value_template: >-
-                {{
-                  float(states('sensor.dads_room_temperature')) < 
-                  float(states('input_number.dads_room_temp_target')) -
-                  float(states('input_number.dads_room_temp_min_diff'))
-                }}
+            - condition: state
+              entity_id: binary_sensor.dads_room_humidity_high
+              state: "off"
               for:
                 hours: 1
-            - condition: template
-              value_template: >-
-                {{
-                  float(states('sensor.dads_room_humidity')) <
-                  float(states('input_number.dads_room_humidity_target')) +
-                  float(states('input_number.dads_room_humidity_min_diff'))
-                }}
+            - condition: state
+              entity_id: binary_sensor.dads_room_temp_high
+              state: "off"
               for:
                 hours: 1
             - condition: state
@@ -747,7 +730,7 @@
       data:
         message: >-
           Turned {{ action }} Dad’s Room AC.
-          Current: {{ states('sensor.dads_room_temperature') }}°C, 
+          Current: {{ states('sensor.dads_room_temperature') }}°C,
           {{ states('sensor.dads_room_humidity') }}%
         data:
           push:
@@ -779,12 +762,9 @@
         action: "idle"
     - choose:
         - conditions:
-            - >-
-                {{
-                  float(states('sensor.dads_room_temperature')) < 
-                  float(states('input_number.dads_room_temp_target')) +
-                  float(states('input_number.dads_room_temp_max_diff'))
-                }}
+            - condition: state
+              entity_id: binary_sensor.dads_room_temp_high
+              state: "off"
             - not:
                 - condition: state
                   entity_id: climate.dads_room_ac
@@ -799,17 +779,16 @@
             - variables:
                 action: "on"
         - conditions:
-            - >-
-                {{
-                  float(states('sensor.dads_room_temperature')) > 
-                  float(states('input_number.dads_room_temp_target')) -
-                  float(states('input_number.dads_room_temp_min_diff'))
-                }} 
+            - condition: state
+              entity_id: binary_sensor.dads_room_temp_high
+              state: "on"
+              for:
+                hours: 1
             - condition: state
               entity_id: climate.dads_room_ac
               state: "heat"
               for:
-                minutes: 30
+                hours: 1
           sequence:
             - action: climate.turn_off
               target:
@@ -849,12 +828,9 @@
         action: "idle"
     - choose:
         - conditions:
-            - >-
-                {{
-                  float(states('sensor.dads_room_humidity')) < 
-                  float(states('input_number.dads_room_humidity_target')) -
-                  float(states('input_number.dads_room_humidity_min_diff'))
-                }}
+            - condition: state
+              entity_id: binary_sensor.dads_room_humidity_high
+              state: "off"
             - condition: state
               entity_id: switch.dads_room_humidifier
               state: "off"
@@ -862,12 +838,9 @@
             - variables:
                 action: "on"
         - conditions:
-            - >-
-                {{
-                  float(states('sensor.dads_room_humidity')) >
-                  float(states('input_number.dads_room_humidity_target')) +
-                  float(states('input_number.dads_room_humidity_max_diff'))
-                }}
+            - condition: state
+              entity_id: binary_sensor.dads_room_humidity_high
+              state: "on"
             - condition: state
               entity_id: switch.dads_room_humidifier
               state: "on"
