@@ -64,8 +64,7 @@ prepare_for_dads_room_ac_manual_internal_clean:
         entity_id:
           - automation.adjust_dads_room_ac_temperature
           - automation.change_dads_room_ac_mode
-          - automation.toggle_dads_room_ac_cool
-          - automation.toggle_dads_room_ac_dry
+          - automation.toggle_dads_room_ac_cooldry
           - automation.toggle_dads_room_ac_heat
           - automation.turn_on_dads_room_ac_internal_clean
     - action: climate.turn_off
@@ -85,8 +84,7 @@ prepare_for_living_room_ac_manual_internal_clean:
         entity_id:
           - automation.adjust_living_room_ac_temperature
           - automation.change_living_room_ac_mode
-          - automation.toggle_living_room_ac_cool
-          - automation.toggle_living_room_ac_dry
+          - automation.toggle_living_room_ac_cooldry
           - automation.toggle_living_area_floor_heating
           - automation.turn_on_living_room_ac_internal_clean
     - action: climate.turn_off
@@ -106,8 +104,7 @@ prepare_for_moms_room_ac_manual_internal_clean:
         entity_id:
           - automation.adjust_moms_room_ac_temperature
           - automation.change_moms_room_ac_mode
-          - automation.toggle_moms_room_ac_cool
-          - automation.toggle_moms_room_ac_dry
+          - automation.toggle_moms_room_ac_cooldry
           - automation.toggle_moms_room_ac_heat
           - automation.turn_on_moms_room_ac_internal_clean
     - action: climate.turn_off
