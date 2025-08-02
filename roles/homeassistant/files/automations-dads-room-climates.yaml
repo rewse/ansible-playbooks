@@ -890,7 +890,7 @@
       to:
        - "Absent Summer"
        - "Absent Winter"
-  condition:
+  conditions:
     - condition: state
       entity_id: switch.dads_room_floor_heating_plug
       state: "on"

@@ -74,7 +74,7 @@
     - trigger: time_pattern
       minutes: "/5"
       seconds: 48
-  condition:
+  conditions:
     - condition: numeric_state
       entity_id: sensor.living_room_co2
       above: 1000
