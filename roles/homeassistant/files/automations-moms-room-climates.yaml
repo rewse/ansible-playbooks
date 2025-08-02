@@ -807,8 +807,8 @@
               entity_id: binary_sensor.moms_room_humidity_high
               state: "on"
             - condition: state
-              entity_id: binary_sensor.moms_room_temp_high
-              state: "off"
+              entity_id: binary_sensor.moms_room_temp_low
+              state: "on"
             - not:
                 - condition: state
                   entity_id: climate.moms_room_ac
@@ -850,13 +850,13 @@
                         hours: 2
         - conditions:
             - condition: state
-              entity_id: binary_sensor.moms_room_humidity_high
-              state: "off"
+              entity_id: binary_sensor.moms_room_humidity_low
+              state: "on"
               for:
                 hours: 1
             - condition: state
-              entity_id: binary_sensor.moms_room_temp_high
-              state: "off"
+              entity_id: binary_sensor.moms_room_temp_low
+              state: "on"
               for:
                 hours: 1
             - condition: state
@@ -906,8 +906,8 @@
     - choose:
         - conditions:
             - condition: state
-              entity_id: binary_sensor.moms_room_temp_high
-              state: "off"
+              entity_id: binary_sensor.moms_room_temp_low
+              state: "on"
             - not:
                 - condition: state
                   entity_id: climate.moms_room_ac
@@ -993,8 +993,8 @@
     - choose:
         - conditions:
             - condition: state
-              entity_id: binary_sensor.moms_room_humidity_high
-              state: "off"
+              entity_id: binary_sensor.moms_room_humidity_low
+              state: "on"
             - condition: state
               entity_id: switch.moms_room_humidifier
               state: "off"

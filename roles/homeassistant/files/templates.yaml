@@ -1,6 +1,7 @@
-# Dad’s Room
-
 - binary_sensor:
+
+  # Dad’s Room
+
   - unique_id: binary_sensor.dads_room_ac_cooldry
     name: "Dad’s Room AC CoolDry"
     state: >-
@@ -11,27 +12,43 @@
     device_class: cold
     icon: "mdi:snowflake"
   - unique_id: binary_sensor.dads_room_humidity_high
-    name: "Dad's Room Humidity Low"
+    name: "Dad's Room Humidity High"
     state: >-
       {{
         float(states('sensor.dads_room_humidity')) >
         float(states('input_number.dads_room_humidity_target')) +
+        float(states('input_number.dads_room_humidity_max_diff'))
+      }}
+    icon: "mdi:water-percent-alert"
+  - unique_id: binary_sensor.dads_room_humidity_low
+    name: "Dad's Room Humidity Low"
+    state: >-
+      {{
+        float(states('sensor.dads_room_humidity')) <
+        float(states('input_number.dads_room_humidity_target')) -
         float(states('input_number.dads_room_humidity_min_diff'))
       }}
-    device_class: moisture
     icon: "mdi:water-percent-alert"
   - unique_id: binary_sensor.dads_room_temp_high
-    name: "Dad's Room Temperature high"
+    name: "Dad's Room Temperature High"
     state: >-
       {{
         float(states('sensor.dads_room_temperature')) >
+        float(states('input_number.dads_room_temp_target')) +
+        float(states('input_number.dads_room_temp_max_diff'))
+      }}
+    icon: "mdi:thermometer-high"
+  - unique_id: binary_sensor.dads_room_temp_low
+    name: "Dad's Room Temperature Low"
+    state: >-
+      {{
+        float(states('sensor.dads_room_temperature')) <
         float(states('input_number.dads_room_temp_target')) -
         float(states('input_number.dads_room_temp_min_diff'))
       }}
-    device_class: heat
-    icon: "mdi:thermometer-high"
+    icon: "mdi:thermometer-low"
 
-# Living Room
+  # Living Room
 
   - unique_id: binary_sensor.living_room_ac_cooldry
     name: "Living Room AC CoolDry"
@@ -39,15 +56,6 @@
       {{
         states('climate.living_room_ac') == 'cool' or
         states('climate.living_room_ac') == 'dry'
-      }}
-    device_class: cold
-    icon: "mdi:snowflake"
-  - unique_id: binary_sensor.moms_room_ac_cooldry
-    name: "Mom’s Room AC CoolDry"
-    state: >-
-      {{
-        states('climate.moms_room_ac') == 'cool' or
-        states('climate.moms_room_ac') == 'dry'
       }}
     device_class: cold
     icon: "mdi:snowflake"
@@ -59,7 +67,15 @@
         float(states('input_number.living_room_humidity_target')) +
         float(states('input_number.living_room_humidity_max_diff'))
       }}
-    device_class: moisture
+    icon: "mdi:water-percent-alert"
+  - unique_id: binary_sensor.living_room_humidity_low
+    name: "Living Room Humidity Low"
+    state: >-
+      {{
+        float(states('sensor.living_room_humidity')) <
+        float(states('input_number.living_room_humidity_target')) -
+        float(states('input_number.living_room_humidity_min_diff'))
+      }}
     icon: "mdi:water-percent-alert"
   - unique_id: binary_sensor.living_room_temp_high
     name: "Living Room Temperature High"
@@ -69,11 +85,28 @@
         float(states('input_number.living_room_temp_target')) +
         float(states('input_number.living_room_temp_max_diff'))
       }}
-    device_class: heat
     icon: "mdi:thermometer-high"
+  - unique_id: binary_sensor.living_room_temp_low
+    name: "Living Room Temperature Low"
+    state: >-
+      {{
+        float(states('sensor.living_room_temperature')) <
+        float(states('input_number.living_room_temp_target')) -
+        float(states('input_number.living_room_temp_min_diff'))
+      }}
+    icon: "mdi:thermometer-low"
 
-# Mom’s Room
+  # Mom’s Room
 
+  - unique_id: binary_sensor.moms_room_ac_cooldry
+    name: "Mom’s Room AC CoolDry"
+    state: >-
+      {{
+        states('climate.moms_room_ac') == 'cool' or
+        states('climate.moms_room_ac') == 'dry'
+      }}
+    device_class: cold
+    icon: "mdi:snowflake"
   - unique_id: binary_sensor.moms_room_humidity_high
     name: "Mom's Room Humidity High"
     state: >-
@@ -82,7 +115,15 @@
         float(states('input_number.moms_room_humidity_target')) +
         float(states('input_number.moms_room_humidity_max_diff'))
       }}
-    device_class: moisture
+    icon: "mdi:water-percent-alert"
+  - unique_id: binary_sensor.moms_room_humidity_low
+    name: "Mom's Room Humidity Low"
+    state: >-
+      {{
+        float(states('sensor.moms_room_humidity')) <
+        float(states('input_number.moms_room_humidity_target')) -
+        float(states('input_number.moms_room_humidity_min_diff'))
+      }}
     icon: "mdi:water-percent-alert"
   - unique_id: binary_sensor.moms_room_temp_high
     name: "Mom's Room Temperature High"
@@ -92,12 +133,21 @@
         float(states('input_number.moms_room_temp_target')) +
         float(states('input_number.moms_room_temp_max_diff'))
       }}
-    device_class: heat
     icon: "mdi:thermometer-high"
-
-# Balcony
+  - unique_id: binary_sensor.moms_room_temp_low
+    name: "Mom's Room Temperature Low"
+    state: >-
+      {{
+        float(states('sensor.moms_room_temperature')) <
+        float(states('input_number.moms_room_temp_target')) -
+        float(states('input_number.moms_room_temp_min_diff'))
+      }}
+    icon: "mdi:thermometer-low"
 
 - sensor:
+
+  # Balcony
+
   - unique_id: sensor.balcony_humidity_difference
     name: "Balcony Humidity Difference"
     state: >-
