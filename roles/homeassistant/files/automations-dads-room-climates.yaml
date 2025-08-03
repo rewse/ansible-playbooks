@@ -15,7 +15,7 @@
         - "cool"
         - "heat"
       for:
-        minutes: 10
+        minutes: 9
   actions:
     - choose:
         - conditions:
@@ -31,7 +31,7 @@
               data:
                 temperature: "{{ int(states('sensor.dads_room_ac_temp')) + 1 }}"
             - delay:
-                minutes: 10
+                minutes: 9
         - conditions:
             - >-
               {{
@@ -45,7 +45,7 @@
               data:
                 temperature: "{{ int(states('sensor.dads_room_ac_temp')) - 1 }}"
             - delay:
-                minutes: 10
+                minutes: 9
   trace:
     stored_traces: 100
 - id: automation.change_dads_room_ac_from_heatcool
