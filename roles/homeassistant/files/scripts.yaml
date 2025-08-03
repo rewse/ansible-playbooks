@@ -10,7 +10,9 @@ darken_living_room:
         - not:
             - condition: state
               entity_id: climate.living_room_ac
-              state: "off"
+              state:
+                - "fan_only"
+                - "off"
       then:
         - action: climate.turn_off
           target:
