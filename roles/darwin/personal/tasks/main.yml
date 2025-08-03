@@ -23,6 +23,10 @@
     update_homebrew: yes
   tags: [darwin-personal, package, cask]
 
+- name: Install qwen
+  command: npm install -g @qwen-code/qwen-code@latest
+  tags: [darwin-personal, package, qwen-code]
+
 # - name: Install rest of the apps
 #   install_yourself:
 #     - https://adblink.me/download/                                  # adbLink
