@@ -24,7 +24,7 @@
             trigger.entity_id.split('.')[1]
           }} opend
         data:
-          url: "/dashboard"
+          url: "/dashboard-securities/"
 - id: automation.alarm_device_battery_level
   alias: "ALARM: Device Battery Level"
   triggers:
