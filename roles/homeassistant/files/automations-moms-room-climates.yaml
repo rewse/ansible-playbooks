@@ -872,7 +872,7 @@
               data:
                 message: >-
                   Turned off Mom’s Room AC.
-                  Current: {{ states('sensor.moms_room_temperature') }}°C
+                  Current: {{ states('sensor.moms_room_temperature') }}°C, 
                   {{ states('sensor.moms_room_humidity') }}%
                 data:
                   push:
