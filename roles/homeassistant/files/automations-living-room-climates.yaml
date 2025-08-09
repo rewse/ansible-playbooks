@@ -848,6 +848,10 @@
               state: "on"
               for:
                 hours: 1
+            - not:
+                - condition: state
+                  entity_id: alarm_control_panel.home
+                  state: armed_vacation
           sequence:
             - action: climate.turn_off
               target:
@@ -982,6 +986,10 @@
               state: "on"
               for:
                 hours: 1
+            - not:
+                - condition: state
+                  entity_id: alarm_control_panel.home
+                  state: armed_vacation
           sequence:
             - action: switch.turn_off
               target:
