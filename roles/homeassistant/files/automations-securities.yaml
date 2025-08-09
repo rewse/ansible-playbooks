@@ -3,9 +3,9 @@
   triggers:
     - trigger: state
       entity_id:
-        - person.shibata_tats
-        - person.shibata_akiko
-        - person.shibata_kayano
+        - device_tracker.ping_atom
+        - device_tracker.ping_ubiqu_personal
+        - device_tracker.ping_kijitora
     - trigger: state
       entity_id:
         - person.shibata_tats
@@ -18,13 +18,23 @@
   actions:
     - choose:
         - conditions:
-            - condition: state
-              entity_id:
-                - person.shibata_tats
-                - person.shibata_akiko
-                - person.shibata_kayano
-              match: any
-              state: "home"
+            - or:
+                - condition: state
+                  entity_id:
+                    - device_tracker.ping_atom
+                    - device_tracker.ping_ubiqu_personal
+                    - device_tracker.ping_kijitora
+                  match: any
+                  state: "home"
+                - condition: state
+                  entity_id:
+                    - person.shibata_tats
+                    - person.shibata_akiko
+                    - person.shibata_kayano
+                  match: any
+                  state: "home"
+                  for:
+                    minutes: 10
           sequence:
             - action: alarm_control_panel.alarm_arm_home
               target:
