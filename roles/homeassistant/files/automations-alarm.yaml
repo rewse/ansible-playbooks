@@ -1,3 +1,30 @@
+- id: automation.alarm_armed_vacation_windows
+  alias: "ALARM: Armed Vacation Windows"
+  triggers:
+    - trigger: state
+      entity_id:
+        - binary_sensor.entrance_door
+        - binary_sensor.living_room_window
+        - binary_sensor.study_window_n
+        - binary_sensor.study_window_s
+        - binary_sensor.moms_room_window_n
+        - binary_sensor.moms_room_window_s
+      to: "on"
+  condition:
+    - condition: state
+      entity_id: alarm_control_panel.home
+      state: armed_vacation
+  actions:
+    - action: notify.tats_devices
+      data:
+        title: "⚠️ ALARM"
+        message: >-
+          {{
+            trigger.to_state.attributes.friendly_name or
+            trigger.entity_id.split('.')[1]
+          }} opend
+        data:
+          url: "/dashboard"
 - id: automation.alarm_device_battery_level
   alias: "ALARM: Device Battery Level"
   triggers:
