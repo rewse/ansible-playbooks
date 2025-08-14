@@ -302,8 +302,7 @@
         entity_id:
           - automation.adjust_living_room_ac_temperature
           - automation.change_living_room_ac_mode
-          - automation.toggle_living_room_ac_cool
-          - automation.toggle_living_room_ac_dry
+          - automation.toggle_living_room_ac_cooldry
           - automation.toggle_living_room_ac_heat
           - automation.turn_on_living_room_ac_internal_clean
   trace:
