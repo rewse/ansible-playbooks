@@ -50,8 +50,7 @@
         entity_id:
           - automation.adjust_dads_room_ac_temperature
           - automation.change_dads_room_ac_mode
-          - automation.toggle_dads_room_ac_cool
-          - automation.toggle_dads_room_ac_dry
+          - automation.toggle_dads_room_ac_cooldry
           - automation.toggle_dads_room_ac_heat
     - action: notify.tats_devices
       data:
