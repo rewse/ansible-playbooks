@@ -26,8 +26,8 @@
     ansible_architecture == "aarch64"
   tags: [ubuntu, package]
 
-- name: Add a repository for Node.js 20
-  shell: curl -fsSL https://deb.nodesource.com/setup_20.x | sudo -E bash -
+- name: Add a repository for Node.js 22
+  shell: curl -fsSL https://deb.nodesource.com/setup_22.x | sudo -E bash -
   tags: [ubuntu, package, nodejs]
 
 - name: Update all packages
