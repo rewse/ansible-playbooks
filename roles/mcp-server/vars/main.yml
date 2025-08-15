@@ -36,6 +36,15 @@ mcp_servers_common:
       - "@playwright/mcp@latest"
     disabled: false
     autoApprove: []
+  Scrapeless MCP Server:
+    command: "npx"
+    args:
+      - "-y"
+      - "scrapeless-mcp-server"
+    env:
+      SCRAPELESS_KEY: "{{ vault_scrapeless_key }}"
+    disabled: false
+    autoApprove: []
 
 mcp_additional_config: |
   "settings": {
