@@ -26,6 +26,10 @@
     ansible_architecture == "aarch64"
   tags: [ubuntu, package]
 
+- name: Add a repository for Node.js 20
+  shell: curl -fsSL https://deb.nodesource.com/setup_20.x | sudo -E bash -
+  tags: [ubuntu, package, nodejs]
+
 - name: Update all packages
   apt:
     name: '*'
@@ -54,6 +58,7 @@
       - mailutils
       - ncdu
       - net-tools
+      - nodejs
       - postfix
       - python3-pip
       - python3-venv
