@@ -3,5 +3,6 @@
   become: yes
   remote_user: ubuntu
   roles:
+    - gemini-cli
     - raspberrypi
     - zabbix/agent/raspberrypi
