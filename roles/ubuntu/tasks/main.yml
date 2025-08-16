@@ -89,6 +89,51 @@
   when: aws.stat.exists
   tags: [ubuntu, package, awscliv2]
 
+- name: Download Q CLI tool for x86_64
+  become_user: "{{ admin }}"
+  ansible.builtin.command: curl --proto '=https' --tlsv1.2 -sSf "https://desktop-release.q.us-east-1.amazonaws.com/latest/q-x86_64-linux-musl.zip" -o "q.zip"
+  args:
+    chdir: /home/{{ admin }}
+    creates: /home/{{ admin }}/q.zip
+  when:
+    ansible_architecture == "x86_64"
+  tags: [ubuntu, package, amazon-q]
+
+- name: Download Q CLI tool for ARM
+  become_user: "{{ admin }}"
+  ansible.builtin.command: curl --proto '=https' --tlsv1.2 -sSf "https://desktop-release.q.us-east-1.amazonaws.com/latest/q-aarch64-linux-musl.zip" -o "q.zip"
+  args:
+    chdir: /home/{{ admin }}
+    creates: /home/{{ admin }}/q.zip
+  when:
+    ansible_architecture == "aarch64"
+  tags: [ubuntu, package, amazon-q]
+
+- name: Unzip Q CLI tool
+  become_user: "{{ admin }}"
+  ansible.builtin.command: unzip q.zip
+  args:
+    chdir: /home/{{ admin }}
+    creates: /home/{{ admin }}/q
+  tags: [ubuntu, package, amazon-q]
+
+- name: Install Q CLI tool
+  become_user: "{{ admin }}"
+  ansible.builtin.command: ./q/install.sh
+  args:
+    chdir: /home/{{ admin }}
+  tags: [ubuntu, package, amazon-q]
+
+- name: Clean up Q CLI installation files
+  become_user: "{{ admin }}"
+  ansible.builtin.file:
+    path: /home/{{ admin }}/{{ item }}
+    state: absent
+  loop:
+    - q.zip
+    - q
+  tags: [ubuntu, package, amazon-q]
+
 - name: "etckeeper : Init /etc"
   command: etckeeper init
   args:
