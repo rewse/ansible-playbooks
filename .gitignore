@@ -1,5 +1,6 @@
 .DS_Store
 *.icloud
 *.retry
+logs
 roles/database/client/files/oracle*
 roles/database/client/gui/files/sqldeveloper*
