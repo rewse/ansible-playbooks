@@ -1,10 +1,4 @@
 ---
-- name: Install packages
-  apt:
-    name:
-      - npm
-  tags: [zabbix-agent-raspberrypi]
-
 - name: Copy raspberrypi.conf
   copy:
     src: raspberrypi.conf
