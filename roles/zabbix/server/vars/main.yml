@@ -2,4 +2,4 @@
 zabbix:
   db_host: rewse-pg.rewse.jp
   db_password: "{{ vault_zabbix.db_password }}"
-  version: 7.2
+  version: 7.4
