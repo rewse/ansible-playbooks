@@ -119,7 +119,7 @@
 
 - name: Install Q CLI tool
   become_user: "{{ admin }}"
-  ansible.builtin.command: ./q/install.sh
+  ansible.builtin.command: ./q/install.sh --no-confirm
   args:
     chdir: /home/{{ admin }}
   tags: [ubuntu, package, amazon-q]
