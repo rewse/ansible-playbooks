@@ -8,7 +8,7 @@
       entity_id:
         - sensor.moms_room_humidity_difference
         - sensor.moms_room_humidity_difference_average
-      above: 10
+      above: 5
   actions:
     - action: automation.turn_off
       target:
@@ -42,7 +42,7 @@
       entity_id:
         - sensor.moms_room_temp_difference
         - sensor.moms_room_temp_difference_average
-      above: 1
+      above: 0.5
   actions:
     - action: automation.turn_off
       target:
