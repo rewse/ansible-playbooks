@@ -226,22 +226,10 @@
   triggers:
     - trigger: state
       entity_id: 
-        - binary_sensor.dads_room_presence_connectivity
         - binary_sensor.dads_room_thermometer_connectivity
-        - binary_sensor.entrance_door_sensor_connectivity
-        - binary_sensor.entrance_lock_bottom_connectivity
-        - binary_sensor.entrance_lock_top_connectivity
         - binary_sensor.living_room_floor_thermometer_connectivity
-        - binary_sensor.living_room_presence_sensor_e_connectivity
-        - binary_sensor.living_room_presence_sensor_s_connectivity
         - binary_sensor.living_room_thermometer_connectivity
-        - binary_sensor.living_room_window_sensor_connectivity
-        - binary_sensor.study_window_sensor_n_connectivity
-        - binary_sensor.study_window_sensor_s_connectivity
-        - binary_sensor.moms_room_presence_sensor_connectivity
         - binary_sensor.moms_room_thermometer_connectivity
-        - binary_sensor.moms_room_window_sensor_n_connectivity
-        - binary_sensor.moms_room_window_sensor_s_connectivity
       to: "off"
       for:
         minutes: 60

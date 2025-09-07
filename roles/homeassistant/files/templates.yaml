@@ -29,11 +29,6 @@
         float(states('input_number.dads_room_humidity_min_diff'))
       }}
     icon: "mdi:water-percent-alert"
-  - unique_id: binary_sensor.dads_room_presence_connectivity
-    name: "Dad's Room Presence Connectivity"
-    state: >-
-      {{ (now() - states.binary_sensor.dads_room_presence.last_updated).total_seconds() < 3600 }}
-    device_class: connectivity
   - unique_id: binary_sensor.dads_room_temp_high
     name: "Dad's Room Temperature High"
     state: >-
@@ -56,24 +51,6 @@
     name: "Dad's Room Thermometer Connectivity"
     state: >-
       {{ (now() - states.sensor.dads_room_temperature.last_updated).total_seconds() < 3600 }}
-    device_class: connectivity
-
-# Entrance
-
-  - unique_id: binary_sensor.entrance_door_sensor_connectivity
-    name: "Entrance Door Sensor Connectivity"
-    state: >-
-      {{ (now() - states.binary_sensor.entrance_door.last_updated).total_seconds() < 3600 }}
-    device_class: connectivity
-  - unique_id: binary_sensor.entrance_lock_bottom_connectivity
-    name: "Entrance Lock Bottom Connectivity"
-    state: >-
-      {{ (now() - states.lock.entrance_lock_bottom.last_updated).total_seconds() < 3600 }}
-    device_class: connectivity
-  - unique_id: binary_sensor.entrance_lock_top_connectivity
-    name: "Entrance Lock Top Connectivity"
-    state: >-
-      {{ (now() - states.lock.entrance_lock_top.last_updated).total_seconds() < 3600 }}
     device_class: connectivity
 
   # Living Room
@@ -110,16 +87,6 @@
         float(states('input_number.living_room_humidity_min_diff'))
       }}
     icon: "mdi:water-percent-alert"
-  - unique_id: binary_sensor.living_room_presence_sensor_e_connectivity
-    name: "Living Room Presence Sensor E Connectivity"
-    state: >-
-      {{ (now() - states.binary_sensor.living_room_presence_e.last_updated).total_seconds() < 3600 }}
-    device_class: connectivity
-  - unique_id: binary_sensor.living_room_presence_sensor_s_connectivity
-    name: "Living Room Presence Sensor S Connectivity"
-    state: >-
-      {{ (now() - states.binary_sensor.living_room_presence_s.last_updated).total_seconds() < 3600 }}
-    device_class: connectivity
   - unique_id: binary_sensor.living_room_temp_high
     name: "Living Room Temperature High"
     state: >-
@@ -142,21 +109,6 @@
     name: "Living Room Thermometer Connectivity"
     state: >-
       {{ (now() - states.sensor.living_room_temperature.last_updated).total_seconds() < 3600 }}
-    device_class: connectivity
-  - unique_id: binary_sensor.living_room_window_sensor_connectivity
-    name: "Living Room Window Sensor Connectivity"
-    state: >-
-      {{ (now() - states.binary_sensor.living_room_window.last_updated).total_seconds() < 3600 }}
-    device_class: connectivity
-  - unique_id: binary_sensor.study_window_sensor_n_connectivity
-    name: "Study Window Sensor N Connectivity"
-    state: >-
-      {{ (now() - states.binary_sensor.study_window_n.last_updated).total_seconds() < 3600 }}
-    device_class: connectivity
-  - unique_id: binary_sensor.study_window_sensor_s_connectivity
-    name: "Study Window Sensor S Connectivity"
-    state: >-
-      {{ (now() - states.binary_sensor.study_window_s.last_updated).total_seconds() < 3600 }}
     device_class: connectivity
 
   # Mom’s Room
@@ -188,11 +140,6 @@
         float(states('input_number.moms_room_humidity_min_diff'))
       }}
     icon: "mdi:water-percent-alert"
-  - unique_id: binary_sensor.moms_room_presence_sensor_connectivity
-    name: "Mom's Room Presence Sensor Connectivity"
-    state: >-
-      {{ (now() - states.binary_sensor.moms_room_presence.last_updated).total_seconds() < 3600 }}
-    device_class: connectivity
   - unique_id: binary_sensor.moms_room_temp_high
     name: "Mom's Room Temperature High"
     state: >-
@@ -215,17 +162,6 @@
     name: "Mom's Room Thermometer Connectivity"
     state: >-
       {{ (now() - states.sensor.moms_room_temperature.last_updated).total_seconds() < 3600 }}
-    device_class: connectivity
-  - unique_id: binary_sensor.moms_room_window_sensor_n_connectivity
-    name: "Mom's Room Window Sensor N Connectivity"
-    state: >-
-      {{ (now() - states.binary_sensor.moms_room_window_n.last_updated).total_seconds() < 3600 }}
-    device_class: connectivity
-  - unique_id: binary_sensor.moms_room_window_sensor_s_connectivity
-    name: "Mom's Room Window Sensor S Connectivity"
-    state: >-
-      {{ (now() - states.binary_sensor.moms_room_window_s.last_updated).total_seconds() < 3600 }}
-    device_class: connectivity
 
 - sensor:
 
