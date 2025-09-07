@@ -55,24 +55,59 @@
       entity_id: climate.moms_room_ac
       to: "heat_cool"
   action:
-    - variables:
-        mode: "idle"
-    - if:
-        - condition: state
-          entity_id: input_select.season_mode
-          state: "Summer"
-      then:
-        - variables:
-            mode: "cool"
-      else:
-        - variables:
-            mode: "heat"
-    - action: climate.set_temperature
-      target:
-        entity_id: climate.moms_room_ac
-      data:
-        hvac_mode: "{{ mode }}"
-        temperature: "{{ int(states('input_number.moms_room_temp_target')) }}"
+    - choose:
+        - conditions:
+            - condition: state
+              entity_id: input_select.season_mode
+              state: "Summer"
+            - >-
+              {{
+                float(states('sensor.moms_room_humidity')) >
+                float(states('input_number.moms_room_humidity_target_present_summer')) +
+                float(states('input_number.moms_room_humidity_max_diff_present_summer'))
+              }}
+            - >-
+              {{
+                float(states('sensor.moms_room_temperature')) <
+                float(states('input_number.moms_room_temp_target_present_summer')) -
+                float(states('input_number.moms_room_temp_min_diff_present_summer'))
+              }}
+          sequence:
+            - action: climate.set_hvac_mode
+              target:
+                entity_id: climate.moms_room_ac
+              data:
+                hvac_mode: dry
+        - conditions:
+            - condition: state
+              entity_id: input_select.season_mode
+              state: "Summer"
+          sequence:
+            - action: climate.set_hvac_mode
+              target:
+                entity_id: climate.moms_room_ac
+              data:
+                hvac_mode: cool
+            - action: climate.set_temperature
+              target:
+                entity_id: climate.moms_room_ac
+              data:
+                temperature: "{{ int(states('input_number.moms_room_temp_target_present_summer')) }}"
+        - conditions:
+            - condition: state
+              entity_id: input_select.season_mode
+              state: "Winter"
+          sequence:
+            - action: climate.set_hvac_mode
+              target:
+                entity_id: climate.moms_room_ac
+              data:
+                hvac_mode: heat
+            - action: climate.set_temperature
+              target:
+                entity_id: climate.moms_room_ac
+              data:
+                temperature: "{{ int(states('input_number.moms_room_temp_target_present_winter')) }}"
   trace:
     stored_traces: 100
 - id: automation.change_moms_room_ac_fan_mode
