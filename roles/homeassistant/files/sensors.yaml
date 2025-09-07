@@ -6,7 +6,7 @@
   entity_id: sensor.balcony_humidity_difference
   state_characteristic: mean
   max_age:
-    hours: 51
+    hours: 8
 - platform: statistics
   unique_id: sensor.balcony_temp_average
   name: "Balcony Temperature Average"
@@ -20,7 +20,7 @@
   entity_id: sensor.balcony_temp_difference
   state_characteristic: mean
   max_age:
-    hours: 51
+    hours: 8
 
 # Dad’s Room
 
@@ -30,7 +30,7 @@
   entity_id: sensor.dads_room_humidity_difference
   state_characteristic: mean
   max_age:
-    hours: 51
+    hours: 8
 - platform: statistics
   unique_id: sensor.dads_room_motion_count
   name: "Dad’s Room Motion Count"
@@ -44,7 +44,7 @@
   entity_id: sensor.dads_room_temp_difference
   state_characteristic: mean
   max_age:
-    hours: 51
+    hours: 8
 
 # Living Room
 
@@ -54,14 +54,14 @@
   entity_id: sensor.living_room_humidity_difference
   state_characteristic: mean
   max_age:
-    hours: 51
+    hours: 8
 - platform: statistics
   unique_id: sensor.living_room_temp_difference_average
   name: "Living Room Temperature Difference Average"
   entity_id: sensor.living_room_temp_difference
   state_characteristic: mean
   max_age:
-    hours: 51
+    hours: 8
 - platform: statistics
   unique_id: sensor.study_motion_count
   name: "Study Motion Count"
@@ -78,11 +78,11 @@
   entity_id: sensor.moms_room_humidity_difference
   state_characteristic: mean
   max_age:
-    hours: 51
+    hours: 8
 - platform: statistics
   unique_id: sensor.moms_room_temp_difference_average
   name: "Mom’s Room Temperature Difference Average"
   entity_id: sensor.moms_room_temp_difference
   state_characteristic: mean
   max_age:
-    hours: 51
+    hours: 8
