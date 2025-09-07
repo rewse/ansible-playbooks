@@ -221,99 +221,45 @@
             interruption-level: time-sensitive
   trace:
     stored_traces: 100
-- id: automation.alarm_dads_room_presence_sensor_offline
-  alias: "ALARM: Dad’s Room Presence Sensor is Offline"
-  use_blueprint:
-    path: alarm_sensor_offline.yaml
-    input:
-      sensor_entity: binary_sensor.dads_room_presence
-- id: automation.alarm_dads_room_thermometer_offline
-  alias: "ALARM: Dad’s Room Thermometer is Offline"
-  use_blueprint:
-    path: alarm_sensor_offline.yaml
-    input:
-      sensor_entity: sensor.dads_room_temperature
-- id: automation.alarm_entrance_door_sensor_offline
-  alias: "ALARM: Entrance Door Sensor is Offline"
-  use_blueprint:
-    path: alarm_sensor_offline.yaml
-    input:
-      sensor_entity: binary_sensor.entrance_door
-- id: automation.alarm_entrance_lock_bottom_offline
-  alias: "ALARM: Entrance Lock Bottom is Offline"
-  use_blueprint:
-    path: alarm_sensor_offline.yaml
-    input:
-      sensor_entity: lock.entrance_lock_bottom
-- id: automation.alarm_entrance_lock_top_offline
-  alias: "ALARM: Entrance Lock Top is Offline"
-  use_blueprint:
-    path: alarm_sensor_offline.yaml
-    input:
-      sensor_entity: lock.entrance_lock_top
-- id: automation.alarm_living_room_floor_thermometer_offline
-  alias: "ALARM: Living Room Floor Thermometer is Offline"
-  use_blueprint:
-    path: alarm_sensor_offline.yaml
-    input:
-      sensor_entity: sensor.living_room_floor_temperature
-- id: automation.alarm_living_room_presence_sensor_e_offline
-  alias: "ALARM: Living Room Presence Sensor E is Offline"
-  use_blueprint:
-    path: alarm_sensor_offline.yaml
-    input:
-      sensor_entity: binary_sensor.living_room_presence_e
-- id: automation.alarm_living_room_presence_sensor_s_offline
-  alias: "ALARM: Living Room Presence Sensor S is Offline"
-  use_blueprint:
-    path: alarm_sensor_offline.yaml
-    input:
-      sensor_entity: binary_sensor.living_room_presence_s
-- id: automation.alarm_living_room_thermometer_offline
-  alias: "ALARM: Living Room Thermometer is Offline"
-  use_blueprint:
-    path: alarm_sensor_offline.yaml
-    input:
-      sensor_entity: sensor.living_room_temperature
-- id: automation.alarm_living_room_window_sensor_offline
-  alias: "ALARM: Living Room Window Sensor is Offline"
-  use_blueprint:
-    path: alarm_sensor_offline.yaml
-    input:
-      sensor_entity: binary_sensor.living_room_window
-- id: automation.alarm_study_window_sensor_n_offline
-  alias: "ALARM: Study Window Sensor N is Offline"
-  use_blueprint:
-    path: alarm_sensor_offline.yaml
-    input:
-      sensor_entity: binary_sensor.study_window_n
-- id: automation.alarm_study_window_sensor_s_offline
-  alias: "ALARM: Study Window Sensor S is Offline"
-  use_blueprint:
-    path: alarm_sensor_offline.yaml
-    input:
-      sensor_entity: binary_sensor.study_window_s
-- id: automation.alarm_moms_room_presence_sensor_offline
-  alias: "ALARM: Mom’s Room Presence Sensor is Offline"
-  use_blueprint:
-    path: alarm_sensor_offline.yaml
-    input:
-      sensor_entity: binary_sensor.moms_room_presence
-- id: automation.alarm_moms_room_thermometer_offline
-  alias: "ALARM: Mom’s Room Thermometer is Offline"
-  use_blueprint:
-    path: alarm_sensor_offline.yaml
-    input:
-      sensor_entity: sensor.moms_room_temperature
-- id: automation.alarm_moms_room_window_sensor_n_offline
-  alias: "ALARM: Mom’s Room Window Sensor N is Offline"
-  use_blueprint:
-    path: alarm_sensor_offline.yaml
-    input:
-      sensor_entity: binary_sensor.moms_room_window_n
-- id: automation.alarm_moms_room_window_sensor_s_offline
-  alias: "ALARM: Mom’s Room Window Sensor S is Offline"
-  use_blueprint:
-    path: alarm_sensor_offline.yaml
-    input:
-      sensor_entity: binary_sensor.moms_room_window_s
+- id: automation.alarm_matter_sensor_offline
+  alias: "ALARM: Matter Sensor is Offline"
+  triggers:
+    - trigger: state
+      entity_id: 
+        - binary_sensor.dads_room_presence_connectivity
+        - binary_sensor.dads_room_thermometer_connectivity
+        - binary_sensor.entrance_door_sensor_connectivity
+        - binary_sensor.entrance_lock_bottom_connectivity
+        - binary_sensor.entrance_lock_top_connectivity
+        - binary_sensor.living_room_floor_thermometer_connectivity
+        - binary_sensor.living_room_presence_sensor_e_connectivity
+        - binary_sensor.living_room_presence_sensor_s_connectivity
+        - binary_sensor.living_room_thermometer_connectivity
+        - binary_sensor.living_room_window_sensor_connectivity
+        - binary_sensor.study_window_sensor_n_connectivity
+        - binary_sensor.study_window_sensor_s_connectivity
+        - binary_sensor.moms_room_presence_sensor_connectivity
+        - binary_sensor.moms_room_thermometer_connectivity
+        - binary_sensor.moms_room_window_sensor_n_connectivity
+        - binary_sensor.moms_room_window_sensor_s_connectivity
+      to: "off"
+      for:
+        minutes: 60
+  actions:
+    - action: notify.tats_devices
+      data:
+        title: "⚠️ ALARM"
+        message: >-
+          {{
+            trigger.to_state.attributes.friendly_name or
+            trigger.entity_id.split('.')[1]
+          }} has a problem
+        data:
+          url: "/dashboard-internal/internal"
+          push:
+            interruption-level: time-sensitive
+    - delay:
+        hours: 2
+  mode: parallel
+  trace:
+    stored_traces: 100
