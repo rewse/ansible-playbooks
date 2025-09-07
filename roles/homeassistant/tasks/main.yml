@@ -76,6 +76,12 @@
     state: directory
   tags: [homeassistant, homeassistant-component]
 
+- name: Create blueprints automation dir
+  file:
+    path: /srv/homeassistant/config/blueprints/automation
+    state: directory
+  tags: [homeassistant, homeassistant-component]
+
 - name: Copy automations-alarm.yaml
   copy:
     src: automations-alarm.yaml
@@ -171,6 +177,13 @@
     src: automations-securities.yaml
     dest: /srv/homeassistant/config/automations
   tags: [homeassistant, homeassistant-automation]
+
+- name: Copy alarm_sensor_offline.yaml blueprint
+  copy:
+    src: alarm_sensor_offline.yaml
+    dest: /srv/homeassistant/config/blueprints/automation
+  notify: Restart homeassistant
+  tags: [homeassistant, homeassistant-blueprint]
 
 - name: Copy secrets.yaml
   template:
