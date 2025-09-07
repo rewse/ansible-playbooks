@@ -178,13 +178,6 @@
     dest: /srv/homeassistant/config/automations
   tags: [homeassistant, homeassistant-automation]
 
-- name: Copy alarm_sensor_offline.yaml blueprint
-  copy:
-    src: alarm_sensor_offline.yaml
-    dest: /srv/homeassistant/config/blueprints/automation
-  notify: Restart homeassistant
-  tags: [homeassistant, homeassistant-blueprint]
-
 - name: Copy secrets.yaml
   template:
     src: secrets.yaml.j2
