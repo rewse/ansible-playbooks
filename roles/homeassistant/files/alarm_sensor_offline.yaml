@@ -1,0 +1,31 @@
+---
+blueprint:
+  name: "ALARM: Sensor Offline"
+  domain: automation
+  input:
+    sensor_entity:
+      name: "Sensor Entity"
+      selector:
+        entity:
+          domain: sensor
+variables:
+  sensor_entity: !input sensor_entity
+triggers:
+  - trigger: time_pattern
+    minutes: "/5"
+    seconds: 20
+conditions:
+  - condition: template
+    value_template: >-
+      {{ (now() - states[sensor_entity].last_updated).total_seconds() > 3600 }}
+actions:
+  - action: notify.tats_devices
+    data:
+      title: "⚠️ ALARM"
+      message: >-
+        {{
+          state_attr(sensor_entity, 'friendly_name') or
+          sensor_entity.split('.')[1]
+        }} is Offline
+  - delay:
+      hours: 2
