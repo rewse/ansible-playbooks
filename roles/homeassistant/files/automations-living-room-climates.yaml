@@ -820,8 +820,8 @@
               entity_id: binary_sensor.living_room_humidity_high
               state: "on"
             - condition: state
-              entity_id: binary_sensor.living_room_temp_low
-              state: "on"
+              entity_id: binary_sensor.living_room_temp_high
+              state: "off"
             - not:
                 - condition: state
                   entity_id: climate.living_room_ac
