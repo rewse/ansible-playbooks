@@ -1,5 +1,5 @@
 ---
-mysql_apt_config_version: 0.8.33-1
+mysql_apt_config_version: 0.8.34-1
 mysql_connector_version: 9.4.0-1ubuntu24.04
 oracle_instantclient_version_1: 23
 oracle_instantclient_version_2: 9
