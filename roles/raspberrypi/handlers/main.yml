@@ -1,6 +1,6 @@
 ---
 - name: Restart systemd-timesyncd
-  systemd:
+  ansible.builtin.systemd:
     name: systemd-timesyncd
     state: restarted
 
@@ -15,4 +15,4 @@
     state: restarted
 
 - name: Run ifmetric
-  command: ifmetric wlan0 100
+  ansible.builtin.command: ifmetric wlan0 100

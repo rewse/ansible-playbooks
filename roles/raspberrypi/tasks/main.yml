@@ -1,6 +1,6 @@
 ---
 - name: Install additional packages
-  apt:
+  ansible.builtin.apt:
     name:
       - bluez
       - ifmetric
@@ -39,7 +39,7 @@
   tags: [raspberrypi, swap]
 
 - name: Add NTP servers
-  lineinfile:
+  ansible.builtin.lineinfile:
     dest: /etc/systemd/timesyncd.conf
     insertafter: '^#NTP='
     regexp: '^NTP='
@@ -48,114 +48,114 @@
   tags: [raspberrypi, time, systemd-timesyncd]
 
 - name: Enable bluetooth services
-  systemd:
+  ansible.builtin.systemd:
     name: "{{ item }}"
     state: started
-    enabled: yes
-  with_items:
+    enabled: true
+  loop:
     - bluetooth
   tags: [raspberrypi]
 
 - name: Enable SNMP mibs
-  lineinfile:
+  ansible.builtin.lineinfile:
     dest: /etc/snmp/snmp.conf
     regexp: "mibs "
     line: "mibs all"
   tags: [raspberrypi]
 
 - name: Download php-miio
-  unarchive:
+  ansible.builtin.unarchive:
     src: https://github.com/skysilver-lab/php-miio/archive/refs/tags/v.{{ php_miio_version }}.zip
     dest: /srv
-    remote_src: yes
+    remote_src: true
   tags: [raspberrypi]
 
 - name: Copy environment
-  copy:
+  ansible.builtin.copy:
     src: environment
     dest: /etc
   tags: [raspberrypi]
 
 - name: Copy netplan/99-config.yaml
-  template:
+  ansible.builtin.template:
     src: 99-config.yaml.j2
     dest: /etc/netplan/99-config.yaml
-    mode: 0600
+    mode: '0600'
   tags: [raspberrypi]
 
 - name: Delete 50-cloud-init.yaml
-  file:
+  ansible.builtin.file:
     path: /etc/netplan/50-cloud-init.yaml
     state: absent
   tags: [raspberrypi]
 
 - name: Copy 99-disable-network-config.cfg
-  copy:
+  ansible.builtin.copy:
     src: 99-disable-network-config.cfg
     dest: /etc/cloud/cloud.cfg.d
   tags: [raspberrypi]
 
 - name: Copy ifmetric to cron.d
-  copy:
+  ansible.builtin.copy:
     src: ifmetric
     dest: /etc/cron.d
   tags: [raspberrypi]
 
 - name: Apply netplan
-  command: netplan apply
+  ansible.builtin.command: netplan apply
   notify: Run ifmetric
   tags: [raspberrypi]
 
 # ssh stuck at expecting SSH2_MSG_KEX_ECDH_REPLY - Unix & Linux Stack Exchange
 # https://unix.stackexchange.com/questions/722954/ssh-stuck-at-expecting-ssh2-msg-kex-ecdh-reply
 - name: Copy kex_algorithms.conf
-  copy:
+  ansible.builtin.copy:
     src: kex_algorithms.conf
     dest: /etc/ssh/ssh_config.d
   tags: [raspberrypi]
 
 - name: Create ssh.socket.d
-  file:
+  ansible.builtin.file:
     path: /etc/systemd/system/ssh.socket.d
     state: directory
   tags: [raspberrypi, ssh]
 
 - name: Copy ssh.socket.d override.conf
-  template:
+  ansible.builtin.template:
     src: override.conf.j2
     dest: /etc/systemd/system/ssh.socket.d/override.conf
   notify: Restart ssh.socket
   tags: [raspberrypi, ssh]
 
 - name: Create /mnt/bak
-  file:
+  ansible.builtin.file:
     path: /mnt/bak
     state: directory
   tags: [raspberrypi]
 
 - name: Copy rsync-time-backup
-  get_url:
+  ansible.builtin.get_url:
     url: https://raw.githubusercontent.com/laurent22/rsync-time-backup/master/rsync_tmbackup.sh
     dest: /usr/local/bin/tmbackup
-    mode: 0755
+    mode: '0755'
   tags: [raspberrypi]
 
 - name: Add / for fn_df_t_src to tmpbackup
-  replace:
+  ansible.builtin.replace:
     dest: /usr/local/bin/tmbackup
     regexp: 'fn_df_t_src "\${SRC_FOLDER}"'
     replace: 'fn_df_t_src "${SRC_FOLDER}/"'
   tags: [raspberrypi]
 
 - name: Copy 000backup-daily
-  template:
+  ansible.builtin.template:
     src: 000backup-daily.j2
     dest: /etc/cron.daily/000backup-daily
-    mode: 0755
+    mode: '0755'
   tags: [raspberrypi]
 
 - name: Copy tmbackup.exclude
-  copy:
+  ansible.builtin.copy:
     src: tmbackup.exclude
     dest: /etc
   tags: [raspberrypi]
