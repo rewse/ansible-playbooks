@@ -11,6 +11,33 @@
       - snmp-mibs-downloader
   tags: [raspberrypi, package]
 
+- name: Configure swap factor to RAM size
+  ansible.builtin.lineinfile:
+    path: /etc/dphys-swapfile
+    regexp: '^#?CONF_SWAPFACTOR='
+    line: 'CONF_SWAPFACTOR=1'
+    backup: true
+  notify: Restart dphys-swapfile
+  tags: [raspberrypi, swap]
+
+- name: Configure swap max size to 16GB
+  ansible.builtin.lineinfile:
+    path: /etc/dphys-swapfile
+    regexp: '^#?CONF_MAXSWAP='
+    line: 'CONF_MAXSWAP=16384'
+    backup: true
+  notify: Restart dphys-swapfile
+  tags: [raspberrypi, swap]
+
+- name: Ensure CONF_SWAPSIZE is commented out for dynamic calculation
+  ansible.builtin.lineinfile:
+    path: /etc/dphys-swapfile
+    regexp: '^CONF_SWAPSIZE='
+    line: '#CONF_SWAPSIZE='
+    backup: true
+  notify: Restart dphys-swapfile
+  tags: [raspberrypi, swap]
+
 - name: Add NTP servers
   lineinfile:
     dest: /etc/systemd/timesyncd.conf
