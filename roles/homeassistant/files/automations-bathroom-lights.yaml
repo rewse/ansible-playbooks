@@ -48,7 +48,7 @@
               target: 
                 entity_id: input_select.bathroom_light_mode
               data:
-                option: "Turned on Concentrate"
+                option: "Turned on Arise"
         - conditions:
             - condition: state
               entity_id: input_select.bathroom_light_remote_mode
@@ -88,13 +88,13 @@
             - condition: state
               entity_id: input_select.bathroom_light_mode
               state:
-                - "Turned on Concentrate"
+                - "Turned on Arise"
           sequence:
             - action: input_select.select_option
               target: 
                 entity_id: input_select.bathroom_scene
               data:
-                option: "scene.bathroom_concentrate"
+                option: "scene.bathroom_arise"
         - conditions:
             - condition: state
               entity_id: input_select.bathroom_light_mode
