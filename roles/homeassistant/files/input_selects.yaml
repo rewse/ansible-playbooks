@@ -269,6 +269,28 @@ moms_room_scene_midnight:
     - "scene.moms_room_dark"
   icon: "mdi:brightness-3"
 
+# Bathroom
+
+bathroom_light_mode:
+  name: "Bathroom Light Mode"
+  options:
+    - "Turned on Concentrate"
+    - "Turned on Natural Light"
+  icon: "mdi:lightbulb-auto"
+bathroom_light_remote_mode:
+  name: "Bathroom Light Remote Mode"
+  options:
+    - "Turned on"
+    - "Turned off"
+    - "Idle"
+  icon: "mdi:remote"
+bathroom_scene:
+  name: "Bathroom Scene"
+  options:
+    - "scene.bathroom_concentrate"
+    - "scene.bathroom_natural_light"
+  icon: "mdi:form-select"
+
 # Season Mode
 
 season_mode:
