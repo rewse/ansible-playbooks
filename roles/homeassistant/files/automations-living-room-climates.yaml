@@ -1138,6 +1138,10 @@
       to: "fan_only"
       for:
         minutes: 120
+    - trigger: state
+      entity_id: climate.living_room_ac
+      from: "fan_only"
+      to: "off"
   actions:
     - action: climate.turn_off
       target:
