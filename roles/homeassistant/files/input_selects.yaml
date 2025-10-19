@@ -274,7 +274,7 @@ moms_room_scene_midnight:
 bathroom_light_mode:
   name: "Bathroom Light Mode"
   options:
-    - "Turned on Concentrate"
+    - "Turned on Arise"
     - "Turned on Natural Light"
     - "Dark"
   icon: "mdi:lightbulb-auto"
@@ -288,7 +288,7 @@ bathroom_light_remote_mode:
 bathroom_scene:
   name: "Bathroom Scene"
   options:
-    - "scene.bathroom_concentrate"
+    - "scene.bathroom_arise"
     - "scene.bathroom_natural_light"
     - "scene.bathroom_dark"
   icon: "mdi:form-select"
