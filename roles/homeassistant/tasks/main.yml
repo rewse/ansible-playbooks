@@ -94,6 +94,12 @@
     dest: /srv/homeassistant/config/automations
   tags: [homeassistant, homeassistant-automation]
 
+- name: Copy automations-bathroom-lights.yaml
+  copy:
+    src: automations-bathroom-lights.yaml
+    dest: /srv/homeassistant/config/automations
+  tags: [homeassistant, homeassistant-automation]
+
 - name: Copy automations-dads-room.yaml
   copy:
     src: automations-dads-room.yaml

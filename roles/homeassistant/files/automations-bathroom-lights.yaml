@@ -1,0 +1,116 @@
+- id: automation.push_bathroom_1_button_switch
+  alias: "Push Bathroom 1-Button Switch"
+  triggers:
+    - trigger: state
+      entity_id: event.bathroom_1_button_switch_button
+  actions:
+    - choose:
+        - conditions:
+            - condition: state
+              entity_id: event.bathroom_1_button_switch_button
+              attribute: event_type
+              state: "multi_press_1"
+          sequence:
+            - action: input_select.select_option
+              target: 
+                entity_id: input_select.bathroom_light_remote_mode
+              data:
+                option: "Turned on"
+        - conditions:
+            - condition: state
+              entity_id: event.bathroom_1_button_switch_button
+              attribute: event_type
+              state: "multi_press_2"
+          sequence:
+            - action: input_select.select_option
+              target: 
+                entity_id: input_select.bathroom_light_remote_mode
+              data:
+                option: "Turned off"
+  trace:
+    stored_traces: 100
+- id: automation.select_bathroom_light_mode
+  alias: "Select Bathroom Light Mode"
+  triggers:
+    - trigger: state
+      entity_id: input_select.bathroom_light_remote_mode
+  actions:
+    - choose:
+        - conditions:
+            - condition: state
+              entity_id: input_select.bathroom_light_remote_mode
+              state: "Turned on"
+          sequence:
+            - action: input_select.select_option
+              target: 
+                entity_id: input_select.bathroom_light_mode
+              data:
+                option: "Turned on Concentrate"
+        - conditions:
+            - condition: state
+              entity_id: input_select.bathroom_light_remote_mode
+              state: "Turned off"
+          sequence:
+            - action: input_select.select_option
+              target: 
+                entity_id: input_select.bathroom_light_mode
+              data:
+                option: "Turned on Natural Light"
+  trace:
+    stored_traces: 100
+- id: automation.select_bathroom_scene
+  alias: "Select Bathroom Scene"
+  triggers:
+    - trigger: state
+      entity_id: input_select.bathroom_light_mode
+    - trigger: state
+      entity_id: input_select.bathroom_scene
+      for:
+        hours: 1
+    - trigger: homeassistant
+      event: start
+  actions:
+    - choose:
+        - conditions:
+            - condition: state
+              entity_id: input_select.bathroom_light_mode
+              state:
+                - "Turned on Concentrate"
+          sequence:
+            - action: input_select.select_option
+              target: 
+                entity_id: input_select.bathroom_scene
+              data:
+                option: "scene.bathroom_concentrate"
+        - conditions:
+            - condition: state
+              entity_id: input_select.bathroom_light_mode
+              state:
+                - "Turned on Natural Light"
+          sequence:
+            - action: input_select.select_option
+              target: 
+                entity_id: input_select.bathroom_scene
+              data:
+                option: "scene.bathroom_natural_light"
+  trace:
+    stored_traces: 100
+- id: automation.turn_on_bathroom_scene
+  alias: "Turn on Bathroom Scene"
+  triggers:
+    - trigger: state
+      entity_id: input_select.bathroom_scene
+  actions:
+    - action: scene.turn_on
+      target: 
+        entity_id: "{{ states('input_select.bathroom_scene') }}"
+    - delay:
+        seconds: 1
+    - action: input_select.select_option
+      target: 
+        entity_id: input_select.bathroom_light_remote_mode
+      data:
+        option: "Idle"
+  mode: restart
+  trace:
+    stored_traces: 100
