@@ -276,6 +276,7 @@ bathroom_light_mode:
   options:
     - "Turned on Concentrate"
     - "Turned on Natural Light"
+    - "Dark"
   icon: "mdi:lightbulb-auto"
 bathroom_light_remote_mode:
   name: "Bathroom Light Remote Mode"
@@ -289,6 +290,7 @@ bathroom_scene:
   options:
     - "scene.bathroom_concentrate"
     - "scene.bathroom_natural_light"
+    - "scene.bathroom_dark"
   icon: "mdi:form-select"
 
 # Season Mode

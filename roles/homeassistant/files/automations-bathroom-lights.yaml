@@ -34,6 +34,9 @@
   triggers:
     - trigger: state
       entity_id: input_select.bathroom_light_remote_mode
+    - trigger: state
+      entity_id: light.bathroom_middle_light
+      to: "off"
   actions:
     - choose:
         - conditions:
@@ -56,6 +59,16 @@
                 entity_id: input_select.bathroom_light_mode
               data:
                 option: "Turned on Natural Light"
+        - conditions:
+            - condition: state
+              entity_id: light.bathroom_middle_light
+              state: "off"
+          sequence:
+            - action: input_select.select_option
+              target: 
+                entity_id: input_select.bathroom_light_mode
+              data:
+                option: "Dark"
   trace:
     stored_traces: 100
 - id: automation.select_bathroom_scene
@@ -93,6 +106,17 @@
                 entity_id: input_select.bathroom_scene
               data:
                 option: "scene.bathroom_natural_light"
+        - conditions:
+            - condition: state
+              entity_id: input_select.bathroom_light_mode
+              state:
+                - "Dark"
+          sequence:
+            - action: input_select.select_option
+              target: 
+                entity_id: input_select.bathroom_scene
+              data:
+                option: "scene.bathroom_dark"
   trace:
     stored_traces: 100
 - id: automation.turn_on_bathroom_scene
