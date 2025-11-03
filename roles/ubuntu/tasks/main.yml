@@ -5,14 +5,14 @@
   tags: [ubuntu, time]
 
 - name: Add an apt key
-  apt_key:
+  ansible.builtin.get_url:
     url: https://cli.github.com/packages/githubcli-archive-keyring.gpg
-    keyring: /usr/share/keyrings/githubcli-archive-keyring.gpg
+    dest: /etc/apt/keyrings/githubcli-archive-keyring.gpg
   tags: [ubuntu, package]
 
 - name: Add a repository for GitHub
   apt_repository:
-    repo: "deb [arch=amd64 signed-by=/usr/share/keyrings/githubcli-archive-keyring.gpg] https://cli.github.com/packages stable main"
+    repo: "deb [arch=amd64 signed-by=/etc/apt/keyrings/githubcli-archive-keyring.gpg] https://cli.github.com/packages stable main"
     filename: github-cli
   when:
     ansible_architecture == "x86_64"
@@ -20,7 +20,7 @@
 
 - name: Add a repository for GitHub
   apt_repository:
-    repo: "deb [arch=arm64 signed-by=/usr/share/keyrings/githubcli-archive-keyring.gpg] https://cli.github.com/packages stable main"
+    repo: "deb [arch=arm64 signed-by=/etc/apt/keyrings/githubcli-archive-keyring.gpg] https://cli.github.com/packages stable main"
     filename: github-cli
   when:
     ansible_architecture == "aarch64"
