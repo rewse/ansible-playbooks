@@ -1,3 +1,7 @@
+---
+inclusion: always
+---
+
 # コミットメッセージガイドライン
 
 このプロジェクトでは、コミットメッセージは [Conventional Commits 1.0.0](https://www.conventionalcommits.org/ja/v1.0.0/) の仕様に従って記述してください。
