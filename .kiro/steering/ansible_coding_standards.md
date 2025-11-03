@@ -1,3 +1,8 @@
+---
+inclusion: fileMatch
+fileMatchPattern: '*.yml'
+---
+
 # Ansible YAML 構文ガイドライン
 
 ## 基本構文
