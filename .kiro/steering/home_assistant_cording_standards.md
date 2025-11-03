@@ -1,3 +1,8 @@
+---
+inclusion: fileMatch
+fileMatchPattern: "**/homeassistant/**/*.yaml"
+---
+
 # Home Assistant 開発ガイドライン
 
 ## YAML スタイルガイド
