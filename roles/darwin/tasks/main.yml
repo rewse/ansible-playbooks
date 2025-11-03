@@ -103,6 +103,7 @@
     - 1451685025  # WireGuard
     - 497799835   # Xcode
     - 1380563956  # 辞書 by 物書堂
+  ignore_errors: true
   tags: [darwin, package, mas]
 
 - name: Create $HOME/.venv
