@@ -1,6 +1,6 @@
 ---
 - name: Install packages by homebrew
-  homebrew:
+  community.general.homebrew:
     name: 
       - ansible
       - awscli
@@ -24,11 +24,11 @@
       - watch
       - yamllint
       - zsh-vi-mode
-    update_homebrew: yes
+    update_homebrew: true
   tags: [darwin, package, homebrew]
 
 - name: Install packages by homebrew_cask
-  homebrew_cask:
+  community.general.homebrew_cask:
     name: 
       - 1password
       - adobe-creative-cloud
@@ -78,12 +78,12 @@
       - vlc
       - wireshark
       - zoom
-    update_homebrew: yes
+    update_homebrew: true
   tags: [darwin, package, cask]
 
 - name: Install packages by mas
-  command: mas install {{item}}
-  with_items:
+  ansible.builtin.command: mas install {{ item }}
+  loop:
     - 1512372293  # 3DMark
     - 302584613   # Amazon Kindle
     - 545519333   # Amazon Prime Video
@@ -107,17 +107,17 @@
   tags: [darwin, package, mas]
 
 - name: Create $HOME/.venv
-  file:
+  ansible.builtin.file:
     path: $HOME/.venv
     state: directory
   tags: [darwin, package, pip]
 
 - name: Create venv
-  command: python3 -m venv $HOME/.venv
+  ansible.builtin.command: python3 -m venv $HOME/.venv
   tags: [darwin, package, pip]
 
 - name: Install packages by pip
-  pip:
+  ansible.builtin.pip:
     name:
       - pip-review
     state: latest
@@ -125,29 +125,29 @@
   tags: [darwin, package, pip]
 
 - name: Create /Library/Fonts/Adobe
-  file:
+  ansible.builtin.file:
     path: /Library/Fonts/Adobe
     state: directory
   tags: [darwin, package, font]
 
 - name: Download source-han-mono
-  get_url:
+  ansible.builtin.get_url:
     url: https://github.com/adobe-fonts/source-han-mono/releases/download/{{ source_han_mono_version }}/SourceHanMono.ttc
     dest: /Library/Fonts/Adobe
   tags: [darwin, package, font]
 
 - name: Download source-han-sans
-  unarchive:
+  ansible.builtin.unarchive:
     src: https://github.com/adobe-fonts/source-han-sans/releases/download/{{ source_han_sans_version }}/SourceHanSans.ttc.zip
     dest: /Library/Fonts/Adobe
-    remote_src: yes
+    remote_src: true
   tags: [darwin, package, font]
 
 - name: Download source-han-serif
-  unarchive:
+  ansible.builtin.unarchive:
     src: https://github.com/adobe-fonts/source-han-serif/releases/download/{{ source_han_serif_version }}/01_SourceHanSerif.ttc.zip
     dest: /Library/Fonts/Adobe
-    remote_src: yes
+    remote_src: true
   tags: [darwin, package, font]
 
 # - name: Install rest of the apps
