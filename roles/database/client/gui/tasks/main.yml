@@ -11,24 +11,24 @@
   tags: [database-client-gui, package, java]
 
 - name: Install Amazon Corretto
-  apt:
+  ansible.builtin.apt:
     name: java-{{ corretto_version }}-amazon-corretto-jdk
-    update_cache: yes
+    state: present
   tags: [database-client-gui, package, java]
 
 - name: Unarchive aws-schema-conversion-tool
-  unarchive:
+  ansible.builtin.unarchive:
     src: https://s3.amazonaws.com/publicsctdownload/Ubuntu/aws-schema-conversion-tool-1.0.latest.zip
     dest: /usr/local/src
-    remote_src: yes
+    remote_src: true
   tags: [database-client-gui, package, sct]
 
 - name: Install aws-schema-conversion-tool
-  apt:
+  ansible.builtin.apt:
     deb: /usr/local/src/aws-schema-conversion-tool-{{ sct_version }}.deb
   tags: [database-client-gui, package, sct]
 
 - name: Install dbeaver
-  apt:
+  ansible.builtin.apt:
     deb: https://dbeaver.io/files/dbeaver-ce_latest_amd64.deb
   tags: [database-client-gui, package, dbeaver]
