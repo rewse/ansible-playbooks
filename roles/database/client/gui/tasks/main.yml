@@ -1,13 +1,20 @@
 ---
-- name: Add an apt key for Amazon Corretto
-  apt_key:
+- name: Download Amazon Corretto GPG key
+  ansible.builtin.get_url:
     url: https://apt.corretto.aws/corretto.key
+    dest: /etc/apt/keyrings/corretto.gpg
   tags: [database-client-gui, package, java]
 
-- name: Add an apt repository for Amazon Corretto
-  apt_repository:
-    repo: deb https://apt.corretto.aws stable main
+- name: Add Amazon Corretto repository
+  ansible.builtin.apt_repository:
+    repo: "deb [signed-by=/etc/apt/keyrings/corretto.gpg] https://apt.corretto.aws stable main"
     filename: corretto
+    state: present
+  tags: [database-client-gui, package, java]
+
+- name: Update apt cache
+  ansible.builtin.apt:
+    update_cache: true
   tags: [database-client-gui, package, java]
 
 - name: Install Amazon Corretto
