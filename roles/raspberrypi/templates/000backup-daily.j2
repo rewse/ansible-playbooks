@@ -18,7 +18,7 @@ if [ "$(grep $dest /proc/mounts)" = "" ]; then
   mount $remote $dest
 fi
 
-nice -n 10 tmbackup $src $dest /etc/tmbackup.exclude > /dev/null
+nice -n 10 tmbackup --strategy "1:1 30:7 90:30" $src $dest /etc/tmbackup.exclude > /dev/null
 
 retval=$?
 
