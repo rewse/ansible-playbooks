@@ -20,6 +20,7 @@
   with_items:
     - 1212616790  # Microsoft To Do
     - 1639692859  # WattsConnected
+  ignore_errors: true
   tags: [darwin-business, package, mas]
 
 # Install toolbox
