@@ -1,13 +1,13 @@
 ---
 - name: Install packages by homebrew
-  homebrew:
+  community.general.homebrew:
     name: 
       - gemini-cli
-    update_homebrew: yes
+    update_homebrew: true
   tags: [darwin, package, homebrew]
 
 - name: Install packages by homebrew_cask
-  homebrew_cask:
+  community.general.homebrew_cask:
     name: 
       - charles
       - deepl
@@ -20,11 +20,11 @@
       - steam
       - steelseries-gg
       - ticktick
-    update_homebrew: yes
+    update_homebrew: true
   tags: [darwin-personal, package, cask]
 
 - name: Install qwen
-  command: npm install -g @qwen-code/qwen-code@latest
+  ansible.builtin.command: npm install -g @qwen-code/qwen-code@latest
   tags: [darwin-personal, package, qwen-code]
 
 # - name: Install rest of the apps

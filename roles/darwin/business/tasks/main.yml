@@ -1,6 +1,6 @@
 ---
 - name: Install packages by homebrew_cask
-  homebrew_cask:
+  community.general.homebrew_cask:
     name: 
       - asana
       - box-drive
@@ -12,12 +12,12 @@
       - quip
       - tripmode
       - webex-meetings
-    update_homebrew: yes
+    update_homebrew: true
   tags: [darwin-business, package, cask]
 
 - name: Install packages by mas
-  command: mas install {{item}}
-  with_items:
+  ansible.builtin.command: mas install {{ item }}
+  loop:
     - 1212616790  # Microsoft To Do
     - 1639692859  # WattsConnected
   ignore_errors: true
@@ -29,21 +29,21 @@
 # Run `mwinit -o` before the command
 
 # Ref: https://w.amazon.com/bin/view/Isengard-cli/
-- name: register isengard-cli repository
-  command: toolbox registry add s3://buildertoolbox-registry-isengard-cli-us-west-2/tools.json
+- name: Register isengard-cli repository
+  ansible.builtin.command: toolbox registry add s3://buildertoolbox-registry-isengard-cli-us-west-2/tools.json
   tags: [darwin-business, package, toolbox]
 
 # Ref: https://w.amazon.com/bin/view/DevAccount/Docs
-- name: install with toolbox
-  command: toolbox install {{ item }}
-  with_items:
+- name: Install with toolbox
+  ansible.builtin.command: toolbox install {{ item }}
+  loop:
     - ada
     - isengard-cli
     - q
   tags: [darwin-business, package, toolbox]
 
-- name: update toolbox
-  command: toolbox update
+- name: Update toolbox
+  ansible.builtin.command: toolbox update
   tags: [darwin-business, package, toolbox]
 
 # - name: Install rest of the apps
