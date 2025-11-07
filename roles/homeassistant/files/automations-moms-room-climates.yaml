@@ -795,6 +795,8 @@
     - condition: state
       entity_id: input_select.season_mode
       state: "Summer"
+      for:
+        minutes: 20
   actions:
     - choose:
         - conditions:
@@ -939,6 +941,8 @@
     - condition: state
       entity_id: input_select.season_mode
       state: "Winter"
+      for:
+        minutes: 20
   actions:
     - choose:
         - conditions:
@@ -1026,6 +1030,20 @@
       seconds: 54
     - trigger: homeassistant
       event: start
+  conditions:
+    - or:
+        - condition: state
+          entity_id: input_select.season_mode
+          state:
+            - "Summer"
+          for:
+            minutes: 20
+        - condition: state
+          entity_id: input_select.season_mode
+          state:
+            - "Winter"
+          for:
+            minutes: 20
   actions:
     - choose:
         - conditions:
