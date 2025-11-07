@@ -295,7 +295,6 @@
           - automation.change_dads_room_ac_mode
           - automation.toggle_dads_room_ac_cooldry
           - automation.toggle_dads_room_ac_heat
-          - automation.turn_on_dads_room_ac_internal_clean
   trace:
     stored_traces: 100
 - id: automation.select_dads_room_climate_mode
