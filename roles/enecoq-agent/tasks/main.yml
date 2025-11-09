@@ -1,0 +1,110 @@
+---
+- name: Check if uv is installed
+  ansible.builtin.stat:
+    path: /root/.local/bin/uv
+  register: uv_installed
+  tags: [enecoq-agent, uv, install]
+
+- name: Install uv
+  ansible.builtin.shell:
+    cmd: curl -LsSf https://astral.sh/uv/install.sh | sh
+  when: not uv_installed.stat.exists
+  tags: [enecoq-agent, uv, install]
+
+- name: Create symlink for uv in /usr/local/sbin
+  ansible.builtin.file:
+    src: /root/.local/bin/uv
+    dest: /usr/local/sbin/uv
+    state: link
+  tags: [enecoq-agent, uv, install]
+
+- name: Update uv to latest version
+  ansible.builtin.shell:
+    cmd: uv self update
+  tags: [enecoq-agent, uv, update]
+
+- name: Download enecoq-agent
+  ansible.builtin.unarchive:
+    src: https://github.com/rewse/enecoq-agent/archive/refs/tags/v{{ enecoq_agent_version }}.zip
+    dest: /tmp
+    remote_src: yes
+  tags: [enecoq-agent, download]
+
+- name: Copy enecoq-agent
+  ansible.builtin.copy:
+    src: /tmp/enecoq-agent-1.0.0/
+    dest: /opt/enecoq-agent
+    remote_src: yes
+  tags: [enecoq-agent, install]
+
+- name: Copy config.yaml
+  ansible.builtin.copy:
+    src: /opt/enecoq-agent/config.yaml.example
+    dest: /opt/enecoq-agent/config.yaml
+    remote_src: yes
+    mode: '0600'
+  tags: [enecoq-agent, config]
+
+- name: Configure email in config.yaml
+  ansible.builtin.lineinfile:
+    path: /opt/enecoq-agent/config.yaml
+    regexp: '^  email:'
+    line: '  email: "{{ enecoq.email }}"'
+  tags: [enecoq-agent, config]
+
+- name: Configure password in config.yaml
+  ansible.builtin.lineinfile:
+    path: /opt/enecoq-agent/config.yaml
+    regexp: '^  password:'
+    line: '  password: "{{ enecoq.password }}"'
+  tags: [enecoq-agent, config]
+
+- name: Update dependencies to latest versions
+  ansible.builtin.shell:
+    cmd: uv lock --upgrade
+    chdir: /opt/enecoq-agent
+  tags: [enecoq-agent, setup, update]
+
+- name: Run uv sync
+  ansible.builtin.shell:
+    cmd: uv sync
+    chdir: /opt/enecoq-agent
+  tags: [enecoq-agent, setup]
+
+- name: Install Playwright dependencies
+  ansible.builtin.apt:
+    name:
+      - libatk1.0-0t64
+      - libatspi2.0-0t64
+      - libgbm1
+      - libxcomposite1
+      - libxdamage1
+      - libxfixes3
+      - libxrandr2
+    update_cache: yes
+  tags: [enecoq-agent, setup, playwright, package]
+
+- name: Install Playwright Chromium
+  ansible.builtin.shell:
+    cmd: uv run playwright install chromium
+    chdir: /opt/enecoq-agent
+  tags: [enecoq-agent, setup, playwright]
+
+- name: Create data directory for Home Assistant
+  ansible.builtin.file:
+    path: /srv/homeassistant/config/data
+    state: directory
+  tags: [enecoq-agent, setup]
+
+- name: Install cron job
+  ansible.builtin.copy:
+    src: enecoq-agent.cron
+    dest: /etc/cron.d/enecoq-agent
+  tags: [enecoq-agent, cron]
+
+- name: Install logrotate configuration
+  ansible.builtin.copy:
+    src: enecoq-agent.logrotate
+    dest: /etc/logrotate.d/enecoq-agent
+  tags: [enecoq-agent, logrotate]
+
