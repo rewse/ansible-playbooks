@@ -25,3 +25,12 @@
     device_class: energy
     state_class: total_increasing
     scan_interval: 300
+- sensor:
+    name: "enecoQ Daily total"
+    unique_id: sensor.enecoq_daily_total
+    command: "cat /config/data/enecoq_daily.json"
+    value_template: "{{ value_json.total}}"
+    unit_of_measurement: "kWh"
+    device_class: energy
+    state_class: total_increasing
+    scan_interval: 300

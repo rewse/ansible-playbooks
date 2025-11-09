@@ -32,7 +32,7 @@
 
 - name: Copy enecoq-agent
   ansible.builtin.copy:
-    src: /tmp/enecoq-agent-1.0.0/
+    src: /tmp/enecoq-agent-{{ enecoq_agent_version }}/
     dest: /opt/enecoq-agent
     remote_src: yes
   tags: [enecoq-agent, install]
