@@ -225,10 +225,26 @@
   notify: Restart homeassistant
   tags: [homeassistant, homeassistant-component]
 
-- name: Config fan
+- name: Config command_line
   lineinfile:
     path: /srv/homeassistant/config/configuration.yaml
     insertafter: '^alexa:'
+    regexp: '^command_line:'
+    line: "command_line: !include command_lines.yaml"
+  notify: Restart homeassistant
+  tags: [homeassistant, homeassistant-component]
+
+- name: Copy command_lines.yaml
+  copy:
+    src: command_lines.yaml
+    dest: /srv/homeassistant/config
+  notify: Restart homeassistant
+  tags: [homeassistant, homeassistant-component]
+
+- name: Config fan
+  lineinfile:
+    path: /srv/homeassistant/config/configuration.yaml
+    insertafter: '^command_line:'
     regexp: '^fan:'
     line: "fan: !include fans.yaml"
   notify: Restart homeassistant
@@ -244,7 +260,7 @@
 - name: Config homekit
   lineinfile:
     path: /srv/homeassistant/config/configuration.yaml
-    insertafter: '^cover:'
+    insertafter: '^fan:'
     regexp: '^homekit:'
     line: "homekit: !include homekit.yaml"
   notify: Restart homeassistant
@@ -498,6 +514,22 @@
   notify: Restart homeassistant
   tags: [homeassistant, homeassistant-component]
 
+- name: Copy utility_meters.yaml
+  copy:
+    src: utility_meters.yaml
+    dest: /srv/homeassistant/config
+  notify: Restart homeassistant
+  tags: [homeassistant, homeassistant-component]
+
+- name: Config utility_meter
+  lineinfile:
+    path: /srv/homeassistant/config/configuration.yaml
+    insertafter: '^template:'
+    regexp: '^utility_meter:'
+    line: "utility_meter: !include utility_meters.yaml"
+  notify: Restart homeassistant
+  tags: [homeassistant, homeassistant-component]
+
 - name: Copy templates.yaml
   copy:
     src: templates.yaml
@@ -508,7 +540,7 @@
 - name: Config zone
   lineinfile:
     path: /srv/homeassistant/config/configuration.yaml
-    insertafter: '^template:'
+    insertafter: '^utility_meter:'
     regexp: '^zone:'
     line: "zone: !include zones.yaml"
   notify: Restart homeassistant

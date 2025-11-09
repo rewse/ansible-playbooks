@@ -382,6 +382,17 @@
 
 # Others
 
+  - unique_id: sensor.enecoq_daily_total
+    name: "enecoQ Daily Total"
+    state: >-
+      {{
+        states('sensor.enecoq_daily_low') | float(0) +
+        states('sensor.enecoq_daily_mid') | float(0) +
+        states('sensor.enecoq_daily_high') | float(0)
+      }}
+    unit_of_measurement: "kWh"
+    device_class: energy
+    state_class: total_increasing
   - unique_id: sensor.tokyo_weather_rain_chance_max
     name: "Tokyo Weather Rain Chance Max"
     state: >-

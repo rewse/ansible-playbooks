@@ -1,0 +1,27 @@
+- sensor:
+    name: "enecoQ Daily Low"
+    unique_id: sensor.enecoq_daily_low
+    command: "cat /config/data/enecoq_daily.json"
+    value_template: "{{ value_json.total_low }}"
+    unit_of_measurement: "kWh"
+    device_class: energy
+    state_class: total_increasing
+    scan_interval: 300
+- sensor:
+    name: "enecoQ Daily Mid"
+    unique_id: sensor.enecoq_daily_mid
+    command: "cat /config/data/enecoq_daily.json"
+    value_template: "{{ value_json.total_mid }}"
+    unit_of_measurement: "kWh"
+    device_class: energy
+    state_class: total_increasing
+    scan_interval: 300
+- sensor:
+    name: "enecoQ Daily High"
+    unique_id: sensor.enecoq_daily_high
+    command: "cat /config/data/enecoq_daily.json"
+    value_template: "{{ value_json.total_high }}"
+    unit_of_measurement: "kWh"
+    device_class: energy
+    state_class: total_increasing
+    scan_interval: 300
