@@ -1,0 +1,5 @@
+---
+enecoq:
+  email: "{{ vault_enecoq.email }}"
+  password: "{{ vault_enecoq.password }}"
+enecoq_agent_version: 1.0.0
