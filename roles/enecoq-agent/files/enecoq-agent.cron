@@ -1,0 +1,3 @@
+10,40 * * * * sleep $(shuf -i 0-59 -n 1) && cd /opt/enecoq-agent && /usr/local/sbin/uv run enecoq-agent --format json --output /srv/homeassistant/config/data/enecoq_daily.json >> /opt/enecoq-agent/logs/cron.log 2>&1
+59 23 * * * sleep $(shuf -i 0-29 -n 1) && cd /opt/enecoq-agent && /usr/local/sbin/uv run enecoq-agent --format json --output /srv/homeassistant/config/data/enecoq_daily.json >> /opt/enecoq-agent/logs/cron.log 2>&1
+46 3 * * * find /opt/enecoq-agent/data -name "enecoq_data_*.csv" -type f -mtime +7 -delete >> /opt/enecoq-agent/logs/cleanup.log 2>&1
