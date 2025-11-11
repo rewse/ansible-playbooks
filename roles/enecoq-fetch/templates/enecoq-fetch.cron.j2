@@ -1,1 +1,1 @@
-19 * * * root sleep $((RANDOM \% 30)) && cd /opt/enecoq-fetch && /usr/local/sbin/uv run enecoq-fetch --email [% enecoq.email %] --password [% enecoq.password %] --period month --format json --output /srv/homeassistant/config/data/enecoq_data.json >> /opt/enecoq-fetch/logs/cron.log 2>&1
+14,44 * * * * root sleep $((RANDOM \% 60)) && cd /opt/enecoq-fetch && /usr/local/sbin/uv run enecoq-fetch --email [% enecoq.email %] --password [% enecoq.password %] --period month --format json --output /srv/homeassistant/config/data/enecoq_data.json >> /opt/enecoq-fetch/logs/cron.log 2>&1
