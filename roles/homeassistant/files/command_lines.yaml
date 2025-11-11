@@ -1,36 +1,29 @@
 - sensor:
-    name: "enecoQ Daily Low"
-    unique_id: sensor.enecoq_daily_low
-    command: "cat /config/data/enecoq_daily.json"
-    value_template: "{{ value_json.total_low }}"
-    unit_of_measurement: "kWh"
-    device_class: energy
+    unique_id: sensor.enecoq_co2_emission
+    name: "enecoQ CO2 Emission"
+    command: "cat /config/data/enecoq_data.json"
+    value_template: "{{ value_json.co2 }}"
+    unit_of_measurement: "kg"
     state_class: total_increasing
+    icon: mdi:molecule-co2
     scan_interval: 300
 - sensor:
-    name: "enecoQ Daily Mid"
-    unique_id: sensor.enecoq_daily_mid
-    command: "cat /config/data/enecoq_daily.json"
-    value_template: "{{ value_json.total_mid }}"
-    unit_of_measurement: "kWh"
-    device_class: energy
+    unique_id: sensor.enecoq_power_cost
+    name: "enecoQ Power Cost"
+    command: "cat /config/data/enecoq_data.json"
+    value_template: "{{ value_json.cost }}"
+    unit_of_measurement: "JPY"
+    device_class: monetary
     state_class: total_increasing
+    icon: mdi:cash
     scan_interval: 300
 - sensor:
-    name: "enecoQ Daily High"
-    unique_id: sensor.enecoq_daily_high
-    command: "cat /config/data/enecoq_daily.json"
-    value_template: "{{ value_json.total_high }}"
+    unique_id: sensor.enecoq_power_usage
+    name: "enecoQ Power Usage"
+    command: "cat /config/data/enecoq_data.json"
+    value_template: "{{ value_json.usage }}"
     unit_of_measurement: "kWh"
     device_class: energy
     state_class: total_increasing
-    scan_interval: 300
-- sensor:
-    name: "enecoQ Daily total"
-    unique_id: sensor.enecoq_daily_total
-    command: "cat /config/data/enecoq_daily.json"
-    value_template: "{{ value_json.total}}"
-    unit_of_measurement: "kWh"
-    device_class: energy
-    state_class: total_increasing
+    icon: mdi:lightning-bolt
     scan_interval: 300
