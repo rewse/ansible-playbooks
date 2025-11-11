@@ -1086,6 +1086,8 @@
             - condition: state
               entity_id: switch.living_room_humidifier
               state: "off"
+              for:
+                hours: 1
             - not:
                 - condition: state
                   entity_id: input_select.time_mode
