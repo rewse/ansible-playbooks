@@ -888,6 +888,8 @@
             - condition: state
               entity_id: switch.dads_room_humidifier
               state: "off"
+              for:
+                hours: 1
           sequence:
             - variables:
                 action: "on"
