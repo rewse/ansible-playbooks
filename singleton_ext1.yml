@@ -6,6 +6,5 @@
     - desktop
     - database/client
     - database/client/gui
-    - enecoq
     - zabbix/aws
     - zabbix/money/sjdc

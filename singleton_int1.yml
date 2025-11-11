@@ -6,7 +6,7 @@
     - autodiscover
     - couchdb
     - docker
-    - enecoq-agent
+    - enecoq-fetch
     - homeassistant
     - httpd
     - litellm
