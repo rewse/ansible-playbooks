@@ -1052,6 +1052,8 @@
             - condition: state
               entity_id: switch.moms_room_humidifier
               state: "off"
+              for:
+                hours: 1
           sequence:
             - choose:
                 - conditions:
