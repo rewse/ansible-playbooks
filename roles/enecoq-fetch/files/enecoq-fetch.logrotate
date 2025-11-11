@@ -1,4 +1,4 @@
-/opt/enecoq-agent/logs/*.log {
+/opt/enecoq-fetch/logs/*.log {
     weekly
     rotate 4
     compress

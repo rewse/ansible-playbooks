@@ -1,0 +1,91 @@
+---
+- name: Check if uv is installed
+  ansible.builtin.stat:
+    path: /root/.local/bin/uv
+  register: uv_installed
+  tags: [enecoq-fetch, uv, install]
+
+- name: Install uv
+  ansible.builtin.shell:
+    cmd: curl -LsSf https://astral.sh/uv/install.sh | sh
+  when: not uv_installed.stat.exists
+  tags: [enecoq-fetch, uv, install]
+
+- name: Create symlink for uv in /usr/local/sbin
+  ansible.builtin.file:
+    src: /root/.local/bin/uv
+    dest: /usr/local/sbin/uv
+    state: link
+  tags: [enecoq-fetch, uv, install]
+
+- name: Update uv to latest version
+  ansible.builtin.shell:
+    cmd: uv self update
+  tags: [enecoq-fetch, uv, update]
+
+- name: Download enecoq-data-fetcher
+  ansible.builtin.unarchive:
+    src: https://github.com/rewse/enecoq-data-fetcher/archive/refs/tags/v{{ enecoq_data_fetcher_version }}.zip
+    dest: /tmp
+    remote_src: yes
+  tags: [enecoq-fetch, download]
+
+- name: Copy enecoq-data-fetcher
+  ansible.builtin.copy:
+    src: /tmp/enecoq-data-fetcher-{{ enecoq_data_fetcher_version }}/
+    dest: /opt/enecoq-fetch
+    remote_src: yes
+  tags: [enecoq-fetch, install]
+
+- name: Update dependencies to latest versions
+  ansible.builtin.shell:
+    cmd: uv lock --upgrade
+    chdir: /opt/enecoq-fetch
+  tags: [enecoq-fetch, setup, update]
+
+- name: Run uv sync
+  ansible.builtin.shell:
+    cmd: uv sync
+    chdir: /opt/enecoq-fetch
+  tags: [enecoq-fetch, setup]
+
+- name: Install Playwright dependencies
+  ansible.builtin.apt:
+    name:
+      - libatk1.0-0t64
+      - libatspi2.0-0t64
+      - libgbm1
+      - libxcomposite1
+      - libxdamage1
+      - libxfixes3
+      - libxrandr2
+    update_cache: yes
+  tags: [enecoq-fetch, setup, playwright, package]
+
+- name: Install Playwright Chromium
+  ansible.builtin.shell:
+    cmd: uv run playwright install chromium
+    chdir: /opt/enecoq-fetch
+  tags: [enecoq-fetch, setup, playwright]
+
+- name: Create data directory for Home Assistant
+  ansible.builtin.file:
+    path: /srv/homeassistant/config/data
+    state: directory
+  tags: [enecoq-fetch, setup]
+
+- name: Install cron job
+  ansible.builtin.template:
+    src: enecoq-fetch.cron.j2
+    dest: /etc/cron.d/enecoq-fetch
+    variable_start_string: '[%'
+    variable_end_string: '%]'
+    mode: '0600'
+  tags: [enecoq-fetch, cron]
+
+- name: Install logrotate configuration
+  ansible.builtin.copy:
+    src: enecoq-fetch.logrotate
+    dest: /etc/logrotate.d/enecoq-fetch
+  tags: [enecoq-fetch, logrotate]
+
