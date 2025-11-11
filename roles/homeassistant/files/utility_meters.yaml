@@ -1,20 +1,24 @@
-enecoq_monthly_low:
-  unique_id: sensor.enecoq_monthly_low
-  name: "enecoQ Monthly Low"
-  source: sensor.enecoq_daily_low
-  cycle: monthly
-enecoq_monthly_mid:
-  unique_id: sensor.enecoq_monthly_mid
-  name: "enecoQ Monthly Mid"
-  source: sensor.enecoq_daily_mid
-  cycle: monthly
-enecoq_monthly_high:
-  unique_id: sensor.enecoq_monthly_high
-  name: "enecoQ Monthly High"
-  source: sensor.enecoq_daily_high
-  cycle: monthly
-enecoq_monthly_total:
-  unique_id: sensor.enecoq_monthly_total
-  name: "enecoQ Monthly Total"
-  source: sensor.enecoq_daily_total
-  cycle: monthly
+enecoq_co2_emission_daily:
+  unique_id: sensor.enecoq_co2_emission_daily
+  source: sensor.enecoq_co2_emission
+  cycle: daily
+enecoq_power_cost_daily:
+  unique_id: sensor.enecoq_power_cost_daily
+  source: sensor.enecoq_power_cost
+  cycle: daily
+enecoq_power_usage_daily:
+  unique_id: sensor.enecoq_power_usage_daily
+  source: sensor.enecoq_power_usage
+  cycle: daily
+enecoq_co2_emission_hourly:
+  unique_id: sensor.enecoq_co2_emission_hourly
+  source: sensor.enecoq_co2_emission
+  cycle: hourly
+enecoq_power_cost_hourly:
+  unique_id: sensor.enecoq_power_cost_hourly
+  source: sensor.enecoq_power_cost
+  cycle: hourly
+enecoq_power_usage_hourly:
+  unique_id: sensor.enecoq_power_usage_hourly
+  source: sensor.enecoq_power_usage
+  cycle: hourly
