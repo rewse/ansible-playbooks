@@ -1,4 +1,11 @@
 ---
+- name: Install packages by homebrew
+  community.general.homebrew:
+    name: 
+      - node@20
+    update_homebrew: true
+  tags: [darwin-business, package, homebrew]
+
 - name: Install packages by homebrew_cask
   community.general.homebrew_cask:
     name: 
@@ -10,6 +17,7 @@
       - microsoft-teams
       - monitorcontrol
       - quip
+      - temurin@8
       - tripmode
       - webex-meetings
     update_homebrew: true
