@@ -8,7 +8,6 @@
       - fontforge
       - fping
       - jq
-      - kiro
       - mas
       - node
       - php
@@ -65,6 +64,7 @@
       - kekaexternalhelper
       - keyboard-maestro
       - keycastr
+      - kiro-cli
       - lm-studio
       - messenger
       - obsidian
