@@ -59,6 +59,7 @@
       - python3-venv
       - sysstat
       - tldr
+      - tree
       - unattended-upgrades
       - unzip
       - update-notifier-common
