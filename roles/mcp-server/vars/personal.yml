@@ -6,5 +6,5 @@ mcp_servers_personal:
       - "-y"
       - "mcp-obsidian"
       - "/Users/tats/Obsidian/vault"
-    disabled: false
+    disabled: true
     autoApprove: []

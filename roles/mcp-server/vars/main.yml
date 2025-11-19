@@ -3,14 +3,6 @@ mcp_config_dir: "{{ ansible_env.HOME }}/.config"
 mcp_config_file: "{{ mcp_config_dir }}/mcp.json"
 
 mcp_servers_common:
-  aws-docs:
-    command: "uvx"
-    args:
-      - "awslabs.aws-documentation-mcp-server@latest"
-    env:
-      FASTMCP_LOG_LEVEL: "ERROR"
-    disabled: false
-    autoApprove: []
   brave-search:
     command: "npx"
     args:
@@ -29,27 +21,9 @@ mcp_servers_common:
     disabled: false
     autoApprove:
       - fetch
-  playwright:
-    command: "npx"
-    args:
-      - "-y"
-      - "@playwright/mcp@latest"
-    disabled: false
-    autoApprove: []
-  Scrapeless MCP Server:
-    command: "npx"
-    args:
-      - "-y"
-      - "scrapeless-mcp-server"
-    env:
-      SCRAPELESS_KEY: "{{ vault_scrapeless_key }}"
-    disabled: false
-    autoApprove: []
 
 mcp_additional_config: |
   "settings": {
-    "autoApproveTimeout": 15,
-    "defaultTimeout": 45
   }
 
 mcp_validate_config: true
