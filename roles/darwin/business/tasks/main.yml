@@ -46,13 +46,24 @@
   ansible.builtin.command: toolbox install {{ item }}
   loop:
     - ada
+    - axe
     - isengard-cli
-    - q
+    - mcp-registry
   tags: [darwin-business, package, toolbox]
 
 - name: Update toolbox
   ansible.builtin.command: toolbox update
   tags: [darwin-business, package, toolbox]
+
+- name: Install Kiro
+  ansible.builtin.command: axe init kiro
+  tags: [darwin-business, package, kiro]
+
+- name: Install MCP servers
+  ansible.builtin.command: mcp-registry install {{ item }}
+  loop:
+    - builder-mcp
+  tags: [darwin-business, package, mcp]
 
 # - name: Install rest of the apps
 #   install_yourself:

@@ -89,50 +89,21 @@
   when: aws.stat.exists
   tags: [ubuntu, package, awscliv2]
 
-- name: Download Q CLI tool for x86_64
+- name: Install Kiro CLI
   become_user: "{{ admin }}"
-  ansible.builtin.command: curl --proto '=https' --tlsv1.2 -sSf "https://desktop-release.q.us-east-1.amazonaws.com/latest/q-x86_64-linux-musl.zip" -o "q.zip"
-  args:
-    chdir: /home/{{ admin }}
-    creates: /home/{{ admin }}/q.zip
-  when:
-    ansible_architecture == "x86_64"
-  tags: [ubuntu, package, amazon-q]
+  ansible.builtin.shell: curl -fsSL https://cli.kiro.dev/install | bash
+  tags: [ubuntu, package, kiro-cli]
 
-- name: Download Q CLI tool for ARM
+- name: Install uv
   become_user: "{{ admin }}"
-  ansible.builtin.command: curl --proto '=https' --tlsv1.2 -sSf "https://desktop-release.q.us-east-1.amazonaws.com/latest/q-aarch64-linux-musl.zip" -o "q.zip"
-  args:
-    chdir: /home/{{ admin }}
-    creates: /home/{{ admin }}/q.zip
-  when:
-    ansible_architecture == "aarch64"
-  tags: [ubuntu, package, amazon-q]
+  ansible.builtin.shell: curl -LsSf https://astral.sh/uv/install.sh | sh
+  tags: [ubuntu, package, uv]
 
-- name: Unzip Q CLI tool
-  become_user: "{{ admin }}"
-  ansible.builtin.command: unzip q.zip
-  args:
-    chdir: /home/{{ admin }}
-    creates: /home/{{ admin }}/q
-  tags: [ubuntu, package, amazon-q]
-
-- name: Install Q CLI tool
-  become_user: "{{ admin }}"
-  ansible.builtin.command: ./q/install.sh --no-confirm
-  args:
-    chdir: /home/{{ admin }}
-  tags: [ubuntu, package, amazon-q]
-
-- name: Clean up Q CLI installation files
-  become_user: "{{ admin }}"
-  ansible.builtin.file:
-    path: /home/{{ admin }}/{{ item }}
-    state: absent
-  loop:
-    - q.zip
-    - q
-  tags: [ubuntu, package, amazon-q]
+- name: Copy local-bin.sh
+  copy:
+    src: local-bin.sh
+    dest: /etc/profile.d
+  tags: [ubuntu, package, uv]
 
 - name: "etckeeper : Init /etc"
   command: etckeeper init
