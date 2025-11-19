@@ -1,27 +1,22 @@
 ---
 mcp_servers_business:
-  amzn-mcp:
-    command: "amzn-mcp"
-    args: []
-    disabled: false
+  awslabs.aws-api-mcp-server:
+    command: "uvx"
+    args:
+      - "awslabs.aws-api-mcp-server@latest"
+    disabled: true
+    autoApprove: []
+  awslabs.aws-documentation-mcp-server:
+    command: "uvx"
+    args:
+      - "awslabs.aws-documentation-mcp-server@latest"
+    disabled: true
     autoApprove: []
   aws-knowledge-mcp-server:
-    command: "npx"
+    command: "uvx"
     args:
-      - "mcp-remote"
+      - "fastmcp"
+      - "run"
       - "https://knowledge-mcp.global.api.aws"
-    disabled: false
-    autoApprove: []
-  builder-mcp:
-    command: "builder-mcp"
-    args: []
-    disabled: false
-    autoApprove: []
-  obsidian:
-    command: "npx"
-    args:
-      - "-y"
-      - "mcp-obsidian"
-      - "/Users/shibtats/Obsidian/vault"
-    disabled: false
+    disabled: true
     autoApprove: []
