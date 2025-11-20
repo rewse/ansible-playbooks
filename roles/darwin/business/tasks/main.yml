@@ -48,6 +48,7 @@
     - ada
     - axe
     - isengard-cli
+    - kiro-cli
     - mcp-registry
   tags: [darwin-business, package, toolbox]
 
