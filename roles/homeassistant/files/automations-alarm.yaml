@@ -251,3 +251,31 @@
   mode: parallel
   trace:
     stored_traces: 100
+- id: automation.alarm_plug_switch_offline
+  alias: "ALARM: Plug Switch is Offline"
+  triggers:
+    - trigger: state
+      entity_id: 
+        - switch.bathroom_washing_machine
+        - switch.kitchen_refrigerator_plug
+        - switch.kitchen_rice_cooker_plug
+        - switch.living_room_tv_plug
+      to: "off"
+  actions:
+    - delay:
+        seconds: 2
+    - action: switch.turn_on
+      target:
+        entity_id: "{{ trigger.entity_id }}"
+    - action: notify.tats_devices
+      data:
+        title: "⚠️ ALARM"
+        message: >-
+          {{ trigger.entity_id }} returned to on
+        data:
+          url: "/dashboard-internal/internal"
+          push:
+            interruption-level: time-sensitive
+  mode: parallel
+  trace:
+    stored_traces: 100
