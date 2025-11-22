@@ -164,7 +164,7 @@
     uid: 2000
     group: "{{ admin }}"
     groups: "adm,sudo"
-    shell: /bin/bash
+    shell: /usr/bin/zsh
     skeleton: /etc/skel
   tags: [ubuntu, user]
 
