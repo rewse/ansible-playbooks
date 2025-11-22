@@ -26,6 +26,22 @@
     ansible_architecture == "aarch64"
   tags: [ubuntu, package]
 
+- name: Add 1Password repository
+  ansible.builtin.shell: |
+    curl -sS https://downloads.1password.com/linux/keys/1password.asc | \
+    sudo gpg --dearmor --output /usr/share/keyrings/1password-archive-keyring.gpg && \
+    echo "deb [arch=$(dpkg --print-architecture) signed-by=/usr/share/keyrings/1password-archive-keyring.gpg] https://downloads.1password.com/linux/debian/$(dpkg --print-architecture) stable main" | \
+    sudo tee /etc/apt/sources.list.d/1password.list && \
+    sudo mkdir -p /etc/debsig/policies/AC2D62742012EA22/ && \
+    curl -sS https://downloads.1password.com/linux/debian/debsig/1password.pol | \
+    sudo tee /etc/debsig/policies/AC2D62742012EA22/1password.pol && \
+    sudo mkdir -p /usr/share/debsig/keyrings/AC2D62742012EA22 && \
+    curl -sS https://downloads.1password.com/linux/keys/1password.asc | \
+    sudo gpg --dearmor --output /usr/share/debsig/keyrings/AC2D62742012EA22/debsig.gpg
+  args:
+    creates: /etc/apt/sources.list.d/1password.list
+  tags: [ubuntu, package, 1password]
+
 - name: Update all packages
   apt:
     name: '*'
@@ -36,6 +52,7 @@
 - name: Install additional packages
   apt:
     name:
+      - 1password-cli
       - apt-file
       - at
       - bat
