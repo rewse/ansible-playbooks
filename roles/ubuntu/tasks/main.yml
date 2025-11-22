@@ -120,12 +120,6 @@
   ansible.builtin.shell: curl -LsSf https://astral.sh/uv/install.sh | sh
   tags: [ubuntu, package, uv]
 
-- name: Copy local-bin.sh
-  copy:
-    src: local-bin.sh
-    dest: /etc/profile.d
-  tags: [ubuntu, package, uv]
-
 - name: "etckeeper : Init /etc"
   command: etckeeper init
   args:
