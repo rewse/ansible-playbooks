@@ -2,8 +2,10 @@
 - name: Install packages by homebrew
   community.general.homebrew:
     name: 
+      - 1password-cli
       - ansible
       - awscli
+      - bat
       - gh
       - fontforge
       - fping
