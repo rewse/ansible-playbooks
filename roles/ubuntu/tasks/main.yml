@@ -38,6 +38,7 @@
     name:
       - apt-file
       - at
+      - bat
       - bc
       - curl
       - dphys-swapfile
@@ -65,6 +66,8 @@
       - update-notifier-common
       - vim
       - wireless-tools
+      - zsh
+      - zsh-vi-mode
   tags: [ubuntu, package]
 
 - name: Stat awscliv2
