@@ -276,6 +276,8 @@
           url: "/dashboard-internal/internal"
           push:
             interruption-level: time-sensitive
+    - delay:
+        minutes: 5
   mode: parallel
   trace:
     stored_traces: 100
