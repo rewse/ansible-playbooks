@@ -4,4 +4,3 @@
   roles:
     - darwin
     - darwin/personal
-    - dotfiles/darwin

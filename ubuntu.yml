@@ -5,5 +5,4 @@
   roles:
     - ubuntu
     - postfix/client
-    - dotfiles/linux
     - zabbix/agent/ubuntu
