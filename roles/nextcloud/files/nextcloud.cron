@@ -1,3 +1,0 @@
-SHELL=/bin/sh
-PATH=/usr/local/sbin:/usr/local/bin:/sbin:/bin:/usr/sbin:/usr/bin
-*/5  *  *  *  * www-data php -f /srv/www/nextcloud/cron.php

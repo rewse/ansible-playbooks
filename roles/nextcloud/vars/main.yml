@@ -1,5 +1,0 @@
----
-nextcloud:
-  iam_key: "{{ vault_nextcloud.iam_key }}"
-  iam_secret: "{{ vault_nextcloud.iam_secret }}"
-php_version: 8.3
