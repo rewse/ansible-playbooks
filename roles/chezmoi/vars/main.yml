@@ -1,0 +1,2 @@
+---
+onepassword_token: "{{ vault_onepassword_token }}"
