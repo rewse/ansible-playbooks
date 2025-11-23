@@ -2,5 +2,6 @@
 - hosts: darwin_personal
   connection: local
   roles:
+    - chezmoi
     - darwin
     - darwin/personal

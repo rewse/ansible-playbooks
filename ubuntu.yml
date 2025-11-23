@@ -1,8 +1,9 @@
 ---
 - hosts: ubuntu
-  become: yes
+  become: true
   remote_user: ubuntu
   roles:
     - ubuntu
     - postfix/client
+    - chezmoi
     - zabbix/agent/ubuntu
