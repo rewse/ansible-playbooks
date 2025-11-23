@@ -107,24 +107,6 @@
   ignore_errors: true
   tags: [darwin, package, mas]
 
-- name: Create $HOME/.venv
-  ansible.builtin.file:
-    path: $HOME/.venv
-    state: directory
-  tags: [darwin, package, pip]
-
-- name: Create venv
-  ansible.builtin.command: python3 -m venv $HOME/.venv
-  tags: [darwin, package, pip]
-
-- name: Install packages by pip
-  ansible.builtin.pip:
-    name:
-      - pip-review
-    state: latest
-    virtualenv: $HOME/.venv
-  tags: [darwin, package, pip]
-
 - name: Create /Library/Fonts/Adobe
   ansible.builtin.file:
     path: /Library/Fonts/Adobe
