@@ -29,7 +29,7 @@
 - name: Update and apply chezmoi configuration for root user
   ansible.builtin.shell: chezmoi update --force
   environment:
-    OP_SERVICE_ACCOUNT_TOKEN: "{{ vault_1password_token }}"
+    OP_SERVICE_ACCOUNT_TOKEN: "{{ onepassword_token }}"
   when: ansible_system == "Linux"
   tags: [chezmoi, apply]
 
@@ -49,5 +49,5 @@
   ansible.builtin.shell: chezmoi update --force
   become_user: "{{ admin }}"
   environment:
-    OP_SERVICE_ACCOUNT_TOKEN: "{{ vault_1password_token }}"
+    OP_SERVICE_ACCOUNT_TOKEN: "{{ onepassword_token }}"
   tags: [chezmoi, apply]
