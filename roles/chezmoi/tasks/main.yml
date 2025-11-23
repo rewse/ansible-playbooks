@@ -1,0 +1,53 @@
+---
+- name: Install chezmoi (macOS)
+  community.general.homebrew:
+    name: chezmoi
+  when: ansible_system == "Darwin"
+  tags: [chezmoi, install]
+
+- name: Install chezmoi (Linux)
+  ansible.builtin.shell: sh -c "$(curl -fsLS get.chezmoi.io)" -- -b /usr/local/bin
+  args:
+    creates: /usr/local/bin/chezmoi
+  when: ansible_system == "Linux"
+  tags: [chezmoi, install]
+
+- name: Check if chezmoi is already initialized for root user
+  ansible.builtin.stat:
+    path: /root/.local/share/chezmoi/.git
+  register: chezmoi_root_initialized
+  when: ansible_system == "Linux"
+  tags: [chezmoi, init]
+
+- name: Initialize chezmoi for root user
+  ansible.builtin.shell: chezmoi init rewse
+  when:
+    - ansible_system == "Linux"
+    - not chezmoi_root_initialized.stat.exists
+  tags: [chezmoi, init]
+
+- name: Update and apply chezmoi configuration for root user
+  ansible.builtin.shell: chezmoi update --force
+  environment:
+    OP_SERVICE_ACCOUNT_TOKEN: "{{ vault_1password_token }}"
+  when: ansible_system == "Linux"
+  tags: [chezmoi, apply]
+
+- name: Check if chezmoi is already initialized for admin user
+  ansible.builtin.stat:
+    path: /home/{{ admin }}/.local/share/chezmoi/.git
+  register: chezmoi_admin_initialized
+  tags: [chezmoi, init]
+
+- name: Initialize chezmoi for admin user
+  ansible.builtin.shell: chezmoi init rewse
+  become_user: "{{ admin }}"
+  when: not chezmoi_admin_initialized.stat.exists
+  tags: [chezmoi, init]
+
+- name: Update and apply chezmoi configuration for admin user
+  ansible.builtin.shell: chezmoi update --force
+  become_user: "{{ admin }}"
+  environment:
+    OP_SERVICE_ACCOUNT_TOKEN: "{{ vault_1password_token }}"
+  tags: [chezmoi, apply]
