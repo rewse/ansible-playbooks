@@ -31,7 +31,7 @@
   environment:
     OP_SERVICE_ACCOUNT_TOKEN: "{{ onepassword_token }}"
   when: ansible_system == "Linux"
-  tags: [chezmoi, apply]
+  tags: [chezmoi, update]
 
 - name: Check if chezmoi is already initialized for admin user
   ansible.builtin.stat:
@@ -50,4 +50,4 @@
   become_user: "{{ admin }}"
   environment:
     OP_SERVICE_ACCOUNT_TOKEN: "{{ onepassword_token }}"
-  tags: [chezmoi, apply]
+  tags: [chezmoi, update]
