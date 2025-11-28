@@ -21,7 +21,7 @@
 
 - name: Copy instantclient
   unarchive:
-    src: https://download.oracle.com/otn_software/linux/instantclient/{{ oracle_instantclient_version_1 }}{{ oracle_instantclient_version_2 }}0000/instantclient-{{ item }}-linux.x64-{{ oracle_instantclient_version_1 }}.{{ oracle_instantclient_version_2 }}.{{ oracle_instantclient_version_3 }}.zip
+    src: https://download.oracle.com/otn_software/linux/instantclient/{{ oracle_instantclient_version_1 }}{{ oracle_instantclient_version_2 }}000/instantclient-{{ item }}-linux.x64-{{ oracle_instantclient_version_1 }}.{{ oracle_instantclient_version_2 }}.{{ oracle_instantclient_version_3 }}.zip
     dest: /srv
     remote_src: yes
   with_items:
