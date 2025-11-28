@@ -566,6 +566,21 @@
     state: directory
   tags: [homeassistant, homeassistant-custom]
 
+- name: Download frosted-glass-manager
+  unarchive:
+    src: https://github.com/wessamlauf/frosted-glass-manager/archive/refs/tags/v{{ frosted_glass_manager_version }}.zip
+    dest: /tmp
+    remote_src: yes
+  tags: [homeassistant, homeassistant-custom]
+
+- name: Copy frosted-glass-manager
+  copy:
+    src: /tmp/frosted-glass-manager-{{ frosted_glass_manager_version }}/custom_components/frosted_glass_manager
+    dest: /srv/homeassistant/config/custom_components
+    remote_src: yes
+  notify: Restart homeassistant
+  tags: [homeassistant, homeassistant-custom]
+
 - name: Download tuya-local
   unarchive:
     src: https://github.com/make-all/tuya-local/archive/refs/tags/{{ tuya_local_version }}.zip
