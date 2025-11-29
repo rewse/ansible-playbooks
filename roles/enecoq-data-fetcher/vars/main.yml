@@ -2,4 +2,3 @@
 enecoq:
   email: "{{ vault_enecoq.email }}"
   password: "{{ vault_enecoq.password }}"
-enecoq_data_fetcher_version: 1.0.0
