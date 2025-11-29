@@ -1,0 +1,1 @@
+14,44 * * * * root sleep $((RANDOM \% 60)) && uvx enecoq-data-fetcher --email [% enecoq.email %] --password [% enecoq.password %] --period month --format json --output /srv/homeassistant/config/data/enecoq_data.json >> /var/log/enecoq-data-fetcher.log 2>&1
