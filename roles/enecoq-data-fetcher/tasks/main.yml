@@ -3,36 +3,36 @@
   ansible.builtin.stat:
     path: /root/.local/bin/uv
   register: uv_installed
-  tags: [enecoq-data-fethcer, uv, install]
+  tags: [enecoq-data-fetcher, uv, install]
 
 - name: Install uv
   ansible.builtin.shell:
     cmd: curl -LsSf https://astral.sh/uv/install.sh | sh
   when: not uv_installed.stat.exists
-  tags: [enecoq-data-fethcer, uv, install]
+  tags: [enecoq-data-fetcher, uv, install]
 
 - name: Create symlink for uv in /usr/local/sbin
   ansible.builtin.file:
     src: /root/.local/bin/uv
     dest: /usr/local/sbin/uv
     state: link
-  tags: [enecoq-data-fethcer, uv, install]
+  tags: [enecoq-data-fetcher, uv, install]
 
 - name: Update uv to latest version
   ansible.builtin.shell:
     cmd: uv self update
-  tags: [enecoq-data-fethcer, uv, update]
+  tags: [enecoq-data-fetcher, uv, update]
 
 - name: Create data directory for Home Assistant
   ansible.builtin.file:
     path: /srv/homeassistant/config/data
     state: directory
-  tags: [enecoq-data-fethcer, setup]
+  tags: [enecoq-data-fetcher, setup]
 
 - name: Install chromium
   ansible.builtin.shell:
     cmd: uvx --from enecoq-data-fetcher playwright install chromium --force
-  tags: [enecoq-data-fethcer, uv, install]
+  tags: [enecoq-data-fetcher, uv, install]
 
 - name: Install cron job
   ansible.builtin.template:
@@ -41,10 +41,10 @@
     variable_start_string: '[%'
     variable_end_string: '%]'
     mode: '0600'
-  tags: [enecoq-data-fethcer, cron]
+  tags: [enecoq-data-fetcher, cron]
 
 - name: Install logrotate configuration
   ansible.builtin.copy:
     src: enecoq-data-fetcher.logrotate
-    dest: /etc/logrotate.d/enecoq-data-fethcer
-  tags: [enecoq-data-fethcer, logrotate]
+    dest: /etc/logrotate.d/enecoq-data-fetcher
+  tags: [enecoq-data-fetcher, logrotate]
