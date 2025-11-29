@@ -11,11 +11,14 @@
   when: not uv_installed.stat.exists
   tags: [enecoq-data-fetcher, uv, install]
 
-- name: Create symlink for uv in /usr/local/sbin
+- name: Create symlinks for uv and uvx in /usr/local/sbin
   ansible.builtin.file:
-    src: /root/.local/bin/uv
-    dest: /usr/local/sbin/uv
+    src: /root/.local/bin/{{ item }}
+    dest: /usr/local/sbin/{{ item }}
     state: link
+  loop:
+    - uv
+    - uvx
   tags: [enecoq-data-fetcher, uv, install]
 
 - name: Update uv to latest version
