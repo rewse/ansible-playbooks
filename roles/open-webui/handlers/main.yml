@@ -1,16 +1,17 @@
 ---
-- name: Reload apache
+- name: "apache: Reload"
   ansible.builtin.systemd:
     name: apache2
     state: reloaded
 
-- name: Restart apache
+- name: "apache: Restart"
   ansible.builtin.systemd:
     name: apache2
     state: restarted
 
-- name: Restart open-webui
+- name: "open-webui: Restart"
   community.docker.docker_compose_v2:
     project_src: /etc
-    services: open-webui
+    services:
+      - open-webui
     state: restarted

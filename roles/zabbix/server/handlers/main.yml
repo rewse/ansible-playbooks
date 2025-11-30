@@ -1,15 +1,15 @@
 ---
-- name: Restart apache
+- name: "apache: Restart"
   ansible.builtin.systemd:
     name: apache2
     state: restarted
 
-- name: Reload apache
+- name: "apache: Reload"
   ansible.builtin.systemd:
     name: apache2
     state: reloaded
 
-- name: Restart zabbix-server
+- name: "zabbix-server: Restart"
   ansible.builtin.systemd:
     name: zabbix-server
     state: restarted

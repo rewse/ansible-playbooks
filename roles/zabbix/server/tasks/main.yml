@@ -1,10 +1,10 @@
 ---
-- name: Install zabbix-release
+- name: "zabbix-server: Install zabbix-release package"
   ansible.builtin.apt:
     deb: https://repo.zabbix.com/zabbix/{{ zabbix.version }}/release/ubuntu/pool/main/z/zabbix-release/zabbix-release_latest_{{ zabbix.version }}+ubuntu24.04_all.deb
-  tags: [zabbix-server, package, zabbix-frontend]
+  tags: [zabbix-server, install, zabbix-frontend]
 
-- name: Install packages
+- name: "zabbix-server: Install packages"
   ansible.builtin.apt:
     name:
       - zabbix-server-pgsql
@@ -15,111 +15,111 @@
       - mosquitto-clients
       - php-pgsql
     update_cache: true
-  notify: Restart apache
-  tags: [zabbix-server, package, zabbix-frontend]
+  notify: "apache: Restart"
+  tags: [zabbix-server, install, zabbix-frontend]
 
-- name: Create zabbix-server.service.d
+- name: "zabbix-server: Create systemd override directory"
   ansible.builtin.file:
     path: /etc/systemd/system/zabbix-server.service.d
     state: directory
-  tags: [zabbix-server]
+  tags: [zabbix-server, init]
 
-- name: Copy override.conf
+- name: "zabbix-server: Copy systemd override config"
   ansible.builtin.copy:
     src: override.conf
     dest: /etc/systemd/system/zabbix-server.service.d
-  notify: Restart zabbix-server
-  tags: [zabbix-server]
+  notify: "zabbix-server: Restart"
+  tags: [zabbix-server, config]
 
-- name: Change permission of zabbix_server.conf
+- name: "zabbix-server: Set config file permissions"
   ansible.builtin.file:
     path: /etc/zabbix/zabbix_server.conf
     owner: root
     group: zabbix
     mode: '0640'
-  tags: [zabbix-server]
+  tags: [zabbix-server, config]
 
-- name: Set DBHost
+- name: "zabbix-server: Set DBHost"
   ansible.builtin.lineinfile:
     dest: /etc/zabbix/zabbix_server.conf
     insertafter: "^# DBHost="
     regexp: "^DBHost="
     line: "DBHost={{ zabbix.db_host }}"
-  notify: Restart zabbix-server
-  tags: [zabbix-server]
+  notify: "zabbix-server: Restart"
+  tags: [zabbix-server, config]
 
-- name: Set DBPassword
+- name: "zabbix-server: Set DBPassword"
   ansible.builtin.lineinfile:
     dest: /etc/zabbix/zabbix_server.conf
     insertafter: "^# DBPassword="
     regexp: "^DBPassword="
     line: "DBPassword={{ zabbix.db_password }}"
-  notify: Restart zabbix-server
-  tags: [zabbix-server]
+  notify: "zabbix-server: Restart"
+  tags: [zabbix-server, config]
 
-- name: Set Timeout
+- name: "zabbix-server: Set Timeout"
   ansible.builtin.lineinfile:
     dest: /etc/zabbix/zabbix_server.conf
     insertafter: "^# Timeout="
     regexp: "^Timeout="
     line: "Timeout=30"
-  notify: Restart zabbix-server
-  tags: [zabbix-server]
+  notify: "zabbix-server: Restart"
+  tags: [zabbix-server, config]
 
-- name: Set MaxHousekeeperDelete
+- name: "zabbix-server: Set MaxHousekeeperDelete"
   ansible.builtin.lineinfile:
     dest: /etc/zabbix/zabbix_server.conf
     insertafter: "^# MaxHousekeeperDelete="
     regexp: "^MaxHousekeeperDelete="
     line: "MaxHousekeeperDelete=20000"
-  notify: Restart zabbix-server
-  tags: [zabbix-server]
+  notify: "zabbix-server: Restart"
+  tags: [zabbix-server, config]
 
-- name: Set AllowUnsupportedDBVersions
+- name: "zabbix-server: Set AllowUnsupportedDBVersions"
   ansible.builtin.lineinfile:
     dest: /etc/zabbix/zabbix_server.conf
     insertafter: "^# AllowUnsupportedDBVersions="
     regexp: "^AllowUnsupportedDBVersions="
     line: "AllowUnsupportedDBVersions=1"
-  notify: Restart zabbix-server
-  tags: [zabbix-server]
+  notify: "zabbix-server: Restart"
+  tags: [zabbix-server, config]
 
-- name: Enable zabbix.conf
+- name: "zabbix-frontend: Enable Apache config"
   ansible.builtin.command: a2enconf zabbix
-  notify: Reload apache
-  tags: [zabbix-server, zabbix-frontend]
+  notify: "apache: Reload"
+  tags: [zabbix-server, config, zabbix-frontend]
 
-- name: Copy zaibbx-frontend conf
+- name: "zabbix-frontend: Copy PHP config"
   ansible.builtin.template:
     src: zabbix.conf.php.j2
     dest: /etc/zabbix/web/zabbix.conf.php
     owner: www-data
     group: www-data
     mode: '0600'
-  tags: [zabbix-server, zabbix-frontend]
+  tags: [zabbix-server, config, zabbix-frontend]
 
-- name: Change font for graphs
+- name: "zabbix-frontend: Set Japanese font for graphs"
   ansible.builtin.file:
     src: /usr/share/fonts/opentype/noto/NotoSansCJK-Regular.ttc
     dest: /etc/alternatives/zabbix-frontend-font
     state: link
-  tags: [zabbix-server, zabbix-frontend]
+  tags: [zabbix-server, config, zabbix-frontend]
 
-- name: Clone ssl-cert-check
+- name: "zabbix-server: Clone ssl-cert-check repository"
   ansible.builtin.git:
     repo: https://github.com/Matty9191/ssl-cert-check.git
     dest: /srv/git/ssl-cert-check
-  tags: [zabbix-server, zabbix-extra]
+  tags: [zabbix-server, install, zabbix-extra]
 
-- name: Copy ssl-cert-check
+- name: "zabbix-server: Copy ssl-cert-check script"
   ansible.builtin.copy:
     src: /srv/git/ssl-cert-check/ssl-cert-check
     dest: /usr/local/bin
     mode: '0755'
     remote_src: true
-  tags: [zabbix-server, zabbix-extra]
+  tags: [zabbix-server, config, zabbix-extra]
 
-- name: Copy to externalscripts
+- name: "zabbix-server: Copy external scripts"
   ansible.builtin.copy:
     src: "{{ item }}"
     dest: /usr/lib/zabbix/externalscripts
@@ -127,4 +127,4 @@
   loop:
     - cloudwatch.sh
     - ssl-cert-check.sh
-  tags: [zabbix-server, zabbix-extra]
+  tags: [zabbix-server, config, zabbix-extra]

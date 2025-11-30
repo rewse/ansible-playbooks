@@ -1,100 +1,100 @@
 ---
-- name: Install zabbix-release
+- name: "zabbix-agent: Install zabbix-release package"
   ansible.builtin.apt:
     deb: https://repo.zabbix.com/zabbix/{{ zabbix.version }}/release/ubuntu/pool/main/z/zabbix-release/zabbix-release_latest_{{ zabbix.version }}+ubuntu24.04_all.deb
-  tags: [zabbix-agent-ubuntu, package]
+  tags: [zabbix-agent-ubuntu, install]
 
-- name: Install zabbix agent
+- name: "zabbix-agent: Install packages"
   ansible.builtin.apt:
     name:
       - zabbix-agent
       - zabbix-sender
     update_cache: true
-  tags: [zabbix-agent-ubuntu, package]
+  tags: [zabbix-agent-ubuntu, install]
 
-- name: Set zabbix server
+- name: "zabbix-agent: Set Server"
   ansible.builtin.lineinfile:
     dest: /etc/zabbix/zabbix_agentd.conf
     regexp: "Server="
     line: "Server={{ zabbix.server }}"
-  notify: Restart zabbix-agent
-  tags: [zabbix-agent-ubuntu]
+  notify: "zabbix-agent: Restart"
+  tags: [zabbix-agent-ubuntu, config]
 
-- name: Set zabbix server active
+- name: "zabbix-agent: Set ServerActive"
   ansible.builtin.lineinfile:
     dest: /etc/zabbix/zabbix_agentd.conf
     regexp: "ServerActive="
     line: "ServerActive={{ zabbix.server }}"
-  notify: Restart zabbix-agent
-  tags: [zabbix-agent-ubuntu]
+  notify: "zabbix-agent: Restart"
+  tags: [zabbix-agent-ubuntu, config]
 
-- name: Set hostname
+- name: "zabbix-agent: Set Hostname"
   ansible.builtin.lineinfile:
     dest: /etc/zabbix/zabbix_agentd.conf
     regexp: "Hostname="
     line: "Hostname={{ ansible_nodename }}"
-  notify: Restart zabbix-agent
-  tags: [zabbix-agent-ubuntu]
+  notify: "zabbix-agent: Restart"
+  tags: [zabbix-agent-ubuntu, config]
 
-- name: Set Timeout
+- name: "zabbix-agent: Set Timeout"
   ansible.builtin.lineinfile:
     dest: /etc/zabbix/zabbix_agentd.conf
     insertafter: "^# Timeout="
     regexp: "^Timeout="
     line: "Timeout=30"
-  notify: Restart zabbix-agent
-  tags: [zabbix-agent-ubuntu]
+  notify: "zabbix-agent: Restart"
+  tags: [zabbix-agent-ubuntu, config]
 
-- name: Set Include
+- name: "zabbix-agent: Set Include path"
   ansible.builtin.lineinfile:
     dest: /etc/zabbix/zabbix_agentd.conf
     insertafter: "^# Include="
     regexp: "^Include="
     line: "Include=/etc/zabbix/zabbix_agentd.d/*.conf"
-  notify: Restart zabbix-agent
-  tags: [zabbix-agent-ubuntu]
+  notify: "zabbix-agent: Restart"
+  tags: [zabbix-agent-ubuntu, config]
 
-- name: Remove zabbix_agentd.conf.d
+- name: "zabbix-agent: Remove old config directory"
   ansible.builtin.file:
     path: /etc/zabbix/zabbix_agentd.conf.d
     state: absent
-  tags: [zabbix-agent-ubuntu]
+  tags: [zabbix-agent-ubuntu, config]
 
-- name: Make zabbix_agentd.d
+- name: "zabbix-agent: Create config directory"
   ansible.builtin.file:
     path: /etc/zabbix/zabbix_agentd.d
     state: directory
-  tags: [zabbix-agent-ubuntu]
+  tags: [zabbix-agent-ubuntu, init]
 
-- name: Copy ubuntu.conf
+- name: "zabbix-agent: Copy Ubuntu config"
   ansible.builtin.copy:
     src: ubuntu.conf
     dest: /etc/zabbix/zabbix_agentd.d
-  notify: Restart zabbix-agent
-  tags: [zabbix-agent-ubuntu]
+  notify: "zabbix-agent: Restart"
+  tags: [zabbix-agent-ubuntu, config]
 
-- name: Remove userparameter_mysql.conf
+- name: "zabbix-agent: Remove MySQL userparameter"
   ansible.builtin.file:
     path: /etc/zabbix/zabbix_agentd.d/userparameter_mysql.conf
     state: absent
-  notify: Restart zabbix-agent
-  tags: [zabbix-agent-ubuntu]
+  notify: "zabbix-agent: Restart"
+  tags: [zabbix-agent-ubuntu, config]
 
-- name: Add zabbix to adm group
+- name: "zabbix-agent: Add zabbix user to adm group"
   ansible.builtin.user:
     name: zabbix
     groups: 'zabbix,adm'
-  notify: Restart zabbix-agent
-  tags: [zabbix-agent-ubuntu]
+  notify: "zabbix-agent: Restart"
+  tags: [zabbix-agent-ubuntu, config]
 
-- name: Make agentscripts dir
+- name: "zabbix-agent: Create agentscripts directory"
   ansible.builtin.file:
     path: /usr/lib/zabbix/agentscripts
     state: directory
-  tags: [zabbix-agent-ubuntu]
+  tags: [zabbix-agent-ubuntu, init]
 
-- name: Copy for sudo
+- name: "zabbix-agent: Copy sudo config"
   ansible.builtin.copy:
     src: zabbix.sudo
     dest: /etc/sudoers.d/zabbix
-  tags: [zabbix-agent-ubuntu]
+  tags: [zabbix-agent-ubuntu, config]

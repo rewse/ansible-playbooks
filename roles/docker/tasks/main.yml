@@ -1,22 +1,22 @@
 ---
-- name: Install additional packages
+- name: "docker: Install packages"
   ansible.builtin.apt:
     name:
       - docker.io
       - docker-compose-v2
       - python3-docker
-  tags: [docker, package]
+  tags: [docker, install]
 
-- name: Create a compose.yml
+- name: "docker: Create compose.yml"
   ansible.builtin.file:
     path: /etc/compose.yml
     state: touch
-  tags: [docker]
+  tags: [docker, init]
 
-- name: Add service
+- name: "docker: Add services section to compose.yml"
   ansible.builtin.lineinfile:
     path: /etc/compose.yml
     insertbefore: BOF
     regexp: '^services:'
     line: 'services:'
-  tags: [docker]
+  tags: [docker, init]

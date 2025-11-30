@@ -1,47 +1,47 @@
 ---
-- name: Copy raspberrypi.conf
+- name: "zabbix-agent: Copy Raspberry Pi config"
   ansible.builtin.copy:
     src: raspberrypi.conf
     dest: /etc/zabbix/zabbix_agentd.d
-  notify: Restart zabbix-agent
-  tags: [zabbix-agent-raspberrypi]
+  notify: "zabbix-agent: Restart"
+  tags: [zabbix-agent-raspberrypi, config]
 
-- name: Copy zabbix-agent.service
+- name: "zabbix-agent: Copy systemd service file"
   ansible.builtin.copy:
     src: /usr/lib/systemd/system/zabbix-agent.service
     dest: /etc/systemd/system
     remote_src: true
-  notify: Restart zabbix-agent
-  tags: [zabbix-agent-raspberrypi]
+  notify: "zabbix-agent: Restart"
+  tags: [zabbix-agent-raspberrypi, config]
 
-- name: Change User
+- name: "zabbix-agent: Set User to root"
   ansible.builtin.lineinfile:
     path: /etc/systemd/system/zabbix-agent.service
     regexp: '^User='
     line: "User=root"
-  notify: Restart zabbix-agent
-  tags: [zabbix-agent-raspberrypi]
+  notify: "zabbix-agent: Restart"
+  tags: [zabbix-agent-raspberrypi, config]
 
-- name: Change Group
+- name: "zabbix-agent: Set Group to root"
   ansible.builtin.lineinfile:
     path: /etc/systemd/system/zabbix-agent.service
     regexp: '^Group='
     line: "Group=root"
-  notify: Restart zabbix-agent
-  tags: [zabbix-agent-raspberrypi]
+  notify: "zabbix-agent: Restart"
+  tags: [zabbix-agent-raspberrypi, config]
 
-- name: Allow root
+- name: "zabbix-agent: Enable AllowRoot"
   ansible.builtin.lineinfile:
     path: /etc/zabbix/zabbix_agentd.conf
     insertafter: '^# AllowRoot='
     regexp: '^AllowRoot='
     line: "AllowRoot=1"
-  notify: Restart zabbix-agent
-  tags: [zabbix-agent-raspberrypi]
+  notify: "zabbix-agent: Restart"
+  tags: [zabbix-agent-raspberrypi, config]
 
-- name: Copy bluetooth-devices.conf
+- name: "zabbix-agent: Copy Bluetooth devices config"
   ansible.builtin.copy:
     src: bluetooth-devices.conf
     dest: /etc/zabbix/zabbix_agentd.d
-  notify: Restart zabbix-agent
-  tags: [zabbix-agent-raspberrypi]
+  notify: "zabbix-agent: Restart"
+  tags: [zabbix-agent-raspberrypi, config]
