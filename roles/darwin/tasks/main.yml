@@ -9,6 +9,7 @@
       - gh
       - fontforge
       - fping
+      - git-cliff
       - jq
       - mas
       - node
