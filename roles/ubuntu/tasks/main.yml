@@ -149,9 +149,6 @@
     - kiro-cli
     - kiro-cli-chat
     - kiro-cli-term
-    - q
-    - qchat
-    - qterm
   tags: [ubuntu, install, kiro-cli]
 
 - name: "kiro-cli: Update"
