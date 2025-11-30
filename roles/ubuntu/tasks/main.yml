@@ -173,13 +173,19 @@
 - name: "zinit: Install"
   ansible.builtin.shell: bash -c "$(curl --fail --show-error --silent --location https://raw.githubusercontent.com/zdharma-continuum/zinit/HEAD/scripts/install.sh)"
   args:
-    creates: /home/{{ admin }}/.local/share/zinit/zinit.git
+    creates: /root/.local/share/zinit/zinit.git
   environment:
     NO_INPUT: "1"
   tags: [ubuntu, install, zinit]
 
+- name: "zinit: Create symlink in /usr/local/share"
+  ansible.builtin.file:
+    src: /root/.local/share/zinit
+    dest: /usr/local/share/zinit
+    state: link
+  tags: [ubuntu, install, zinit]
+
 - name: "zinit: Update"
-  become_user: "{{ admin }}"
   ansible.builtin.command: zsh -ic "zinit self-update"
   tags: [ubuntu, update, zinit]
 
