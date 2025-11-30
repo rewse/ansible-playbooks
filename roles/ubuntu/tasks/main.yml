@@ -145,11 +145,16 @@
   become_user: "{{ admin }}"
   ansible.builtin.shell: curl -LsSf https://astral.sh/uv/install.sh | sh
   args:
-    creates: /home/{{ admin }}/.local/bin/uv
+    creates: /usr/local/bin/uv
+  environment:
+    UV_INSTALL_DIR: /usr/local/bin
   tags: [ubuntu, install, uv]
 
+- name: "uv: Update"
+  ansible.builtin.command: /usr/local/bin/uv self update
+  tags: [ubuntu, update, uv]
+
 - name: "zinit: Install"
-  become_user: "{{ admin }}"
   ansible.builtin.shell: bash -c "$(curl --fail --show-error --silent --location https://raw.githubusercontent.com/zdharma-continuum/zinit/HEAD/scripts/install.sh)"
   args:
     creates: /home/{{ admin }}/.local/share/zinit/zinit.git

@@ -1,29 +1,4 @@
 ---
-- name: "uv: Check installation status"
-  ansible.builtin.stat:
-    path: /root/.local/bin/uv
-  register: uv_installed
-  tags: [enecoq-data-fetcher, install, uv]
-
-- name: "uv: Install via script"
-  ansible.builtin.shell: curl -LsSf https://astral.sh/uv/install.sh | sh
-  when: not uv_installed.stat.exists
-  tags: [enecoq-data-fetcher, install, uv]
-
-- name: "uv: Create symlinks in /usr/local/sbin"
-  ansible.builtin.file:
-    src: /root/.local/bin/{{ item }}
-    dest: /usr/local/sbin/{{ item }}
-    state: link
-  loop:
-    - uv
-    - uvx
-  tags: [enecoq-data-fetcher, config, uv]
-
-- name: "uv: Update to latest version"
-  ansible.builtin.command: uv self update
-  tags: [enecoq-data-fetcher, update, uv]
-
 - name: "enecoq-data-fetcher: Create data directory"
   ansible.builtin.file:
     path: /srv/homeassistant/config/data
