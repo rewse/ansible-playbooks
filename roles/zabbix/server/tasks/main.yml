@@ -1,11 +1,11 @@
 ---
 - name: Install zabbix-release
-  apt:
+  ansible.builtin.apt:
     deb: https://repo.zabbix.com/zabbix/{{ zabbix.version }}/release/ubuntu/pool/main/z/zabbix-release/zabbix-release_latest_{{ zabbix.version }}+ubuntu24.04_all.deb
   tags: [zabbix-server, package, zabbix-frontend]
 
 - name: Install packages
-  apt:
+  ansible.builtin.apt:
     name:
       - zabbix-server-pgsql
       - zabbix-frontend-php
@@ -14,33 +14,33 @@
       - fonts-noto-cjk
       - mosquitto-clients
       - php-pgsql
-    update_cache: yes
+    update_cache: true
   notify: Restart apache
   tags: [zabbix-server, package, zabbix-frontend]
 
 - name: Create zabbix-server.service.d
-  file:
+  ansible.builtin.file:
     path: /etc/systemd/system/zabbix-server.service.d
     state: directory
   tags: [zabbix-server]
 
 - name: Copy override.conf
-  copy:
+  ansible.builtin.copy:
     src: override.conf
     dest: /etc/systemd/system/zabbix-server.service.d
   notify: Restart zabbix-server
   tags: [zabbix-server]
 
 - name: Change permission of zabbix_server.conf
-  file:
+  ansible.builtin.file:
     path: /etc/zabbix/zabbix_server.conf
     owner: root
     group: zabbix
-    mode: 0640
+    mode: '0640'
   tags: [zabbix-server]
 
 - name: Set DBHost
-  lineinfile:
+  ansible.builtin.lineinfile:
     dest: /etc/zabbix/zabbix_server.conf
     insertafter: "^# DBHost="
     regexp: "^DBHost="
@@ -49,7 +49,7 @@
   tags: [zabbix-server]
 
 - name: Set DBPassword
-  lineinfile:
+  ansible.builtin.lineinfile:
     dest: /etc/zabbix/zabbix_server.conf
     insertafter: "^# DBPassword="
     regexp: "^DBPassword="
@@ -58,7 +58,7 @@
   tags: [zabbix-server]
 
 - name: Set Timeout
-  lineinfile:
+  ansible.builtin.lineinfile:
     dest: /etc/zabbix/zabbix_server.conf
     insertafter: "^# Timeout="
     regexp: "^Timeout="
@@ -67,7 +67,7 @@
   tags: [zabbix-server]
 
 - name: Set MaxHousekeeperDelete
-  lineinfile:
+  ansible.builtin.lineinfile:
     dest: /etc/zabbix/zabbix_server.conf
     insertafter: "^# MaxHousekeeperDelete="
     regexp: "^MaxHousekeeperDelete="
@@ -76,7 +76,7 @@
   tags: [zabbix-server]
 
 - name: Set AllowUnsupportedDBVersions
-  lineinfile:
+  ansible.builtin.lineinfile:
     dest: /etc/zabbix/zabbix_server.conf
     insertafter: "^# AllowUnsupportedDBVersions="
     regexp: "^AllowUnsupportedDBVersions="
@@ -85,46 +85,46 @@
   tags: [zabbix-server]
 
 - name: Enable zabbix.conf
-  command: a2enconf zabbix
+  ansible.builtin.command: a2enconf zabbix
   notify: Reload apache
   tags: [zabbix-server, zabbix-frontend]
 
 - name: Copy zaibbx-frontend conf
-  template:
+  ansible.builtin.template:
     src: zabbix.conf.php.j2
     dest: /etc/zabbix/web/zabbix.conf.php
     owner: www-data
     group: www-data
-    mode: 0600
+    mode: '0600'
   tags: [zabbix-server, zabbix-frontend]
 
 - name: Change font for graphs
-  file:
+  ansible.builtin.file:
     src: /usr/share/fonts/opentype/noto/NotoSansCJK-Regular.ttc
     dest: /etc/alternatives/zabbix-frontend-font
     state: link
   tags: [zabbix-server, zabbix-frontend]
 
 - name: Clone ssl-cert-check
-  git:
+  ansible.builtin.git:
     repo: https://github.com/Matty9191/ssl-cert-check.git
     dest: /srv/git/ssl-cert-check
   tags: [zabbix-server, zabbix-extra]
 
 - name: Copy ssl-cert-check
-  copy:
+  ansible.builtin.copy:
     src: /srv/git/ssl-cert-check/ssl-cert-check
     dest: /usr/local/bin
-    mode: 0755
-    remote_src: yes
+    mode: '0755'
+    remote_src: true
   tags: [zabbix-server, zabbix-extra]
 
 - name: Copy to externalscripts
-  copy:
+  ansible.builtin.copy:
     src: "{{ item }}"
     dest: /usr/lib/zabbix/externalscripts
-    mode: 0755
-  with_items:
+    mode: '0755'
+  loop:
     - cloudwatch.sh
     - ssl-cert-check.sh
   tags: [zabbix-server, zabbix-extra]

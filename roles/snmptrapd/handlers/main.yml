@@ -1,10 +1,10 @@
 ---
 - name: Restart snmptrapd
-  systemd:
+  ansible.builtin.systemd:
     name: snmptrapd
     state: restarted
 
 - name: Restart snmptt
-  systemd:
+  ansible.builtin.systemd:
     name: snmptt
     state: restarted

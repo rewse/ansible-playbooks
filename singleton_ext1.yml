@@ -1,6 +1,6 @@
 ---
 - hosts: singleton_ext1
-  become: yes
+  become: true
   remote_user: ubuntu
   roles:
     - desktop

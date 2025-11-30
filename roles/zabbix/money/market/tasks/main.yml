@@ -1,33 +1,33 @@
 ---
 - name: Install additional packages
-  apt:
-    name: 
+  ansible.builtin.apt:
+    name:
       - python3-bs4
       - python3-requests
-    update_cache: yes
+    update_cache: true
   tags: [zabbix-money-market, package]
 
 - name: Clone market-price-check.git
-  git:
+  ansible.builtin.git:
     repo: git@github.com:rewse/market-price-check.git
     dest: /srv/git/market-price-check
-    accept_hostkey: yes
+    accept_hostkey: true
     key_file: /home/{{ admin }}/.ssh/id_rsa
   tags: [zabbix-money-market]
 
 - name: Copy market-price-check
-  copy:
+  ansible.builtin.copy:
     src: /srv/git/market-price-check/market-price-check
     dest: /usr/local/bin/
-    mode: 0755
-    remote_src: yes
+    mode: '0755'
+    remote_src: true
   tags: [zabbix-money-market]
 
 - name: Copy to externalscripts
-  copy:
+  ansible.builtin.copy:
     src: "{{ item }}"
     dest: /usr/lib/zabbix/externalscripts
-    mode: 0755
-  with_items:
+    mode: '0755'
+  loop:
     - market-price-check.sh
   tags: [zabbix-money-market]

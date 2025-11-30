@@ -1,11 +1,11 @@
 ---
 - name: Add an apt repository for MySQL
-  apt:
+  ansible.builtin.apt:
     deb: https://repo.mysql.com//mysql-apt-config_{{ mysql_apt_config_version }}_all.deb
   tags: [database-client, package, mysql]
 
 - name: Install additional packages
-  apt:
+  ansible.builtin.apt:
     name:
       - mysql-client
       - postgresql-client
@@ -15,91 +15,91 @@
   tags: [database-client, package, mysql, postgresql, oracle]
 
 - name: Install mysql-connector-j
-  apt:
+  ansible.builtin.apt:
     deb: https://cdn.mysql.com//Downloads/Connector-J/mysql-connector-j_{{ mysql_connector_version }}_all.deb
   tags: [database-client, package, mysql]
 
 - name: Copy instantclient
-  unarchive:
+  ansible.builtin.unarchive:
     src: https://download.oracle.com/otn_software/linux/instantclient/{{ oracle_instantclient_version_1 }}{{ oracle_instantclient_version_2 }}000/instantclient-{{ item }}-linux.x64-{{ oracle_instantclient_version_1 }}.{{ oracle_instantclient_version_2 }}.{{ oracle_instantclient_version_3 }}.zip
     dest: /srv
-    remote_src: yes
-  with_items:
+    remote_src: true
+  loop:
     - basic
     - sqlplus
     - tools
   tags: [database-client, oracle]
 
 - name: Add /srv/instantclient to PATH
-  template:
+  ansible.builtin.template:
     src: oracle-instantclient.sh.j2
     dest: /etc/profile.d/oracle-instantclient.sh
   tags: [database-client, oracle]
 
 - name: Add /srv/instantclient to ld.so
-  template:
+  ansible.builtin.template:
     src: oracle-instantclient.conf.j2
     dest: /etc/ld.so.conf.d/oracle-instantclient.conf
   tags: [database-client, oracle]
 
 - name: Create symlink for ojdbc.jar
-  file:
+  ansible.builtin.file:
     src: /srv/instantclient_{{ oracle_instantclient_version_1 }}_{{ oracle_instantclient_version_2 }}/ojdbc8.jar
     dest: /usr/share/java/ojdbc11.jar
     state: link
   tags: [database-client, oracle]
 
 - name: Add safe directory
-  git_config:
+  community.general.git_config:
     name: safe.directory
     scope: global
     value: /srv/git/orascript
   tags: [database-client, oracle]
 
 - name: Clone orascript.git
-  git:
+  ansible.builtin.git:
     repo: git@github.com:rewse/orascript.git
     dest: /srv/git/orascript
-    accept_hostkey: yes
+    accept_hostkey: true
     key_file: /home/{{ admin }}/.ssh/id_rsa
   tags: [database-client, oracle]
 
 - name: Change mode of git/orascript
-  file:
+  ansible.builtin.file:
     path: /srv/git/orascript
     owner: "{{ admin }}"
     group: "{{ admin }}"
-    recurse: yes
+    recurse: true
   tags: [database-client, oracle]
 
 - name: Copy orarc
   become_user: "{{ admin }}"
-  copy:
+  ansible.builtin.copy:
     src: /srv/git/orascript/orarc
     dest: /home/{{ admin }}/.orarc
-    remote_src: True
+    remote_src: true
   tags: [database-client, oracle]
 
 - name: Create symlink for orascript/common
   become_user: "{{ admin }}"
-  file:
+  ansible.builtin.file:
     src: /srv/git/orascript/common
     dest: /home/{{ admin }}/oracle
     state: link
   tags: [database-client, oracle]
 
 - name: Install Redshift JDBC driver
-  get_url:
+  ansible.builtin.get_url:
     url: https://s3.amazonaws.com/redshift-downloads/drivers/jdbc/{{ redshift_jdbc_version }}/redshift-jdbc42-{{ redshift_jdbc_version }}.jar
     dest: /usr/share/java
   tags: [database-client, redshift]
 
 - name: Create symlink RedShiftJDBC.jar
-  file:
+  ansible.builtin.file:
     src: redshift-jdbc42-{{ redshift_jdbc_version }}.jar
     dest: /usr/share/java/{{ item }}
     state: link
-  with_items:
+  loop:
     - redshift-jdbc42.jar
     - redshift-jdbc.jar
   tags: [database-client, redshift]

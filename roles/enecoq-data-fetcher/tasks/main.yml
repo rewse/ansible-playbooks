@@ -6,8 +6,7 @@
   tags: [enecoq-data-fetcher, uv, install]
 
 - name: Install uv
-  ansible.builtin.shell:
-    cmd: curl -LsSf https://astral.sh/uv/install.sh | sh
+  ansible.builtin.shell: curl -LsSf https://astral.sh/uv/install.sh | sh
   when: not uv_installed.stat.exists
   tags: [enecoq-data-fetcher, uv, install]
 
@@ -22,8 +21,7 @@
   tags: [enecoq-data-fetcher, uv, install]
 
 - name: Update uv to latest version
-  ansible.builtin.shell:
-    cmd: uv self update
+  ansible.builtin.command: uv self update
   tags: [enecoq-data-fetcher, uv, update]
 
 - name: Create data directory for Home Assistant
@@ -33,8 +31,7 @@
   tags: [enecoq-data-fetcher, setup]
 
 - name: Install chromium
-  ansible.builtin.shell:
-    cmd: uvx --from enecoq-data-fetcher playwright install chromium --force
+  ansible.builtin.command: uvx --from enecoq-data-fetcher playwright install chromium --force
   tags: [enecoq-data-fetcher, uv, install]
 
 - name: Install cron job

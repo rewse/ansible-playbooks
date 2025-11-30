@@ -1,21 +1,21 @@
 ---
 - name: Copy raspberrypi.conf
-  copy:
+  ansible.builtin.copy:
     src: raspberrypi.conf
     dest: /etc/zabbix/zabbix_agentd.d
   notify: Restart zabbix-agent
   tags: [zabbix-agent-raspberrypi]
 
 - name: Copy zabbix-agent.service
-  copy:
+  ansible.builtin.copy:
     src: /usr/lib/systemd/system/zabbix-agent.service
     dest: /etc/systemd/system
-    remote_src: yes
+    remote_src: true
   notify: Restart zabbix-agent
   tags: [zabbix-agent-raspberrypi]
 
 - name: Change User
-  lineinfile:
+  ansible.builtin.lineinfile:
     path: /etc/systemd/system/zabbix-agent.service
     regexp: '^User='
     line: "User=root"
@@ -23,7 +23,7 @@
   tags: [zabbix-agent-raspberrypi]
 
 - name: Change Group
-  lineinfile:
+  ansible.builtin.lineinfile:
     path: /etc/systemd/system/zabbix-agent.service
     regexp: '^Group='
     line: "Group=root"
@@ -31,7 +31,7 @@
   tags: [zabbix-agent-raspberrypi]
 
 - name: Allow root
-  lineinfile:
+  ansible.builtin.lineinfile:
     path: /etc/zabbix/zabbix_agentd.conf
     insertafter: '^# AllowRoot='
     regexp: '^AllowRoot='
@@ -40,7 +40,7 @@
   tags: [zabbix-agent-raspberrypi]
 
 - name: Copy bluetooth-devices.conf
-  copy:
+  ansible.builtin.copy:
     src: bluetooth-devices.conf
     dest: /etc/zabbix/zabbix_agentd.d
   notify: Restart zabbix-agent

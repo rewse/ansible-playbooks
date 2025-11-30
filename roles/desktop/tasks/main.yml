@@ -1,6 +1,6 @@
 ---
 - name: Install additional packages
-  apt:
+  ansible.builtin.apt:
     name:
       - fonts-ricty-diminished
       - tigervnc-standalone-server
@@ -8,17 +8,17 @@
   tags: [desktop, package]
 
 - name: "git : Clone one-gnome-terminal.git"
-  git:
+  ansible.builtin.git:
     repo: https://github.com/denysdovhan/one-gnome-terminal.git
     dest: /srv/git/one-gnome-terminal
   tags: [desktop, terminal]
 
 - name: Execute one-dark.sh
   become_user: "{{ admin }}"
-  command: bash /srv/git/one-gnome-terminal/one-dark.sh
+  ansible.builtin.command: bash /srv/git/one-gnome-terminal/one-dark.sh
   tags: [desktop, terminal]
 
 - name: Change terminal font to Ricty
   become_user: "{{ admin }}"
-  command: gsettings set org.gnome.desktop.interface monospace-font-name "Ricty Diminished Regular 12"
+  ansible.builtin.command: gsettings set org.gnome.desktop.interface monospace-font-name "Ricty Diminished Regular 12"
   tags: [desktop, terminal]

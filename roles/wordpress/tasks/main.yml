@@ -20,7 +20,7 @@
   ansible.builtin.unarchive:
     src: https://wordpress.org/latest.zip
     dest: /srv/www
-    remote_src: yes
+    remote_src: true
     owner: www-data
     group: www-data
   when: wordpress_dir.stat.isdir is not defined
@@ -38,7 +38,7 @@
   ansible.builtin.copy:
     src: wordpress.cron
     dest: /etc/cron.daily/wordpress
-    mode: 0755
+    mode: '0755'
   tags: [wordpress]
 
 - name: Copy htaccess
@@ -104,7 +104,7 @@
     dest: /srv/www/wordpress/wp-content/themes
     owner: www-data
     group: www-data
-    remote_src: yes
+    remote_src: true
   tags: [wordpress]
 
 - name: Create directories
@@ -113,7 +113,7 @@
     state: directory
     owner: www-data
     group: www-data
-  with_items:
+  loop:
     - /srv/www/wordpress/wp-content/languages/themes
     - /srv/www/wordpress/wp-content/languages/plugins
   tags: [wordpress]
@@ -124,7 +124,7 @@
     dest: /srv/www/wordpress/wp-content/languages/themes
     owner: www-data
     group: www-data
-  with_items:
+  loop:
     - fukasawa-ja.mo
     - fukasawa-ja.po
   tags: [wordpress]
@@ -135,7 +135,7 @@
     dest: /srv/www/wordpress/wp-content/languages/plugins
     owner: www-data
     group: www-data
-  with_items:
+  loop:
     - jetpack-ja.mo
     - jetpack-ja.po
   tags: [wordpress]
@@ -146,6 +146,7 @@
     regexp: '\$google_fonts = ..*'
     replace: "$google_fonts = 'off';"
   tags: [wordpress]
+
 
 - name: Add some functions
   ansible.builtin.blockinfile:
@@ -311,6 +312,7 @@
     line: ""
   tags: [wordpress]
 
+
 - name: Add an author box
   ansible.builtin.blockinfile:
     path: /srv/www/wordpress/wp-content/themes/fukasawa/singular.php
@@ -364,18 +366,18 @@
   ansible.builtin.unarchive:
     src: https://pochipp.com/download/?p=assist
     dest: /srv/www/wordpress/wp-content/plugins
-    remote_src: yes
+    remote_src: true
   tags: [wordpress, wordpress-plugin]
 
 - name: Download wp-cli
-  get_url:
+  ansible.builtin.get_url:
     url: https://raw.githubusercontent.com/wp-cli/builds/gh-pages/phar/wp-cli.phar
     dest: /usr/local/sbin/wp
     mode: '0755'
   tags: [wordpress]
 
 - name: Copy flyingpress.cron
-  copy:
+  ansible.builtin.copy:
     src: flyingpress.cron
     dest: /etc/cron.d/flyingpress
   tags: [wordpress]

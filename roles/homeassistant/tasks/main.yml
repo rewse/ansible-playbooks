@@ -1,25 +1,25 @@
 ---
 - name: Install additional packages
-  apt:
+  ansible.builtin.apt:
     name:
       - apparmor-utils
   tags: [homeassistant, homeassistant-docker]
 
 - name: Create certs dir
-  file:
+  ansible.builtin.file:
     path: /srv/homeassistant/config/certs
     state: directory
   tags: [homeassistant]
 
 - name: Copy ISRG_Root_X1.pem
-  copy:
+  ansible.builtin.copy:
     src: /etc/ssl/certs/ISRG_Root_X1.pem
     dest: /srv/homeassistant/config/certs
-    remote_src: yes
+    remote_src: true
   tags: [homeassistant]
 
 - name: Add to compose.yml
-  blockinfile:
+  ansible.builtin.blockinfile:
     path: /etc/compose.yml
     marker: "# {mark} ANSIBLE MANAGED BLOCK homeassistant"
     block: |2
@@ -43,27 +43,27 @@
 
 # Ref: https://github.com/home-assistant/core/issues/117768
 - name: Download docker-default
-  get_url:
+  ansible.builtin.get_url:
     url: https://github.com/home-assistant/core/files/9417617/docker-default.txt
     dest: /etc/apparmor.d/docker-default
   tags: [homeassistant, homeassistant-docker]
 
 - name: Copy aa-disable-homeassistant.service
-  copy:
+  ansible.builtin.copy:
     src: aa-disable-homeassistant.service
     dest: /etc/systemd/system
   notify: Restart aa-disable-homeassistant
   tags: [homeassistant, homeassistant-docker]
 
 - name: Copy deafult configuration.yaml
-  copy:
+  ansible.builtin.copy:
     src: configuration.yaml
     dest: /srv/homeassistant/config
   notify: Restart homeassistant
   tags: [homeassistant, homeassistant-component]
 
 - name: Config automation
-  lineinfile:
+  ansible.builtin.lineinfile:
     path: /srv/homeassistant/config/configuration.yaml
     regexp: '^automation:'
     line: "automation: !include_dir_merge_list automations/"
@@ -71,121 +71,121 @@
   tags: [homeassistant, homeassistant-component]
 
 - name: Create auatomations dir
-  file:
+  ansible.builtin.file:
     path: /srv/homeassistant/config/automations
     state: directory
   tags: [homeassistant, homeassistant-component]
 
 - name: Create blueprints automation dir
-  file:
+  ansible.builtin.file:
     path: /srv/homeassistant/config/blueprints/automation
     state: directory
   tags: [homeassistant, homeassistant-component]
 
 - name: Copy automations-alarm.yaml
-  copy:
+  ansible.builtin.copy:
     src: automations-alarm.yaml
     dest: /srv/homeassistant/config/automations
   tags: [homeassistant, homeassistant-automation]
 
 - name: Copy automations-balcony.yaml
-  copy:
+  ansible.builtin.copy:
     src: automations-balcony.yaml
     dest: /srv/homeassistant/config/automations
   tags: [homeassistant, homeassistant-automation]
 
 - name: Copy automations-bathroom-lights.yaml
-  copy:
+  ansible.builtin.copy:
     src: automations-bathroom-lights.yaml
     dest: /srv/homeassistant/config/automations
   tags: [homeassistant, homeassistant-automation]
 
 - name: Copy automations-dads-room.yaml
-  copy:
+  ansible.builtin.copy:
     src: automations-dads-room.yaml
     dest: /srv/homeassistant/config/automations
   tags: [homeassistant, homeassistant-automation]
 
 - name: Copy automations-dads-room-climates.yaml
-  copy:
+  ansible.builtin.copy:
     src: automations-dads-room-climates.yaml
     dest: /srv/homeassistant/config/automations
   tags: [homeassistant, homeassistant-automation]
 
 - name: Copy automations-dads-room-lights.yaml
-  copy:
+  ansible.builtin.copy:
     src: automations-dads-room-lights.yaml
     dest: /srv/homeassistant/config/automations
   tags: [homeassistant, homeassistant-automation]
 
 - name: Copy automations-entrance.yaml
-  copy:
+  ansible.builtin.copy:
     src: automations-entrance.yaml
     dest: /srv/homeassistant/config/automations
   tags: [homeassistant, homeassistant-automation]
 
 - name: Copy automations-info.yaml
-  copy:
+  ansible.builtin.copy:
     src: automations-info.yaml
     dest: /srv/homeassistant/config/automations
   tags: [homeassistant, homeassistant-automation]
 
 - name: Copy automations-living-room.yaml
-  copy:
+  ansible.builtin.copy:
     src: automations-living-room.yaml
     dest: /srv/homeassistant/config/automations
   tags: [homeassistant, homeassistant-automation]
 
 - name: Copy automations-living-room-climates.yaml
-  copy:
+  ansible.builtin.copy:
     src: automations-living-room-climates.yaml
     dest: /srv/homeassistant/config/automations
   tags: [homeassistant, homeassistant-automation]
 
 - name: Copy automations-living-room-lights.yaml
-  copy:
+  ansible.builtin.copy:
     src: automations-living-room-lights.yaml
     dest: /srv/homeassistant/config/automations
   tags: [homeassistant, homeassistant-automation]
 
 - name: Copy automations-moms-room.yaml
-  copy:
+  ansible.builtin.copy:
     src: automations-moms-room.yaml
     dest: /srv/homeassistant/config/automations
   tags: [homeassistant, homeassistant-automation]
 
 - name: Copy automations-moms-room-climates.yaml
-  copy:
+  ansible.builtin.copy:
     src: automations-moms-room-climates.yaml
     dest: /srv/homeassistant/config/automations
   tags: [homeassistant, homeassistant-automation]
 
 - name: Copy automations-moms-room-lights.yaml
-  copy:
+  ansible.builtin.copy:
     src: automations-moms-room-lights.yaml
     dest: /srv/homeassistant/config/automations
   tags: [homeassistant, homeassistant-automation]
 
 - name: Copy automations-modes.yaml
-  copy:
+  ansible.builtin.copy:
     src: automations-modes.yaml
     dest: /srv/homeassistant/config/automations
   tags: [homeassistant, homeassistant-automation]
 
 - name: Copy automations-others.yaml
-  copy:
+  ansible.builtin.copy:
     src: automations-others.yaml
     dest: /srv/homeassistant/config/automations
   tags: [homeassistant, homeassistant-automation]
 
 - name: Copy automations-securities.yaml
-  copy:
+  ansible.builtin.copy:
     src: automations-securities.yaml
     dest: /srv/homeassistant/config/automations
   tags: [homeassistant, homeassistant-automation]
 
 - name: Copy secrets.yaml
-  template:
+  ansible.builtin.template:
     src: secrets.yaml.j2
     dest: /srv/homeassistant/config/secrets.yaml
     variable_start_string: "[%"
@@ -194,7 +194,7 @@
   tags: [homeassistant, homeassistant-component]
 
 - name: Config alarm_control_panel
-  lineinfile:
+  ansible.builtin.lineinfile:
     path: /srv/homeassistant/config/configuration.yaml
     insertafter: '^automation:'
     regexp: '^alarm_control_panel:'
@@ -203,14 +203,14 @@
   tags: [homeassistant, homeassistant-component]
 
 - name: Copy alarm_control_panels.yaml
-  copy:
+  ansible.builtin.copy:
     src: alarm_control_panels.yaml
     dest: /srv/homeassistant/config
   notify: Restart homeassistant
   tags: [homeassistant, homeassistant-component]
 
 - name: Config alexa
-  lineinfile:
+  ansible.builtin.lineinfile:
     path: /srv/homeassistant/config/configuration.yaml
     insertafter: '^alarm_control_panel:'
     regexp: '^alexa:'
@@ -219,14 +219,14 @@
   tags: [homeassistant, homeassistant-component]
 
 - name: Copy alexa.yaml
-  copy:
+  ansible.builtin.copy:
     src: alexa.yaml
     dest: /srv/homeassistant/config
   notify: Restart homeassistant
   tags: [homeassistant, homeassistant-component]
 
 - name: Config command_line
-  lineinfile:
+  ansible.builtin.lineinfile:
     path: /srv/homeassistant/config/configuration.yaml
     insertafter: '^alexa:'
     regexp: '^command_line:'
@@ -235,14 +235,14 @@
   tags: [homeassistant, homeassistant-component]
 
 - name: Copy command_lines.yaml
-  copy:
+  ansible.builtin.copy:
     src: command_lines.yaml
     dest: /srv/homeassistant/config
   notify: Restart homeassistant
   tags: [homeassistant, homeassistant-component]
 
 - name: Config fan
-  lineinfile:
+  ansible.builtin.lineinfile:
     path: /srv/homeassistant/config/configuration.yaml
     insertafter: '^command_line:'
     regexp: '^fan:'
@@ -251,14 +251,14 @@
   tags: [homeassistant, homeassistant-component]
 
 - name: Copy fans.yaml
-  copy:
+  ansible.builtin.copy:
     src: fans.yaml
     dest: /srv/homeassistant/config
   notify: Restart homeassistant
   tags: [homeassistant, homeassistant-component]
 
 - name: Config homekit
-  lineinfile:
+  ansible.builtin.lineinfile:
     path: /srv/homeassistant/config/configuration.yaml
     insertafter: '^fan:'
     regexp: '^homekit:'
@@ -267,14 +267,14 @@
   tags: [homeassistant, homeassistant-component]
 
 - name: Copy homekit.yaml
-  copy:
+  ansible.builtin.copy:
     src: homekit.yaml
     dest: /srv/homeassistant/config
   notify: Restart homeassistant
   tags: [homeassistant, homeassistant-component]
 
 - name: Config input_boolean
-  lineinfile:
+  ansible.builtin.lineinfile:
     path: /srv/homeassistant/config/configuration.yaml
     insertafter: '^homekit:'
     regexp: '^input_boolean:'
@@ -282,13 +282,13 @@
   tags: [homeassistant, homeassistant-component, homeassistant-input-boolean]
 
 - name: Copy input_booleans.yaml
-  copy:
+  ansible.builtin.copy:
     src: input_booleans.yaml
     dest: /srv/homeassistant/config
   tags: [homeassistant, homeassistant-component, homeassistant-input-boolean]
 
 - name: Config input_datetime
-  lineinfile:
+  ansible.builtin.lineinfile:
     path: /srv/homeassistant/config/configuration.yaml
     insertafter: '^input_boolean:'
     regexp: '^input_datetime:'
@@ -296,13 +296,13 @@
   tags: [homeassistant, homeassistant-component, homeassistant-input-datetime]
 
 - name: Copy input_datetimes.yaml
-  copy:
+  ansible.builtin.copy:
     src: input_datetimes.yaml
     dest: /srv/homeassistant/config
   tags: [homeassistant, homeassistant-component, homeassistant-input-datetime]
 
 - name: Config input_number
-  lineinfile:
+  ansible.builtin.lineinfile:
     path: /srv/homeassistant/config/configuration.yaml
     insertafter: '^input_datetime:'
     regexp: '^input_number:'
@@ -310,13 +310,13 @@
   tags: [homeassistant, homeassistant-component, homeassistant-input-number]
 
 - name: Copy input_numbers.yaml
-  copy:
+  ansible.builtin.copy:
     src: input_numbers.yaml
     dest: /srv/homeassistant/config
   tags: [homeassistant, homeassistant-component, homeassistant-input-number]
 
 - name: Config input_select
-  lineinfile:
+  ansible.builtin.lineinfile:
     path: /srv/homeassistant/config/configuration.yaml
     insertafter: '^input_numbers:'
     regexp: '^input_select:'
@@ -324,13 +324,13 @@
   tags: [homeassistant, homeassistant-component, homeassistant-input-select]
 
 - name: Copy input_selects.yaml
-  copy:
+  ansible.builtin.copy:
     src: input_selects.yaml
     dest: /srv/homeassistant/config
   tags: [homeassistant, homeassistant-component, homeassistant-input-select]
 
 - name: Config light
-  lineinfile:
+  ansible.builtin.lineinfile:
     path: /srv/homeassistant/config/configuration.yaml
     insertafter: '^ios:'
     regexp: '^light:'
@@ -339,14 +339,14 @@
   tags: [homeassistant, homeassistant-component]
 
 - name: Copy lights.yaml
-  copy:
+  ansible.builtin.copy:
     src: lights.yaml
     dest: /srv/homeassistant/config
   notify: Restart homeassistant
   tags: [homeassistant, homeassistant-component]
 
 - name: Config lock
-  lineinfile:
+  ansible.builtin.lineinfile:
     path: /srv/homeassistant/config/configuration.yaml
     insertafter: '^light:'
     regexp: '^lock:'
@@ -355,14 +355,14 @@
   tags: [homeassistant, homeassistant-component]
 
 - name: Copy locks.yaml
-  copy:
+  ansible.builtin.copy:
     src: locks.yaml
     dest: /srv/homeassistant/config
   notify: Restart homeassistant
   tags: [homeassistant, homeassistant-component]
 
 - name: Config media_player
-  lineinfile:
+  ansible.builtin.lineinfile:
     path: /srv/homeassistant/config/configuration.yaml
     insertafter: '^lock:'
     regexp: '^media_player:'
@@ -371,14 +371,14 @@
   tags: [homeassistant, homeassistant-component]
 
 - name: Copy media_players.yaml
-  copy:
+  ansible.builtin.copy:
     src: media_players.yaml
     dest: /srv/homeassistant/config
   notify: Restart homeassistant
   tags: [homeassistant, homeassistant-component]
 
 - name: Config MQTT
-  lineinfile:
+  ansible.builtin.lineinfile:
     path: /srv/homeassistant/config/configuration.yaml
     insertafter: '^media_player:'
     regexp: '^mqtt:'
@@ -387,14 +387,14 @@
   tags: [homeassistant, homeassistant-component]
 
 - name: Copy mqtt.yaml
-  copy:
+  ansible.builtin.copy:
     src: mqtt.yaml
     dest: /srv/homeassistant/config
   notify: Restart homeassistant
   tags: [homeassistant, homeassistant-component]
 
 - name: Config notify
-  lineinfile:
+  ansible.builtin.lineinfile:
     path: /srv/homeassistant/config/configuration.yaml
     insertafter: '^mqtt:'
     regexp: '^notify:'
@@ -403,14 +403,14 @@
   tags: [homeassistant, homeassistant-component]
 
 - name: Copy notify.yaml
-  copy:
+  ansible.builtin.copy:
     src: notify.yaml
     dest: /srv/homeassistant/config
   notify: Restart homeassistant
   tags: [homeassistant, homeassistant-component]
 
 - name: Config rest
-  lineinfile:
+  ansible.builtin.lineinfile:
     path: /srv/homeassistant/config/configuration.yaml
     insertafter: '^notify:'
     regexp: '^rest:'
@@ -419,14 +419,14 @@
   tags: [homeassistant, homeassistant-component]
 
 - name: Copy rests.yaml
-  copy:
+  ansible.builtin.copy:
     src: rests.yaml
     dest: /srv/homeassistant/config
   notify: Restart homeassistant
   tags: [homeassistant, homeassistant-component]
 
 - name: Config scene
-  lineinfile:
+  ansible.builtin.lineinfile:
     path: /srv/homeassistant/config/configuration.yaml
     insertafter: '^rest:'
     regexp: '^scene:'
@@ -435,13 +435,13 @@
   tags: [homeassistant, homeassistant-component]
 
 - name: Copy scenes.yaml
-  copy:
+  ansible.builtin.copy:
     src: scenes.yaml
     dest: /srv/homeassistant/config
   tags: [homeassistant, homeassistant-scene]
 
 - name: Config script
-  lineinfile:
+  ansible.builtin.lineinfile:
     path: /srv/homeassistant/config/configuration.yaml
     insertafter: '^scene:'
     regexp: '^script:'
@@ -450,13 +450,13 @@
   tags: [homeassistant, homeassistant-component]
 
 - name: Copy script.yaml
-  copy:
+  ansible.builtin.copy:
     src: scripts.yaml
     dest: /srv/homeassistant/config
   tags: [homeassistant, homeassistant-script]
 
 - name: Config sensor
-  lineinfile:
+  ansible.builtin.lineinfile:
     path: /srv/homeassistant/config/configuration.yaml
     insertafter: '^script:'
     regexp: '^sensor:'
@@ -465,14 +465,14 @@
   tags: [homeassistant, homeassistant-component]
 
 - name: Copy sensors.yaml
-  copy:
+  ansible.builtin.copy:
     src: sensors.yaml
     dest: /srv/homeassistant/config
   notify: Restart homeassistant
   tags: [homeassistant, homeassistant-component]
 
 - name: Config shell_command
-  lineinfile:
+  ansible.builtin.lineinfile:
     path: /srv/homeassistant/config/configuration.yaml
     insertafter: '^sensor:'
     regexp: '^shell_command:'
@@ -481,7 +481,7 @@
   tags: [homeassistant, homeassistant-component]
 
 - name: Copy shell_commands.yaml.j2
-  template:
+  ansible.builtin.template:
     src: shell_commands.yaml.j2
     dest: /srv/homeassistant/config/shell_commands.yaml
     variable_start_string: "[%"
@@ -490,7 +490,7 @@
   tags: [homeassistant, homeassistant-component]
 
 - name: Config switch
-  lineinfile:
+  ansible.builtin.lineinfile:
     path: /srv/homeassistant/config/configuration.yaml
     insertafter: '^shell_command:'
     regexp: '^switch:'
@@ -499,14 +499,14 @@
   tags: [homeassistant, homeassistant-component]
 
 - name: Copy switches.yaml
-  copy:
+  ansible.builtin.copy:
     src: switches.yaml
     dest: /srv/homeassistant/config
   notify: Restart homeassistant
   tags: [homeassistant, homeassistant-component]
 
 - name: Config template
-  lineinfile:
+  ansible.builtin.lineinfile:
     path: /srv/homeassistant/config/configuration.yaml
     insertafter: '^switch:'
     regexp: '^template:'
@@ -515,14 +515,14 @@
   tags: [homeassistant, homeassistant-component]
 
 - name: Copy utility_meters.yaml
-  copy:
+  ansible.builtin.copy:
     src: utility_meters.yaml
     dest: /srv/homeassistant/config
   notify: Restart homeassistant
   tags: [homeassistant, homeassistant-component]
 
 - name: Config utility_meter
-  lineinfile:
+  ansible.builtin.lineinfile:
     path: /srv/homeassistant/config/configuration.yaml
     insertafter: '^template:'
     regexp: '^utility_meter:'
@@ -531,14 +531,14 @@
   tags: [homeassistant, homeassistant-component]
 
 - name: Copy templates.yaml
-  copy:
+  ansible.builtin.copy:
     src: templates.yaml
     dest: /srv/homeassistant/config
   notify: Restart homeassistant
   tags: [homeassistant, homeassistant-component]
 
 - name: Config zone
-  lineinfile:
+  ansible.builtin.lineinfile:
     path: /srv/homeassistant/config/configuration.yaml
     insertafter: '^utility_meter:'
     regexp: '^zone:'
@@ -547,102 +547,102 @@
   tags: [homeassistant, homeassistant-component]
 
 - name: Copy zones.yaml
-  copy:
+  ansible.builtin.copy:
     src: zones.yaml
     dest: /srv/homeassistant/config
   notify: Restart homeassistant
   tags: [homeassistant, homeassistant-component]
 
 - name: Copy customize.yaml
-  copy:
+  ansible.builtin.copy:
     src: customize.yaml
     dest: /srv/homeassistant/config
   notify: Restart homeassistant
   tags: [homeassistant, homeassistant-customize]
 
 - name: Create custom_components dir
-  file:
+  ansible.builtin.file:
     path: /srv/homeassistant/config/custom_components
     state: directory
   tags: [homeassistant, homeassistant-custom]
 
 - name: Download frosted-glass-manager
-  unarchive:
+  ansible.builtin.unarchive:
     src: https://github.com/wessamlauf/frosted-glass-manager/archive/refs/tags/v{{ frosted_glass_manager_version }}.zip
     dest: /tmp
-    remote_src: yes
+    remote_src: true
   tags: [homeassistant, homeassistant-custom]
 
 - name: Copy frosted-glass-manager
-  copy:
+  ansible.builtin.copy:
     src: /tmp/frosted-glass-manager-{{ frosted_glass_manager_version }}/custom_components/frosted_glass_manager
     dest: /srv/homeassistant/config/custom_components
-    remote_src: yes
+    remote_src: true
   notify: Restart homeassistant
   tags: [homeassistant, homeassistant-custom]
 
 - name: Download tuya-local
-  unarchive:
+  ansible.builtin.unarchive:
     src: https://github.com/make-all/tuya-local/archive/refs/tags/{{ tuya_local_version }}.zip
     dest: /tmp
-    remote_src: yes
+    remote_src: true
   tags: [homeassistant, homeassistant-custom]
 
 - name: Copy tuya-local
-  copy:
+  ansible.builtin.copy:
     src: /tmp/tuya-local-{{ tuya_local_version }}/custom_components/tuya_local
     dest: /srv/homeassistant/config/custom_components
-    remote_src: yes
+    remote_src: true
   notify: Restart homeassistant
   tags: [homeassistant, homeassistant-custom]
 
 - name: Create themes dir
-  file:
+  ansible.builtin.file:
     path: /srv/homeassistant/config/themes
     state: directory
   tags: [homeassistant, homeassistant-theme]
 
 - name: Download frosted-glass
-  unarchive:
+  ansible.builtin.unarchive:
     src: https://github.com/wessamlauf/homeassistant-frosted-glass-themes/archive/refs/tags/v{{ frosted_glass_version }}.zip
     dest: /tmp
-    remote_src: yes
+    remote_src: true
   tags: [homeassistant, homeassistant-theme]
 
 - name: Copy Frosted Glass Themes
-  copy:
+  ansible.builtin.copy:
     src: /tmp/homeassistant-frosted-glass-themes-{{ frosted_glass_version }}/themes/{{ item }}
     dest: /srv/homeassistant/config/themes
-    remote_src: yes
-  with_items:
+    remote_src: true
+  loop:
     - Frosted Glass.yaml
     - Frosted Glass Dark.yaml
     - Frosted Glass Light.yaml
   tags: [homeassistant, homeassistant-theme]
 
 - name: Create www dir
-  file:
+  ansible.builtin.file:
     path: /srv/homeassistant/config/www
     state: directory
   tags: [homeassistant, homeassistant-custom]
 
 - name: Download Lovelace Card Mod
-  unarchive:
+  ansible.builtin.unarchive:
     src: https://github.com/thomasloven/lovelace-card-mod/archive/refs/tags/v{{ card_mod_version }}.tar.gz
     dest: /tmp
-    remote_src: yes
+    remote_src: true
   tags: [homeassistant, homeassistant-custom]
 
 - name: Copy Lovelace Card Mod
-  copy:
+  ansible.builtin.copy:
     src: /tmp/lovelace-card-mod-{{ card_mod_version }}/card-mod.js
     dest: /srv/homeassistant/config/www
-    remote_src: yes
+    remote_src: true
   notify: Restart homeassistant
   tags: [homeassistant, homeassistant-custom]
 
 - name: Add Lovelace Card Mod
-  blockinfile:
+  ansible.builtin.blockinfile:
     path: /srv/homeassistant/config/configuration.yaml
     marker: "# {mark} ANSIBLE MANAGED BLOCK card-mod"
     insertafter: '^  themes:'
@@ -653,28 +653,29 @@
   tags: [homeassistant, homeassistant-custom]
 
 - name: Copy Lovelace Mini Graph Card
-  get_url:
+  ansible.builtin.get_url:
     url: https://github.com/kalkih/mini-graph-card/releases/download/v{{ mini_graph_card_version }}/mini-graph-card-bundle.js
     dest: /srv/homeassistant/config/www
   notify: Restart homeassistant
   tags: [homeassistant, homeassistant-custom]
 
 - name: Copy Lovelace Mini Media Player
-  get_url:
+  ansible.builtin.get_url:
     url: https://github.com/kalkih/mini-media-player/releases/download/v{{ mini_media_player_version }}/mini-media-player-bundle.js
     dest: /srv/homeassistant/config/www
   notify: Restart homeassistant
   tags: [homeassistant, homeassistant-custom]
 
 - name: Copy Lovelace Simeple Weather Card
-  get_url:
+  ansible.builtin.get_url:
     url: https://github.com/kalkih/simple-weather-card/releases/download/v{{ simple_weather_card_version }}/simple-weather-card-bundle.js
     dest: /srv/homeassistant/config/www
   notify: Restart homeassistant
   tags: [homeassistant, homeassistant-custom]
 
+
 - name: Modify configuration.yaml
-  blockinfile:
+  ansible.builtin.blockinfile:
     path: /srv/homeassistant/config/configuration.yaml
     block: |
       homeassistant:
@@ -719,7 +720,7 @@
 - name: Enable proxy
   community.general.apache2_module:
     name: "{{ item }}"
-  with_items:
+  loop:
     - proxy
     - proxy_http
     - proxy_wstunnel
@@ -727,13 +728,13 @@
   tags: [homeassistant, homeassistant-apache]
 
 - name: Copy hass.rewse.jp.conf
-  copy:
+  ansible.builtin.copy:
     src: hass.rewse.jp.conf
     dest: /etc/apache2/sites-available
   notify: Reload apache
   tags: [homeassistant, homeassistant-apache]
 
 - name: Enable hass.rewse.jp
-  command: a2ensite hass.rewse.jp
+  ansible.builtin.command: a2ensite hass.rewse.jp
   notify: Reload apache
   tags: [homeassistant, homeassistant-apache]

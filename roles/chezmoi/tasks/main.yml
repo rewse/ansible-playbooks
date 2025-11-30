@@ -20,14 +20,14 @@
   tags: [chezmoi, init]
 
 - name: Initialize chezmoi for root user
-  ansible.builtin.shell: chezmoi init rewse
+  ansible.builtin.command: chezmoi init rewse
   when:
     - ansible_system == "Linux"
     - not chezmoi_root_initialized.stat.exists
   tags: [chezmoi, init]
 
 - name: Update and apply chezmoi configuration for root user
-  ansible.builtin.shell: chezmoi update --force
+  ansible.builtin.command: chezmoi update --force
   environment:
     OP_SERVICE_ACCOUNT_TOKEN: "{{ onepassword_token }}"
   when: ansible_system == "Linux"
@@ -40,13 +40,13 @@
   tags: [chezmoi, init]
 
 - name: Initialize chezmoi for admin user
-  ansible.builtin.shell: chezmoi init rewse
+  ansible.builtin.command: chezmoi init rewse
   become_user: "{{ admin }}"
   when: not chezmoi_admin_initialized.stat.exists
   tags: [chezmoi, init]
 
 - name: Update and apply chezmoi configuration for admin user
-  ansible.builtin.shell: chezmoi update --force
+  ansible.builtin.command: chezmoi update --force
   become_user: "{{ admin }}"
   environment:
     OP_SERVICE_ACCOUNT_TOKEN: "{{ onepassword_token }}"

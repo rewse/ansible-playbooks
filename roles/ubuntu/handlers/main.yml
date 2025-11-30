@@ -1,11 +1,11 @@
 ---
 - name: Restart ssh
-  systemd:
+  ansible.builtin.systemd:
     name: ssh
     state: restarted
 
 - name: Restart ssh.socket
-  systemd:
+  ansible.builtin.systemd:
     daemon_reload: true
     name: ssh.socket
     state: restarted
