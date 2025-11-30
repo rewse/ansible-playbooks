@@ -1,11 +1,11 @@
 ---
 - name: Reload apache
-  systemd:
+  ansible.builtin.systemd:
     name: apache2
     state: reloaded
 
 - name: Restart apache
-  systemd:
+  ansible.builtin.systemd:
     name: apache2
     state: restarted
 

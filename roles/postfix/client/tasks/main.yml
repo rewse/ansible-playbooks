@@ -1,6 +1,6 @@
 ---
 - name: Change myhostname
-  lineinfile:
+  ansible.builtin.lineinfile:
     dest: /etc/postfix/main.cf
     insertafter: "^myhostname "
     regexp: "^myhostname "
@@ -9,7 +9,7 @@
   tags: [postfix-client]
 
 - name: Add mydomain
-  lineinfile:
+  ansible.builtin.lineinfile:
     dest: /etc/postfix/main.cf
     insertafter: "^myhostname "
     regexp: "^mydomain "
@@ -18,7 +18,7 @@
   tags: [postfix-client]
 
 - name: Change myorigin
-  lineinfile:
+  ansible.builtin.lineinfile:
     dest: /etc/postfix/main.cf
     insertafter: "^#myorigin "
     regexp: "^myorigin "
@@ -27,7 +27,7 @@
   tags: [postfix-client]
 
 - name: Change relayhost
-  lineinfile:
+  ansible.builtin.lineinfile:
     dest: /etc/postfix/main.cf
     insertafter: "^#relayhost "
     regexp: "^relayhost "
@@ -36,7 +36,7 @@
   tags: [postfix-client]
 
 - name: Change smtp_tls_security_level
-  lineinfile:
+  ansible.builtin.lineinfile:
     dest: /etc/postfix/main.cf
     regexp: "^smtp_tls_security_level"
     line: "smtp_tls_security_level = encrypt"
@@ -44,7 +44,7 @@
   tags: [postfix-client]
 
 - name: Change smtp_tls_wrappermode
-  lineinfile:
+  ansible.builtin.lineinfile:
     dest: /etc/postfix/main.cf
     regexp: "^smtp_tls_wrappermode"
     line: "smtp_tls_wrappermode = yes"
@@ -52,7 +52,7 @@
   tags: [postfix-client]
 
 - name: Set smtp_sasl_auth_enable
-  lineinfile:
+  ansible.builtin.lineinfile:
     dest: /etc/postfix/main.cf
     regexp: "^smtp_sasl_auth_enable "
     line: "smtp_sasl_auth_enable = yes"
@@ -60,7 +60,7 @@
   tags: [postfix-client]
 
 - name: Set smtp_sasl_mechanism_filter
-  lineinfile:
+  ansible.builtin.lineinfile:
     dest: /etc/postfix/main.cf
     regexp: "^smtp_sasl_mechanism_filter"
     line: "smtp_sasl_mechanism_filter = plain, login"
@@ -68,7 +68,7 @@
   tags: [postfix-client]
 
 - name: Set smtp_sasl_password_maps
-  lineinfile:
+  ansible.builtin.lineinfile:
     dest: /etc/postfix/main.cf
     regexp: "smtp_sasl_password_maps "
     line: "smtp_sasl_password_maps = hash:/etc/postfix/sasl_passwd"
@@ -76,7 +76,7 @@
   tags: [postfix-client]
 
 - name: Set smtp_sasl_security_options
-  lineinfile:
+  ansible.builtin.lineinfile:
     dest: /etc/postfix/main.cf
     regexp: "smtp_sasl_security_options "
     line: "smtp_sasl_security_options = noanonymous"
@@ -84,30 +84,30 @@
   tags: [postfix-client]
 
 - name: Create sasl_passwd
-  lineinfile:
+  ansible.builtin.lineinfile:
     dest: /etc/postfix/sasl_passwd
     regexp: '^\[{{ relayhost.name }}\]:{{ relayhost.port }}'
     line: '[{{ relayhost.name }}]:{{ relayhost.port }} {{ so_net.username }}:{{ so_net.password }}'
-    create: yes
-    mode: 0600
+    create: true
+    mode: '0600'
   register: postfix_sasl_password_out
   tags: [postfix-client]
 
 - name: Create sasl_passwd.db
-  file:
+  ansible.builtin.file:
     path: /etc/postfix/sasl_passwd.db
     state: touch
-    mode: 0600
+    mode: '0600'
   tags: [postfix-client]
 
 - name: Hash sasl_passwd
-  command: postmap hash:/etc/postfix/sasl_passwd
+  ansible.builtin.command: postmap hash:/etc/postfix/sasl_passwd
   when: postfix_sasl_password_out is changed
   notify: Reload postfix
   tags: [postfix-client]
 
 - name: Write root mail alias
-  lineinfile:
+  ansible.builtin.lineinfile:
     dest: /etc/aliases
     insertafter: "^postmaster:"
     regexp: "^root: "
@@ -115,5 +115,5 @@
   tags: [postfix-client, postfix, aliases]
 
 - name: Enable mail alias
-  command: newaliases
+  ansible.builtin.command: newaliases
   tags: [postfix-client, postfix, aliases]

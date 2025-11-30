@@ -1,12 +1,12 @@
 ---
 - name: Create directory
-  file:
+  ansible.builtin.file:
     path: /srv/open-webui/data
     state: directory
   tags: [open-webui]
 
 - name: Add to compose.yml
-  blockinfile:
+  ansible.builtin.blockinfile:
     path: /etc/compose.yml
     marker: "# {mark} ANSIBLE MANAGED BLOCK open-webui"
     block: |2
@@ -33,7 +33,7 @@
 - name: Enable proxy
   community.general.apache2_module:
     name: "{{ item }}"
-  with_items:
+  loop:
     - proxy
     - proxy_http
     - proxy_wstunnel
@@ -41,13 +41,13 @@
   tags: [open-webui, open-webui-apache]
 
 - name: Copy open-ebui.rewse.jp.conf
-  copy:
+  ansible.builtin.copy:
     src: openwebui.rewse.jp.conf
     dest: /etc/apache2/sites-available
   notify: Reload apache
   tags: [open-webui, open-webui-apache]
 
 - name: Enable openwebui.rewse.jp
-  command: a2ensite openwebui.rewse.jp
+  ansible.builtin.command: a2ensite openwebui.rewse.jp
   notify: Reload apache
   tags: [open-webui, open-webui-apache]

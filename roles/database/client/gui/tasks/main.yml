@@ -1,8 +1,9 @@
 ---
 - name: Download Amazon Corretto GPG key
-  ansible.builtin.get_url:
-    url: https://apt.corretto.aws/corretto.key
-    dest: /etc/apt/keyrings/corretto.gpg
+  ansible.builtin.shell: |
+    curl -fsSL https://apt.corretto.aws/corretto.key | gpg --dearmor -o /etc/apt/keyrings/corretto.gpg
+  args:
+    creates: /etc/apt/keyrings/corretto.gpg
   tags: [database-client-gui, package, java]
 
 - name: Add Amazon Corretto repository

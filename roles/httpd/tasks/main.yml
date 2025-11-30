@@ -1,20 +1,20 @@
 ---
 - name: Create /srv/www dir
-  file:
+  ansible.builtin.file:
     path: /srv/www
     state: directory
-    mode: 0755
+    mode: '0755'
   tags: [httpd]
 
 - name: Create /var/www link
-  file:
+  ansible.builtin.file:
     src: /srv/www
     dest: /var/www
     state: link
   tags: [httpd]
 
 - name: Install packages
-  apt:
+  ansible.builtin.apt:
     name:
       - apache2
       - php
@@ -22,9 +22,9 @@
   tags: [httpd, package, php]
 
 - name: Enable modules
-  apache2_module:
+  community.general.apache2_module:
     name: "{{ item }}"
-  with_items:
+  loop:
     - headers
     - rewrite
     - ssl
@@ -33,12 +33,12 @@
   tags: [httpd]
 
 - name: Check if default-ssl.conf exists
-  stat:
+  ansible.builtin.stat:
     path: /etc/apache2/sites-available/default-ssl.conf
   register: default_ssl_conf_exists
 
 - name: Copy default-ssl.conf to rename
-  file:
+  ansible.builtin.file:
     src: /etc/apache2/sites-available/default-ssl.conf
     dest: /etc/apache2/sites-available/000-default-ssl.conf
     state: hard
@@ -47,29 +47,29 @@
   tags: [httpd]
 
 - name: Enable 000-default-ssl
-  command: a2ensite 000-default-ssl
+  ansible.builtin.command: a2ensite 000-default-ssl
   notify: Reload apache
   tags: [httpd]
 
 - name: Remove default-ssl.conf
-  file:
-    path: "{{item}}"
+  ansible.builtin.file:
+    path: "{{ item }}"
     state: absent
-  with_items:
+  loop:
     - /etc/apache2/sites-available/default-ssl.conf
     - /etc/apache2/sites-enabled/default-ssl.conf
   notify: Reload apache
   tags: [httpd]
 
 - name: Add an apt key for mod_pagespeed
-  apt_key:
+  ansible.builtin.apt_key:
     url: https://dl.google.com/linux/linux_signing_key.pub
   when:
     ansible_architecture == "x86_64"
   tags: [httpd, package]
 
 - name: Set ServerName
-  lineinfile:
+  ansible.builtin.lineinfile:
     dest: /etc/apache2/sites-available/000-default.conf
     insertafter: "^	#ServerName"
     regexp: "^	ServerName "
@@ -78,7 +78,7 @@
   tags: [httpd]
 
 - name: Set ServerAdmin for http
-  lineinfile:
+  ansible.builtin.lineinfile:
     dest: /etc/apache2/sites-available/000-default.conf
     regexp: "^	ServerAdmin "
     line: "	ServerAdmin hostmaster@rewse.jp"
@@ -86,7 +86,7 @@
   tags: [httpd]
 
 - name: Set ServerAdmin for https
-  lineinfile:
+  ansible.builtin.lineinfile:
     dest: /etc/apache2/sites-available/000-default-ssl.conf
     regexp: "^	ServerAdmin "
     line: "	ServerAdmin hostmaster@rewse.jp"
@@ -94,7 +94,7 @@
   tags: [httpd]
 
 - name: Set ServerName for https
-  lineinfile:
+  ansible.builtin.lineinfile:
     dest: /etc/apache2/sites-available/000-default-ssl.conf
     insertafter: "^	ServerAdmin"
     regexp: "^	ServerName "
@@ -103,7 +103,7 @@
   tags: [httpd]
 
 - name: Set ErrorLog
-  lineinfile:
+  ansible.builtin.lineinfile:
     dest: /etc/apache2/apache2.conf
     regexp: "^ErrorLog "
     line: "ErrorLog syslog"
@@ -111,7 +111,7 @@
   tags: [httpd]
 
 - name: Set LogLevel
-  lineinfile:
+  ansible.builtin.lineinfile:
     dest: /etc/apache2/apache2.conf
     regexp: "^LogLevel "
     line: "LogLevel notice"
@@ -119,7 +119,7 @@
   tags: [httpd]
 
 - name: Enable .htaccess
-  blockinfile:
+  ansible.builtin.blockinfile:
     path: /etc/apache2/apache2.conf
     insertbefore: '<Directory /srv/>'
     block: |
@@ -132,77 +132,77 @@
   tags: [httpd]
 
 - name: Copy 00-forcessl.conf
-  copy:
+  ansible.builtin.copy:
     src: 00-forcessl.conf
     dest: /etc/apache2/conf-available
   tags: [httpd]
 
 - name: Enable forcessl
-  command: a2enconf 00-forcessl
+  ansible.builtin.command: a2enconf 00-forcessl
   notify: Reload apache
   tags: [httpd]
 
 - name: Copy admin.conf
-  template:
+  ansible.builtin.template:
     src: admin.conf.j2
     dest: /etc/apache2/conf-available/admin.conf
   tags: [httpd]
 
 - name: Enable admin
-  command: a2enconf admin
+  ansible.builtin.command: a2enconf admin
   notify: Reload apache
   tags: [httpd]
 
 - name: Copy status.conf
-  template:
+  ansible.builtin.template:
     src: status.conf.j2
     dest: /etc/apache2/conf-available/status.conf
   notify: Reload apache
   tags: [httpd]
 
 - name: Enable status
-  command: a2enconf status
+  ansible.builtin.command: a2enconf status
   notify: Reload apache
   tags: [httpd]
 
 - name: Create html/admin dir
-  file:
+  ansible.builtin.file:
     path: /srv/www/html/admin
     state: directory
   tags: [httpd]
 
 - name: Copy phpinfo.php
-  copy:
+  ansible.builtin.copy:
     src: phpinfo.php
     dest: /srv/www/html/admin
   tags: [httpd]
 
 - name: Copy timezone.ini
-  copy:
+  ansible.builtin.copy:
     src: timezone.ini
     dest: /etc/php/{{ php_version }}/mods-available
   tags: [httpd, php]
 
 - name: Enable timezone
-  command: phpenmod -v {{ php_version }} -s ALL timezone
+  ansible.builtin.command: phpenmod -v {{ php_version }} -s ALL timezone
   notify: Restart apache
   tags: [httpd, php]
 
 - name: Make agentscripts dir
-  file:
+  ansible.builtin.file:
     path: /usr/lib/zabbix/agentscripts
     state: directory
   tags: [httpd, zabbix-agent]
 
 - name: Copy apache.sh
-  copy:
+  ansible.builtin.copy:
     src: apache.sh
     dest: /usr/lib/zabbix/agentscripts
-    mode: 0755
+    mode: '0755'
   tags: [httpd, zabbix-agent]
 
 - name: Copy apache.conf
-  template:
+  ansible.builtin.template:
     src: apache.conf.j2
     dest: /etc/zabbix/zabbix_agentd.d/apache.conf
   notify: Restart zabbix-agent

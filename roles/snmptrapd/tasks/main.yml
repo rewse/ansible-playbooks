@@ -1,21 +1,21 @@
 ---
 - name: Install packages
-  apt:
+  ansible.builtin.apt:
     name:
       - snmptrapd
       - snmptt
-    update_cache: yes
+    update_cache: true
   tags: [snmptrapd]
 
 - name: Copy snmptrapd.conf
-  copy:
+  ansible.builtin.copy:
     src: snmptrapd.conf
     dest: /etc/snmp
   notify: Restart snmptrapd
   tags: [snmptrapd]
 
 - name: Set net_snmp_perl_enable
-  lineinfile:
+  ansible.builtin.lineinfile:
     dest: /etc/snmp/snmptt.ini
     regexp: "^net_snmp_perl_enable ="
     line: "net_snmp_perl_enable = 1"
@@ -23,7 +23,7 @@
   tags: [snmptrapd]
 
 - name: Set date_time_format
-  lineinfile:
+  ansible.builtin.lineinfile:
     dest: /etc/snmp/snmptt.ini
     regexp: "^date_time_format ="
     line: "date_time_format = %H:%M:%S %Y/%m/%d"
@@ -31,7 +31,7 @@
   tags: [snmptrapd]
 
 - name: Add trap format
-  blockinfile:
+  ansible.builtin.blockinfile:
     path: /etc/snmp/snmptt.conf
     block: |
       EVENT general .* "General event" Normal

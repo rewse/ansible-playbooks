@@ -1,6 +1,6 @@
 ---
 - name: Install additional packages
-  apt:
+  ansible.builtin.apt:
     name:
       - docker.io
       - docker-compose-v2
@@ -8,13 +8,13 @@
   tags: [docker, package]
 
 - name: Create a compose.yml
-  file:
+  ansible.builtin.file:
     path: /etc/compose.yml
     state: touch
   tags: [docker]
 
 - name: Add service
-  lineinfile:
+  ansible.builtin.lineinfile:
     path: /etc/compose.yml
     insertbefore: BOF
     regexp: '^services:'

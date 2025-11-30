@@ -1,16 +1,16 @@
 ---
 - name: Reload apache
-  systemd:
+  ansible.builtin.systemd:
     name: apache2
     state: reloaded
 
 - name: Restart aa-disable-homeassistant
-  systemd:
+  ansible.builtin.systemd:
     name: aa-disable-homeassistant
     state: restarted
 
 - name: Restart apache
-  systemd:
+  ansible.builtin.systemd:
     name: apache2
     state: restarted
 

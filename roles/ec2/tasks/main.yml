@@ -1,22 +1,22 @@
 ---
 - name: Install packages
-  apt:
+  ansible.builtin.apt:
     name:
       - nvme-cli
   tags: [ec2]
 
 - name: Format the secondary disk
-  filesystem:
+  community.general.filesystem:
     fstype: ext4
     dev: /dev/{{ secondary_diskname }}
   tags: [ec2, storage]
 
 - name: Label the secondary disk
-  command: e2label /dev/{{ secondary_diskname }} srv
+  ansible.builtin.command: e2label /dev/{{ secondary_diskname }} srv
   tags: [ec2, storage]
 
 - name: Mount srv
-  mount:
+  ansible.posix.mount:
     src: LABEL=srv
     path: /srv
     fstype: ext4

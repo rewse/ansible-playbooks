@@ -1,12 +1,12 @@
 ---
 - name: Create directory
-  file:
+  ansible.builtin.file:
     path: /etc/matter-server/data
     state: directory
   tags: [matter-server]
 
 - name: Add to compose.yml
-  blockinfile:
+  ansible.builtin.blockinfile:
     path: /etc/compose.yml
     marker: "# {mark} ANSIBLE MANAGED BLOCK matter-server"
     block: |2
