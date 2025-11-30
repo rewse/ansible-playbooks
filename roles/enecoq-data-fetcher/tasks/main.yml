@@ -1,16 +1,16 @@
 ---
-- name: Check if uv is installed
+- name: "uv: Check installation status"
   ansible.builtin.stat:
     path: /root/.local/bin/uv
   register: uv_installed
-  tags: [enecoq-data-fetcher, uv, install]
+  tags: [enecoq-data-fetcher, install, uv]
 
-- name: Install uv
+- name: "uv: Install via script"
   ansible.builtin.shell: curl -LsSf https://astral.sh/uv/install.sh | sh
   when: not uv_installed.stat.exists
-  tags: [enecoq-data-fetcher, uv, install]
+  tags: [enecoq-data-fetcher, install, uv]
 
-- name: Create symlinks for uv and uvx in /usr/local/sbin
+- name: "uv: Create symlinks in /usr/local/sbin"
   ansible.builtin.file:
     src: /root/.local/bin/{{ item }}
     dest: /usr/local/sbin/{{ item }}
@@ -18,33 +18,33 @@
   loop:
     - uv
     - uvx
-  tags: [enecoq-data-fetcher, uv, install]
+  tags: [enecoq-data-fetcher, config, uv]
 
-- name: Update uv to latest version
+- name: "uv: Update to latest version"
   ansible.builtin.command: uv self update
-  tags: [enecoq-data-fetcher, uv, update]
+  tags: [enecoq-data-fetcher, update, uv]
 
-- name: Create data directory for Home Assistant
+- name: "enecoq-data-fetcher: Create data directory"
   ansible.builtin.file:
     path: /srv/homeassistant/config/data
     state: directory
-  tags: [enecoq-data-fetcher, setup]
+  tags: [enecoq-data-fetcher, init]
 
-- name: Install chromium
+- name: "enecoq-data-fetcher: Install chromium via playwright"
   ansible.builtin.command: uvx --from enecoq-data-fetcher playwright install chromium --force
-  tags: [enecoq-data-fetcher, uv, install]
+  tags: [enecoq-data-fetcher, install]
 
-- name: Install cron job
+- name: "enecoq-data-fetcher: Configure cron job"
   ansible.builtin.template:
     src: enecoq-data-fetcher.cron.j2
     dest: /etc/cron.d/enecoq-data-fetcher
     variable_start_string: '[%'
     variable_end_string: '%]'
     mode: '0600'
-  tags: [enecoq-data-fetcher, cron]
+  tags: [enecoq-data-fetcher, config, cron]
 
-- name: Install logrotate configuration
+- name: "enecoq-data-fetcher: Configure logrotate"
   ansible.builtin.copy:
     src: enecoq-data-fetcher.logrotate
     dest: /etc/logrotate.d/enecoq-data-fetcher
-  tags: [enecoq-data-fetcher, logrotate]
+  tags: [enecoq-data-fetcher, config, logrotate]

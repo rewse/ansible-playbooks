@@ -1,29 +1,29 @@
 ---
-- name: Install additional packages
+- name: "zabbix-money-sbisec: Install packages"
   ansible.builtin.apt:
     name:
       - python3-bs4
       - python3-selenium
     update_cache: true
-  tags: [zabbix-money-sbisec, package]
+  tags: [zabbix-money-sbisec, install]
 
-- name: Clone sbisec.git
+- name: "zabbix-money-sbisec: Clone repository"
   ansible.builtin.git:
     repo: git@github.com:rewse/sbisec.git
     dest: /srv/git/sbisec
     accept_hostkey: true
     key_file: /home/{{ admin }}/.ssh/id_rsa
-  tags: [zabbix-money-sbisec]
+  tags: [zabbix-money-sbisec, install]
 
-- name: Copy sbisec
+- name: "zabbix-money-sbisec: Copy script to /usr/local/bin"
   ansible.builtin.copy:
     src: /srv/git/sbisec/sbisec
     dest: /usr/local/bin/
     mode: '0755'
     remote_src: true
-  tags: [zabbix-money-sbisec]
+  tags: [zabbix-money-sbisec, config]
 
-- name: Copy sbisec.sh
+- name: "zabbix-money-sbisec: Copy agent script"
   ansible.builtin.template:
     src: sbisec.sh.j2
     dest: /usr/lib/zabbix/agentscripts/sbisec.sh
@@ -31,11 +31,11 @@
     mode: '0750'
     variable_start_string: "[%"
     variable_end_string: "%]"
-  tags: [zabbix-money-sbisec]
+  tags: [zabbix-money-sbisec, config]
 
-- name: Copy sbisec.conf
+- name: "zabbix-money-sbisec: Copy agent config"
   ansible.builtin.copy:
     src: sbisec.conf
     dest: /etc/zabbix/zabbix_agentd.d
-  notify: Restart zabbix-agent
-  tags: [zabbix-money-sbisec]
+  notify: "zabbix-agent: Restart"
+  tags: [zabbix-money-sbisec, config]

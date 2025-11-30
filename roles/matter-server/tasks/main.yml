@@ -1,11 +1,11 @@
 ---
-- name: Create directory
+- name: "matter-server: Create data directory"
   ansible.builtin.file:
     path: /etc/matter-server/data
     state: directory
-  tags: [matter-server]
+  tags: [matter-server, init]
 
-- name: Add to compose.yml
+- name: "matter-server: Add Docker Compose service"
   ansible.builtin.blockinfile:
     path: /etc/compose.yml
     marker: "# {mark} ANSIBLE MANAGED BLOCK matter-server"
@@ -20,5 +20,5 @@
             - apparmor:unconfined
           network_mode: host
           restart: unless-stopped
-  notify: Restart matter-server
-  tags: [matter-server]
+  notify: "matter-server: Restart"
+  tags: [matter-server, config, docker]

@@ -1,81 +1,79 @@
 ---
-- name: Set timezone
+- name: "ubuntu: Set timezone to Asia/Tokyo"
   community.general.timezone:
     name: Asia/Tokyo
-  tags: [ubuntu, time]
+  tags: [ubuntu, config, timezone]
 
-- name: Add an apt key
+- name: "github: Download apt GPG key"
   ansible.builtin.get_url:
     url: https://cli.github.com/packages/githubcli-archive-keyring.gpg
     dest: /etc/apt/keyrings/githubcli-archive-keyring.gpg
-  tags: [ubuntu, package]
+  tags: [ubuntu, install, github]
 
-- name: Add a repository for GitHub
+- name: "github: Add apt repository (amd64)"
   ansible.builtin.apt_repository:
     repo: "deb [arch=amd64 signed-by=/etc/apt/keyrings/githubcli-archive-keyring.gpg] https://cli.github.com/packages stable main"
     filename: github-cli
-  when:
-    ansible_architecture == "x86_64"
-  tags: [ubuntu, package]
+  when: ansible_architecture == "x86_64"
+  tags: [ubuntu, install, github]
 
-- name: Add a repository for GitHub
+- name: "github: Add apt repository (arm64)"
   ansible.builtin.apt_repository:
     repo: "deb [arch=arm64 signed-by=/etc/apt/keyrings/githubcli-archive-keyring.gpg] https://cli.github.com/packages stable main"
     filename: github-cli
-  when:
-    ansible_architecture == "aarch64"
-  tags: [ubuntu, package]
+  when: ansible_architecture == "aarch64"
+  tags: [ubuntu, install, github]
 
-- name: "1password : Download GPG key"
+- name: "1password: Download GPG key"
   ansible.builtin.get_url:
     url: https://downloads.1password.com/linux/keys/1password.asc
     dest: /tmp/1password.asc
-  tags: [ubuntu, package, 1password]
+  tags: [ubuntu, install, 1password]
 
-- name: "1password : Dearmor GPG key for apt"
+- name: "1password: Dearmor GPG key for apt"
   ansible.builtin.shell: gpg --dearmor < /tmp/1password.asc > /usr/share/keyrings/1password-archive-keyring.gpg
   args:
     creates: /usr/share/keyrings/1password-archive-keyring.gpg
-  tags: [ubuntu, package, 1password]
+  tags: [ubuntu, install, 1password]
 
-- name: "1password : Add apt repository"
+- name: "1password: Add apt repository"
   ansible.builtin.apt_repository:
     repo: "deb [arch={{ ansible_architecture | replace('x86_64', 'amd64') | replace('aarch64', 'arm64') }} signed-by=/usr/share/keyrings/1password-archive-keyring.gpg] https://downloads.1password.com/linux/debian/{{ ansible_architecture | replace('x86_64', 'amd64') | replace('aarch64', 'arm64') }} stable main"
     filename: 1password
-  tags: [ubuntu, package, 1password]
+  tags: [ubuntu, install, 1password]
 
-- name: "1password : Create debsig policies directory"
+- name: "1password: Create debsig policies directory"
   ansible.builtin.file:
     path: /etc/debsig/policies/AC2D62742012EA22
     state: directory
-  tags: [ubuntu, package, 1password]
+  tags: [ubuntu, install, 1password]
 
-- name: "1password : Download debsig policy"
+- name: "1password: Download debsig policy"
   ansible.builtin.get_url:
     url: https://downloads.1password.com/linux/debian/debsig/1password.pol
     dest: /etc/debsig/policies/AC2D62742012EA22/1password.pol
-  tags: [ubuntu, package, 1password]
+  tags: [ubuntu, install, 1password]
 
-- name: "1password : Create debsig keyrings directory"
+- name: "1password: Create debsig keyrings directory"
   ansible.builtin.file:
     path: /usr/share/debsig/keyrings/AC2D62742012EA22
     state: directory
-  tags: [ubuntu, package, 1password]
+  tags: [ubuntu, install, 1password]
 
-- name: "1password : Dearmor GPG key for debsig"
+- name: "1password: Dearmor GPG key for debsig"
   ansible.builtin.shell: gpg --dearmor < /tmp/1password.asc > /usr/share/debsig/keyrings/AC2D62742012EA22/debsig.gpg
   args:
     creates: /usr/share/debsig/keyrings/AC2D62742012EA22/debsig.gpg
-  tags: [ubuntu, package, 1password]
+  tags: [ubuntu, install, 1password]
 
-- name: Update all packages
+- name: "ubuntu: Update all packages"
   ansible.builtin.apt:
     name: '*'
     state: latest
     update_cache: true
-  tags: [ubuntu, package]
+  tags: [ubuntu, update]
 
-- name: Install additional packages
+- name: "ubuntu: Install packages"
   ansible.builtin.apt:
     name:
       - 1password-cli
@@ -111,85 +109,85 @@
       - wireless-tools
       - zsh
       - zsh-vi-mode
-  tags: [ubuntu, package]
+  tags: [ubuntu, install]
 
-- name: Stat awscliv2
+- name: "awscliv2: Check installation status"
   ansible.builtin.stat:
     path: /usr/local/bin/aws
   register: aws
-  tags: [ubuntu, package, awscliv2]
+  tags: [ubuntu, install, awscliv2]
 
-- name: Unarchive awscliv2
+- name: "awscliv2: Download and extract"
   ansible.builtin.unarchive:
     src: https://awscli.amazonaws.com/awscli-exe-linux-{{ ansible_architecture }}.zip
     dest: /usr/local/src
     remote_src: true
   when: not aws.stat.exists
-  tags: [ubuntu, package, awscliv2]
+  tags: [ubuntu, install, awscliv2]
 
-- name: Install awscliv2
+- name: "awscliv2: Install"
   ansible.builtin.command: /usr/local/src/aws/install
   when: not aws.stat.exists
-  tags: [ubuntu, package, awscliv2]
+  tags: [ubuntu, install, awscliv2]
 
-- name: Update awscliv2
+- name: "awscliv2: Update"
   ansible.builtin.command: /usr/local/src/aws/install --update
   when: aws.stat.exists
-  tags: [ubuntu, package, awscliv2]
+  tags: [ubuntu, update, awscliv2]
 
-- name: Install Kiro CLI
+- name: "kiro-cli: Install"
   become_user: "{{ admin }}"
   ansible.builtin.shell: curl -fsSL https://cli.kiro.dev/install | bash
   args:
     creates: /home/{{ admin }}/.local/bin/kiro-cli
-  tags: [ubuntu, package, kiro-cli]
+  tags: [ubuntu, install, kiro-cli]
 
-- name: Install uv
+- name: "uv: Install"
   become_user: "{{ admin }}"
   ansible.builtin.shell: curl -LsSf https://astral.sh/uv/install.sh | sh
   args:
     creates: /home/{{ admin }}/.local/bin/uv
-  tags: [ubuntu, package, uv]
+  tags: [ubuntu, install, uv]
 
-- name: "etckeeper : Init /etc"
+- name: "etckeeper: Initialize /etc"
   ansible.builtin.command: etckeeper init
   args:
     creates: /etc/.git
-  tags: [ubuntu, etckeeper]
+  tags: [ubuntu, init, etckeeper]
 
-- name: "etckeeper : Initial commit"
+- name: "etckeeper: Create initial commit"
   ansible.builtin.command: etckeeper commit "Initial commit"
   args:
     chdir: /etc
     creates: /etc/.git/logs
-  tags: [ubuntu, etckeeper]
+  tags: [ubuntu, init, etckeeper]
 
-- name: Set hostname
+- name: "ubuntu: Set hostname"
   ansible.builtin.hostname:
     name: "{{ inventory_hostname }}"
-  tags: [ubuntu, hostname]
+  tags: [ubuntu, config, hostname]
 
-- name: "cloud-init : Enable preserve_hostname"
+- name: "cloud-init: Enable preserve_hostname"
   ansible.builtin.lineinfile:
     dest: /etc/cloud/cloud.cfg
     regexp: '^preserve_hostname'
     line: 'preserve_hostname: true'
-  tags: [ubuntu, cloud-init]
+  tags: [ubuntu, config, cloud-init]
 
-- name: "input : Set editing-mode to vi"
+- name: "inputrc: Set editing-mode to vi"
   ansible.builtin.lineinfile:
     dest: /etc/inputrc
     regexp: 'set editing-mode '
     line: 'set editing-mode vi'
-  tags: [ubuntu, input]
+  tags: [ubuntu, config, inputrc]
 
-- name: Add a group for admin user
+- name: "user: Create admin group"
   ansible.builtin.group:
     name: "{{ admin }}"
     gid: 2000
-  tags: [ubuntu, user]
+  tags: [ubuntu, config, user]
 
-- name: Add admin user
+- name: "user: Create admin user"
   ansible.builtin.user:
     name: "{{ admin }}"
     uid: 2000
@@ -197,9 +195,9 @@
     groups: "adm,sudo"
     shell: /usr/bin/zsh
     skeleton: /etc/skel
-  tags: [ubuntu, user]
+  tags: [ubuntu, config, user]
 
-- name: Allow sudo to admin user
+- name: "user: Configure passwordless sudo for admin"
   ansible.builtin.lineinfile:
     dest: /etc/sudoers.d/00-{{ admin }}
     regexp: '^{{ admin }}'
@@ -207,25 +205,25 @@
     create: true
     mode: '0440'
     validate: 'visudo -cf %s'
-  tags: [ubuntu, user]
+  tags: [ubuntu, config, user]
 
-- name: Make .ssh dir for admin user
+- name: "user: Create .ssh directory for admin"
   ansible.builtin.file:
     path: /home/{{ admin }}/.ssh
     owner: "{{ admin }}"
     group: "{{ admin }}"
     state: directory
     mode: '0700'
-  tags: [ubuntu, user]
+  tags: [ubuntu, config, user]
 
-- name: Copy authentication.conf
+- name: "ssh: Copy authentication.conf"
   ansible.builtin.copy:
     src: authentication.conf
     dest: /etc/ssh/sshd_config.d
-  notify: Restart ssh
-  tags: [ubuntu, ssh]
+  notify: "ssh: Restart"
+  tags: [ubuntu, config, ssh]
 
-- name: Copy authorized_keys
+- name: "user: Copy authorized_keys for admin"
   ansible.builtin.copy:
     src: /home/ubuntu/.ssh/authorized_keys
     dest: /home/{{ admin }}/.ssh/authorized_keys
@@ -233,18 +231,18 @@
     owner: "{{ admin }}"
     group: "{{ admin }}"
     mode: '0600'
-  tags: [ubuntu, user]
+  tags: [ubuntu, config, user]
 
 # Ref: https://ghostty.org/docs/help/terminfo
-- name: Copy xterm-ghostty
+- name: "ghostty: Copy terminfo"
   ansible.builtin.copy:
     src: xterm-ghostty
     dest: /usr/share/terminfo/x/xterm-ghostty
-  tags: [ubuntu, ghostty]
+  tags: [ubuntu, install, ghostty]
 
-- name: Create a link, ghostty
+- name: "ghostty: Create symlink"
   ansible.builtin.file:
     src: ../x/xterm-ghostty
     dest: /usr/share/terminfo/g/ghostty
     state: link
-  tags: [ubuntu, ghostty]
+  tags: [ubuntu, install, ghostty]

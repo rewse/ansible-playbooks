@@ -1,5 +1,5 @@
 ---
-- name: Reload postfix
+- name: "postfix: Reload"
   ansible.builtin.systemd:
     name: postfix
     state: reloaded

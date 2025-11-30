@@ -1,31 +1,31 @@
 ---
-- name: Create /opt/mhz19
+- name: "mhz19: Create installation directory"
   ansible.builtin.file:
     path: /opt/mhz19
     state: directory
-  tags: [mhz19]
+  tags: [mhz19, init]
 
-- name: Create venv
+- name: "mhz19: Create Python virtual environment"
   ansible.builtin.command: python3 -m venv /opt/mhz19
-  tags: [mhz19]
+  tags: [mhz19, init]
 
-- name: Install mh_z19
+- name: "mhz19: Install mh_z19 package"
   ansible.builtin.pip:
     name: mh_z19
     virtualenv: /opt/mhz19
-  tags: [mhz19]
+  tags: [mhz19, install]
 
-- name: Copy mhz192mqtt
+- name: "mhz19: Copy MQTT publisher script"
   ansible.builtin.template:
     src: mhz192mqtt.j2
     dest: /usr/local/sbin/mhz192mqtt
     mode: '0755'
     variable_start_string: "[%"
     variable_end_string: "%]"
-  tags: [mhz19]
+  tags: [mhz19, config]
 
-- name: Copy mhz192mqtt.cron
+- name: "mhz19: Configure cron job"
   ansible.builtin.copy:
     src: mhz192mqtt.cron
     dest: /etc/cron.d/mhz192mqtt
-  tags: [mhz19]
+  tags: [mhz19, config, cron]

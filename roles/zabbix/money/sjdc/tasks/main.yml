@@ -1,29 +1,29 @@
 ---
-- name: Install additional packages
+- name: "zabbix-money-sjdc: Install packages"
   ansible.builtin.apt:
     name:
       - python3-bs4
       - python3-selenium
     update_cache: true
-  tags: [zabbix-money-sjdc, package]
+  tags: [zabbix-money-sjdc, install]
 
-- name: Clone sjdc.git
+- name: "zabbix-money-sjdc: Clone repository"
   ansible.builtin.git:
     repo: git@github.com:rewse/sjdc.git
     dest: /srv/git/sjdc
     accept_hostkey: true
     key_file: /home/{{ admin }}/.ssh/id_rsa
-  tags: [zabbix-money-sjdc]
+  tags: [zabbix-money-sjdc, install]
 
-- name: Copy sjdc
+- name: "zabbix-money-sjdc: Copy script to /usr/local/bin"
   ansible.builtin.copy:
     src: /srv/git/sjdc/sjdc
     dest: /usr/local/bin/
     mode: '0755'
     remote_src: true
-  tags: [zabbix-money-sjdc]
+  tags: [zabbix-money-sjdc, config]
 
-- name: Copy sjdc.sh
+- name: "zabbix-money-sjdc: Copy agent script"
   ansible.builtin.template:
     src: sjdc.sh.j2
     dest: /usr/lib/zabbix/agentscripts/sjdc.sh
@@ -31,11 +31,11 @@
     mode: '0750'
     variable_start_string: "[%"
     variable_end_string: "%]"
-  tags: [zabbix-money-sjdc]
+  tags: [zabbix-money-sjdc, config]
 
-- name: Copy sjdc.conf
+- name: "zabbix-money-sjdc: Copy agent config"
   ansible.builtin.copy:
     src: sjdc.conf
     dest: /etc/zabbix/zabbix_agentd.d
-  notify: Restart zabbix-agent
-  tags: [zabbix-money-sjdc]
+  notify: "zabbix-agent: Restart"
+  tags: [zabbix-money-sjdc, config]

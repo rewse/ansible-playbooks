@@ -1,20 +1,20 @@
 ---
-- name: Reload apache
+- name: "apache: Reload"
   ansible.builtin.systemd:
     name: apache2
     state: reloaded
 
-- name: Restart aa-disable-homeassistant
+- name: "aa-disable-homeassistant: Restart"
   ansible.builtin.systemd:
     name: aa-disable-homeassistant
     state: restarted
 
-- name: Restart apache
+- name: "apache: Restart"
   ansible.builtin.systemd:
     name: apache2
     state: restarted
 
-- name: Restart homeassistant
+- name: "homeassistant: Restart"
   community.docker.docker_compose_v2:
     project_src: /etc
     services: homeassistant

@@ -1,16 +1,17 @@
 ---
-- name: Reload apache
+- name: "apache: Reload"
   ansible.builtin.systemd:
     name: apache2
     state: reloaded
 
-- name: Restart apache
+- name: "apache: Restart"
   ansible.builtin.systemd:
     name: apache2
     state: restarted
 
-- name: Restart couchdb
+- name: "couchdb: Restart"
   community.docker.docker_compose_v2:
     project_src: /etc
-    services: couchdb
+    services:
+      - couchdb
     state: restarted
