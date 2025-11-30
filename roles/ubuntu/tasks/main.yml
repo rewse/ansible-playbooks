@@ -108,7 +108,6 @@
       - vim
       - wireless-tools
       - zsh
-      - zsh-vi-mode
   tags: [ubuntu, install]
 
 - name: "awscliv2: Check installation status"
@@ -148,6 +147,20 @@
   args:
     creates: /home/{{ admin }}/.local/bin/uv
   tags: [ubuntu, install, uv]
+
+- name: "zinit: Install"
+  become_user: "{{ admin }}"
+  ansible.builtin.shell: bash -c "$(curl --fail --show-error --silent --location https://raw.githubusercontent.com/zdharma-continuum/zinit/HEAD/scripts/install.sh)"
+  args:
+    creates: /home/{{ admin }}/.local/share/zinit/zinit.git
+  environment:
+    NO_INPUT: "1"
+  tags: [ubuntu, install, zinit]
+
+- name: "zinit: Update"
+  become_user: "{{ admin }}"
+  ansible.builtin.command: zsh -ic "zinit self-update"
+  tags: [ubuntu, update, zinit]
 
 - name: "etckeeper: Initialize /etc"
   ansible.builtin.command: etckeeper init
