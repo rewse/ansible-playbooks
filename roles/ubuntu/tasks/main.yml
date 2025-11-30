@@ -135,14 +135,30 @@
   tags: [ubuntu, update, awscliv2]
 
 - name: "kiro-cli: Install"
-  become_user: "{{ admin }}"
   ansible.builtin.shell: curl -fsSL https://cli.kiro.dev/install | bash
   args:
-    creates: /home/{{ admin }}/.local/bin/kiro-cli
+    creates: /root/.local/bin/kiro-cli
   tags: [ubuntu, install, kiro-cli]
 
+- name: "kiro-cli: Create symlinks in /usr/local/bin"
+  ansible.builtin.file:
+    src: /root/.local/bin/{{ item }}
+    dest: /usr/local/bin/{{ item }}
+    state: link
+  loop:
+    - kiro-cli
+    - kiro-cli-chat
+    - kiro-cli-term
+    - q
+    - qchat
+    - qterm
+  tags: [ubuntu, install, kiro-cli]
+
+- name: "kiro-cli: Update"
+  ansible.builtin.command: /usr/local/bin/kiro-cli update
+  tags: [ubuntu, update, kiro-cli]
+
 - name: "uv: Install"
-  become_user: "{{ admin }}"
   ansible.builtin.shell: curl -LsSf https://astral.sh/uv/install.sh | sh
   args:
     creates: /usr/local/bin/uv
