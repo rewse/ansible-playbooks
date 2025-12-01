@@ -1,42 +1,42 @@
 ---
-- name: "corretto: Download and dearmor GPG key"
+- name: "corretto : Download and dearmor GPG key"
   ansible.builtin.shell: |
     curl -fsSL https://apt.corretto.aws/corretto.key | gpg --dearmor -o /etc/apt/keyrings/corretto.gpg
   args:
     creates: /etc/apt/keyrings/corretto.gpg
   tags: [database-client-gui, install, java]
 
-- name: "corretto: Add apt repository"
+- name: "corretto : Add apt repository"
   ansible.builtin.apt_repository:
     repo: "deb [signed-by=/etc/apt/keyrings/corretto.gpg] https://apt.corretto.aws stable main"
     filename: corretto
     state: present
   tags: [database-client-gui, install, java]
 
-- name: "corretto: Update apt cache"
+- name: "corretto : Update apt cache"
   ansible.builtin.apt:
     update_cache: true
   tags: [database-client-gui, install, java]
 
-- name: "corretto: Install JDK"
+- name: "corretto : Install JDK"
   ansible.builtin.apt:
     name: java-{{ corretto_version }}-amazon-corretto-jdk
     state: present
   tags: [database-client-gui, install, java]
 
-- name: "sct: Download and extract"
+- name: "sct : Download and extract"
   ansible.builtin.unarchive:
     src: https://s3.amazonaws.com/publicsctdownload/Ubuntu/aws-schema-conversion-tool-1.0.latest.zip
     dest: /usr/local/src
     remote_src: true
   tags: [database-client-gui, install, sct]
 
-- name: "sct: Install package"
+- name: "sct : Install package"
   ansible.builtin.apt:
     deb: /usr/local/src/aws-schema-conversion-tool-{{ sct_version }}.deb
   tags: [database-client-gui, install, sct]
 
-- name: "dbeaver: Install package"
+- name: "dbeaver : Install package"
   ansible.builtin.apt:
     deb: https://dbeaver.io/files/dbeaver-ce_latest_amd64.deb
   tags: [database-client-gui, install, dbeaver]

@@ -1,15 +1,15 @@
 ---
-- name: "enecoq-data-fetcher: Create data directory"
+- name: "enecoq-data-fetcher : Create data directory"
   ansible.builtin.file:
     path: /srv/homeassistant/config/data
     state: directory
   tags: [enecoq-data-fetcher, init]
 
-- name: "enecoq-data-fetcher: Install chromium via playwright"
+- name: "enecoq-data-fetcher : Install chromium via playwright"
   ansible.builtin.command: uvx --from enecoq-data-fetcher playwright install chromium --force
   tags: [enecoq-data-fetcher, install]
 
-- name: "enecoq-data-fetcher: Configure cron job"
+- name: "enecoq-data-fetcher : Configure cron job"
   ansible.builtin.template:
     src: enecoq-data-fetcher.cron.j2
     dest: /etc/cron.d/enecoq-data-fetcher
@@ -18,7 +18,7 @@
     mode: '0600'
   tags: [enecoq-data-fetcher, config, cron]
 
-- name: "enecoq-data-fetcher: Configure logrotate"
+- name: "enecoq-data-fetcher : Configure logrotate"
   ansible.builtin.copy:
     src: enecoq-data-fetcher.logrotate
     dest: /etc/logrotate.d/enecoq-data-fetcher

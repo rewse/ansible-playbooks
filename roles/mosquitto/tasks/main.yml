@@ -1,22 +1,22 @@
 ---
-- name: "mosquitto: Install packages"
+- name: "mosquitto : Install packages"
   ansible.builtin.apt:
     name:
       - mosquitto
       - mosquitto-clients
   tags: [mosquitto, install]
 
-- name: "mosquitto: Create password file"
+- name: "mosquitto : Create password file"
   ansible.builtin.template:
     src: pwfile.j2
     dest: /etc/mosquitto/pwfile
   tags: [mosquitto, config]
 
-- name: "mosquitto: Hash password file"
+- name: "mosquitto : Hash password file"
   ansible.builtin.command: mosquitto_passwd -U /etc/mosquitto/pwfile
   tags: [mosquitto, config]
 
-- name: "mosquitto: Copy authentication config"
+- name: "mosquitto : Copy authentication config"
   ansible.builtin.copy:
     src: password.conf
     dest: /etc/mosquitto/conf.d

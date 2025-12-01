@@ -1,5 +1,5 @@
 ---
-- name: Install additional packages
+- name: "package : Install packages"
   ansible.builtin.apt:
     name:
       - bluez
@@ -9,153 +9,153 @@
       - pi-bluetooth
       - snmp
       - snmp-mibs-downloader
-  tags: [raspberrypi, package]
+  tags: [raspberrypi, install]
 
-- name: Configure swap factor to RAM size
+- name: "swap : Set swap factor to RAM size"
   ansible.builtin.lineinfile:
     path: /etc/dphys-swapfile
     regexp: '^#?CONF_SWAPFACTOR='
     line: 'CONF_SWAPFACTOR=1'
     backup: true
   notify: Restart dphys-swapfile
-  tags: [raspberrypi, swap]
+  tags: [raspberrypi, config, swap]
 
-- name: Configure swap max size to 16GB
+- name: "swap : Set swap max size to 16GB"
   ansible.builtin.lineinfile:
     path: /etc/dphys-swapfile
     regexp: '^#?CONF_MAXSWAP='
     line: 'CONF_MAXSWAP=16384'
     backup: true
   notify: Restart dphys-swapfile
-  tags: [raspberrypi, swap]
+  tags: [raspberrypi, config, swap]
 
-- name: Ensure CONF_SWAPSIZE is commented out for dynamic calculation
+- name: "swap : Disable fixed swap size for dynamic calculation"
   ansible.builtin.lineinfile:
     path: /etc/dphys-swapfile
     regexp: '^CONF_SWAPSIZE='
     line: '#CONF_SWAPSIZE='
     backup: true
   notify: Restart dphys-swapfile
-  tags: [raspberrypi, swap]
+  tags: [raspberrypi, config, swap]
 
-- name: Add NTP servers
+- name: "ntp : Configure NTP servers"
   ansible.builtin.lineinfile:
     dest: /etc/systemd/timesyncd.conf
     insertafter: '^#NTP='
     regexp: '^NTP='
     line: 'NTP=ntp.nict.jp ntp.jst.mfeed.ad.jp'
   notify: Restart systemd-timesyncd
-  tags: [raspberrypi, time, systemd-timesyncd]
+  tags: [raspberrypi, config, time]
 
-- name: Enable bluetooth services
+- name: "bluetooth : Enable service"
   ansible.builtin.systemd:
     name: "{{ item }}"
     state: started
     enabled: true
   loop:
     - bluetooth
-  tags: [raspberrypi]
+  tags: [raspberrypi, config]
 
-- name: Enable SNMP mibs
+- name: "snmp : Enable MIBs"
   ansible.builtin.lineinfile:
     dest: /etc/snmp/snmp.conf
     regexp: "mibs "
     line: "mibs all"
-  tags: [raspberrypi]
+  tags: [raspberrypi, config]
 
-- name: Download php-miio
+- name: "php-miio : Install"
   ansible.builtin.unarchive:
     src: https://github.com/skysilver-lab/php-miio/archive/refs/tags/v.{{ php_miio_version }}.zip
     dest: /srv
     remote_src: true
-  tags: [raspberrypi]
+  tags: [raspberrypi, install]
 
-- name: Copy environment
+- name: "environment : Copy file"
   ansible.builtin.copy:
     src: environment
     dest: /etc
-  tags: [raspberrypi]
+  tags: [raspberrypi, config]
 
-- name: Copy netplan/99-config.yaml
+- name: "netplan : Configure network"
   ansible.builtin.template:
     src: 99-config.yaml.j2
     dest: /etc/netplan/99-config.yaml
     mode: '0600'
-  tags: [raspberrypi]
+  tags: [raspberrypi, config]
 
-- name: Delete 50-cloud-init.yaml
+- name: "netplan : Remove cloud-init config"
   ansible.builtin.file:
     path: /etc/netplan/50-cloud-init.yaml
     state: absent
-  tags: [raspberrypi]
+  tags: [raspberrypi, config]
 
-- name: Copy 99-disable-network-config.cfg
+- name: "cloud-init : Disable network config"
   ansible.builtin.copy:
     src: 99-disable-network-config.cfg
     dest: /etc/cloud/cloud.cfg.d
-  tags: [raspberrypi]
+  tags: [raspberrypi, config]
 
-- name: Copy ifmetric to cron.d
+- name: "ifmetric : Configure cron job"
   ansible.builtin.copy:
     src: ifmetric
     dest: /etc/cron.d
-  tags: [raspberrypi]
+  tags: [raspberrypi, config]
 
-- name: Apply netplan
+- name: "netplan : Apply configuration"
   ansible.builtin.command: netplan apply
   notify: Run ifmetric
-  tags: [raspberrypi]
+  tags: [raspberrypi, config]
 
 # ssh stuck at expecting SSH2_MSG_KEX_ECDH_REPLY - Unix & Linux Stack Exchange
 # https://unix.stackexchange.com/questions/722954/ssh-stuck-at-expecting-ssh2-msg-kex-ecdh-reply
-- name: Copy kex_algorithms.conf
+- name: "ssh : Configure KEX algorithms"
   ansible.builtin.copy:
     src: kex_algorithms.conf
     dest: /etc/ssh/ssh_config.d
-  tags: [raspberrypi]
+  tags: [raspberrypi, config, ssh]
 
-- name: Create ssh.socket.d
+- name: "ssh : Create socket override directory"
   ansible.builtin.file:
     path: /etc/systemd/system/ssh.socket.d
     state: directory
-  tags: [raspberrypi, ssh]
+  tags: [raspberrypi, config, ssh]
 
-- name: Copy ssh.socket.d override.conf
+- name: "ssh : Configure socket override"
   ansible.builtin.template:
     src: override.conf.j2
     dest: /etc/systemd/system/ssh.socket.d/override.conf
   notify: Restart ssh.socket
-  tags: [raspberrypi, ssh]
+  tags: [raspberrypi, config, ssh]
 
-- name: Create /mnt/bak
+- name: "backup : Create mount point"
   ansible.builtin.file:
     path: /mnt/bak
     state: directory
-  tags: [raspberrypi]
+  tags: [raspberrypi, config]
 
-- name: Copy rsync-time-backup
+- name: "backup : Install rsync-time-backup script"
   ansible.builtin.get_url:
     url: https://raw.githubusercontent.com/laurent22/rsync-time-backup/master/rsync_tmbackup.sh
     dest: /usr/local/bin/tmbackup
     mode: '0755'
-  tags: [raspberrypi]
+  tags: [raspberrypi, install]
 
-- name: Add / for fn_df_t_src to tmpbackup
+- name: "backup : Fix rsync-time-backup source path"
   ansible.builtin.replace:
     dest: /usr/local/bin/tmbackup
     regexp: 'fn_df_t_src "\${SRC_FOLDER}"'
     replace: 'fn_df_t_src "${SRC_FOLDER}/"'
-  tags: [raspberrypi]
+  tags: [raspberrypi, config]
 
-- name: Copy 000backup-daily
+- name: "backup : Configure daily cron job"
   ansible.builtin.template:
     src: 000backup-daily.j2
     dest: /etc/cron.daily/000backup-daily
     mode: '0755'
-  tags: [raspberrypi]
+  tags: [raspberrypi, config]
 
-- name: Copy tmbackup.exclude
+- name: "backup : Copy exclusion list"
   ansible.builtin.copy:
     src: tmbackup.exclude
     dest: /etc
-  tags: [raspberrypi]
+  tags: [raspberrypi, config]
