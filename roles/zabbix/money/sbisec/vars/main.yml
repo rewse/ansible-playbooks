@@ -1,4 +1,0 @@
----
-sbisec:
-  username: "{{ vault_sbisec.username }}"
-  password: "{{ vault_sbisec.password }}"
