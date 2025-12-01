@@ -1,11 +1,11 @@
 ---
-- name: "matter-server: Create data directory"
+- name: "matter-server : Create data directory"
   ansible.builtin.file:
     path: /etc/matter-server/data
     state: directory
   tags: [matter-server, init]
 
-- name: "matter-server: Add Docker Compose service"
+- name: "matter-server : Add Docker Compose service"
   ansible.builtin.blockinfile:
     path: /etc/compose.yml
     marker: "# {mark} ANSIBLE MANAGED BLOCK matter-server"

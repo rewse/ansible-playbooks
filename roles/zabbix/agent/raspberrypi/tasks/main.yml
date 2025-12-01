@@ -1,12 +1,12 @@
 ---
-- name: "zabbix-agent: Copy Raspberry Pi config"
+- name: "zabbix-agent : Copy Raspberry Pi config"
   ansible.builtin.copy:
     src: raspberrypi.conf
     dest: /etc/zabbix/zabbix_agentd.d
   notify: "zabbix-agent: Restart"
   tags: [zabbix-agent-raspberrypi, config]
 
-- name: "zabbix-agent: Copy systemd service file"
+- name: "zabbix-agent : Copy systemd service file"
   ansible.builtin.copy:
     src: /usr/lib/systemd/system/zabbix-agent.service
     dest: /etc/systemd/system
@@ -14,7 +14,7 @@
   notify: "zabbix-agent: Restart"
   tags: [zabbix-agent-raspberrypi, config]
 
-- name: "zabbix-agent: Set User to root"
+- name: "zabbix-agent : Set User to root"
   ansible.builtin.lineinfile:
     path: /etc/systemd/system/zabbix-agent.service
     regexp: '^User='
@@ -22,7 +22,7 @@
   notify: "zabbix-agent: Restart"
   tags: [zabbix-agent-raspberrypi, config]
 
-- name: "zabbix-agent: Set Group to root"
+- name: "zabbix-agent : Set Group to root"
   ansible.builtin.lineinfile:
     path: /etc/systemd/system/zabbix-agent.service
     regexp: '^Group='
@@ -30,7 +30,7 @@
   notify: "zabbix-agent: Restart"
   tags: [zabbix-agent-raspberrypi, config]
 
-- name: "zabbix-agent: Enable AllowRoot"
+- name: "zabbix-agent : Enable AllowRoot"
   ansible.builtin.lineinfile:
     path: /etc/zabbix/zabbix_agentd.conf
     insertafter: '^# AllowRoot='
@@ -39,7 +39,7 @@
   notify: "zabbix-agent: Restart"
   tags: [zabbix-agent-raspberrypi, config]
 
-- name: "zabbix-agent: Copy Bluetooth devices config"
+- name: "zabbix-agent : Copy Bluetooth devices config"
   ansible.builtin.copy:
     src: bluetooth-devices.conf
     dest: /etc/zabbix/zabbix_agentd.d

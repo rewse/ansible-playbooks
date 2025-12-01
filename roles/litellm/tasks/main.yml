@@ -1,5 +1,5 @@
 ---
-- name: Create LiteLLM configuration directory
+- name: "litellm : Create configuration directory"
   ansible.builtin.file:
     path: /srv/litellm
     state: directory
@@ -7,7 +7,7 @@
     group: root
   tags: [litellm, config]
 
-- name: Generate LiteLLM configuration file
+- name: "litellm : Generate configuration file"
   ansible.builtin.template:
     src: config.yaml.j2
     dest: /srv/litellm/config.yaml
@@ -16,7 +16,7 @@
   notify: Restart litellm
   tags: [litellm, config]
 
-- name: Add LiteLLM service to Docker Compose
+- name: "docker : Add LiteLLM service to compose"
   ansible.builtin.blockinfile:
     path: /etc/compose.yml
     marker: "# {mark} ANSIBLE MANAGED BLOCK litellm"
@@ -38,4 +38,4 @@
           restart: unless-stopped
           command: ["--config", "/app/config.yaml", "--port", "4000"]
   notify: Restart litellm
-  tags: [litellm, docker]
+  tags: [litellm, config, docker]

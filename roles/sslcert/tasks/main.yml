@@ -1,5 +1,5 @@
 ---
-- name: "certbot: Install prerequisite packages"
+- name: "certbot : Install prerequisite packages"
   ansible.builtin.apt:
     name:
       - python3
@@ -7,17 +7,17 @@
       - libaugeas0
   tags: [sslcert, install]
 
-- name: "certbot: Create installation directory"
+- name: "certbot : Create installation directory"
   ansible.builtin.file:
     path: /opt/certbot
     state: directory
   tags: [sslcert, init]
 
-- name: "certbot: Create Python virtual environment"
+- name: "certbot : Create Python virtual environment"
   ansible.builtin.command: python3 -m venv /opt/certbot
   tags: [sslcert, init]
 
-- name: "certbot: Install packages"
+- name: "certbot : Install packages"
   ansible.builtin.pip:
     name:
       - certbot
@@ -27,7 +27,7 @@
     virtualenv: /opt/certbot
   tags: [sslcert, install]
 
-- name: "certbot: Configure monthly cron job"
+- name: "certbot : Configure monthly cron job"
   ansible.builtin.template:
     src: certbot.cron.j2
     dest: /etc/cron.monthly/certbot
@@ -36,7 +36,7 @@
     variable_end_string: "%]"
   tags: [sslcert, config, cron]
 
-- name: "certbot: Copy AWS credentials"
+- name: "certbot : Copy AWS credentials"
   ansible.builtin.template:
     src: config.j2
     dest: /root/.aws/config
@@ -61,14 +61,14 @@
 #     --agree-tos
 #   tags: [sslcert, init]
 
-- name: "apache: Set SSL certificate path"
+- name: "apache : Set SSL certificate path"
   ansible.builtin.lineinfile:
     path: /etc/apache2/sites-available/000-default-ssl.conf
     regexp: '^\s+SSLCertificateFile'
     line: '        SSLCertificateFile /etc/letsencrypt/live/rewse.jp/fullchain.pem'
   tags: [sslcert, config, apache]
 
-- name: "apache: Set SSL private key path"
+- name: "apache : Set SSL private key path"
   ansible.builtin.lineinfile:
     path: /etc/apache2/sites-available/000-default-ssl.conf
     regexp: '^\s+SSLCertificateKeyFile'

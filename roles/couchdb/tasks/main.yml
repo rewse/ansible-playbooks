@@ -1,5 +1,5 @@
 ---
-- name: "couchdb: Create data directories"
+- name: "couchdb : Create data directories"
   ansible.builtin.file:
     path: "{{ item }}"
     state: directory
@@ -8,7 +8,7 @@
     - /srv/couchdb/etc/local.d
   tags: [couchdb, init]
 
-- name: "couchdb: Add Docker Compose service"
+- name: "couchdb : Add Docker Compose service"
   ansible.builtin.blockinfile:
     path: /etc/compose.yml
     marker: "# {mark} ANSIBLE MANAGED BLOCK couchdb"
@@ -28,14 +28,14 @@
   notify: "couchdb: Restart"
   tags: [couchdb, config, docker]
 
-- name: "couchdb: Download init script"
+- name: "couchdb : Download init script"
   ansible.builtin.get_url:
     url: https://raw.githubusercontent.com/vrtmrz/obsidian-livesync/main/utils/couchdb/couchdb-init.sh
     dest: /tmp
     mode: '0755'
   tags: [couchdb, init]
 
-- name: "couchdb: Run init script"
+- name: "couchdb : Run init script"
   ansible.builtin.command: /tmp/couchdb-init.sh
   environment:
     hostname: localhost:5984
@@ -43,14 +43,14 @@
     password: "{{ couchdb_password }}"
   tags: [couchdb, init]
 
-- name: "couchdb: Copy Apache vhost config"
+- name: "couchdb : Copy Apache vhost config"
   ansible.builtin.copy:
     src: couchdb.rewse.jp.conf
     dest: /etc/apache2/sites-available
   notify: "apache: Reload"
   tags: [couchdb, config, apache]
 
-- name: "couchdb: Enable Apache site"
+- name: "couchdb : Enable Apache site"
   ansible.builtin.command: a2ensite couchdb.rewse.jp
   notify: "apache: Reload"
   tags: [couchdb, config, apache]

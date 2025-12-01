@@ -1,5 +1,5 @@
 ---
-- name: "snmptrapd: Install packages"
+- name: "snmptrapd : Install packages"
   ansible.builtin.apt:
     name:
       - snmptrapd
@@ -7,14 +7,14 @@
     update_cache: true
   tags: [snmptrapd, install]
 
-- name: "snmptrapd: Copy config file"
+- name: "snmptrapd : Copy config file"
   ansible.builtin.copy:
     src: snmptrapd.conf
     dest: /etc/snmp
   notify: "snmptrapd: Restart"
   tags: [snmptrapd, config]
 
-- name: "snmptt: Enable net_snmp_perl"
+- name: "snmptt : Enable net_snmp_perl"
   ansible.builtin.lineinfile:
     dest: /etc/snmp/snmptt.ini
     regexp: "^net_snmp_perl_enable ="
@@ -22,7 +22,7 @@
   notify: "snmptt: Restart"
   tags: [snmptrapd, config]
 
-- name: "snmptt: Set date_time_format"
+- name: "snmptt : Set date_time_format"
   ansible.builtin.lineinfile:
     dest: /etc/snmp/snmptt.ini
     regexp: "^date_time_format ="
@@ -30,7 +30,7 @@
   notify: "snmptt: Restart"
   tags: [snmptrapd, config]
 
-- name: "snmptt: Add trap format for Zabbix"
+- name: "snmptt : Add trap format for Zabbix"
   ansible.builtin.blockinfile:
     path: /etc/snmp/snmptt.conf
     block: |

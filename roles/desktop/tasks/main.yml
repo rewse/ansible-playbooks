@@ -1,5 +1,5 @@
 ---
-- name: "desktop: Install packages"
+- name: "desktop : Install packages"
   ansible.builtin.apt:
     name:
       - fonts-ricty-diminished
@@ -7,18 +7,18 @@
       - ubuntu-desktop
   tags: [desktop, install]
 
-- name: "terminal: Clone one-gnome-terminal theme"
+- name: "terminal : Clone one-gnome-terminal theme"
   ansible.builtin.git:
     repo: https://github.com/denysdovhan/one-gnome-terminal.git
     dest: /srv/git/one-gnome-terminal
   tags: [desktop, install, terminal]
 
-- name: "terminal: Apply one-dark theme"
+- name: "terminal : Apply one-dark theme"
   become_user: "{{ admin }}"
   ansible.builtin.command: bash /srv/git/one-gnome-terminal/one-dark.sh
   tags: [desktop, config, terminal]
 
-- name: "terminal: Set font to Ricty Diminished"
+- name: "terminal : Set font to Ricty Diminished"
   become_user: "{{ admin }}"
   ansible.builtin.command: gsettings set org.gnome.desktop.interface monospace-font-name "Ricty Diminished Regular 12"
   tags: [desktop, config, terminal]
