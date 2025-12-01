@@ -1,29 +1,29 @@
 ---
 alexa_client:
-  id: "{{ vault_alexa_client.id }}"
-  secret: "{{ vault_alexa_client.secret }}"
+  id: "{{ lookup('pipe', 'op read op://ansible/Alexa/username') }}"
+  secret: "{{ lookup('pipe', 'op read op://ansible/Alexa/credential') }}"
 card_mod_version: 3.4.5
 frosted_glass_manager_version: 1.3
 frosted_glass_version: 1.3
 gmail:
-  address: "{{ vault_gmail.address }}"
-  password: "{{ vault_gmail.password }}"
-homeassistant_token: "{{ vault_homeassistant_token }}"
+  address: "{{ lookup('pipe', 'op read op://ansible/Gmail/username') }}"
+  password: "{{ lookup('pipe', 'op read op://ansible/Gmail/credential') }}"
+homeassistant_token: "{{ lookup('pipe', 'op read \"op://ansible/Home Assistant/token\"') }}"
 latlng:
   home:
-    lat: "{{ vault_latlng.home.lat }}"
-    lng: "{{ vault_latlng.home.lng }}"
+    lat: "{{ lookup('pipe', 'op read \"op://ansible/Tats Shibata/latitude\"') }}"
+    lng: "{{ lookup('pipe', 'op read \"op://ansible/Tats Shibata/longitude\"') }}"
 mini_graph_card_version: 0.13.0
 mini_media_player_version: 1.16.9
-mosquitto_password: "{{ vault_mosquitto_password }}"
+mosquitto_password: "{{ lookup('pipe', 'op read op://ansible/Mosquitto/credential') }}"
 postgres:
-  username: "{{ vault_postgres.username }}"
-  password: "{{ vault_postgres.password }}"
-  hostname: rewse-pg.rewse.jp
-  db: homeassistant
+  username: "{{ lookup('pipe', 'op read \"op://ansible/PostgreSQL - Home Assistant/username\"') }}"
+  password: "{{ lookup('pipe', 'op read \"op://ansible/PostgreSQL - Home Assistant/password\"') }}"
+  hostname: "{{ lookup('pipe', 'op read \"op://ansible/PostgreSQL - Home Assistant/server\"') }}"
+  db: "{{ lookup('pipe', 'op read \"op://ansible/PostgreSQL - Home Assistant/database\"') }}"
 regza:
-  username: "{{ vault_regza.username }}"
-  password: "{{ vault_regza.password }}"
+  username: "{{ lookup('pipe', 'op read op://ansible/REGZA/username') }}"
+  password: "{{ lookup('pipe', 'op read op://ansible/REGZA/credential') }}"
 simple_thermostat_version: 2.5.0
 simple_weather_card_version: 0.8.5
 tuya_local_version: 2025.11.2

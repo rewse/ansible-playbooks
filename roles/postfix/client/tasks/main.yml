@@ -111,7 +111,7 @@
     dest: /etc/aliases
     insertafter: "^postmaster:"
     regexp: "^root: "
-    line: "root: {{ vault_email.primary }}"
+    line: "root: {{ email.primary }}"
   tags: [postfix-client, config, aliases]
 
 - name: "postfix: Rebuild aliases database"

@@ -8,7 +8,7 @@ inclusion: always
 - **Ansible**: 構成管理のための主要な自動化ツール
 - **YAML**: プレイブック、ロール、変数定義に使用
 - **Jinja2**: 動的構成ファイルのためのテンプレートエンジン
-- **Vault**: 機密情報の安全な保存のため
+- **1Password CLI**: 機密情報の安全な保存と取得のため
 
 ## プラットフォーム
 - **Ubuntu**: Linux サーバーとクラウドインスタンス
@@ -38,9 +38,6 @@ ansible-playbook ubuntu.yml
 # 特定のタグで実行
 ansible-playbook ubuntu.yml --tags ubuntu,package
 
-# Vault パスワードで実行
-ansible-playbook site.yml --ask-vault-pass
-
 # チェックモード（ドライラン）
 ansible-playbook site.yml --check
 
@@ -48,21 +45,26 @@ ansible-playbook site.yml --check
 ansible-playbook site.yml --limit "fox.rewse.jp"
 ```
 
-### Vault コマンド
+### 1Password コマンド
 ```bash
-# Vault ファイルを編集
-ansible-vault edit group_vars/all/vault
+# 1Password にサインイン
+op signin
 
-# 新しい Vault ファイルを作成
-ansible-vault create new_vault_file.yml
+# 認証状態を確認
+op whoami
 
-# 既存のファイルを暗号化
-ansible-vault encrypt plain_file.yml
+# シークレットを読み取る（テスト用）
+op read op://ansible/database/password
+
+# Ansible での使用例
+# プレイブックや vars ファイル内で:
+# db_password: "{{ lookup('pipe', 'op read op://ansible/database/password') }}"
 ```
 
 ### ベストプラクティス
 - 選択的な実行にはタグを常に使用する
-- 機密データは Vault ファイルに保管する
+- 機密データは 1Password に保管し、`lookup('pipe', 'op read ...')` で参照する
 - 共有設定には group_vars を使用する
 - 変更を適用する前に --check で確認する
 - ロール固有の変数は role/vars ディレクトリに保持する
+- Ansible 実行前に `op signin` で 1Password に認証しておく

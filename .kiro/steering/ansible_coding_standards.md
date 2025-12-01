@@ -453,23 +453,43 @@ Ansible 2.10以降、モジュールは完全修飾コレクション名（Fully
 9. **デフォルト値を省略する**: デフォルト値と同じ設定は記述しない
 10. **シンプルな表記を優先する**: 可能な限り簡潔で読みやすい構文を使用する
 
-## Vault コマンド
+## 1Password による機密情報管理
 
-### Vault ファイルの操作
+### 1Password CLI の使用
+
+機密情報は 1Password に保存し、Ansible から `lookup('pipe', 'op read ...')` で参照します。
 
 ```bash
-# Vault ファイルを編集
-ansible-vault edit group_vars/all/vault
+# 1Password にサインイン（Ansible 実行前に必須）
+op signin
 
-# 新しい Vault ファイルを作成
-ansible-vault create new_vault_file.yml
+# 認証状態を確認
+op whoami
 
-# 既存のファイルを暗号化
-ansible-vault encrypt plain_file.yml
-
-# Vault ファイルの内容を確認
-ansible-vault view group_vars/all/vault | cat
+# シークレットを読み取る（テスト用）
+op read op://ansible/database/password
 ```
+
+### Ansible での使用例
+
+```yaml
+# vars ファイルや playbook 内で
+db_password: "{{ lookup('pipe', 'op read op://ansible/database/password') }}"
+api_key: "{{ lookup('pipe', 'op read op://ansible/api-service/credential') }}"
+```
+
+```jinja2
+# テンプレートファイル内で
+password = {{ lookup('pipe', 'op read op://ansible/database/password') }}
+api_key = {{ lookup('pipe', 'op read op://ansible/api-service/credential') }}
+```
+
+### ベストプラクティス
+
+- 機密情報は必ず 1Password に保存する
+- Ansible 実行前に `op signin` で認証する
+- 1Password のパス形式: `op://vault/item/field`
+- ローカルで実行されるため、ターゲットホストに `op` は不要
 
 ## 参考資料
 

@@ -1,4 +1,4 @@
 ---
 enecoq:
-  email: "{{ vault_enecoq.email }}"
-  password: "{{ vault_enecoq.password }}"
+  email: "{{ lookup('pipe', 'op read op://ansible/enecoQ/username') }}"
+  password: "{{ lookup('pipe', 'op read op://ansible/enecoQ/credential') }}"
