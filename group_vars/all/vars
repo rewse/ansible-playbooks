@@ -1,8 +1,7 @@
 ---
 admin: tats
 email:
-  primary: "{{vault_email.primary}}"
-  secondary: "{{vault_email.secondary}}"
+  primary: "{{ lookup('pipe', 'op read \"op://ansible/Tats Shibata/email\"') }}"
 global_ip:
   home: 106.163.184.9/32
   home_ip: 106.163.184.9

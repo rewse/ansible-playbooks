@@ -25,7 +25,7 @@
             - "8000:8000"
           volumes:
             - /root/.config/mcp.json:/app/config.json
-          command: --config /app/config.json --port 8000 --api-key {{ vault_mcpo_api_key }}
+          command: --config /app/config.json --port 8000 --api-key {{ lookup('pipe', 'op read "op://ansible/MCPO/credential"') }}
           restart: unless-stopped
   notify: "open-webui: Restart"
   tags: [open-webui, config, docker]

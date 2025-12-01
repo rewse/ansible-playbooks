@@ -3,5 +3,5 @@ relayhost:
   name: smtp.mail.us-west-2.awsapps.com
   port: 465
 so_net:
-  username: "{{ vault_workmail.username }}"
-  password: "{{ vault_workmail.password }}"
+  username: "{{ lookup('pipe', 'op read op://ansible/So-net/username') }}"
+  password: "{{ lookup('pipe', 'op read op://ansible/So-net/credential') }}"

@@ -1,5 +1,5 @@
 ---
 zabbix:
-  db_host: rewse-pg.rewse.jp
-  db_password: "{{ vault_zabbix.db_password }}"
+  db_host: "{{ lookup('pipe', 'op read \"op://ansible/PostgreSQL - Zabbix/server\"') }}"
+  db_password: "{{ lookup('pipe', 'op read \"op://ansible/PostgreSQL - Zabbix/password\"') }}"
   version: 7.4

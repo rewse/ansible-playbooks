@@ -6,4 +6,4 @@ php_miio_version: 0.2.6
 resolved1:
   ip: 192.168.0.1
   ipv6: 240f:78:31e9:1:70a7:41ff:fea6:bd7a
-xray_password: "{{ vault_xray_password }}"
+xray_password: "{{ lookup('pipe', 'op read \"op://ansible/xray/wireless network password\"') }}"

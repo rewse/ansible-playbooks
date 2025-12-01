@@ -1,2 +1,2 @@
 ---
-couchdb_password: "{{ vault_couchdb_password }}"
+couchdb_password: "{{ lookup('pipe', 'op read op://ansible/CouchDB/credential') }}"

@@ -35,7 +35,7 @@ This repository contains Ansible playbooks and roles for managing infrastructure
 
 - Ansible 2.10 or later installed
 - SSH access configured to target hosts
-- Vault password file placed at `~/.ansible/vault_password`
+- 1Password CLI (`op`) installed and authenticated
 
 ### Basic Commands
 
@@ -80,30 +80,29 @@ ansible-playbook site.yml --tags docker
 ansible-playbook site.yml --check
 ```
 
-### Vault Operations
+### 1Password Operations
 
-#### Edit vault file
+Sensitive information is managed through 1Password CLI. Use the following pattern in your playbooks and templates:
 
-```bash
-ansible-vault edit group_vars/all/vault
+```yaml
+# In playbooks or vars files
+db_password: "{{ lookup('pipe', 'op read op://ansible/database/password') }}"
+api_key: "{{ lookup('pipe', 'op read op://ansible/api-service/credential') }}"
 ```
 
-#### View vault file contents
-
-```bash
-ansible-vault view group_vars/all/vault | cat
+```jinja2
+# In templates
+password = {{ lookup('pipe', 'op read op://ansible/database/password') }}
 ```
 
-#### Create new vault file
+#### Sign in to 1Password
 
 ```bash
-ansible-vault create new_vault_file.yml
-```
+# Sign in (required before running playbooks)
+op signin
 
-#### Encrypt existing file
-
-```bash
-ansible-vault encrypt plain_file.yml
+# Verify authentication
+op whoami
 ```
 
 ## Inventory
@@ -126,8 +125,7 @@ Hosts are classified into the following groups:
 
 Group-specific variables are placed in the `group_vars/<group_name>/` directory:
 
-- `vars`: Regular variables
-- `vault`: Encrypted sensitive information
+- `vars`: Regular variables and references to 1Password secrets using `lookup('pipe', 'op read ...')`
 
 ### Role Variables
 
@@ -152,7 +150,7 @@ ansible-playbook site.yml --tags docker
 
 1. **Verify before changes**: Use the `--check` option before applying to production
 2. **Utilize tags**: Use tags to execute only necessary parts
-3. **Use Vault**: Always encrypt sensitive information with Vault
+3. **Use 1Password**: Always store sensitive information in 1Password and reference via `lookup('pipe', 'op read ...')`
 4. **Gradual application**: Test large changes on specific hosts first
 5. **Check logs**: Review logs after execution to ensure no issues
 
@@ -166,14 +164,17 @@ ansible-playbook site.yml --tags docker
 ssh ubuntu@<hostname>
 ```
 
-### Vault Password Errors
+### 1Password Authentication Errors
 
 ```bash
-# Verify vault password file is in the correct location
-ls -la ~/.ansible/vault_password
+# Verify 1Password CLI is installed
+op --version
 
-# Or enter password at runtime
-ansible-playbook site.yml --ask-vault-pass
+# Sign in to 1Password
+op signin
+
+# Verify authentication status
+op whoami
 ```
 
 ### Python Interpreter Errors
