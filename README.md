@@ -87,7 +87,7 @@ Sensitive information is managed through 1Password CLI. Use the following patter
 ```yaml
 # In playbooks or vars files
 db_password: "{{ lookup('pipe', 'op read op://ansible/database/password') }}"
-api_key: "{{ lookup('pipe', 'op read op://ansible/api-service/credential') }}"
+api_key: "{{ lookup('pipe', 'op read \"op://ansible/API Service/credential\"') }}"
 ```
 
 ```jinja2
