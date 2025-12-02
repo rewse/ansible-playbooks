@@ -1,54 +1,57 @@
 #!/usr/bin/env bash
+#
+# MHZ-19 CO2 sensor data publisher to MQTT
+#
 
-PATH=/opt/mhz19/bin:$PATH
+set -euo pipefail
 
-trap 'exit 1' 1 2 3 15
+readonly VENV_PATH="/opt/mhz19"
+readonly MQTT_HOST="hass.rewse.jp"
+readonly MQTT_PORT="1883"
+readonly MQTT_USER="pub_client"
+readonly MQTT_PASS="[% mosquitto_password %]"
+readonly TOPIC_BASE="mhz19/[% location %]"
 
-# }}}
-# {{{ send_co2()
+PATH="${VENV_PATH}/bin:${PATH}"
+
+cleanup() {
+  local exit_code=$?
+  exit "${exit_code}"
+}
+
+trap cleanup EXIT
+trap 'exit 1' INT TERM HUP
+
+publish_mqtt() {
+  local topic="$1"
+  local message="$2"
+
+  mosquitto_pub -r -t "${topic}" \
+    -u "${MQTT_USER}" -P "${MQTT_PASS}" \
+    -h "${MQTT_HOST}" -p "${MQTT_PORT}" \
+    -m "${message}"
+}
 
 send_co2() {
-    co2=$(python3 -m mh_z19 --pwm | sed s/\'/\"/g | jq -r .co2)
+  local co2
+  local datetime
 
-    retval=$?
+  co2=$(python3 -m mh_z19 --pwm | grep -oE '[0-9]+\.?[0-9]*')
 
-    if [ "$co2" != "null" ]; then
-        mosquitto_pub -r -t mhz19/[% location %]/state \
-            -u pub_client -P [% mosquitto_password %] \
-            -h hass.rewse.jp -p 1883 \
-            -m online
-    else
-        mosquitto_pub -r -t mhz19/[% location %]/state \
-            -u pub_client -P [% mosquitto_password %] \
-            -h hass.rewse.jp -p 1883 \
-            -m offline
+  if [[ -z "${co2}" ]]; then
+    publish_mqtt "${TOPIC_BASE}/state" "offline"
+    return 1
+  fi
 
-        exit $retval
-    fi
+  publish_mqtt "${TOPIC_BASE}/state" "online"
 
-    datetime=$(date --iso-8601=seconds)
+  datetime=$(date --iso-8601=seconds)
 
-    json=$(cat <<!
-{
-    "datetime": "$datetime",
-    "co2": $co2
-}
-!
-)
-
-    mosquitto_pub -r -t mhz19/[% location %]/co2 \
-        -u pub_client -P [% mosquitto_password %] \
-        -h hass.rewse.jp -p 1883 \
-        -m "$json"
-
-    retval=$?
+  publish_mqtt "${TOPIC_BASE}/co2" "{\"datetime\":\"${datetime}\",\"co2\":${co2}}"
 }
 
-# }}}
-# {{{ Main
+main() {
+  send_co2
+}
 
-send_co2
-
-exit $retval
-
-# }}}
+main "$@"

@@ -5,14 +5,17 @@
     state: directory
   tags: [mhz19, init]
 
-- name: "mhz19 : Create Python virtual environment"
-  ansible.builtin.command: python3 -m venv /opt/mhz19
+- name: "mhz19 : Create Python virtual environment with uv"
+  ansible.builtin.command: uv venv /opt/mhz19
+  args:
+    creates: /opt/mhz19/bin/activate
   tags: [mhz19, init]
 
-- name: "mhz19 : Install mh_z19 package"
-  ansible.builtin.pip:
-    name: mh_z19
-    virtualenv: /opt/mhz19
+- name: "mhz19 : Install mh_z19 package with uv"
+  ansible.builtin.command: uv pip install mh_z19
+  environment:
+    VIRTUAL_ENV: /opt/mhz19
+  changed_when: false
   tags: [mhz19, install]
 
 - name: "mhz19 : Copy MQTT publisher script"
