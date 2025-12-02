@@ -1,25 +1,41 @@
 #!/usr/bin/bash
+set -euo pipefail
 
-readonly remote=guppy:/volume1/Backup/{{ ansible_hostname }}
-readonly src=/
-readonly dest=/mnt/bak
+# Configuration
+readonly REMOTE="guppy:/volume1/Backup/{{ ansible_hostname }}"
+readonly SRC="/"
+readonly DEST="/mnt/bak"
+readonly EXCLUDE_FILE="/etc/tmbackup.exclude"
+readonly BACKUP_STRATEGY="1:1 30:7 90:30"
 
-trap 'my_exit 1' 1 2 3 15
-
-my_exit() {
-  if [ "$(grep $dest /proc/mounts)" != "" ]; then
-    umount $dest
+# Cleanup function
+cleanup() {
+  local exit_code="${1:-0}"
+  
+  if mountpoint -q "${DEST}"; then
+    umount "${DEST}" || {
+      echo "Warning: Failed to unmount ${DEST}" >&2
+      exit_code=1
+    }
   fi
-
-  exit $1
+  
+  exit "${exit_code}"
 }
 
-if [ "$(grep $dest /proc/mounts)" = "" ]; then
-  mount $remote $dest
+# Set trap for cleanup
+trap 'cleanup 1' INT TERM EXIT
+
+# Mount remote if not already mounted
+if ! mountpoint -q "${DEST}"; then
+  mount "${REMOTE}" "${DEST}" || {
+    echo "Error: Failed to mount ${REMOTE} to ${DEST}" >&2
+    exit 1
+  }
 fi
 
-nice -n 10 tmbackup --strategy "1:1 30:7 90:30" $src $dest /etc/tmbackup.exclude > /dev/null
+# Run backup
+nice -n 10 tmbackup --strategy "${BACKUP_STRATEGY}" "${SRC}" "${DEST}" "${EXCLUDE_FILE}" > /dev/null
 
-retval=$?
-
-my_exit $retval
+# Cleanup with success status
+trap - INT TERM EXIT
+cleanup 0
