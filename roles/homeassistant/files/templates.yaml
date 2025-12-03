@@ -571,8 +571,8 @@
           }}
         {% endif %}
       icon: "mdi:clock"
-- trigger:
-    - platform: event
+- triggers:
+    - trigger: event
       event_type: "imap_content"
       id: "custom_event"
       event_data:
