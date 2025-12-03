@@ -6,7 +6,11 @@
     regexp: "^myhostname "
     line: "myhostname = {{ ansible_nodename }}"
   notify: "postfix: Reload"
-  tags: [postfix-client, config]
+  tags:
+    - postfix-client
+    - config
+    - postfix-client_postfix
+    - postfix-client_postfix_config
 
 - name: "postfix : Set mydomain"
   ansible.builtin.lineinfile:
@@ -15,7 +19,11 @@
     regexp: "^mydomain "
     line: "mydomain = rewse.jp"
   notify: "postfix: Reload"
-  tags: [postfix-client, config]
+  tags:
+    - postfix-client
+    - config
+    - postfix-client_postfix
+    - postfix-client_postfix_config
 
 - name: "postfix : Set myorigin"
   ansible.builtin.lineinfile:
@@ -24,7 +32,11 @@
     regexp: "^myorigin "
     line: "myorigin = $mydomain"
   notify: "postfix: Reload"
-  tags: [postfix-client, config]
+  tags:
+    - postfix-client
+    - config
+    - postfix-client_postfix
+    - postfix-client_postfix_config
 
 - name: "postfix : Set relayhost"
   ansible.builtin.lineinfile:
@@ -33,7 +45,11 @@
     regexp: "^relayhost "
     line: 'relayhost = [{{ relayhost.name }}]:{{ relayhost.port }}'
   notify: "postfix: Reload"
-  tags: [postfix-client, config]
+  tags:
+    - postfix-client
+    - config
+    - postfix-client_postfix
+    - postfix-client_postfix_config
 
 - name: "postfix : Set smtp_tls_security_level"
   ansible.builtin.lineinfile:
@@ -41,7 +57,11 @@
     regexp: "^smtp_tls_security_level"
     line: "smtp_tls_security_level = encrypt"
   notify: "postfix: Reload"
-  tags: [postfix-client, config]
+  tags:
+    - postfix-client
+    - config
+    - postfix-client_postfix
+    - postfix-client_postfix_config
 
 - name: "postfix : Set smtp_tls_wrappermode"
   ansible.builtin.lineinfile:
@@ -49,7 +69,11 @@
     regexp: "^smtp_tls_wrappermode"
     line: "smtp_tls_wrappermode = yes"
   notify: "postfix: Reload"
-  tags: [postfix-client, config]
+  tags:
+    - postfix-client
+    - config
+    - postfix-client_postfix
+    - postfix-client_postfix_config
 
 - name: "postfix : Enable SASL authentication"
   ansible.builtin.lineinfile:
@@ -57,7 +81,11 @@
     regexp: "^smtp_sasl_auth_enable "
     line: "smtp_sasl_auth_enable = yes"
   notify: "postfix: Reload"
-  tags: [postfix-client, config]
+  tags:
+    - postfix-client
+    - config
+    - postfix-client_postfix
+    - postfix-client_postfix_config
 
 - name: "postfix : Set SASL mechanism filter"
   ansible.builtin.lineinfile:
@@ -65,7 +93,11 @@
     regexp: "^smtp_sasl_mechanism_filter"
     line: "smtp_sasl_mechanism_filter = plain, login"
   notify: "postfix: Reload"
-  tags: [postfix-client, config]
+  tags:
+    - postfix-client
+    - config
+    - postfix-client_postfix
+    - postfix-client_postfix_config
 
 - name: "postfix : Set SASL password maps"
   ansible.builtin.lineinfile:
@@ -73,7 +105,11 @@
     regexp: "smtp_sasl_password_maps "
     line: "smtp_sasl_password_maps = hash:/etc/postfix/sasl_passwd"
   notify: "postfix: Reload"
-  tags: [postfix-client, config]
+  tags:
+    - postfix-client
+    - config
+    - postfix-client_postfix
+    - postfix-client_postfix_config
 
 - name: "postfix : Set SASL security options"
   ansible.builtin.lineinfile:
@@ -81,7 +117,11 @@
     regexp: "smtp_sasl_security_options "
     line: "smtp_sasl_security_options = noanonymous"
   notify: "postfix: Reload"
-  tags: [postfix-client, config]
+  tags:
+    - postfix-client
+    - config
+    - postfix-client_postfix
+    - postfix-client_postfix_config
 
 - name: "postfix : Create SASL password file"
   ansible.builtin.lineinfile:
@@ -91,20 +131,34 @@
     create: true
     mode: '0600'
   register: postfix_sasl_password_out
-  tags: [postfix-client, config]
+  tags:
+    - postfix-client
+    - config
+    - postfix-client_postfix
+    - postfix-client_postfix_config
+    - postfix-client_postfix_init
 
 - name: "postfix : Create SASL password database file"
   ansible.builtin.file:
     path: /etc/postfix/sasl_passwd.db
     state: touch
     mode: '0600'
-  tags: [postfix-client, config]
+  tags:
+    - postfix-client
+    - config
+    - postfix-client_postfix
+    - postfix-client_postfix_config
+    - postfix-client_postfix_init
 
 - name: "postfix : Hash SASL password file"
   ansible.builtin.command: postmap hash:/etc/postfix/sasl_passwd
   when: postfix_sasl_password_out is changed
   notify: "postfix: Reload"
-  tags: [postfix-client, config]
+  tags:
+    - postfix-client
+    - config
+    - postfix-client_postfix
+    - postfix-client_postfix_config
 
 - name: "postfix : Set root mail alias"
   ansible.builtin.lineinfile:
@@ -112,8 +166,18 @@
     insertafter: "^postmaster:"
     regexp: "^root: "
     line: "root: {{ email.primary }}"
-  tags: [postfix-client, config, aliases]
+  tags:
+    - postfix-client
+    - config
+    - aliases
+    - postfix-client_postfix
+    - postfix-client_postfix_config
 
 - name: "postfix : Rebuild aliases database"
   ansible.builtin.command: newaliases
-  tags: [postfix-client, config, aliases]
+  tags:
+    - postfix-client
+    - config
+    - aliases
+    - postfix-client_postfix
+    - postfix-client_postfix_config

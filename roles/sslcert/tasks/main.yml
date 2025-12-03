@@ -5,17 +5,29 @@
       - python3
       - python3-venv
       - libaugeas0
-  tags: [sslcert, install]
+  tags:
+    - sslcert
+    - install
+    - sslcert_certbot
+    - sslcert_certbot_install
 
 - name: "certbot : Create installation directory"
   ansible.builtin.file:
     path: /opt/certbot
     state: directory
-  tags: [sslcert, init]
+  tags:
+    - sslcert
+    - init
+    - sslcert_certbot
+    - sslcert_certbot_init
 
 - name: "certbot : Create Python virtual environment"
   ansible.builtin.command: python3 -m venv /opt/certbot
-  tags: [sslcert, init]
+  tags:
+    - sslcert
+    - init
+    - sslcert_certbot
+    - sslcert_certbot_init
 
 - name: "certbot : Install packages"
   ansible.builtin.pip:
@@ -25,7 +37,11 @@
       - certbot-dns-route53
       - pip-review
     virtualenv: /opt/certbot
-  tags: [sslcert, install]
+  tags:
+    - sslcert
+    - install
+    - sslcert_certbot
+    - sslcert_certbot_install
 
 - name: "certbot : Configure monthly cron job"
   ansible.builtin.template:
@@ -34,7 +50,12 @@
     mode: '0644'
     variable_start_string: "[%"
     variable_end_string: "%]"
-  tags: [sslcert, config, cron]
+  tags:
+    - sslcert
+    - config
+    - cron
+    - sslcert_certbot
+    - sslcert_certbot_config
 
 - name: "certbot : Copy AWS credentials"
   ansible.builtin.template:
@@ -43,7 +64,11 @@
     mode: '0600'
     variable_start_string: "[%"
     variable_end_string: "%]"
-  tags: [sslcert, config]
+  tags:
+    - sslcert
+    - config
+    - sslcert_certbot
+    - sslcert_certbot_config
 
 #   Commented out to prevent that ansible makes unnecessary requests
 #   Please run it manually if the first issue is needed
@@ -66,11 +91,21 @@
     path: /etc/apache2/sites-available/000-default-ssl.conf
     regexp: '^\s+SSLCertificateFile'
     line: '        SSLCertificateFile /etc/letsencrypt/live/rewse.jp/fullchain.pem'
-  tags: [sslcert, config, apache]
+  tags:
+    - sslcert
+    - config
+    - apache
+    - sslcert_apache
+    - sslcert_apache_config
 
 - name: "apache : Set SSL private key path"
   ansible.builtin.lineinfile:
     path: /etc/apache2/sites-available/000-default-ssl.conf
     regexp: '^\s+SSLCertificateKeyFile'
     line: '        SSLCertificateKeyFile /etc/letsencrypt/live/rewse.jp/privkey.pem'
-  tags: [sslcert, config, apache]
+  tags:
+    - sslcert
+    - config
+    - apache
+    - sslcert_apache
+    - sslcert_apache_config

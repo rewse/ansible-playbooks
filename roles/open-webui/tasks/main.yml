@@ -3,7 +3,11 @@
   ansible.builtin.file:
     path: /srv/open-webui/data
     state: directory
-  tags: [open-webui, init]
+  tags:
+    - open-webui
+    - init
+    - open-webui_open-webui
+    - open-webui_open-webui_init
 
 - name: "open-webui : Add Docker Compose services"
   ansible.builtin.blockinfile:
@@ -28,7 +32,12 @@
           command: --config /app/config.json --port 8000 --api-key {{ lookup('pipe', 'op read "op://ansible/MCPO/credential"') }}
           restart: unless-stopped
   notify: "open-webui: Restart"
-  tags: [open-webui, config, docker]
+  tags:
+    - open-webui
+    - config
+    - docker
+    - open-webui_open-webui
+    - open-webui_open-webui_config
 
 - name: "open-webui : Enable Apache proxy modules"
   community.general.apache2_module:
@@ -38,16 +47,31 @@
     - proxy_http
     - proxy_wstunnel
   notify: "apache: Restart"
-  tags: [open-webui, config, apache]
+  tags:
+    - open-webui
+    - config
+    - apache
+    - open-webui_open-webui
+    - open-webui_open-webui_config
 
 - name: "open-webui : Copy Apache vhost config"
   ansible.builtin.copy:
     src: openwebui.rewse.jp.conf
     dest: /etc/apache2/sites-available
   notify: "apache: Reload"
-  tags: [open-webui, config, apache]
+  tags:
+    - open-webui
+    - config
+    - apache
+    - open-webui_open-webui
+    - open-webui_open-webui_config
 
 - name: "open-webui : Enable Apache site"
   ansible.builtin.command: a2ensite openwebui.rewse.jp
   notify: "apache: Reload"
-  tags: [open-webui, config, apache]
+  tags:
+    - open-webui
+    - config
+    - apache
+    - open-webui_open-webui
+    - open-webui_open-webui_config

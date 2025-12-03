@@ -4,21 +4,37 @@
     name:
       - mosquitto
       - mosquitto-clients
-  tags: [mosquitto, install]
+  tags:
+    - mosquitto
+    - install
+    - mosquitto_mosquitto
+    - mosquitto_mosquitto_install
 
 - name: "mosquitto : Create password file"
   ansible.builtin.template:
     src: pwfile.j2
     dest: /etc/mosquitto/pwfile
-  tags: [mosquitto, config]
+  tags:
+    - mosquitto
+    - config
+    - mosquitto_mosquitto
+    - mosquitto_mosquitto_init
 
 - name: "mosquitto : Hash password file"
   ansible.builtin.command: mosquitto_passwd -U /etc/mosquitto/pwfile
-  tags: [mosquitto, config]
+  tags:
+    - mosquitto
+    - config
+    - mosquitto_mosquitto
+    - mosquitto_mosquitto_config
 
 - name: "mosquitto : Copy authentication config"
   ansible.builtin.copy:
     src: password.conf
     dest: /etc/mosquitto/conf.d
   notify: "mosquitto: Restart"
-  tags: [mosquitto, config]
+  tags:
+    - mosquitto
+    - config
+    - mosquitto_mosquitto
+    - mosquitto_mosquitto_config

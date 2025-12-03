@@ -3,20 +3,32 @@
   ansible.builtin.file:
     path: /opt/mhz19
     state: directory
-  tags: [mhz19, init]
+  tags:
+    - mhz19
+    - init
+    - mhz19_mhz19
+    - mhz19_mhz19_init
 
 - name: "mhz19 : Create Python virtual environment with uv"
   ansible.builtin.command: uv venv /opt/mhz19
   args:
     creates: /opt/mhz19/bin/activate
-  tags: [mhz19, init]
+  tags:
+    - mhz19
+    - init
+    - mhz19_mhz19
+    - mhz19_mhz19_init
 
 - name: "mhz19 : Install mh_z19 package with uv"
   ansible.builtin.command: uv pip install mh_z19
   environment:
     VIRTUAL_ENV: /opt/mhz19
   changed_when: false
-  tags: [mhz19, install]
+  tags:
+    - mhz19
+    - install
+    - mhz19_mhz19
+    - mhz19_mhz19_install
 
 - name: "mhz19 : Copy MQTT publisher script"
   ansible.builtin.template:
@@ -25,10 +37,19 @@
     mode: '0755'
     variable_start_string: "[%"
     variable_end_string: "%]"
-  tags: [mhz19, config]
+  tags:
+    - mhz19
+    - config
+    - mhz19_mhz19
+    - mhz19_mhz19_config
 
 - name: "mhz19 : Configure cron job"
   ansible.builtin.copy:
     src: mhz192mqtt.cron
     dest: /etc/cron.d/mhz192mqtt
-  tags: [mhz19, config, cron]
+  tags:
+    - mhz19
+    - config
+    - cron
+    - mhz19_mhz19
+    - mhz19_mhz19_config

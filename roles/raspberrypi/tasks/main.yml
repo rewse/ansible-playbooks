@@ -9,7 +9,11 @@
       - pi-bluetooth
       - snmp
       - snmp-mibs-downloader
-  tags: [raspberrypi, install]
+  tags:
+    - raspberrypi
+    - install
+    - raspberrypi_package
+    - raspberrypi_package_install
 
 - name: "swap : Set swap factor to RAM size"
   ansible.builtin.lineinfile:
@@ -18,7 +22,12 @@
     line: 'CONF_SWAPFACTOR=1'
     backup: true
   notify: Restart dphys-swapfile
-  tags: [raspberrypi, config, swap]
+  tags:
+    - raspberrypi
+    - config
+    - swap
+    - raspberrypi_swap
+    - raspberrypi_swap_config
 
 - name: "swap : Set swap max size to 16GB"
   ansible.builtin.lineinfile:
@@ -27,7 +36,12 @@
     line: 'CONF_MAXSWAP=16384'
     backup: true
   notify: Restart dphys-swapfile
-  tags: [raspberrypi, config, swap]
+  tags:
+    - raspberrypi
+    - config
+    - swap
+    - raspberrypi_swap
+    - raspberrypi_swap_config
 
 - name: "swap : Disable fixed swap size for dynamic calculation"
   ansible.builtin.lineinfile:
@@ -36,7 +50,12 @@
     line: '#CONF_SWAPSIZE='
     backup: true
   notify: Restart dphys-swapfile
-  tags: [raspberrypi, config, swap]
+  tags:
+    - raspberrypi
+    - config
+    - swap
+    - raspberrypi_swap
+    - raspberrypi_swap_config
 
 - name: "ntp : Configure NTP servers"
   ansible.builtin.lineinfile:
@@ -45,7 +64,12 @@
     regexp: '^NTP='
     line: 'NTP=ntp.nict.jp ntp.jst.mfeed.ad.jp'
   notify: Restart systemd-timesyncd
-  tags: [raspberrypi, config, time]
+  tags:
+    - raspberrypi
+    - config
+    - time
+    - raspberrypi_ntp
+    - raspberrypi_ntp_config
 
 - name: "bluetooth : Enable service"
   ansible.builtin.systemd:
@@ -54,57 +78,93 @@
     enabled: true
   loop:
     - bluetooth
-  tags: [raspberrypi, config]
+  tags:
+    - raspberrypi
+    - config
+    - raspberrypi_bluetooth
+    - raspberrypi_bluetooth_config
 
 - name: "snmp : Enable MIBs"
   ansible.builtin.lineinfile:
     dest: /etc/snmp/snmp.conf
     regexp: "mibs "
     line: "mibs all"
-  tags: [raspberrypi, config]
+  tags:
+    - raspberrypi
+    - config
+    - raspberrypi_snmp
+    - raspberrypi_snmp_config
 
 - name: "php-miio : Install"
   ansible.builtin.unarchive:
     src: https://github.com/skysilver-lab/php-miio/archive/refs/tags/v.{{ php_miio_version }}.zip
     dest: /srv
     remote_src: true
-  tags: [raspberrypi, install]
+  tags:
+    - raspberrypi
+    - install
+    - raspberrypi_php-miio
+    - raspberrypi_php-miio_install
 
 - name: "environment : Copy file"
   ansible.builtin.copy:
     src: environment
     dest: /etc
-  tags: [raspberrypi, config]
+  tags:
+    - raspberrypi
+    - config
+    - raspberrypi_environment
+    - raspberrypi_environment_config
 
 - name: "netplan : Configure network"
   ansible.builtin.template:
     src: 99-config.yaml.j2
     dest: /etc/netplan/99-config.yaml
     mode: '0600'
-  tags: [raspberrypi, config]
+  tags:
+    - raspberrypi
+    - config
+    - raspberrypi_netplan
+    - raspberrypi_netplan_config
 
 - name: "netplan : Remove cloud-init config"
   ansible.builtin.file:
     path: /etc/netplan/50-cloud-init.yaml
     state: absent
-  tags: [raspberrypi, config]
+  tags:
+    - raspberrypi
+    - config
+    - raspberrypi_netplan
+    - raspberrypi_netplan_config
 
 - name: "cloud-init : Disable network config"
   ansible.builtin.copy:
     src: 99-disable-network-config.cfg
     dest: /etc/cloud/cloud.cfg.d
-  tags: [raspberrypi, config]
+  tags:
+    - raspberrypi
+    - config
+    - raspberrypi_cloud-init
+    - raspberrypi_cloud-init_config
 
 - name: "ifmetric : Configure cron job"
   ansible.builtin.copy:
     src: ifmetric
     dest: /etc/cron.d
-  tags: [raspberrypi, config]
+  tags:
+    - raspberrypi
+    - config
+    - raspberrypi_ifmetric
+    - raspberrypi_ifmetric_config
 
 - name: "netplan : Apply configuration"
   ansible.builtin.command: netplan apply
   notify: Run ifmetric
-  tags: [raspberrypi, config]
+  tags:
+    - raspberrypi
+    - config
+    - raspberrypi_netplan
+    - raspberrypi_netplan_config
 
 # ssh stuck at expecting SSH2_MSG_KEX_ECDH_REPLY - Unix & Linux Stack Exchange
 # https://unix.stackexchange.com/questions/722954/ssh-stuck-at-expecting-ssh2-msg-kex-ecdh-reply
@@ -112,50 +172,85 @@
   ansible.builtin.copy:
     src: kex_algorithms.conf
     dest: /etc/ssh/ssh_config.d
-  tags: [raspberrypi, config, ssh]
+  tags:
+    - raspberrypi
+    - config
+    - ssh
+    - raspberrypi_ssh
+    - raspberrypi_ssh_config
 
 - name: "ssh : Create socket override directory"
   ansible.builtin.file:
     path: /etc/systemd/system/ssh.socket.d
     state: directory
-  tags: [raspberrypi, config, ssh]
+  tags:
+    - raspberrypi
+    - config
+    - ssh
+    - raspberrypi_ssh
+    - raspberrypi_ssh_init
 
 - name: "ssh : Configure socket override"
   ansible.builtin.template:
     src: override.conf.j2
     dest: /etc/systemd/system/ssh.socket.d/override.conf
   notify: Restart ssh.socket
-  tags: [raspberrypi, config, ssh]
+  tags:
+    - raspberrypi
+    - config
+    - ssh
+    - raspberrypi_ssh
+    - raspberrypi_ssh_config
 
 - name: "backup : Create mount point"
   ansible.builtin.file:
     path: /mnt/bak
     state: directory
-  tags: [raspberrypi, config]
+  tags:
+    - raspberrypi
+    - config
+    - raspberrypi_backup
+    - raspberrypi_backup_init
 
 - name: "backup : Install rsync-time-backup script"
   ansible.builtin.get_url:
     url: https://raw.githubusercontent.com/laurent22/rsync-time-backup/master/rsync_tmbackup.sh
     dest: /usr/local/bin/tmbackup
     mode: '0755'
-  tags: [raspberrypi, install]
+  tags:
+    - raspberrypi
+    - install
+    - raspberrypi_backup
+    - raspberrypi_backup_install
 
 - name: "backup : Fix rsync-time-backup source path"
   ansible.builtin.replace:
     dest: /usr/local/bin/tmbackup
     regexp: 'fn_df_t_src "\${SRC_FOLDER}"'
     replace: 'fn_df_t_src "${SRC_FOLDER}/"'
-  tags: [raspberrypi, config]
+  tags:
+    - raspberrypi
+    - config
+    - raspberrypi_backup
+    - raspberrypi_backup_config
 
 - name: "backup : Configure daily cron job"
   ansible.builtin.template:
     src: 000backup-daily.j2
     dest: /etc/cron.daily/000backup-daily
     mode: '0755'
-  tags: [raspberrypi, config]
+  tags:
+    - raspberrypi
+    - config
+    - raspberrypi_backup
+    - raspberrypi_backup_config
 
 - name: "backup : Copy exclusion list"
   ansible.builtin.copy:
     src: tmbackup.exclude
     dest: /etc
-  tags: [raspberrypi, config]
+  tags:
+    - raspberrypi
+    - config
+    - raspberrypi_backup
+    - raspberrypi_backup_config

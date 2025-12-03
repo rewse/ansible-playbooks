@@ -4,11 +4,21 @@
     src: guardduty.sh
     dest: /usr/lib/zabbix/agentscripts
     mode: '0755'
-  tags: [zabbix-aws, config, guardduty]
+  tags:
+    - zabbix-aws
+    - config
+    - guardduty
+    - zabbix-aws_zabbix-aws
+    - zabbix-aws_zabbix-aws_config
 
 - name: "zabbix-aws : Copy GuardDuty agent config"
   ansible.builtin.copy:
     src: guardduty.conf
     dest: /etc/zabbix/zabbix_agentd.d
   notify: "zabbix-agent: Restart"
-  tags: [zabbix-aws, config, guardduty]
+  tags:
+    - zabbix-aws
+    - config
+    - guardduty
+    - zabbix-aws_zabbix-aws
+    - zabbix-aws_zabbix-aws_config

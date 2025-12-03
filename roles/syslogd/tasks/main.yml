@@ -4,11 +4,20 @@
     src: 10-remote.conf
     dest: /etc/rsyslog.d
   notify: "rsyslog: Restart"
-  tags: [syslogd, config]
+  tags:
+    - syslogd
+    - config
+    - syslogd_rsyslog
+    - syslogd_rsyslog_config
 
 - name: "logrotate : Copy remote log rotation config"
   ansible.builtin.copy:
     src: remote
     dest: /etc/logrotate.d
   notify: "logrotate: Restart"
-  tags: [syslogd, config, logrotate]
+  tags:
+    - syslogd
+    - config
+    - logrotate
+    - syslogd_logrotate
+    - syslogd_logrotate_config

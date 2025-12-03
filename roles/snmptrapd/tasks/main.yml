@@ -5,14 +5,22 @@
       - snmptrapd
       - snmptt
     update_cache: true
-  tags: [snmptrapd, install]
+  tags:
+    - snmptrapd
+    - install
+    - snmptrapd_snmptrapd
+    - snmptrapd_snmptrapd_install
 
 - name: "snmptrapd : Copy config file"
   ansible.builtin.copy:
     src: snmptrapd.conf
     dest: /etc/snmp
   notify: "snmptrapd: Restart"
-  tags: [snmptrapd, config]
+  tags:
+    - snmptrapd
+    - config
+    - snmptrapd_snmptrapd
+    - snmptrapd_snmptrapd_config
 
 - name: "snmptt : Enable net_snmp_perl"
   ansible.builtin.lineinfile:
@@ -20,7 +28,11 @@
     regexp: "^net_snmp_perl_enable ="
     line: "net_snmp_perl_enable = 1"
   notify: "snmptt: Restart"
-  tags: [snmptrapd, config]
+  tags:
+    - snmptrapd
+    - config
+    - snmptrapd_snmptt
+    - snmptrapd_snmptt_config
 
 - name: "snmptt : Set date_time_format"
   ansible.builtin.lineinfile:
@@ -28,7 +40,11 @@
     regexp: "^date_time_format ="
     line: "date_time_format = %H:%M:%S %Y/%m/%d"
   notify: "snmptt: Restart"
-  tags: [snmptrapd, config]
+  tags:
+    - snmptrapd
+    - config
+    - snmptrapd_snmptt
+    - snmptrapd_snmptt_config
 
 - name: "snmptt : Add trap format for Zabbix"
   ansible.builtin.blockinfile:
@@ -37,4 +53,8 @@
       EVENT general .* "General event" Normal
       FORMAT ZBXTRAP $aA $ar
   notify: "snmptt: Restart"
-  tags: [snmptrapd, config]
+  tags:
+    - snmptrapd
+    - config
+    - snmptrapd_snmptt
+    - snmptrapd_snmptt_config
