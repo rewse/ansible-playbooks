@@ -5,13 +5,21 @@
       - docker.io
       - docker-compose-v2
       - python3-docker
-  tags: [docker, install]
+  tags:
+    - docker
+    - install
+    - docker_docker
+    - docker_docker_install
 
 - name: "docker : Create compose.yml"
   ansible.builtin.file:
     path: /etc/compose.yml
     state: touch
-  tags: [docker, init]
+  tags:
+    - docker
+    - init
+    - docker_docker
+    - docker_docker_init
 
 - name: "docker : Add services section to compose.yml"
   ansible.builtin.lineinfile:
@@ -19,4 +27,9 @@
     insertbefore: BOF
     regexp: '^services:'
     line: 'services:'
-  tags: [docker, init]
+  tags:
+    - docker
+    - init
+    - docker_docker
+    - docker_docker_init
+    - docker_docker_config

@@ -3,17 +3,31 @@
   ansible.builtin.apt:
     name:
       - nvme-cli
-  tags: [ec2, install]
+  tags:
+    - ec2
+    - install
+    - ec2_ec2
+    - ec2_ec2_install
 
 - name: "ec2 : Format secondary disk as ext4"
   community.general.filesystem:
     fstype: ext4
     dev: /dev/{{ secondary_diskname }}
-  tags: [ec2, init, storage]
+  tags:
+    - ec2
+    - init
+    - storage
+    - ec2_ec2
+    - ec2_ec2_config
 
 - name: "ec2 : Label secondary disk as srv"
   ansible.builtin.command: e2label /dev/{{ secondary_diskname }} srv
-  tags: [ec2, init, storage]
+  tags:
+    - ec2
+    - init
+    - storage
+    - ec2_ec2
+    - ec2_ec2_config
 
 - name: "ec2 : Mount /srv"
   ansible.posix.mount:
@@ -22,4 +36,9 @@
     fstype: ext4
     opts: defaults,discard
     state: mounted
-  tags: [ec2, config, storage]
+  tags:
+    - ec2
+    - config
+    - storage
+    - ec2_ec2
+    - ec2_ec2_config

@@ -5,7 +5,11 @@
     state: directory
     owner: root
     group: root
-  tags: [litellm, config]
+  tags:
+    - litellm
+    - config
+    - litellm_litellm
+    - litellm_litellm_init
 
 - name: "litellm : Generate configuration file"
   ansible.builtin.template:
@@ -14,7 +18,11 @@
     owner: root
     group: root
   notify: Restart litellm
-  tags: [litellm, config]
+  tags:
+    - litellm
+    - config
+    - litellm_litellm
+    - litellm_litellm_config
 
 - name: "docker : Add LiteLLM service to compose"
   ansible.builtin.blockinfile:
@@ -38,4 +46,9 @@
           restart: unless-stopped
           command: ["--config", "/app/config.yaml", "--port", "4000"]
   notify: Restart litellm
-  tags: [litellm, config, docker]
+  tags:
+    - litellm
+    - config
+    - docker
+    - litellm_docker
+    - litellm_docker_config

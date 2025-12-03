@@ -5,6 +5,7 @@
       - charles
       - deepl
       - epic-games
+      - gemini-cli
       - gog-galaxy
       - kiro
       - kiro-cli
@@ -16,11 +17,17 @@
       - steelseries-gg
       - ticktick
     update_homebrew: true
-  tags: [darwin-personal, package, cask]
+  tags:
+    - darwin-personal
+    - package
+    - cask
 
 - name: Install qwen
   ansible.builtin.command: npm install -g @qwen-code/qwen-code@latest
-  tags: [darwin-personal, package, qwen-code]
+  tags:
+    - darwin-personal
+    - package
+    - qwen-code
 
 # - name: Install rest of the apps
 #   install_yourself:

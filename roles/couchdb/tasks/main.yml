@@ -6,7 +6,11 @@
   loop:
     - /srv/couchdb/data
     - /srv/couchdb/etc/local.d
-  tags: [couchdb, init]
+  tags:
+    - couchdb
+    - init
+    - couchdb_couchdb
+    - couchdb_couchdb_init
 
 - name: "couchdb : Add Docker Compose service"
   ansible.builtin.blockinfile:
@@ -26,14 +30,23 @@
             - COUCHDB_PASSWORD={{ couchdb_password }}
           restart: unless-stopped
   notify: "couchdb: Restart"
-  tags: [couchdb, config, docker]
+  tags:
+    - couchdb
+    - config
+    - docker
+    - couchdb_couchdb
+    - couchdb_couchdb_config
 
 - name: "couchdb : Download init script"
   ansible.builtin.get_url:
     url: https://raw.githubusercontent.com/vrtmrz/obsidian-livesync/main/utils/couchdb/couchdb-init.sh
     dest: /tmp
     mode: '0755'
-  tags: [couchdb, init]
+  tags:
+    - couchdb
+    - init
+    - couchdb_couchdb
+    - couchdb_couchdb_download
 
 - name: "couchdb : Run init script"
   ansible.builtin.command: /tmp/couchdb-init.sh
@@ -41,16 +54,30 @@
     hostname: localhost:5984
     username: tats
     password: "{{ couchdb_password }}"
-  tags: [couchdb, init]
+  tags:
+    - couchdb
+    - init
+    - couchdb_couchdb
+    - couchdb_couchdb_config
 
 - name: "couchdb : Copy Apache vhost config"
   ansible.builtin.copy:
     src: couchdb.rewse.jp.conf
     dest: /etc/apache2/sites-available
   notify: "apache: Reload"
-  tags: [couchdb, config, apache]
+  tags:
+    - couchdb
+    - config
+    - apache
+    - couchdb_couchdb
+    - couchdb_couchdb_config
 
 - name: "couchdb : Enable Apache site"
   ansible.builtin.command: a2ensite couchdb.rewse.jp
   notify: "apache: Reload"
-  tags: [couchdb, config, apache]
+  tags:
+    - couchdb
+    - config
+    - apache
+    - couchdb_couchdb
+    - couchdb_couchdb_config

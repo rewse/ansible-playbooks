@@ -4,7 +4,10 @@
     name: 
       - node@20
     update_homebrew: true
-  tags: [darwin-business, package, homebrew]
+  tags:
+    - darwin-business
+    - package
+    - homebrew
 
 - name: Install packages by homebrew_cask
   community.general.homebrew_cask:
@@ -21,7 +24,10 @@
       - tripmode
       - webex-meetings
     update_homebrew: true
-  tags: [darwin-business, package, cask]
+  tags:
+    - darwin-business
+    - package
+    - cask
 
 - name: Install packages by mas
   ansible.builtin.command: mas install {{ item }}
@@ -29,7 +35,10 @@
     - 1212616790  # Microsoft To Do
     - 1639692859  # WattsConnected
   ignore_errors: true
-  tags: [darwin-business, package, mas]
+  tags:
+    - darwin-business
+    - package
+    - mas
 
 # Install toolbox
 # Ref: https://docs.hub.amazon.dev/builder-toolbox/user-guide/getting-started/
@@ -39,7 +48,10 @@
 # Ref: https://w.amazon.com/bin/view/Isengard-cli/
 - name: Register isengard-cli repository
   ansible.builtin.command: toolbox registry add s3://buildertoolbox-registry-isengard-cli-us-west-2/tools.json
-  tags: [darwin-business, package, toolbox]
+  tags:
+    - darwin-business
+    - package
+    - toolbox
 
 # Ref: https://w.amazon.com/bin/view/DevAccount/Docs
 - name: Install with toolbox
@@ -50,21 +62,33 @@
     - isengard-cli
     - kiro-cli
     - mcp-registry
-  tags: [darwin-business, package, toolbox]
+  tags:
+    - darwin-business
+    - package
+    - toolbox
 
 - name: Update toolbox
   ansible.builtin.command: toolbox update
-  tags: [darwin-business, package, toolbox]
+  tags:
+    - darwin-business
+    - package
+    - toolbox
 
 - name: Install Kiro
   ansible.builtin.command: axe init kiro
-  tags: [darwin-business, package, kiro]
+  tags:
+    - darwin-business
+    - package
+    - kiro
 
 - name: Install MCP servers
   ansible.builtin.command: mcp-registry install {{ item }}
   loop:
     - builder-mcp
-  tags: [darwin-business, package, mcp]
+  tags:
+    - darwin-business
+    - package
+    - mcp
 
 # - name: Install rest of the apps
 #   install_yourself:

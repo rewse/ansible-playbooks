@@ -3,7 +3,11 @@
   ansible.builtin.file:
     path: /etc/matter-server/data
     state: directory
-  tags: [matter-server, init]
+  tags:
+    - matter-server
+    - init
+    - matter-server_matter-server
+    - matter-server_matter-server_init
 
 - name: "matter-server : Add Docker Compose service"
   ansible.builtin.blockinfile:
@@ -21,4 +25,9 @@
           network_mode: host
           restart: unless-stopped
   notify: "matter-server: Restart"
-  tags: [matter-server, config, docker]
+  tags:
+    - matter-server
+    - config
+    - docker
+    - matter-server_matter-server
+    - matter-server_matter-server_config

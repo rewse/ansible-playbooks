@@ -8,13 +8,21 @@
       - php-intl
       - php-zip
       - wordpress
-  tags: [wordpress, install]
+  tags:
+    - wordpress
+    - install
+    - wordpress_wordpress
+    - wordpress_wordpress_install
 
 - name: "wordpress : Check installation directory"
   ansible.builtin.stat:
     path: /srv/www/wordpress
   register: wordpress_dir
-  tags: [wordpress, install]
+  tags:
+    - wordpress
+    - install
+    - wordpress_wordpress
+    - wordpress_wordpress_install
 
 - name: "wordpress : Extract archive"
   ansible.builtin.unarchive:
@@ -24,7 +32,11 @@
     owner: www-data
     group: www-data
   when: wordpress_dir.stat.isdir is not defined
-  tags: [wordpress, install]
+  tags:
+    - wordpress
+    - install
+    - wordpress_wordpress
+    - wordpress_wordpress_install
 
 - name: "wordpress : Copy wp-config.php"
   ansible.builtin.template:
@@ -32,14 +44,23 @@
     dest: /srv/www/wordpress/wp-config.php
     owner: www-data
     group: www-data
-  tags: [wordpress, config]
+  tags:
+    - wordpress
+    - config
+    - wordpress_wordpress
+    - wordpress_wordpress_config
 
 - name: "wordpress : Configure daily cron job"
   ansible.builtin.copy:
     src: wordpress.cron
     dest: /etc/cron.daily/wordpress
     mode: '0755'
-  tags: [wordpress, config, cron]
+  tags:
+    - wordpress
+    - config
+    - cron
+    - wordpress_wordpress
+    - wordpress_wordpress_config
 
 - name: "wordpress : Copy .htaccess"
   ansible.builtin.copy:
@@ -47,41 +68,75 @@
     dest: /srv/www/wordpress/.htaccess
     owner: www-data
     group: www-data
-  tags: [wordpress, config]
+  tags:
+    - wordpress
+    - config
+    - wordpress_wordpress
+    - wordpress_wordpress_config
 
 - name: "wordpress : Enable mod_expires"
   ansible.builtin.command: a2enmod expires
   notify: "apache: Restart"
-  tags: [wordpress, config, apache]
+  tags:
+    - wordpress
+    - config
+    - apache
+    - wordpress_wordpress
+    - wordpress_wordpress_config
 
 - name: "wordpress : Enable mod_headers"
   ansible.builtin.command: a2enmod headers
   notify: "apache: Restart"
-  tags: [wordpress, config, apache]
+  tags:
+    - wordpress
+    - config
+    - apache
+    - wordpress_wordpress
+    - wordpress_wordpress_config
 
 - name: "wordpress : Copy Apache config"
   ansible.builtin.copy:
     src: wordpress.conf
     dest: /etc/apache2/conf-available
   notify: "apache: Reload"
-  tags: [wordpress, config, apache]
+  tags:
+    - wordpress
+    - config
+    - apache
+    - wordpress_wordpress
+    - wordpress_wordpress_config
 
 - name: "wordpress : Enable Apache config"
   ansible.builtin.command: a2enconf wordpress
   notify: "apache: Reload"
-  tags: [wordpress, config, apache]
+  tags:
+    - wordpress
+    - config
+    - apache
+    - wordpress_wordpress
+    - wordpress_wordpress_config
 
 - name: "wordpress : Copy welcome config"
   ansible.builtin.copy:
     src: welcome.conf
     dest: /etc/apache2/conf-available
   notify: "apache: Reload"
-  tags: [wordpress, config, apache]
+  tags:
+    - wordpress
+    - config
+    - apache
+    - wordpress_wordpress
+    - wordpress_wordpress_config
 
 - name: "wordpress : Enable welcome config"
   ansible.builtin.command: a2enconf welcome
   notify: "apache: Reload"
-  tags: [wordpress, config, apache]
+  tags:
+    - wordpress
+    - config
+    - apache
+    - wordpress_wordpress
+    - wordpress_wordpress_config
 
 - name: "wordpress : Enable .htaccess override"
   ansible.builtin.lineinfile:
@@ -89,14 +144,24 @@
     regexp: "^	AllowOverride "
     line: "	AllowOverride All"
   notify: "apache: Reload"
-  tags: [wordpress, config, apache]
+  tags:
+    - wordpress
+    - config
+    - apache
+    - wordpress_wordpress
+    - wordpress_wordpress_config
 
 - name: "php : Copy WordPress PHP config"
   ansible.builtin.copy:
     src: 30-wordpress.ini
     dest: /etc/php/{{ php_version }}/apache2/conf.d
   notify: "apache: Reload"
-  tags: [wordpress, config, php]
+  tags:
+    - wordpress
+    - config
+    - php
+    - wordpress_php
+    - wordpress_php_config
 
 - name: "wordpress : Install Fukasawa theme"
   ansible.builtin.unarchive:
@@ -105,7 +170,12 @@
     owner: www-data
     group: www-data
     remote_src: true
-  tags: [wordpress, install, theme]
+  tags:
+    - wordpress
+    - install
+    - theme
+    - wordpress_wordpress
+    - wordpress_wordpress_install
 
 - name: "wordpress : Create language directories"
   ansible.builtin.file:
@@ -116,7 +186,11 @@
   loop:
     - /srv/www/wordpress/wp-content/languages/themes
     - /srv/www/wordpress/wp-content/languages/plugins
-  tags: [wordpress, init]
+  tags:
+    - wordpress
+    - init
+    - wordpress_wordpress
+    - wordpress_wordpress_init
 
 - name: "wordpress : Copy Fukasawa Japanese translation"
   ansible.builtin.copy:
@@ -127,7 +201,12 @@
   loop:
     - fukasawa-ja.mo
     - fukasawa-ja.po
-  tags: [wordpress, config, theme]
+  tags:
+    - wordpress
+    - config
+    - theme
+    - wordpress_wordpress
+    - wordpress_wordpress_config
 
 - name: "wordpress : Copy Jetpack Japanese translation"
   ansible.builtin.copy:
@@ -138,14 +217,24 @@
   loop:
     - jetpack-ja.mo
     - jetpack-ja.po
-  tags: [wordpress, config, plugin]
+  tags:
+    - wordpress
+    - config
+    - plugin
+    - wordpress_wordpress
+    - wordpress_wordpress_config
 
 - name: "wordpress : Disable Lato font in Fukasawa"
   ansible.builtin.replace:
     path: /srv/www/wordpress/wp-content/themes/fukasawa/functions.php
     regexp: '\$google_fonts = ..*'
     replace: "$google_fonts = 'off';"
-  tags: [wordpress, config, theme]
+  tags:
+    - wordpress
+    - config
+    - theme
+    - wordpress_wordpress
+    - wordpress_wordpress_config
 
 - name: "wordpress : Add custom functions to Fukasawa"
   ansible.builtin.blockinfile:
@@ -269,14 +358,25 @@
         2
       );
 
-  tags: [wordpress, config, theme]
+  tags:
+
+    - wordpress
+
+    - config
+
+    - theme
 
 - name: "wordpress : Customize copyright in header"
   ansible.builtin.lineinfile:
     path: /srv/www/wordpress/wp-content/themes/fukasawa/header.php
     regexp: '<p>&copy;'
     line: "                <p>&copy; <?php echo date( 'Y' ); ?> <a href=\"<?php echo esc_url( home_url( '/' ) ); ?>\">Tats Shibata</a>.</p>"
-  tags: [wordpress, config, theme]
+  tags:
+    - wordpress
+    - config
+    - theme
+    - wordpress_wordpress
+    - wordpress_wordpress_config
 
 - name: "wordpress : Add post date on top"
   ansible.builtin.blockinfile:
@@ -287,7 +387,12 @@
                         <?php if ( is_single() ) : ?>
                                 <p class="post-date-top"><?php the_date( get_option( 'date_format' ) ); ?></p>
                         <?php endif; ?>
-  tags: [wordpress, config, theme]
+  tags:
+    - wordpress
+    - config
+    - theme
+    - wordpress_wordpress
+    - wordpress_wordpress_config
 
 - name: "wordpress : Add affiliate disclosure message"
   ansible.builtin.blockinfile:
@@ -302,14 +407,24 @@
                         ?>
                               <p class='pr-message'>アフィリエイトリンクが含まれていますが、広告主などからの依頼に基づく投稿ではありません。</p>
                         <?php break; endif; endforeach; ?>
-  tags: [wordpress, config, theme]
+  tags:
+    - wordpress
+    - config
+    - theme
+    - wordpress_wordpress
+    - wordpress_wordpress_config
 
 - name: "wordpress : Remove date from bottom"
   ansible.builtin.lineinfile:
     path: /srv/www/wordpress/wp-content/themes/fukasawa/singular.php
     regexp: '<li class="post-date">'
     line: ""
-  tags: [wordpress, config, theme]
+  tags:
+    - wordpress
+    - config
+    - theme
+    - wordpress_wordpress
+    - wordpress_wordpress_config
 
 - name: "wordpress : Add author box"
   ansible.builtin.blockinfile:
@@ -330,13 +445,21 @@
                                   echo do_shortcode( '[jetpack-related-posts]' );
                               }
                           ?>
-  tags: [wordpress, config, theme]
+  tags:
+    - wordpress
+    - config
+    - theme
 
 - name: "wordpress : Copy pagination.php"
   ansible.builtin.copy:
     src: pagination.php
     dest: /srv/www/wordpress/wp-content/themes/fukasawa
-  tags: [wordpress, config, theme]
+  tags:
+    - wordpress
+    - config
+    - theme
+    - wordpress_wordpress
+    - wordpress_wordpress_config
 
 - name: "wordpress : Copy embed-content.php"
   ansible.builtin.copy:
@@ -344,38 +467,67 @@
     dest: /srv/www/wordpress/wp-content/themes/fukasawa/
     owner: www-data
     group: www-data
-  tags: [wordpress, config, theme]
+  tags:
+    - wordpress
+    - config
+    - theme
+    - wordpress_wordpress
+    - wordpress_wordpress_config
 
 - name: "wordpress : Add attributes to blog logo"
   ansible.builtin.lineinfile:
     path: /srv/www/wordpress/wp-content/themes/fukasawa/header.php
     regexp: '<img src="<\?php echo esc_url\( \$custom_logo_url \); \?>.*'
     line: '                        <img src="<?php echo esc_url( $custom_logo_url ); ?>" alt="Rewse Lab." width="2048" height="2048" />'
-  tags: [wordpress, config, theme]
+  tags:
+    - wordpress
+    - config
+    - theme
+    - wordpress_wordpress
+    - wordpress_wordpress_config
 
 - name: "wordpress : Remove user-scalable from viewport"
   ansible.builtin.lineinfile:
     path: /srv/www/wordpress/wp-content/themes/fukasawa/header.php
     regexp: '<meta name="viewport".*'
     line: '        <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0" >'
-  tags: [wordpress, config, theme]
+  tags:
+    - wordpress
+    - config
+    - theme
+    - wordpress_wordpress
+    - wordpress_wordpress_config
 
 - name: "wordpress : Install Pochipp Assist plugin"
   ansible.builtin.unarchive:
     src: https://pochipp.com/download/?p=assist
     dest: /srv/www/wordpress/wp-content/plugins
     remote_src: true
-  tags: [wordpress, install, plugin]
+  tags:
+    - wordpress
+    - install
+    - plugin
+    - wordpress_wordpress
+    - wordpress_wordpress_install
 
 - name: "wordpress : Download WP-CLI"
   ansible.builtin.get_url:
     url: https://raw.githubusercontent.com/wp-cli/builds/gh-pages/phar/wp-cli.phar
     dest: /usr/local/sbin/wp
     mode: '0755'
-  tags: [wordpress, install]
+  tags:
+    - wordpress
+    - install
+    - wordpress_wordpress
+    - wordpress_wordpress_download
 
 - name: "wordpress : Configure FlyingPress cron job"
   ansible.builtin.copy:
     src: flyingpress.cron
     dest: /etc/cron.d/flyingpress
-  tags: [wordpress, config, cron]
+  tags:
+    - wordpress
+    - config
+    - cron
+    - wordpress_wordpress
+    - wordpress_wordpress_config

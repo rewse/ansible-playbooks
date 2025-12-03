@@ -5,20 +5,39 @@
       - fonts-ricty-diminished
       - tigervnc-standalone-server
       - ubuntu-desktop
-  tags: [desktop, install]
+  tags:
+    - desktop
+    - install
+    - desktop_desktop
+    - desktop_desktop_install
 
 - name: "terminal : Clone one-gnome-terminal theme"
   ansible.builtin.git:
     repo: https://github.com/denysdovhan/one-gnome-terminal.git
     dest: /srv/git/one-gnome-terminal
-  tags: [desktop, install, terminal]
+  tags:
+    - desktop
+    - install
+    - terminal
+    - desktop_terminal
+    - desktop_terminal_config
 
 - name: "terminal : Apply one-dark theme"
   become_user: "{{ admin }}"
   ansible.builtin.command: bash /srv/git/one-gnome-terminal/one-dark.sh
-  tags: [desktop, config, terminal]
+  tags:
+    - desktop
+    - config
+    - terminal
+    - desktop_terminal
+    - desktop_terminal_config
 
 - name: "terminal : Set font to Ricty Diminished"
   become_user: "{{ admin }}"
   ansible.builtin.command: gsettings set org.gnome.desktop.interface monospace-font-name "Ricty Diminished Regular 12"
-  tags: [desktop, config, terminal]
+  tags:
+    - desktop
+    - config
+    - terminal
+    - desktop_terminal
+    - desktop_terminal_config
