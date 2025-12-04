@@ -1,5 +1,5 @@
 ---
-- name: Install packages by homebrew
+- name: "package : Install packages by homebrew"
   community.general.homebrew:
     name: 
       - 1password-cli
@@ -30,10 +30,12 @@
     update_homebrew: true
   tags:
     - darwin
+    - install
     - package
-    - homebrew
+    - darwin_package
+    - darwin_package_install
 
-- name: Install packages by homebrew_cask
+- name: "package : Install packages by homebrew_cask"
   community.general.homebrew_cask:
     name: 
       - 1password
@@ -87,10 +89,12 @@
     update_homebrew: true
   tags:
     - darwin
+    - install
     - package
-    - cask
+    - darwin_package
+    - darwin_package_install
 
-- name: Install packages by mas
+- name: "package : Install packages by mas"
   ansible.builtin.command: mas install {{ item }}
   loop:
     - 1512372293  # 3DMark
@@ -115,46 +119,59 @@
   ignore_errors: true
   tags:
     - darwin
+    - install
     - package
-    - mas
+    - darwin_package
+    - darwin_package_install
 
-- name: Create /Library/Fonts/Adobe
+- name: "font : Create directory"
   ansible.builtin.file:
     path: /Library/Fonts/Adobe
     state: directory
   tags:
     - darwin
-    - package
+    - init
     - font
+    - darwin_font
+    - darwin_font_init
 
-- name: Download source-han-mono
+- name: "font : Download source-han-mono"
   ansible.builtin.get_url:
     url: https://github.com/adobe-fonts/source-han-mono/releases/download/{{ source_han_mono_version }}/SourceHanMono.ttc
     dest: /Library/Fonts/Adobe
   tags:
     - darwin
-    - package
+    - install
     - font
+    - darwin_font
+    - darwin_font_install
+    - darwin_font_download
 
-- name: Download source-han-sans
+- name: "font : Download source-han-sans"
   ansible.builtin.unarchive:
     src: https://github.com/adobe-fonts/source-han-sans/releases/download/{{ source_han_sans_version }}/SourceHanSans.ttc.zip
     dest: /Library/Fonts/Adobe
     remote_src: true
   tags:
     - darwin
-    - package
+    - install
     - font
+    - darwin_font
+    - darwin_font_install
+    - darwin_font_download
 
-- name: Download source-han-serif
+- name: "font : Download source-han-serif"
   ansible.builtin.unarchive:
     src: https://github.com/adobe-fonts/source-han-serif/releases/download/{{ source_han_serif_version }}/01_SourceHanSerif.ttc.zip
     dest: /Library/Fonts/Adobe
     remote_src: true
   tags:
     - darwin
-    - package
+    - install
     - font
+    - darwin_font
+    - darwin_font_install
+    - darwin_font_download
 
 # - name: Install rest of the apps
 #   install_yourself:
