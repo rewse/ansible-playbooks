@@ -13,6 +13,7 @@
       - jq
       - mas
       - node
+      - osv-scanner
       - php
       - pv
       - pwgen
