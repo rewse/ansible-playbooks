@@ -505,6 +505,57 @@
 
 - triggers:
     - trigger: event
+      event_type: "imap_content"
+      id: "custom_event"
+      event_data:
+        sender: "thanks@aplus.co.jp"
+  sensor:
+    - unique_id: sensor.aplus
+      name: "Aplus"
+      state: "{{ trigger.event.data['subject'] }}"
+      attributes:
+        Message: "{{ trigger.event.data['text'] }}"
+        Server: "{{ trigger.event.data['server'] }}"
+        Username: "{{ trigger.event.data['username'] }}"
+        Search: "{{ trigger.event.data['search'] }}"
+        Folder: "{{ trigger.event.data['folder'] }}"
+        Sender: "{{ trigger.event.data['sender'] }}"
+        Date: "{{ trigger.event.data['date'] }}"
+        Subject: "{{ trigger.event.data['subject'] }}"
+        To: "{{ trigger.event.data['headers']['Delivered-To'][0] }}"
+        Return_Path: "{{ trigger.event.data['headers']['Return-Path'][0] }}"
+        Received-first: "{{ trigger.event.data['headers']['Received'][0] }}"
+        Received-last: "{{ trigger.event.data['headers']['Received'][-1] }}"
+      icon: "mdi:credit-card"
+    - unique_id: sensor.aplus_amount
+      name: "Aplus Amount"
+      state: >-
+        {% if is_state('sensor.aplus', "unavailable") %}
+          unavailable
+        {% else %}
+          {{
+            state_attr('sensor.aplus', 'Message') |
+            regex_findall_index('利用金額：(..*)円') |
+            regex_replace(',', '') | int
+          }}
+        {% endif %}
+      icon: "mdi:credit-card-check"
+      unit_of_measurement: "JPY"
+    - unique_id: sensor.aplus_time
+      name: "Aplus Time"
+      state: >-
+        {% if is_state('sensor.aplus', "unavailable") %}
+          unavailable
+        {% else %}
+          {{
+            state_attr('sensor.aplus', 'Message') |
+            regex_findall_index("([0-9][0-9]*時[0-9][0-9]*)分") |
+            regex_replace("時", ":")
+          }}
+        {% endif %}
+      icon: "mdi:credit-card-clock"
+- triggers:
+    - trigger: event
       event_type: imap_content
       id: "custom_event"
       event_data:

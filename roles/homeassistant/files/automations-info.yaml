@@ -1,3 +1,21 @@
+- id: automation.info_aplus
+  alias: "INFO: Aplus"
+  triggers:
+    - trigger: state
+      entity_id: sensor.aplus
+  conditions:
+    - "{{ (as_timestamp(now()) - as_timestamp(state_attr('sensor.aplus', 'Date'))) < 180 }}"
+  actions:
+    - delay:
+        seconds: 5
+    - action: notify.all_devices
+      data:
+        title: "💳 Luxury Card"
+        message: "{{ states('sensor.aplus_time') }}に{{ states('sensor.aplus_amount') }}円の利用がありました"
+        data:
+          push:
+            interruption-level: time-sensitive
+          url: "/lovelace/others"
 - id: automation.info_mamorail
   alias: "INFO: Mamorail"
   triggers:
