@@ -36,7 +36,7 @@ send_co2() {
   local co2
   local datetime
 
-  co2=$(python3 -m mh_z19 --pwm | grep -oE '[0-9]+\.?[0-9]*')
+  co2=$(python3 -m mh_z19 --pwm | grep -oP "(?<='co2': )\d+")
 
   if [[ -z "${co2}" ]]; then
     publish_mqtt "${TOPIC_BASE}/state" "offline"
