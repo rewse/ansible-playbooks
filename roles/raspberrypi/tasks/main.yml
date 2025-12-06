@@ -21,7 +21,7 @@
     regexp: '^#?CONF_SWAPFACTOR='
     line: 'CONF_SWAPFACTOR=1'
     backup: true
-  notify: Restart dphys-swapfile
+  notify: "dphys-swapfile: Restart"
   tags:
     - raspberrypi
     - config
@@ -35,7 +35,7 @@
     regexp: '^#?CONF_MAXSWAP='
     line: 'CONF_MAXSWAP=16384'
     backup: true
-  notify: Restart dphys-swapfile
+  notify: "dphys-swapfile: Restart"
   tags:
     - raspberrypi
     - config
@@ -49,7 +49,7 @@
     regexp: '^CONF_SWAPSIZE='
     line: '#CONF_SWAPSIZE='
     backup: true
-  notify: Restart dphys-swapfile
+  notify: "dphys-swapfile: Restart"
   tags:
     - raspberrypi
     - config
@@ -63,7 +63,7 @@
     insertafter: '^#NTP='
     regexp: '^NTP='
     line: 'NTP=ntp.nict.jp ntp.jst.mfeed.ad.jp'
-  notify: Restart systemd-timesyncd
+  notify: "systemd-timesyncd: Restart"
   tags:
     - raspberrypi
     - config
@@ -159,7 +159,7 @@
 
 - name: "netplan : Apply configuration"
   ansible.builtin.command: netplan apply
-  notify: Run ifmetric
+  notify: "ifmetric: Run"
   tags:
     - raspberrypi
     - config
@@ -194,7 +194,7 @@
   ansible.builtin.template:
     src: override.conf.j2
     dest: /etc/systemd/system/ssh.socket.d/override.conf
-  notify: Restart ssh.socket
+  notify: "ssh: Restart socket"
   tags:
     - raspberrypi
     - config

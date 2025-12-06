@@ -1,5 +1,5 @@
 ---
-- name: Restart matter-server
+- name: "matter-server: Restart"
   community.docker.docker_compose_v2:
     project_src: /etc
     services: matter-server
