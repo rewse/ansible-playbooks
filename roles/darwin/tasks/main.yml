@@ -95,6 +95,19 @@
     - darwin_package
     - darwin_package_install
 
+# Note: If this task fails with "sudo: a terminal is required to read the password" error,
+# some casks require sudo password for upgrade. In such cases, run `brew upgrade` manually
+# in the terminal.
+- name: "package : Upgrade all homebrew packages"
+  community.general.homebrew:
+    upgrade_all: true
+  tags:
+    - darwin
+    - upgrade
+    - package
+    - darwin_package
+    - darwin_package_upgrade
+
 - name: "package : Install packages by mas"
   ansible.builtin.command: mas install {{ item }}
   loop:
