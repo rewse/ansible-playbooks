@@ -17,7 +17,7 @@
     dest: /srv/litellm/config.yaml
     owner: root
     group: root
-  notify: Restart litellm
+  notify: "litellm: Restart"
   tags:
     - litellm
     - config
@@ -45,7 +45,7 @@
             - LITELLM_SALT_KEY={{ litellm_salt_key }}
           restart: unless-stopped
           command: ["--config", "/app/config.yml", "--port", "4000"]
-  notify: Restart litellm
+  notify: "litellm: Restart"
   tags:
     - litellm
     - config

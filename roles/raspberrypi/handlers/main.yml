@@ -1,18 +1,18 @@
 ---
-- name: Restart systemd-timesyncd
+- name: "systemd-timesyncd: Restart"
   ansible.builtin.systemd:
     name: systemd-timesyncd
     state: restarted
 
-- name: Restart dphys-swapfile
+- name: "dphys-swapfile: Restart"
   ansible.builtin.systemd:
     name: dphys-swapfile
     state: restarted
 
-- name: Restart ssh.socket
+- name: "ssh: Restart socket"
   ansible.builtin.systemd:
     name: ssh.socket
     state: restarted
 
-- name: Run ifmetric
+- name: "ifmetric: Run"
   ansible.builtin.command: ifmetric wlan0 100
