@@ -8,7 +8,6 @@
       - bat
       - direnv
       - gh
-      - fontforge
       - fping
       - git-cliff
       - jq
@@ -21,13 +20,10 @@
       - python3
       - switchaudio-osx
       - telnet
-      - source-highlight
       - svn
-      - tmux
       - tree
       - uv
       - watch
-      - yamllint
       - zsh-vi-mode
     update_homebrew: true
   tags:
