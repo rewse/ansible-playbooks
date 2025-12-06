@@ -3,6 +3,9 @@
     "Home Assistant": {
       "command": "uvx",
       "args": ["ha-mcp@latest"],
+      "env": {
+        "FASTMCP_LOG_LEVEL": "ERROR"
+      },
       "autoApprove": [
         "ha_check_config",
         "ha_config_get_automation",
