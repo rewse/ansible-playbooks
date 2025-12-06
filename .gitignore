@@ -5,6 +5,9 @@ logs
 roles/database/client/files/oracle*
 roles/database/client/gui/files/sqldeveloper*
 
+# Environment files
+.env
+
 # Vault files (migrated to 1Password)
 group_vars/*/vault
 host_vars/*/vault
