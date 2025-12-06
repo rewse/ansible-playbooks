@@ -263,36 +263,10 @@
     - homeassistant_command-line
     - homeassistant_command-line_config
 
-- name: "fan : Configure include"
-  ansible.builtin.lineinfile:
-    path: /srv/homeassistant/config/configuration.yaml
-    insertafter: '^command_line:'
-    regexp: '^fan:'
-    line: "fan: !include fans.yaml"
-  notify: "homeassistant: Restart"
-  tags:
-    - homeassistant
-    - config
-    - fan
-    - homeassistant_fan
-    - homeassistant_fan_config
-
-- name: "fan : Copy configuration"
-  ansible.builtin.copy:
-    src: fans.yaml
-    dest: /srv/homeassistant/config
-  notify: "homeassistant: Restart"
-  tags:
-    - homeassistant
-    - config
-    - fan
-    - homeassistant_fan
-    - homeassistant_fan_config
-
 - name: "homekit : Configure include"
   ansible.builtin.lineinfile:
     path: /srv/homeassistant/config/configuration.yaml
-    insertafter: '^fan:'
+    insertafter: '^command-line:'
     regexp: '^homekit:'
     line: "homekit: !include homekit.yaml"
   notify: "homeassistant: Restart"
@@ -437,36 +411,10 @@
     - homeassistant_light
     - homeassistant_light_config
 
-- name: "lock : Configure include"
-  ansible.builtin.lineinfile:
-    path: /srv/homeassistant/config/configuration.yaml
-    insertafter: '^light:'
-    regexp: '^lock:'
-    line: "lock: !include locks.yaml"
-  notify: "homeassistant: Restart"
-  tags:
-    - homeassistant
-    - config
-    - lock
-    - homeassistant_lock
-    - homeassistant_lock_config
-
-- name: "lock : Copy configuration"
-  ansible.builtin.copy:
-    src: locks.yaml
-    dest: /srv/homeassistant/config
-  notify: "homeassistant: Restart"
-  tags:
-    - homeassistant
-    - config
-    - lock
-    - homeassistant_lock
-    - homeassistant_lock_config
-
 - name: "media-player : Configure include"
   ansible.builtin.lineinfile:
     path: /srv/homeassistant/config/configuration.yaml
-    insertafter: '^lock:'
+    insertafter: '^light:'
     regexp: '^media_player:'
     line: "media_player: !include media_players.yaml"
   notify: "homeassistant: Restart"
