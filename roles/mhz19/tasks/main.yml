@@ -20,7 +20,7 @@
     - mhz19_mhz19_init
 
 - name: "mhz19 : Install mh_z19 package with uv"
-  ansible.builtin.command: uv install --upgrade mh_z19
+  ansible.builtin.command: uv pip install --upgrade mh_z19
   environment:
     VIRTUAL_ENV: /opt/mhz19
   changed_when: false
