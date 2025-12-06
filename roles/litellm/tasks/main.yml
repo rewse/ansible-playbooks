@@ -13,8 +13,8 @@
 
 - name: "litellm : Generate configuration file"
   ansible.builtin.template:
-    src: config.yaml.j2
-    dest: /srv/litellm/config.yaml
+    src: config.yml.j2
+    dest: /srv/litellm/config.yml
     owner: root
     group: root
   notify: "litellm: Restart"
