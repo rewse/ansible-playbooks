@@ -12,6 +12,7 @@
 - name: "couchdb: Restart"
   community.docker.docker_compose_v2:
     project_src: /etc
-    services:
-      - couchdb
+    services: couchdb
     state: restarted
+    pull: always
+    recreate: always
