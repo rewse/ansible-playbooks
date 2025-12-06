@@ -1,11 +1,23 @@
 ---
+- name: "package : Install packages by homebrew"
+  community.general.homebrew:
+    name: 
+      - gemini-cli
+    update_homebrew: true
+  tags:
+    - darwin
+    - darwin_personal
+    - install
+    - package
+    - darwin_package
+    - darwin_package_install
+
 - name: "package : Install packages by homebrew_cask"
   community.general.homebrew_cask:
     name: 
       - charles
       - deepl
       - epic-games
-      - gemini-cli
       - gog-galaxy
       - kiro
       - kiro-cli
