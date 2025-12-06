@@ -8,9 +8,7 @@ inclusion: always
 - **Ansible**: 構成管理のための主要な自動化ツール
 - **YAML**: プレイブック、ロール、変数定義に使用
 - **Jinja2**: 動的構成ファイルのためのテンプレートエンジン
-- **direnv**: ディレクトリベースの環境変数管理
 - **1Password CLI**: 機密情報の安全な保存と取得のため
-- **1Password Environments**: 環境変数の安全な管理とローカル `.env` ファイルマウント
 
 ## プラットフォーム
 - **Ubuntu**: Linux サーバーとクラウドインスタンス
@@ -62,61 +60,6 @@ op read op://ansible/database/password
 # プレイブックや vars ファイル内で:
 # db_password: "{{ lookup('pipe', 'op read op://ansible/database/password') }}"
 ```
-
-### direnv
-このプロジェクトでは、direnv を使用してディレクトリベースの環境変数管理を行っている。
-
-#### 仕組み
-- ディレクトリに入ると自動的に `.envrc` ファイルを読み込む
-- ディレクトリから出ると環境変数を自動的にアンロード
-- セキュリティのため、`.envrc` の変更時には `direnv allow` で明示的な承認が必要
-
-#### 使用方法
-```bash
-# .envrc の変更を承認
-direnv allow
-
-# direnv の状態を確認
-direnv status
-```
-
-このプロジェクトの `.envrc` では、1Password Environments の `.env` ファイルを読み込んでいる：
-```bash
-set -a
-source .env
-set +a
-```
-
-- `set -a`: 以降の変数を自動的に環境変数としてエクスポート
-- `source .env`: `.env` ファイルを読み込む
-- `set +a`: 自動エクスポートを解除
-
-**注意**: direnv の `dotenv` コマンドは UNIX 名前付きパイプに対応していないため、`source` コマンドを使用している。
-
-#### 詳細情報
-- [direnv 公式サイト](https://direnv.net/)
-
-### 1Password Environments
-このプロジェクトでは、1Password Environments を使用して環境変数を安全に管理している。
-
-#### 仕組み
-- 1Password が `.env` ファイルを UNIX 名前付きパイプとしてマウント
-- ファイルの内容は平文でディスクに保存されず、読み取り時にオンデマンドで提供される
-- 1Password がロックされるまで認証が持続し、複数のプロセスから読み取り可能
-
-#### 設定方法
-1. 1Password デスクトップアプリで Developer 機能を有効化
-2. 新しい Environment を作成
-3. 環境変数（キー・バリューペア）を追加
-4. Destinations タブから「Local `.env` file」を設定
-5. マウント先のパスを選択（このプロジェクトでは `.env`）
-
-#### 使用方法
-初回読み取り時に 1Password の認証プロンプトが表示される。
-
-#### 詳細情報
-- [1Password Environments ドキュメント](https://developer.1password.com/docs/environments/)
-- [ローカル .env ファイルマウント](https://developer.1password.com/docs/environments/local-env-file)
 
 ### ベストプラクティス
 - 選択的な実行にはタグを常に使用する
