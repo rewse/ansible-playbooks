@@ -4,3 +4,5 @@
     project_src: /etc
     services: matter-server
     state: restarted
+    pull: always
+    recreate: always

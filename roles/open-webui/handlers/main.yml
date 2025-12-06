@@ -12,6 +12,7 @@
 - name: "open-webui: Restart"
   community.docker.docker_compose_v2:
     project_src: /etc
-    services:
-      - open-webui
+    services: open-webui
     state: restarted
+    pull: always
+    recreate: always

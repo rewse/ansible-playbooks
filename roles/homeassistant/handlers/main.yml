@@ -19,3 +19,5 @@
     project_src: /etc
     services: homeassistant
     state: restarted
+    pull: always
+    recreate: always
