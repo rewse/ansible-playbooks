@@ -1,7 +1,5 @@
 - binary_sensor:
-
   # Dad’s Room
-
   - unique_id: binary_sensor.dads_room_ac_cooldry
     name: "Dad’s Room AC CoolDry"
     state: >-
@@ -52,9 +50,7 @@
     state: >-
       {{ (now() - states.sensor.dads_room_temperature.last_updated).total_seconds() < 3600 }}
     device_class: connectivity
-
   # Living Room
-
   - unique_id: binary_sensor.living_room_ac_cooldry
     name: "Living Room AC CoolDry"
     state: >-
@@ -110,9 +106,7 @@
     state: >-
       {{ (now() - states.sensor.living_room_temperature.last_updated).total_seconds() < 3600 }}
     device_class: connectivity
-
   # Mom’s Room
-
   - unique_id: binary_sensor.moms_room_ac_cooldry
     name: "Mom’s Room AC CoolDry"
     state: >-
@@ -162,11 +156,48 @@
     name: "Mom's Room Thermometer Connectivity"
     state: >-
       {{ (now() - states.sensor.moms_room_temperature.last_updated).total_seconds() < 3600 }}
-
+- fan:
+  - unique_id: fan.living_room_fan
+    turn_on:
+    - target:
+        entity_id:
+        - switch.living_room_fan_switch
+      action: switch.turn_on
+    turn_off:
+    - target:
+        entity_id:
+        - switch.living_room_fan_switch
+      action: switch.turn_off
+    default_entity_id: fan.living_room_fan
+    availability: '{{ states(''switch.living_room_fan_plug'') }}'
+    name: Living Room Fan
+    state: '{{ float(states(''sensor.living_room_fan_plug_power'')) > 3 }}'
+- lock:
+  - unique_id: lock.entrance_locks
+    name: Entrance Locks
+    lock:
+    - action: lock.lock
+      target:
+        entity_id:
+        - lock.entrance_lock_top
+    - action: lock.lock
+      target:
+        entity_id:
+        - lock.entrance_lock_bottom
+    unlock:
+    - action: lock.unlock
+      target:
+        entity_id:
+        - lock.entrance_lock_top
+    - action: lock.unlock
+      target:
+        entity_id:
+        - lock.entrance_lock_bottom
+    optimistic: false
+    state: "{{\n  is_state('lock.entrance_lock_top', 'locked') or\n  is_state('lock.entrance_lock_bottom',
+      'locked')\n}}"
 - sensor:
-
   # Balcony
-
   - unique_id: sensor.balcony_humidity_difference
     name: "Balcony Humidity Difference"
     state: >-
@@ -207,9 +238,7 @@
     state_class: measurement
     device_class: temperature
     icon: "mdi:thermometer-water"
-
-# Dad’s Room
-
+  # Dad’s Room
   - unique_id: sensor.dads_room_ac_mode
     name: "Dad’s Room AC Mode"
     state: "{{ states('climate.dads_room_ac') }}"
@@ -261,9 +290,7 @@
     state_class: measurement
     device_class: temperature
     icon: "mdi:thermometer-water"
-
-# Living Room
-
+  # Living Room
   - unique_id: sensor.living_room_ac_mode
     name: "Living Room AC Mode"
     state: "{{ states('climate.living_room_ac') }}"
@@ -326,9 +353,7 @@
     state_class: measurement
     device_class: temperature
     icon: "mdi:thermometer-water"
-
-# Mom’s Room
-
+  # Mom’s Room
   - unique_id: sensor.moms_room_ac_mode
     name: "Mom’s Room AC Mode"
     state: "{{ states('climate.moms_room_ac') }}"
@@ -379,9 +404,7 @@
     state_class: measurement
     device_class: temperature
     icon: "mdi:thermometer-water"
-
-# Others
-
+  # Others
   - unique_id: sensor.tokyo_weather_rain_chance_max
     name: "Tokyo Weather Rain Chance Max"
     state: >-
@@ -500,9 +523,98 @@
       {% else %}
         mdi:weather-partly-cloudy
       {% endif %}
-
-# IMAP
-
+- switch:
+  # Dad’s Room
+  - unique_id: switch.dads_room_humidifier
+    turn_on:
+    - action: switch.toggle
+      target:
+        entity_id:
+        - switch.dads_room_humidifier_switch
+    turn_off:
+    - action: switch.toggle
+      target:
+        entity_id:
+        - switch.dads_room_humidifier_switch
+    default_entity_id: switch.dads_room_humidifier
+    icon: mdi:air-humidifier
+    availability: '{{ states(''switch.dads_room_humidifier_plug'') }}'
+    name: Dad’s Room Humidifier
+    state: '{{ float(states(''sensor.dads_room_humidifier_plug_power'')) > 3 }}'
+  # Living Room
+  - unique_id: switch.living_room_floor_heating
+    turn_on:
+    - action: switch.toggle
+      target:
+        entity_id:
+        - switch.living_room_floor_heating_switch
+    turn_off:
+    - action: switch.toggle
+      target:
+        entity_id:
+        - switch.living_room_floor_heating_switch
+    default_entity_id: switch.living_room_floor_heating
+    icon: mdi:heating-coil
+    name: Living Room Floor Heating
+    state: '{{ float(states(''sensor.living_room_floor_heating_effect'')) > 1 }}'
+  - unique_id: switch.living_room_humidifier
+    turn_on:
+    - action: switch.toggle
+      target:
+        entity_id:
+        - switch.living_room_humidifier_switch
+    turn_off:
+    - action: switch.toggle
+      target:
+        entity_id:
+        - switch.living_room_humidifier_switch
+    default_entity_id: switch.living_room_humidifier
+    icon: mdi:air-humidifier
+    availability: '{{ states(''switch.living_room_humidifier_plug'') }}'
+    name: Living Room Humidifier
+    state: '{{ float(states(''sensor.living_room_humidifier_plug_power'')) > 3 }}'
+  - unique_id: switch.living_room_tv
+    turn_on:
+    - action: shell_command.control_toggle_regza
+    turn_off:
+    - action: shell_command.control_toggle_regza
+    default_entity_id: switch.living_room_tv
+    icon: mdi:television
+    availability: '{{ states(''switch.living_room_tv_plug'') }}'
+    name: Living Room TV
+    state: '{{ float(states(''sensor.living_room_tv_plug_power'')) > 50 }}'
+  - unique_id: switch.study_floor_heating
+    turn_on:
+    - action: switch.toggle
+      target:
+        entity_id:
+        - switch.study_floor_heating_switch
+    turn_off:
+    - action: switch.toggle
+      target:
+        entity_id:
+        - switch.study_floor_heating_switch
+    default_entity_id: switch.study_floor_heating
+    icon: mdi:heating-coil
+    name: Study Floor Heating
+    state: '{{ float(states(''sensor.living_room_floor_heating_effect'')) > 1 }}'
+  # Mom’s Room
+  - unique_id: switch.moms_room_humidifier
+    turn_on:
+    - action: switch.toggle
+      target:
+        entity_id:
+        - switch.moms_room_humidifier_switch
+    turn_off:
+    - action: switch.toggle
+      target:
+        entity_id:
+        - switch.moms_room_humidifier_switch
+    default_entity_id: switch.moms_room_humidifier
+    icon: mdi:air-humidifier
+    availability: '{{ states(''switch.moms_room_humidifier_plug'') }}'
+    name: Mom’s Room humidifier
+    state: '{{ float(states(''sensor.moms_room_humidifier_plug_power'')) > 3 }}'
 - triggers:
     - trigger: event
       event_type: "imap_content"
