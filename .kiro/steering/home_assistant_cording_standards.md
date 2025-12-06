@@ -587,3 +587,100 @@ two: "{{ states.climate.living_room.attributes.temperature }}"
 ```
 
 これは `states()`、`is_state()`、`state_attr()`、`is_state_attr()` に適用され、エンティティがまだ準備できていない場合（例：Home Assistant起動時）のエラーやエラーメッセージを避けるためです。
+
+## Home Assistant MCP Server
+
+### 概要
+
+Home Assistant MCP (Model Context Protocol) Serverは、KiroからHome Assistantインスタンスに直接アクセスし、操作するためのツールです。このツールを使用することで、以下のような操作が可能になります：
+
+- エンティティの状態取得と制御
+- オートメーション、スクリプト、シーンの管理
+- ダッシュボードの作成と更新
+- デバイスとエリアの管理
+- 統計データと履歴の取得
+- システム情報の確認
+
+### 利用可能なツール
+
+MCP Serverは多数のツールを提供していますが、主要なものは以下の通りです：
+
+#### エンティティ操作
+- `ha_get_state`: エンティティの状態を取得
+- `ha_call_service`: サービスを呼び出してエンティティを制御
+- `ha_search_entities`: エンティティを検索
+- `ha_get_overview`: システム全体の概要を取得
+
+#### 設定管理
+- `ha_config_get_automation`: オートメーション設定を取得
+- `ha_config_set_automation`: オートメーションを作成・更新
+- `ha_config_get_script`: スクリプト設定を取得
+- `ha_config_set_script`: スクリプトを作成・更新
+- `ha_config_set_helper`: ヘルパーエンティティを作成・更新
+
+#### ダッシュボード管理
+- `ha_config_list_dashboards`: ダッシュボード一覧を取得
+- `ha_config_get_dashboard`: ダッシュボード設定を取得
+- `ha_config_set_dashboard`: ダッシュボードを作成・更新
+- `ha_get_dashboard_guide`: ダッシュボード設定ガイドを取得
+- `ha_get_card_documentation`: カード種類のドキュメントを取得
+
+#### データ取得
+- `ha_get_history`: エンティティの履歴データを取得
+- `ha_get_statistics`: 長期統計データを取得
+- `ha_get_logbook`: ログブックエントリを取得
+
+#### テンプレート
+- `ha_eval_template`: Jinja2テンプレートを評価
+
+### 使用例
+
+#### エンティティの状態確認
+
+```
+ha_get_state(entity_id="sensor.living_room_temperature")
+```
+
+#### ライトの制御
+
+```
+ha_call_service(
+  domain="light",
+  service="turn_on",
+  entity_id="light.living_room",
+  data={"brightness_pct": 75, "color_temp_kelvin": 2700}
+)
+```
+
+#### オートメーションの作成
+
+```
+ha_config_set_automation(
+  config={
+    "alias": "Motion Light",
+    "trigger": [{"platform": "state", "entity_id": "binary_sensor.motion", "to": "on"}],
+    "action": [{"service": "light.turn_on", "target": {"entity_id": "light.hallway"}}]
+  }
+)
+```
+
+#### テンプレートの評価
+
+```
+ha_eval_template(template="{{ states('sensor.temperature') | float }}")
+```
+
+### ベストプラクティス
+
+1. **エンティティIDの確認**: 操作前に `ha_search_entities` や `ha_get_overview` でエンティティIDを確認する
+2. **設定の取得**: 既存の設定を変更する場合は、まず `ha_config_get_*` で現在の設定を取得する
+3. **テンプレートのテスト**: 複雑なテンプレートは `ha_eval_template` で事前にテストする
+4. **ドキュメントの参照**: 不明な点は `ha_get_domain_docs` や `ha_get_dashboard_guide` でドキュメントを確認する
+5. **バックアップ**: 重要な変更を行う前は `ha_backup_create` でバックアップを作成する
+
+### 注意事項
+
+- MCP Serverを使用するには、Home Assistantインスタンスへの接続設定が必要です
+- 一部の操作には管理者権限が必要な場合があります
+- 設定変更後は、必要に応じてHome Assistantの再起動や設定の再読み込みが必要です
+- 機密情報（トークン、パスワードなど）は適切に管理してください
