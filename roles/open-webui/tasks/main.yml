@@ -39,6 +39,31 @@
     - open-webui_open-webui
     - open-webui_open-webui_config
 
+- name: "open-webui : Pull latest Docker image"
+  community.docker.docker_image_pull:
+    name: ghcr.io/open-webui/open-webui
+    tag: main
+  notify: "open-webui: Restart"
+  tags:
+    - open-webui
+    - update
+    - docker
+    - open-webui_open-webui
+    - open-webui_open-webui_update
+
+- name: "mcpo : Pull latest Docker image"
+  community.docker.docker_image_pull:
+    name: ghcr.io/open-webui/mcpo
+    tag: latest
+  notify: "open-webui: Restart"
+  tags:
+    - open-webui
+    - update
+    - docker
+    - mcpo
+    - open-webui_mcpo
+    - open-webui_mcpo_update
+
 - name: "open-webui : Enable Apache proxy modules"
   community.general.apache2_module:
     name: "{{ item }}"

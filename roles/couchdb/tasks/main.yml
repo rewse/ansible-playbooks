@@ -37,6 +37,18 @@
     - couchdb_couchdb
     - couchdb_couchdb_config
 
+- name: "couchdb : Pull latest Docker image"
+  community.docker.docker_image_pull:
+    name: apache/couchdb
+    tag: latest
+  notify: "couchdb: Restart"
+  tags:
+    - couchdb
+    - update
+    - docker
+    - couchdb_couchdb
+    - couchdb_couchdb_update
+
 - name: "couchdb : Download init script"
   ansible.builtin.get_url:
     url: https://raw.githubusercontent.com/vrtmrz/obsidian-livesync/main/utils/couchdb/couchdb-init.sh

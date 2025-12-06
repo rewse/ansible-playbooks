@@ -60,6 +60,18 @@
     - homeassistant_docker
     - homeassistant_docker_config
 
+- name: "docker : Pull latest Docker image"
+  community.docker.docker_image_pull:
+    name: ghcr.io/home-assistant/home-assistant
+    tag: stable
+  notify: "homeassistant: Restart"
+  tags:
+    - homeassistant
+    - update
+    - docker
+    - homeassistant_docker
+    - homeassistant_docker_update
+
 # Ref: https://github.com/home-assistant/core/issues/117768
 - name: "apparmor : Download docker-default"
   ansible.builtin.get_url:
