@@ -25,6 +25,7 @@
       - svn
       - tmux
       - tree
+      - uv
       - watch
       - yamllint
       - zsh-vi-mode
