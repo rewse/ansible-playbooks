@@ -186,7 +186,7 @@
     - darwin_security
     - darwin_security_install
 
-# - name: Install rest of the apps
+# - name: "package : Install rest of the apps"
 #   install_yourself:
 #     - https://www.blackmagicdesign.com/jp/products/davinciresolve/  # DaVinci Resolve
 #     - https://www.insta360.com/download/insta360-link2c             # Insta360 Link Controller

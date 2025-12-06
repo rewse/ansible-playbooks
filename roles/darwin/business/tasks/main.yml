@@ -1,15 +1,18 @@
 ---
-- name: Install packages by homebrew
+- name: "package : Install packages by homebrew"
   community.general.homebrew:
     name: 
       - node@20
     update_homebrew: true
   tags:
-    - darwin-business
+    - darwin
+    - darwin_business
+    - install
     - package
-    - homebrew
+    - darwin_package
+    - darwin_package_install
 
-- name: Install packages by homebrew_cask
+- name: "package : Install packages by homebrew_cask"
   community.general.homebrew_cask:
     name: 
       - asana
@@ -25,20 +28,26 @@
       - webex-meetings
     update_homebrew: true
   tags:
-    - darwin-business
+    - darwin
+    - darwin_business
+    - install
     - package
-    - cask
+    - darwin_package
+    - darwin_package_install
 
-- name: Install packages by mas
+- name: "package : Install packages by mas"
   ansible.builtin.command: mas install {{ item }}
   loop:
     - 1212616790  # Microsoft To Do
     - 1639692859  # WattsConnected
   ignore_errors: true
   tags:
-    - darwin-business
+    - darwin
+    - darwin_business
+    - install
     - package
-    - mas
+    - darwin_package
+    - darwin_package_install
 
 # Install toolbox
 # Ref: https://docs.hub.amazon.dev/builder-toolbox/user-guide/getting-started/
@@ -46,15 +55,18 @@
 # Run `mwinit -o` before the command
 
 # Ref: https://w.amazon.com/bin/view/Isengard-cli/
-- name: Register isengard-cli repository
+- name: "toolbox : Register isengard-cli repository"
   ansible.builtin.command: toolbox registry add s3://buildertoolbox-registry-isengard-cli-us-west-2/tools.json
   tags:
-    - darwin-business
-    - package
+    - darwin
+    - darwin_business
+    - init
     - toolbox
+    - darwin_toolbox
+    - darwin_toolbox_init
 
 # Ref: https://w.amazon.com/bin/view/DevAccount/Docs
-- name: Install with toolbox
+- name: "toolbox : Install with toolbox"
   ansible.builtin.command: toolbox install {{ item }}
   loop:
     - ada
@@ -63,33 +75,45 @@
     - kiro-cli
     - mcp-registry
   tags:
-    - darwin-business
-    - package
+    - darwin
+    - darwin_business
+    - install
     - toolbox
+    - darwin_toolbox
+    - darwin_toolbox_install
 
-- name: Update toolbox
+- name: "toolbox : Update toolbox"
   ansible.builtin.command: toolbox update
   tags:
-    - darwin-business
-    - package
+    - darwin
+    - darwin_business
+    - install
     - toolbox
+    - darwin_toolbox
+    - darwin_toolbox_install
 
-- name: Install Kiro
+- name: "kiro : Install Kiro"
   ansible.builtin.command: axe init kiro
   tags:
-    - darwin-business
-    - package
+    - darwin
+    - darwin_business
+    - install
     - kiro
+    - darwin_kiro
+    - darwin_kiro_install
 
-- name: Install MCP servers
+- name: "mcp : Install MCP servers"
   ansible.builtin.command: mcp-registry install {{ item }}
   loop:
     - builder-mcp
   tags:
-    - darwin-business
-    - package
+    - darwin
+    - darwin_business
+    - install
     - mcp
+    - darwin_mcp
+    - darwin_mcp_install
 
-# - name: Install rest of the apps
+# - name: "package: Install rest of the apps"
 #   install_yourself:
 #     - https://www.poly.com/us/en/products/services/cloud/poly-lens  # Poly Lens
