@@ -1,5 +1,5 @@
 ---
-- name: Install packages by homebrew_cask
+- name: "package : Install packages by homebrew_cask"
   community.general.homebrew_cask:
     name: 
       - charles
@@ -18,18 +18,24 @@
       - ticktick
     update_homebrew: true
   tags:
-    - darwin-personal
+    - darwin
+    - darwin_personal
+    - install
     - package
-    - cask
+    - darwin_package
+    - darwin_package_install
 
-- name: Install qwen
+- name: "qwen : Install qwen"
   ansible.builtin.command: npm install -g @qwen-code/qwen-code@latest
   tags:
-    - darwin-personal
-    - package
-    - qwen-code
+    - darwin
+    - darwin_personal
+    - install
+    - qwen
+    - darwin_qwen
+    - darwin_qwen_install
 
-# - name: Install rest of the apps
+# - name: "package : Install rest of the apps"
 #   install_yourself:
 #     - https://adblink.me/download/                                  # adbLink
 #     - https://www.houdah.com/houdahGPS/download.html                # HoudahGPS
