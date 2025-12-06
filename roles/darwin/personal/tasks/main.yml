@@ -37,16 +37,6 @@
     - darwin_package
     - darwin_package_install
 
-- name: "qwen : Install qwen"
-  ansible.builtin.command: npm install -g @qwen-code/qwen-code@latest
-  tags:
-    - darwin
-    - darwin_personal
-    - install
-    - qwen
-    - darwin_qwen
-    - darwin_qwen_install
-
 # - name: "package : Install rest of the apps"
 #   install_yourself:
 #     - https://adblink.me/download/                                  # adbLink
