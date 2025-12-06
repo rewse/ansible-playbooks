@@ -205,8 +205,6 @@
 - name: "security : Install Aikido Safe Chain"
   ansible.builtin.shell: |
     curl -fsSL https://raw.githubusercontent.com/AikidoSec/safe-chain/main/install-scripts/install-safe-chain.sh | sh -s -- --include-python
-  args:
-    creates: ~/.aikido/safe-chain
   tags:
     - darwin
     - install
