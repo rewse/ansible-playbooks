@@ -35,7 +35,7 @@
           ports:
             - "4000:4000"
           volumes:
-            - /srv/litellm/config.yaml:/app/config.yaml:ro
+            - /srv/litellm/config.yml:/app/config.yml:ro
           environment:
             - AWS_ACCESS_KEY_ID={{ litellm_aws_access_key_id }}
             - AWS_SECRET_ACCESS_KEY={{ litellm_aws_secret_access_key }}
@@ -44,7 +44,7 @@
             - LITELLM_MASTER_KEY={{ litellm_master_key }}
             - LITELLM_SALT_KEY={{ litellm_salt_key }}
           restart: unless-stopped
-          command: ["--config", "/app/config.yaml", "--port", "4000"]
+          command: ["--config", "/app/config.yml", "--port", "4000"]
   notify: Restart litellm
   tags:
     - litellm
