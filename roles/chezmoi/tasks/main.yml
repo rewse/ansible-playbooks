@@ -20,10 +20,15 @@
     - chezmoi_chezmoi
     - chezmoi_chezmoi_install
 
-- name: "chezmoi : Check initialization status for root"
+- name: "chezmoi : Check initialization status"
   ansible.builtin.stat:
-    path: /root/.local/share/chezmoi/.git
-  register: chezmoi_root_initialized
+    path: "{{ item.home }}/.local/share/chezmoi/.git"
+  become: true
+  become_user: "{{ item.user }}"
+  loop:
+    - { user: "root", home: "/root" }
+    - { user: "{{ admin }}", home: "/home/{{ admin }}" }
+  register: chezmoi_initialized
   when: ansible_facts["system"] == "Linux"
   tags:
     - chezmoi
@@ -31,53 +36,30 @@
     - chezmoi_chezmoi
     - chezmoi_chezmoi_install
 
-- name: "chezmoi : Initialize for root"
+- name: "chezmoi : Initialize"
   ansible.builtin.command: chezmoi init rewse
+  become: true
+  become_user: "{{ item.item.user }}"
+  loop: "{{ chezmoi_initialized.results }}"
   when:
     - ansible_facts["system"] == "Linux"
-    - not chezmoi_root_initialized.stat.exists
+    - not item.stat.exists
   tags:
     - chezmoi
     - init
     - chezmoi_chezmoi
     - chezmoi_chezmoi_init
 
-- name: "chezmoi : Update and apply for root"
+- name: "chezmoi : Update and apply"
   ansible.builtin.command: chezmoi update --force
+  become: true
+  become_user: "{{ item }}"
   environment:
     OP_SERVICE_ACCOUNT_TOKEN: "{{ onepassword_token }}"
+  loop:
+    - root
+    - "{{ admin }}"
   when: ansible_facts["system"] == "Linux"
-  tags:
-    - chezmoi
-    - update
-    - chezmoi_chezmoi
-    - chezmoi_chezmoi_update
-
-- name: "chezmoi : Check initialization status for admin"
-  ansible.builtin.stat:
-    path: /home/{{ admin }}/.local/share/chezmoi/.git
-  register: chezmoi_admin_initialized
-  tags:
-    - chezmoi
-    - init
-    - chezmoi_chezmoi
-    - chezmoi_chezmoi_install
-
-- name: "chezmoi : Initialize for admin"
-  ansible.builtin.command: chezmoi init rewse
-  become_user: "{{ admin }}"
-  when: not chezmoi_admin_initialized.stat.exists
-  tags:
-    - chezmoi
-    - init
-    - chezmoi_chezmoi
-    - chezmoi_chezmoi_init
-
-- name: "chezmoi : Update and apply for admin"
-  ansible.builtin.command: chezmoi update --force
-  become_user: "{{ admin }}"
-  environment:
-    OP_SERVICE_ACCOUNT_TOKEN: "{{ onepassword_token }}"
   tags:
     - chezmoi
     - update
