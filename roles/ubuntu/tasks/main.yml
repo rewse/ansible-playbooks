@@ -265,6 +265,18 @@
     - ubuntu_kiro-cli
     - ubuntu_kiro-cli_update
 
+- name: "qwen-code : Install"
+  community.general.npm:
+    name: "@qwen/qwen-code"
+    global: true
+    state: present
+  tags:
+    - ubuntu
+    - install
+    - qwen-code
+    - ubuntu_qwen-code
+    - ubuntu_qwen-code_install
+
 - name: "uv : Install"
   ansible.builtin.shell: curl -LsSf https://astral.sh/uv/install.sh | sh
   args:

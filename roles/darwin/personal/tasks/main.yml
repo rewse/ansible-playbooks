@@ -2,7 +2,7 @@
 - name: "package : Install packages by homebrew"
   community.general.homebrew:
     name: 
-      - gemini-cli
+      - qwen-code
     update_homebrew: true
   tags:
     - darwin
