@@ -202,6 +202,18 @@
     - raspberrypi_ssh
     - raspberrypi_ssh_config
 
+- name: "qwen-code : Install"
+  community.general.npm:
+    name: "@qwen-code/qwen-code@latest"
+    global: true
+    state: present
+  tags:
+    - raspberrypi
+    - install
+    - qwen-code
+    - raspberrypi_qwen-code
+    - raspberrypi_qwen-code_install
+
 - name: "backup : Create mount point"
   ansible.builtin.file:
     path: /mnt/bak
