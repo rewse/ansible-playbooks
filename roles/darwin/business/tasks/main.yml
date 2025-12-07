@@ -94,6 +94,8 @@
 
 - name: "kiro : Install Kiro"
   ansible.builtin.command: axe init kiro
+  args:
+    creates: /Applications/Kiro.app
   tags:
     - darwin
     - darwin_business
