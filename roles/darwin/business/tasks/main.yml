@@ -105,6 +105,8 @@
 - name: "mcp : Install MCP servers"
   ansible.builtin.command: mcp-registry install {{ item }}
   loop:
+    - aws-outlook-mcp
+    - aws-sentral-mcp
     - builder-mcp
   tags:
     - darwin
