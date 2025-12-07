@@ -212,6 +212,24 @@
     - darwin_security
     - darwin_security_install
 
+# Note: This task requires sudo password. Run the playbook with -K or --ask-become-pass option.
+# Example: ansible-playbook darwin-personal.yml --ask-become-pass
+- name: "path : Copy path configurations"
+  ansible.builtin.copy:
+    src: "{{ item }}"
+    dest: /etc/paths.d/{{ item }}
+    mode: '0644'
+  become: true
+  loop:
+    - homebrew
+    - local
+  tags:
+    - darwin
+    - config
+    - path
+    - darwin_path
+    - darwin_path_config
+
 # - name: "package : Install rest of the apps"
 #   install_yourself:
 #     - https://www.blackmagicdesign.com/jp/products/davinciresolve/  # DaVinci Resolve
