@@ -1,9 +1,0 @@
----
-- hosts: ubuntu
-  become: yes
-  remote_user: ubuntu
-  tags: [maintenance]
-  tasks:
-    - name: Include SSL certificate maintenance tasks
-      include_tasks: roles/sslcert/tasks/maintenance.yml
-      tags: [sslcert, maintenance]
