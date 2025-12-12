@@ -31,7 +31,7 @@
     - sslcert_certbot_init
 
 - name: "certbot : Install packages with uv"
-  ansible.builtin.shell: uv pip install --upgrade \
+  ansible.builtin.shell: uv pip install --upgrade --upgrade-strategy eager
       certbot \
       certbot-apache \
       certbot-dns-route53
