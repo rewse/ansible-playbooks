@@ -1,11 +1,13 @@
 #!/bin/bash
 
-. /opt/certbot/bin/activate
+# Activate certbot virtual environment
+source /opt/certbot/bin/activate
 
-pip-review -a
+# Update certbot packages
+VIRTUAL_ENV=/opt/certbot uv pip install --upgrade certbot certbot-apache certbot-dns-route53
 
-sleep 10
+# Renew certificates
+certbot renew --quiet
 
-certbot renew -q
-
-systemctl restart apache2
+# Restart Apache if running
+systemctl is-active --quiet apache2 && systemctl restart apache2

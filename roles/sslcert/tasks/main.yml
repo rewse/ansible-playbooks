@@ -47,7 +47,7 @@
   ansible.builtin.template:
     src: certbot.cron.j2
     dest: /etc/cron.monthly/certbot
-    mode: '0644'
+    mode: '0755'
     variable_start_string: "[%"
     variable_end_string: "%]"
   tags:
