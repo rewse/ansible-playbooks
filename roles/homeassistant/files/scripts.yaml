@@ -24,6 +24,36 @@ darken_living_room:
               push:
                 interruption-level: time-sensitive
               url: "/lovelace/overview"
+    - if:
+        - condition: state
+          entity_id: switch.living_area_floor_heating
+          state: "on"
+      then:
+        - action: switch.turn_off
+          target:
+            entity_id: switch.living_area_floor_heating
+        - action: notify.tats_devices
+          data:
+            message: "Turned off Living Area Floor Heating"
+            data:
+              push:
+                interruption-level: time-sensitive
+              url: "/lovelace/overview"
+    - if:
+        - condition: state
+          entity_id: switch.living_room_humidifier
+          state: "on"
+      then:
+        - action: switch.turn_off
+          target:
+            entity_id: switch.living_room_humidifier
+        - action: notify.tats_devices
+          data:
+            message: "Turned off Living Room Humidifier"
+            data:
+              push:
+                interruption-level: time-sensitive
+              url: "/lovelace/overview"
   icon: "mdi:bed"
 force_entrance_door:
   alias: "Force Entrance Door"
