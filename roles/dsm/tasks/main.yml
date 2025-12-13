@@ -1,0 +1,28 @@
+---
+- name: "ssh : Add StrictModes in sshd_config"
+  ansible.builtin.lineinfile:
+    path: /etc/ssh/sshd_config
+    insertafter: '^#StrictModes yes'
+    line: 'StrictModes no'
+  notify: "ssh: Restart"
+  tags:
+    - dsm
+    - config
+    - ssh
+    - dsm_ssh
+    - dsm_ssh_config
+
+- name: "user : Configure passwordless sudo for admin"
+  ansible.builtin.lineinfile:
+    dest: /etc/sudoers.d/00-{{ admin }}
+    regexp: '^{{ admin }}'
+    line: '{{ admin }} ALL=(ALL) NOPASSWD: ALL'
+    create: true
+    mode: '0440'
+    validate: 'visudo -cf %s'
+  tags:
+    - dsm
+    - config
+    - user
+    - dsm_user
+    - dsm_user_config
