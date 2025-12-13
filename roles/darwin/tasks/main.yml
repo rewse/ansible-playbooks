@@ -18,10 +18,12 @@
       - pv
       - pwgen
       - python3
+      - pyright
       - switchaudio-osx
-      - telnet
       - svn
+      - telnet
       - tree
+      - typescript-language-server
       - uv
       - watch
       - zsh-vi-mode
