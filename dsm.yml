@@ -1,0 +1,8 @@
+---
+- hosts: dsm
+  become: true
+  remote_user: "{{ admin }}"
+  vars:
+    ansible_python_interpreter: /volume1/@appstore/Python3.9/usr/bin/python3.9
+  roles:
+    - dsm
