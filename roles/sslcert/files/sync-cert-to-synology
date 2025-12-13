@@ -1,0 +1,99 @@
+#!/bin/bash
+#
+# Sync Let's Encrypt certificates to Synology NAS
+# Based on: https://github.com/catchdave/ssl-certs/blob/main/replace_synology_ssl_certs.sh
+#
+
+set -euo pipefail
+
+CERT_DIR="/etc/letsencrypt/live/rewse.jp"
+NAS_HOST="guppy.rewse.jp"
+NAS_USER="tats"
+LOG_FILE="/var/log/cert-sync.log"
+
+log() {
+    echo "$(date '+%Y-%m-%d %H:%M:%S') - $1" | tee -a "$LOG_FILE"
+}
+
+if [[ ! -f "$CERT_DIR/cert.pem" || ! -f "$CERT_DIR/chain.pem" || ! -f "$CERT_DIR/fullchain.pem" || ! -f "$CERT_DIR/privkey.pem" ]]; then
+    log "ERROR: Certificate files not found in $CERT_DIR"
+    exit 1
+fi
+
+log "Starting certificate sync to $NAS_HOST"
+
+log "Copying certificates..."
+scp -O "$CERT_DIR/cert.pem" "$CERT_DIR/chain.pem" "$CERT_DIR/fullchain.pem" "$CERT_DIR/privkey.pem" \
+    "$NAS_USER@$NAS_HOST:/tmp/"
+
+# Ref: https://github.com/catchdave/ssl-certs/blob/main/replace_synology_ssl_certs.sh
+log "Updating certificates on NAS..."
+ssh "$NAS_USER@$NAS_HOST" << 'REMOTE_EOF'
+    set -euo pipefail
+
+    info() { echo "[INFO ] $1"; }
+    warn() { echo "[WARN ] $1"; }
+
+    CERTS_SRC_DIR="/usr/syno/etc/certificate/system/default"
+    PACKAGES_TO_RESTART=("ScsiTarget" "SynologyDrive" "WebDAVServer" "ActiveBackup")
+
+    # Build target directories list
+    TARGET_CERT_DIRS=(
+        "/usr/syno/etc/certificate/system/FQDN"
+        "/usr/local/etc/certificate/ScsiTarget/pkg-scsi-plugin-server/"
+        "/usr/local/etc/certificate/SynologyDrive/SynologyDrive/"
+        "/usr/local/etc/certificate/WebDAVServer/webdav/"
+        "/usr/local/etc/certificate/ActiveBackup/ActiveBackup/"
+        "/usr/syno/etc/certificate/smbftpd/ftpd/"
+    )
+
+    # Add the default archive directory
+    if [[ -f /usr/syno/etc/certificate/_archive/DEFAULT ]]; then
+        DEFAULT_DIR_NAME=$(</usr/syno/etc/certificate/_archive/DEFAULT)
+        if [[ -n "$DEFAULT_DIR_NAME" ]]; then
+            TARGET_CERT_DIRS+=("/usr/syno/etc/certificate/_archive/${DEFAULT_DIR_NAME}")
+            info "Default cert directory: /usr/syno/etc/certificate/_archive/${DEFAULT_DIR_NAME}"
+        fi
+    fi
+
+    # Add reverse proxy directories
+    for proxy in /usr/syno/etc/certificate/ReverseProxy/*/; do
+        [[ -d "$proxy" ]] && TARGET_CERT_DIRS+=("$proxy")
+    done
+
+    # Move certificates to default directory
+    sudo mv /tmp/{privkey,fullchain,cert,chain}.pem "$CERTS_SRC_DIR/"
+    sudo chown root:root "$CERTS_SRC_DIR"/{privkey,fullchain,cert,chain}.pem
+    sudo chmod 400 "$CERTS_SRC_DIR"/{privkey,fullchain,cert,chain}.pem
+    info "Certs moved to $CERTS_SRC_DIR"
+
+    # Copy certificates to all target directories
+    for target_dir in "${TARGET_CERT_DIRS[@]}"; do
+        if [[ ! -d "$target_dir" ]]; then
+            continue
+        fi
+        info "Copying certificates to '$target_dir'"
+        sudo cp "$CERTS_SRC_DIR"/{privkey,fullchain,cert,chain}.pem "$target_dir/" 2>/dev/null || \
+        sudo cp "$CERTS_SRC_DIR"/{privkey,fullchain,cert}.pem "$target_dir/"
+        sudo chown root:root "$target_dir"/*.pem
+        sudo chmod 400 "$target_dir"/*.pem
+    done
+
+    # Restart packages that are installed and turned on
+    info "Restarting packages..."
+    for package in "${PACKAGES_TO_RESTART[@]}"; do
+        if /usr/syno/bin/synopkg is_onoff "$package" 1>/dev/null 2>&1; then
+            info "Restarting $package"
+            /usr/syno/bin/synopkg restart "$package" || warn "Failed to restart $package"
+        fi
+    done
+
+    # Regenerate and reload nginx
+    info "Reloading nginx..."
+    sudo /usr/syno/bin/synow3tool --gen-all
+    sudo systemctl reload nginx
+
+    info "Certificate update completed"
+REMOTE_EOF
+
+log "Certificate sync completed successfully"

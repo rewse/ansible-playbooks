@@ -86,6 +86,27 @@
 #     --agree-tos
 #   tags: [sslcert, init]
 
+- name: "certbot : Copy sync-cert-to-synology script"
+  ansible.builtin.copy:
+    src: sync-cert-to-synology
+    dest: /usr/local/sbin/sync-cert-to-synology
+    mode: '0755'
+  tags:
+    - sslcert
+    - config
+    - sslcert_certbot
+    - sslcert_certbot_config
+
+- name: "certbot : Configure logrotate"
+  ansible.builtin.copy:
+    src: certbot.logrotate
+    dest: /etc/logrotate.d/certbot
+  tags:
+    - sslcert
+    - config
+    - sslcert_certbot
+    - sslcert_certbot_config
+
 - name: "apache : Set SSL certificate path"
   ansible.builtin.lineinfile:
     path: /etc/apache2/sites-available/000-default-ssl.conf
