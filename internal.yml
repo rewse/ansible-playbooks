@@ -1,6 +1,0 @@
----
-- hosts: internal
-  become: true
-  remote_user: ubuntu
-  roles:
-    - mhz19
