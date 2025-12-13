@@ -10,7 +10,7 @@
     - enecoq-data-fetcher_enecoq-data-fetcher_init
 
 - name: "enecoq-data-fetcher : Install chromium via playwright"
-  ansible.builtin.command: uvx --from enecoq-data-fetcher playwright install chromium --force
+  ansible.builtin.command: npx playwright install chromium --force
   tags:
     - enecoq-data-fetcher
     - install
