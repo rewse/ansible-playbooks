@@ -70,6 +70,8 @@
   alias: "Select Mom’s Room Presence Mode"
   triggers:
     - trigger: state
+      entity_id: sensor.moms_room_motion_count
+    - trigger: state
       entity_id: binary_sensor.moms_room_presence
       for:
         minutes: 1
@@ -78,16 +80,23 @@
   actions:
     - choose:
         - conditions:
-            - condition: state
-              entity_id: binary_sensor.moms_room_presence
-              state: "on"
-              for:
-                minutes: 1
+            - or:
+                - condition: numeric_state
+                  entity_id: sensor.mom_room_motion_count
+                  above: 5
+                - condition: state
+                  entity_id: binary_sensor.moms_room_presence
+                  state: "on"
+                  for:
+                    minutes: 1
           sequence:
             - action: input_boolean.turn_on
               target: 
                 entity_id: input_boolean.moms_room_presence_mode
         - conditions:
+            - condition: numeric_state
+              entity_id: sensor.mom_room_motion_count
+              below: 6
             - condition: state
               entity_id: binary_sensor.moms_room_presence
               state: "off"

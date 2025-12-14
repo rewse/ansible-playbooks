@@ -80,6 +80,13 @@
   max_age:
     hours: 8
 - platform: statistics
+  unique_id: sensor.moms_room_motion_count
+  name: "Mom’s Room Motion Count"
+  entity_id: binary_sensor.moms_room_motion
+  state_characteristic: count
+  max_age:
+    minutes: 10
+- platform: statistics
   unique_id: sensor.moms_room_temp_difference_average
   name: "Mom’s Room Temperature Difference Average"
   entity_id: sensor.moms_room_temp_difference
