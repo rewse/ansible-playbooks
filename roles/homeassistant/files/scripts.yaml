@@ -26,12 +26,12 @@ darken_living_room:
               url: "/lovelace/overview"
     - if:
         - condition: state
-          entity_id: switch.living_area_floor_heating
+          entity_id: switch.living_area_floor_heatings
           state: "on"
       then:
         - action: switch.turn_off
           target:
-            entity_id: switch.living_area_floor_heating
+            entity_id: switch.living_area_floor_heatings
         - action: notify.tats_devices
           data:
             message: "Turned off Living Area Floor Heating"
