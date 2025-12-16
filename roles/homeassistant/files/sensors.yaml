@@ -45,6 +45,14 @@
   state_characteristic: mean
   max_age:
     hours: 8
+- platform: integration
+  unique_id: sensor.dads_room_youth_energy_total
+  name: "Dad’s Room youth Energy Total"
+  source: sensor.dads_room_youth_power_current
+  unit_prefix: k
+  round: 6
+  max_sub_interval:
+    minutes: 5
 
 # Living Room
 

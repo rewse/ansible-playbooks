@@ -1,0 +1,94 @@
+---
+- name: "homebrew : Install required packages"
+  community.general.homebrew:
+    name:
+      - jq
+      - mosquitto
+    state: present
+  tags:
+    - power-monitor
+    - install
+    - homebrew
+    - power-monitor_homebrew
+    - power-monitor_homebrew_install
+
+- name: "power-monitor : Create directories"
+  ansible.builtin.file:
+    path: "{{ item }}"
+    state: directory
+    mode: '0755'
+  loop:
+    - "{{ ansible_facts['env']['HOME'] }}/.local/bin"
+    - "{{ ansible_facts['env']['HOME'] }}/.config/power-monitor-mqtt"
+  tags:
+    - power-monitor
+    - config
+    - power-monitor_power-monitor
+    - power-monitor_power-monitor_config
+
+- name: "power-monitor : Download MQTT script from GitHub"
+  ansible.builtin.get_url:
+    url: "{{ power_monitor_mqtt_script_url }}"
+    dest: "{{ ansible_facts['env']['HOME'] }}/.local/bin/power-monitor-mqtt"
+    mode: '0755'
+    force: yes
+  tags:
+    - power-monitor
+    - config
+    - power-monitor_power-monitor
+    - power-monitor_power-monitor_config
+
+- name: "power-monitor : Download configuration file from GitHub"
+  ansible.builtin.get_url:
+    url: "{{ power_monitor_mqtt_config_url }}"
+    dest: "{{ ansible_facts['env']['HOME'] }}/.config/power-monitor-mqtt/config"
+    mode: '0600'
+    force: yes
+  tags:
+    - power-monitor
+    - config
+    - power-monitor_power-monitor
+    - power-monitor_power-monitor_config
+
+- name: "power-monitor : Configure MQTT host"
+  ansible.builtin.lineinfile:
+    path: "{{ ansible_facts['env']['HOME'] }}/.config/power-monitor-mqtt/config"
+    regexp: '^MQTT_HOST='
+    line: 'MQTT_HOST="{{ mosquitto_host }}"'
+  tags:
+    - power-monitor
+    - config
+    - power-monitor_power-monitor
+    - power-monitor_power-monitor_config
+
+- name: "power-monitor : Configure MQTT password"
+  ansible.builtin.lineinfile:
+    path: "{{ ansible_facts['env']['HOME'] }}/.config/power-monitor-mqtt/config"
+    regexp: '^MQTT_PASSWORD='
+    line: 'MQTT_PASSWORD="{{ mosquitto_password }}"'
+  tags:
+    - power-monitor
+    - config
+    - power-monitor_power-monitor
+    - power-monitor_power-monitor_config
+
+- name: "power-monitor : Test MQTT script"
+  ansible.builtin.command:
+    cmd: "{{ ansible_facts['env']['HOME'] }}/.local/bin/power-monitor-mqtt --test"
+  register: power_monitor_test
+  changed_when: false
+  failed_when: power_monitor_test.rc != 0
+  tags:
+    - power-monitor
+    - test
+    - power-monitor_power-monitor
+    - power-monitor_power-monitor_test
+
+- name: "power-monitor : Display test results"
+  ansible.builtin.debug:
+    var: power_monitor_test.stdout
+  tags:
+    - power-monitor
+    - test
+    - power-monitor_power-monitor
+    - power-monitor_power-monitor_test
