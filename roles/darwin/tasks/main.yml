@@ -14,6 +14,7 @@
       - mas
       - node
       - osv-scanner
+      - pandoc
       - php
       - pv
       - pwgen
@@ -87,6 +88,17 @@
       - wireshark
       - zoom
     update_homebrew: true
+  tags:
+    - darwin
+    - install
+    - package
+    - darwin_package
+    - darwin_package_install
+
+- name: "package : Install package by uv"
+  ansible.builtin.command: uv tool install {{ item }}
+  loop:
+    - docling
   tags:
     - darwin
     - install
@@ -238,4 +250,5 @@
 #     - https://www.insta360.com/download/insta360-link2c             # Insta360 Link Controller
 #     - https://www.ireasoning.com/mibbrowser.shtml                   # MIB Browser
 #     - https://prowritingaid.com/everywhere-download-mac             # ProWritingAid Everywhere
+#     - https://github.com/SAP/power-monitoring-tool-for-macos        # SAP Power Monitor
 #     - https://www.xencelabs.com/support/download-drivers/           # Xencelabs Driver
