@@ -1,4 +1,20 @@
 sensor:
+  - unique_id: sensor.dads_room_youth_power_average
+    name: "Dad’s Room youth Power Average"
+    state_topic: "power-monitor/youth/power/average"
+    value_template: "{{ value_json.value }}"
+    unit_of_measurement: "W"
+    state_class: measurement
+    device_class: power
+    icon: "mdi:flash"
+  - unique_id: sensor.dads_room_youth_power_current
+    name: "Dad’s Room youth Power Current"
+    state_topic: "power-monitor/youth/power/current"
+    value_template: "{{ value_json.value }}"
+    unit_of_measurement: "W"
+    state_class: measurement
+    device_class: power
+    icon: "mdi:flash"
   # Do not use mhz19 integration because it cannot the correct value
   - unique_id: sensor.dads_room_co2
     name: "Dad’s Room CO2"

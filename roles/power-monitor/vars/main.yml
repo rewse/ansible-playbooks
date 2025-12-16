@@ -1,0 +1,4 @@
+power_monitor_mqtt_script_url: "https://raw.githubusercontent.com/rewse/power-monitor-mqtt/main/power-monitor-mqtt.sh"
+power_monitor_mqtt_config_url: "https://raw.githubusercontent.com/rewse/power-monitor-mqtt/main/config.example"
+mosquitto_host: "hass.rewse.jp"
+mosquitto_password: "{{ lookup('pipe', 'op read op://ansible/Mosquitto/credential') }}"
