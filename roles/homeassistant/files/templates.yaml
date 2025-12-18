@@ -290,6 +290,18 @@
     state_class: measurement
     device_class: temperature
     icon: "mdi:thermometer-water"
+  - unique_id: sensor.dads_room_youth_power_average_corrected
+    name: "Dad's Room Youth Power Average Corrected"
+    state: "{{ (float(states('sensor.dads_room_youth_power_average'), 0) * 1.2) }}"
+    unit_of_measurement: "W"
+    device_class: power
+    state_class: measurement
+  - unique_id: sensor.dads_room_youth_power_current_corrected
+    name: "Dad's Room Youth Power Current Corrected"
+    state: "{{ (float(states('sensor.dads_room_youth_power_current'), 0) * 1.2) }}"
+    unit_of_measurement: "W"
+    device_class: power
+    state_class: measurement
   # Living Room
   - unique_id: sensor.living_room_ac_mode
     name: "Living Room AC Mode"
