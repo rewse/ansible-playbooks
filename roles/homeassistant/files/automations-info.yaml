@@ -8,7 +8,7 @@
   actions:
     - delay:
         seconds: 5
-    - action: notify.all_devices
+    - action: notify.tats_devices
       data:
         title: "💳 Luxury Card"
         message: "{{ states('sensor.aplus_time') }}に{{ states('sensor.aplus_amount') }}円の利用がありました"
