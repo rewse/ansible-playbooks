@@ -987,7 +987,7 @@
                             interruption-level: time-sensitive
                           url: "/lovelace/overview"
                     - delay:
-                        seconds: 10
+                        hours: 2
         - conditions:
             - condition: state
               entity_id: binary_sensor.moms_room_temp_high
