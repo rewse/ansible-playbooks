@@ -18,7 +18,7 @@
   authentication: digest
   username: !secret regza_username
   password: !secret regza_password
-  sensor:
+  binary_sensor:
     - unique_id: binary_sensor.regza_volume_muted
       name: "REGZA Volume Muted"
       value_template: "{{ value_json.mute == 'on' }}"
