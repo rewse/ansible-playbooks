@@ -2,9 +2,21 @@
 - name: "zabbix-money-market : Clone repository"
   ansible.builtin.git:
     repo: git@github.com:rewse/stock-price-fetcher.git
-    dest: /srv/stock-price-fetcher
+    dest: /usr/lib/zabbix/stock-price-fetcher
     accept_hostkey: true
     key_file: /home/{{ admin }}/.ssh/id_rsa
+  tags:
+    - zabbix-money-market
+    - install
+    - zabbix-money-market_zabbix-money-market
+    - zabbix-money-market_zabbix-money-market_install
+
+- name: "zabbix-money-market : Set ownership"
+  ansible.builtin.file:
+    path: /usr/lib/zabbix/stock-price-fetcher
+    owner: zabbix
+    group: zabbix
+    recurse: yes
   tags:
     - zabbix-money-market
     - install
@@ -14,7 +26,8 @@
 - name: "zabbix-money-market : Sync dependencies"
   ansible.builtin.command: uv sync
   args:
-    chdir: /srv/stock-price-fetcher
+    chdir: /usr/lib/zabbix/stock-price-fetcher
+  become_user: zabbix
   tags:
     - zabbix-money-market
     - install
