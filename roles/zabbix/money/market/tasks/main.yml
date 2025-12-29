@@ -1,27 +1,25 @@
 ---
-- name: "zabbix-money-market : Install packages"
-  ansible.builtin.apt:
-    name:
-      - python3-bs4
-      - python3-requests
-    update_cache: true
-  tags: [zabbix-money-market, install]
-
 - name: "zabbix-money-market : Clone repository"
   ansible.builtin.git:
-    repo: git@github.com:rewse/market-price-check.git
-    dest: /srv/git/market-price-check
+    repo: git@github.com:rewse/stock-price-fetcher.git
+    dest: /srv/stock-price-fetcher
     accept_hostkey: true
     key_file: /home/{{ admin }}/.ssh/id_rsa
-  tags: [zabbix-money-market, install]
+  tags:
+    - zabbix-money-market
+    - install
+    - zabbix-money-market_zabbix-money-market
+    - zabbix-money-market_zabbix-money-market_install
 
-- name: "zabbix-money-market : Copy script to /usr/local/bin"
-  ansible.builtin.copy:
-    src: /srv/git/market-price-check/market-price-check
-    dest: /usr/local/bin/
-    mode: '0755'
-    remote_src: true
-  tags: [zabbix-money-market, config]
+- name: "zabbix-money-market : Sync dependencies"
+  ansible.builtin.command: uv sync
+  args:
+    chdir: /srv/stock-price-fetcher
+  tags:
+    - zabbix-money-market
+    - install
+    - zabbix-money-market_zabbix-money-market
+    - zabbix-money-market_zabbix-money-market_install
 
 - name: "zabbix-money-market : Copy external script"
   ansible.builtin.copy:
@@ -29,5 +27,9 @@
     dest: /usr/lib/zabbix/externalscripts
     mode: '0755'
   loop:
-    - market-price-check.sh
-  tags: [zabbix-money-market, config]
+    - stock-price-fetcher.sh
+  tags:
+    - zabbix-money-market
+    - config
+    - zabbix-money-market_zabbix-money-market
+    - zabbix-money-market_zabbix-money-market_config
