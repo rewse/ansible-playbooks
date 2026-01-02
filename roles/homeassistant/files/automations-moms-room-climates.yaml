@@ -1016,6 +1016,41 @@
                 hours: 2
   trace:
     stored_traces: 100
+- id: automation.toggle_moms_room_air_purifier
+  alias: "Toggle Mom’s Room Air Purifier"
+  triggers:
+    - trigger: state
+      entity_id: alarm_control_panel.home
+    - trigger: homeassistant
+      event: start
+  actions:
+    - choose:
+        - conditions:
+            - condition: state
+              entity_id: alarm_control_panel.home
+              state:
+                - "armed_home"
+                - "disarmed"
+          sequence:
+            - action: fan.set_preset_mode
+              target:
+                entity_id: fan.moms_room_air_purifier
+              data:
+                preset_mode: "auto"
+        - conditions:
+            - condition: state
+              entity_id: alarm_control_panel.home
+              state:
+                - "armed_away"
+                - "armed_vacation"
+          sequence:
+            - action: fan.set_preset_mode
+              target:
+                entity_id: fan.moms_room_air_purifier
+              data:
+                preset_mode: "pet"
+  trace:
+    stored_traces: 100
 - id: automation.toggle_moms_room_humidifier
   alias: "Toggle Mom’s Room Humidifier"
   triggers:
