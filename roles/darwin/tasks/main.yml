@@ -120,6 +120,18 @@
     - darwin_package
     - darwin_package_upgrade
 
+- name: "package : Remove invalid npm global package-lock file"
+  ansible.builtin.file:
+    path: /opt/homebrew/lib/node_modules/.package-lock.json
+    state: absent
+  ignore_errors: true
+  tags:
+    - darwin
+    - upgrade
+    - package
+    - darwin_package
+    - darwin_package_upgrade
+
 - name: "package : Update global npm packages"
   ansible.builtin.command: npm update -g
   tags:
