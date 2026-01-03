@@ -93,7 +93,7 @@
 - name: "httpd : Add apt key for mod_pagespeed"
   ansible.builtin.apt_key:
     url: https://dl.google.com/linux/linux_signing_key.pub
-  when: ansible_architecture == "x86_64"
+  when: ansible_facts["architecture"] == "x86_64"
   tags:
     - httpd
     - install

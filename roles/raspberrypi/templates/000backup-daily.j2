@@ -2,7 +2,7 @@
 set -euo pipefail
 
 # Configuration
-readonly REMOTE="guppy:/volume1/Backup/{{ ansible_hostname }}"
+readonly REMOTE="guppy:/volume1/Backup/{{ ansible_facts['hostname'] }}"
 readonly SRC="/"
 readonly DEST="/mnt/bak"
 readonly EXCLUDE_FILE="/etc/tmbackup.exclude"
