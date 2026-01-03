@@ -289,12 +289,12 @@ handlers:
   ansible.builtin.apt:
     name: apache2
     state: present
-  when: ansible_os_family == "Debian"
+  when: ansible_facts["os_family"] == "Debian"
 
 # 複雑な条件の場合
 - name: Set complex condition
   ansible.builtin.set_fact:
-    should_install: "{{ ansible_os_family == 'Debian' and ansible_distribution_version is version('18.04', '>=') }}"
+    should_install: "{{ ansible_facts['os_family'] == 'Debian' and ansible_facts['distribution_version'] is version('18.04', '>=') }}"
 
 - name: Install package with complex condition
   ansible.builtin.apt:

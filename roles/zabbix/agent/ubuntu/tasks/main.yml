@@ -32,7 +32,7 @@
   ansible.builtin.lineinfile:
     dest: /etc/zabbix/zabbix_agentd.conf
     regexp: "Hostname="
-    line: "Hostname={{ ansible_nodename }}"
+    line: "Hostname={{ ansible_facts['nodename'] }}"
   notify: "zabbix-agent: Restart"
   tags: [zabbix-agent-ubuntu, config]
 

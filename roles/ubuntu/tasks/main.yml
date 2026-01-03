@@ -21,24 +21,11 @@
     - ubuntu_github_install
     - ubuntu_github_download
 
-- name: "github : Add apt repository (amd64)"
+- name: "github : Add apt repository"
   ansible.builtin.apt_repository:
-    repo: "deb [arch=amd64 signed-by=/etc/apt/keyrings/githubcli-archive-keyring.gpg] https://cli.github.com/packages stable main"
+    repo: "deb [arch={{ ansible_facts['architecture'] | replace('x86_64', 'amd64') | replace('aarch64', 'arm64') }} signed-by=/etc/apt/keyrings/githubcli-archive-keyring.gpg] https://cli.github.com/packages stable main"
     filename: github-cli
-  when: ansible_architecture == "x86_64"
-  tags:
-    - ubuntu
-    - install
-    - github
-    - ubuntu_github
-    - ubuntu_github_install
-    - ubuntu_github_config
-
-- name: "github : Add apt repository (arm64)"
-  ansible.builtin.apt_repository:
-    repo: "deb [arch=arm64 signed-by=/etc/apt/keyrings/githubcli-archive-keyring.gpg] https://cli.github.com/packages stable main"
-    filename: github-cli
-  when: ansible_architecture == "aarch64"
+  when: ansible_facts["architecture"] in ["x86_64", "aarch64"]
   tags:
     - ubuntu
     - install
@@ -73,7 +60,7 @@
 
 - name: "1password : Add apt repository"
   ansible.builtin.apt_repository:
-    repo: "deb [arch={{ ansible_architecture | replace('x86_64', 'amd64') | replace('aarch64', 'arm64') }} signed-by=/usr/share/keyrings/1password-archive-keyring.gpg] https://downloads.1password.com/linux/debian/{{ ansible_architecture | replace('x86_64', 'amd64') | replace('aarch64', 'arm64') }} stable main"
+    repo: "deb [arch={{ ansible_facts['architecture'] | replace('x86_64', 'amd64') | replace('aarch64', 'arm64') }} signed-by=/usr/share/keyrings/1password-archive-keyring.gpg] https://downloads.1password.com/linux/debian/{{ ansible_facts['architecture'] | replace('x86_64', 'amd64') | replace('aarch64', 'arm64') }} stable main"
     filename: 1password
   tags:
     - ubuntu
@@ -196,7 +183,7 @@
 
 - name: "awscliv2 : Download and extract"
   ansible.builtin.unarchive:
-    src: https://awscli.amazonaws.com/awscli-exe-linux-{{ ansible_architecture }}.zip
+    src: https://awscli.amazonaws.com/awscli-exe-linux-{{ ansible_facts["architecture"] }}.zip
     dest: /usr/local/src
     remote_src: true
   when: not aws.stat.exists
@@ -492,11 +479,6 @@
 
 - name: "package : Update global npm packages"
   ansible.builtin.command: npm update -g
-  become: true
-  become_user: "{{ item }}"
-  loop:
-    - root
-    - "{{ admin }}"
   tags:
     - ubuntu
     - upgrade

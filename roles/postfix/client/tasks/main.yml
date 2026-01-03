@@ -4,7 +4,7 @@
     dest: /etc/postfix/main.cf
     insertafter: "^myhostname "
     regexp: "^myhostname "
-    line: "myhostname = {{ ansible_nodename }}"
+    line: "myhostname = {{ ansible_facts['nodename'] }}"
   notify: "postfix: Reload"
   tags:
     - postfix-client

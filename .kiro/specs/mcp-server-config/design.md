@@ -129,7 +129,7 @@ ansible-infrastructure/
 
 ```yaml
 # デフォルト変数
-mcp_config_dir: "{{ ansible_env.HOME }}/.config"
+mcp_config_dir: "{{ ansible_facts['env']['HOME'] }}/.config"
 mcp_config_file: "{{ mcp_config_dir }}/mcp.json"
 
 # デフォルトのMCPサーバー設定
