@@ -1,4 +1,14 @@
 ---
+- name: "zabbix-money-market : Remove existing repository if exists"
+  ansible.builtin.file:
+    path: /usr/lib/zabbix/stock-price-fetcher
+    state: absent
+  tags:
+    - zabbix-money-market
+    - install
+    - zabbix-money-market_zabbix-money-market
+    - zabbix-money-market_zabbix-money-market_install
+
 - name: "zabbix-money-market : Clone repository"
   ansible.builtin.git:
     repo: git@github.com:rewse/stock-price-fetcher.git
