@@ -210,6 +210,25 @@
     - httpd_httpd
     - httpd_httpd_config
 
+- name: "httpd : Copy blog redirect config"
+  ansible.builtin.copy:
+    src: 01-blog-redirect.conf
+    dest: /etc/apache2/conf-available
+  tags:
+    - httpd
+    - config
+    - httpd_httpd
+    - httpd_httpd_config
+
+- name: "httpd : Enable blog redirect config"
+  ansible.builtin.command: a2enconf 01-blog-redirect
+  notify: "apache: Reload"
+  tags:
+    - httpd
+    - config
+    - httpd_httpd
+    - httpd_httpd_config
+
 - name: "httpd : Copy admin config"
   ansible.builtin.template:
     src: admin.conf.j2
