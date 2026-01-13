@@ -96,6 +96,26 @@
     - package
     - darwin_package
     - darwin_package_install
+  
+- name: "package: Install global npm packages"
+  ansible.builtin.command: npm install -g {{ item }}
+  loop:
+    - agent-browser
+  tags:
+    - darwin
+    - install
+    - package
+    - darwin_package
+    - darwin_package_install
+
+- name: "package: Install Chrome for agent-browser"
+  ansible.builtin.command: agent-browser install
+  tags:
+    - darwin
+    - install
+    - package
+    - darwin_package
+    - darwin_package_install
 
 - name: "package : Install package by uv"
   ansible.builtin.command: uv tool install {{ item }}
