@@ -16,6 +16,7 @@
       - osv-scanner
       - pandoc
       - php
+      - podman
       - pv
       - pwgen
       - python3
