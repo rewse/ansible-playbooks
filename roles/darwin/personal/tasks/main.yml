@@ -3,6 +3,7 @@
   community.general.homebrew:
     name: 
       - qwen-code
+      - vips
     update_homebrew: true
   tags:
     - darwin
