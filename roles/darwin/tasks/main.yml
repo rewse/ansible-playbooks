@@ -112,6 +112,7 @@
   ansible.builtin.command: npm install -g {{ item }}
   loop:
     - agent-browser
+    - "@playwright/mcp@latest"
   tags:
     - darwin
     - install
