@@ -97,7 +97,10 @@
   alias: "Select Dad’s Room Presence Mode"
   triggers:
     - trigger: state
-      entity_id: sensor.dads_room_motion_count
+      entity_id:
+        - sensor.dads_room_motion_count
+        - binary_sensor.atom_focus
+        - sensor.atom_battery_state
     - trigger: state
       entity_id: binary_sensor.dads_room_presence
       for:
@@ -116,6 +119,17 @@
                   state: "on"
                   for:
                     minutes: 1
+                - and:
+                    - condition: state
+                      entity_id: binary_sensor.atom_focus
+                      state: "on"
+                    - condition: state
+                      entity_id: person.shibata_tats
+                      state: "home"
+                    - not:
+                        - condition: state
+                          entity_id: sensor.atom_battery_state
+                          state: "Not Charging"
           sequence:
             - action: input_boolean.turn_on
               target: 
@@ -129,6 +143,18 @@
               state: "off"
               for:
                 minutes: 1
+            - not:
+                - and:
+                    - condition: state
+                      entity_id: binary_sensor.atom_focus
+                      state: "on"
+                    - condition: state
+                      entity_id: person.shibata_tats
+                      state: "home"
+                    - not:
+                        - condition: state
+                          entity_id: sensor.atom_battery_state
+                          state: "Not Charging"
           sequence:
             - action: input_boolean.turn_off
               target: 
