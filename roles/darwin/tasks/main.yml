@@ -8,8 +8,9 @@
       - bat
       - coreutils
       - direnv
-      - gh
       - fping
+      - gh
+      - gnu-sed
       - git-cliff
       - jq
       - mas
