@@ -1,23 +1,9 @@
 ---
-- name: "package : Install packages by homebrew"
-  community.general.homebrew:
-    name: 
-      - node@20
-    update_homebrew: true
-  tags:
-    - darwin
-    - darwin_business
-    - install
-    - package
-    - darwin_package
-    - darwin_package_install
-
 - name: "package : Install packages by homebrew_cask"
   community.general.homebrew_cask:
     name: 
       - asana
       - box-drive
-      - corretto@8
       - displaylink
       - font-noto-sans-cjk
       - gotomeeting
@@ -110,6 +96,7 @@
     - aws-outlook-mcp
     - aws-sentral-mcp
     - builder-mcp
+    - workplace-chat-mcp
   tags:
     - darwin
     - darwin_business
