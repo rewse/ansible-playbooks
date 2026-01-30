@@ -38,7 +38,7 @@
 # Install toolbox
 # Ref: https://docs.hub.amazon.dev/builder-toolbox/user-guide/getting-started/
 
-# Run `mwinit -o` before the command
+# Run `mwinit -f` before the command
 
 # Ref: https://w.amazon.com/bin/view/Isengard-cli/
 - name: "toolbox : Register isengard-cli repository"
@@ -79,7 +79,7 @@
     - darwin_toolbox
     - darwin_toolbox_install
 
-- name: "kiro : Install Kiro"
+- name: "kiro : Install Kiro IDE"
   ansible.builtin.command: axe init kiro
   args:
     creates: /Applications/Kiro.app
