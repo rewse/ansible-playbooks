@@ -56,6 +56,7 @@
   ansible.builtin.command: toolbox install {{ item }}
   loop:
     - ada
+    - aim
     - axe
     - isengard-cli
     - kiro-cli
@@ -90,8 +91,20 @@
     - darwin_kiro
     - darwin_kiro_install
 
-- name: "mcp : Install MCP servers"
-  ansible.builtin.command: mcp-registry install {{ item }}
+- name: "aim : Install Agents"
+  ansible.builtin.command: aim agents install {{ item }}
+  loop:
+    - AIPowerUserCapabilities
+  tags:
+    - darwin
+    - darwin_business
+    - install
+    - aim
+    - darwin_aim
+    - darwin_aim_install
+
+- name: "aim : Install MCP servers"
+  ansible.builtin.command: aim mcp install {{ item }}
   loop:
     - aws-outlook-mcp
     - aws-sentral-mcp
@@ -101,9 +114,9 @@
     - darwin
     - darwin_business
     - install
-    - mcp
-    - darwin_mcp
-    - darwin_mcp_install
+    - aim
+    - darwin_aim
+    - darwin_aim_install
 
 # - name: "package: Install rest of the apps"
 #   install_yourself:
