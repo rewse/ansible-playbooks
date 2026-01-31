@@ -53,11 +53,12 @@
     - litellm_docker
     - litellm_docker_config
 
-- name: "docker : Pull latest Docker image"
-  community.docker.docker_image_pull:
-    name: ghcr.io/berriai/litellm
-    tag: main-stable
-  notify: "litellm: Restart"
+- name: "docker : Pull and update container"
+  community.docker.docker_compose_v2:
+    project_src: /etc
+    services: litellm
+    state: present
+    pull: always
   tags:
     - litellm
     - update
