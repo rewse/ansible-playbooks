@@ -60,11 +60,12 @@
     - homeassistant_docker
     - homeassistant_docker_config
 
-- name: "docker : Pull latest Docker image"
-  community.docker.docker_image_pull:
-    name: ghcr.io/home-assistant/home-assistant
-    tag: stable
-  notify: "homeassistant: Restart"
+- name: "docker : Pull and update container"
+  community.docker.docker_compose_v2:
+    project_src: /etc
+    services: homeassistant
+    state: present
+    pull: always
   tags:
     - homeassistant
     - update

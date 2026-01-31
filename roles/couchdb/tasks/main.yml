@@ -37,11 +37,12 @@
     - couchdb_couchdb
     - couchdb_couchdb_config
 
-- name: "couchdb : Pull latest Docker image"
-  community.docker.docker_image_pull:
-    name: apache/couchdb
-    tag: latest
-  notify: "couchdb: Restart"
+- name: "couchdb : Pull and update container"
+  community.docker.docker_compose_v2:
+    project_src: /etc
+    services: couchdb
+    state: present
+    pull: always
   tags:
     - couchdb
     - update

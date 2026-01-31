@@ -32,11 +32,12 @@
     - matter-server_matter-server
     - matter-server_matter-server_config
 
-- name: "matter-server : Pull latest Docker image"
-  community.docker.docker_image_pull:
-    name: ghcr.io/home-assistant-libs/python-matter-server
-    tag: stable
-  notify: "matter-server: Restart"
+- name: "matter-server : Pull and update container"
+  community.docker.docker_compose_v2:
+    project_src: /etc
+    services: matter-server
+    state: present
+    pull: always
   tags:
     - matter-server
     - update

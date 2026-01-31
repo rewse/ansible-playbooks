@@ -39,11 +39,12 @@
     - open-webui_open-webui
     - open-webui_open-webui_config
 
-- name: "open-webui : Pull latest Docker image"
-  community.docker.docker_image_pull:
-    name: ghcr.io/open-webui/open-webui
-    tag: main
-  notify: "open-webui: Restart"
+- name: "open-webui : Pull and update container"
+  community.docker.docker_compose_v2:
+    project_src: /etc
+    services: open-webui
+    state: present
+    pull: always
   tags:
     - open-webui
     - update
@@ -51,11 +52,12 @@
     - open-webui_open-webui
     - open-webui_open-webui_update
 
-- name: "mcpo : Pull latest Docker image"
-  community.docker.docker_image_pull:
-    name: ghcr.io/open-webui/mcpo
-    tag: latest
-  notify: "open-webui: Restart"
+- name: "mcpo : Pull and update container"
+  community.docker.docker_compose_v2:
+    project_src: /etc
+    services: mcpo
+    state: present
+    pull: always
   tags:
     - open-webui
     - update
