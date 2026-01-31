@@ -121,6 +121,17 @@
     - darwin_package
     - darwin_package_install
 
+- name: "package: Fix agent-browser binary permissions"
+  ansible.builtin.file:
+    path: /opt/homebrew/lib/node_modules/agent-browser/bin/agent-browser-darwin-arm64
+    mode: '0755'
+  tags:
+    - darwin
+    - install
+    - package
+    - darwin_package
+    - darwin_package_install
+
 - name: "package: Install Chrome for agent-browser"
   ansible.builtin.command: agent-browser install
   tags:
