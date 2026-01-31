@@ -187,7 +187,6 @@
 - name: "package : Install packages by mas"
   ansible.builtin.command: mas install {{ item }}
   loop:
-    - 1512372293  # 3DMark
     - 302584613   # Amazon Kindle
     - 545519333   # Amazon Prime Video
     - 1168254295  # AmorphousDiskMark
@@ -199,7 +198,6 @@
     - 1436994560  # Portal
     - 1187772509  # stts
     - 899247664   # TestFlight
-    - 1385561119  # Ubiquiti WiFiman
     - 494803304   # WiFi Explorer
     - 1295203466  # Windows App
     - 1451685025  # WireGuard
