@@ -6,7 +6,6 @@ readonly REMOTE="guppy:/volume1/Backup/{{ ansible_facts['hostname'] }}"
 readonly SRC="/"
 readonly DEST="/mnt/bak"
 readonly EXCLUDE_FILE="/etc/tmbackup.exclude"
-readonly BACKUP_STRATEGY="1:1 30:7 90:30"
 
 # Cleanup function
 cleanup() {
@@ -34,7 +33,7 @@ if ! mountpoint -q "${DEST}"; then
 fi
 
 # Run backup
-nice -n 10 tmbackup --strategy "${BACKUP_STRATEGY}" "${SRC}" "${DEST}" "${EXCLUDE_FILE}" > /dev/null
+nice -n 10 tmbackup "${SRC}" "${DEST}" "${EXCLUDE_FILE}" > /dev/null
 
 # Cleanup with success status
 trap - INT TERM EXIT
