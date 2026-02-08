@@ -70,6 +70,10 @@
   triggers:
     - trigger: state
       entity_id: input_select.living_room_light_mode
+    - trigger: state
+      entity_id: input_boolean.living_room_presence_mode
+      for:
+        hours: 1
     - trigger: homeassistant
       event: start
   actions:
@@ -124,6 +128,20 @@
                 entity_id: input_select.living_room_scene
               data:
                 option: scene.living_room_midnight
+        - conditions:
+            - condition: state
+              entity_id: input_select.living_room_light_mode
+              state: "Midnight"
+            - condition: state
+              entity_id: input_boolean.living_room_presence_mode
+              state: "off"
+              for:
+                hours: 1
+            - condition: state
+              entity_id: alarm_control_panel.home
+              state: "armed_home"
+          sequence:
+            - action: script.darken_living_room
   trace:
     stored_traces: 100
 - id: automation.select_living_room_tv_light_scene
