@@ -169,6 +169,7 @@ living_room_light_mode:
     - "Night"
     - "Late Night"
     - "Midnight"
+    - "Dark"
   icon: "mdi:lightbulb-auto"
 living_room_regza_content_type_mode:
   name: "Living Room Regza Content Type Mode"
