@@ -138,7 +138,7 @@ dads_room_light_auto_off_minutes:
   max: 60
   unit_of_measurement: "min"
   icon: "mdi:lightbulb-group-off"
-dads_room_presence_sensitibity_minutes:
+dads_room_presence_sensitivity_minutes:
   name: "Dad’s Room Presence Sensitivity Minutes"
   min: 0
   max: 60
@@ -453,7 +453,7 @@ living_room_humidity_target_absent_winter:
   max: 100
   unit_of_measurement: "%"
   icon: "mdi:water-percent"
-living_room_presence_sensitibity_minutes:
+living_room_presence_sensitivity_minutes:
   name: "Living Room Presence Sensitivity Minutes"
   min: 0
   max: 60
@@ -824,7 +824,7 @@ moms_room_light_auto_off_minutes:
   max: 60
   unit_of_measurement: "min"
   icon: "mdi:lightbulb-group-off"
-moms_room_presence_sensitibity_minutes:
+moms_room_presence_sensitivity_minutes:
   name: "Mom’s Room Presence Sensitivity Minutes"
   min: 0
   max: 60
