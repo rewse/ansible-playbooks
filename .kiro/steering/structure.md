@@ -2,22 +2,24 @@
 inclusion: always
 ---
 
-# プロジェクト構造
+# Project Structure
 
-## トップレベルの構成
-- **プレイブック**: ルートレベルの YAML ファイル（例：`site.yml`, `ubuntu.yml`, `ec2.yml`）
-- **インベントリ**: `hosts` ファイルのホスト定義
-- **設定**: `ansible.cfg` の Ansible 設定
-- **グループ変数**: `group_vars/` ディレクトリに保存
-- **ロール**: `roles/` ディレクトリのモジュラーコンポーネント
+## Top-Level Organization
 
-## プレイブック構造
-プレイブックは一貫したパターンに従います：
-- ターゲットホストの定義
-- 共通パラメータの設定（become, remote_user）
-- 関連するロールの適用
+- **Playbooks**: Root-level YAML files (e.g., `site.yml`, `ubuntu.yml`, `ec2.yml`)
+- **Inventory**: Host definitions in `hosts` file
+- **Configuration**: Ansible configuration in `ansible.cfg`
+- **Group Variables**: Stored in `group_vars/` directory
+- **Roles**: Modular components in `roles/` directory
 
-例：
+## Playbook Structure
+
+Playbooks follow a consistent pattern:
+- Define target hosts
+- Set common parameters (become, remote_user)
+- Apply relevant roles
+
+Example:
 ```yaml
 ---
 - hosts: ubuntu
@@ -30,43 +32,77 @@ inclusion: always
     - dotfiles/linux
 ```
 
-タスク例：
+Task example:
 ```yaml
-- name: Install required packages
-  ansible.builtin.apt:
-    name: "{{ item }}"
-    state: present
-  loop: "{{ required_packages }}"
-  tags: [ubuntu, package]
+- name: "ntp : Configure NTP servers"
+  ansible.builtin.lineinfile:
+    path: /etc/systemd/timesyncd.conf
+    regexp: '^#?NTP='
+    line: 'NTP=ntp.nict.jp ntp.jst.mfeed.ad.jp'
+  notify: "systemd-timesyncd: Restart"
+  tags:
+    - raspberrypi
+    - config
+    - time
+    - raspberrypi_ntp
+    - raspberrypi_ntp_config
 ```
 
-## ロール構造
-各ロールは標準的な Ansible ディレクトリ構造に従います：
-- `tasks/`: ロールのタスクを含む main.yml
-- `handlers/`: タスクによってトリガーされるイベントハンドラー
-- `templates/`: Jinja2 テンプレート（*.j2）
-- `files/`: ホストにコピーする静的ファイル
-- `vars/`: ロール固有の変数
-- `meta/`: ロールの依存関係とメタデータ
+## Role Structure
 
-## 変数の階層
-1. **グループ変数**: `group_vars/group_name/vars`
-2. **Vault 変数**: `group_vars/group_name/vault`
-3. **ロール変数**: `roles/role_name/vars/main.yml`
-4. **ホスト変数**: インベントリまたは別のファイルで定義
+Each role follows standard Ansible directory structure:
+- `tasks/`: main.yml containing role tasks
+- `handlers/`: Event handlers triggered by tasks
+- `templates/`: Jinja2 templates (*.j2)
+- `files/`: Static files to copy to hosts
+- `vars/`: Role-specific variables
+- `meta/`: Role dependencies and metadata
 
-## 命名規則
-- **ファイル**: アンダースコアまたはハイフン付きの小文字を使用
-- **変数**: スネークケース（アンダースコア付きの小文字）を使用
-- **ロール**: その目的を反映した説明的な名前を使用
-- **タグ**: ロール名をプレフィックスとしてカテゴリを続ける（例：`ubuntu,package`）
-- **タグのフォーマット**: タグは配列形式で記述する（例：`tags: [ubuntu, package]`）
+## Variable Hierarchy
 
-## ベストプラクティス
-- 関連するロールをサブディレクトリに整理する（例：`zabbix/agent/ubuntu`）
-- 選択的な実行のためにタグを一貫して使用する
-- タグは常に配列形式で記述する（例：`tags: [ubuntu, package]`）
-- ロールは単一の責任に焦点を当てる
-- サービスの再起動やその他のトリガーされるアクションにはハンドラーを活用する
-- 動的構成ファイルにはテンプレートを使用する
-- 機密データは Vault ファイルに保存する
+1. **Group Variables**: `group_vars/group_name/vars`
+2. **Role Variables**: `roles/role_name/vars/main.yml`
+3. **Host Variables**: Defined in inventory or separate files
+
+## Naming Conventions
+
+- **Files**: Use lowercase with underscores or hyphens
+- **Variables**: Use snake_case (lowercase with underscores)
+- **Roles**: Use lowercase descriptive names reflecting their purpose
+- **Submodules**: Use lowercase names (e.g., `ntp`, `swap`, `ssh`)
+- **Task Names**: Format as `"{submodule} : {Description}"` where:
+  - Submodule name is lowercase
+  - Description starts with uppercase letter
+  - Example: `"ntp : Configure NTP servers"`, `"ec2 : Install packages"`
+- **Tags**: All lowercase (e.g., `raspberrypi`, `config`, `raspberrypi_ntp_config`)
+- **Common Tag Categories**: `install`, `config`, `update`, `init`
+
+### Tag Structure
+
+Tags should follow a hierarchical pattern for flexible filtering:
+1. **Role name**: Base role identifier (e.g., `raspberrypi`)
+2. **Category**: Action type (e.g., `install`, `config`, `init`, `update`)
+3. **Submodule**: Specific component being configured (e.g., `ntp`, `swap`, `ssh`)
+4. **Combined tags**: For precise targeting
+   - `{role}_{submodule}` (e.g., `raspberrypi_ntp`)
+   - `{role}_{submodule}_{category}` (e.g., `raspberrypi_ntp_config`)
+
+Example tag set:
+```yaml
+tags:
+  - raspberrypi          # Role level
+  - config               # Category level
+  - ntp                  # Submodule level
+  - raspberrypi_ntp      # Role + submodule
+  - raspberrypi_ntp_config  # Role + submodule + category
+```
+
+## Best Practices
+
+- You MUST organize related roles in subdirectories (e.g., `zabbix/agent/ubuntu`)
+- You SHOULD use tags consistently for selective execution
+- You MUST write tags in YAML list format with proper indentation
+- You MUST focus roles on single responsibility
+- You SHOULD leverage handlers for service restarts and other triggered actions
+- You SHOULD use templates for dynamic configuration files
+- YOu MUST store sensitive data in 1Password

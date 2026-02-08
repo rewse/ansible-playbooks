@@ -2,25 +2,25 @@
 inclusion: always
 ---
 
-# Ansible インフラストラクチャ管理リポジトリ
+# Ansible Infrastructure Management Repository
 
-このリポジトリには、様々な環境にわたるインフラストラクチャコンポーネントを管理するための Ansible プレイブックとロールが含まれています。対象となるインフラストラクチャには以下が含まれます：
+This repository contains Ansible playbooks and roles for managing infrastructure components across various environments. Target infrastructure includes:
 
-- Ubuntu サーバー
-- AWS の EC2 インスタンス
-- Raspberry Pi デバイス
-- macOS マシン（ビジネス用と個人用）
+- Ubuntu servers
+- macOS machines (business and personal)
+- AWS EC2 instances
+- Raspberry Pi devices
 
-このオートメーションは以下のような幅広いサービスとアプリケーションをカバーしています：
+This automation covers a wide range of services and applications:
 
-- Home Assistant によるホームオートメーション
-- Web サーバー（Apache, Nginx）
-- データベースシステム（CouchDB）
-- 監視ソリューション（Zabbix）
-- IoT デバイスと統合（SwitchBot, Matter, MQTT）
-- 開発環境
-- セキュリティ設定と SSL 証明書
-- Docker 環境
-- クラウドサービス統合
+- Home automation with Home Assistant
+- Web servers (Apache, Nginx)
+- Database systems (CouchDB)
+- Monitoring solutions (Zabbix)
+- IoT devices and integrations (SwitchBot, Matter, MQTT)
+- Development environments
+- Security configuration and SSL certificates
+- Docker environments
+- Cloud service integrations
 
-このリポジトリは、複数のホストとプラットフォームにわたって一貫した環境を維持するための中央構成管理システムとして機能します。
+This repository serves as a central configuration management system for maintaining consistent environments across multiple hosts and platforms.
