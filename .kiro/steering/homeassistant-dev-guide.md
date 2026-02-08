@@ -1,6 +1,6 @@
 # Home Assistant Development Guide
 
-## Search, Control, Manager, Monitor
+## Search, Control, Manage, Monitor
 
 When performing the following operations on Home Assistant, you MUST delegate them by `printf "{{prompt}}\n/quit\n" | kiro-cli chat --agent homeassistant`:
 - Searching and finding Home Assistant entities, devices, and configurations
