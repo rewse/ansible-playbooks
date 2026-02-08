@@ -908,42 +908,8 @@
                 hours: 2
   trace:
     stored_traces: 100
-- id: automation.toggle_living_room_fan
-  alias: "Toggle Living Room Fan"
-  triggers:
-    - trigger: time_pattern
-      minutes: "/5"
-      seconds: 4
-    - trigger: homeassistant
-      event: start
-  action:
-    - choose:
-        - conditions:
-            - condition: numeric_state
-              entity_id: sensor.study_motion_count
-              above: 5
-            - condition: state
-              entity_id: fan.living_room_fan
-              state: "off"
-          sequence:
-            - action: fan.turn_on
-              target:
-                entity_id: fan.living_room_fan
-        - conditions:
-            - condition: numeric_state
-              entity_id: sensor.study_motion_count
-              below: 5
-            - condition: state
-              entity_id: fan.living_room_fan
-              state: "on"
-          sequence:
-            - action: fan.turn_off
-              target:
-                entity_id: fan.living_room_fan
-  trace:
-    stored_traces: 100
-- id: automation.toggle_living_area_floor_heating
-  alias: "Toggle Living Area Floor Heating"
+- id: automation.toggle_living_room_ac_heat
+  alias: "Toggle Living Room AC Heat"
   triggers:
     - trigger: state
       entity_id:
@@ -955,7 +921,7 @@
       to: "off"
     - trigger: time_pattern
       minutes: "/5"
-      seconds: 11
+      seconds: 3
     - trigger: homeassistant
       event: start
   conditions:
@@ -972,75 +938,55 @@
               state: "on"
             - condition: state
               entity_id: switch.living_area_floor_heatings
+              state: "on"
+              for:
+                hours: 1
+            - condition: state
+              entity_id: input_boolean.living_room_window_mode
               state: "off"
+              for:
+                hours: 1
+            - not:
+                - condition: state
+                  entity_id: climate.living_room_ac
+                  state: "heat"
             - not:
                 - condition: state
                   entity_id: input_select.time_mode
                   state: "Midnight"
           sequence:
-            - choose:
-                - conditions:
-                    - or:
-                        - condition: state
-                          entity_id: input_boolean.living_room_window_mode
-                          state: "on"
-                          for:
-                            minutes: 10
-                        - condition: state
-                          entity_id: input_select.time_mode
-                          state: "Late Night"
-                  sequence:
-                    - event: "living_room_temp_too_low"
-                - conditions:
-                    - condition: state
-                      entity_id: input_boolean.living_room_window_mode
-                      state: "off"
-                      for:
-                        minutes: 10
-                  sequence:
-                    - action: switch.turn_on
-                      target:
-                        entity_id: switch.living_room_floor_heating
-                    - action: switch.turn_on
-                      target:
-                        entity_id: switch.study_floor_heating
-                    - action: notify.all_devices
-                      data:
-                        message: >-
-                          Turned on Living Area Floor Heating.
-                          Current: {{ states('sensor.living_room_temperature') }}°C
-                        data:
-                          push:
-                            interruption-level: time-sensitive
-                          url: "/lovelace/overview"
-                    - delay:
-                        hours: 2
+            - action: climate.set_temperature
+              target:
+                entity_id: climate.living_room_ac
+              data:
+                hvac_mode: "heat"
+                temperature: "{{ int(states('input_number.living_room_temp_target')) }}"
+            - action: notify.all_devices
+              data:
+                message: >-
+                  Turned on Living Room AC Heat.
+                  Current: {{ states('sensor.living_room_temperature') }}°C
+                data:
+                  push:
+                    interruption-level: time-sensitive
+                  url: "/lovelace/overview"
+            - delay:
+                hours: 2
         - conditions:
             - condition: state
               entity_id: binary_sensor.living_room_temp_high
               state: "on"
-              for:
-                hours: 1
             - condition: state
-              entity_id: switch.living_area_floor_heatings
-              state: "on"
-              for:
-                hours: 1
-            - not:
-                - condition: state
-                  entity_id: alarm_control_panel.home
-                  state: armed_vacation
+              entity_id: climate.living_room_ac
+              state: "heat"
           sequence:
-            - action: switch.turn_off
+            - action: climate.turn_off
               target:
-                entity_id: switch.living_room_floor_heating
-            - action: switch.turn_off
-              target:
-                entity_id: switch.study_floor_heating
+                entity_id: climate.living_room_ac
             - action: notify.all_devices
               data:
                 message: >-
-                  Turned off Living Area Floor Heating.
+                  Turned off Living Room AC Heat.
                   Current: {{ states('sensor.living_room_temperature') }}°C
                 data:
                   push:
@@ -1229,5 +1175,147 @@
         entity_id: climate.living_room_ac
       data:
         hvac_mode: "fan_only"
+  trace:
+    stored_traces: 100
+- id: automation.toggle_living_room_fan
+  alias: "Toggle Living Room Fan"
+  triggers:
+    - trigger: time_pattern
+      minutes: "/5"
+      seconds: 4
+    - trigger: homeassistant
+      event: start
+  action:
+    - choose:
+        - conditions:
+            - condition: numeric_state
+              entity_id: sensor.study_motion_count
+              above: 5
+            - condition: state
+              entity_id: fan.living_room_fan
+              state: "off"
+          sequence:
+            - action: fan.turn_on
+              target:
+                entity_id: fan.living_room_fan
+        - conditions:
+            - condition: numeric_state
+              entity_id: sensor.study_motion_count
+              below: 5
+            - condition: state
+              entity_id: fan.living_room_fan
+              state: "on"
+          sequence:
+            - action: fan.turn_off
+              target:
+                entity_id: fan.living_room_fan
+  trace:
+    stored_traces: 100
+- id: automation.toggle_living_area_floor_heating
+  alias: "Toggle Living Area Floor Heating"
+  triggers:
+    - trigger: state
+      entity_id:
+        - input_number.living_room_temp_target
+        - input_number.living_room_temp_max_diff
+        - input_number.living_room_temp_min_diff
+    - trigger: state
+      entity_id: input_boolean.living_room_window_mode
+      to: "off"
+    - trigger: time_pattern
+      minutes: "/5"
+      seconds: 11
+    - trigger: homeassistant
+      event: start
+  conditions:
+    - condition: state
+      entity_id: input_select.season_mode
+      state: "Winter"
+      for:
+        minutes: 20
+  actions:
+    - choose:
+        - conditions:
+            - condition: state
+              entity_id: binary_sensor.living_room_temp_low
+              state: "on"
+            - condition: state
+              entity_id: switch.living_area_floor_heatings
+              state: "off"
+            - not:
+                - condition: state
+                  entity_id: input_select.time_mode
+                  state: "Midnight"
+          sequence:
+            - choose:
+                - conditions:
+                    - or:
+                        - condition: state
+                          entity_id: input_boolean.living_room_window_mode
+                          state: "on"
+                          for:
+                            minutes: 10
+                        - condition: state
+                          entity_id: input_select.time_mode
+                          state: "Late Night"
+                  sequence:
+                    - event: "living_room_temp_too_low"
+                - conditions:
+                    - condition: state
+                      entity_id: input_boolean.living_room_window_mode
+                      state: "off"
+                      for:
+                        minutes: 10
+                  sequence:
+                    - action: switch.turn_on
+                      target:
+                        entity_id: switch.living_room_floor_heating
+                    - action: switch.turn_on
+                      target:
+                        entity_id: switch.study_floor_heating
+                    - action: notify.all_devices
+                      data:
+                        message: >-
+                          Turned on Living Area Floor Heating.
+                          Current: {{ states('sensor.living_room_temperature') }}°C
+                        data:
+                          push:
+                            interruption-level: time-sensitive
+                          url: "/lovelace/overview"
+                    - delay:
+                        hours: 2
+        - conditions:
+            - condition: state
+              entity_id: binary_sensor.living_room_temp_high
+              state: "on"
+              for:
+                hours: 1
+            - condition: state
+              entity_id: switch.living_area_floor_heatings
+              state: "on"
+              for:
+                hours: 1
+            - not:
+                - condition: state
+                  entity_id: alarm_control_panel.home
+                  state: armed_vacation
+          sequence:
+            - action: switch.turn_off
+              target:
+                entity_id: switch.living_room_floor_heating
+            - action: switch.turn_off
+              target:
+                entity_id: switch.study_floor_heating
+            - action: notify.all_devices
+              data:
+                message: >-
+                  Turned off Living Area Floor Heating.
+                  Current: {{ states('sensor.living_room_temperature') }}°C
+                data:
+                  push:
+                    interruption-level: time-sensitive
+                  url: "/lovelace/overview"
+            - delay:
+                hours: 2
   trace:
     stored_traces: 100
