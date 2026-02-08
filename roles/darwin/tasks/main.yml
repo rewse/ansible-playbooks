@@ -143,7 +143,6 @@
 - name: "package : Install package by uv"
   ansible.builtin.command: uv tool install {{ item }}
   loop:
-    - docling
     - homeassistant-cli
   tags:
     - darwin
