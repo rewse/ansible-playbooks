@@ -1,13 +1,8 @@
----
-inclusion: fileMatch
-fileMatchPattern: '**/homeassistant/**/*.md'
----
-
 # Home Assistant Development Guide
 
 ## Search, Control, Manager, Monitor
 
-When performing the following operation for Home Assistant, you MUST delegate to `homeassistant` agent
+When performing the following operations on Home Assistant, you MUST delegate them by `printf "{{prompt}}\n/quit\n" | kiro-cli chat --agent homeassistant`:
 - Searching and finding Home Assistant entities, devices, and configurations
 - Controlling smart home devices and automations
 - Managing Home Assistant setup, configuration, and troubleshooting
