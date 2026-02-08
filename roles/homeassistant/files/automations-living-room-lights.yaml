@@ -208,7 +208,7 @@
               entity_id: input_select.living_room_regza_content_type_mode
               state: "Off"
       then:
-        # The scene is auto-applied when automation.select_living_room_scene is actioned
+        # The scene is auto-applied when automation.select_living_room_scene is acted
         - action: light.turn_on
           target:
             entity_id: light.living_room_tv_light
