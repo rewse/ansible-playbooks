@@ -1125,7 +1125,7 @@
       to: "Ventilated"
   actions:
     - variables:
-        actioned: false
+        acted: false
     - if:
         - condition: state
           entity_id: climate.living_room_ac
@@ -1138,7 +1138,7 @@
           target:
             entity_id: climate.living_room_ac
         - variables:
-            actioned: true
+            acted: true
     - if:
         - condition: state
           entity_id: switch.living_room_humidifier
@@ -1148,9 +1148,9 @@
           target:
             entity_id: switch.living_room_humidifier
         - variables:
-            actioned: true
+            acted: true
     - if:
-        - "{{ actioned }}"
+        - "{{ acted }}"
       then:
         - action: notify.all_devices
           data:
