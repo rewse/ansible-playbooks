@@ -49,18 +49,11 @@ op read op://ansible/database/password
 # db_password: "{{ lookup('pipe', 'op read op://ansible/database/password') }}"
 ```
 
-## Home Assistant Development
+## Ansible Syntax
 
-When performing the following operation for Home Assistant, you MUST delegate to `homeassistant` agent
-- Searching and finding Home Assistant entities, devices, and configurations
-- Controlling smart home devices and automations
-- Managing Home Assistant setup, configuration, and troubleshooting
-- Monitoring system status, logs, and performance
-- Providing guidance on best practices for home automation
-- Helping with YAML configurations, scripts, and automations
-- Assisting with integrations and add-ons
+You MSUT follow [Ansible YAML Syntax](https://docs.ansible.com/projects/ansible/latest/reference_appendices/YAMLSyntax.html).
 
-### Best Practices
+## Best Practices
 
 - You SHOULD use tags for selective execution
 - You MUST store sensitive data in 1Password and reference with `lookup('pipe', 'op read ...')`
