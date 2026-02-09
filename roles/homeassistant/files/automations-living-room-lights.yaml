@@ -59,19 +59,6 @@
               entity_id: input_select.time_mode
               state: "Midnight"
             - condition: state
-              entity_id: light.living_room_shelf_light
-              state: "on"
-          sequence:
-            - action: input_select.select_option
-              target: 
-                entity_id: input_select.living_room_light_mode
-              data:
-                option: "Midnight"
-        - conditions:
-            - condition: state
-              entity_id: input_select.time_mode
-              state: "Midnight"
-            - condition: state
               entity_id: input_boolean.living_room_presence_mode
               state: "off"
               for:
@@ -81,6 +68,19 @@
               state: "armed_home"
           sequence:
             - action: script.darken_living_room
+        - conditions:
+            - condition: state
+              entity_id: input_select.time_mode
+              state: "Midnight"
+            - condition: state
+              entity_id: light.living_room_shelf_light
+              state: "on"
+          sequence:
+            - action: input_select.select_option
+              target: 
+                entity_id: input_select.living_room_light_mode
+              data:
+                option: "Midnight"
   trace:
     stored_traces: 100
 - id: automation.select_living_room_scene
