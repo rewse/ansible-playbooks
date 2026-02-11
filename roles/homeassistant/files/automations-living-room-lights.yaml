@@ -6,7 +6,7 @@
     - trigger: state
       entity_id: input_boolean.living_room_presence_mode
       for:
-        hours: 1
+        minutes: "{{ states('input_number.living_room_light_auto_off_minutes') }}"
     - trigger: homeassistant
       event: start
   actions:
@@ -62,7 +62,7 @@
               entity_id: input_boolean.living_room_presence_mode
               state: "off"
               for:
-                hours: 1
+                minutes: "{{ states('input_number.living_room_light_auto_off_minutes') }}"
             - condition: state
               entity_id: alarm_control_panel.home
               state: "armed_home"
