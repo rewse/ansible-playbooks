@@ -453,6 +453,12 @@ living_room_humidity_target_absent_winter:
   max: 100
   unit_of_measurement: "%"
   icon: "mdi:water-percent"
+living_room_light_auto_off_minutes:
+  name: "Living Room Light Auto-off Minutes"
+  min: 0
+  max: 60
+  unit_of_measurement: "min"
+  icon: "mdi:lightbulb-group-off"
 living_room_presence_sensitivity_minutes:
   name: "Living Room Presence Sensitivity Minutes"
   min: 0
