@@ -2,7 +2,6 @@
 - name: "package : Install packages by homebrew"
   community.general.homebrew:
     name: 
-      - qwen-code
       - vips
     update_homebrew: true
   tags:
