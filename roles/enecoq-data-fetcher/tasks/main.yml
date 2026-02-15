@@ -35,7 +35,7 @@
   ansible.builtin.copy:
     src: enecoq-data-fetcher.service
     dest: /etc/systemd/system/enecoq-data-fetcher.service
-  notify: "enecoq-data-fetcher : Reload systemd"
+  notify: "Reload systemd"
   tags:
     - enecoq-data-fetcher
     - config
@@ -46,7 +46,7 @@
   ansible.builtin.copy:
     src: enecoq-data-fetcher.timer
     dest: /etc/systemd/system/enecoq-data-fetcher.timer
-  notify: "enecoq-data-fetcher : Reload systemd"
+  notify: "enecoq-data-fetcher : Restart timer"
   tags:
     - enecoq-data-fetcher
     - config

@@ -1,4 +1,10 @@
 ---
-- name: "certbot : Reload systemd"
+- name: "Reload systemd"
   ansible.builtin.systemd:
+    daemon_reload: true
+
+- name: "certbot : Restart timer"
+  ansible.builtin.systemd:
+    name: certbot.timer
+    state: restarted
     daemon_reload: true

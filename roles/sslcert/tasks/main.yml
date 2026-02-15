@@ -58,7 +58,7 @@
   ansible.builtin.copy:
     src: certbot.service
     dest: /etc/systemd/system/certbot.service
-  notify: "certbot : Reload systemd"
+  notify: "Reload systemd"
   tags:
     - sslcert
     - config
@@ -69,7 +69,7 @@
   ansible.builtin.copy:
     src: certbot.timer
     dest: /etc/systemd/system/certbot.timer
-  notify: "certbot : Reload systemd"
+  notify: "certbot : Restart timer"
   tags:
     - sslcert
     - config

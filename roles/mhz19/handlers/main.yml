@@ -1,4 +1,10 @@
 ---
-- name: "mhz19 : Reload systemd"
+- name: "Reload systemd"
   ansible.builtin.systemd:
+    daemon_reload: true
+
+- name: "mhz19 : Restart timer"
+  ansible.builtin.systemd:
+    name: mhz192mqtt.timer
+    state: restarted
     daemon_reload: true
