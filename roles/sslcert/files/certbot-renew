@@ -1,0 +1,22 @@
+#!/bin/bash
+set -euo pipefail
+
+echo "$(date '+%Y-%m-%d %H:%M:%S') - Starting certbot renewal"
+
+source /opt/certbot/bin/activate
+
+echo "$(date '+%Y-%m-%d %H:%M:%S') - Updating certbot packages"
+VIRTUAL_ENV=/opt/certbot uv pip install --upgrade certbot certbot-apache certbot-dns-route53
+
+echo "$(date '+%Y-%m-%d %H:%M:%S') - Renewing certificates"
+certbot renew
+
+if systemctl is-active --quiet apache2; then
+    echo "$(date '+%Y-%m-%d %H:%M:%S') - Restarting Apache"
+    systemctl restart apache2
+fi
+
+echo "$(date '+%Y-%m-%d %H:%M:%S') - Syncing certificates to Synology NAS"
+/usr/local/sbin/sync-cert-to-synology
+
+echo "$(date '+%Y-%m-%d %H:%M:%S') - Certbot renewal completed"
