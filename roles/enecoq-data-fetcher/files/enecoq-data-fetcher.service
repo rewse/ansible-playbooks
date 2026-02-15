@@ -1,0 +1,8 @@
+[Unit]
+Description=Enecoq data fetcher
+After=network-online.target
+Wants=network-online.target
+
+[Service]
+Type=oneshot
+ExecStart=/usr/local/sbin/enecoq-data-fetcher

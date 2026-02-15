@@ -1,0 +1,20 @@
+#!/bin/bash
+set -euo pipefail
+
+sleep $((RANDOM % 60))
+
+uvx enecoq-data-fetcher \
+  --email '[% enecoq.email %]' \
+  --password '[% enecoq.password %]' \
+  --period month \
+  --format json \
+  --output /srv/homeassistant/config/data/enecoq_data.json \
+  || {
+    npx playwright install chromium --force
+    uvx enecoq-data-fetcher \
+      --email '[% enecoq.email %]' \
+      --password '[% enecoq.password %]' \
+      --period month \
+      --format json \
+      --output /srv/homeassistant/config/data/enecoq_data.json
+  }

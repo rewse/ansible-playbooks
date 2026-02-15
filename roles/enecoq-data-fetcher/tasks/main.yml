@@ -18,27 +18,49 @@
     - enecoq-data-fetcher_enecoq-data-fetcher
     - enecoq-data-fetcher_enecoq-data-fetcher_install
 
-- name: "enecoq-data-fetcher : Configure cron job"
+- name: "enecoq-data-fetcher : Install script"
   ansible.builtin.template:
-    src: enecoq-data-fetcher.cron.j2
-    dest: /etc/cron.d/enecoq-data-fetcher
+    src: enecoq-data-fetcher.j2
+    dest: /usr/local/sbin/enecoq-data-fetcher
     variable_start_string: '[%'
     variable_end_string: '%]'
-    mode: '0600'
+    mode: '0700'
   tags:
     - enecoq-data-fetcher
     - config
-    - cron
     - enecoq-data-fetcher_enecoq-data-fetcher
     - enecoq-data-fetcher_enecoq-data-fetcher_config
 
-- name: "enecoq-data-fetcher : Configure logrotate"
+- name: "enecoq-data-fetcher : Install systemd service"
   ansible.builtin.copy:
-    src: enecoq-data-fetcher.logrotate
-    dest: /etc/logrotate.d/enecoq-data-fetcher
+    src: enecoq-data-fetcher.service
+    dest: /etc/systemd/system/enecoq-data-fetcher.service
+  notify: "enecoq-data-fetcher : Reload systemd"
   tags:
     - enecoq-data-fetcher
     - config
-    - logrotate
+    - enecoq-data-fetcher_enecoq-data-fetcher
+    - enecoq-data-fetcher_enecoq-data-fetcher_config
+
+- name: "enecoq-data-fetcher : Install systemd timer"
+  ansible.builtin.copy:
+    src: enecoq-data-fetcher.timer
+    dest: /etc/systemd/system/enecoq-data-fetcher.timer
+  notify: "enecoq-data-fetcher : Reload systemd"
+  tags:
+    - enecoq-data-fetcher
+    - config
+    - enecoq-data-fetcher_enecoq-data-fetcher
+    - enecoq-data-fetcher_enecoq-data-fetcher_config
+
+- name: "enecoq-data-fetcher : Enable and start timer"
+  ansible.builtin.systemd:
+    name: enecoq-data-fetcher.timer
+    enabled: true
+    state: started
+    daemon_reload: true
+  tags:
+    - enecoq-data-fetcher
+    - config
     - enecoq-data-fetcher_enecoq-data-fetcher
     - enecoq-data-fetcher_enecoq-data-fetcher_config
