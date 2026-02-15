@@ -1,0 +1,9 @@
+[Unit]
+Description=Enecoq data fetcher timer
+
+[Timer]
+OnCalendar=*:14,44
+Persistent=true
+
+[Install]
+WantedBy=timers.target
