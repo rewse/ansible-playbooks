@@ -17,8 +17,8 @@
 - name: "ifmetric: Run"
   ansible.builtin.command: ifmetric wlan0 100
 
-- name: "network-failover: Restart"
+- name: "network-failover: Restart timer"
   ansible.builtin.systemd:
-    name: network-failover
+    name: network-failover.timer
     state: restarted
     daemon_reload: true

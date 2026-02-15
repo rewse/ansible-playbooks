@@ -1,0 +1,9 @@
+[Unit]
+Description=Network Failover Monitor Timer
+
+[Timer]
+OnBootSec=1min
+OnUnitActiveSec=1min
+
+[Install]
+WantedBy=timers.target

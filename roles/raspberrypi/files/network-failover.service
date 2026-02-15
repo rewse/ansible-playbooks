@@ -1,12 +1,6 @@
 [Unit]
 Description=Network Failover Monitor
-After=network.target
 
 [Service]
-Type=simple
+Type=oneshot
 ExecStart=/usr/local/sbin/network-failover
-Restart=always
-RestartSec=10
-
-[Install]
-WantedBy=multi-user.target

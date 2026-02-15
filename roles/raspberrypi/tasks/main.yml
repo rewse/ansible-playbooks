@@ -197,16 +197,26 @@
   ansible.builtin.copy:
     src: network-failover.service
     dest: /etc/systemd/system
-  notify: "network-failover: Restart"
   tags:
     - raspberrypi
     - config
     - raspberrypi_network-failover
     - raspberrypi_network-failover_config
 
-- name: "network-failover : Enable service"
+- name: "network-failover : Copy timer"
+  ansible.builtin.copy:
+    src: network-failover.timer
+    dest: /etc/systemd/system
+  notify: "network-failover: Restart timer"
+  tags:
+    - raspberrypi
+    - config
+    - raspberrypi_network-failover
+    - raspberrypi_network-failover_config
+
+- name: "network-failover : Enable timer"
   ansible.builtin.systemd:
-    name: network-failover
+    name: network-failover.timer
     state: started
     enabled: true
     daemon_reload: true
