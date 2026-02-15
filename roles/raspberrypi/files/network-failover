@@ -9,7 +9,7 @@ while true; do
         if ip link show wlan0 2>/dev/null | grep -q "state UP"; then
             logger "network-failover: eth0 is up, disabling wlan0"
             ip link set wlan0 down
-            ip neigh flush dev wlan0
+            ip neigh flush all
             conntrack -F 2>/dev/null || true
         fi
     else
