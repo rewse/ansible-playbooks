@@ -118,3 +118,36 @@
           push:
             interruption-level: time-sensitive
           url: "/lovelace/overview"
+- id: automation.toggle_wireguard
+  alias: "Toggle WireGuard"
+  triggers:
+    - trigger: state
+      entity_id: person.shibata_tats
+    - trigger: homeassistant
+      event: start
+  actions:
+    - choose:
+        - conditions:
+            - condition: state
+              entity_id: person.shibata_tats
+              state: "not_home"
+            - condition: state
+              entity_id: switch.unifi_network_block_wireguard
+              state: "on"
+          sequence:
+            - action: switch.turn_off
+              target:
+                entity_id: switch.unifi_network_block_wireguard
+        - conditions:
+            - condition: state
+              entity_id: person.shibata_tats
+              state: "home"
+            - condition: state
+              entity_id: switch.unifi_network_block_wireguard
+              state: "off"
+          sequence:
+            - action: switch.turn_on
+              target:
+                entity_id: switch.unifi_network_block_wireguard
+  trace:
+    stored_traces: 100
