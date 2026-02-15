@@ -187,6 +187,7 @@
   ansible.builtin.copy:
     src: network-failover.service
     dest: /etc/systemd/system
+  notify: "Reload systemd"
   tags:
     - raspberrypi
     - config
@@ -204,7 +205,7 @@
     - raspberrypi_network-failover
     - raspberrypi_network-failover_config
 
-- name: "network-failover : Enable timer"
+- name: "network-failover : Enable and start timer"
   ansible.builtin.systemd:
     name: network-failover.timer
     state: started
@@ -305,11 +306,45 @@
     - raspberrypi_backup
     - raspberrypi_backup_config
 
-- name: "backup : Configure daily cron job"
+- name: "backup : Copy script"
   ansible.builtin.template:
-    src: 000backup-daily.j2
-    dest: /etc/cron.daily/000backup-daily
+    src: backup-daily.j2
+    dest: /usr/local/sbin/backup-daily
     mode: '0755'
+  tags:
+    - raspberrypi
+    - config
+    - raspberrypi_backup
+    - raspberrypi_backup_config
+
+- name: "backup : Copy service"
+  ansible.builtin.copy:
+    src: backup-daily.service
+    dest: /etc/systemd/system/backup-daily.service
+  notify: "Reload systemd"
+  tags:
+    - raspberrypi
+    - config
+    - raspberrypi_backup
+    - raspberrypi_backup_config
+
+- name: "backup : Copy timer"
+  ansible.builtin.copy:
+    src: backup-daily.timer
+    dest: /etc/systemd/system/backup-daily.timer
+  notify: "raspberrypi : Restart backup-daily timer"
+  tags:
+    - raspberrypi
+    - config
+    - raspberrypi_backup
+    - raspberrypi_backup_config
+
+- name: "backup : Enable and start timer"
+  ansible.builtin.systemd:
+    name: backup-daily.timer
+    enabled: true
+    state: started
+    daemon_reload: true
   tags:
     - raspberrypi
     - config

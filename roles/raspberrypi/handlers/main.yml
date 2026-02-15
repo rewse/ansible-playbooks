@@ -19,3 +19,14 @@
     name: network-failover.timer
     state: restarted
     daemon_reload: true
+
+- name: "Reload systemd"
+  ansible.builtin.systemd:
+    daemon_reload: true
+
+- name: "raspberrypi : Restart backup-daily timer"
+  ansible.builtin.systemd:
+    name: backup-daily.timer
+    state: restarted
+    daemon_reload: true
+
