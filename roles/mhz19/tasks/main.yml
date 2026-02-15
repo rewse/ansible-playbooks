@@ -47,7 +47,7 @@
   ansible.builtin.copy:
     src: mhz192mqtt.service
     dest: /etc/systemd/system/mhz192mqtt.service
-  notify: "mhz19 : Reload systemd"
+  notify: "Reload systemd"
   tags:
     - mhz19
     - config
@@ -58,7 +58,7 @@
   ansible.builtin.copy:
     src: mhz192mqtt.timer
     dest: /etc/systemd/system/mhz192mqtt.timer
-  notify: "mhz19 : Reload systemd"
+  notify: "mhz19 : Restart timer"
   tags:
     - mhz19
     - config
