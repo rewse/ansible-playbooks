@@ -34,7 +34,7 @@
   ansible.builtin.template:
     src: mhz192mqtt.j2
     dest: /usr/local/sbin/mhz192mqtt
-    mode: '0755'
+    mode: '0700'
     variable_start_string: "[%"
     variable_end_string: "%]"
   tags:
@@ -43,13 +43,36 @@
     - mhz19_mhz19
     - mhz19_mhz19_config
 
-- name: "mhz19 : Configure cron job"
+- name: "mhz19 : Install systemd service"
   ansible.builtin.copy:
-    src: mhz192mqtt.cron
-    dest: /etc/cron.d/mhz192mqtt
+    src: mhz192mqtt.service
+    dest: /etc/systemd/system/mhz192mqtt.service
+  notify: "mhz19 : Reload systemd"
   tags:
     - mhz19
     - config
-    - cron
+    - mhz19_mhz19
+    - mhz19_mhz19_config
+
+- name: "mhz19 : Install systemd timer"
+  ansible.builtin.copy:
+    src: mhz192mqtt.timer
+    dest: /etc/systemd/system/mhz192mqtt.timer
+  notify: "mhz19 : Reload systemd"
+  tags:
+    - mhz19
+    - config
+    - mhz19_mhz19
+    - mhz19_mhz19_config
+
+- name: "mhz19 : Enable and start timer"
+  ansible.builtin.systemd:
+    name: mhz192mqtt.timer
+    enabled: true
+    state: started
+    daemon_reload: true
+  tags:
+    - mhz19
+    - config
     - mhz19_mhz19
     - mhz19_mhz19_config

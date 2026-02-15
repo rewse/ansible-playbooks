@@ -1,0 +1,6 @@
+[Unit]
+Description=MH-Z19 CO2 sensor to MQTT
+
+[Service]
+Type=oneshot
+ExecStart=/usr/local/sbin/mhz192mqtt

@@ -1,0 +1,9 @@
+[Unit]
+Description=MH-Z19 CO2 sensor to MQTT timer
+
+[Timer]
+OnCalendar=*:03,08,13,18,23,28,33,38,43,48,53,58
+Persistent=true
+
+[Install]
+WantedBy=timers.target
