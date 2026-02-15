@@ -1,0 +1,6 @@
+[Unit]
+Description=Daily backup to NAS
+
+[Service]
+Type=oneshot
+ExecStart=/usr/local/sbin/backup-daily

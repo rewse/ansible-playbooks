@@ -1,0 +1,9 @@
+[Unit]
+Description=Daily backup to NAS timer
+
+[Timer]
+OnCalendar=daily
+Persistent=true
+
+[Install]
+WantedBy=timers.target
