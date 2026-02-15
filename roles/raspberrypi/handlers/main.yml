@@ -14,9 +14,6 @@
     name: ssh.socket
     state: restarted
 
-- name: "ifmetric: Run"
-  ansible.builtin.command: ifmetric wlan0 100
-
 - name: "network-failover: Restart timer"
   ansible.builtin.systemd:
     name: network-failover.timer
