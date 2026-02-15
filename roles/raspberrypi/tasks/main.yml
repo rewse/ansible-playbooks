@@ -162,16 +162,6 @@
     - raspberrypi_cloud-init
     - raspberrypi_cloud-init_config
 
-- name: "ifmetric : Configure cron job"
-  ansible.builtin.copy:
-    src: ifmetric
-    dest: /etc/cron.d
-  tags:
-    - raspberrypi
-    - config
-    - raspberrypi_ifmetric
-    - raspberrypi_ifmetric_config
-
 - name: "sysctl : Configure for multi NIC"
   ansible.builtin.copy:
     src: 99-arp-multinic.conf
