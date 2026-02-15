@@ -182,6 +182,40 @@
     - raspberrypi_sysctl
     - raspberrypi_sysctl_config
 
+- name: "network-failover : Copy script"
+  ansible.builtin.copy:
+    src: network-failover
+    dest: /usr/local/sbin
+    mode: '0755'
+  tags:
+    - raspberrypi
+    - config
+    - raspberrypi_network-failover
+    - raspberrypi_network-failover_config
+
+- name: "network-failover : Copy service"
+  ansible.builtin.copy:
+    src: network-failover.service
+    dest: /etc/systemd/system
+  notify: "network-failover: Restart"
+  tags:
+    - raspberrypi
+    - config
+    - raspberrypi_network-failover
+    - raspberrypi_network-failover_config
+
+- name: "network-failover : Enable service"
+  ansible.builtin.systemd:
+    name: network-failover
+    state: started
+    enabled: true
+    daemon_reload: true
+  tags:
+    - raspberrypi
+    - config
+    - raspberrypi_network-failover
+    - raspberrypi_network-failover_config
+
 - name: "netplan : Apply configuration"
   ansible.builtin.command: netplan apply
   notify: "ifmetric: Run"
