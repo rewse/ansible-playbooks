@@ -116,6 +116,21 @@
     - raspberrypi_environment
     - raspberrypi_environment_config
 
+- name: "boot : Configure NVMe power management workaround"
+  ansible.builtin.lineinfile:
+    path: /boot/firmware/cmdline.txt
+    regexp: '^(.*)$'
+    line: '\1 nvme_core.default_ps_max_latency_us=0 pcie_aspm=off pcie_port_pm=off'
+    backrefs: true
+    backup: true
+  when: ansible_facts['devices']['nvme0n1'] is defined
+  tags:
+    - raspberrypi
+    - config
+    - boot
+    - raspberrypi_boot
+    - raspberrypi_boot_config
+
 - name: "netplan : Configure network"
   ansible.builtin.template:
     src: 99-config.yaml.j2
