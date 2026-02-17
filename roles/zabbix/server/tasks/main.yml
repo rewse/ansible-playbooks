@@ -130,6 +130,19 @@
     - zabbix-server_zabbix-server
     - zabbix-server_zabbix-server_config
 
+- name: "zabbix-server : Set HistoryCacheSize"
+  ansible.builtin.lineinfile:
+    dest: /etc/zabbix/zabbix_server.conf
+    insertafter: "^# HistoryCacheSize="
+    regexp: "^HistoryCacheSize="
+    line: "HistoryCacheSize=64M"
+  notify: "zabbix-server: Restart"
+  tags:
+    - zabbix-server
+    - config
+    - zabbix-server_zabbix-server
+    - zabbix-server_zabbix-server_config
+
 - name: "zabbix-frontend : Enable Apache config"
   ansible.builtin.command: a2enconf zabbix
   notify: "apache: Reload"
