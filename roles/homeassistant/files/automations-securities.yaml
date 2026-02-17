@@ -122,15 +122,19 @@
   alias: "Toggle WireGuard"
   triggers:
     - trigger: state
-      entity_id: person.shibata_tats
+      entity_id: device_tracker.ping_atom
+      for:
+        minutes: 10
     - trigger: homeassistant
       event: start
   actions:
     - choose:
         - conditions:
             - condition: state
-              entity_id: person.shibata_tats
-              state: "not_home"
+              entity_id: device_tracker.ping_atom
+              state: "off"
+              for:
+                minutes: 10
             - condition: state
               entity_id: switch.unifi_network_block_wireguard
               state: "on"
@@ -140,8 +144,10 @@
                 entity_id: switch.unifi_network_block_wireguard
         - conditions:
             - condition: state
-              entity_id: person.shibata_tats
-              state: "home"
+              entity_id: device_tracker.ping_atom
+              state: "on"
+              for:
+                minutes: 10
             - condition: state
               entity_id: switch.unifi_network_block_wireguard
               state: "off"
