@@ -33,7 +33,7 @@ if ! mountpoint -q "${DEST}"; then
 fi
 
 # Run backup
-nice -n 10 tmbackup "${SRC}" "${DEST}" "${EXCLUDE_FILE}" > /dev/null
+nice -n 10 tmbackup --rsync-append-flags "--no-owner --no-group" "${SRC}" "${DEST}" "${EXCLUDE_FILE}" > /dev/null
 
 # Cleanup with success status
 trap - INT TERM EXIT
