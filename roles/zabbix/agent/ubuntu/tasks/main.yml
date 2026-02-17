@@ -97,4 +97,5 @@
   ansible.builtin.copy:
     src: zabbix.sudo
     dest: /etc/sudoers.d/zabbix
+    mode: '0440'
   tags: [zabbix-agent-ubuntu, config]
