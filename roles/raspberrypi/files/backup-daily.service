@@ -1,5 +1,7 @@
 [Unit]
 Description=Daily backup to NAS
+After=network-online.target
+Wants=network-online.target
 
 [Service]
 Type=oneshot

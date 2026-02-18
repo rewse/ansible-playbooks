@@ -1,5 +1,7 @@
 [Unit]
 Description=MH-Z19 CO2 sensor to MQTT
+After=network-online.target
+Wants=network-online.target
 
 [Service]
 Type=oneshot

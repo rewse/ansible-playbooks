@@ -2,7 +2,8 @@
 Description=Certbot certificate renewal timer
 
 [Timer]
-OnCalendar=monthly
+OnCalendar=*-*-01 05:00:00
+RandomizedDelaySec=1h
 Persistent=true
 
 [Install]

@@ -3,6 +3,7 @@ Description=Enecoq data fetcher timer
 
 [Timer]
 OnCalendar=*:14,44
+RandomizedDelaySec=1m
 Persistent=true
 
 [Install]
