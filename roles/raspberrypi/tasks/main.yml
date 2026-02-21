@@ -15,6 +15,30 @@
     - raspberrypi_package
     - raspberrypi_package_install
 
+- name: "claude: Install Claude Code"
+  ansible.builtin.shell: curl -fsSL https://claude.ai/install.sh | bash
+  args:
+    creates: ~/.local/bin/claude
+  tags:
+    - raspberrypi
+    - install
+    - claude
+    - raspberrypi_claude
+    - raspberrypi_claude_install
+
+- name: "claude: Create symlink to /usr/local/bin"
+  ansible.builtin.file:
+    src: ~/.local/bin/claude
+    dest: /usr/local/bin/claude
+    state: link
+  become: true
+  tags:
+    - raspberrypi
+    - install
+    - claude
+    - raspberrypi_claude
+    - raspberrypi_claude_install
+
 - name: "swap : Set swap factor to RAM size"
   ansible.builtin.lineinfile:
     path: /etc/dphys-swapfile

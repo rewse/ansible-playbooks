@@ -97,17 +97,6 @@
     - darwin_package
     - darwin_package_install
 
-- name: "package: Install Claude Code"
-  ansible.builtin.shell: curl -fsSL https://claude.ai/install.sh | bash
-  args:
-    creates: ~/.local/bin/claude
-  tags:
-    - darwin
-    - install
-    - package
-    - darwin_package
-    - darwin_package_install
-  
 - name: "package: Install global npm packages"
   ansible.builtin.command: npm install -g {{ item }}
   loop:
