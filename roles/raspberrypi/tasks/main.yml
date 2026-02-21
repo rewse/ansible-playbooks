@@ -219,7 +219,6 @@
 
 - name: "netplan : Apply configuration"
   ansible.builtin.command: netplan apply
-  notify: "ifmetric: Run"
   tags:
     - raspberrypi
     - config
