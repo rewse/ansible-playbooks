@@ -37,6 +37,17 @@
     - darwin_package
     - darwin_package_install
 
+- name: "claude: Install Claude Code"
+  ansible.builtin.shell: curl -fsSL https://claude.ai/install.sh | bash
+  args:
+    creates: ~/.local/bin/claude
+  tags:
+    - darwin
+    - install
+    - claude
+    - darwin_claude
+    - darwin_claude_install
+
 # - name: "package : Install rest of the apps"
 #   install_yourself:
 #     - https://adblink.me/download/                                  # adbLink
