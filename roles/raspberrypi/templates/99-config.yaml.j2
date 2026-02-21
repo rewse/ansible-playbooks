@@ -3,15 +3,15 @@ network:
   ethernets:
     eth0:
       dhcp4: false
-      dhcp6: false
+      dhcp6: true
+      ipv6-mtu: 9000
+      accept-ra: true
       optional: true
       addresses:
          - {{ local.ip }}/24
       routes:
         - to: default
           via: {{ default_gateway }}
-        - to: default
-          via: {{ default_gateway6 }}
       nameservers:
         addresses:
           - {{ resolved1.ip }}
