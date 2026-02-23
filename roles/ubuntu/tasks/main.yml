@@ -141,6 +141,7 @@
       - dphys-swapfile
       - dnsutils
       - etckeeper
+      - fail2ban
       - gh
       - git
       - irqbalance
@@ -450,6 +451,18 @@
     - user
     - ubuntu_user
     - ubuntu_user_config
+
+- name: "fail2ban : Copy jail.local"
+  ansible.builtin.template:
+    src: sshd.conf.j2
+    dest: /etc/fail2ban/jail.d/sshd.conf
+  notify: "fail2ban: Restart"
+  tags:
+    - ubuntu
+    - config
+    - fail2ban
+    - ubuntu_fail2ban
+    - ubuntu_fail2ban_config
 
 # Ref: https://ghostty.org/docs/help/terminfo
 - name: "ghostty : Copy terminfo"

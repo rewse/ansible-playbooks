@@ -9,3 +9,8 @@
     daemon_reload: true
     name: ssh.socket
     state: restarted
+
+- name: "fail2ban: Restart"
+  ansible.builtin.systemd:
+    name: fail2ban
+    state: restarted
