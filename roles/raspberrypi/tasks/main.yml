@@ -286,7 +286,9 @@
   ansible.builtin.template:
     src: override.conf.j2
     dest: /etc/systemd/system/ssh.socket.d/override.conf
-  notify: "ssh: Restart socket"
+  notify:
+    - "Reload systemd"
+    - "ssh: Restart socket"
   tags:
     - raspberrypi
     - config
