@@ -453,9 +453,45 @@
     - ubuntu_user_config
 
 - name: "fail2ban : Copy jail.local"
+  ansible.builtin.copy:
+    src: jail.local
+    dest: /etc/fail2ban/jail.local
+  notify: "fail2ban: Restart"
+  tags:
+    - ubuntu
+    - config
+    - fail2ban
+    - ubuntu_fail2ban
+    - ubuntu_fail2ban_config
+
+- name: "fail2ban : Copy sshd jail config"
   ansible.builtin.template:
     src: sshd.conf.j2
     dest: /etc/fail2ban/jail.d/sshd.conf
+  notify: "fail2ban: Restart"
+  tags:
+    - ubuntu
+    - config
+    - fail2ban
+    - ubuntu_fail2ban
+    - ubuntu_fail2ban_config
+
+- name: "fail2ban : Copy homeassistant filter"
+  ansible.builtin.copy:
+    src: homeassistant-filter.conf
+    dest: /etc/fail2ban/filter.d/homeassistant.conf
+  notify: "fail2ban: Restart"
+  tags:
+    - ubuntu
+    - config
+    - fail2ban
+    - ubuntu_fail2ban
+    - ubuntu_fail2ban_config
+
+- name: "fail2ban : Copy homeassistant jail config"
+  ansible.builtin.copy:
+    src: homeassistant.conf
+    dest: /etc/fail2ban/jail.d/homeassistant.conf
   notify: "fail2ban: Restart"
   tags:
     - ubuntu
