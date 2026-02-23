@@ -247,6 +247,17 @@
     - raspberrypi_netplan
     - raspberrypi_netplan_config
 
+- name: "netplan : Wait for network to be reachable"
+  ansible.builtin.wait_for:
+    host: 1.1.1.1
+    port: 53
+    timeout: 30
+  tags:
+    - raspberrypi
+    - config
+    - raspberrypi_netplan
+    - raspberrypi_netplan_config
+
 # ssh stuck at expecting SSH2_MSG_KEX_ECDH_REPLY - Unix & Linux Stack Exchange
 # https://unix.stackexchange.com/questions/722954/ssh-stuck-at-expecting-ssh2-msg-kex-ecdh-reply
 - name: "ssh : Configure KEX algorithms"
