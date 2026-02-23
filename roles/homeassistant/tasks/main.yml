@@ -751,6 +751,10 @@
     src: https://github.com/wessamlauf/frosted-glass-manager/archive/refs/tags/v{{ frosted_glass_manager_version }}.zip
     dest: /tmp
     remote_src: true
+  retries: 3
+  delay: 10
+  register: download_result
+  until: download_result is succeeded
   tags:
     - homeassistant
     - install
