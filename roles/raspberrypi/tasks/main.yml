@@ -145,8 +145,6 @@
     path: /boot/firmware/cmdline.txt
     regexp: '^(.*)$'
     line: '\1 nvme_core.default_ps_max_latency_us=0 pcie_aspm=off pcie_port_pm=off'
-    backrefs: true
-    backup: true
   when: ansible_facts['devices']['nvme0n1'] is defined
   tags:
     - raspberrypi
