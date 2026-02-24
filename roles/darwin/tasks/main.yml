@@ -39,6 +39,16 @@
     - darwin_package
     - darwin_package_install
 
+- name: "xurl : Add homebrew tap for xurl"
+  community.general.homebrew_tap:
+    name: xdevplatform/tap
+  tags:
+    - darwin
+    - install
+    - xurl
+    - darwin_xurl
+    - darwin_xurl_install
+
 - name: "package : Install packages by homebrew_cask"
   community.general.homebrew_cask:
     name: 
@@ -88,6 +98,7 @@
       - sf-symbols
       - visual-studio-code
       - vlc
+      - xurl
       - zoom
     update_homebrew: true
   tags:
@@ -286,6 +297,20 @@
     - path
     - darwin_path
     - darwin_path_config
+
+- name: "xurl : Configure X API authentication"
+  ansible.builtin.command:
+    cmd: >
+      xurl auth apps add kiro-rewse
+      --client-id "{{ lookup('pipe', 'op read op://ansible/X/username') }}"
+      --client-secret "{{ lookup('pipe', 'op read op://ansible/X/credential') }}"
+    creates: ~/.xurl
+  tags:
+    - darwin
+    - config
+    - xurl
+    - darwin_xurl
+    - darwin_xurl_config
 
 # - name: "package : Install rest of the apps"
 #   install_yourself:
