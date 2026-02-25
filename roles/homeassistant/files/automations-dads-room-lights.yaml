@@ -359,6 +359,10 @@
     - trigger: homeassistant
       event: start
   actions:
+    # Distinguish between user-initiated changes and automatic changes:
+    # - User-initiated (explicit mode or >1s since last automation): Use scene.turn_on for instant response
+    # - Automatic (within 1s of automation chain): Use hue.activate_scene with 5-min transition for smooth change
+    # This ensures user actions feel responsive while automatic time-based changes are gentle on the eyes
     - if: 
         - or:
             - condition: state
@@ -380,19 +384,19 @@
         - action: scene.turn_on
           target: 
             entity_id: "{{ states('input_select.dads_room_scene') }}"
-        - delay:
-            seconds: 1
-        - action: input_select.select_option
-          target: 
-            entity_id: input_select.dads_room_light_remote_mode
-          data:
-            option: "Idle"
       else:
         - action: hue.activate_scene
           target: 
             entity_id: "{{ states('input_select.dads_room_scene') }}"
           data:
             transition: 300
+    - delay:
+        seconds: 1
+    - action: input_select.select_option
+      target: 
+        entity_id: input_select.dads_room_light_remote_mode
+      data:
+        option: "Idle"
   mode: restart
   trace:
     stored_traces: 100
