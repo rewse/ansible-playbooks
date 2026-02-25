@@ -75,7 +75,7 @@
     - postfix-client_postfix
     - postfix-client_postfix_config
 
-- name: "postfix : Enable SASL authentication"
+- name: "sasl : Enable SASL authentication"
   ansible.builtin.lineinfile:
     dest: /etc/postfix/main.cf
     regexp: "^smtp_sasl_auth_enable "
@@ -84,10 +84,11 @@
   tags:
     - postfix-client
     - config
-    - postfix-client_postfix
-    - postfix-client_postfix_config
+    - sasl
+    - postfix-client_sasl
+    - postfix-client_sasl_config
 
-- name: "postfix : Set SASL mechanism filter"
+- name: "sasl : Set SASL mechanism filter"
   ansible.builtin.lineinfile:
     dest: /etc/postfix/main.cf
     regexp: "^smtp_sasl_mechanism_filter"
@@ -96,10 +97,11 @@
   tags:
     - postfix-client
     - config
-    - postfix-client_postfix
-    - postfix-client_postfix_config
+    - sasl
+    - postfix-client_sasl
+    - postfix-client_sasl_config
 
-- name: "postfix : Set SASL password maps"
+- name: "sasl : Set SASL password maps"
   ansible.builtin.lineinfile:
     dest: /etc/postfix/main.cf
     regexp: "smtp_sasl_password_maps "
@@ -108,10 +110,11 @@
   tags:
     - postfix-client
     - config
-    - postfix-client_postfix
-    - postfix-client_postfix_config
+    - sasl
+    - postfix-client_sasl
+    - postfix-client_sasl_config
 
-- name: "postfix : Set SASL security options"
+- name: "sasl : Set SASL security options"
   ansible.builtin.lineinfile:
     dest: /etc/postfix/main.cf
     regexp: "smtp_sasl_security_options "
@@ -120,10 +123,11 @@
   tags:
     - postfix-client
     - config
-    - postfix-client_postfix
-    - postfix-client_postfix_config
+    - sasl
+    - postfix-client_sasl
+    - postfix-client_sasl_config
 
-- name: "postfix : Create SASL password file"
+- name: "sasl : Create SASL password file"
   ansible.builtin.lineinfile:
     dest: /etc/postfix/sasl_passwd
     regexp: '^\[{{ relayhost.name }}\]:{{ relayhost.port }}'
@@ -134,11 +138,12 @@
   tags:
     - postfix-client
     - config
-    - postfix-client_postfix
-    - postfix-client_postfix_config
-    - postfix-client_postfix_init
+    - sasl
+    - postfix-client_sasl
+    - postfix-client_sasl_config
+    - postfix-client_sasl_init
 
-- name: "postfix : Create SASL password database file"
+- name: "sasl : Create SASL password database file"
   ansible.builtin.file:
     path: /etc/postfix/sasl_passwd.db
     state: touch
@@ -146,19 +151,58 @@
   tags:
     - postfix-client
     - config
-    - postfix-client_postfix
-    - postfix-client_postfix_config
-    - postfix-client_postfix_init
+    - sasl
+    - postfix-client_sasl
+    - postfix-client_sasl_config
+    - postfix-client_sasl_init
 
-- name: "postfix : Hash SASL password file"
+- name: "sasl : Hash SASL password file"
   ansible.builtin.command: postmap hash:/etc/postfix/sasl_passwd
   when: postfix_sasl_password_out is changed
   notify: "postfix: Reload"
   tags:
     - postfix-client
     - config
-    - postfix-client_postfix
-    - postfix-client_postfix_config
+    - sasl
+    - postfix-client_sasl
+    - postfix-client_sasl_config
+
+- name: "sender-canonical : Set sender_canonical_maps"
+  ansible.builtin.lineinfile:
+    dest: /etc/postfix/main.cf
+    regexp: "^sender_canonical_maps "
+    line: "sender_canonical_maps = hash:/etc/postfix/sender_canonical"
+  notify: "postfix: Reload"
+  tags:
+    - postfix-client
+    - config
+    - sender-canonical
+    - postfix-client_sender-canonical
+    - postfix-client_sender-canonical_config
+
+- name: "sender-canonical : Copy sender_canonical file"
+  ansible.builtin.template:
+    src: sender_canonical.j2
+    dest: /etc/postfix/sender_canonical
+    mode: '0600'
+  register: postfix_sender_canonical_out
+  tags:
+    - postfix-client
+    - config
+    - sender-canonical
+    - postfix-client_sender-canonical
+    - postfix-client_sender-canonical_config
+
+- name: "sender-canonical : Hash sender_canonical file"
+  ansible.builtin.command: postmap hash:/etc/postfix/sender_canonical
+  when: postfix_sender_canonical_out is changed
+  notify: "postfix: Reload"
+  tags:
+    - postfix-client
+    - config
+    - sender-canonical
+    - postfix-client_sender-canonical
+    - postfix-client_sender-canonical_config
 
 - name: "postfix : Set root mail alias"
   ansible.builtin.lineinfile:
