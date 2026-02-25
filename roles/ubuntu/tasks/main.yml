@@ -476,6 +476,30 @@
     - ubuntu_fail2ban
     - ubuntu_fail2ban_config
 
+- name: "fail2ban : Copy couchdb filter"
+  ansible.builtin.copy:
+    src: couchdb-filter.conf
+    dest: /etc/fail2ban/filter.d/couchdb.conf
+  notify: "fail2ban: Restart"
+  tags:
+    - ubuntu
+    - config
+    - fail2ban
+    - ubuntu_fail2ban
+    - ubuntu_fail2ban_config
+
+- name: "fail2ban : Copy couchdb jail config"
+  ansible.builtin.copy:
+    src: couchdb.conf
+    dest: /etc/fail2ban/jail.d/couchdb.conf
+  notify: "fail2ban: Restart"
+  tags:
+    - ubuntu
+    - config
+    - fail2ban
+    - ubuntu_fail2ban
+    - ubuntu_fail2ban_config
+
 - name: "fail2ban : Copy homeassistant filter"
   ansible.builtin.copy:
     src: homeassistant-filter.conf
