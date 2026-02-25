@@ -524,6 +524,30 @@
     - ubuntu_fail2ban
     - ubuntu_fail2ban_config
 
+- name: "fail2ban : Copy zabbix-web filter"
+  ansible.builtin.copy:
+    src: zabbix-web-filter.conf
+    dest: /etc/fail2ban/filter.d/zabbix-web.conf
+  notify: "fail2ban: Restart"
+  tags:
+    - ubuntu
+    - config
+    - fail2ban
+    - ubuntu_fail2ban
+    - ubuntu_fail2ban_config
+
+- name: "fail2ban : Copy zabbix-web jail config"
+  ansible.builtin.copy:
+    src: zabbix-web.conf
+    dest: /etc/fail2ban/jail.d/zabbix-web.conf
+  notify: "fail2ban: Restart"
+  tags:
+    - ubuntu
+    - config
+    - fail2ban
+    - ubuntu_fail2ban
+    - ubuntu_fail2ban_config
+
 # Ref: https://ghostty.org/docs/help/terminfo
 - name: "ghostty : Copy terminfo"
   ansible.builtin.copy:
