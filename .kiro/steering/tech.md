@@ -34,20 +34,21 @@ ansible-playbook site.yml --limit "fox.rewse.jp"
 
 ### 1Password Commands
 
-```bash
-# Sign in to 1Password
-op signin
+This repository uses 1Password Service Accounts for authentication. The Service Account token is configured in `.envrc` and automatically loaded by direnv.
 
-# Check authentication status
+```bash
+# Verify authentication (Service Account)
 op whoami
 
-# Read secrets (for testing)
+# Read secrets
 op read op://ansible/database/password
 
 # Usage example in Ansible
 # In playbooks or vars files:
 # db_password: "{{ lookup('pipe', 'op read op://ansible/database/password') }}"
 ```
+
+**Note**: Service Accounts work in interactive shells but may fail in automated contexts due to a known 1Password CLI limitation.
 
 ## Ansible Syntax
 

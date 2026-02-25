@@ -7,6 +7,7 @@ roles/database/client/gui/files/sqldeveloper*
 
 # Environment files
 .env
+.envrc
 
 # Vault files (migrated to 1Password)
 group_vars/*/vault
