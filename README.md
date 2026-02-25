@@ -35,7 +35,37 @@ This repository contains Ansible playbooks and roles for managing infrastructure
 
 - Ansible 2.10 or later installed
 - SSH access configured to target hosts
-- 1Password CLI (`op`) installed and authenticated
+- 1Password CLI (`op`) installed (version 2.18.0 or later)
+- direnv installed (optional but recommended)
+
+### 1Password Setup
+
+This repository uses 1Password Service Accounts for authentication. Service Accounts allow automated access to secrets without interactive sign-in.
+
+#### Using direnv (Recommended)
+
+1. Install direnv:
+   ```bash
+   # Ubuntu
+   sudo apt install direnv
+
+   # macOS
+   brew install direnv
+   ```
+
+2. Add direnv hook to your shell (`~/.bashrc` or `~/.zshrc`):
+   ```bash
+   eval "$(direnv hook bash)"  # or zsh
+   ```
+
+3. Reload your shell and allow direnv:
+   ```bash
+   source ~/.bashrc  # or ~/.zshrc
+   cd /path/to/ansible-playbooks
+   direnv allow
+   ```
+
+The `.envrc` file contains the Service Account token and will be automatically loaded.
 
 ### Basic Commands
 
@@ -78,31 +108,6 @@ ansible-playbook site.yml --tags docker
 
 ```bash
 ansible-playbook site.yml --check
-```
-
-### 1Password Operations
-
-Sensitive information is managed through 1Password CLI. Use the following pattern in your playbooks and templates:
-
-```yaml
-# In playbooks or vars files
-db_password: "{{ lookup('pipe', 'op read op://ansible/database/password') }}"
-api_key: "{{ lookup('pipe', 'op read \"op://ansible/API Service/credential\"') }}"
-```
-
-```jinja2
-# In templates
-password = {{ lookup('pipe', 'op read op://ansible/database/password') }}
-```
-
-#### Sign in to 1Password
-
-```bash
-# Sign in (required before running playbooks)
-op signin
-
-# Verify authentication
-op whoami
 ```
 
 ## Inventory
@@ -154,33 +159,3 @@ ansible-playbook site.yml --tags docker
 4. **Gradual application**: Test large changes on specific hosts first
 5. **Check logs**: Review logs after execution to ensure no issues
 
-## Troubleshooting
-
-### SSH Connection Errors
-
-```bash
-# Disable host key checking (already configured in ansible.cfg)
-# Or manually verify SSH connection
-ssh ubuntu@<hostname>
-```
-
-### 1Password Authentication Errors
-
-```bash
-# Verify 1Password CLI is installed
-op --version
-
-# Sign in to 1Password
-op signin
-
-# Verify authentication status
-op whoami
-```
-
-### Python Interpreter Errors
-
-```bash
-# Python 3 is specified in ansible.cfg
-# Verify Python 3 is installed on target hosts
-ansible all -m ping
-```

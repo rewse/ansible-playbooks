@@ -138,6 +138,7 @@
       - bat
       - bc
       - curl
+      - direnv
       - dphys-swapfile
       - dnsutils
       - etckeeper
