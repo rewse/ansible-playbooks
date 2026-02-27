@@ -13,7 +13,7 @@ network:
       routes:
         - to: default
           via: {{ default_gateway }}
-        - to: 10.0.0.0/16
+        - to: {{ aws_vpc_cidr }}
           via: {{ default_gateway }}
       nameservers:
         addresses:
