@@ -184,6 +184,16 @@
     - raspberrypi_cloud-init
     - raspberrypi_cloud-init_config
 
+- name: "sysctl : Configure for VPN"
+  ansible.builtin.copy:
+    src: 90-vpn.conf
+    dest: /etc/sysctl.d
+  tags:
+    - raspberrypi
+    - config
+    - raspberrypi_sysctl
+    - raspberrypi_sysctl_config
+
 - name: "sysctl : Configure for multi NIC"
   ansible.builtin.copy:
     src: 99-arp-multinic.conf
