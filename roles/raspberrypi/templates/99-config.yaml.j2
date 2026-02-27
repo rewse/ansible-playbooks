@@ -13,6 +13,8 @@ network:
       routes:
         - to: default
           via: {{ default_gateway }}
+        - to: 10.0.0.0/16
+          via: {{ default_gateway }}
       nameservers:
         addresses:
           - {{ resolved1.ip }}
