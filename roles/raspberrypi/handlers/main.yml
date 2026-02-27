@@ -30,3 +30,5 @@
     state: restarted
     daemon_reload: true
 
+- name: "sysctl: Reload"
+  ansible.builtin.command: sysctl --system
