@@ -26,4 +26,4 @@ regza:
   password: "{{ lookup('pipe', 'op read op://ansible/REGZA/credential') }}"
 simple_thermostat_version: 2.5.0
 simple_weather_card_version: 0.8.5
-tuya_local_version: 2026.1.1
+tuya_local_version: 2026.2.0
