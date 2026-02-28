@@ -1,4 +1,5 @@
 ---
+aws_vpc_cidr: 10.0.0.0/16
 default_gateway: 192.168.0.1
 default_gateway6: fe80::70a7:41ff:fea6:bd7a
 netgear_gs108tv3_version: 7.0.6.2
@@ -7,3 +8,4 @@ resolved1:
   ip: 192.168.0.1
   ipv6: 240f:78:31e9:1:70a7:41ff:fea6:bd7a
 xray_password: "{{ lookup('pipe', 'op read \"op://ansible/xray/wireless network password\"') }}"
+xray_legacy_password: "{{ lookup('pipe', 'op read \"op://ansible/xray-legacy/wireless network password\"') }}"
