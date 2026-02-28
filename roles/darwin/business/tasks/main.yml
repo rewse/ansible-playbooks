@@ -13,7 +13,7 @@
       - tripmode
       - webex-meetings
     update_homebrew: true
-    ignore_errors: true
+  ignore_errors: true
   tags:
     - darwin
     - darwin_business

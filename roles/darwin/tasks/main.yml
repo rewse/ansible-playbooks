@@ -100,8 +100,8 @@
       - vlc
       - xurl
       - zoom
-    update_homebrew: true 
-    ignore_errors: true
+    update_homebrew: true
+  ignore_errors: true
   tags:
     - darwin
     - install
