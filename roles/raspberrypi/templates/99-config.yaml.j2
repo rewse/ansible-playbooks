@@ -13,6 +13,7 @@ network:
       routes:
         - to: default
           via: {{ default_gateway }}
+          metric: 100
         - to: {{ aws_vpc_cidr }}
           via: {{ default_gateway }}
       nameservers:
@@ -24,10 +25,27 @@ network:
   wifis:
     wlan0:
       access-points:
-        xray:
-          password: {{ xray_password }}
+        xray-legacy:
+          password: {{ xray_legacy_password }}
+          auth:
+            key-management: psk
       dhcp4: false
-      dhcp6: false
+      dhcp6: true
+      mtu: 1500
+      ipv6-mtu: 1500
+      accept-ra: true
       optional: true
       addresses:
          - {{ local.ip_2 }}/24
+      routes:
+        - to: default
+          via: {{ default_gateway }}
+          metric: 200
+        - to: {{ aws_vpc_cidr }}
+          via: {{ default_gateway }}
+      nameservers:
+        addresses:
+          - {{ resolved1.ip }}
+          - {{ resolved1.ipv6 }}
+        search:
+          - rewse.jp
