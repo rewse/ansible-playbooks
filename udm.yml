@@ -1,5 +1,0 @@
----
-- hosts: udm
-  remote_user: root
-  roles:
-    - udm
