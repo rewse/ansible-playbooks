@@ -29,7 +29,7 @@
       - steelseries-gg
       - ticktick
     update_homebrew: true
-    ignore_errors: true
+  ignore_errors: true
   tags:
     - darwin
     - darwin_personal
