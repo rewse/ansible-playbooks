@@ -35,7 +35,7 @@
 
 - name: "oracle : Extract instantclient archives"
   ansible.builtin.unarchive:
-    src: https://download.oracle.com/otn_software/linux/instantclient/{{ oracle_instantclient_version_1 }}{{ oracle_instantclient_version_2 }}000/instantclient-{{ item }}-linux.x64-{{ oracle_instantclient_version_1 }}.{{ oracle_instantclient_version_2 }}.{{ oracle_instantclient_version_3 }}.zip
+    src: https://download.oracle.com/otn_software/linux/instantclient/{{ oracle_instantclient_version_1 }}{{ oracle_instantclient_version_2 }}{{ oracle_instantclient_version_3 }}{{ oracle_instantclient_version_4 }}{{ oracle_instantclient_version_5 }}/instantclient-{{ item }}-linux.x64-{{ oracle_instantclient_version_1 }}.{{ oracle_instantclient_version_2 }}.{{ oracle_instantclient_version_3 }}.{{ oracle_instantclient_version_4 }}.{{ oracle_instantclient_version_5 }}.zip
     dest: /srv
     remote_src: true
   loop:
