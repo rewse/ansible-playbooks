@@ -55,7 +55,7 @@
   become: true
   become_user: "{{ item }}"
   environment:
-    OP_SERVICE_ACCOUNT_TOKEN: "{{ onepassword_token }}"
+    OP_SERVICE_ACCOUNT_TOKEN: "{{ lookup('env', 'OP_SERVICE_ACCOUNT_TOKEN') }}"
   loop:
     - root
     - "{{ admin }}"

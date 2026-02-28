@@ -1,2 +1,0 @@
----
-onepassword_token: "{{ lookup('pipe', 'op read op://ansible/1Password - chezmoi/credential') }}"
