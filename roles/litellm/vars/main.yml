@@ -1,6 +1,5 @@
 ---
 litellm_aws_access_key_id: "{{ lookup('pipe', 'op read \"op://ansible/AWS - LiteLLM/username\"') }}"
 litellm_aws_secret_access_key: "{{ lookup('pipe', 'op read \"op://ansible/AWS - LiteLLM/credential\"') }}"
-litellm_gemini_api_key: "{{ lookup('pipe', 'op read \"op://ansible/Gemini/credential\"') }}"
 litellm_master_key: "{{ lookup('pipe', 'op read \"op://ansible/AWS - LiteLLM/master key\"') }}"
 litellm_salt_key: "{{ lookup('pipe', 'op read \"op://ansible/AWS - LiteLLM/salt key\"') }}"
