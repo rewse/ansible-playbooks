@@ -1,0 +1,33 @@
+---
+- name: "lmstudio : Enable Apache proxy modules"
+  community.general.apache2_module:
+    name: "{{ item }}"
+  loop:
+    - proxy
+    - proxy_http
+  notify: "apache: Restart"
+  tags:
+    - lmstudio
+    - config
+    - apache
+    - lmstudio_config
+
+- name: "lmstudio : Copy Apache vhost config"
+  ansible.builtin.copy:
+    src: lmstudio.rewse.jp.conf
+    dest: /etc/apache2/sites-available
+  notify: "apache: Reload"
+  tags:
+    - lmstudio
+    - config
+    - apache
+    - lmstudio_config
+
+- name: "lmstudio : Enable Apache site"
+  ansible.builtin.command: a2ensite lmstudio.rewse.jp
+  notify: "apache: Reload"
+  tags:
+    - lmstudio
+    - config
+    - apache
+    - lmstudio_config
