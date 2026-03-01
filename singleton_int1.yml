@@ -13,7 +13,6 @@
     - lmstudio
     - matter-server
     - mosquitto
-    - open-webui
     - syslogd
     - zabbix/server
     - zabbix/money/market
