@@ -11,6 +11,10 @@ model_list:
     litellm_params:
       model: bedrock/us.anthropic.claude-opus-4-6-v1
       aws_region_name: us-east-1
+  - model_name: nova-2-lite
+    litellm_params:
+      model: bedrock/us.amazon.nova-2-lite-v1:0
+      aws_region_name: us-east-1
   - model_name: qwen3-next-80b-a3b
     litellm_params:
       model: bedrock/qwen.qwen3-next-80b-a3b
