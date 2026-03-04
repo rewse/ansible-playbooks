@@ -11,12 +11,10 @@
     - litellm_litellm
     - litellm_litellm_init
 
-- name: "litellm : Generate configuration file"
-  ansible.builtin.template:
-    src: config.yml.j2
-    dest: /srv/litellm/config.yml
-    owner: root
-    group: root
+- name: "litellm : Copy configuration file"
+  ansible.builtin.copy:
+    src: config.yml
+    dest: /srv/litellm
   notify: "litellm: Restart"
   tags:
     - litellm
