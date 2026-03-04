@@ -132,7 +132,7 @@
         - conditions:
             - condition: state
               entity_id: device_tracker.ping_atom
-              state: "off"
+              state: "not_home"
               for:
                 minutes: 10
             - condition: state
@@ -145,7 +145,7 @@
         - conditions:
             - condition: state
               entity_id: device_tracker.ping_atom
-              state: "on"
+              state: "home"
               for:
                 minutes: 10
             - condition: state
