@@ -14,11 +14,14 @@
   ansible.builtin.template:
     src: pwfile.j2
     dest: /etc/mosquitto/pwfile
+    owner: root
+    group: root
+    mode: '0600'
   tags:
     - mosquitto
     - config
     - mosquitto_mosquitto
-    - mosquitto_mosquitto_init
+    - mosquitto_mosquitto_config
 
 - name: "mosquitto : Hash password file"
   ansible.builtin.command: mosquitto_passwd -U /etc/mosquitto/pwfile
