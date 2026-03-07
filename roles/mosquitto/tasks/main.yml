@@ -14,8 +14,8 @@
   ansible.builtin.template:
     src: pwfile.j2
     dest: /etc/mosquitto/pwfile
-    owner: root
-    group: root
+    owner: mosquitto
+    group: mosquitto
     mode: '0600'
   tags:
     - mosquitto
