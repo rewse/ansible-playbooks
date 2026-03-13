@@ -88,19 +88,6 @@
     - sslcert_certbot
     - sslcert_certbot_config
 
-- name: "certbot : Copy AWS credentials"
-  ansible.builtin.template:
-    src: config.j2
-    dest: /root/.aws/config
-    mode: '0600'
-    variable_start_string: "[%"
-    variable_end_string: "%]"
-  tags:
-    - sslcert
-    - config
-    - sslcert_certbot
-    - sslcert_certbot_config
-
 #   Commented out to prevent that ansible makes unnecessary requests
 #   Please run it manually if the first issue is needed
 # - name: "certbot: Issue certificate"
