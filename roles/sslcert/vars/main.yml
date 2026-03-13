@@ -1,3 +1,0 @@
----
-aws_config:
-  secret: "{{ lookup('pipe', 'op read \"op://ansible/AWS - sslcert/credential\"') }}"
