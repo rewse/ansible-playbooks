@@ -115,6 +115,7 @@
   loop:
     - agent-browser
     - docx
+    - npx7
     - "@playwright/mcp@latest"
   tags:
     - darwin
@@ -142,6 +143,27 @@
     - package
     - darwin_package
     - darwin_package_install
+
+- name: "package : Setup ctx7"
+  ansible.builtin.command: ctx7 setup --cli --universal
+  tags:
+    - darwin
+    - install
+    - package
+    - darwin_package
+    - darwin_package_install
+
+- name: "package : Create symlink for find-docs skill"
+  ansible.builtin.file:
+    src: ~/.config/agents/skills/find-docs
+    dest: ~/.kiro/skills/find-docs
+    state: link
+  tags:
+    - darwin
+    - config
+    - package
+    - darwin_package
+    - darwin_package_config
 
 - name: "package : Install package by uv"
   ansible.builtin.command: uv tool install {{ item }}
