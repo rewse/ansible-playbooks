@@ -1,16 +1,22 @@
+litellm_settings:
+  drop_params: true
+
 model_list:
   - model_name: claude-haiku-4-5
     litellm_params:
       model: bedrock/us.anthropic.claude-haiku-4-5-20251001-v1:0
       aws_region_name: us-east-1
+      additional_drop_params: ["top_p"]
   - model_name: claude-sonnet-4-6
     litellm_params:
       model: bedrock/us.anthropic.claude-sonnet-4-6
       aws_region_name: us-east-1
+      additional_drop_params: ["top_p"]
   - model_name: claude-opus-4-6
     litellm_params:
       model: bedrock/us.anthropic.claude-opus-4-6-v1
       aws_region_name: us-east-1
+      additional_drop_params: ["top_p"]
   - model_name: nova-2-lite
     litellm_params:
       model: bedrock/us.amazon.nova-2-lite-v1:0
