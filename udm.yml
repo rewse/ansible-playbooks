@@ -1,0 +1,6 @@
+---
+- hosts: udm
+  become: true
+  remote_user: root
+  roles:
+    - udm
