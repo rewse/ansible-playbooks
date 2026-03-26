@@ -1,0 +1,13 @@
+- name: "sysctl: Disable rp_filter for VPN VTI interfaces"
+  ansible.posix.sysctl:
+    name: "{{ item }}"
+    value: "0"
+    sysctl_file: /etc/sysctl.conf
+    reload: true
+  loop:
+    - net.ipv4.conf.vti64.rp_filter
+    - net.ipv4.conf.vti65.rp_filter
+  tags:
+    - udm
+    - sysctl
+    - udm_sysctl
