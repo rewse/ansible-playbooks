@@ -1,0 +1,34 @@
+---
+# Quarantine check: set quarantine_passed for use with when conditions
+- name: "quarantine : Inspect image"
+  ansible.builtin.command:
+    cmd: "skopeo inspect docker://{{ quarantine_image }}"
+  register: quarantine_inspect_result
+  changed_when: false
+  tags:
+    - docker
+    - quarantine
+    - docker_quarantine
+
+- name: "quarantine : Set result"
+  ansible.builtin.set_fact:
+    quarantine_passed: >-
+      {{ (now(utc=true) - (quarantine_inspect_result.stdout | from_json).Created[:19]
+      | to_datetime('%Y-%m-%dT%H:%M:%S')).days >= quarantine_days }}
+  tags:
+    - docker
+    - quarantine
+    - docker_quarantine
+
+- name: "quarantine : Warn if image is within quarantine period"
+  ansible.builtin.debug:
+    msg: >-
+      SKIPPED: {{ quarantine_image }} was created
+      {{ (now(utc=true) - (quarantine_inspect_result.stdout | from_json).Created[:19]
+      | to_datetime('%Y-%m-%dT%H:%M:%S')).days }} day(s) ago
+      (quarantine: {{ quarantine_days }} days)
+  when: not quarantine_passed
+  tags:
+    - docker
+    - quarantine
+    - docker_quarantine

@@ -23,6 +23,7 @@
       - pwgen
       - python3
       - pyright
+      - skopeo
       - switchaudio-osx
       - svn
       - telnet

@@ -50,12 +50,26 @@
     - litellm_docker
     - litellm_docker_config
 
+- name: "docker : Check image quarantine"
+  ansible.builtin.include_role:
+    name: docker/quarantine
+  vars:
+    quarantine_image: ghcr.io/berriai/litellm:main-stable
+  tags:
+    - litellm
+    - update
+    - docker
+    - quarantine
+    - litellm_docker
+    - litellm_docker_update
+
 - name: "docker : Pull and update container"
   community.docker.docker_compose_v2:
     project_src: /etc
     services: litellm
     state: present
     pull: always
+  when: quarantine_passed
   tags:
     - litellm
     - update

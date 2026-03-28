@@ -32,12 +32,26 @@
     - matter-server_matter-server
     - matter-server_matter-server_config
 
+- name: "docker : Check image quarantine"
+  ansible.builtin.include_role:
+    name: docker/quarantine
+  vars:
+    quarantine_image: ghcr.io/home-assistant-libs/python-matter-server:stable
+  tags:
+    - matter-server
+    - update
+    - docker
+    - quarantine
+    - matter-server_matter-server
+    - matter-server_matter-server_update
+
 - name: "matter-server : Pull and update container"
   community.docker.docker_compose_v2:
     project_src: /etc
     services: matter-server
     state: present
     pull: always
+  when: quarantine_passed
   tags:
     - matter-server
     - update
