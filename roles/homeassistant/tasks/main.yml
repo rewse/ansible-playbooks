@@ -60,12 +60,26 @@
     - homeassistant_docker
     - homeassistant_docker_config
 
+- name: "docker : Check image quarantine"
+  ansible.builtin.include_role:
+    name: docker/quarantine
+  vars:
+    quarantine_image: ghcr.io/home-assistant/home-assistant:stable
+  tags:
+    - homeassistant
+    - update
+    - docker
+    - quarantine
+    - homeassistant_docker
+    - homeassistant_docker_update
+
 - name: "docker : Pull and update container"
   community.docker.docker_compose_v2:
     project_src: /etc
     services: homeassistant
     state: present
     pull: always
+  when: quarantine_passed
   tags:
     - homeassistant
     - update

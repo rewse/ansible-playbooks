@@ -5,6 +5,7 @@
       - docker.io
       - docker-compose-v2
       - python3-docker
+      - skopeo
   tags:
     - docker
     - install
