@@ -1,4 +1,14 @@
 ---
+- name: "mcporter : Add homebrew tap for mcporter"
+  community.general.homebrew_tap:
+    name: steipete/tap
+  tags:
+    - darwin
+    - install
+    - mcporter
+    - darwin_mcporter
+    - darwin_mcporter_install
+
 - name: "package : Install packages by homebrew"
   community.general.homebrew:
     name: 
@@ -14,6 +24,7 @@
       - git-cliff
       - jq
       - mas
+      - mcporter
       - node
       - osv-scanner
       - pandoc
