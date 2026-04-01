@@ -13,6 +13,7 @@
   community.general.homebrew:
     name: 
       - 1password-cli
+      - agent-browser
       - ansible
       - awscli
       - bat
@@ -30,6 +31,7 @@
       - pandoc
       - php
       - podman
+      - poppler
       - pv
       - pwgen
       - python3
@@ -44,6 +46,15 @@
       - watch
       - zsh-vi-mode
     update_homebrew: true
+  tags:
+    - darwin
+    - install
+    - package
+    - darwin_package
+    - darwin_package_install
+
+- name: "package: Install Chrome for agent-browser"
+  ansible.builtin.command: agent-browser install
   tags:
     - darwin
     - install
@@ -76,6 +87,7 @@
       - chatbox
       - corretto
       - cyberduck
+      - dotnet-sdk
       - firefox
       - fantastical
       - font-hackgen
@@ -100,6 +112,7 @@
       - kekaexternalhelper
       - keyboard-maestro
       - keycastr
+      - libreoffice
       - lm-studio
       - messenger
       - obsidian
@@ -125,30 +138,8 @@
 - name: "package: Install global npm packages"
   ansible.builtin.command: npm install -g {{ item }}
   loop:
-    - agent-browser
-    - docx
     - npx7
     - "@playwright/mcp@latest"
-  tags:
-    - darwin
-    - install
-    - package
-    - darwin_package
-    - darwin_package_install
-
-- name: "package: Fix agent-browser binary permissions"
-  ansible.builtin.file:
-    path: /opt/homebrew/lib/node_modules/agent-browser/bin/agent-browser-darwin-arm64
-    mode: '0755'
-  tags:
-    - darwin
-    - install
-    - package
-    - darwin_package
-    - darwin_package_install
-
-- name: "package: Install Chrome for agent-browser"
-  ansible.builtin.command: agent-browser install
   tags:
     - darwin
     - install
@@ -180,7 +171,11 @@
 - name: "package : Install package by uv"
   ansible.builtin.command: uv tool install {{ item }}
   loop:
-    - homeassistant-cli
+    - openpyxl
+    - pandas
+    - python-docx
+    - pdfplumber
+    - pypdf
   tags:
     - darwin
     - install
@@ -317,6 +312,15 @@
     - security
     - darwin_security
     - darwin_security_install
+
+- name: "package : Install PowerShell by dotnet"
+  ansible.builtin.command: dotnet tool install --global PowerShell
+  tags:
+    - darwin
+    - install
+    - package
+    - darwin_package
+    - darwin_package_install
 
 # Note: This task requires sudo password. Run the playbook with -K or --ask-become-pass option.
 # Example: ansible-playbook darwin-personal.yml --ask-become-pass
