@@ -34,6 +34,7 @@
     repo: https://github.com/initMAX/zabbix-mcp-server.git
     dest: /opt/zabbix-mcp/src
     version: "v{{ zabbix_mcp.version }}"
+    force: true
   register: zabbix_mcp_git
   tags:
     - zabbix-mcp
