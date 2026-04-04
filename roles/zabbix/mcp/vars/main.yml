@@ -1,0 +1,7 @@
+---
+zabbix_mcp:
+  version: "1.14"
+  url: "{{ lookup('pipe', 'op read \"op://ansible/Zabbix MCP Server/url\"') }}"
+  api_token: "{{ lookup('pipe', 'op read \"op://ansible/Zabbix MCP Server/credential\"') }}"
+  auth_token: "{{ lookup('pipe', 'op read \"op://ansible/Zabbix MCP Server/auth_token\"') }}"
+  read_only: true

@@ -1,0 +1,119 @@
+---
+- name: "mcp : Create system user"
+  ansible.builtin.user:
+    name: zabbix-mcp
+    system: true
+    shell: /usr/sbin/nologin
+    home: /opt/zabbix-mcp
+    create_home: false
+  tags:
+    - zabbix-mcp
+    - init
+    - zabbix-mcp_mcp
+    - zabbix-mcp_mcp_init
+
+- name: "mcp : Create directories"
+  ansible.builtin.file:
+    path: "{{ item.path }}"
+    state: directory
+    owner: "{{ item.owner }}"
+    group: "{{ item.group }}"
+    mode: "{{ item.mode }}"
+  loop:
+    - { path: /opt/zabbix-mcp, owner: root, group: root, mode: '0755' }
+    - { path: /etc/zabbix-mcp, owner: zabbix-mcp, group: zabbix-mcp, mode: '0755' }
+    - { path: /var/log/zabbix-mcp, owner: zabbix-mcp, group: zabbix-mcp, mode: '0750' }
+  tags:
+    - zabbix-mcp
+    - init
+    - zabbix-mcp_mcp
+    - zabbix-mcp_mcp_init
+
+- name: "mcp : Clone repository"
+  ansible.builtin.git:
+    repo: https://github.com/initMAX/zabbix-mcp-server.git
+    dest: /opt/zabbix-mcp/src
+    version: "v{{ zabbix_mcp.version }}"
+  register: zabbix_mcp_git
+  tags:
+    - zabbix-mcp
+    - install
+    - zabbix-mcp_mcp
+    - zabbix-mcp_mcp_install
+
+- name: "mcp : Create virtual environment"
+  ansible.builtin.command:
+    cmd: uv venv --python /usr/bin/python3 /opt/zabbix-mcp/venv
+    creates: /opt/zabbix-mcp/venv
+  tags:
+    - zabbix-mcp
+    - install
+    - zabbix-mcp_mcp
+    - zabbix-mcp_mcp_install
+
+- name: "mcp : Install package"
+  ansible.builtin.command:
+    cmd: uv pip install /opt/zabbix-mcp/src
+  environment:
+    VIRTUAL_ENV: /opt/zabbix-mcp/venv
+  notify: "zabbix-mcp-server: Restart"
+  tags:
+    - zabbix-mcp
+    - install
+    - zabbix-mcp_mcp
+    - zabbix-mcp_mcp_install
+
+- name: "mcp : Deploy config"
+  ansible.builtin.template:
+    src: config.toml.j2
+    dest: /etc/zabbix-mcp/config.toml
+    owner: zabbix-mcp
+    group: zabbix-mcp
+    mode: '0600'
+  notify: "zabbix-mcp-server: Restart"
+  tags:
+    - zabbix-mcp
+    - config
+    - zabbix-mcp_mcp
+    - zabbix-mcp_mcp_config
+
+- name: "mcp : Install systemd unit"
+  ansible.builtin.copy:
+    src: zabbix-mcp-server.service
+    dest: /etc/systemd/system/zabbix-mcp-server.service
+    owner: root
+    group: root
+    mode: '0644'
+  notify:
+    - "systemd: Daemon reload"
+    - "zabbix-mcp-server: Restart"
+  tags:
+    - zabbix-mcp
+    - init
+    - zabbix-mcp_mcp
+    - zabbix-mcp_mcp_init
+
+- name: "mcp : Install logrotate config"
+  ansible.builtin.copy:
+    src: zabbix-mcp-server.logrotate
+    dest: /etc/logrotate.d/zabbix-mcp-server
+    owner: root
+    group: root
+    mode: '0644'
+  tags:
+    - zabbix-mcp
+    - init
+    - zabbix-mcp_mcp
+    - zabbix-mcp_mcp_init
+
+- name: "mcp : Enable and start service"
+  ansible.builtin.systemd:
+    name: zabbix-mcp-server
+    enabled: true
+    state: started
+  when: not ansible_check_mode
+  tags:
+    - zabbix-mcp
+    - init
+    - zabbix-mcp_mcp
+    - zabbix-mcp_mcp_init

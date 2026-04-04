@@ -15,4 +15,5 @@
     - mosquitto
     - syslogd
     - zabbix/server
+    - zabbix/mcp
     - zabbix/money/market

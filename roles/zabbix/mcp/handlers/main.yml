@@ -1,0 +1,10 @@
+---
+- name: "systemd: Daemon reload"
+  ansible.builtin.systemd:
+    daemon_reload: true
+
+- name: "zabbix-mcp-server: Restart"
+  ansible.builtin.systemd:
+    name: zabbix-mcp-server
+    state: restarted
+  when: not ansible_check_mode
