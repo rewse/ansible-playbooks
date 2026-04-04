@@ -119,11 +119,12 @@
     - raspberrypi_snmp
     - raspberrypi_snmp_config
 
-- name: "php-miio : Install"
-  ansible.builtin.unarchive:
-    src: https://github.com/skysilver-lab/php-miio/archive/refs/tags/v.{{ php_miio_version }}.zip
-    dest: /srv
-    remote_src: true
+- name: "php-miio : Clone repository"
+  ansible.builtin.git:
+    repo: https://github.com/skysilver-lab/php-miio.git
+    dest: /srv/php-miio
+    version: "v.{{ php_miio_version }}"
+  register: php_miio_git
   tags:
     - raspberrypi
     - install

@@ -760,15 +760,12 @@
     - homeassistant_custom
     - homeassistant_custom_init
 
-- name: "frosted-glass : Download manager"
-  ansible.builtin.unarchive:
-    src: https://github.com/wessamlauf/frosted-glass-manager/archive/refs/tags/v{{ frosted_glass_manager_version }}.zip
-    dest: /tmp
-    remote_src: true
-  retries: 3
-  delay: 10
-  register: download_result
-  until: download_result is succeeded
+- name: "frosted-glass : Clone manager"
+  ansible.builtin.git:
+    repo: https://github.com/wessamlauf/frosted-glass-manager.git
+    dest: /tmp/frosted-glass-manager
+    version: "v{{ frosted_glass_manager_version }}"
+  register: frosted_glass_manager_git
   tags:
     - homeassistant
     - install
@@ -776,11 +773,10 @@
     - frosted-glass
     - homeassistant_frosted-glass
     - homeassistant_frosted-glass_install
-    - homeassistant_frosted-glass_download
 
 - name: "frosted-glass : Install manager"
   ansible.builtin.copy:
-    src: /tmp/frosted-glass-manager-{{ frosted_glass_manager_version }}/custom_components/frosted_glass_manager
+    src: /tmp/frosted-glass-manager/custom_components/frosted_glass_manager
     dest: /srv/homeassistant/config/custom_components
     remote_src: true
   notify: "homeassistant: Restart"
@@ -793,11 +789,12 @@
     - homeassistant_frosted-glass_config
     - homeassistant_frosted-glass_install
 
-- name: "tuya : Download local integration"
-  ansible.builtin.unarchive:
-    src: https://github.com/make-all/tuya-local/archive/refs/tags/{{ tuya_local_version }}.zip
-    dest: /tmp
-    remote_src: true
+- name: "tuya : Clone local integration"
+  ansible.builtin.git:
+    repo: https://github.com/make-all/tuya-local.git
+    dest: /tmp/tuya-local
+    version: "{{ tuya_local_version }}"
+  register: tuya_local_git
   tags:
     - homeassistant
     - install
@@ -805,11 +802,10 @@
     - tuya
     - homeassistant_tuya
     - homeassistant_tuya_install
-    - homeassistant_tuya_download
 
 - name: "tuya : Install local integration"
   ansible.builtin.copy:
-    src: /tmp/tuya-local-{{ tuya_local_version }}/custom_components/tuya_local
+    src: /tmp/tuya-local/custom_components/tuya_local
     dest: /srv/homeassistant/config/custom_components
     remote_src: true
   notify: "homeassistant: Restart"
@@ -833,11 +829,12 @@
     - homeassistant_theme
     - homeassistant_theme_init
 
-- name: "frosted-glass : Download themes"
-  ansible.builtin.unarchive:
-    src: https://github.com/wessamlauf/homeassistant-frosted-glass-themes/archive/refs/tags/v{{ frosted_glass_version }}.zip
-    dest: /tmp
-    remote_src: true
+- name: "frosted-glass : Clone themes"
+  ansible.builtin.git:
+    repo: https://github.com/wessamlauf/homeassistant-frosted-glass-themes.git
+    dest: /tmp/homeassistant-frosted-glass-themes
+    version: "v{{ frosted_glass_version }}"
+  register: frosted_glass_themes_git
   tags:
     - homeassistant
     - install
@@ -845,11 +842,10 @@
     - frosted-glass
     - homeassistant_frosted-glass
     - homeassistant_frosted-glass_install
-    - homeassistant_frosted-glass_download
 
 - name: "frosted-glass : Install themes"
   ansible.builtin.copy:
-    src: /tmp/homeassistant-frosted-glass-themes-{{ frosted_glass_version }}/themes/{{ item }}
+    src: /tmp/homeassistant-frosted-glass-themes/themes/{{ item }}
     dest: /srv/homeassistant/config/themes
     remote_src: true
   loop:
