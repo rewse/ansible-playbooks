@@ -221,6 +221,22 @@
             interruption-level: time-sensitive
   trace:
     stored_traces: 100
+- id: automation.alarm_kitchen_water_leak
+  alias: "ALARM: Kitchen Water Leak"
+  triggers:
+    - trigger: state
+      entity_id: binary_sensor.kitchen_water_leak
+      to: "on"
+  actions:
+    - action: notify.all_devices
+      data:
+        title: "⚠️ ALARM"
+        message: "Kitchen Water Leak Detected"
+        data:
+          push:
+            interruption-level: time-sensitive
+  trace:
+    stored_traces: 100
 - id: automation.alarm_matter_sensor_offline
   alias: "ALARM: Matter Sensor is Offline"
   triggers:
