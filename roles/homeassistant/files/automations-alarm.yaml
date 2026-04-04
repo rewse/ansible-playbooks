@@ -105,7 +105,6 @@
         - binary_sensor.fancysyncbox
         - binary_sensor.firetv_liv
         - binary_sensor.firetv_liv_beta
-        - binary_sensor.firetv_mom
         - binary_sensor.guppy
         - binary_sensor.huebridge
         - binary_sensor.regza
