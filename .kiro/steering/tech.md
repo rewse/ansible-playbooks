@@ -52,12 +52,13 @@ op read op://ansible/database/password
 
 ## Ansible Syntax
 
-You MSUT follow [Ansible YAML Syntax](https://docs.ansible.com/projects/ansible/latest/reference_appendices/YAMLSyntax.html).
+Follow [Ansible YAML Syntax](https://docs.ansible.com/projects/ansible/latest/reference_appendices/YAMLSyntax.html).
 
 ## Best Practices
 
-- You SHOULD use tags for selective execution
-- You MUST store sensitive data in 1Password and reference with `lookup('pipe', 'op read ...')`
-- When saving share configuration, you SHOULD use group_vars
-- Before applying changes, you SHOUL verify with `--check`
-- You MUST keep role-specific variables in `role/vars` directories
+- Use tags for selective execution
+- Store sensitive data in 1Password and reference with `lookup('pipe', 'op read ...')`
+- Use group_vars when saving share configuration
+- Verify with `--check` before applying changes
+- Keep role-specific variables in `role/vars` directories
+- Don't add temporary or one-time fixes to playbooks; apply them directly via SSH instead
