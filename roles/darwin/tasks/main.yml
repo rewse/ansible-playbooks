@@ -173,11 +173,7 @@
 - name: "package : Install package by uv"
   ansible.builtin.command: uv tool install {{ item }}
   loop:
-    - openpyxl
-    - pandas
-    - python-docx
     - pdfplumber
-    - pypdf
   tags:
     - darwin
     - install
