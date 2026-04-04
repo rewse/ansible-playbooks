@@ -140,7 +140,7 @@
 - name: "package: Install global npm packages"
   ansible.builtin.command: npm install -g {{ item }}
   loop:
-    - npx7
+    - ctx7
     - "@playwright/mcp@latest"
   tags:
     - darwin
