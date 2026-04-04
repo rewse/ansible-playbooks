@@ -209,6 +209,15 @@
     - darwin_package
     - darwin_package_upgrade
 
+- name: "package : Update npm"
+  ansible.builtin.command: npm install -g npm@latest
+  tags:
+    - ubuntu
+    - upgrade
+    - package
+    - ubuntu_package
+    - ubuntu_package_upgrade
+
 - name: "package : Update global npm packages"
   ansible.builtin.command: npm update -g
   tags:
