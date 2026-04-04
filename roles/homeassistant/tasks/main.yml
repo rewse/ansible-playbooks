@@ -872,23 +872,22 @@
     - homeassistant_lovelace
     - homeassistant_lovelace_init
 
-- name: "card-mod : Download"
-  ansible.builtin.unarchive:
-    src: https://github.com/thomasloven/lovelace-card-mod/archive/refs/tags/v{{ card_mod_version }}.tar.gz
-    dest: /tmp
-    remote_src: true
+- name: "card-mod : Clone repository"
+  ansible.builtin.git:
+    repo: https://github.com/thomasloven/lovelace-card-mod.git
+    dest: /tmp/lovelace-card-mod
+    version: "v{{ card_mod_version }}"
+  register: card_mod_git
   tags:
     - homeassistant
     - install
-    - lovelace
     - card-mod
     - homeassistant_card-mod
     - homeassistant_card-mod_install
-    - homeassistant_card-mod_download
 
 - name: "card-mod : Install"
   ansible.builtin.copy:
-    src: /tmp/lovelace-card-mod-{{ card_mod_version }}/card-mod.js
+    src: /tmp/lovelace-card-mod/card-mod.js
     dest: /srv/homeassistant/config/www
     remote_src: true
   notify: "homeassistant: Restart"
