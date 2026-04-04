@@ -30,6 +30,7 @@
       - osv-scanner
       - pandoc
       - php
+      - pipx
       - podman
       - poppler
       - pv
