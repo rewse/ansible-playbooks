@@ -160,7 +160,7 @@
 
 - name: "package : Create symlink for find-docs skill"
   ansible.builtin.file:
-    src: ~/.config/agents/skills/find-docs
+    src: ~/.claude/skills/find-docs
     dest: ~/.kiro/skills/find-docs
     state: link
   tags:
