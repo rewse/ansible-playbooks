@@ -1,13 +1,17 @@
 ---
-- name: "mcporter : Add homebrew tap for mcporter"
+- name: "package : Add homebrew taps"
   community.general.homebrew_tap:
-    name: steipete/tap
+    name: "{{ item }}"
+  loop:
+    - k1LoW/tap
+    - steipete/tap
+    - xdevplatform/tap
   tags:
     - darwin
     - install
-    - mcporter
-    - darwin_mcporter
-    - darwin_mcporter_install
+    - package
+    - darwin_package
+    - darwin_package_install
 
 - name: "package : Install packages by homebrew"
   community.general.homebrew:
@@ -26,6 +30,7 @@
       - jq
       - mas
       - mcporter
+      - mo
       - node
       - osv-scanner
       - pandoc
@@ -62,16 +67,6 @@
     - package
     - darwin_package
     - darwin_package_install
-
-- name: "xurl : Add homebrew tap for xurl"
-  community.general.homebrew_tap:
-    name: xdevplatform/tap
-  tags:
-    - darwin
-    - install
-    - xurl
-    - darwin_xurl
-    - darwin_xurl_install
 
 - name: "package : Install packages by homebrew_cask"
   community.general.homebrew_cask:
