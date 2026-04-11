@@ -1,13 +1,22 @@
-- name: "sysctl: Disable rp_filter for VPN VTI interfaces"
-  ansible.posix.sysctl:
-    name: "{{ item }}"
-    value: "0"
-    sysctl_file: /etc/sysctl.conf
-    reload: true
-  loop:
-    - net.ipv4.conf.vti64.rp_filter
-    - net.ipv4.conf.vti65.rp_filter
+- name: "udm : Deploy udm-rp-filter.service"
+  ansible.builtin.copy:
+    src: udm-rp-filter.service
+    dest: /etc/systemd/system/udm-rp-filter.service
+    owner: root
+    group: root
+    mode: "0644"
+  notify: "udm-rp-filter: Restart"
   tags:
     - udm
-    - sysctl
-    - udm_sysctl
+    - config
+    - udm_config
+
+- name: "udm : Enable udm-rp-filter.service"
+  ansible.builtin.systemd:
+    name: udm-rp-filter
+    enabled: true
+    daemon_reload: true
+  tags:
+    - udm
+    - config
+    - udm_config
