@@ -1,0 +1,13 @@
+[Unit]
+Description=Disable rp_filter for VPN VTI interfaces
+After=network-online.target
+Wants=network-online.target
+
+[Service]
+Type=oneshot
+ExecStart=/sbin/sysctl -w net.ipv4.conf.vti64.rp_filter=0
+ExecStart=/sbin/sysctl -w net.ipv4.conf.vti65.rp_filter=0
+RemainAfterExit=yes
+
+[Install]
+WantedBy=multi-user.target
