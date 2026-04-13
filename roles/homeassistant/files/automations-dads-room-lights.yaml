@@ -118,6 +118,15 @@
       to: "off"
       for:
         minutes: "{{ states('input_number.dads_room_light_auto_off_minutes') }}"
+    # Handles the edge case where dads_room_presence briefly turns on (resetting the
+    # presence_mode timer) then turns off again within 1 minute (before presence_mode
+    # can turn on). Without this trigger, presence_mode stays off but never changes,
+    # so the presence_mode-based trigger never fires again, leaving the lights on indefinitely.
+    - trigger: state
+      entity_id: binary_sensor.dads_room_presence
+      to: "off"
+      for:
+        minutes: 1
     - trigger: homeassistant
       event: start
   actions:
@@ -203,6 +212,9 @@
                       state: "off"
                       for:
                         minutes: "{{ states('input_number.dads_room_light_auto_off_minutes') }}"
+                    - condition: state
+                      entity_id: binary_sensor.dads_room_presence
+                      state: "off"
           sequence:
             - action: input_select.select_option
               target: 
