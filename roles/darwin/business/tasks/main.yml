@@ -39,7 +39,7 @@
 # Install toolbox
 # Ref: https://docs.hub.amazon.dev/builder-toolbox/user-guide/getting-started/
 
-# Run `mwinit -f` before the command
+# Run `mwinit -s` before the command
 
 # Ref: https://w.amazon.com/bin/view/Isengard-cli/
 - name: "toolbox : Register isengard-cli repository"
@@ -94,6 +94,7 @@
   ansible.builtin.command: aim mcp install {{ item }}
   loop:
     - amazon-sharepoint-mcp
+    - atoz-mcp
     - aws-outlook-mcp
     - aws-sentral-mcp
     - builder-mcp
@@ -119,4 +120,5 @@
 
 # - name: "package: Install rest of the apps"
 #   install_yourself:
+#     - https://gitlab.aws.dev/kaizawap/MeetNote # MeetNote
 #     - https://www.poly.com/us/en/products/services/cloud/poly-lens  # Poly Lens
