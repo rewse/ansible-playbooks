@@ -25,6 +25,7 @@
       - direnv
       - fping
       - gh
+      - gitleaks
       - gnu-sed
       - git-cliff
       - jq
