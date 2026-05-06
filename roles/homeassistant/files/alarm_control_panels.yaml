@@ -19,5 +19,3 @@
     - armed_home
     - armed_away
     - armed_vacation
-  armed_vacation:
-    arming_time: 600
