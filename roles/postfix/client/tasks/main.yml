@@ -131,7 +131,7 @@
   ansible.builtin.lineinfile:
     dest: /etc/postfix/sasl_passwd
     regexp: '^\[{{ relayhost.name }}\]:{{ relayhost.port }}'
-    line: '[{{ relayhost.name }}]:{{ relayhost.port }} {{ workmail.username }}:{{ workmail.password }}'
+    line: '[{{ relayhost.name }}]:{{ relayhost.port }} {{ sakura.username }}:{{ sakura.password }}'
     create: true
     mode: '0600'
   register: postfix_sasl_password_out

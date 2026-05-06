@@ -1,7 +1,7 @@
 ---
 relayhost:
-  name: smtp.mail.us-west-2.awsapps.com
+  name: rewse.sakura.ne.jp
   port: 465
-workmail:
-  username: "{{ lookup('pipe', 'op read op://ansible/WorkMail/username') }}"
-  password: "{{ lookup('pipe', 'op read op://ansible/WorkMail/credential') }}"
+sakura:
+  username: "{{ lookup('pipe', 'op read op://ansible/Sakura/username') }}"
+  password: "{{ lookup('pipe', 'op read op://ansible/Sakura/credential') }}"
