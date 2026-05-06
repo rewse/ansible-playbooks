@@ -66,6 +66,19 @@
         hours: 8
   trace:
     stored_traces: 100
+- id: automation.open_moms_room_curtains_vacation
+  alias: "Open Mom’s Room Curtains Vacation"
+  triggers:
+    - trigger: time
+      at: "08:00:00"
+  conditions:
+    - condition: state
+      entity_id: alarm_control_panel.home
+      state: "armed_vacation"
+  actions:
+    - action: cover.open_cover
+      target:
+        entity_id: cover.moms_room_curtains
 - id: automation.select_moms_room_presence_mode
   alias: "Select Mom’s Room Presence Mode"
   triggers:
