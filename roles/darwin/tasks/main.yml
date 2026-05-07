@@ -138,6 +138,7 @@
   loop:
     - ctx7
     - "@playwright/mcp@latest"
+    - skills
   tags:
     - darwin
     - install
