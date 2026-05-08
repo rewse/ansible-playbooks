@@ -36,8 +36,23 @@ if docker ps --format '{{.Names}}' | grep -q '^homeassistant$'; then
     exit 0
 fi
 
+check_primary_api() {
+    local http_code
+    http_code=$(curl --silent --max-time "${HEALTHCHECK_TIMEOUT}" -o /dev/null -w "%{http_code}" "${PRIMARY_API}" 2>/dev/null || echo "000")
+    # Any non-5xx response means HA is up (401 is returned without auth).
+    case "${http_code}" in
+        2??|3??|401|403)
+            return 0
+            ;;
+        *)
+            log "Primary API returned HTTP ${http_code}"
+            return 1
+            ;;
+    esac
+}
+
 # First API check
-if curl --silent --fail --max-time "${HEALTHCHECK_TIMEOUT}" "${PRIMARY_API}" >/dev/null 2>&1; then
+if check_primary_api; then
     exit 0
 fi
 
@@ -45,7 +60,7 @@ log "Primary API check failed; waiting ${RETRY_WAIT}s before retry"
 sleep "${RETRY_WAIT}"
 
 # Second API check
-if curl --silent --fail --max-time "${HEALTHCHECK_TIMEOUT}" "${PRIMARY_API}" >/dev/null 2>&1; then
+if check_primary_api; then
     log "Primary API recovered on retry"
     exit 0
 fi

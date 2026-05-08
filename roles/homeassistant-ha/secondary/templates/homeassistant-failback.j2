@@ -284,10 +284,13 @@ log "Waiting up to ${API_WAIT_TIMEOUT}s for ${PRIMARY_API} to respond..."
 elapsed=0
 api_ready=false
 while [ "${elapsed}" -lt "${API_WAIT_TIMEOUT}" ]; do
-    if curl --silent --fail --max-time 5 "${PRIMARY_API}" >/dev/null 2>&1; then
-        api_ready=true
-        break
-    fi
+    http_code=$(curl --silent --max-time 5 -o /dev/null -w "%{http_code}" "${PRIMARY_API}" 2>/dev/null || echo "000")
+    case "${http_code}" in
+        2??|3??|401|403)
+            api_ready=true
+            break
+            ;;
+    esac
     sleep "${API_WAIT_INTERVAL}"
     elapsed=$((elapsed + API_WAIT_INTERVAL))
 done
