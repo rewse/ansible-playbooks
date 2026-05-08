@@ -1,0 +1,9 @@
+/var/log/rsyncd.log {
+    weekly
+    rotate 4
+    compress
+    delaycompress
+    missingok
+    notifempty
+    copytruncate
+}

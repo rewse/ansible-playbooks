@@ -19,6 +19,13 @@
     state: started
   tags: [homeassistant-ha-primary, config]
 
+- name: "rsync-daemon : Install logrotate config"
+  ansible.builtin.copy:
+    src: rsyncd.logrotate
+    dest: /etc/logrotate.d/rsyncd
+    mode: '0644'
+  tags: [homeassistant-ha-primary, config]
+
 - name: "zabbix : Copy userparameter config"
   ansible.builtin.copy:
     src: homeassistant-ha.conf
