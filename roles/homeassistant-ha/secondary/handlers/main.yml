@@ -2,3 +2,8 @@
 - name: "systemd: Reload"
   ansible.builtin.systemd:
     daemon_reload: true
+
+- name: "zabbix-agent: Restart"
+  ansible.builtin.systemd:
+    name: zabbix-agent
+    state: restarted
