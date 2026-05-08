@@ -190,7 +190,9 @@ diff_output=$(rsync --archive --delete --dry-run --itemize-changes \
     --exclude='tts/' \
     --exclude='deps/' \
     --exclude='__pycache__/' \
-    "${CONFIG_DIR}/" "${RSYNC_MODULE}" 2>&1 || true)
+    --rsync-path="sudo rsync" \
+    -e "ssh -p ${PRIMARY_SSH_PORT} -o BatchMode=yes -o StrictHostKeyChecking=accept-new" \
+    "${CONFIG_DIR}/" "${PRIMARY_SSH_USER}@${PRIMARY_HOST}:${CONFIG_DIR}/" 2>&1 || true)
 
 if [ -z "${diff_output}" ]; then
     log "No config differences detected."
@@ -260,6 +262,7 @@ if [ "${MERGE_STRATEGY}" = "push" ]; then
             --exclude='tts/' \
             --exclude='deps/' \
             --exclude='__pycache__/' \
+            --rsync-path="sudo rsync" \
             -e "ssh -p ${PRIMARY_SSH_PORT} -o BatchMode=yes -o StrictHostKeyChecking=accept-new" \
             "${CONFIG_DIR}/" \
             "${PRIMARY_SSH_USER}@${PRIMARY_HOST}:${CONFIG_DIR}/"; then
