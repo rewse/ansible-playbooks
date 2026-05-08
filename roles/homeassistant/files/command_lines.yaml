@@ -27,3 +27,9 @@
     state_class: total_increasing
     icon: mdi:lightning-bolt
     scan_interval: 300
+- sensor:
+    unique_id: sensor.hostname
+    name: "Hostname"
+    command: "hostname -s"
+    icon: mdi:server
+    scan_interval: 60
