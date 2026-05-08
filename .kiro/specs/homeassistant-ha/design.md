@@ -60,7 +60,7 @@ hosts allow = 192.168.0.0/24
 **目的:** foxの設定ファイルを定期的に同期
 
 **実装:**
-- `/usr/local/bin/homeassistant-sync.sh`
+- `/usr/local/bin/homeassistant-sync`
 - rsyncコマンドで `rsync://fox.rewse.jp/homeassistant-config` から同期
 - systemd timerで1分ごとに実行
 
@@ -74,7 +74,7 @@ hosts allow = 192.168.0.0/24
 **目的:** foxのHome Assistantを監視し、異常時にフェイルオーバー
 
 **実装:**
-- `/usr/local/bin/homeassistant-failover.sh`
+- `/usr/local/bin/homeassistant-failover`
 - systemd timerで30秒ごとに実行
 
 **チェックフロー:**
@@ -200,8 +200,8 @@ roles/homeassistant-ha/
 │   └── main.yml              # メインタスク（fox/hotel分岐）
 ├── files/
 │   ├── rsyncd.conf           # rsync daemon設定（fox用）
-│   ├── homeassistant-sync.sh # 同期スクリプト（hotel用）
-│   ├── homeassistant-failover.sh # フェイルオーバースクリプト（hotel用）
+│   ├── homeassistant-sync # 同期スクリプト（hotel用）
+│   ├── homeassistant-failover # フェイルオーバースクリプト（hotel用）
 │   ├── homeassistant-sync.service
 │   ├── homeassistant-sync.timer
 │   ├── homeassistant-failover.service

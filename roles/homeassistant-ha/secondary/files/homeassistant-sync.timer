@@ -1,0 +1,11 @@
+[Unit]
+Description=Sync Home Assistant configuration from fox (every minute)
+
+[Timer]
+OnBootSec=2min
+OnUnitActiveSec=1min
+AccuracySec=10s
+Unit=homeassistant-sync.service
+
+[Install]
+WantedBy=timers.target

@@ -2,14 +2,15 @@
 
 ## タスク概要
 
-- [ ] Task 1: ドキュメント作成
-- [ ] Task 2: rsync daemon設定（fox側）
-- [ ] Task 3: rsync同期設定（hotel側）
-- [ ] Task 4: hotel側のDocker Compose設定
-- [ ] Task 5: ヘルスチェックスクリプト作成（hotel側）
-- [ ] Task 6: systemd timer設定（hotel側）
-- [ ] Task 7: メール通知設定
-- [ ] Task 8: Ansible Playbookの統合
+- [x] Task 1: ドキュメント作成
+- [x] Task 2: rsync daemon設定（fox側）
+- [x] Task 3: rsync同期設定（hotel側）
+- [x] Task 4: hotel側のDocker Compose設定
+- [x] Task 5: ヘルスチェックスクリプト作成（hotel側）
+- [x] Task 6: systemd timer設定（hotel側）
+- [x] Task 7: メール通知設定
+- [x] Task 8: Ansible Playbookの統合
+- [x] Task 9: 復旧（failback）スクリプト作成
 
 ---
 
@@ -22,14 +23,14 @@
 - [x] `requirements.md`: 要件定義
 - [x] `design.md`: 設計ドキュメント（アーキテクチャ図、コンポーネント説明）
 - [x] `tasks.md`: タスク一覧とチェックリスト
-- [ ] `operations.md`: 運用手順（手動復旧、設定変更時の注意点、フェイルオーバー確認方法）
-- [ ] `troubleshooting.md`: トラブルシューティング（よくある問題と解決方法）
+- [x] `operations.md`: 運用手順（手動復旧、設定変更時の注意点、フェイルオーバー確認方法）
+- [x] `troubleshooting.md`: トラブルシューティング（よくある問題と解決方法）
 
 **テスト:**
-- [ ] ドキュメントをレビューし、不足している情報がないか確認
+- [x] ドキュメントをレビューし、不足している情報がないか確認
 
 **Demo:**
-- [ ] ドキュメントが作成され、全体像が把握できる
+- [x] ドキュメントが作成され、全体像が把握できる
 
 ---
 
@@ -38,11 +39,11 @@
 **目的:** foxの `/srv/homeassistant/config` をrsync経由で公開
 
 **実装:**
-- [ ] `roles/homeassistant-ha/tasks/main.yml` を作成
-- [ ] `roles/homeassistant-ha/files/rsyncd.conf` を作成
-- [ ] rsync daemonの設定ファイル `/etc/rsyncd.conf` を配置
-- [ ] systemdで `rsync.service` を起動
-- [ ] ファイアウォール設定（必要に応じて）
+- [x] `roles/homeassistant-ha/primary/tasks/main.yml` を作成
+- [x] `roles/homeassistant-ha/primary/files/rsyncd.conf` を作成
+- [x] rsync daemonの設定ファイル `/etc/rsyncd.conf` を配置
+- [x] systemdで `rsync.service` を起動
+- [ ] ファイアウォール設定（必要に応じて。家庭LAN内なので現状不要）
 
 **テスト:**
 - [ ] hotelから `rsync rsync://fox.rewse.jp/homeassistant-config` で接続確認
@@ -58,13 +59,13 @@
 **目的:** hotelからfoxの設定ファイルを1分ごとに同期
 
 **実装:**
-- [ ] `/srv/homeassistant/config` ディレクトリを作成
-- [ ] `roles/homeassistant-ha/files/homeassistant-sync.sh` を作成
-- [ ] rsync同期スクリプト `/usr/local/bin/homeassistant-sync.sh` を配置
-- [ ] `roles/homeassistant-ha/files/homeassistant-sync.service` を作成
-- [ ] `roles/homeassistant-ha/files/homeassistant-sync.timer` を作成
-- [ ] systemd service/timer を配置（1分ごとに実行）
-- [ ] 初回同期を実行
+- [x] `/srv/homeassistant/config` ディレクトリを作成
+- [x] `roles/homeassistant-ha/secondary/files/homeassistant-sync` を作成
+- [x] rsync同期スクリプト `/usr/local/bin/homeassistant-sync` を配置
+- [x] `roles/homeassistant-ha/secondary/files/homeassistant-sync.service` を作成
+- [x] `roles/homeassistant-ha/secondary/files/homeassistant-sync.timer` を作成
+- [x] systemd service/timer を配置（1分ごとに実行）
+- [ ] 初回同期を実行（本番適用時）
 
 **テスト:**
 - [ ] タイマーを起動し、1分後に同期が実行されることを確認
@@ -80,10 +81,10 @@
 **目的:** hotelの `/etc/compose.yml` にhomeassistantセクションを追加
 
 **実装:**
-- [ ] `roles/homeassistant/tasks/main.yml` を修正し、hotelにも適用可能にする
-- [ ] hotelでコンテナをpullするが、起動はしない（`state: present`）
-- [ ] 必要なディレクトリ、証明書、設定ファイルを配置
-- [ ] hotelに `singleton_int2` グループ変数を追加（必要に応じて）
+- [x] `roles/homeassistant-ha/secondary/tasks/main.yml` でhotel用のcompose設定を追加
+- [x] hotelでコンテナをpullするが、起動はしない（`state: present`, `restart: "no"`）
+- [x] `/srv/homeassistant/config` ディレクトリを配置（設定ファイルはrsync経由）
+- [x] `singleton_int2.yml` を作成
 
 **テスト:**
 - [ ] `docker compose -f /etc/compose.yml config` でエラーがないことを確認
@@ -100,15 +101,15 @@
 **目的:** foxのHome Assistantの状態を監視し、異常時にフェイルオーバー
 
 **実装:**
-- [ ] `roles/homeassistant-ha/files/homeassistant-failover.sh` を作成
-- [ ] `/usr/local/bin/homeassistant-failover.sh` を配置
-- [ ] チェックロジックを実装:
-  - [ ] foxのAPI（http://fox.rewse.jp:8123/api/）をcurlで確認
-  - [ ] 失敗したら30秒待機して再チェック
-  - [ ] 2回連続失敗したら、SSH経由で `docker ps | grep homeassistant` を実行
-  - [ ] コンテナが停止していたら、hotelで `docker compose up -d homeassistant` を実行
-  - [ ] メール通知を送信
-- [ ] ロックファイル `/var/run/homeassistant-failover.lock` で二重実行を防止
+- [x] `roles/homeassistant-ha/secondary/templates/homeassistant-failover.j2` を作成
+- [x] `/usr/local/bin/homeassistant-failover` を配置
+- [x] チェックロジックを実装:
+  - [x] foxのAPI（http://fox.rewse.jp:8123/api/）をcurlで確認
+  - [x] 失敗したら30秒待機して再チェック
+  - [x] 2回連続失敗したら、SSH経由で `docker ps | grep homeassistant` を実行
+  - [x] コンテナが停止していたら、hotelで `docker compose up -d homeassistant` を実行
+  - [x] メール通知を送信
+- [x] ロックファイル `/var/run/homeassistant-failover.lock` で二重実行を防止
 
 **テスト:**
 - [ ] スクリプトを手動実行し、正常系の動作を確認（foxが稼働中）
@@ -125,11 +126,11 @@
 **目的:** ヘルスチェックスクリプトを30秒ごとに実行
 
 **実装:**
-- [ ] `roles/homeassistant-ha/files/homeassistant-failover.service` を作成
-- [ ] `roles/homeassistant-ha/files/homeassistant-failover.timer` を作成
-- [ ] systemd service `/etc/systemd/system/homeassistant-failover.service` を配置
-- [ ] systemd timer `/etc/systemd/system/homeassistant-failover.timer` を配置（30秒ごと）
-- [ ] タイマーを有効化
+- [x] `roles/homeassistant-ha/secondary/files/homeassistant-failover.service` を作成
+- [x] `roles/homeassistant-ha/secondary/files/homeassistant-failover.timer` を作成
+- [x] systemd service `/etc/systemd/system/homeassistant-failover.service` を配置
+- [x] systemd timer `/etc/systemd/system/homeassistant-failover.timer` を配置（30秒ごと）
+- [x] タイマーを有効化
 
 **テスト:**
 - [ ] タイマーを起動: `systemctl start homeassistant-failover.timer`
@@ -146,12 +147,12 @@
 **目的:** フェイルオーバー発生時にメール通知
 
 **実装:**
-- [ ] ヘルスチェックスクリプトにメール送信処理を追加
-- [ ] 既存のpostfix設定を利用（`roles/postfix/client`）
-- [ ] 通知内容を実装:
-  - [ ] 件名: `[ALERT] Home Assistant Failover: fox -> hotel`
-  - [ ] 本文: フェイルオーバー発生時刻、理由、現在の状態
-- [ ] 通知先メールアドレスを設定（group_vars等）
+- [x] ヘルスチェックスクリプトにメール送信処理を追加
+- [x] 既存のpostfix設定を利用（`roles/postfix/client`、`ubuntu.yml` 経由でhotelにも適用済み）
+- [x] 通知内容を実装:
+  - [x] 件名: `[ALERT] Home Assistant Failover: fox.rewse.jp -> <hostname>`
+  - [x] 本文: フェイルオーバー発生時刻、理由、現在の状態
+- [x] 通知先メールアドレスを設定（`group_vars/all/vars` の `email.primary` を参照）
 
 **テスト:**
 - [ ] スクリプトから手動でメール送信を実行
@@ -167,21 +168,56 @@
 **目的:** 全ての設定をAnsibleで管理
 
 **実装:**
-- [ ] `roles/homeassistant-ha/` ロールを作成
-- [ ] `roles/homeassistant-ha/tasks/main.yml` でfox/hotel別の処理を分岐
-- [ ] `roles/homeassistant-ha/handlers/main.yml` を作成
-- [ ] `singleton_int1.yml` に `homeassistant-ha` ロールを追加
-- [ ] `singleton_int2.yml` に `homeassistant-ha` ロールを追加
-- [ ] タグ設定: `homeassistant-ha`, `homeassistant-ha-sync`, `homeassistant-ha-failover`
+- [x] `roles/homeassistant-ha/primary/` ロールを作成（fox用）
+- [x] `roles/homeassistant-ha/secondary/` ロールを作成（hotel用）
+- [x] `roles/homeassistant-ha/primary/handlers/main.yml` を作成
+- [x] `roles/homeassistant-ha/secondary/handlers/main.yml` を作成
+- [x] `roles/homeassistant-ha/secondary/meta/main.yml` で `docker` ロール依存を定義
+- [x] `singleton_int1.yml` に `homeassistant-ha/primary` ロールを追加
+- [x] `singleton_int2.yml` に `homeassistant-ha/secondary` ロールを追加
+- [x] `site.yml` に `singleton_int2.yml` を追加
+- [x] タグ設定: `homeassistant-ha-primary`, `homeassistant-ha-secondary`, `install`, `config`, `update`
 
 **テスト:**
-- [ ] `ansible-playbook site.yml --tags homeassistant-ha --check` でドライラン
-- [ ] エラーがないことを確認
-- [ ] `ansible-playbook site.yml --tags homeassistant-ha --limit fox.rewse.jp` でfoxに適用
-- [ ] `ansible-playbook site.yml --tags homeassistant-ha --limit hotel.rewse.jp` でhotelに適用
+- [x] `ansible-playbook site.yml --tags homeassistant-ha-primary,homeassistant-ha-secondary --check` でドライラン
+- [x] エラーがないことを確認（failed=0）
+- [ ] `ansible-playbook site.yml --tags homeassistant-ha-primary --limit fox.rewse.jp` でfoxに適用
+- [ ] `ansible-playbook site.yml --tags homeassistant-ha-secondary --limit hotel.rewse.jp` でhotelに適用
 
 **Demo:**
 - [ ] Ansibleで全体を適用し、HA構成が完成
+
+---
+
+## Task 9: 復旧（failback）スクリプト作成
+
+**目的:** hotel から fox への切り戻し手順をスクリプト化
+
+**実装:**
+- [x] `roles/homeassistant-ha/secondary/templates/homeassistant-failback.j2` を作成
+- [x] `/usr/local/bin/homeassistant-failback` を配置
+- [x] 対話モード/非対話モード（`--yes --merge STRATEGY`）の両対応
+- [x] ロジックを実装:
+  - [x] 前提チェック（hotel で HA 起動中 / fox に SSH・rsync 到達可能）
+  - [x] フェイルオーバータイマーを停止
+  - [x] `rsync --dry-run` で設定差分を表示
+  - [x] マージ方針選択（push / discard / abort）
+  - [x] hotel の HA コンテナを停止
+  - [x] `push` 選択時は rsync over SSH で fox に設定を反映
+  - [x] SSH 経由で fox の HA コンテナを起動
+  - [x] fox API の応答を最大 120 秒ポーリング
+  - [x] フェイルオーバータイマーを再開
+  - [x] 成功/失敗のメール通知
+- [x] エラー発生時に自動でフェイルオーバータイマーを再開してから終了
+- [x] `operations.md` にスクリプト使用方法を追記
+
+**テスト:**
+- [ ] スクリプトを `--help` で実行し、使い方が表示されることを確認
+- [ ] フェイルオーバー発生中にスクリプトを手動実行し、復旧することを確認
+- [ ] 不正な引数（`--yes` のみなど）を渡してエラーハンドリングを確認
+
+**Demo:**
+- [ ] フェイルオーバー状態から `sudo homeassistant-failback` で fox に切り戻す
 
 ---
 
@@ -195,5 +231,5 @@
 - [ ] hotelで30秒ごとにヘルスチェックが実行されている
 - [ ] foxのコンテナを停止すると、自動的にhotelで起動する
 - [ ] フェイルオーバー発生時にメール通知が送信される
-- [ ] 全ての設定がAnsibleで管理されている
-- [ ] ドキュメントが整備されている
+- [x] 全ての設定がAnsibleで管理されている
+- [x] ドキュメントが整備されている

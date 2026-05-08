@@ -1,0 +1,29 @@
+#!/bin/bash
+set -euo pipefail
+
+SOURCE="rsync://fox.rewse.jp/homeassistant-config/"
+DEST="/srv/homeassistant/config/"
+LOG_TAG="homeassistant-sync"
+
+# Skip sync when local Home Assistant is running (failover active)
+if docker ps --format '{{.Names}}' | grep -q '^homeassistant$'; then
+    logger -t "${LOG_TAG}" "Local Home Assistant is running (failover active); skipping sync"
+    exit 0
+fi
+
+rsync \
+    --archive \
+    --delete \
+    --exclude='*.log*' \
+    --exclude='home-assistant_v2.db*' \
+    --exclude='*.db-shm' \
+    --exclude='*.db-wal' \
+    --exclude='.cache/' \
+    --exclude='.ha_run.lock' \
+    --exclude='backups/' \
+    --exclude='tmp_backups/' \
+    --exclude='tts/' \
+    --exclude='deps/' \
+    --exclude='__pycache__/' \
+    "${SOURCE}" \
+    "${DEST}"

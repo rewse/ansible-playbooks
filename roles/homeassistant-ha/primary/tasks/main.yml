@@ -1,0 +1,20 @@
+---
+- name: "rsync-daemon : Install package"
+  ansible.builtin.apt:
+    name: rsync
+  tags: [homeassistant-ha-primary, install]
+
+- name: "rsync-daemon : Copy configuration"
+  ansible.builtin.copy:
+    src: rsyncd.conf
+    dest: /etc/rsyncd.conf
+    mode: '0644'
+  notify: "rsync: Restart"
+  tags: [homeassistant-ha-primary, config]
+
+- name: "rsync-daemon : Enable and start service"
+  ansible.builtin.systemd:
+    name: rsync
+    enabled: true
+    state: started
+  tags: [homeassistant-ha-primary, config]

@@ -1,0 +1,123 @@
+---
+- name: "config : Create directory"
+  ansible.builtin.file:
+    path: /srv/homeassistant/config
+    state: directory
+    mode: '0755'
+  tags: [homeassistant-ha-secondary, init]
+
+- name: "rsync-sync : Install package"
+  ansible.builtin.apt:
+    name: rsync
+  tags: [homeassistant-ha-secondary, install]
+
+- name: "rsync-sync : Copy script"
+  ansible.builtin.copy:
+    src: homeassistant-sync
+    dest: /usr/local/bin/homeassistant-sync
+    mode: '0755'
+  tags: [homeassistant-ha-secondary, config]
+
+- name: "rsync-sync : Copy service unit"
+  ansible.builtin.copy:
+    src: homeassistant-sync.service
+    dest: /etc/systemd/system/homeassistant-sync.service
+    mode: '0644'
+  notify: "systemd: Reload"
+  tags: [homeassistant-ha-secondary, config]
+
+- name: "rsync-sync : Copy timer unit"
+  ansible.builtin.copy:
+    src: homeassistant-sync.timer
+    dest: /etc/systemd/system/homeassistant-sync.timer
+    mode: '0644'
+  notify: "systemd: Reload"
+  tags: [homeassistant-ha-secondary, config]
+
+- name: "rsync-sync : Enable timer"
+  ansible.builtin.systemd:
+    name: homeassistant-sync.timer
+    enabled: true
+    state: started
+    daemon_reload: true
+  when: not ansible_check_mode
+  tags: [homeassistant-ha-secondary, config]
+
+- name: "docker : Add compose service"
+  ansible.builtin.blockinfile:
+    path: /etc/compose.yml
+    create: true
+    marker: "# {mark} ANSIBLE MANAGED BLOCK homeassistant"
+    block: |2
+        homeassistant:
+          container_name: homeassistant
+          image: ghcr.io/home-assistant/home-assistant:stable
+          volumes:
+            - /etc/localtime:/etc/localtime:ro
+            - /run/dbus:/run/dbus:ro
+            - /srv/homeassistant/config:/config
+          security_opt:
+            - apparmor:unconfined
+          network_mode: host
+          privileged: true
+          restart: "no"
+  tags: [homeassistant-ha-secondary, config]
+
+- name: "docker : Check image quarantine"
+  ansible.builtin.include_role:
+    name: docker/quarantine
+  vars:
+    quarantine_image: ghcr.io/home-assistant/home-assistant:stable
+  tags: [homeassistant-ha-secondary, update, quarantine]
+
+- name: "docker : Pull image (standby, do not start)"
+  community.docker.docker_compose_v2:
+    project_src: /etc
+    services: homeassistant
+    state: present
+    pull: always
+  when: quarantine_passed | default(false)
+  tags: [homeassistant-ha-secondary, update]
+
+- name: "failover : Copy script"
+  ansible.builtin.template:
+    src: homeassistant-failover.j2
+    dest: /usr/local/bin/homeassistant-failover
+    mode: '0755'
+    variable_start_string: "[%"
+    variable_end_string: "%]"
+  tags: [homeassistant-ha-secondary, config]
+
+- name: "failover : Copy service unit"
+  ansible.builtin.copy:
+    src: homeassistant-failover.service
+    dest: /etc/systemd/system/homeassistant-failover.service
+    mode: '0644'
+  notify: "systemd: Reload"
+  tags: [homeassistant-ha-secondary, config]
+
+- name: "failover : Copy timer unit"
+  ansible.builtin.copy:
+    src: homeassistant-failover.timer
+    dest: /etc/systemd/system/homeassistant-failover.timer
+    mode: '0644'
+  notify: "systemd: Reload"
+  tags: [homeassistant-ha-secondary, config]
+
+- name: "failover : Enable timer"
+  ansible.builtin.systemd:
+    name: homeassistant-failover.timer
+    enabled: true
+    state: started
+    daemon_reload: true
+  when: not ansible_check_mode
+  tags: [homeassistant-ha-secondary, config]
+
+- name: "failback : Copy script"
+  ansible.builtin.template:
+    src: homeassistant-failback.j2
+    dest: /usr/local/bin/homeassistant-failback
+    mode: '0755'
+    variable_start_string: "[%"
+    variable_end_string: "%]"
+  tags: [homeassistant-ha-secondary, config]

@@ -1,0 +1,5 @@
+---
+- name: "rsync: Restart"
+  ansible.builtin.systemd:
+    name: rsync
+    state: restarted

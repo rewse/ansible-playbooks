@@ -1,0 +1,313 @@
+#!/bin/bash
+set -uo pipefail
+
+PRIMARY_HOST="fox.rewse.jp"
+PRIMARY_API="http://${PRIMARY_HOST}:8123/api/"
+PRIMARY_SSH_PORT="11022"
+PRIMARY_SSH_USER="[% admin %]"
+CONFIG_DIR="/srv/homeassistant/config"
+RSYNC_MODULE="rsync://${PRIMARY_HOST}/homeassistant-config/"
+COMPOSE_DIR="/etc"
+FAILOVER_TIMER="homeassistant-failover.timer"
+API_WAIT_TIMEOUT=120
+API_WAIT_INTERVAL=5
+LOG_TAG="homeassistant-failback"
+MAIL_TO="[% email.primary %]"
+
+# -----------------------------------------------------------------------------
+# Argument parsing
+# -----------------------------------------------------------------------------
+NON_INTERACTIVE=false
+MERGE_STRATEGY="ask"  # ask | push | discard
+
+usage() {
+    cat <<EOF
+Usage: $(basename "$0") [OPTIONS]
+
+Perform failback from hotel (secondary) to fox (primary).
+
+Options:
+  -y, --yes              Non-interactive mode. Requires --merge to be set.
+  -m, --merge STRATEGY   Config merge strategy: push | discard
+                           push    - Push hotel config to fox (hotel wins)
+                           discard - Keep fox config as-is (hotel changes lost)
+  -h, --help             Show this help message.
+
+Interactive mode (default):
+  Shows config diff and prompts for merge strategy.
+EOF
+}
+
+while [ $# -gt 0 ]; do
+    case "$1" in
+        -y|--yes)
+            NON_INTERACTIVE=true
+            shift
+            ;;
+        -m|--merge)
+            MERGE_STRATEGY="${2:-}"
+            shift 2
+            ;;
+        -h|--help)
+            usage
+            exit 0
+            ;;
+        *)
+            echo "Unknown option: $1" >&2
+            usage >&2
+            exit 2
+            ;;
+    esac
+done
+
+if [ "${NON_INTERACTIVE}" = true ] && [ "${MERGE_STRATEGY}" = "ask" ]; then
+    echo "ERROR: --yes requires --merge (push|discard)" >&2
+    exit 2
+fi
+
+if [ "${MERGE_STRATEGY}" != "ask" ] \
+   && [ "${MERGE_STRATEGY}" != "push" ] \
+   && [ "${MERGE_STRATEGY}" != "discard" ]; then
+    echo "ERROR: invalid --merge value: ${MERGE_STRATEGY}" >&2
+    exit 2
+fi
+
+# -----------------------------------------------------------------------------
+# Helpers
+# -----------------------------------------------------------------------------
+log() {
+    logger -t "${LOG_TAG}" "$1"
+    echo "$(date '+%Y-%m-%d %H:%M:%S') $1"
+}
+
+ssh_primary() {
+    ssh \
+        -o BatchMode=yes \
+        -o ConnectTimeout=10 \
+        -o StrictHostKeyChecking=accept-new \
+        -p "${PRIMARY_SSH_PORT}" \
+        "${PRIMARY_SSH_USER}@${PRIMARY_HOST}" \
+        "$@"
+}
+
+send_notification() {
+    local status="$1"
+    local detail="$2"
+    local hostname_local
+    hostname_local=$(hostname)
+
+    local subject_prefix
+    if [ "${status}" = "SUCCESS" ]; then
+        subject_prefix="[INFO]"
+    else
+        subject_prefix="[ALERT]"
+    fi
+
+    local subject="${subject_prefix} Home Assistant Failback: ${hostname_local} -> ${PRIMARY_HOST} (${status})"
+    local body
+    body=$(cat <<EOF
+Home Assistant failback has ${status}.
+
+Completion time : $(date '+%Y-%m-%d %H:%M:%S %Z')
+From (standby)  : ${hostname_local}
+To (primary)    : ${PRIMARY_HOST}
+Merge strategy  : ${MERGE_STRATEGY}
+
+Detail:
+${detail}
+
+Current status on primary:
+$(ssh_primary "docker ps --filter name=homeassistant --format 'table {{.Names}}\t{{.Status}}\t{{.Ports}}'" 2>/dev/null || echo "(unable to query primary)")
+
+--
+${LOG_TAG} on ${hostname_local}
+EOF
+)
+
+    if command -v mail >/dev/null 2>&1; then
+        echo "${body}" | mail -s "${subject}" "${MAIL_TO}" || \
+            log "Failed to send notification email to ${MAIL_TO}"
+    else
+        log "mail command not found; skipping email notification"
+    fi
+}
+
+abort() {
+    local msg="$1"
+    log "ABORT: ${msg}"
+    send_notification "FAILED" "${msg}"
+    exit 1
+}
+
+# -----------------------------------------------------------------------------
+# Step 1: Preflight checks
+# -----------------------------------------------------------------------------
+log "=== Starting failback from $(hostname) to ${PRIMARY_HOST} ==="
+
+if ! docker ps --format '{{.Names}}' | grep -q '^homeassistant$'; then
+    abort "Local Home Assistant is not running on $(hostname); nothing to fail back."
+fi
+
+if ! ssh_primary "true" 2>/dev/null; then
+    abort "Cannot reach primary ${PRIMARY_HOST} via SSH on port ${PRIMARY_SSH_PORT}."
+fi
+
+if ! rsync --dry-run "${RSYNC_MODULE}" >/dev/null 2>&1; then
+    abort "Cannot reach rsync daemon at ${RSYNC_MODULE}."
+fi
+
+log "Preflight checks passed."
+
+# -----------------------------------------------------------------------------
+# Step 2: Stop failover timer
+# -----------------------------------------------------------------------------
+log "Stopping ${FAILOVER_TIMER}..."
+if ! systemctl stop "${FAILOVER_TIMER}"; then
+    abort "Failed to stop ${FAILOVER_TIMER}."
+fi
+
+# Ensure the timer is restarted on any early exit
+restore_failover_timer() {
+    log "Restoring ${FAILOVER_TIMER}..."
+    systemctl start "${FAILOVER_TIMER}" || \
+        log "WARNING: could not restart ${FAILOVER_TIMER}"
+}
+
+# -----------------------------------------------------------------------------
+# Step 3: Show config diff and decide merge strategy
+# -----------------------------------------------------------------------------
+log "Checking config differences between $(hostname) and ${PRIMARY_HOST}..."
+
+diff_output=$(rsync --archive --delete --dry-run --itemize-changes \
+    --exclude='*.log*' \
+    --exclude='home-assistant_v2.db*' \
+    --exclude='*.db-shm' \
+    --exclude='*.db-wal' \
+    --exclude='.cache/' \
+    --exclude='.ha_run.lock' \
+    --exclude='backups/' \
+    --exclude='tmp_backups/' \
+    --exclude='tts/' \
+    --exclude='deps/' \
+    --exclude='__pycache__/' \
+    "${CONFIG_DIR}/" "${RSYNC_MODULE}" 2>&1 || true)
+
+if [ -z "${diff_output}" ]; then
+    log "No config differences detected."
+    has_diff=false
+else
+    has_diff=true
+    echo "--- Config diff (hotel -> fox) ---"
+    echo "${diff_output}"
+    echo "----------------------------------"
+fi
+
+if [ "${MERGE_STRATEGY}" = "ask" ]; then
+    if [ "${has_diff}" = false ]; then
+        MERGE_STRATEGY="discard"
+        log "No diff; proceeding without config push."
+    else
+        echo
+        echo "Choose merge strategy:"
+        echo "  1) push    - Push hotel config to fox (hotel wins)"
+        echo "  2) discard - Keep fox config as-is (hotel changes lost)"
+        echo "  3) abort   - Cancel failback and restart failover timer"
+        echo
+        read -rp "Enter 1/2/3: " choice
+        case "${choice}" in
+            1) MERGE_STRATEGY="push" ;;
+            2) MERGE_STRATEGY="discard" ;;
+            3)
+                restore_failover_timer
+                log "Failback cancelled by user."
+                exit 0
+                ;;
+            *)
+                restore_failover_timer
+                abort "Invalid choice: ${choice}"
+                ;;
+        esac
+    fi
+fi
+
+log "Merge strategy: ${MERGE_STRATEGY}"
+
+# -----------------------------------------------------------------------------
+# Step 4: Stop Home Assistant on hotel
+# -----------------------------------------------------------------------------
+log "Stopping Home Assistant on $(hostname)..."
+if ! docker compose -f "${COMPOSE_DIR}/compose.yml" stop homeassistant; then
+    restore_failover_timer
+    abort "Failed to stop Home Assistant on $(hostname)."
+fi
+
+# -----------------------------------------------------------------------------
+# Step 5: Push config to fox if requested
+# -----------------------------------------------------------------------------
+if [ "${MERGE_STRATEGY}" = "push" ]; then
+    log "Pushing config from $(hostname) to ${PRIMARY_HOST} via SSH..."
+    if ! rsync \
+            --archive \
+            --delete \
+            --exclude='*.log*' \
+            --exclude='home-assistant_v2.db*' \
+            --exclude='*.db-shm' \
+            --exclude='*.db-wal' \
+            --exclude='.cache/' \
+            --exclude='.ha_run.lock' \
+            --exclude='backups/' \
+            --exclude='tmp_backups/' \
+            --exclude='tts/' \
+            --exclude='deps/' \
+            --exclude='__pycache__/' \
+            -e "ssh -p ${PRIMARY_SSH_PORT} -o BatchMode=yes -o StrictHostKeyChecking=accept-new" \
+            "${CONFIG_DIR}/" \
+            "${PRIMARY_SSH_USER}@${PRIMARY_HOST}:${CONFIG_DIR}/"; then
+        restore_failover_timer
+        abort "Failed to push config to ${PRIMARY_HOST}."
+    fi
+fi
+
+# -----------------------------------------------------------------------------
+# Step 6: Start Home Assistant on fox
+# -----------------------------------------------------------------------------
+log "Starting Home Assistant on ${PRIMARY_HOST}..."
+if ! ssh_primary "sudo docker compose -f ${COMPOSE_DIR}/compose.yml up -d homeassistant"; then
+    restore_failover_timer
+    abort "Failed to start Home Assistant on ${PRIMARY_HOST}."
+fi
+
+# -----------------------------------------------------------------------------
+# Step 7: Wait for fox API to respond
+# -----------------------------------------------------------------------------
+log "Waiting up to ${API_WAIT_TIMEOUT}s for ${PRIMARY_API} to respond..."
+elapsed=0
+api_ready=false
+while [ "${elapsed}" -lt "${API_WAIT_TIMEOUT}" ]; do
+    if curl --silent --fail --max-time 5 "${PRIMARY_API}" >/dev/null 2>&1; then
+        api_ready=true
+        break
+    fi
+    sleep "${API_WAIT_INTERVAL}"
+    elapsed=$((elapsed + API_WAIT_INTERVAL))
+done
+
+if [ "${api_ready}" = false ]; then
+    restore_failover_timer
+    abort "Primary API did not respond within ${API_WAIT_TIMEOUT}s after startup."
+fi
+
+log "Primary API is responding (took ~${elapsed}s)."
+
+# -----------------------------------------------------------------------------
+# Step 8: Restart failover timer
+# -----------------------------------------------------------------------------
+restore_failover_timer
+
+# -----------------------------------------------------------------------------
+# Step 9: Notify and exit
+# -----------------------------------------------------------------------------
+log "=== Failback completed successfully ==="
+send_notification "SUCCESS" "Failback from $(hostname) to ${PRIMARY_HOST} completed. Merge strategy: ${MERGE_STRATEGY}. API ready in ~${elapsed}s."
+
+exit 0

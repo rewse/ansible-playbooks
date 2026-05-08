@@ -8,6 +8,7 @@
     - docker
     - enecoq-data-fetcher
     - homeassistant
+    - homeassistant-ha/primary
     - httpd
     - litellm
     - lmstudio

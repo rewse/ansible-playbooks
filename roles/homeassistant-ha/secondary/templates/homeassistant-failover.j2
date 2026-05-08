@@ -1,0 +1,124 @@
+#!/bin/bash
+set -uo pipefail
+
+PRIMARY_HOST="fox.rewse.jp"
+PRIMARY_API="http://${PRIMARY_HOST}:8123/api/"
+PRIMARY_SSH_PORT="11022"
+PRIMARY_SSH_USER="[% admin %]"
+HEALTHCHECK_TIMEOUT=5
+RETRY_WAIT=30
+LOCK_FILE="/var/run/homeassistant-failover.lock"
+LOG_TAG="homeassistant-failover"
+MAIL_TO="[% email.primary %]"
+COMPOSE_DIR="/etc"
+
+log() {
+    logger -t "${LOG_TAG}" "$1"
+    echo "$(date '+%Y-%m-%d %H:%M:%S') $1"
+}
+
+cleanup() {
+    rm -f "${LOCK_FILE}"
+}
+
+# Prevent double execution
+if [ -e "${LOCK_FILE}" ]; then
+    log "Lock file exists; another instance is running. Exiting."
+    exit 0
+fi
+
+touch "${LOCK_FILE}"
+trap cleanup EXIT
+
+# Skip if local Home Assistant is already running (failover already active)
+if docker ps --format '{{.Names}}' | grep -q '^homeassistant$'; then
+    log "Local Home Assistant is already running (failover active). Exiting."
+    exit 0
+fi
+
+# First API check
+if curl --silent --fail --max-time "${HEALTHCHECK_TIMEOUT}" "${PRIMARY_API}" >/dev/null 2>&1; then
+    exit 0
+fi
+
+log "Primary API check failed; waiting ${RETRY_WAIT}s before retry"
+sleep "${RETRY_WAIT}"
+
+# Second API check
+if curl --silent --fail --max-time "${HEALTHCHECK_TIMEOUT}" "${PRIMARY_API}" >/dev/null 2>&1; then
+    log "Primary API recovered on retry"
+    exit 0
+fi
+
+log "Primary API check failed twice; checking container status via SSH"
+
+# Check container status via SSH
+ssh_container_status=$(ssh \
+    -o BatchMode=yes \
+    -o ConnectTimeout=10 \
+    -o StrictHostKeyChecking=accept-new \
+    -p "${PRIMARY_SSH_PORT}" \
+    "${PRIMARY_SSH_USER}@${PRIMARY_HOST}" \
+    "docker ps --format '{{.Names}}' | grep -q '^homeassistant\$' && echo running || echo stopped" 2>/dev/null || echo "unreachable")
+
+log "Primary container status: ${ssh_container_status}"
+
+case "${ssh_container_status}" in
+    running)
+        log "Primary container is running but API is unreachable; skipping failover"
+        exit 0
+        ;;
+    stopped|unreachable)
+        reason="${ssh_container_status}"
+        ;;
+    *)
+        log "Unexpected status '${ssh_container_status}'; skipping failover"
+        exit 0
+        ;;
+esac
+
+log "Triggering failover: primary=${reason}"
+
+# Start Home Assistant on hotel
+failover_time=$(date '+%Y-%m-%d %H:%M:%S %Z')
+if docker compose -f "${COMPOSE_DIR}/compose.yml" up -d homeassistant; then
+    log "Failover succeeded: homeassistant started on $(hostname)"
+    failover_status="SUCCESS"
+else
+    log "Failover failed: could not start homeassistant on $(hostname)"
+    failover_status="FAILED"
+fi
+
+# Send email notification
+hostname_local=$(hostname)
+mail_subject="[ALERT] Home Assistant Failover: ${PRIMARY_HOST} -> ${hostname_local}"
+mail_body=$(cat <<EOF
+Home Assistant failover was triggered.
+
+Failover time : ${failover_time}
+Primary host  : ${PRIMARY_HOST}
+Standby host  : ${hostname_local}
+Reason        : Primary container is ${reason} (API unreachable after retry)
+Result        : ${failover_status}
+
+Current status on standby:
+$(docker ps --filter name=homeassistant --format 'table {{.Names}}\t{{.Status}}\t{{.Ports}}')
+
+Next steps:
+  1. Investigate the cause on ${PRIMARY_HOST}.
+  2. Once recovered, follow the manual failback procedure in
+     .kiro/specs/homeassistant-ha/operations.md.
+
+--
+${LOG_TAG} on ${hostname_local}
+EOF
+)
+
+if command -v mail >/dev/null 2>&1; then
+    echo "${mail_body}" | mail -s "${mail_subject}" "${MAIL_TO}" || \
+        log "Failed to send notification email to ${MAIL_TO}"
+else
+    log "mail command not found; skipping email notification"
+fi
+
+exit 0

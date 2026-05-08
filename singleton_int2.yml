@@ -1,0 +1,6 @@
+---
+- hosts: singleton_int2
+  become: true
+  remote_user: ubuntu
+  roles:
+    - homeassistant-ha/secondary

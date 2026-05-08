@@ -115,14 +115,60 @@ foxがダウンした原因を調査する：
 - Dockerコンテナのクラッシュ
 - システムリソース不足
 
-## 手動復旧（foxへの切り戻し）
+## 復旧（foxへの切り戻し）
 
 ### 前提条件
 
 - foxが復旧していること
 - foxのHome Assistantコンテナが起動可能な状態であること
+- hotel から fox への SSH 鍵認証が設定されていること
 
-### 手順
+### スクリプトによる復旧（推奨）
+
+hotel 側に `/usr/local/bin/homeassistant-failback` スクリプトが配置されている。
+このスクリプトが以下の処理を自動で行う：
+
+1. 前提条件のチェック（hotel で HA が起動中か、fox に SSH/rsync で到達可能か）
+2. フェイルオーバータイマーの停止
+3. 設定ファイルの差分表示
+4. マージ方針の選択（push / discard / abort）
+5. hotel の Home Assistant を停止
+6. 設定ファイルを fox に push（push を選択した場合）
+7. fox の Home Assistant を起動
+8. fox の API が応答するまで最大 120 秒ポーリング
+9. フェイルオーバータイマーの再開
+10. 成功/失敗のメール通知
+
+#### 対話モード（推奨）
+
+```bash
+# hotel で実行
+sudo homeassistant-failback
+```
+
+差分が表示されたら、以下から選択する：
+
+- `1` push: hotel の設定で fox を上書き（hotel 側で設定変更していた場合）
+- `2` discard: hotel の変更を破棄（fox の元の設定で戻す）
+- `3` abort: 復旧を中止してフェイルオーバータイマーを再開
+
+#### 非対話モード
+
+```bash
+# hotel の設定を fox に反映
+sudo homeassistant-failback --yes --merge push
+
+# hotel の設定を破棄（fox の設定を維持）
+sudo homeassistant-failback --yes --merge discard
+```
+
+#### スクリプトが失敗した場合
+
+各ステップは失敗時に自動でフェイルオーバータイマーを再開してから終了するため、
+hotel が再び監視を継続する状態に戻る。失敗理由は `journalctl -t homeassistant-failback` で確認できる。
+対処後、再度スクリプトを実行するか、以下の手動復旧手順を参照する。
+
+### 手動復旧（スクリプトが使えない場合）
 
 #### 1. フェイルオーバー監視を停止
 

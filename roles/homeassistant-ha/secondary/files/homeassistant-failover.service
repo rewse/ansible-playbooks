@@ -1,0 +1,8 @@
+[Unit]
+Description=Home Assistant failover health check
+After=network-online.target docker.service
+Wants=network-online.target
+
+[Service]
+Type=oneshot
+ExecStart=/usr/local/bin/homeassistant-failover
