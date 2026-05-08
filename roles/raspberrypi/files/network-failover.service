@@ -1,5 +1,6 @@
 [Unit]
 Description=Network Failover Monitor
+OnFailure=failure-notify@%n.service
 
 [Service]
 Type=oneshot

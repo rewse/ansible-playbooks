@@ -1,0 +1,6 @@
+[Unit]
+Description=Send failure notification for %i
+
+[Service]
+Type=oneshot
+ExecStart=/usr/local/sbin/failure-notify %i

@@ -1,0 +1,34 @@
+#!/usr/bin/bash
+set -euo pipefail
+
+# Send email notification when a systemd unit fails.
+# Intended to be invoked from failure-notify@.service via OnFailure= directive.
+
+readonly UNIT="${1:?service name required}"
+readonly HOSTNAME=$(hostname -f)
+readonly NOW_TIME=$(date +%H:%M:%S)
+readonly NOW_DATE=$(date +%Y.%m.%d)
+readonly EVENT_NAME="Service failed: ${UNIT}"
+
+readonly RESULT=$(systemctl show -p Result --value "${UNIT}" 2>/dev/null || echo "unknown")
+readonly EXIT_CODE=$(systemctl show -p ExecMainStatus --value "${UNIT}" 2>/dev/null || echo "?")
+readonly INVOCATION_ID=$(systemctl show -p InvocationID --value "${UNIT}" 2>/dev/null || echo "unknown")
+
+{
+  echo "From: alert@rewse.jp"
+  echo "To: {{ email.primary }}"
+  echo "Subject: Problem: ${EVENT_NAME}"
+  echo ""
+  echo "Problem started at ${NOW_TIME} on ${NOW_DATE}"
+  echo "Problem name: ${EVENT_NAME}"
+  echo "Host: ${HOSTNAME}"
+  echo "Severity: High"
+  echo "Operational data: Result=${RESULT}, ExitCode=${EXIT_CODE}"
+  echo "Original problem ID: ${INVOCATION_ID}"
+  echo ""
+  echo "--- Unit status ---"
+  systemctl status --no-pager --full "${UNIT}" 2>&1 | head -30 || true
+  echo ""
+  echo "--- Last 50 journal entries ---"
+  journalctl -u "${UNIT}" --no-pager -n 50 || true
+} | /usr/sbin/sendmail -t -f alert@rewse.jp

@@ -2,6 +2,7 @@
 Description=Home Assistant failover health check
 After=network-online.target docker.service
 Wants=network-online.target
+OnFailure=failure-notify@%n.service
 
 [Service]
 Type=oneshot

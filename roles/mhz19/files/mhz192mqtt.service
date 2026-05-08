@@ -2,6 +2,7 @@
 Description=MH-Z19 CO2 sensor to MQTT
 After=network-online.target
 Wants=network-online.target
+OnFailure=failure-notify@%n.service
 
 [Service]
 Type=oneshot

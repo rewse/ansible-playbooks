@@ -549,6 +549,30 @@
     - ubuntu_fail2ban
     - ubuntu_fail2ban_config
 
+- name: "failure-notify : Copy script"
+  ansible.builtin.template:
+    src: failure-notify.j2
+    dest: /usr/local/sbin/failure-notify
+    mode: '0755'
+  tags:
+    - ubuntu
+    - config
+    - failure-notify
+    - ubuntu_failure-notify
+    - ubuntu_failure-notify_config
+
+- name: "failure-notify : Copy service"
+  ansible.builtin.copy:
+    src: failure-notify@.service
+    dest: /etc/systemd/system/failure-notify@.service
+  notify: "Reload systemd"
+  tags:
+    - ubuntu
+    - config
+    - failure-notify
+    - ubuntu_failure-notify
+    - ubuntu_failure-notify_config
+
 # Ref: https://ghostty.org/docs/help/terminfo
 - name: "ghostty : Copy terminfo"
   ansible.builtin.copy:
