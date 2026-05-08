@@ -117,7 +117,7 @@ Detail:
 ${detail}
 
 Current status on primary:
-$(ssh_primary "docker ps --filter name=homeassistant --format 'table {{.Names}}\t{{.Status}}\t{{.Ports}}'" 2>/dev/null || echo "(unable to query primary)")
+$(ssh_primary "sudo docker ps --filter name=homeassistant --format 'table {{.Names}}\t{{.Status}}\t{{.Ports}}'" 2>/dev/null || echo "(unable to query primary)")
 
 --
 ${LOG_TAG} on ${hostname_local}

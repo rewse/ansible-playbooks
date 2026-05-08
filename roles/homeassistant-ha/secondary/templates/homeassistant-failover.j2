@@ -121,8 +121,8 @@ $(docker ps --filter name=homeassistant --format 'table {{.Names}}\t{{.Status}}\
 
 Next steps:
   1. Investigate the cause on ${PRIMARY_HOST}.
-  2. Once recovered, follow the manual failback procedure in
-     .kiro/specs/homeassistant-ha/operations.md.
+  2. Once recovered, run 'sudo homeassistant-failback' on $(hostname)
+     to fail back to ${PRIMARY_HOST}. See operations.md for details.
 
 --
 ${LOG_TAG} on ${hostname_local}
