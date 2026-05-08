@@ -12,6 +12,17 @@
     - docker_docker
     - docker_docker_install
 
+- name: "docker : Add admin user to docker group"
+  ansible.builtin.user:
+    name: "{{ admin }}"
+    groups: docker
+    append: true
+  tags:
+    - docker
+    - config
+    - docker_docker
+    - docker_docker_config
+
 - name: "docker : Create compose.yml"
   ansible.builtin.file:
     path: /etc/compose.yml
