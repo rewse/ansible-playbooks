@@ -3,4 +3,5 @@
   become: true
   remote_user: ubuntu
   roles:
+    - docker
     - homeassistant-ha/secondary

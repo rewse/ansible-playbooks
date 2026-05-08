@@ -11,5 +11,5 @@ log file = /var/log/rsyncd.log
     comment = Home Assistant configuration files
     read only = yes
     list = yes
-    hosts allow = 192.168.0.0/24
+    hosts allow = 192.168.0.0/24 {{ ipv6.home }}
     hosts deny = *
