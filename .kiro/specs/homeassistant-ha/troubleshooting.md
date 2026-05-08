@@ -132,7 +132,7 @@ ls -lh /srv/homeassistant/config/
 解決方法:
 ```bash
 # hotelで実行
-sudo /usr/local/bin/homeassistant-sync.sh
+sudo /usr/local/bin/homeassistant-sync
 ```
 
 **原因3: デバイスマッピングの問題**
@@ -218,7 +218,7 @@ sudo systemctl enable postfix
 確認方法:
 ```bash
 # hotelで実行
-grep -r "MAILTO" /usr/local/bin/homeassistant-failover.sh
+grep -r "MAILTO" /usr/local/bin/homeassistant-failover
 ```
 
 解決方法:
@@ -358,10 +358,10 @@ sudo tail -f /var/log/syslog | grep homeassistant
 
 ```bash
 # rsync同期のテスト
-sudo /usr/local/bin/homeassistant-sync.sh
+sudo /usr/local/bin/homeassistant-sync
 
 # ヘルスチェックのテスト
-sudo /usr/local/bin/homeassistant-failover.sh
+sudo /usr/local/bin/homeassistant-failover
 
 # Home Assistantの起動テスト
 cd /etc
