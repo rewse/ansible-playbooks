@@ -4,8 +4,6 @@ set -euo pipefail
 # Configuration
 readonly REMOTE="guppy:/volume1/Backup/{{ ansible_facts['hostname'] }}"
 readonly MOUNT="/mnt/bak"
-readonly SRC="/"
-readonly EXCLUDE_FILE="/etc/restic.exclude"
 
 # Cleanup function
 cleanup() {
@@ -32,28 +30,8 @@ if ! mountpoint -q "${MOUNT}"; then
   }
 fi
 
-# Initialize repository on first run
-if [ ! -f "${MOUNT}/config" ]; then
-  restic init
-fi
-
-# Run backup
-nice -n 10 restic backup "${SRC}" \
-  --verbose \
-  --one-file-system \
-  --pack-size 128 \
-  --exclude-file="${EXCLUDE_FILE}" \
-  --tag daily
-
-# Apply retention policy
-nice -n 10 restic forget \
-  --keep-daily 30 \
-  --keep-weekly 8 \
-  --keep-monthly 12 \
-  --prune
-
-# Mark successful completion for monitoring
-touch /var/lib/backup-daily.success
+# Verify repository integrity (reads all pack files)
+nice -n 10 restic check --read-data --verbose
 
 # Cleanup with success status
 trap - INT TERM EXIT

@@ -1,5 +1,5 @@
 [Unit]
-Description=Daily backup to NAS
+Description=Monthly restic repository integrity check
 After=network-online.target
 Wants=network-online.target
 
@@ -9,4 +9,4 @@ Environment=RESTIC_REPOSITORY=/mnt/bak
 Environment=RESTIC_PASSWORD_FILE=/etc/restic/password
 Environment=RESTIC_PROGRESS_FPS=0.0166
 Environment=XDG_CACHE_HOME=/var/cache/restic
-ExecStart=/usr/local/sbin/backup-daily
+ExecStart=/usr/local/sbin/backup-monthly-check

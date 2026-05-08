@@ -3,6 +3,7 @@
   ansible.builtin.apt:
     name:
       - bluez
+      - fuse3
       - ifmetric
       - mosquitto-clients
       - nfs-common
@@ -331,22 +332,71 @@
     - raspberrypi_backup
     - raspberrypi_backup_init
 
-- name: "backup : Install rsync-time-backup script"
-  ansible.builtin.get_url:
-    url: https://raw.githubusercontent.com/laurent22/rsync-time-backup/master/rsync_tmbackup.sh
-    dest: /usr/local/bin/tmbackup
-    mode: '0755'
+- name: "backup : Check installed restic version"
+  ansible.builtin.command: restic version
+  register: restic_installed
+  changed_when: false
+  failed_when: false
+  check_mode: false
   tags:
     - raspberrypi
     - install
     - raspberrypi_backup
     - raspberrypi_backup_install
 
-- name: "backup : Fix rsync-time-backup source path"
-  ansible.builtin.replace:
-    dest: /usr/local/bin/tmbackup
-    regexp: 'fn_df_t_src "\${SRC_FOLDER}"'
-    replace: 'fn_df_t_src "${SRC_FOLDER}/"'
+- name: "backup : Download restic binary archive"
+  ansible.builtin.get_url:
+    url: "https://github.com/restic/restic/releases/download/v{{ restic.version }}/restic_{{ restic.version }}_linux_{{ restic_arch }}.bz2"
+    dest: "/tmp/restic_{{ restic.version }}_linux_{{ restic_arch }}.bz2"
+  vars:
+    restic_arch: "{{ ansible_facts['architecture'] | replace('x86_64', 'amd64') | replace('aarch64', 'arm64') }}"
+  when: restic.version not in (restic_installed.stdout | default(''))
+  tags:
+    - raspberrypi
+    - install
+    - raspberrypi_backup
+    - raspberrypi_backup_install
+
+- name: "backup : Extract restic binary"
+  ansible.builtin.shell: |
+    bunzip2 -kc /tmp/restic_{{ restic.version }}_linux_{{ restic_arch }}.bz2 > /usr/local/bin/restic
+    chmod 755 /usr/local/bin/restic
+  vars:
+    restic_arch: "{{ ansible_facts['architecture'] | replace('x86_64', 'amd64') | replace('aarch64', 'arm64') }}"
+  when: restic.version not in (restic_installed.stdout | default(''))
+  tags:
+    - raspberrypi
+    - install
+    - raspberrypi_backup
+    - raspberrypi_backup_install
+
+- name: "backup : Create password directory"
+  ansible.builtin.file:
+    path: /etc/restic
+    state: directory
+    mode: '0700'
+  tags:
+    - raspberrypi
+    - config
+    - raspberrypi_backup
+    - raspberrypi_backup_config
+
+- name: "backup : Install repository password"
+  ansible.builtin.copy:
+    content: "{{ restic.password }}"
+    dest: /etc/restic/password
+    mode: '0600'
+  no_log: true
+  tags:
+    - raspberrypi
+    - config
+    - raspberrypi_backup
+    - raspberrypi_backup_config
+
+- name: "backup : Copy exclusion list"
+  ansible.builtin.copy:
+    src: restic.exclude
+    dest: /etc
   tags:
     - raspberrypi
     - config
@@ -398,10 +448,45 @@
     - raspberrypi_backup
     - raspberrypi_backup_config
 
-- name: "backup : Copy exclusion list"
+- name: "backup : Copy monthly check script"
+  ansible.builtin.template:
+    src: backup-monthly-check.j2
+    dest: /usr/local/sbin/backup-monthly-check
+    mode: '0755'
+  tags:
+    - raspberrypi
+    - config
+    - raspberrypi_backup
+    - raspberrypi_backup_config
+
+- name: "backup : Copy monthly check service"
   ansible.builtin.copy:
-    src: tmbackup.exclude
-    dest: /etc
+    src: backup-monthly-check.service
+    dest: /etc/systemd/system/backup-monthly-check.service
+  notify: "Reload systemd"
+  tags:
+    - raspberrypi
+    - config
+    - raspberrypi_backup
+    - raspberrypi_backup_config
+
+- name: "backup : Copy monthly check timer"
+  ansible.builtin.copy:
+    src: backup-monthly-check.timer
+    dest: /etc/systemd/system/backup-monthly-check.timer
+  notify: "raspberrypi : Restart backup-monthly-check timer"
+  tags:
+    - raspberrypi
+    - config
+    - raspberrypi_backup
+    - raspberrypi_backup_config
+
+- name: "backup : Enable and start monthly check timer"
+  ansible.builtin.systemd:
+    name: backup-monthly-check.timer
+    enabled: true
+    state: started
+    daemon_reload: true
   tags:
     - raspberrypi
     - config

@@ -3,6 +3,8 @@ media/
 mnt/
 proc/
 run/
+sys/
 tmp/
 var/cache/
 var/swap
+var/tmp/

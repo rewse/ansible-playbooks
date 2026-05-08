@@ -4,6 +4,9 @@ default_gateway: 192.168.0.1
 default_gateway6: fe80::70a7:41ff:fea6:bd7a
 netgear_gs108tv3_version: 7.0.6.2
 php_miio_version: 0.2.6
+restic:
+  password: "{{ lookup('pipe', 'op read \"op://ansible/restic/password\"') }}"
+  version: 0.18.1
 resolved1:
   ip: 192.168.0.1
   ipv6: 240f:78:31e9:1:70a7:41ff:fea6:bd7a
