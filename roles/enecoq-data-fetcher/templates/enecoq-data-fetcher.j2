@@ -10,7 +10,7 @@ uvx enecoq-data-fetcher \
   --format json \
   --output /srv/homeassistant/config/data/enecoq_data.json \
   || {
-    npx playwright install chromium --force
+    uvx --from enecoq-data-fetcher playwright install chromium
     uvx enecoq-data-fetcher \
       --email '[% enecoq.email %]' \
       --password '[% enecoq.password %]' \
