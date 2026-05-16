@@ -51,6 +51,18 @@
     - postfix-client_postfix
     - postfix-client_postfix_config
 
+- name: "postfix : Set smtp_address_preference"
+  ansible.builtin.lineinfile:
+    dest: /etc/postfix/main.cf
+    regexp: "^smtp_address_preference"
+    line: "smtp_address_preference = ipv4"
+  notify: "postfix: Reload"
+  tags:
+    - postfix-client
+    - config
+    - postfix-client_postfix
+    - postfix-client_postfix_config
+
 - name: "postfix : Set smtp_tls_security_level"
   ansible.builtin.lineinfile:
     dest: /etc/postfix/main.cf
