@@ -137,7 +137,6 @@
 - name: "package: Install global npm packages"
   ansible.builtin.command: npm install -g {{ item }}
   loop:
-    - "@browserbasehq/browse-cli"
     - ctx7
     - "@playwright/mcp@latest"
     - skills
