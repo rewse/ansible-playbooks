@@ -7,7 +7,10 @@ roles/database/client/gui/files/sqldeveloper*
 
 # Environment files
 .env
+.venv/
 
-# Vault files (migrated to 1Password)
-group_vars/*/vault
-host_vars/*/vault
+# TinyTuya (contains API keys and device local keys)
+devices.json
+snapshot.json
+tinytuya.json
+tuya-raw.json

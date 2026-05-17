@@ -2,7 +2,7 @@
 
 ## Search, Control, Manage, Monitor
 
-When performing the following operations on Home Assistant, you MUST delegate them by `printf "{{prompt}}\n/quit\n" | kiro-cli chat --agent homeassistant`:
+When performing the following operations on Home Assistant, you MUST read `mcporter` skill and use `mcporter call home-assistant.<tool>`:
 - Searching and finding Home Assistant entities, devices, and configurations
 - Controlling smart home devices and automations
 - Managing Home Assistant setup, configuration, and troubleshooting
@@ -59,3 +59,35 @@ Reference:
 ## Automation
 
 When using `trigger: time_pattern`, you MUST add `seconds` with a random number (0 to 59) to prevent multiple automations from running at the same time.
+
+## Troubleshooting
+
+### tuya_local: Entity Unavailable
+
+When a `tuya_local` entity becomes `unavailable`:
+
+1. Check HA system logs for `tuya_local` errors:
+   - `"Check device key or version"` → Local key or Device ID has changed
+   - `"device offline"` → Network unreachable or key mismatch (tuya_local reports offline when handshake fails)
+
+2. Verify network connectivity from HA server (`ssh fox`):
+   - DNS resolution: `dig +short <hostname>`
+   - Ping: `ping <ip>`
+   - Port: `nc -z -w 3 <ip> 6668`
+
+3. If network is fine, the Device ID and/or Local Key likely rotated. Retrieve new credentials:
+   ```bash
+   .venv/bin/python3 -m tinytuya wizard
+   ```
+   - API Key/Secret: from Tuya IoT Platform project
+   - Region: `us`
+   - Compare the returned `id` and `key` with current HA config
+
+4. If Device ID changed, delete the old tuya_local entry in HA and re-add with new ID + key
+
+**Known causes of ID/key rotation:**
+- Removing and re-adding device in Tuya/Smart Life app
+- Firmware updates (rare)
+- Tuya cloud-side maintenance (rare, unannounced)
+
+**Note:** LocalTuya can auto-sync keys but does not support all devices (e.g., Fancy Sync Box). For unsupported devices, tuya_local is required and manual key updates are unavoidable.
