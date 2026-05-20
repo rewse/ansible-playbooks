@@ -120,8 +120,6 @@
   tags:
     - homeassistant
     - config
-    - homeassistant_configuration
-    - homeassistant_configuration_config
 
 - name: "automation : Configure include"
   ansible.builtin.lineinfile:
@@ -1001,8 +999,6 @@
   tags:
     - homeassistant
     - config
-    - homeassistant_configuration
-    - homeassistant_configuration_config
 
 - name: "apache : Enable proxy modules"
   community.general.apache2_module:
