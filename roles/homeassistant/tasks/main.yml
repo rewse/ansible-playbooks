@@ -79,7 +79,7 @@
     services: homeassistant
     state: present
     pull: always
-  when: quarantine_passed
+  when: quarantine_passed | default(false)
   tags:
     - homeassistant
     - update

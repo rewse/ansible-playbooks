@@ -56,7 +56,7 @@
     services: couchdb
     state: present
     pull: always
-  when: quarantine_passed
+  when: quarantine_passed | default(false)
   tags:
     - couchdb
     - update

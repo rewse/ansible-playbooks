@@ -69,7 +69,7 @@
     services: litellm
     state: present
     pull: always
-  when: quarantine_passed
+  when: quarantine_passed | default(false)
   tags:
     - litellm
     - update
