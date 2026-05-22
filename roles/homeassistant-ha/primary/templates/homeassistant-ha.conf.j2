@@ -1,3 +1,3 @@
 UserParameter=homeassistant.rsync.active,systemctl is-active rsync
 UserParameter=homeassistant.container.running,sudo docker inspect --format '{{.State.Running}}' homeassistant 2>/dev/null || echo false
-UserParameter=homeassistant.api.http_code,curl -s -o /dev/null -w '%{http_code}' --max-time 5 http://localhost:8123/api/ || echo 000
+UserParameter=homeassistant.api.http_code,curl -s -o /dev/null -w '%{http_code}' --max-time 5 -H 'Authorization: Bearer [% homeassistant_ha_token %]' http://localhost:8123/api/ || echo 000

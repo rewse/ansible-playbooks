@@ -27,9 +27,11 @@
   tags: [homeassistant-ha-primary, config]
 
 - name: "zabbix : Copy userparameter config"
-  ansible.builtin.copy:
-    src: homeassistant-ha.conf
+  ansible.builtin.template:
+    src: homeassistant-ha.conf.j2
     dest: /etc/zabbix/zabbix_agentd.d/homeassistant-ha.conf
     mode: '0644'
+    variable_start_string: "[%"
+    variable_end_string: "%]"
   notify: "zabbix-agent: Restart"
   tags: [homeassistant-ha-primary, config]

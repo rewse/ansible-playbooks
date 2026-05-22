@@ -5,6 +5,7 @@ PRIMARY_HOST="fox.rewse.jp"
 PRIMARY_API="http://${PRIMARY_HOST}:8123/api/"
 PRIMARY_SSH_PORT="11022"
 PRIMARY_SSH_USER="[% admin %]"
+HA_TOKEN="[% homeassistant_ha_token %]"
 CONFIG_DIR="/srv/homeassistant/config"
 RSYNC_MODULE="rsync://${PRIMARY_HOST}/homeassistant-config/"
 COMPOSE_DIR="/etc"
@@ -287,9 +288,9 @@ log "Waiting up to ${API_WAIT_TIMEOUT}s for ${PRIMARY_API} to respond..."
 elapsed=0
 api_ready=false
 while [ "${elapsed}" -lt "${API_WAIT_TIMEOUT}" ]; do
-    http_code=$(curl --silent --max-time 5 -o /dev/null -w "%{http_code}" "${PRIMARY_API}" 2>/dev/null || echo "000")
+    http_code=$(curl --silent --max-time 5 -o /dev/null -w "%{http_code}" -H "Authorization: Bearer ${HA_TOKEN}" "${PRIMARY_API}" 2>/dev/null || echo "000")
     case "${http_code}" in
-        2??|3??|401|403)
+        2??|3??)
             api_ready=true
             break
             ;;

@@ -5,6 +5,7 @@ PRIMARY_HOST="fox.rewse.jp"
 PRIMARY_API="http://${PRIMARY_HOST}:8123/api/"
 PRIMARY_SSH_PORT="11022"
 PRIMARY_SSH_USER="[% admin %]"
+HA_TOKEN="[% homeassistant_ha_token %]"
 HEALTHCHECK_TIMEOUT=5
 RETRY_WAIT=60
 LOCK_FILE="/var/run/homeassistant-failover.lock"
@@ -38,10 +39,10 @@ fi
 
 check_primary_api() {
     local http_code
-    http_code=$(curl --silent --max-time "${HEALTHCHECK_TIMEOUT}" -o /dev/null -w "%{http_code}" "${PRIMARY_API}" 2>/dev/null || echo "000")
-    # Any non-5xx response means HA is up (401 is returned without auth).
+    http_code=$(curl --silent --max-time "${HEALTHCHECK_TIMEOUT}" -o /dev/null -w "%{http_code}" -H "Authorization: Bearer ${HA_TOKEN}" "${PRIMARY_API}" 2>/dev/null || echo "000")
+    # 2xx/3xx means HA is up and authenticated.
     case "${http_code}" in
-        2??|3??|401|403)
+        2??|3??)
             return 0
             ;;
         *)

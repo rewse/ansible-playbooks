@@ -1,0 +1,2 @@
+---
+homeassistant_ha_token: "{{ lookup('pipe', 'op read \"op://ansible/Home Assistant - homeassistant-ha/credential\"') }}"
