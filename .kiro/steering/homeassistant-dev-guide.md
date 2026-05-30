@@ -75,15 +75,28 @@ When a `tuya_local` entity becomes `unavailable`:
    - Ping: `ping <ip>`
    - Port: `nc -z -w 3 <ip> 6668`
 
-3. If network is fine, the Device ID and/or Local Key likely rotated. Retrieve new credentials:
+3. If network is fine, try power cycling the device first. This resolves handshake issues without key rotation.
+
+4. If power cycle does not help, the Device ID and/or Local Key likely rotated. Retrieve new credentials:
    ```bash
    .venv/bin/python3 -m tinytuya wizard
    ```
-   - API Key/Secret: from Tuya IoT Platform project
+   - API Key/Secret: from Tuya IoT Platform project (`/home/tats/.config/configstore/@tuyapi/cli.json`)
    - Region: `us`
    - Compare the returned `id` and `key` with current HA config
+   - Non-interactive alternative:
+     ```bash
+     uvx --from tinytuya python3 -c "
+     import tinytuya, json
+     c = tinytuya.Cloud(apiRegion='us', apiKey='...', apiSecret='...')
+     devices = c.getdevices()
+     for d in devices:
+         if d.get('id') == '<device_id>':
+             print(json.dumps(d, indent=2))
+     "
+     ```
 
-4. If Device ID changed, delete the old tuya_local entry in HA and re-add with new ID + key
+5. If Device ID changed, delete the old tuya_local entry in HA and re-add with new ID + key
 
 **Known causes of ID/key rotation:**
 - Removing and re-adding device in Tuya/Smart Life app
