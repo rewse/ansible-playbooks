@@ -14,6 +14,7 @@
   ansible.builtin.file:
     path: /opt/certbot
     state: directory
+    mode: '0755'
   tags:
     - sslcert
     - init
@@ -21,7 +22,7 @@
     - sslcert_certbot_init
 
 - name: "certbot : Create Python virtual environment with uv"
-  ansible.builtin.shell: uv venv /opt/certbot
+  ansible.builtin.command: uv venv /opt/certbot
   args:
     creates: /opt/certbot/bin/activate
   tags:
@@ -31,12 +32,14 @@
     - sslcert_certbot_init
 
 - name: "certbot : Install packages with uv"
-  ansible.builtin.shell: uv pip install --upgrade
-      certbot \
-      certbot-apache \
-      certbot-dns-route53
+  ansible.builtin.command: >
+    uv pip install --upgrade
+    certbot
+    certbot-apache
+    certbot-dns-route53
   environment:
     VIRTUAL_ENV: /opt/certbot
+  changed_when: false
   tags:
     - sslcert
     - install
@@ -58,6 +61,7 @@
   ansible.builtin.copy:
     src: certbot.service
     dest: /etc/systemd/system/certbot.service
+    mode: '0644'
   notify: "Reload systemd"
   tags:
     - sslcert
@@ -69,6 +73,7 @@
   ansible.builtin.copy:
     src: certbot.timer
     dest: /etc/systemd/system/certbot.timer
+    mode: '0644'
   notify: "certbot : Restart timer"
   tags:
     - sslcert

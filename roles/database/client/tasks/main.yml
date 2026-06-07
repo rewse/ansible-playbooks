@@ -1,7 +1,7 @@
 ---
 - name: "mysql : Add apt repository"
   ansible.builtin.apt:
-    deb: https://repo.mysql.com//mysql-apt-config_{{ mysql_apt_config_version }}_all.deb
+    deb: https://repo.mysql.com//mysql-apt-config_{{ database_mysql_apt_config_version }}_all.deb
   tags:
     - database-client
     - install
@@ -25,7 +25,7 @@
 
 - name: "mysql : Install connector-j"
   ansible.builtin.apt:
-    deb: https://cdn.mysql.com//Downloads/Connector-J/mysql-connector-j_{{ mysql_connector_version }}_all.deb
+    deb: https://cdn.mysql.com//Downloads/Connector-J/mysql-connector-j_{{ database_mysql_connector_version }}_all.deb
   tags:
     - database-client
     - install
@@ -35,7 +35,7 @@
 
 - name: "oracle : Extract instantclient archives"
   ansible.builtin.unarchive:
-    src: https://download.oracle.com/otn_software/linux/instantclient/{{ oracle_instantclient_version_1 }}{{ oracle_instantclient_version_2 }}{{ oracle_instantclient_version_3 }}{{ oracle_instantclient_version_4 }}{{ oracle_instantclient_version_5 }}/instantclient-{{ item }}-linux.x64-{{ oracle_instantclient_version_1 }}.{{ oracle_instantclient_version_2 }}.{{ oracle_instantclient_version_3 }}.{{ oracle_instantclient_version_4 }}.{{ oracle_instantclient_version_5 }}.zip
+    src: https://download.oracle.com/otn_software/linux/instantclient/{{ database_oracle_instantclient_version | replace('.', '') }}/instantclient-{{ item }}-linux.x64-{{ database_oracle_instantclient_version }}.zip
     dest: /srv
     remote_src: true
   loop:
@@ -53,6 +53,7 @@
   ansible.builtin.template:
     src: oracle-instantclient.sh.j2
     dest: /etc/profile.d/oracle-instantclient.sh
+    mode: '0644'
   tags:
     - database-client
     - config
@@ -64,6 +65,7 @@
   ansible.builtin.template:
     src: oracle-instantclient.conf.j2
     dest: /etc/ld.so.conf.d/oracle-instantclient.conf
+    mode: '0644'
   tags:
     - database-client
     - config
@@ -73,7 +75,7 @@
 
 - name: "oracle : Create symlink for ojdbc.jar"
   ansible.builtin.file:
-    src: /srv/instantclient_{{ oracle_instantclient_version_1 }}_{{ oracle_instantclient_version_2 }}/ojdbc8.jar
+    src: /srv/instantclient_{{ database_oracle_instantclient_version.split('.')[0] }}_{{ database_oracle_instantclient_version.split('.')[1] }}/ojdbc8.jar
     dest: /usr/share/java/ojdbc11.jar
     state: link
   tags:
@@ -101,6 +103,7 @@
     dest: /srv/git/orascript
     accept_hostkey: true
     key_file: /home/{{ admin }}/.ssh/id_rsa
+    version: master
   tags:
     - database-client
     - install
@@ -114,6 +117,7 @@
     owner: "{{ admin }}"
     group: "{{ admin }}"
     recurse: true
+    mode: '0644'
   tags:
     - database-client
     - config
@@ -122,11 +126,13 @@
     - database-client_oracle_config
 
 - name: "oracle : Copy orarc to admin home"
+  become: true
   become_user: "{{ admin }}"
   ansible.builtin.copy:
     src: /srv/git/orascript/orarc
     dest: /home/{{ admin }}/.orarc
     remote_src: true
+    mode: '0644'
   tags:
     - database-client
     - config
@@ -135,6 +141,7 @@
     - database-client_oracle_config
 
 - name: "oracle : Create symlink for orascript/common"
+  become: true
   become_user: "{{ admin }}"
   ansible.builtin.file:
     src: /srv/git/orascript/common
@@ -149,8 +156,9 @@
 
 - name: "redshift : Download JDBC driver"
   ansible.builtin.get_url:
-    url: https://s3.amazonaws.com/redshift-downloads/drivers/jdbc/{{ redshift_jdbc_version }}/redshift-jdbc42-{{ redshift_jdbc_version }}.jar
+    url: https://s3.amazonaws.com/redshift-downloads/drivers/jdbc/{{ database_redshift_jdbc_version }}/redshift-jdbc42-{{ database_redshift_jdbc_version }}.jar
     dest: /usr/share/java
+    mode: '0644'
   tags:
     - database-client
     - install
@@ -160,7 +168,7 @@
 
 - name: "redshift : Create symlinks for JDBC driver"
   ansible.builtin.file:
-    src: redshift-jdbc42-{{ redshift_jdbc_version }}.jar
+    src: redshift-jdbc42-{{ database_redshift_jdbc_version }}.jar
     dest: /usr/share/java/{{ item }}
     state: link
   loop:

@@ -38,6 +38,14 @@ This repository contains Ansible playbooks and roles for managing infrastructure
 - 1Password CLI (`op`) installed (version 2.18.0 or later)
 - direnv installed (optional but recommended)
 
+### Install Ansible Collections
+
+This repository depends on external Ansible collections. Install them before running any playbook:
+
+```bash
+ansible-galaxy collection install -r requirements.yml
+```
+
 ### 1Password Setup
 
 This repository uses 1Password Service Accounts for authentication. Service Accounts allow automated access to secrets without interactive sign-in.

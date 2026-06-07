@@ -1,6 +1,7 @@
 ---
 - name: "autodiscover : Enable proxy_http module"
-  ansible.builtin.command: a2enmod proxy_http
+  community.general.apache2_module:
+    name: proxy_http
   notify: "apache: Restart"
   tags:
     - autodiscover
@@ -12,6 +13,7 @@
   ansible.builtin.copy:
     src: autodiscover.conf
     dest: /etc/apache2/conf-available
+    mode: '0644'
   notify: "apache: Reload"
   tags:
     - autodiscover
@@ -21,6 +23,8 @@
 
 - name: "autodiscover : Enable autodiscover configuration"
   ansible.builtin.command: a2enconf autodiscover
+  register: autodiscover_a2enconf
+  changed_when: "'already enabled' not in autodiscover_a2enconf.stdout"
   notify: "apache: Reload"
   tags:
     - autodiscover

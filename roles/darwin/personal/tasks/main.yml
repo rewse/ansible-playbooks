@@ -1,7 +1,7 @@
 ---
 - name: "package : Install packages by homebrew"
   community.general.homebrew:
-    name: 
+    name:
       - vips
     update_homebrew: true
   tags:
@@ -14,7 +14,7 @@
 
 - name: "package : Install packages by homebrew_cask"
   community.general.homebrew_cask:
-    name: 
+    name:
       - charles
       - deepl
       - epic-games
@@ -30,7 +30,7 @@
       - steelseries-gg
       - ticktick
     update_homebrew: true
-  ignore_errors: true
+  failed_when: false
   tags:
     - darwin
     - darwin_personal
@@ -39,8 +39,20 @@
     - darwin_package
     - darwin_package_install
 
+- name: "claude: Download Claude Code installer"
+  ansible.builtin.get_url:
+    url: https://claude.ai/install.sh
+    dest: /tmp/claude-install.sh
+    mode: '0755'
+  tags:
+    - darwin
+    - install
+    - claude
+    - darwin_claude
+    - darwin_claude_install
+
 - name: "claude: Install Claude Code"
-  ansible.builtin.shell: curl -fsSL https://claude.ai/install.sh | bash
+  ansible.builtin.command: bash /tmp/claude-install.sh
   args:
     creates: ~/.local/bin/claude
   tags:

@@ -1,4 +1,11 @@
 ---
+- name: "ubuntu : Set deb architecture fact"
+  ansible.builtin.set_fact:
+    ubuntu_deb_arch: "{{ ubuntu_deb_arch }}"
+  tags:
+    - ubuntu
+    - always
+
 - name: "ubuntu : Set timezone to Asia/Tokyo"
   community.general.timezone:
     name: Asia/Tokyo
@@ -13,6 +20,7 @@
   ansible.builtin.get_url:
     url: https://cli.github.com/packages/githubcli-archive-keyring.gpg
     dest: /etc/apt/keyrings/githubcli-archive-keyring.gpg
+    mode: '0644'
   tags:
     - ubuntu
     - install
@@ -23,7 +31,7 @@
 
 - name: "github : Add apt repository"
   ansible.builtin.apt_repository:
-    repo: "deb [arch={{ ansible_facts['architecture'] | replace('x86_64', 'amd64') | replace('aarch64', 'arm64') }} signed-by=/etc/apt/keyrings/githubcli-archive-keyring.gpg] https://cli.github.com/packages stable main"
+    repo: "deb [arch={{ ubuntu_deb_arch }} signed-by=/etc/apt/keyrings/githubcli-archive-keyring.gpg] https://cli.github.com/packages stable main"
     filename: github-cli
   when: ansible_facts["architecture"] in ["x86_64", "aarch64"]
   tags:
@@ -38,6 +46,7 @@
   ansible.builtin.get_url:
     url: https://downloads.1password.com/linux/keys/1password.asc
     dest: /tmp/1password.asc
+    mode: '0644'
   tags:
     - ubuntu
     - install
@@ -60,7 +69,7 @@
 
 - name: "1password : Add apt repository"
   ansible.builtin.apt_repository:
-    repo: "deb [arch={{ ansible_facts['architecture'] | replace('x86_64', 'amd64') | replace('aarch64', 'arm64') }} signed-by=/usr/share/keyrings/1password-archive-keyring.gpg] https://downloads.1password.com/linux/debian/{{ ansible_facts['architecture'] | replace('x86_64', 'amd64') | replace('aarch64', 'arm64') }} stable main"
+    repo: "deb [arch={{ ubuntu_deb_arch }} signed-by=/usr/share/keyrings/1password-archive-keyring.gpg] https://downloads.1password.com/linux/debian/{{ ubuntu_deb_arch }} stable main"
     filename: 1password
   tags:
     - ubuntu
@@ -74,6 +83,7 @@
   ansible.builtin.file:
     path: /etc/debsig/policies/AC2D62742012EA22
     state: directory
+    mode: '0755'
   tags:
     - ubuntu
     - install
@@ -86,6 +96,7 @@
   ansible.builtin.get_url:
     url: https://downloads.1password.com/linux/debian/debsig/1password.pol
     dest: /etc/debsig/policies/AC2D62742012EA22/1password.pol
+    mode: '0644'
   tags:
     - ubuntu
     - install
@@ -98,6 +109,7 @@
   ansible.builtin.file:
     path: /usr/share/debsig/keyrings/AC2D62742012EA22
     state: directory
+    mode: '0755'
   tags:
     - ubuntu
     - install
@@ -120,8 +132,7 @@
 
 - name: "ubuntu : Update all packages"
   ansible.builtin.apt:
-    name: '*'
-    state: latest
+    upgrade: dist
     update_cache: true
   tags:
     - ubuntu
@@ -175,7 +186,7 @@
 - name: "awscliv2 : Check installation status"
   ansible.builtin.stat:
     path: /usr/local/bin/aws
-  register: aws
+  register: ubuntu_aws
   tags:
     - ubuntu
     - install
@@ -188,7 +199,7 @@
     src: https://awscli.amazonaws.com/awscli-exe-linux-{{ ansible_facts["architecture"] }}.zip
     dest: /usr/local/src
     remote_src: true
-  when: not aws.stat.exists
+  when: not ubuntu_aws.stat.exists
   tags:
     - ubuntu
     - install
@@ -199,7 +210,8 @@
 
 - name: "awscliv2 : Install"
   ansible.builtin.command: /usr/local/src/aws/install
-  when: not aws.stat.exists
+  changed_when: true
+  when: not ubuntu_aws.stat.exists
   tags:
     - ubuntu
     - install
@@ -209,7 +221,8 @@
 
 - name: "awscliv2 : Update"
   ansible.builtin.command: /usr/local/src/aws/install --update
-  when: aws.stat.exists
+  changed_when: false
+  when: ubuntu_aws.stat.exists
   tags:
     - ubuntu
     - update
@@ -217,8 +230,19 @@
     - ubuntu_awscliv2
     - ubuntu_awscliv2_update
 
+- name: "kiro-cli : Download installer"
+  ansible.builtin.get_url:
+    url: https://cli.kiro.dev/install
+    dest: /tmp/kiro-cli-install.sh
+    mode: '0755'
+  tags:
+    - ubuntu
+    - install
+    - kiro-cli
+    - ubuntu_kiro-cli
+
 - name: "kiro-cli : Install"
-  ansible.builtin.shell: curl -fsSL https://cli.kiro.dev/install | bash
+  ansible.builtin.command: bash /tmp/kiro-cli-install.sh
   args:
     creates: /root/.local/bin/kiro-cli
   tags:
@@ -247,6 +271,7 @@
 
 - name: "kiro-cli : Update"
   ansible.builtin.command: /usr/local/bin/kiro-cli update
+  changed_when: false
   tags:
     - ubuntu
     - update
@@ -254,8 +279,17 @@
     - ubuntu_kiro-cli
     - ubuntu_kiro-cli_update
 
+- name: "uv : Download installer"
+  ansible.builtin.get_url:
+    url: https://astral.sh/uv/install.sh
+    dest: /tmp/uv-install.sh
+    mode: '0755'
+  tags:
+    - ubuntu
+    - install
+
 - name: "uv : Install"
-  ansible.builtin.shell: curl -LsSf https://astral.sh/uv/install.sh | sh
+  ansible.builtin.command: sh /tmp/uv-install.sh
   args:
     creates: /usr/local/bin/uv
   environment:
@@ -269,6 +303,7 @@
 
 - name: "uv : Update"
   ansible.builtin.command: /usr/local/bin/uv self update
+  changed_when: false
   tags:
     - ubuntu
     - update
@@ -304,6 +339,7 @@
 
 - name: "zinit : Update"
   ansible.builtin.command: zsh -ic "zinit self-update"
+  changed_when: false
   tags:
     - ubuntu
     - update
@@ -430,6 +466,7 @@
   ansible.builtin.copy:
     src: authentication.conf
     dest: /etc/ssh/sshd_config.d
+    mode: '0644'
   notify: "ssh: Restart"
   tags:
     - ubuntu
@@ -457,6 +494,7 @@
   ansible.builtin.copy:
     src: jail.local
     dest: /etc/fail2ban/jail.local
+    mode: '0644'
   notify: "fail2ban: Restart"
   tags:
     - ubuntu
@@ -469,6 +507,7 @@
   ansible.builtin.template:
     src: sshd.conf.j2
     dest: /etc/fail2ban/jail.d/sshd.conf
+    mode: '0644'
   notify: "fail2ban: Restart"
   tags:
     - ubuntu
@@ -481,6 +520,7 @@
   ansible.builtin.copy:
     src: couchdb-filter.conf
     dest: /etc/fail2ban/filter.d/couchdb.conf
+    mode: '0644'
   notify: "fail2ban: Restart"
   tags:
     - ubuntu
@@ -493,6 +533,7 @@
   ansible.builtin.copy:
     src: couchdb.conf
     dest: /etc/fail2ban/jail.d/couchdb.conf
+    mode: '0644'
   notify: "fail2ban: Restart"
   tags:
     - ubuntu
@@ -505,6 +546,7 @@
   ansible.builtin.copy:
     src: homeassistant-filter.conf
     dest: /etc/fail2ban/filter.d/homeassistant.conf
+    mode: '0644'
   notify: "fail2ban: Restart"
   tags:
     - ubuntu
@@ -517,6 +559,7 @@
   ansible.builtin.copy:
     src: homeassistant.conf
     dest: /etc/fail2ban/jail.d/homeassistant.conf
+    mode: '0644'
   notify: "fail2ban: Restart"
   tags:
     - ubuntu
@@ -529,6 +572,7 @@
   ansible.builtin.copy:
     src: zabbix-web-filter.conf
     dest: /etc/fail2ban/filter.d/zabbix-web.conf
+    mode: '0644'
   notify: "fail2ban: Restart"
   tags:
     - ubuntu
@@ -541,6 +585,7 @@
   ansible.builtin.copy:
     src: zabbix-web.conf
     dest: /etc/fail2ban/jail.d/zabbix-web.conf
+    mode: '0644'
   notify: "fail2ban: Restart"
   tags:
     - ubuntu
@@ -565,6 +610,7 @@
   ansible.builtin.copy:
     src: failure-notify@.service
     dest: /etc/systemd/system/failure-notify@.service
+    mode: '0644'
   notify: "Reload systemd"
   tags:
     - ubuntu
@@ -578,6 +624,7 @@
   ansible.builtin.copy:
     src: xterm-ghostty
     dest: /usr/share/terminfo/x/xterm-ghostty
+    mode: '0644'
   tags:
     - ubuntu
     - install
@@ -601,6 +648,7 @@
 
 - name: "package : Update global npm packages"
   ansible.builtin.command: npm update -g
+  changed_when: false
   tags:
     - ubuntu
     - upgrade
@@ -610,6 +658,7 @@
 
 - name: "package : Upgrade all uv tools"
   ansible.builtin.command: uv tool upgrade --all
+  changed_when: false
   become: true
   become_user: "{{ item }}"
   loop:

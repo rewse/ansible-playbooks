@@ -63,6 +63,7 @@
 
 - name: "package: Install Chrome for agent-browser"
   ansible.builtin.command: agent-browser install
+  changed_when: false
   tags:
     - darwin
     - install
@@ -127,7 +128,7 @@
       - xurl
       - zoom
     update_homebrew: true
-  ignore_errors: true
+  failed_when: false
   tags:
     - darwin
     - install
@@ -137,6 +138,7 @@
 
 - name: "package: Install global npm packages"
   ansible.builtin.command: npm install -g {{ item }}
+  changed_when: false
   loop:
     - ctx7
     - "@playwright/mcp@latest"
@@ -150,6 +152,7 @@
 
 - name: "package : Install package by uv"
   ansible.builtin.command: uv tool install {{ item }}
+  changed_when: false
   loop:
     - pdfplumber
   tags:
@@ -176,7 +179,8 @@
   ansible.builtin.file:
     path: /opt/homebrew/lib/node_modules/.package-lock.json
     state: absent
-  ignore_errors: true
+    mode: '0644'
+  failed_when: false
   tags:
     - darwin
     - upgrade
@@ -186,6 +190,7 @@
 
 - name: "package : Update npm"
   ansible.builtin.command: npm install -g npm@latest
+  changed_when: false
   tags:
     - ubuntu
     - upgrade
@@ -195,6 +200,7 @@
 
 - name: "package : Update global npm packages"
   ansible.builtin.command: npm update -g
+  changed_when: false
   tags:
     - darwin
     - upgrade
@@ -204,6 +210,7 @@
 
 - name: "package : Upgrade all uv tools"
   ansible.builtin.command: uv tool upgrade --all
+  changed_when: false
   tags:
     - darwin
     - upgrade
@@ -213,6 +220,7 @@
 
 - name: "package : Install packages by mas"
   ansible.builtin.command: mas install {{ item }}
+  changed_when: false
   loop:
     - 302584613   # Amazon Kindle
     - 545519333   # Amazon Prime Video
@@ -230,7 +238,7 @@
     - 1451685025  # WireGuard
     - 497799835   # Xcode
     - 1380563956  # 辞書 by 物書堂
-  ignore_errors: true
+  failed_when: false
   tags:
     - darwin
     - install
@@ -242,6 +250,7 @@
   ansible.builtin.file:
     path: /Library/Fonts/Adobe
     state: directory
+    mode: '0755'
   tags:
     - darwin
     - init
@@ -251,8 +260,9 @@
 
 - name: "font : Download source-han-mono"
   ansible.builtin.get_url:
-    url: https://github.com/adobe-fonts/source-han-mono/releases/download/{{ source_han_mono_version }}/SourceHanMono.ttc
+    url: https://github.com/adobe-fonts/source-han-mono/releases/download/{{ darwin_source_han_mono_version }}/SourceHanMono.ttc
     dest: /Library/Fonts/Adobe
+    mode: '0644'
   tags:
     - darwin
     - install
@@ -263,7 +273,7 @@
 
 - name: "font : Download source-han-sans"
   ansible.builtin.unarchive:
-    src: https://github.com/adobe-fonts/source-han-sans/releases/download/{{ source_han_sans_version }}/SourceHanSans.ttc.zip
+    src: https://github.com/adobe-fonts/source-han-sans/releases/download/{{ darwin_source_han_sans_version }}/SourceHanSans.ttc.zip
     dest: /Library/Fonts/Adobe
     remote_src: true
   tags:
@@ -276,7 +286,7 @@
 
 - name: "font : Download source-han-serif"
   ansible.builtin.unarchive:
-    src: https://github.com/adobe-fonts/source-han-serif/releases/download/{{ source_han_serif_version }}/01_SourceHanSerif.ttc.zip
+    src: https://github.com/adobe-fonts/source-han-serif/releases/download/{{ darwin_source_han_serif_version }}/01_SourceHanSerif.ttc.zip
     dest: /Library/Fonts/Adobe
     remote_src: true
   tags:
@@ -287,9 +297,21 @@
     - darwin_font_install
     - darwin_font_download
 
+- name: "security : Download Aikido Safe Chain installer"
+  ansible.builtin.get_url:
+    url: https://raw.githubusercontent.com/AikidoSec/safe-chain/main/install-scripts/install-safe-chain.sh
+    dest: /tmp/install-safe-chain.sh
+    mode: '0755'
+  tags:
+    - darwin
+    - install
+    - security
+    - darwin_security
+    - darwin_security_install
+
 - name: "security : Install Aikido Safe Chain"
-  ansible.builtin.shell: |
-    curl -fsSL https://raw.githubusercontent.com/AikidoSec/safe-chain/main/install-scripts/install-safe-chain.sh | sh -s -- --include-python
+  ansible.builtin.command: sh /tmp/install-safe-chain.sh --include-python
+  changed_when: false
   tags:
     - darwin
     - install
@@ -299,6 +321,7 @@
 
 - name: "package : Install PowerShell by dotnet"
   ansible.builtin.command: dotnet tool install --global PowerShell
+  changed_when: false
   tags:
     - darwin
     - install
@@ -317,7 +340,7 @@
   loop:
     - homebrew
     - local
-  ignore_errors: true
+  failed_when: false
   tags:
     - darwin
     - config

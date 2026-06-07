@@ -12,21 +12,21 @@ network:
          - {{ local.ip }}/24
       routes:
         - to: default
-          via: {{ default_gateway }}
+          via: {{ raspberrypi_default_gateway }}
           metric: 100
-        - to: {{ aws_vpc_cidr }}
-          via: {{ default_gateway }}
+        - to: {{ raspberrypi_aws_vpc_cidr }}
+          via: {{ raspberrypi_default_gateway }}
       nameservers:
         addresses:
-          - {{ resolved1.ip }}
-          - {{ resolved1.ipv6 }}
+          - {{ raspberrypi_resolved1.ip }}
+          - {{ raspberrypi_resolved1.ipv6 }}
         search:
           - rewse.jp
   wifis:
     wlan0:
       access-points:
         xray-legacy:
-          password: {{ xray_legacy_password }}
+          password: {{ raspberrypi_xray_legacy_password }}
           auth:
             key-management: psk
       dhcp4: false
@@ -39,13 +39,13 @@ network:
          - {{ local.ip_2 }}/24
       routes:
         - to: default
-          via: {{ default_gateway }}
+          via: {{ raspberrypi_default_gateway }}
           metric: 200
-        - to: {{ aws_vpc_cidr }}
-          via: {{ default_gateway }}
+        - to: {{ raspberrypi_aws_vpc_cidr }}
+          via: {{ raspberrypi_default_gateway }}
       nameservers:
         addresses:
-          - {{ resolved1.ip }}
-          - {{ resolved1.ipv6 }}
+          - {{ raspberrypi_resolved1.ip }}
+          - {{ raspberrypi_resolved1.ipv6 }}
         search:
           - rewse.jp

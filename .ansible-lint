@@ -1,0 +1,8 @@
+---
+skip_list:
+  - name[casing]
+  - name[play]
+  - role-name[path]
+
+exclude_paths:
+  - roles/homeassistant/files/

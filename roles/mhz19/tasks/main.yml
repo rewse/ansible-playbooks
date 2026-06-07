@@ -3,6 +3,7 @@
   ansible.builtin.file:
     path: /opt/mhz19
     state: directory
+    mode: '0755'
   tags:
     - mhz19
     - init
@@ -47,6 +48,7 @@
   ansible.builtin.copy:
     src: mhz192mqtt.service
     dest: /etc/systemd/system/mhz192mqtt.service
+    mode: '0644'
   notify: "Reload systemd"
   tags:
     - mhz19
@@ -58,6 +60,7 @@
   ansible.builtin.copy:
     src: mhz192mqtt.timer
     dest: /etc/systemd/system/mhz192mqtt.timer
+    mode: '0644'
   notify: "mhz19 : Restart timer"
   tags:
     - mhz19

@@ -16,6 +16,7 @@
   ansible.builtin.copy:
     src: lmstudio.rewse.jp.conf
     dest: /etc/apache2/sites-available
+    mode: '0644'
   notify: "apache: Reload"
   tags:
     - lmstudio
@@ -25,6 +26,8 @@
 
 - name: "lmstudio : Enable Apache site"
   ansible.builtin.command: a2ensite lmstudio.rewse.jp
+  register: lmstudio_a2ensite
+  changed_when: "'already enabled' not in lmstudio_a2ensite.stdout"
   notify: "apache: Reload"
   tags:
     - lmstudio

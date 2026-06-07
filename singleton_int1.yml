@@ -6,13 +6,13 @@
     - autodiscover
     - couchdb
     - docker
-    - enecoq-data-fetcher
+    - enecoq_data_fetcher
     - homeassistant
     - homeassistant-ha/primary
     - httpd
     - litellm
     - lmstudio
-    - matter-server
+    - matter_server
     - mosquitto
     - syslogd
     - zabbix/server

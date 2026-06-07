@@ -17,14 +17,9 @@
     owner: mosquitto
     group: mosquitto
     mode: '0600'
-  tags:
-    - mosquitto
-    - config
-    - mosquitto_mosquitto
-    - mosquitto_mosquitto_config
-
-- name: "mosquitto : Hash password file"
-  ansible.builtin.command: mosquitto_passwd -U /etc/mosquitto/pwfile
+  notify:
+    - "mosquitto: Hash password file"
+    - "mosquitto: Restart"
   tags:
     - mosquitto
     - config
@@ -35,6 +30,7 @@
   ansible.builtin.copy:
     src: password.conf
     dest: /etc/mosquitto/conf.d
+    mode: '0644'
   notify: "mosquitto: Restart"
   tags:
     - mosquitto

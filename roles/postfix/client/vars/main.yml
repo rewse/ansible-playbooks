@@ -1,7 +1,7 @@
 ---
-relayhost:
+postfix_relayhost:
   name: rewse.sakura.ne.jp
   port: 465
-sakura:
+postfix_sakura:
   username: "{{ lookup('pipe', 'op read op://ansible/Sakura/username') }}"
   password: "{{ lookup('pipe', 'op read op://ansible/Sakura/credential') }}"

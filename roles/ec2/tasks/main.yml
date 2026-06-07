@@ -22,6 +22,7 @@
 
 - name: "ec2 : Label secondary disk as srv"
   ansible.builtin.command: e2label /dev/{{ secondary_diskname }} srv
+  changed_when: false
   tags:
     - ec2
     - init

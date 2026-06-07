@@ -3,6 +3,7 @@
   ansible.builtin.copy:
     src: 10-remote.conf
     dest: /etc/rsyslog.d
+    mode: '0644'
   notify: "rsyslog: Restart"
   tags:
     - syslogd
@@ -14,6 +15,7 @@
   ansible.builtin.copy:
     src: remote
     dest: /etc/logrotate.d
+    mode: '0644'
   notify: "logrotate: Restart"
   tags:
     - syslogd

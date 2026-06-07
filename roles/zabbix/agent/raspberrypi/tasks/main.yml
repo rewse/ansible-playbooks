@@ -3,6 +3,7 @@
   ansible.builtin.copy:
     src: raspberrypi.conf
     dest: /etc/zabbix/zabbix_agentd.d
+    mode: '0644'
   notify: "zabbix-agent: Restart"
   tags: [zabbix-agent-raspberrypi, config]
 
@@ -11,6 +12,7 @@
     src: /usr/lib/systemd/system/zabbix-agent.service
     dest: /etc/systemd/system
     remote_src: true
+    mode: '0644'
   notify: "zabbix-agent: Restart"
   tags: [zabbix-agent-raspberrypi, config]
 
@@ -43,5 +45,6 @@
   ansible.builtin.copy:
     src: bluetooth-devices.conf
     dest: /etc/zabbix/zabbix_agentd.d
+    mode: '0644'
   notify: "zabbix-agent: Restart"
   tags: [zabbix-agent-raspberrypi, config]

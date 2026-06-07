@@ -1,11 +1,11 @@
 ---
 - name: "zabbix-server : Install zabbix-release package"
   ansible.builtin.apt:
-    deb: https://repo.zabbix.com/zabbix/{{ zabbix.version }}/release/ubuntu/pool/main/z/zabbix-release/zabbix-release_latest_{{ zabbix.version }}+ubuntu24.04_all.deb
+    deb: https://repo.zabbix.com/zabbix/{{ zabbix_server.version }}/release/ubuntu/pool/main/z/zabbix-release/zabbix-release_latest_{{ zabbix_server.version }}+ubuntu24.04_all.deb
   retries: 3
   delay: 5
-  register: result
-  until: result is succeeded
+  register: zabbix_release_install
+  until: zabbix_release_install is succeeded
   tags:
     - zabbix-server
     - install
@@ -36,6 +36,7 @@
   ansible.builtin.file:
     path: /etc/systemd/system/zabbix-server.service.d
     state: directory
+    mode: '0755'
   tags:
     - zabbix-server
     - init
@@ -46,6 +47,7 @@
   ansible.builtin.copy:
     src: override.conf
     dest: /etc/systemd/system/zabbix-server.service.d
+    mode: '0644'
   notify: "zabbix-server: Restart"
   tags:
     - zabbix-server
@@ -70,7 +72,7 @@
     dest: /etc/zabbix/zabbix_server.conf
     insertafter: "^# DBHost="
     regexp: "^DBHost="
-    line: "DBHost={{ zabbix.db_host }}"
+    line: "DBHost={{ zabbix_server.db_host }}"
   notify: "zabbix-server: Restart"
   tags:
     - zabbix-server
@@ -83,7 +85,7 @@
     dest: /etc/zabbix/zabbix_server.conf
     insertafter: "^# DBPassword="
     regexp: "^DBPassword="
-    line: "DBPassword={{ zabbix.db_password }}"
+    line: "DBPassword={{ zabbix_server.db_password }}"
   notify: "zabbix-server: Restart"
   tags:
     - zabbix-server
@@ -145,6 +147,8 @@
 
 - name: "zabbix-frontend : Enable Apache config"
   ansible.builtin.command: a2enconf zabbix
+  register: zabbix_a2enconf
+  changed_when: "'already enabled' not in zabbix_a2enconf.stdout"
   notify: "apache: Reload"
   tags:
     - zabbix-server
@@ -183,6 +187,7 @@
   ansible.builtin.git:
     repo: https://github.com/Matty9191/ssl-cert-check.git
     dest: /srv/git/ssl-cert-check
+    version: master
   tags:
     - zabbix-server
     - install

@@ -16,8 +16,18 @@
     - raspberrypi_package
     - raspberrypi_package_install
 
+- name: "claude: Download Claude Code installer"
+  ansible.builtin.get_url:
+    url: https://claude.ai/install.sh
+    dest: /tmp/claude-install.sh
+    mode: '0755'
+  tags:
+    - raspberrypi
+    - install
+    - claude
+
 - name: "claude: Install Claude Code"
-  ansible.builtin.shell: curl -fsSL https://claude.ai/install.sh | bash
+  ansible.builtin.command: bash /tmp/claude-install.sh
   args:
     creates: ~/.local/bin/claude
   tags:
@@ -124,8 +134,8 @@
   ansible.builtin.git:
     repo: https://github.com/skysilver-lab/php-miio.git
     dest: /srv/php-miio
-    version: "v.{{ php_miio_version }}"
-  register: php_miio_git
+    version: "v.{{ raspberrypi_php_miio_version }}"
+  register: raspberrypi_php_miio_git
   tags:
     - raspberrypi
     - install
@@ -136,6 +146,7 @@
   ansible.builtin.copy:
     src: environment
     dest: /etc
+    mode: '0644'
   tags:
     - raspberrypi
     - config
@@ -170,6 +181,7 @@
   ansible.builtin.file:
     path: /etc/netplan/50-cloud-init.yaml
     state: absent
+    mode: '0644'
   tags:
     - raspberrypi
     - config
@@ -180,6 +192,7 @@
   ansible.builtin.copy:
     src: 99-disable-network-config.cfg
     dest: /etc/cloud/cloud.cfg.d
+    mode: '0644'
   tags:
     - raspberrypi
     - config
@@ -190,6 +203,7 @@
   ansible.builtin.copy:
     src: 90-vpn.conf
     dest: /etc/sysctl.d
+    mode: '0644'
   notify: "sysctl: Reload"
   tags:
     - raspberrypi
@@ -201,6 +215,7 @@
   ansible.builtin.copy:
     src: 99-arp-multinic.conf
     dest: /etc/sysctl.d
+    mode: '0644'
   notify: "sysctl: Reload"
   tags:
     - raspberrypi
@@ -223,6 +238,7 @@
   ansible.builtin.copy:
     src: network-failover.service
     dest: /etc/systemd/system
+    mode: '0644'
   notify: "Reload systemd"
   tags:
     - raspberrypi
@@ -234,6 +250,7 @@
   ansible.builtin.copy:
     src: network-failover.timer
     dest: /etc/systemd/system
+    mode: '0644'
   notify: "network-failover: Restart timer"
   tags:
     - raspberrypi
@@ -255,6 +272,7 @@
 
 - name: "netplan : Apply configuration"
   ansible.builtin.command: netplan apply
+  changed_when: false
   tags:
     - raspberrypi
     - config
@@ -278,6 +296,7 @@
   ansible.builtin.copy:
     src: kex_algorithms.conf
     dest: /etc/ssh/ssh_config.d
+    mode: '0644'
   tags:
     - raspberrypi
     - config
@@ -289,6 +308,7 @@
   ansible.builtin.file:
     path: /etc/systemd/system/ssh.socket.d
     state: directory
+    mode: '0755'
   tags:
     - raspberrypi
     - config
@@ -300,6 +320,7 @@
   ansible.builtin.template:
     src: override.conf.j2
     dest: /etc/systemd/system/ssh.socket.d/override.conf
+    mode: '0644'
   notify:
     - "Reload systemd"
     - "ssh: Restart socket"
@@ -326,6 +347,7 @@
   ansible.builtin.file:
     path: /mnt/bak
     state: directory
+    mode: '0755'
   tags:
     - raspberrypi
     - config
@@ -334,7 +356,7 @@
 
 - name: "backup : Check installed restic version"
   ansible.builtin.command: restic version
-  register: restic_installed
+  register: raspberrypi_restic_installed
   changed_when: false
   failed_when: false
   check_mode: false
@@ -346,11 +368,12 @@
 
 - name: "backup : Download restic binary archive"
   ansible.builtin.get_url:
-    url: "https://github.com/restic/restic/releases/download/v{{ restic.version }}/restic_{{ restic.version }}_linux_{{ restic_arch }}.bz2"
-    dest: "/tmp/restic_{{ restic.version }}_linux_{{ restic_arch }}.bz2"
+    url: "https://github.com/restic/restic/releases/download/v{{ raspberrypi_restic.version }}/restic_{{ raspberrypi_restic.version }}_linux_{{ restic_arch }}.bz2"
+    dest: "/tmp/restic_{{ raspberrypi_restic.version }}_linux_{{ restic_arch }}.bz2"
+    mode: '0644'
   vars:
     restic_arch: "{{ ansible_facts['architecture'] | replace('x86_64', 'amd64') | replace('aarch64', 'arm64') }}"
-  when: restic.version not in (restic_installed.stdout | default(''))
+  when: raspberrypi_restic.version not in (raspberrypi_restic_installed.stdout | default(''))
   tags:
     - raspberrypi
     - install
@@ -359,11 +382,12 @@
 
 - name: "backup : Extract restic binary"
   ansible.builtin.shell: |
-    bunzip2 -kc /tmp/restic_{{ restic.version }}_linux_{{ restic_arch }}.bz2 > /usr/local/bin/restic
+    bunzip2 -kc /tmp/restic_{{ raspberrypi_restic.version }}_linux_{{ restic_arch }}.bz2 > /usr/local/bin/restic
     chmod 755 /usr/local/bin/restic
   vars:
     restic_arch: "{{ ansible_facts['architecture'] | replace('x86_64', 'amd64') | replace('aarch64', 'arm64') }}"
-  when: restic.version not in (restic_installed.stdout | default(''))
+  when: raspberrypi_restic.version not in (raspberrypi_restic_installed.stdout | default(''))
+  changed_when: true
   tags:
     - raspberrypi
     - install
@@ -383,7 +407,7 @@
 
 - name: "backup : Install repository password"
   ansible.builtin.copy:
-    content: "{{ restic.password }}"
+    content: "{{ raspberrypi_restic.password }}"
     dest: /etc/restic/password
     mode: '0600'
   no_log: true
@@ -397,6 +421,7 @@
   ansible.builtin.copy:
     src: restic.exclude
     dest: /etc
+    mode: '0644'
   tags:
     - raspberrypi
     - config
@@ -418,6 +443,7 @@
   ansible.builtin.copy:
     src: backup-daily.service
     dest: /etc/systemd/system/backup-daily.service
+    mode: '0644'
   notify: "Reload systemd"
   tags:
     - raspberrypi
@@ -429,6 +455,7 @@
   ansible.builtin.copy:
     src: backup-daily.timer
     dest: /etc/systemd/system/backup-daily.timer
+    mode: '0644'
   notify: "raspberrypi : Restart backup-daily timer"
   tags:
     - raspberrypi
@@ -463,6 +490,7 @@
   ansible.builtin.copy:
     src: backup-monthly-check.service
     dest: /etc/systemd/system/backup-monthly-check.service
+    mode: '0644'
   notify: "Reload systemd"
   tags:
     - raspberrypi
@@ -474,6 +502,7 @@
   ansible.builtin.copy:
     src: backup-monthly-check.timer
     dest: /etc/systemd/system/backup-monthly-check.timer
+    mode: '0644'
   notify: "raspberrypi : Restart backup-monthly-check timer"
   tags:
     - raspberrypi

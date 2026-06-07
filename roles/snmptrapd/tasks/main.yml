@@ -15,6 +15,7 @@
   ansible.builtin.copy:
     src: snmptrapd.conf
     dest: /etc/snmp
+    mode: '0644'
   notify: "snmptrapd: Restart"
   tags:
     - snmptrapd

@@ -3,6 +3,7 @@
   ansible.builtin.file:
     path: /etc/matter-server/data
     state: directory
+    mode: '0755'
   tags:
     - matter-server
     - init
@@ -51,7 +52,7 @@
     services: matter-server
     state: present
     pull: always
-  when: quarantine_passed | default(false)
+  when: docker_quarantine_passed | default(false)
   tags:
     - matter-server
     - update

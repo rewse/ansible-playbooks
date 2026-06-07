@@ -1,7 +1,7 @@
 ---
 - name: "zabbix-agent : Install zabbix-release package"
   ansible.builtin.apt:
-    deb: https://repo.zabbix.com/zabbix/{{ zabbix.version }}/release/ubuntu/pool/main/z/zabbix-release/zabbix-release_latest_{{ zabbix.version }}+ubuntu24.04_all.deb
+    deb: https://repo.zabbix.com/zabbix/{{ zabbix_agent.version }}/release/ubuntu/pool/main/z/zabbix-release/zabbix-release_latest_{{ zabbix_agent.version }}+ubuntu24.04_all.deb
   tags: [zabbix-agent-ubuntu, install]
 
 - name: "zabbix-agent : Install packages"
@@ -16,7 +16,7 @@
   ansible.builtin.lineinfile:
     dest: /etc/zabbix/zabbix_agentd.conf
     regexp: "Server="
-    line: "Server={{ zabbix.server }}"
+    line: "Server={{ zabbix_agent.server }}"
   notify: "zabbix-agent: Restart"
   tags: [zabbix-agent-ubuntu, config]
 
@@ -24,7 +24,7 @@
   ansible.builtin.lineinfile:
     dest: /etc/zabbix/zabbix_agentd.conf
     regexp: "ServerActive="
-    line: "ServerActive={{ zabbix.server }}"
+    line: "ServerActive={{ zabbix_agent.server }}"
   notify: "zabbix-agent: Restart"
   tags: [zabbix-agent-ubuntu, config]
 
@@ -58,18 +58,21 @@
   ansible.builtin.file:
     path: /etc/zabbix/zabbix_agentd.conf.d
     state: absent
+    mode: '0644'
   tags: [zabbix-agent-ubuntu, config]
 
 - name: "zabbix-agent : Create config directory"
   ansible.builtin.file:
     path: /etc/zabbix/zabbix_agentd.d
     state: directory
+    mode: '0755'
   tags: [zabbix-agent-ubuntu, init]
 
 - name: "zabbix-agent : Copy Ubuntu config"
   ansible.builtin.copy:
     src: ubuntu.conf
     dest: /etc/zabbix/zabbix_agentd.d
+    mode: '0644'
   notify: "zabbix-agent: Restart"
   tags: [zabbix-agent-ubuntu, config]
 
@@ -77,6 +80,7 @@
   ansible.builtin.file:
     path: /etc/zabbix/zabbix_agentd.d/userparameter_mysql.conf
     state: absent
+    mode: '0644'
   notify: "zabbix-agent: Restart"
   tags: [zabbix-agent-ubuntu, config]
 
@@ -91,6 +95,7 @@
   ansible.builtin.file:
     path: /usr/lib/zabbix/agentscripts
     state: directory
+    mode: '0755'
   tags: [zabbix-agent-ubuntu, init]
 
 - name: "zabbix-agent : Copy sudo config"

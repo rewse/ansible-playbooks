@@ -27,6 +27,7 @@
   ansible.builtin.file:
     path: /etc/compose.yml
     state: touch
+    mode: '0644'
   tags:
     - docker
     - init

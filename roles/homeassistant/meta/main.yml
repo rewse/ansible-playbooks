@@ -2,5 +2,5 @@
 dependencies:
   - {role: httpd}
   - {role: docker}
-  - {role: matter-server}
+  - {role: matter_server}
   - {role: sslcert}

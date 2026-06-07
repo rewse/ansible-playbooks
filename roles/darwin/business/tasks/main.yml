@@ -1,7 +1,7 @@
 ---
 - name: "package : Install packages by homebrew_cask"
   community.general.homebrew_cask:
-    name: 
+    name:
       - asana
       - box-drive
       - displaylink
@@ -13,7 +13,7 @@
       - tripmode
       - webex-meetings
     update_homebrew: true
-  ignore_errors: true
+  failed_when: false
   tags:
     - darwin
     - darwin_business
@@ -24,10 +24,11 @@
 
 - name: "package : Install packages by mas"
   ansible.builtin.command: mas install {{ item }}
+  changed_when: false
   loop:
     - 1274495053  # Microsoft To Do
     - 1639692859  # WattsConnected
-  ignore_errors: true
+  failed_when: false
   tags:
     - darwin
     - darwin_business
@@ -44,6 +45,7 @@
 # Ref: https://w.amazon.com/bin/view/Isengard-cli/
 - name: "toolbox : Register isengard-cli repository"
   ansible.builtin.command: toolbox registry add s3://buildertoolbox-registry-isengard-cli-us-west-2/tools.json
+  changed_when: false
   tags:
     - darwin
     - darwin_business
@@ -55,6 +57,7 @@
 # Ref: https://w.amazon.com/bin/view/DevAccount/Docs
 - name: "toolbox : Install with toolbox"
   ansible.builtin.command: toolbox install {{ item }}
+  changed_when: false
   loop:
     - aim
     - axe
@@ -70,6 +73,7 @@
 
 - name: "toolbox : Update toolbox"
   ansible.builtin.command: toolbox update
+  changed_when: false
   tags:
     - darwin
     - darwin_business
@@ -92,6 +96,7 @@
 
 - name: "aim : Install MCP servers"
   ansible.builtin.command: aim mcp install {{ item }}
+  changed_when: false
   loop:
     - amazon-sharepoint-mcp
     - atoz-mcp
@@ -110,6 +115,7 @@
 
 - name: "aim : Update MCP servers"
   ansible.builtin.command: aim mcp update
+  changed_when: false
   tags:
     - darwin
     - darwin_business

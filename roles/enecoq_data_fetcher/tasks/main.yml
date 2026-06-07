@@ -3,6 +3,7 @@
   ansible.builtin.file:
     path: /srv/homeassistant/config/data
     state: directory
+    mode: '0755'
   tags:
     - enecoq-data-fetcher
     - init
@@ -11,6 +12,7 @@
 
 - name: "enecoq-data-fetcher : Install/update chromium via playwright"
   ansible.builtin.command: npx playwright install chromium --force
+  changed_when: false
   tags:
     - enecoq-data-fetcher
     - install
@@ -35,6 +37,7 @@
   ansible.builtin.copy:
     src: enecoq-data-fetcher.service
     dest: /etc/systemd/system/enecoq-data-fetcher.service
+    mode: '0644'
   notify: "Reload systemd"
   tags:
     - enecoq-data-fetcher
@@ -46,6 +49,7 @@
   ansible.builtin.copy:
     src: enecoq-data-fetcher.timer
     dest: /etc/systemd/system/enecoq-data-fetcher.timer
+    mode: '0644'
   notify: "enecoq-data-fetcher : Restart timer"
   tags:
     - enecoq-data-fetcher

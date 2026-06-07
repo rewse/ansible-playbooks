@@ -52,14 +52,15 @@
 - name: "httpd : Check if default-ssl.conf exists"
   ansible.builtin.stat:
     path: /etc/apache2/sites-available/default-ssl.conf
-  register: default_ssl_conf_exists
+  register: httpd_default_ssl_conf_exists
 
 - name: "httpd : Create hard link for default-ssl.conf"
   ansible.builtin.file:
     src: /etc/apache2/sites-available/default-ssl.conf
     dest: /etc/apache2/sites-available/000-default-ssl.conf
     state: hard
-  when: default_ssl_conf_exists.stat.exists
+    mode: '0644'
+  when: httpd_default_ssl_conf_exists.stat.exists
   notify: "apache: Reload"
   tags:
     - httpd
@@ -69,6 +70,8 @@
 
 - name: "httpd : Enable 000-default-ssl site"
   ansible.builtin.command: a2ensite 000-default-ssl
+  register: httpd_a2ensite_default
+  changed_when: "'already enabled' not in httpd_a2ensite_default.stdout"
   notify: "apache: Reload"
   tags:
     - httpd
@@ -80,6 +83,7 @@
   ansible.builtin.file:
     path: "{{ item }}"
     state: absent
+    mode: '0644'
   loop:
     - /etc/apache2/sites-available/default-ssl.conf
     - /etc/apache2/sites-enabled/default-ssl.conf
@@ -195,6 +199,7 @@
   ansible.builtin.copy:
     src: 00-forcessl.conf
     dest: /etc/apache2/conf-available
+    mode: '0644'
   tags:
     - httpd
     - config
@@ -203,6 +208,8 @@
 
 - name: "httpd : Enable force SSL config"
   ansible.builtin.command: a2enconf 00-forcessl
+  register: httpd_a2enconf_forcessl
+  changed_when: "'already enabled' not in httpd_a2enconf_forcessl.stdout"
   notify: "apache: Reload"
   tags:
     - httpd
@@ -214,6 +221,7 @@
   ansible.builtin.copy:
     src: 01-blog-redirect.conf
     dest: /etc/apache2/conf-available
+    mode: '0644'
   tags:
     - httpd
     - config
@@ -222,6 +230,8 @@
 
 - name: "httpd : Enable blog redirect config"
   ansible.builtin.command: a2enconf 01-blog-redirect
+  register: httpd_a2enconf_blog
+  changed_when: "'already enabled' not in httpd_a2enconf_blog.stdout"
   notify: "apache: Reload"
   tags:
     - httpd
@@ -233,6 +243,7 @@
   ansible.builtin.template:
     src: admin.conf.j2
     dest: /etc/apache2/conf-available/admin.conf
+    mode: '0644'
   tags:
     - httpd
     - config
@@ -241,6 +252,8 @@
 
 - name: "httpd : Enable admin config"
   ansible.builtin.command: a2enconf admin
+  register: httpd_a2enconf_admin
+  changed_when: "'already enabled' not in httpd_a2enconf_admin.stdout"
   notify: "apache: Reload"
   tags:
     - httpd
@@ -252,6 +265,7 @@
   ansible.builtin.template:
     src: status.conf.j2
     dest: /etc/apache2/conf-available/status.conf
+    mode: '0644'
   notify: "apache: Reload"
   tags:
     - httpd
@@ -261,6 +275,8 @@
 
 - name: "httpd : Enable status config"
   ansible.builtin.command: a2enconf status
+  register: httpd_a2enconf_status
+  changed_when: "'already enabled' not in httpd_a2enconf_status.stdout"
   notify: "apache: Reload"
   tags:
     - httpd
@@ -272,6 +288,7 @@
   ansible.builtin.file:
     path: /srv/www/html/admin
     state: directory
+    mode: '0755'
   tags:
     - httpd
     - init
@@ -282,6 +299,7 @@
   ansible.builtin.copy:
     src: phpinfo.php
     dest: /srv/www/html/admin
+    mode: '0644'
   tags:
     - httpd
     - config
@@ -291,7 +309,8 @@
 - name: "php : Copy timezone config"
   ansible.builtin.copy:
     src: timezone.ini
-    dest: /etc/php/{{ php_version }}/mods-available
+    dest: /etc/php/{{ httpd_php_version }}/mods-available
+    mode: '0644'
   tags:
     - httpd
     - config
@@ -300,7 +319,8 @@
     - httpd_php_config
 
 - name: "php : Enable timezone module"
-  ansible.builtin.command: phpenmod -v {{ php_version }} -s ALL timezone
+  ansible.builtin.command: phpenmod -v {{ httpd_php_version }} -s ALL timezone
+  changed_when: false
   notify: "apache: Restart"
   tags:
     - httpd
@@ -313,6 +333,7 @@
   ansible.builtin.file:
     path: /usr/lib/zabbix/agentscripts
     state: directory
+    mode: '0755'
   tags:
     - httpd
     - init
@@ -336,6 +357,7 @@
   ansible.builtin.template:
     src: apache.conf.j2
     dest: /etc/zabbix/zabbix_agentd.d/apache.conf
+    mode: '0644'
   notify: "zabbix-agent: Restart"
   tags:
     - httpd

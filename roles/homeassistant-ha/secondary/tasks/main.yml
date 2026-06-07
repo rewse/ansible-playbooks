@@ -47,6 +47,7 @@
   ansible.builtin.blockinfile:
     path: /etc/compose.yml
     create: true
+    mode: '0644'
     marker: "# {mark} ANSIBLE MANAGED BLOCK homeassistant"
     block: |2
         homeassistant:
@@ -76,7 +77,7 @@
     services: homeassistant
     state: present
     pull: always
-  when: quarantine_passed | default(false)
+  when: docker_quarantine_passed | default(false)
   tags: [homeassistant-ha-secondary, update]
 
 - name: "failover : Copy script"

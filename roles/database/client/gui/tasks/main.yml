@@ -1,7 +1,13 @@
 ---
-- name: "corretto : Download and dearmor GPG key"
-  ansible.builtin.shell: |
-    curl -fsSL https://apt.corretto.aws/corretto.key | gpg --dearmor -o /etc/apt/keyrings/corretto.gpg
+- name: "corretto : Download GPG key"
+  ansible.builtin.get_url:
+    url: https://apt.corretto.aws/corretto.key
+    dest: /etc/apt/keyrings/corretto.key
+    mode: '0644'
+  tags: [database-client-gui, install, java]
+
+- name: "corretto : Dearmor GPG key"
+  ansible.builtin.command: gpg --dearmor -o /etc/apt/keyrings/corretto.gpg /etc/apt/keyrings/corretto.key
   args:
     creates: /etc/apt/keyrings/corretto.gpg
   tags: [database-client-gui, install, java]
@@ -20,7 +26,7 @@
 
 - name: "corretto : Install JDK"
   ansible.builtin.apt:
-    name: java-{{ corretto_version }}-amazon-corretto-jdk
+    name: java-{{ database_corretto_version }}-amazon-corretto-jdk
     state: present
   tags: [database-client-gui, install, java]
 
@@ -33,7 +39,7 @@
 
 - name: "sct : Install package"
   ansible.builtin.apt:
-    deb: /usr/local/src/aws-schema-conversion-tool-{{ sct_version }}.deb
+    deb: /usr/local/src/aws-schema-conversion-tool-{{ database_sct_version }}.deb
   tags: [database-client-gui, install, sct]
 
 - name: "dbeaver : Install package"

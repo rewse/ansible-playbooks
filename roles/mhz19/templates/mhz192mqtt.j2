@@ -9,7 +9,7 @@ readonly VENV_PATH="/opt/mhz19"
 readonly MQTT_HOST="hass.rewse.jp"
 readonly MQTT_PORT="1883"
 readonly MQTT_USER="pub_client"
-readonly MQTT_PASS="[% mosquitto_password %]"
+readonly MQTT_PASS="[% mhz19_mosquitto_password %]"
 readonly TOPIC_BASE="mhz19/[% location %]"
 
 PATH="${VENV_PATH}/bin:${PATH}"

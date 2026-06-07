@@ -57,6 +57,7 @@
     cmd: uv pip install /opt/zabbix-mcp/src
   environment:
     VIRTUAL_ENV: /opt/zabbix-mcp/venv
+  changed_when: false
   notify: "zabbix-mcp-server: Restart"
   tags:
     - zabbix-mcp

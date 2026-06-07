@@ -3,6 +3,7 @@
   ansible.builtin.file:
     path: "{{ item }}"
     state: directory
+    mode: '0755'
   loop:
     - /srv/couchdb/data
     - /srv/couchdb/etc/local.d
@@ -56,7 +57,7 @@
     services: couchdb
     state: present
     pull: always
-  when: quarantine_passed | default(false)
+  when: docker_quarantine_passed | default(false)
   tags:
     - couchdb
     - update
@@ -77,6 +78,7 @@
 
 - name: "couchdb : Run init script"
   ansible.builtin.command: /tmp/couchdb-init.sh
+  changed_when: false
   environment:
     hostname: localhost:5984
     username: tats
@@ -91,6 +93,7 @@
   ansible.builtin.copy:
     src: couchdb.rewse.jp.conf
     dest: /etc/apache2/sites-available
+    mode: '0644'
   notify: "apache: Reload"
   tags:
     - couchdb
@@ -101,6 +104,8 @@
 
 - name: "couchdb : Enable Apache site"
   ansible.builtin.command: a2ensite couchdb.rewse.jp
+  register: couchdb_a2ensite
+  changed_when: "'already enabled' not in couchdb_a2ensite.stdout"
   notify: "apache: Reload"
   tags:
     - couchdb

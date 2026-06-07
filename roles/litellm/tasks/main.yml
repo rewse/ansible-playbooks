@@ -5,6 +5,7 @@
     state: directory
     owner: root
     group: root
+    mode: '0755'
   tags:
     - litellm
     - config
@@ -15,6 +16,7 @@
   ansible.builtin.copy:
     src: config.yml
     dest: /srv/litellm
+    mode: '0644'
   notify: "litellm: Restart"
   tags:
     - litellm
@@ -69,7 +71,7 @@
     services: litellm
     state: present
     pull: always
-  when: quarantine_passed | default(false)
+  when: docker_quarantine_passed | default(false)
   tags:
     - litellm
     - update

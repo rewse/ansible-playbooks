@@ -43,7 +43,7 @@
     dest: /etc/postfix/main.cf
     insertafter: "^#relayhost "
     regexp: "^relayhost "
-    line: 'relayhost = [{{ relayhost.name }}]:{{ relayhost.port }}'
+    line: 'relayhost = [{{ postfix_relayhost.name }}]:{{ postfix_relayhost.port }}'
   notify: "postfix: Reload"
   tags:
     - postfix-client
@@ -142,11 +142,13 @@
 - name: "sasl : Create SASL password file"
   ansible.builtin.lineinfile:
     dest: /etc/postfix/sasl_passwd
-    regexp: '^\[{{ relayhost.name }}\]:{{ relayhost.port }}'
-    line: '[{{ relayhost.name }}]:{{ relayhost.port }} {{ sakura.username }}:{{ sakura.password }}'
+    regexp: '^\[{{ postfix_relayhost.name }}\]:{{ postfix_relayhost.port }}'
+    line: '[{{ postfix_relayhost.name }}]:{{ postfix_relayhost.port }} {{ postfix_sakura.username }}:{{ postfix_sakura.password }}'
     create: true
     mode: '0600'
-  register: postfix_sasl_password_out
+  notify:
+    - "sasl: Hash password file"
+    - "postfix: Reload"
   tags:
     - postfix-client
     - config
@@ -168,17 +170,6 @@
     - postfix-client_sasl_config
     - postfix-client_sasl_init
 
-- name: "sasl : Hash SASL password file"
-  ansible.builtin.command: postmap hash:/etc/postfix/sasl_passwd
-  when: postfix_sasl_password_out is changed
-  notify: "postfix: Reload"
-  tags:
-    - postfix-client
-    - config
-    - sasl
-    - postfix-client_sasl
-    - postfix-client_sasl_config
-
 - name: "sender-canonical : Set sender_canonical_maps"
   ansible.builtin.lineinfile:
     dest: /etc/postfix/main.cf
@@ -197,18 +188,9 @@
     src: sender_canonical.j2
     dest: /etc/postfix/sender_canonical
     mode: '0600'
-  register: postfix_sender_canonical_out
-  tags:
-    - postfix-client
-    - config
-    - sender-canonical
-    - postfix-client_sender-canonical
-    - postfix-client_sender-canonical_config
-
-- name: "sender-canonical : Hash sender_canonical file"
-  ansible.builtin.command: postmap hash:/etc/postfix/sender_canonical
-  when: postfix_sender_canonical_out is changed
-  notify: "postfix: Reload"
+  notify:
+    - "sender-canonical: Hash file"
+    - "postfix: Reload"
   tags:
     - postfix-client
     - config
@@ -222,15 +204,7 @@
     insertafter: "^postmaster:"
     regexp: "^root: "
     line: "root: {{ email.primary }}"
-  tags:
-    - postfix-client
-    - config
-    - aliases
-    - postfix-client_postfix
-    - postfix-client_postfix_config
-
-- name: "postfix : Rebuild aliases database"
-  ansible.builtin.command: newaliases
+  notify: "postfix: Rebuild aliases database"
   tags:
     - postfix-client
     - config

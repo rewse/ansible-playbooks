@@ -1,4 +1,4 @@
 ---
-enecoq:
+enecoq_data_fetcher_enecoq:
   email: "{{ lookup('pipe', 'op read op://ansible/enecoQ/username') }}"
   password: "{{ lookup('pipe', 'op read op://ansible/enecoQ/credential') }}"

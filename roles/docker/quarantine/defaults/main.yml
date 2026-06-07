@@ -1,2 +1,2 @@
 ---
-quarantine_days: 4
+docker_quarantine_days: 4

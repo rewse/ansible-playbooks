@@ -13,6 +13,7 @@
   ansible.builtin.file:
     path: /srv/homeassistant/config/certs
     state: directory
+    mode: '0755'
   tags:
     - homeassistant
     - init
@@ -25,6 +26,7 @@
     src: /etc/ssl/certs/ISRG_Root_X1.pem
     dest: /srv/homeassistant/config/certs
     remote_src: true
+    mode: '0644'
   tags:
     - homeassistant
     - config
@@ -79,7 +81,7 @@
     services: homeassistant
     state: present
     pull: always
-  when: quarantine_passed | default(false)
+  when: docker_quarantine_passed | default(false)
   tags:
     - homeassistant
     - update
@@ -92,6 +94,7 @@
   ansible.builtin.get_url:
     url: https://github.com/home-assistant/core/files/9417617/docker-default.txt
     dest: /etc/apparmor.d/docker-default
+    mode: '0644'
   tags:
     - homeassistant
     - config
@@ -104,6 +107,7 @@
   ansible.builtin.copy:
     src: aa-disable-homeassistant.service
     dest: /etc/systemd/system
+    mode: '0644'
   notify: "aa-disable-homeassistant: Restart"
   tags:
     - homeassistant
@@ -116,6 +120,7 @@
   ansible.builtin.copy:
     src: configuration.yaml
     dest: /srv/homeassistant/config
+    mode: '0644'
   notify: "homeassistant: Restart"
   tags:
     - homeassistant
@@ -138,6 +143,7 @@
   ansible.builtin.file:
     path: /srv/homeassistant/config/automations
     state: directory
+    mode: '0755'
   tags:
     - homeassistant
     - init
@@ -149,6 +155,7 @@
   ansible.builtin.file:
     path: /srv/homeassistant/config/blueprints/automation
     state: directory
+    mode: '0755'
   tags:
     - homeassistant
     - init
@@ -160,6 +167,7 @@
   ansible.builtin.copy:
     src: "{{ item }}"
     dest: /srv/homeassistant/config/automations
+    mode: '0644'
   loop:
     - automations-alarm.yaml
     - automations-balcony.yaml
@@ -191,6 +199,7 @@
     dest: /srv/homeassistant/config/secrets.yaml
     variable_start_string: "[%"
     variable_end_string: "%]"
+    mode: '0644'
   notify: "homeassistant: Restart"
   tags:
     - homeassistant
@@ -216,6 +225,7 @@
   ansible.builtin.copy:
     src: alarm_control_panels.yaml
     dest: /srv/homeassistant/config
+    mode: '0644'
   notify: "homeassistant: Restart"
   tags:
     - homeassistant
@@ -242,6 +252,7 @@
   ansible.builtin.copy:
     src: alexa.yaml
     dest: /srv/homeassistant/config
+    mode: '0644'
   notify: "homeassistant: Restart"
   tags:
     - homeassistant
@@ -268,6 +279,7 @@
   ansible.builtin.copy:
     src: command_lines.yaml
     dest: /srv/homeassistant/config
+    mode: '0644'
   notify: "homeassistant: Restart"
   tags:
     - homeassistant
@@ -294,6 +306,7 @@
   ansible.builtin.copy:
     src: homekit.yaml
     dest: /srv/homeassistant/config
+    mode: '0644'
   notify: "homeassistant: Restart"
   tags:
     - homeassistant
@@ -319,6 +332,7 @@
   ansible.builtin.copy:
     src: input_booleans.yaml
     dest: /srv/homeassistant/config
+    mode: '0644'
   tags:
     - homeassistant
     - config
@@ -343,6 +357,7 @@
   ansible.builtin.copy:
     src: input_datetimes.yaml
     dest: /srv/homeassistant/config
+    mode: '0644'
   tags:
     - homeassistant
     - config
@@ -367,6 +382,7 @@
   ansible.builtin.copy:
     src: input_numbers.yaml
     dest: /srv/homeassistant/config
+    mode: '0644'
   tags:
     - homeassistant
     - config
@@ -391,6 +407,7 @@
   ansible.builtin.copy:
     src: input_selects.yaml
     dest: /srv/homeassistant/config
+    mode: '0644'
   tags:
     - homeassistant
     - config
@@ -416,6 +433,7 @@
   ansible.builtin.copy:
     src: lights.yaml
     dest: /srv/homeassistant/config
+    mode: '0644'
   notify: "homeassistant: Restart"
   tags:
     - homeassistant
@@ -442,6 +460,7 @@
   ansible.builtin.copy:
     src: media_players.yaml
     dest: /srv/homeassistant/config
+    mode: '0644'
   notify: "homeassistant: Restart"
   tags:
     - homeassistant
@@ -468,6 +487,7 @@
   ansible.builtin.copy:
     src: mqtt.yaml
     dest: /srv/homeassistant/config
+    mode: '0644'
   notify: "homeassistant: Restart"
   tags:
     - homeassistant
@@ -494,6 +514,7 @@
   ansible.builtin.copy:
     src: notify.yaml
     dest: /srv/homeassistant/config
+    mode: '0644'
   notify: "homeassistant: Restart"
   tags:
     - homeassistant
@@ -520,6 +541,7 @@
   ansible.builtin.copy:
     src: rests.yaml
     dest: /srv/homeassistant/config
+    mode: '0644'
   notify: "homeassistant: Restart"
   tags:
     - homeassistant
@@ -546,6 +568,7 @@
   ansible.builtin.copy:
     src: scenes.yaml
     dest: /srv/homeassistant/config
+    mode: '0644'
   tags:
     - homeassistant
     - config
@@ -571,6 +594,7 @@
   ansible.builtin.copy:
     src: scripts.yaml
     dest: /srv/homeassistant/config
+    mode: '0644'
   tags:
     - homeassistant
     - config
@@ -596,6 +620,7 @@
   ansible.builtin.copy:
     src: sensors.yaml
     dest: /srv/homeassistant/config
+    mode: '0644'
   notify: "homeassistant: Restart"
   tags:
     - homeassistant
@@ -624,6 +649,7 @@
     dest: /srv/homeassistant/config/shell_commands.yaml
     variable_start_string: "[%"
     variable_end_string: "%]"
+    mode: '0644'
   notify: "homeassistant: Restart"
   tags:
     - homeassistant
@@ -650,6 +676,7 @@
   ansible.builtin.copy:
     src: switches.yaml
     dest: /srv/homeassistant/config
+    mode: '0644'
   notify: "homeassistant: Restart"
   tags:
     - homeassistant
@@ -676,6 +703,7 @@
   ansible.builtin.copy:
     src: utility_meters.yaml
     dest: /srv/homeassistant/config
+    mode: '0644'
   notify: "homeassistant: Restart"
   tags:
     - homeassistant
@@ -702,6 +730,7 @@
   ansible.builtin.copy:
     src: templates.yaml
     dest: /srv/homeassistant/config
+    mode: '0644'
   notify: "homeassistant: Restart"
   tags:
     - homeassistant
@@ -728,6 +757,7 @@
   ansible.builtin.copy:
     src: zones.yaml
     dest: /srv/homeassistant/config
+    mode: '0644'
   notify: "homeassistant: Restart"
   tags:
     - homeassistant
@@ -740,6 +770,7 @@
   ansible.builtin.copy:
     src: customize.yaml
     dest: /srv/homeassistant/config
+    mode: '0644'
   notify: "homeassistant: Restart"
   tags:
     - homeassistant
@@ -751,6 +782,7 @@
   ansible.builtin.file:
     path: /srv/homeassistant/config/custom_components
     state: directory
+    mode: '0755'
   tags:
     - homeassistant
     - init
@@ -762,8 +794,8 @@
   ansible.builtin.git:
     repo: https://github.com/wessamlauf/frosted-glass-manager.git
     dest: /tmp/frosted-glass-manager
-    version: "v{{ frosted_glass_manager_version }}"
-  register: frosted_glass_manager_git
+    version: "v{{ homeassistant_frosted_glass_manager_version }}"
+  register: homeassistant_frosted_glass_manager_git
   tags:
     - homeassistant
     - install
@@ -777,6 +809,7 @@
     src: /tmp/frosted-glass-manager/custom_components/frosted_glass_manager
     dest: /srv/homeassistant/config/custom_components
     remote_src: true
+    mode: '0644'
   notify: "homeassistant: Restart"
   tags:
     - homeassistant
@@ -791,8 +824,8 @@
   ansible.builtin.git:
     repo: https://github.com/make-all/tuya-local.git
     dest: /tmp/tuya-local
-    version: "{{ tuya_local_version }}"
-  register: tuya_local_git
+    version: "{{ homeassistant_tuya_local_version }}"
+  register: homeassistant_tuya_local_git
   tags:
     - homeassistant
     - install
@@ -806,6 +839,7 @@
     src: /tmp/tuya-local/custom_components/tuya_local
     dest: /srv/homeassistant/config/custom_components
     remote_src: true
+    mode: '0644'
   notify: "homeassistant: Restart"
   tags:
     - homeassistant
@@ -820,6 +854,7 @@
   ansible.builtin.file:
     path: /srv/homeassistant/config/themes
     state: directory
+    mode: '0755'
   tags:
     - homeassistant
     - init
@@ -831,8 +866,8 @@
   ansible.builtin.git:
     repo: https://github.com/wessamlauf/homeassistant-frosted-glass-themes.git
     dest: /tmp/homeassistant-frosted-glass-themes
-    version: "v{{ frosted_glass_version }}"
-  register: frosted_glass_themes_git
+    version: "v{{ homeassistant_frosted_glass_version }}"
+  register: homeassistant_frosted_glass_themes_git
   tags:
     - homeassistant
     - install
@@ -846,6 +881,7 @@
     src: /tmp/homeassistant-frosted-glass-themes/themes/{{ item }}
     dest: /srv/homeassistant/config/themes
     remote_src: true
+    mode: '0644'
   loop:
     - Frosted Glass.yaml
     - Frosted Glass Dark.yaml
@@ -863,6 +899,7 @@
   ansible.builtin.file:
     path: /srv/homeassistant/config/www
     state: directory
+    mode: '0755'
   tags:
     - homeassistant
     - init
@@ -874,8 +911,8 @@
   ansible.builtin.git:
     repo: https://github.com/thomasloven/lovelace-card-mod.git
     dest: /tmp/lovelace-card-mod
-    version: "v{{ card_mod_version }}"
-  register: card_mod_git
+    version: "v{{ homeassistant_card_mod_version }}"
+  register: homeassistant_card_mod_git
   tags:
     - homeassistant
     - install
@@ -888,6 +925,7 @@
     src: /tmp/lovelace-card-mod/card-mod.js
     dest: /srv/homeassistant/config/www
     remote_src: true
+    mode: '0644'
   notify: "homeassistant: Restart"
   tags:
     - homeassistant
@@ -917,8 +955,9 @@
 
 - name: "mini-graph-card : Install"
   ansible.builtin.get_url:
-    url: https://github.com/kalkih/mini-graph-card/releases/download/v{{ mini_graph_card_version }}/mini-graph-card-bundle.js
+    url: https://github.com/kalkih/mini-graph-card/releases/download/v{{ homeassistant_mini_graph_card_version }}/mini-graph-card-bundle.js
     dest: /srv/homeassistant/config/www
+    mode: '0644'
   notify: "homeassistant: Restart"
   tags:
     - homeassistant
@@ -930,8 +969,9 @@
 
 - name: "mini-media-player : Install"
   ansible.builtin.get_url:
-    url: https://github.com/kalkih/mini-media-player/releases/download/v{{ mini_media_player_version }}/mini-media-player-bundle.js
+    url: https://github.com/kalkih/mini-media-player/releases/download/v{{ homeassistant_mini_media_player_version }}/mini-media-player-bundle.js
     dest: /srv/homeassistant/config/www
+    mode: '0644'
   notify: "homeassistant: Restart"
   tags:
     - homeassistant
@@ -943,8 +983,9 @@
 
 - name: "simple-weather-card : Install"
   ansible.builtin.get_url:
-    url: https://github.com/kalkih/simple-weather-card/releases/download/v{{ simple_weather_card_version }}/simple-weather-card-bundle.js
+    url: https://github.com/kalkih/simple-weather-card/releases/download/v{{ homeassistant_simple_weather_card_version }}/simple-weather-card-bundle.js
     dest: /srv/homeassistant/config/www
+    mode: '0644'
   notify: "homeassistant: Restart"
   tags:
     - homeassistant
@@ -1018,6 +1059,7 @@
   ansible.builtin.copy:
     src: hass.rewse.jp.conf
     dest: /etc/apache2/sites-available
+    mode: '0644'
   notify: "apache: Reload"
   tags:
     - homeassistant
@@ -1028,6 +1070,8 @@
 
 - name: "apache : Enable site"
   ansible.builtin.command: a2ensite hass.rewse.jp
+  register: homeassistant_a2ensite
+  changed_when: "'already enabled' not in homeassistant_a2ensite.stdout"
   notify: "apache: Reload"
   tags:
     - homeassistant

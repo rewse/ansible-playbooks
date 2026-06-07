@@ -15,6 +15,7 @@
     dest: /usr/lib/zabbix/stock-price-fetcher
     accept_hostkey: true
     key_file: /home/{{ admin }}/.ssh/id_rsa
+    version: main
   tags:
     - zabbix-money-market
     - install
@@ -26,7 +27,7 @@
     path: /usr/lib/zabbix/stock-price-fetcher
     owner: zabbix
     group: zabbix
-    recurse: yes
+    recurse: true
   tags:
     - zabbix-money-market
     - install
@@ -37,7 +38,9 @@
   ansible.builtin.command: uv sync
   args:
     chdir: /usr/lib/zabbix/stock-price-fetcher
+  become: true
   become_user: zabbix
+  changed_when: false
   tags:
     - zabbix-money-market
     - install

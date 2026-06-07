@@ -17,5 +17,6 @@
   ansible.builtin.copy:
     src: ec2.conf
     dest: /etc/zabbix/zabbix_agentd.d
+    mode: '0644'
   notify: "zabbix-agent: Restart"
   tags: [zabbix-agent-ec2, config]

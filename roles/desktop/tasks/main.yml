@@ -15,6 +15,7 @@
   ansible.builtin.git:
     repo: https://github.com/denysdovhan/one-gnome-terminal.git
     dest: /srv/git/one-gnome-terminal
+    version: master
   tags:
     - desktop
     - install
@@ -23,8 +24,10 @@
     - desktop_terminal_config
 
 - name: "terminal : Apply one-dark theme"
+  become: true
   become_user: "{{ admin }}"
   ansible.builtin.command: bash /srv/git/one-gnome-terminal/one-dark.sh
+  changed_when: false
   tags:
     - desktop
     - config
@@ -33,8 +36,10 @@
     - desktop_terminal_config
 
 - name: "terminal : Set font to Ricty Diminished"
+  become: true
   become_user: "{{ admin }}"
   ansible.builtin.command: gsettings set org.gnome.desktop.interface monospace-font-name "Ricty Diminished Regular 12"
+  changed_when: false
   tags:
     - desktop
     - config
