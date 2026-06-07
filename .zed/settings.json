@@ -1,0 +1,7 @@
+{
+  "file_types": {
+    "Ansible": ["**/*.yml"],
+    "INI": ["hosts"],
+    "Shell Script": [".envrc"]
+  }
+}
