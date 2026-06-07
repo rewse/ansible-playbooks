@@ -16,6 +16,16 @@
     - ubuntu_ubuntu
     - ubuntu_ubuntu_config
 
+- name: "ubuntu : Install apt repository management dependency"
+  ansible.builtin.apt:
+    name: python3-debian
+    update_cache: true
+  tags:
+    - ubuntu
+    - install
+    - ubuntu_ubuntu
+    - ubuntu_ubuntu_install
+
 - name: "github : Download apt GPG key"
   ansible.builtin.get_url:
     url: https://cli.github.com/packages/githubcli-archive-keyring.gpg
@@ -30,10 +40,27 @@
     - ubuntu_github_download
 
 - name: "github : Add apt repository"
-  ansible.builtin.apt_repository:
-    repo: "deb [arch={{ ubuntu_deb_arch }} signed-by=/etc/apt/keyrings/githubcli-archive-keyring.gpg] https://cli.github.com/packages stable main"
-    filename: github-cli
+  ansible.builtin.deb822_repository:
+    name: github-cli
+    types: deb
+    uris: https://cli.github.com/packages
+    suites: stable
+    components: main
+    architectures: "{{ ubuntu_deb_arch }}"
+    signed_by: /etc/apt/keyrings/githubcli-archive-keyring.gpg
   when: ansible_facts["architecture"] in ["x86_64", "aarch64"]
+  tags:
+    - ubuntu
+    - install
+    - github
+    - ubuntu_github
+    - ubuntu_github_install
+    - ubuntu_github_config
+
+- name: "github : Remove legacy apt list"
+  ansible.builtin.file:
+    path: /etc/apt/sources.list.d/github-cli.list
+    state: absent
   tags:
     - ubuntu
     - install
@@ -68,9 +95,26 @@
     - ubuntu_1password_config
 
 - name: "1password : Add apt repository"
-  ansible.builtin.apt_repository:
-    repo: "deb [arch={{ ubuntu_deb_arch }} signed-by=/usr/share/keyrings/1password-archive-keyring.gpg] https://downloads.1password.com/linux/debian/{{ ubuntu_deb_arch }} stable main"
-    filename: 1password
+  ansible.builtin.deb822_repository:
+    name: 1password
+    types: deb
+    uris: "https://downloads.1password.com/linux/debian/{{ ubuntu_deb_arch }}"
+    suites: stable
+    components: main
+    architectures: "{{ ubuntu_deb_arch }}"
+    signed_by: /usr/share/keyrings/1password-archive-keyring.gpg
+  tags:
+    - ubuntu
+    - install
+    - 1password
+    - ubuntu_1password
+    - ubuntu_1password_install
+    - ubuntu_1password_config
+
+- name: "1password : Remove legacy apt list"
+  ansible.builtin.file:
+    path: /etc/apt/sources.list.d/1password.list
+    state: absent
   tags:
     - ubuntu
     - install

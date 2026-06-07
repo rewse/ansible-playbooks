@@ -94,16 +94,6 @@
     - httpd_httpd
     - httpd_httpd_config
 
-- name: "httpd : Add apt key for mod_pagespeed"
-  ansible.builtin.apt_key:
-    url: https://dl.google.com/linux/linux_signing_key.pub
-  when: ansible_facts["architecture"] == "x86_64"
-  tags:
-    - httpd
-    - install
-    - httpd_httpd
-    - httpd_httpd_config
-
 - name: "httpd : Set ServerName for HTTP"
   ansible.builtin.lineinfile:
     dest: /etc/apache2/sites-available/000-default.conf

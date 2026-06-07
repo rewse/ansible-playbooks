@@ -12,11 +12,27 @@
     creates: /etc/apt/keyrings/corretto.gpg
   tags: [database-client-gui, install, java]
 
+- name: "corretto : Install apt repository management dependency"
+  ansible.builtin.apt:
+    name: python3-debian
+    update_cache: true
+  tags: [database-client-gui, install, java]
+
 - name: "corretto : Add apt repository"
-  ansible.builtin.apt_repository:
-    repo: "deb [signed-by=/etc/apt/keyrings/corretto.gpg] https://apt.corretto.aws stable main"
-    filename: corretto
+  ansible.builtin.deb822_repository:
+    name: corretto
+    types: deb
+    uris: https://apt.corretto.aws
+    suites: stable
+    components: main
+    signed_by: /etc/apt/keyrings/corretto.gpg
     state: present
+  tags: [database-client-gui, install, java]
+
+- name: "corretto : Remove legacy apt list"
+  ansible.builtin.file:
+    path: /etc/apt/sources.list.d/corretto.list
+    state: absent
   tags: [database-client-gui, install, java]
 
 - name: "corretto : Update apt cache"
