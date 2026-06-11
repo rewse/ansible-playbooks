@@ -39,3 +39,7 @@
 - name: "sysctl: Reload"
   ansible.builtin.command: sysctl --system
   changed_when: false
+
+- name: "udev: Reload rules"
+  ansible.builtin.command: udevadm control --reload-rules
+  changed_when: false

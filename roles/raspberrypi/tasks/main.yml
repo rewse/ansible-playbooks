@@ -153,6 +153,19 @@
     - raspberrypi_environment
     - raspberrypi_environment_config
 
+- name: "nvme : Disable runtime power management via udev"
+  ansible.builtin.copy:
+    src: 99-nvme-power.rules
+    dest: /etc/udev/rules.d
+    mode: "0644"
+  when: ansible_facts['devices']['nvme0n1'] is defined
+  notify: "udev: Reload rules"
+  tags:
+    - raspberrypi
+    - config
+    - raspberrypi_nvme
+    - raspberrypi_nvme_config
+
 - name: "boot : Configure NVMe power management workaround"
   ansible.builtin.lineinfile:
     path: /boot/firmware/cmdline.txt

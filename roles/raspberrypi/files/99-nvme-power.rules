@@ -1,0 +1,1 @@
+ACTION=="add", SUBSYSTEM=="nvme", ATTR{power/control}="on"
