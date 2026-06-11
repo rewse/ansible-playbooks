@@ -188,6 +188,8 @@
   ansible.builtin.apt:
     name:
       - 1password-cli
+      - ansible
+      - ansible-lint
       - apt-file
       - at
       - bat
