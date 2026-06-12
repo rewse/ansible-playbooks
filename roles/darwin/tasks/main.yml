@@ -21,6 +21,7 @@
       - ansible
       - ansible-lint
       - awscli
+      - basedpyright
       - bat
       - coreutils
       - direnv
@@ -43,7 +44,6 @@
       - pv
       - pwgen
       - python3
-      - pyright
       - skopeo
       - switchaudio-osx
       - svn
