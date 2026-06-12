@@ -24,6 +24,28 @@
     - litellm_litellm
     - litellm_litellm_config
 
+- name: "docker : Resolve quarantined image"
+  ansible.builtin.include_role:
+    name: docker/quarantine
+    apply:
+      tags:
+        - litellm
+        - update
+        - docker
+        - quarantine
+        - litellm_docker
+        - litellm_docker_update
+  vars:
+    quarantine_repo: ghcr.io/berriai/litellm
+    quarantine_tag_pattern: '^v\d+\.\d+\.\d+-stable(\.patch\.\d+)?$'
+  tags:
+    - litellm
+    - update
+    - docker
+    - quarantine
+    - litellm_docker
+    - litellm_docker_update
+
 - name: "docker : Add LiteLLM service to compose"
   ansible.builtin.blockinfile:
     path: /etc/compose.yml
@@ -31,7 +53,7 @@
     block: |2
         litellm:
           container_name: litellm
-          image: ghcr.io/berriai/litellm:main-stable
+          image: {{ docker_quarantine_image_ref }}
           ports:
             - "4000:4000"
           volumes:
@@ -45,6 +67,7 @@
           restart: unless-stopped
           command: ["--config", "/app/config.yml", "--port", "4000"]
   notify: "litellm: Restart"
+  when: docker_quarantine_image_ref | length > 0
   tags:
     - litellm
     - config
@@ -52,26 +75,13 @@
     - litellm_docker
     - litellm_docker_config
 
-- name: "docker : Check image quarantine"
-  ansible.builtin.include_role:
-    name: docker/quarantine
-  vars:
-    quarantine_image: ghcr.io/berriai/litellm:main-stable
-  tags:
-    - litellm
-    - update
-    - docker
-    - quarantine
-    - litellm_docker
-    - litellm_docker_update
-
 - name: "docker : Pull and update container"
   community.docker.docker_compose_v2:
     project_src: /etc
     services: litellm
     state: present
-    pull: always
-  when: docker_quarantine_passed | default(false)
+    pull: missing
+  when: docker_quarantine_image_ref | length > 0
   tags:
     - litellm
     - update

@@ -1,33 +1,44 @@
 ---
-# Quarantine check: set docker_quarantine_passed for use with when conditions
-- name: "quarantine : Inspect image"
-  ansible.builtin.command:
-    cmd: "skopeo inspect docker://{{ quarantine_image }}"
-  register: docker_quarantine_inspect_result
+# Supply-chain cooldown: resolve the newest release tag that has survived the
+# quarantine window and expose it as docker_quarantine_image_ref ("tag@digest").
+# Consuming roles write that reference into their compose image line, so the
+# deployment always runs a version that has been public long enough to be vetted
+# and yanked if compromised.
+#
+# docker_quarantine_image_ref is always (re)assigned here, including to an empty
+# string when nothing resolves, so a reference never leaks between roles that
+# share the same play. Consuming roles act only when it is non-empty.
+- name: "quarantine : Resolve aged image"
+  ansible.builtin.script:
+    cmd: "resolve_image.py {{ quarantine_repo }} '{{ quarantine_tag_pattern }}' {{ docker_quarantine_days }}"
+  register: docker_quarantine_resolve
   changed_when: false
+  check_mode: false
   tags:
     - docker
     - quarantine
     - docker_quarantine
 
-- name: "quarantine : Set result"
+- name: "quarantine : Parse resolution result"
   ansible.builtin.set_fact:
-    docker_quarantine_passed: >-
-      {{ (now(utc=true) - (docker_quarantine_inspect_result.stdout | from_json).Created[:19]
-      | to_datetime('%Y-%m-%dT%H:%M:%S')).days >= docker_quarantine_days }}
+    docker_quarantine_result: "{{ docker_quarantine_resolve.stdout | from_json }}"
   tags:
     - docker
     - quarantine
     - docker_quarantine
 
-- name: "quarantine : Warn if image is within quarantine period"
+- name: "quarantine : Set image reference"
+  ansible.builtin.set_fact:
+    docker_quarantine_image_ref: "{{ docker_quarantine_result.ref if docker_quarantine_result.resolved else '' }}"
+  tags:
+    - docker
+    - quarantine
+    - docker_quarantine
+
+- name: "quarantine : Warn when no aged image is available"
   ansible.builtin.debug:
-    msg: >-
-      SKIPPED: {{ quarantine_image }} was created
-      {{ (now(utc=true) - (docker_quarantine_inspect_result.stdout | from_json).Created[:19]
-      | to_datetime('%Y-%m-%dT%H:%M:%S')).days }} day(s) ago
-      (quarantine: {{ docker_quarantine_days }} days)
-  when: not docker_quarantine_passed
+    msg: "SKIPPED: {{ quarantine_repo }} not pinned ({{ docker_quarantine_result.reason }})"
+  when: not docker_quarantine_result.resolved
   tags:
     - docker
     - quarantine

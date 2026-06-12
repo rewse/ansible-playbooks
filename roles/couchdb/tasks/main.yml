@@ -13,6 +13,28 @@
     - couchdb_couchdb
     - couchdb_couchdb_init
 
+- name: "docker : Resolve quarantined image"
+  ansible.builtin.include_role:
+    name: docker/quarantine
+    apply:
+      tags:
+        - couchdb
+        - update
+        - docker
+        - quarantine
+        - couchdb_couchdb
+        - couchdb_couchdb_update
+  vars:
+    quarantine_repo: apache/couchdb
+    quarantine_tag_pattern: '^\d+\.\d+\.\d+$'
+  tags:
+    - couchdb
+    - update
+    - docker
+    - quarantine
+    - couchdb_couchdb
+    - couchdb_couchdb_update
+
 - name: "couchdb : Add Docker Compose service"
   ansible.builtin.blockinfile:
     path: /etc/compose.yml
@@ -20,7 +42,7 @@
     block: |2
         couchdb:
           container_name: couchdb
-          image: apache/couchdb
+          image: {{ docker_quarantine_image_ref }}
           ports:
             - "5984:5984"
           volumes:
@@ -31,6 +53,7 @@
             - COUCHDB_PASSWORD={{ couchdb_password }}
           restart: unless-stopped
   notify: "couchdb: Restart"
+  when: docker_quarantine_image_ref | length > 0
   tags:
     - couchdb
     - config
@@ -38,26 +61,13 @@
     - couchdb_couchdb
     - couchdb_couchdb_config
 
-- name: "docker : Check image quarantine"
-  ansible.builtin.include_role:
-    name: docker/quarantine
-  vars:
-    quarantine_image: apache/couchdb
-  tags:
-    - couchdb
-    - update
-    - docker
-    - quarantine
-    - couchdb_couchdb
-    - couchdb_couchdb_update
-
 - name: "couchdb : Pull and update container"
   community.docker.docker_compose_v2:
     project_src: /etc
     services: couchdb
     state: present
-    pull: always
-  when: docker_quarantine_passed | default(false)
+    pull: missing
+  when: docker_quarantine_image_ref | length > 0
   tags:
     - couchdb
     - update

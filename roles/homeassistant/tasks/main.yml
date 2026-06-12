@@ -34,6 +34,28 @@
     - homeassistant_certs
     - homeassistant_certs_config
 
+- name: "docker : Resolve quarantined image"
+  ansible.builtin.include_role:
+    name: docker/quarantine
+    apply:
+      tags:
+        - homeassistant
+        - update
+        - docker
+        - quarantine
+        - homeassistant_docker
+        - homeassistant_docker_update
+  vars:
+    quarantine_repo: ghcr.io/home-assistant/home-assistant
+    quarantine_tag_pattern: '^\d{4}\.\d+\.\d+$'
+  tags:
+    - homeassistant
+    - update
+    - docker
+    - quarantine
+    - homeassistant_docker
+    - homeassistant_docker_update
+
 - name: "docker : Add compose service"
   ansible.builtin.blockinfile:
     path: /etc/compose.yml
@@ -41,7 +63,7 @@
     block: |2
         homeassistant:
           container_name: homeassistant
-          image: ghcr.io/home-assistant/home-assistant:stable
+          image: {{ docker_quarantine_image_ref }}
           devices:
             - /dev/ttyUSB0:/dev/ttyUSB0
           volumes:
@@ -55,6 +77,7 @@
           privileged: true
           restart: unless-stopped
   notify: "homeassistant: Restart"
+  when: docker_quarantine_image_ref | length > 0
   tags:
     - homeassistant
     - config
@@ -62,26 +85,13 @@
     - homeassistant_docker
     - homeassistant_docker_config
 
-- name: "docker : Check image quarantine"
-  ansible.builtin.include_role:
-    name: docker/quarantine
-  vars:
-    quarantine_image: ghcr.io/home-assistant/home-assistant:stable
-  tags:
-    - homeassistant
-    - update
-    - docker
-    - quarantine
-    - homeassistant_docker
-    - homeassistant_docker_update
-
 - name: "docker : Pull and update container"
   community.docker.docker_compose_v2:
     project_src: /etc
     services: homeassistant
     state: present
-    pull: always
-  when: docker_quarantine_passed | default(false)
+    pull: missing
+  when: docker_quarantine_image_ref | length > 0
   tags:
     - homeassistant
     - update
