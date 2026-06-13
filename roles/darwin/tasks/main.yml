@@ -13,6 +13,30 @@
     - darwin_package
     - darwin_package_install
 
+- name: "package : Trust homebrew tap formulae"
+  ansible.builtin.command: brew trust --formula {{ item }}
+  changed_when: false
+  loop:
+    - steipete/tap/agent-browser
+  tags:
+    - darwin
+    - install
+    - package
+    - darwin_package
+    - darwin_package_install
+
+- name: "package : Trust homebrew tap casks"
+  ansible.builtin.command: brew trust --cask {{ item }}
+  changed_when: false
+  loop:
+    - xdevplatform/tap/xurl
+  tags:
+    - darwin
+    - install
+    - package
+    - darwin_package
+    - darwin_package_install
+
 - name: "package : Install packages by homebrew"
   community.general.homebrew:
     name:
