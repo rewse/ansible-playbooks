@@ -39,11 +39,11 @@
       - pandoc
       - php
       - pipx
-      - podman
       - poppler
       - pv
       - pwgen
       - python3
+      - rsync
       - skopeo
       - switchaudio-osx
       - svn
@@ -103,7 +103,6 @@
       - google-chrome
       - grandperspective
       - handbrake
-      - hhkb
       - istat-menus
       - jordanbaird-ice
       - karabiner-elements
