@@ -36,49 +36,66 @@
     - darwin_package
     - darwin_package_install
 
+# Update Homebrew once here rather than per item in the install loops below,
+# where update_homebrew per iteration would re-run brew update many times.
+- name: "package : Update homebrew"
+  community.general.homebrew:
+    update_homebrew: true
+  tags:
+    - darwin
+    - install
+    - package
+    - darwin_package
+    - darwin_package_install
+
+# Use loop instead of passing a list to name: so that a failure on one package
+# does not abort the others. With a list, the module processes packages in order
+# and stops at the first failure, leaving the rest uninstalled.
 - name: "package : Install packages by homebrew"
   community.general.homebrew:
-    name:
-      - 1password-cli
-      - agent-browser
-      - ansible
-      - ansible-lint
-      - awscli
-      - basedpyright
-      - bat
-      - chezmoi
-      - coreutils
-      - direnv
-      - dotnet
-      - fping
-      - gh
-      - gitleaks
-      - gnu-sed
-      - git-cliff
-      - jq
-      - mas
-      - mcporter
-      - mo
-      - node
-      - osv-scanner
-      - pandoc
-      - php
-      - pipx
-      - poppler
-      - pv
-      - pwgen
-      - python3
-      - rsync
-      - skopeo
-      - switchaudio-osx
-      - svn
-      - telnet
-      - tree
-      - typescript-language-server
-      - uv
-      - watch
-      - zsh-vi-mode
-    update_homebrew: true
+    name: "{{ item }}"
+    update_homebrew: false
+  loop:
+    - 1password-cli
+    - agent-browser
+    - ansible
+    - ansible-lint
+    - awscli
+    - basedpyright
+    - bat
+    - chezmoi
+    - coreutils
+    - direnv
+    - dotnet
+    - fping
+    - gh
+    - gitleaks
+    - glab
+    - gnu-sed
+    - git-cliff
+    - jq
+    - mas
+    - mcporter
+    - mo
+    - node
+    - osv-scanner
+    - pandoc
+    - php
+    - pipx
+    - poppler
+    - pv
+    - pwgen
+    - python3
+    - rsync
+    - skopeo
+    - switchaudio-osx
+    - svn
+    - telnet
+    - tree
+    - typescript-language-server
+    - uv
+    - watch
+    - zsh-vi-mode
   tags:
     - darwin
     - install
@@ -96,64 +113,64 @@
     - darwin_package
     - darwin_package_install
 
+# Use loop for the same reason as the homebrew task above: a list aborts at the
+# first failing cask, which is common when an app already exists at the target
+# path, leaving the rest uninstalled.
 - name: "package : Install packages by homebrew_cask"
   community.general.homebrew_cask:
-    name:
-      - 1password
-      - adobe-creative-cloud
-      - alfred
-      - amazon-chime
-      - appcleaner
-      - arc
-      - atok
-      - calibre
-      - calibrite-profiler
-      - chatbox
-      - cmux
-      - corretto
-      - cyberduck
-      - dotnet-sdk
-      - firefox
-      - fantastical
-      - font-hackgen
-      - font-new-york
-      - font-sf-compact
-      - font-sf-mono
-      - font-sf-mono-for-powerline
-      - font-sf-pro
-      - font-source-sans-3
-      - font-source-serif-4
-      - geekbench
-      - ghostty
-      - gnucash
-      - google-chrome
-      - grandperspective
-      - handbrake
-      - istat-menus
-      - jordanbaird-ice
-      - karabiner-elements
-      - keka
-      - kekaexternalhelper
-      - keyboard-maestro
-      - keycastr
-      - libreoffice
-      - lm-studio
-      - messenger
-      - obsidian
-      - popclip
-      - prowritingaid
-      - qlmarkdown
-      - rectangle-pro
-      - slack
-      - spokenly
-      - steermouse
-      - sf-symbols
-      - visual-studio-code
-      - vlc
-      - xurl
-      - zed
-      - zoom
-    update_homebrew: true
+    name: "{{ item }}"
+    update_homebrew: false
+  loop:
+    - 1password
+    - adobe-creative-cloud
+    - amazon-chime
+    - appcleaner
+    - arc
+    - atok
+    - calibre
+    - calibrite-profiler
+    - chatbox
+    - cmux
+    - corretto
+    - cyberduck
+    - dotnet-sdk
+    - firefox
+    - font-hackgen
+    - font-new-york
+    - font-sf-compact
+    - font-sf-mono
+    - font-sf-mono-for-powerline
+    - font-sf-pro
+    - font-source-sans-3
+    - font-source-serif-4
+    - geekbench
+    - ghostty
+    - gnucash
+    - google-chrome
+    - grandperspective
+    - handbrake
+    - istat-menus
+    - jordanbaird-ice
+    - karabiner-elements
+    - keka
+    - kekaexternalhelper
+    - keyboard-maestro
+    - keycastr
+    - libreoffice
+    - lm-studio
+    - obsidian
+    - popclip
+    - prowritingaid
+    - qlmarkdown
+    - rectangle-pro
+    - slack
+    - spokenly
+    - steermouse
+    - sf-symbols
+    - vlc
+    - xurl
+    - zed
+    - zoom
   failed_when: false
   tags:
     - darwin

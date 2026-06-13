@@ -4,4 +4,9 @@
     "INI": ["hosts"],
     "Shell Script": [".envrc"],
   },
+  "languages": {
+    "YAML": {
+      "format_on_save": "off",
+    },
+  },
 }

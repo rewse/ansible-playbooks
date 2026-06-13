@@ -1,9 +1,13 @@
 ---
+# Use loop instead of passing a list to name: so that a failure on one package
+# does not abort the others. With a list, the module processes packages in order
+# and stops at the first failure, leaving the rest uninstalled.
 - name: "package : Install packages by homebrew"
   community.general.homebrew:
-    name:
-      - vips
-    update_homebrew: true
+    name: "{{ item }}"
+    update_homebrew: false
+  loop:
+    - vips
   tags:
     - darwin
     - darwin_personal
@@ -12,24 +16,29 @@
     - darwin_package
     - darwin_package_install
 
+# Use loop for the same reason as the homebrew task above: a list aborts at the
+# first failing cask, which is common when an app already exists at the target
+# path, leaving the rest uninstalled.
 - name: "package : Install packages by homebrew_cask"
   community.general.homebrew_cask:
-    name:
-      - charles
-      - deepl
-      - epic-games
-      - gog-galaxy
-      - google-cloud-sdk
-      - kiro
-      - kiro-cli
-      - origin
-      - microsoft-office
-      - raspberry-pi-imager
-      - sony-ps-remote-play
-      - steam
-      - steelseries-gg
-      - ticktick
-    update_homebrew: true
+    name: "{{ item }}"
+    update_homebrew: false
+  loop:
+    - charles
+    - deepl
+    - fantastical
+    - epic-games
+    - gog-galaxy
+    - google-cloud-sdk
+    - kiro
+    - kiro-cli
+    - origin
+    - microsoft-office
+    - raspberry-pi-imager
+    - sony-ps-remote-play
+    - steam
+    - steelseries-gg
+    - ticktick
   failed_when: false
   tags:
     - darwin
@@ -61,7 +70,6 @@
     - claude
     - darwin_claude
     - darwin_claude_install
-
 # - name: "package : Install rest of the apps"
 #   install_yourself:
 #     - https://adblink.me/download/                                  # adbLink
