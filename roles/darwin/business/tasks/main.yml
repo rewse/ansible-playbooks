@@ -66,7 +66,6 @@
   changed_when: false
   loop:
     - aim
-    - amazon-quick-mcp
     - axe
     - brazilcli
     - isengard-cli
@@ -106,6 +105,7 @@
   ansible.builtin.command: aim mcp install {{ item }}
   changed_when: false
   loop:
+    - amazon-quick-mcp
     - amazon-sharepoint-mcp
     - atoz-mcp
     - aws-outlook-mcp
