@@ -2,7 +2,7 @@ darken_living_room:
   alias: "Darken Living Room"
   sequence:
     - action: input_select.select_option
-      target: 
+      target:
         entity_id: input_select.living_room_light_mode
       data:
         option: "Dark"
@@ -35,6 +35,21 @@ darken_living_room:
         - action: notify.tats_devices
           data:
             message: "Turned off Living Area Floor Heating"
+            data:
+              push:
+                interruption-level: time-sensitive
+              url: "/lovelace/overview"
+    - if:
+        - condition: state
+          entity_id: fan.living_room_fan
+          state: "on"
+      then:
+        - action: fan.turn_off
+          target:
+            entity_id: fan.living_room_fan
+        - action: notify.tats_devices
+          data:
+            message: "Turned off Living Room Fan"
             data:
               push:
                 interruption-level: time-sensitive
