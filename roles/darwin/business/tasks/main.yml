@@ -66,6 +66,7 @@
   changed_when: false
   loop:
     - aim
+    - amazon-quick-mcp
     - axe
     - brazilcli
     - isengard-cli
