@@ -25,8 +25,11 @@
     - darwin_package
     - darwin_package_install
 
+# Note: mas 6+ requires root privileges to install App Store apps, so this task
+# needs become. Run the playbook with -K or --ask-become-pass.
 - name: "package : Install packages by mas"
   ansible.builtin.command: mas install {{ item }}
+  become: true
   changed_when: false
   loop:
     - 1274495053  # Microsoft To Do
@@ -64,6 +67,7 @@
   loop:
     - aim
     - axe
+    - brazilcli
     - isengard-cli
     - kiro-cli
   tags:

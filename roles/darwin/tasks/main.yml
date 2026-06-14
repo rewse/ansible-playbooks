@@ -56,7 +56,6 @@
     name: "{{ item }}"
     update_homebrew: false
   loop:
-    - 1password-cli
     - agent-browser
     - ansible
     - ansible-lint
@@ -122,11 +121,13 @@
     update_homebrew: false
   loop:
     - 1password
+    - 1password-cli
     - adobe-creative-cloud
     - amazon-chime
     - appcleaner
     - arc
     - atok
+    - betterdisplay
     - calibre
     - calibrite-profiler
     - chatbox
@@ -134,6 +135,7 @@
     - corretto
     - cyberduck
     - dotnet-sdk
+    - easydict
     - firefox
     - font-hackgen
     - font-new-york
@@ -150,7 +152,6 @@
     - grandperspective
     - handbrake
     - istat-menus
-    - jordanbaird-ice
     - karabiner-elements
     - keka
     - kekaexternalhelper
@@ -167,6 +168,7 @@
     - spokenly
     - steermouse
     - sf-symbols
+    - thaw
     - vlc
     - xurl
     - zed
@@ -261,8 +263,11 @@
     - darwin_package
     - darwin_package_upgrade
 
+# Note: mas 6+ requires root privileges to install App Store apps, so this task
+# needs become. Run the playbook with -K or --ask-become-pass.
 - name: "package : Install packages by mas"
   ansible.builtin.command: mas install {{ item }}
+  become: true
   changed_when: false
   loop:
     - 302584613   # Amazon Kindle
@@ -272,7 +277,6 @@
     - 1044629456  # GFXBench Metal
     - 1099568401  # Home Assistant
     - 539883307   # LINE
-    - 981430153   # Online
     - 1436994560  # Portal
     - 1187772509  # stts
     - 899247664   # TestFlight
