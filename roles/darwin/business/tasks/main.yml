@@ -113,6 +113,7 @@
     - builder-mcp
     - pippin-mcp
     - slack-mcp
+    - wis-web-search-mcp
   tags:
     - darwin
     - darwin_business
