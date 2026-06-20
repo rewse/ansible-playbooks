@@ -200,6 +200,7 @@
   changed_when: false
   loop:
     - pdfplumber
+    - tavily-cli
   tags:
     - darwin
     - install

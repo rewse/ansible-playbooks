@@ -357,6 +357,29 @@
     - ubuntu_uv
     - ubuntu_uv_update
 
+- name: "uv : Install package by uv"
+  ansible.builtin.command: uv tool install {{ item }}
+  changed_when: false
+  loop:
+    - pdfplumber
+    - tavily-cli
+  tags:
+    - ubuntu
+    - install
+    - package
+    - ubuntu_package
+    - ubuntu_package_install
+
+    - name: "uv : Upgrade all uv tools"
+      ansible.builtin.command: uv tool upgrade --all
+      changed_when: false
+      tags:
+        - ubuntu
+        - upgrade
+        - package
+        - ubuntu_package
+        - ubuntu_package_upgrade
+
 - name: "zinit : Install"
   ansible.builtin.shell: bash -c "$(curl --fail --show-error --silent --location https://raw.githubusercontent.com/zdharma-continuum/zinit/HEAD/scripts/install.sh)"
   args:
@@ -695,21 +718,6 @@
 - name: "package : Update global npm packages"
   ansible.builtin.command: npm update -g
   changed_when: false
-  tags:
-    - ubuntu
-    - upgrade
-    - package
-    - ubuntu_package
-    - ubuntu_package_upgrade
-
-- name: "package : Upgrade all uv tools"
-  ansible.builtin.command: uv tool upgrade --all
-  changed_when: false
-  become: true
-  become_user: "{{ item }}"
-  loop:
-    - root
-    - "{{ admin }}"
   tags:
     - ubuntu
     - upgrade
