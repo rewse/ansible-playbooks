@@ -101,7 +101,13 @@
   alias: "Select Living Room Regza Content Type Mode"
   triggers:
     - trigger: state
-      entity_id: sensor.regza_content_type
+      entity_id: media_player.aventage
+      attribute: source
+      for:
+        seconds: 5
+    - trigger: state
+      entity_id: media_player.aventage
+      to: "off"
       for:
         seconds: 5
     - trigger: homeassistant
@@ -109,38 +115,34 @@
   actions:
     - choose:
         - conditions:
-            - or:
-                - condition: state
-                  entity_id: sensor.regza_content_type
-                  state: "broadcast"
-                  for:
-                    seconds: 5
-                - condition: state
-                  entity_id: sensor.regza_content_type
-                  state: "recorded"
-                  for:
-                    seconds: 5
+            - condition: state
+              entity_id: media_player.aventage
+              attribute: source
+              state: "TV"
           sequence:
             - action: input_select.select_option
-              target: 
+              target:
                 entity_id: input_select.living_room_regza_content_type_mode
               data:
                 option: "Internal"
         - conditions:
             - condition: state
-              entity_id: sensor.regza_content_type
-              state: "external"
-              for:
-                seconds: 5
+              entity_id: media_player.aventage
+              state: "playing"
+            - not:
+                - condition: state
+                  entity_id: media_player.aventage
+                  attribute: source
+                  state: "TV"
           sequence:
             - action: input_select.select_option
-              target: 
+              target:
                 entity_id: input_select.living_room_regza_content_type_mode
               data:
                 option: "External"
       default:
         - action: input_select.select_option
-          target: 
+          target:
             entity_id: input_select.living_room_regza_content_type_mode
           data:
             option: "Off"

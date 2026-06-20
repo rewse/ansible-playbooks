@@ -1,12 +1,12 @@
 control_toggle_regza: >-
-    curl --digest --user '[% homeassistant_regza.username %]:[% homeassistant_regza.password %]' \
-    http://regza.rewse.jp/remote/remote.htm?key=40BF12
+    curl -k --digest --user '[% homeassistant_regza.username %]:[% homeassistant_regza.password %]' \
+    https://regza.rewse.jp:4430/remote/remote.htm?key=40BF12
 control_volume_up_regza: >-
-    curl --digest --user '[% homeassistant_regza.username %]:[% homeassistant_regza.password %]' \
-    http://regza.rewse.jp/remote/remote.htm?key=40BF1A
+    curl -k --digest --user '[% homeassistant_regza.username %]:[% homeassistant_regza.password %]' \
+    https://regza.rewse.jp:4430/remote/remote.htm?key=40BF1A
 control_volume_down_regza: >-
-    curl --digest --user '[% homeassistant_regza.username %]:[% homeassistant_regza.password %]' \
-    http://regza.rewse.jp/remote/remote.htm?key=40BF1E
+    curl -k --digest --user '[% homeassistant_regza.username %]:[% homeassistant_regza.password %]' \
+    https://regza.rewse.jp:4430/remote/remote.htm?key=40BF1E
 control_mute_regza: >-
-    curl --digest --user '[% homeassistant_regza.username %]:[% homeassistant_regza.password %]' \
-    http://regza.rewse.jp/remote/remote.htm?key=40BF10
+    curl -k --digest --user '[% homeassistant_regza.username %]:[% homeassistant_regza.password %]' \
+    https://regza.rewse.jp:4430/remote/remote.htm?key=40BF10
