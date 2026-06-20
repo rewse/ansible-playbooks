@@ -102,7 +102,7 @@
     - darwin_kiro_install
 
 - name: "aim : Install MCP servers"
-  ansible.builtin.command: aim mcp install {{ item }}
+  ansible.builtin.command: aim mcp install --print-client-config {{ item }}
   changed_when: false
   loop:
     - amazon-quick-mcp
