@@ -370,15 +370,15 @@
     - ubuntu_package
     - ubuntu_package_install
 
-    - name: "uv : Upgrade all uv tools"
-      ansible.builtin.command: uv tool upgrade --all
-      changed_when: false
-      tags:
-        - ubuntu
-        - upgrade
-        - package
-        - ubuntu_package
-        - ubuntu_package_upgrade
+- name: "uv : Upgrade all uv tools"
+  ansible.builtin.command: uv tool upgrade --all
+  changed_when: false
+  tags:
+    - ubuntu
+    - upgrade
+    - package
+    - ubuntu_package
+    - ubuntu_package_upgrade
 
 - name: "zinit : Install"
   ansible.builtin.shell: bash -c "$(curl --fail --show-error --silent --location https://raw.githubusercontent.com/zdharma-continuum/zinit/HEAD/scripts/install.sh)"
