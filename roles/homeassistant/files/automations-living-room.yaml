@@ -165,14 +165,14 @@
             - condition: state
               entity_id:
                 - binary_sensor.living_room_presence_e
-                - binary_sensor.living_room_presence_s
+                # - binary_sensor.living_room_presence_s
               match: any
               state: "on"
               for:
                 minutes: 1
           sequence:
             - action: input_boolean.turn_on
-              target: 
+              target:
                 entity_id: input_boolean.living_room_presence_mode
         - conditions:
             - condition: state
@@ -184,7 +184,7 @@
                 minutes: 1
           sequence:
             - action: input_boolean.turn_off
-              target: 
+              target:
                 entity_id: input_boolean.living_room_presence_mode
   trace:
     stored_traces: 100
@@ -210,7 +210,7 @@
               state: "on"
           sequence:
             - action: input_boolean.turn_on
-              target: 
+              target:
                 entity_id: input_boolean.living_room_window_mode
         - conditions:
             - condition: state
@@ -221,7 +221,7 @@
               state: "off"
           sequence:
             - action: input_boolean.turn_off
-              target: 
+              target:
                 entity_id: input_boolean.living_room_window_mode
   trace:
     stored_traces: 100
