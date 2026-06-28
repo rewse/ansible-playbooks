@@ -48,8 +48,8 @@ ssh "$NAS_USER@$NAS_HOST" << 'REMOTE_EOF'
     )
 
     # Add the default archive directory
-    if [[ -f /usr/syno/etc/certificate/_archive/DEFAULT ]]; then
-        DEFAULT_DIR_NAME=$(</usr/syno/etc/certificate/_archive/DEFAULT)
+    if sudo test -f /usr/syno/etc/certificate/_archive/DEFAULT; then
+        DEFAULT_DIR_NAME=$(sudo cat /usr/syno/etc/certificate/_archive/DEFAULT)
         if [[ -n "$DEFAULT_DIR_NAME" ]]; then
             TARGET_CERT_DIRS+=("/usr/syno/etc/certificate/_archive/${DEFAULT_DIR_NAME}")
             info "Default cert directory: /usr/syno/etc/certificate/_archive/${DEFAULT_DIR_NAME}"
@@ -58,7 +58,7 @@ ssh "$NAS_USER@$NAS_HOST" << 'REMOTE_EOF'
 
     # Add reverse proxy directories
     for proxy in /usr/syno/etc/certificate/ReverseProxy/*/; do
-        [[ -d "$proxy" ]] && TARGET_CERT_DIRS+=("$proxy")
+        sudo test -d "$proxy" && TARGET_CERT_DIRS+=("$proxy")
     done
 
     # Move certificates to default directory
@@ -69,14 +69,18 @@ ssh "$NAS_USER@$NAS_HOST" << 'REMOTE_EOF'
 
     # Copy certificates to all target directories
     for target_dir in "${TARGET_CERT_DIRS[@]}"; do
-        if [[ ! -d "$target_dir" ]]; then
+        if ! sudo test -d "$target_dir"; then
             continue
         fi
         info "Copying certificates to '$target_dir'"
-        sudo cp "$CERTS_SRC_DIR"/{privkey,fullchain,cert,chain}.pem "$target_dir/" 2>/dev/null || \
-        sudo cp "$CERTS_SRC_DIR"/{privkey,fullchain,cert}.pem "$target_dir/"
-        sudo chown root:root "$target_dir"/*.pem
-        sudo chmod 400 "$target_dir"/*.pem
+        sudo cp -f "$CERTS_SRC_DIR"/{privkey,fullchain,cert,chain}.pem "$target_dir/" 2>/dev/null || \
+        sudo cp -f "$CERTS_SRC_DIR"/{privkey,fullchain,cert}.pem "$target_dir/"
+        sudo chown root:root "$target_dir"/privkey.pem "$target_dir"/fullchain.pem "$target_dir"/cert.pem
+        sudo chmod 400 "$target_dir"/privkey.pem "$target_dir"/fullchain.pem "$target_dir"/cert.pem
+        if [[ -f "$target_dir/chain.pem" ]] || sudo test -f "$target_dir/chain.pem"; then
+            sudo chown root:root "$target_dir"/chain.pem
+            sudo chmod 400 "$target_dir"/chain.pem
+        fi
     done
 
     # Restart packages that are installed and turned on
