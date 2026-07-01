@@ -65,6 +65,7 @@
     - basedpyright
     - bat
     - chezmoi
+    - container
     - coreutils
     - direnv
     - dotnet
