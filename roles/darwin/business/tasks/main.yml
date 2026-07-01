@@ -9,6 +9,7 @@
   loop:
     - asana
     - box-drive
+    - claude
     - displaylink
     - font-noto-sans-cjk
     - gotomeeting
