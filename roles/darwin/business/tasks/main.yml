@@ -112,6 +112,7 @@
     - aws-outlook-mcp
     - aws-sentral-mcp
     - builder-mcp
+    - concur-mcp
     - pippin-mcp
     - slack-mcp
     - wis-web-search-mcp
