@@ -2,6 +2,8 @@
 
 set -euo pipefail
 
+export STOCK_FETCHER_DEBUG=1
+
 code="$1"
 provider="${2:-}"
 
