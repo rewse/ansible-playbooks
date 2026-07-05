@@ -6,7 +6,7 @@ raspberrypi_netgear_gs108tv3_version: 7.0.6.2
 raspberrypi_php_miio_version: 0.2.6
 raspberrypi_restic:
   password: "{{ lookup('pipe', 'op read \"op://ansible/restic/password\"') }}"
-  version: 0.18.1
+  version: 0.19.1
 raspberrypi_resolved1:
   ip: 192.168.0.1
   ipv6: 240f:78:31e9:1:70a7:41ff:fea6:bd7a
