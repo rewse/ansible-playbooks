@@ -79,7 +79,7 @@
   community.docker.docker_compose_v2:
     project_src: /etc
     services: homeassistant
-    state: present
+    state: stopped
     pull: missing
   when: docker_quarantine_image_ref | length > 0
   tags: [homeassistant-ha-secondary, update]
