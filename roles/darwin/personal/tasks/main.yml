@@ -26,13 +26,13 @@
   loop:
     - charles
     - deepl
+    - ea
     - fantastical
     - epic-games
     - gog-galaxy
     - google-cloud-sdk
     - kiro
     - kiro-cli
-    - origin
     - microsoft-office
     - raspberry-pi-imager
     - sony-ps-remote-play
