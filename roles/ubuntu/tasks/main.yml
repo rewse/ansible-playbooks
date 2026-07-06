@@ -715,6 +715,37 @@
     - ubuntu_ghostty_install
     - ubuntu_ghostty_init
 
+- name: "agent-browser : Install"
+  ansible.builtin.command: npm install -g agent-browser
+  changed_when: false
+  tags:
+    - ubuntu
+    - install
+    - agent-browser
+    - ubuntu_agent-browser
+    - ubuntu_agent-browser_install
+
+- name: "lightpanda : Set download architecture"
+  ansible.builtin.set_fact:
+    ubuntu_lightpanda_arch: "{{ ansible_facts['architecture'] | replace('x86_64', 'x86_64') | replace('aarch64', 'aarch64') }}"
+  tags:
+    - ubuntu
+    - install
+    - lightpanda
+    - always
+
+- name: "lightpanda : Download binary"
+  ansible.builtin.get_url:
+    url: "https://github.com/lightpanda-io/browser/releases/download/{{ ubuntu_lightpanda_version }}/lightpanda-{{ ubuntu_lightpanda_arch }}-linux"
+    dest: /usr/local/bin/lightpanda
+    mode: '0755'
+  tags:
+    - ubuntu
+    - install
+    - lightpanda
+    - ubuntu_lightpanda
+    - ubuntu_lightpanda_install
+
 - name: "package : Update global npm packages"
   ansible.builtin.command: npm update -g
   changed_when: false
