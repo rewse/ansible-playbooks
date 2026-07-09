@@ -49,10 +49,12 @@
 
 # Run `mwinit -s` before the command
 
-# Ref: https://w.amazon.com/bin/view/Isengard-cli/
-- name: "toolbox : Register isengard-cli repository"
-  ansible.builtin.command: toolbox registry add s3://buildertoolbox-registry-isengard-cli-us-west-2/tools.json
+- name: "toolbox : Register repositories"
+  ansible.builtin.command: toolbox registry add {{ item }}
   changed_when: false
+  loop:
+    - s3://buildertoolbox-registry-aisec-enfable-us-west-2/tools.json
+    - s3://buildertoolbox-registry-isengard-cli-us-west-2/tools.json
   tags:
     - darwin
     - darwin_business
@@ -69,6 +71,7 @@
     - aim
     - axe
     - brazilcli
+    - enfable
     - isengard-cli
     - kiro-cli
   tags:
@@ -89,6 +92,17 @@
     - toolbox
     - darwin_toolbox
     - darwin_toolbox_update
+
+- name: "enfable : Enable enfable"
+  ansible.builtin.command: enfable enable
+  changed_when: false
+  tags:
+    - darwin
+    - darwin_business
+    - init
+    - enfable
+    - darwin_enfable
+    - darwin_enfable_init
 
 - name: "kiro : Install Kiro IDE"
   ansible.builtin.command: axe init kiro
