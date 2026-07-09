@@ -115,6 +115,8 @@
     - concur-mcp
     - pippin-mcp
     - slack-mcp
+    - spec-req-mcp
+    - specialist-super-agent-mcp
     - wis-web-search-mcp
   tags:
     - darwin
