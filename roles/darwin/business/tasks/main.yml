@@ -123,6 +123,7 @@
     - amazon-quick-mcp
     - amazon-sharepoint-mcp
     - atoz-mcp
+    - aws-insights-mcp
     - aws-outlook-mcp
     - aws-sentral-mcp
     - builder-mcp
