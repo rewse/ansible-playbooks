@@ -97,6 +97,7 @@
     - typescript-language-server
     - uv
     - watch
+    - yt-dlp
     - zsh-vi-mode
   tags:
     - darwin
