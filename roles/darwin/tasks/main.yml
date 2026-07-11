@@ -203,6 +203,7 @@
   ansible.builtin.command: uv tool install {{ item }}
   changed_when: false
   loop:
+    - jupyterlab
     - pdfplumber
     - tavily-cli
   tags:
