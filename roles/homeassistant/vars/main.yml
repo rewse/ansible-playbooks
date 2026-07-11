@@ -26,4 +26,4 @@ homeassistant_regza:
   password: "{{ lookup('pipe', 'op read op://ansible/REGZA/credential') }}"
 homeassistant_simple_thermostat_version: 2.5.0
 homeassistant_simple_weather_card_version: 0.8.5
-homeassistant_tuya_local_version: 2026.6.4
+homeassistant_tuya_local_version: 2026.7.1
