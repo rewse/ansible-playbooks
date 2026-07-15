@@ -84,6 +84,7 @@
     - pandoc
     - php
     - pipx
+    - pnpm
     - poppler
     - pv
     - pwgen
@@ -164,11 +165,13 @@
     - libreoffice
     - lm-studio
     - obsidian
+    - otty
     - popclip
     - prowritingaid
     - qlmarkdown
     - rectangle-pro
     - slack
+    - snapzy
     - spokenly
     - steermouse
     - sf-symbols
