@@ -715,6 +715,16 @@
     - ubuntu_ghostty_install
     - ubuntu_ghostty_init
 
+- name: "skills : Install"
+  ansible.builtin.command: npm install -g skills
+  changed_when: false
+  tags:
+    - ubuntu
+    - install
+    - skills
+    - ubuntu_skills
+    - ubuntu_skills_install
+
 - name: "agent-browser : Install"
   ansible.builtin.command: npm install -g agent-browser
   changed_when: false
