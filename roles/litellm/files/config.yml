@@ -2,30 +2,50 @@ litellm_settings:
   drop_params: true
 
 model_list:
-  - model_name: claude-haiku-4-5
+  # Claude stays on bedrock-runtime rather than bedrock-mantle. On mantle these
+  # models accept only /anthropic/v1/messages and reject /v1/chat/completions
+  # ("The model 'anthropic.claude-opus-5' does not support the
+  # '/v1/chat/completions'"), which is the path this gateway serves. Mantle also
+  # exposes no geo or global inference IDs, so it would give up the worldwide
+  # cross-region routing of the global. prefix below, and it does not support
+  # Guardrails.
+  #
+  # Opus 5 and Sonnet 5 reject temperature ("`temperature` is deprecated for
+  # this model"), so it is dropped along with top_p. Clients that always send
+  # temperature, such as EasyDict, get a 400 otherwise.
+  - model_name: claude-opus-5
     litellm_params:
-      model: bedrock/us.anthropic.claude-haiku-4-5-20251001-v1:0
+      model: bedrock/global.anthropic.claude-opus-5
       aws_region_name: us-east-1
-      additional_drop_params: ["top_p"]
-  - model_name: claude-sonnet-4-6
+      additional_drop_params: ["temperature", "top_p"]
+  - model_name: claude-sonnet-5
     litellm_params:
-      model: bedrock/us.anthropic.claude-sonnet-4-6
+      model: bedrock/global.anthropic.claude-sonnet-5
       aws_region_name: us-east-1
-      additional_drop_params: ["top_p"]
-  - model_name: claude-opus-4-6
+      additional_drop_params: ["temperature", "top_p"]
+  # Gemma 4 is served only on the bedrock-mantle endpoint, and only on its
+  # openai/v1 path, so api_base must be set explicitly.
+  #
+  # LiteLLM 1.83.14 (the newest stable image as of 2026-07) does not SigV4-sign
+  # mantle requests, so a Bedrock API key is required even though the container
+  # already has AWS credentials. LiteLLM 1.93.0 signs them correctly: verified
+  # that bedrock_mantle/google.gemma-4-31b succeeds there with AWS credentials
+  # alone, with and without api_base. Once the image reaches 1.93.0 or later,
+  # drop api_base and api_key from these entries, replace them with
+  # "aws_region_name: us-east-1", and remove BEDROCK_MANTLE_API_KEY from the
+  # role (tasks/main.yml and vars/main.yml).
+  - model_name: gemma-4-26b-a4b
     litellm_params:
-      model: bedrock/us.anthropic.claude-opus-4-6-v1
-      aws_region_name: us-east-1
-      additional_drop_params: ["top_p"]
-  - model_name: nova-2-lite
+      model: bedrock_mantle/google.gemma-4-26b-a4b
+      api_base: https://bedrock-mantle.us-east-1.api.aws/openai/v1
+      api_key: os.environ/BEDROCK_MANTLE_API_KEY
+  - model_name: gemma-4-31b
     litellm_params:
-      model: bedrock/us.amazon.nova-2-lite-v1:0
-      aws_region_name: us-east-1
-  - model_name: qwen3-next-80b-a3b
+      model: bedrock_mantle/google.gemma-4-31b
+      api_base: https://bedrock-mantle.us-east-1.api.aws/openai/v1
+      api_key: os.environ/BEDROCK_MANTLE_API_KEY
+  - model_name: gemma-4-e2b
     litellm_params:
-      model: bedrock/qwen.qwen3-next-80b-a3b
-      aws_region_name: us-west-2
-  - model_name: qwen3-235b-a22b
-    litellm_params:
-      model: bedrock/qwen.qwen3-235b-a22b-2507-v1:0
-      aws_region_name: us-west-2
+      model: bedrock_mantle/google.gemma-4-e2b
+      api_base: https://bedrock-mantle.us-east-1.api.aws/openai/v1
+      api_key: os.environ/BEDROCK_MANTLE_API_KEY
