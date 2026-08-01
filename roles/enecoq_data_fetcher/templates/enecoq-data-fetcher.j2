@@ -4,7 +4,7 @@ set -euo pipefail
 readonly OUTPUT=/srv/homeassistant/config/data/enecoq_data.json
 
 fetch() {
-  uvx enecoq-data-fetcher \
+  uvx enecoq-data-fetcher@latest \
     --email '[% enecoq_data_fetcher_enecoq.email %]' \
     --password '[% enecoq_data_fetcher_enecoq.password %]' \
     --period month \
@@ -35,7 +35,7 @@ if fetch; then
 fi
 
 # A playwright update leaves its browser behind, so reinstall and retry
-uvx --from enecoq-data-fetcher playwright install chromium
+uvx --from enecoq-data-fetcher@latest playwright install chromium
 
 if fetch; then
   exit 0
