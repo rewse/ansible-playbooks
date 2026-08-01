@@ -3,6 +3,7 @@
   community.general.homebrew_tap:
     name: "{{ item }}"
   loop:
+    - k1low/tap
     - lightpanda-io/browser
     - steipete/tap
     - xdevplatform/tap
@@ -17,8 +18,10 @@
   ansible.builtin.command: brew trust --formula {{ item }}
   changed_when: false
   loop:
+    - k1low/tap/mo
     - lightpanda-io/browser/lightpanda
     - steipete/tap/agent-browser
+    - steipete/tap/mcporter
   tags:
     - darwin
     - install
