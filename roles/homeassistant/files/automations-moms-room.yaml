@@ -66,15 +66,39 @@
         hours: 8
   trace:
     stored_traces: 100
-- id: automation.open_moms_room_curtains_vacation
-  alias: "Open Mom’s Room Curtains Vacation"
+- id: automation.open_moms_room_curtains_nobody
+  alias: "Open Mom’s Room Curtains Nobody"
   triggers:
-    - trigger: time
-      at: "08:00:00"
+    - trigger: sun
+      event: sunrise
+      offset: "02:00:00"
+    - trigger: state
+      entity_id: input_boolean.moms_room_presence_mode
+      to: "off"
+      for:
+        hours: 1
+    - trigger: state
+      entity_id:
+        - person.shibata_akiko
+        - person.shibata_kayano
+      to: not_home
+    - trigger: homeassistant
+      event: start
   conditions:
+    - condition: sun
+      after: sunrise
+      after_offset: "02:00:00"
+      before: sunset
     - condition: state
-      entity_id: alarm_control_panel.home
-      state: "armed_vacation"
+      entity_id: input_boolean.moms_room_presence_mode
+      state: "off"
+      for:
+        hours: 1
+    - condition: state
+      entity_id:
+        - person.shibata_akiko
+        - person.shibata_kayano
+      state: not_home
   actions:
     - action: cover.open_cover
       target:
@@ -104,7 +128,7 @@
                     minutes: 1
           sequence:
             - action: input_boolean.turn_on
-              target: 
+              target:
                 entity_id: input_boolean.moms_room_presence_mode
         - conditions:
             - condition: numeric_state
@@ -117,7 +141,7 @@
                 minutes: 1
           sequence:
             - action: input_boolean.turn_off
-              target: 
+              target:
                 entity_id: input_boolean.moms_room_presence_mode
   trace:
     stored_traces: 100
@@ -141,7 +165,7 @@
               state: "on"
           sequence:
             - action: input_boolean.turn_on
-              target: 
+              target:
                 entity_id: input_boolean.moms_room_window_mode
         - conditions:
             - condition: state
@@ -151,7 +175,7 @@
               state: "off"
           sequence:
             - action: input_boolean.turn_off
-              target: 
+              target:
                 entity_id: input_boolean.moms_room_window_mode
   trace:
     stored_traces: 100
