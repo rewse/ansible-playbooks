@@ -62,3 +62,4 @@ Follow [Ansible YAML Syntax](https://docs.ansible.com/projects/ansible/latest/re
 - Verify with `--check` before applying changes
 - Keep role-specific variables in `role/vars` directories
 - Don't add temporary or one-time fixes to playbooks; apply them directly via SSH instead
+- Judge a playbook run by its exit code, not by the per-host `failed` counts in PLAY RECAP. When every host in a play fails, the run ends and the remaining imported playbooks are skipped without a banner, so every host can still report `failed=0` while later plays were never applied. Most plays in `site.yml` target a single host, where one failure is enough to trigger this.
