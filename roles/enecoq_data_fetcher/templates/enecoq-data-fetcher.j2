@@ -1,20 +1,49 @@
 #!/bin/bash
 set -euo pipefail
 
+readonly OUTPUT=/srv/homeassistant/config/data/enecoq_data.json
+
+fetch() {
+  uvx enecoq-data-fetcher \
+    --email '[% enecoq_data_fetcher_enecoq.email %]' \
+    --password '[% enecoq_data_fetcher_enecoq.password %]' \
+    --period month \
+    --format json \
+    --output "$OUTPUT"
+}
+
+# The enecoQ widget serves no data until around 01:40 on the 1st of the month
+# while the previous month is being closed
+in_rollover_window() {
+  local day hour minute
+
+  day=$(date +%-d)
+  hour=$(date +%-H)
+  minute=$(date +%-M)
+
+  if [[ $day -eq 1 && ($hour -eq 0 || ($hour -eq 1 && $minute -lt 40)) ]]; then
+    return 0
+  fi
+
+  return 1
+}
+
 sleep $((RANDOM % 60))
 
-uvx enecoq-data-fetcher \
-  --email '[% enecoq_data_fetcher_enecoq.email %]' \
-  --password '[% enecoq_data_fetcher_enecoq.password %]' \
-  --period month \
-  --format json \
-  --output /srv/homeassistant/config/data/enecoq_data.json \
-  || {
-    uvx --from enecoq-data-fetcher playwright install chromium
-    uvx enecoq-data-fetcher \
-      --email '[% enecoq_data_fetcher_enecoq.email %]' \
-      --password '[% enecoq_data_fetcher_enecoq.password %]' \
-      --period month \
-      --format json \
-      --output /srv/homeassistant/config/data/enecoq_data.json
-  }
+if fetch; then
+  exit 0
+fi
+
+# A playwright update leaves its browser behind, so reinstall and retry
+uvx --from enecoq-data-fetcher playwright install chromium
+
+if fetch; then
+  exit 0
+fi
+
+if in_rollover_window; then
+  echo "enecoQ data is unavailable during the monthly rollover window" >&2
+  exit 0
+fi
+
+exit 1
