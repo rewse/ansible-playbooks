@@ -127,7 +127,7 @@
     - aws-outlook-mcp
     - aws-sentral-mcp
     - builder-mcp
-    - concur-mcp
+    - emburse-mcp
     - pippin-mcp
     - slack-mcp
     - spec-req-mcp
