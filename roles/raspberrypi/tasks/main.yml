@@ -106,6 +106,20 @@
     - raspberrypi_ntp
     - raspberrypi_ntp_config
 
+- name: "journald : Limit journal disk usage"
+  ansible.builtin.lineinfile:
+    dest: /etc/systemd/journald.conf
+    insertafter: '^#SystemMaxUse='
+    regexp: '^SystemMaxUse='
+    line: 'SystemMaxUse=200M'
+  notify: "systemd-journald: Restart"
+  tags:
+    - raspberrypi
+    - config
+    - journald
+    - raspberrypi_journald
+    - raspberrypi_journald_config
+
 - name: "bluetooth : Enable service"
   ansible.builtin.systemd:
     name: "{{ item }}"

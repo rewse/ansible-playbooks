@@ -1,4 +1,9 @@
 ---
+- name: "systemd-journald: Restart"
+  ansible.builtin.systemd:
+    name: systemd-journald
+    state: restarted
+
 - name: "systemd-timesyncd: Restart"
   ansible.builtin.systemd:
     name: systemd-timesyncd
