@@ -10,7 +10,7 @@
         - binary_sensor.moms_room_window_n
         - binary_sensor.moms_room_window_s
       to: "on"
-  condition:
+  conditions:
     - condition: state
       entity_id: alarm_control_panel.home
       state: armed_vacation
@@ -25,6 +25,11 @@
           }} opend
         data:
           url: "/dashboard-securities/"
+    - delay:
+        minutes: 1
+  max_exceeded: silent
+  trace:
+    stored_traces: 100
 - id: automation.alarm_device_battery_level
   alias: "ALARM: Device Battery Level"
   triggers:
