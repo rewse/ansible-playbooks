@@ -32,6 +32,7 @@
     - condition: state
       entity_id: vacuum.roomba_combo
       state: docked
+    - "{{ states('sensor.roomba_combo_battery') | int(0) >= 50 }}"
     - "{{ now().timestamp() > state_attr('input_datetime.roomba_combo_next', 'timestamp') }}"
   actions:
     - action: vacuum.start
