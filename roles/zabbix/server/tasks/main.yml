@@ -1,7 +1,7 @@
 ---
 - name: "zabbix-server : Install zabbix-release package"
   ansible.builtin.apt:
-    deb: https://repo.zabbix.com/zabbix/{{ zabbix_server.version }}/release/ubuntu/pool/main/z/zabbix-release/zabbix-release_latest_{{ zabbix_server.version }}+ubuntu24.04_all.deb
+    deb: https://repo.zabbix.com/zabbix/{{ zabbix_server.version }}/release/ubuntu/pool/main/z/zabbix-release/zabbix-release_latest_{{ zabbix_server.version }}+ubuntu{{ ansible_facts['distribution_version'] }}_all.deb
   retries: 3
   delay: 5
   register: zabbix_release_install

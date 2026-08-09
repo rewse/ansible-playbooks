@@ -25,7 +25,7 @@
 
 - name: "mysql : Install connector-j"
   ansible.builtin.apt:
-    deb: https://cdn.mysql.com//Downloads/Connector-J/mysql-connector-j_{{ database_mysql_connector_version }}_all.deb
+    deb: https://cdn.mysql.com//Downloads/Connector-J/mysql-connector-j_{{ database_mysql_connector_version }}ubuntu{{ ansible_facts['distribution_version'] }}_all.deb
   tags:
     - database-client
     - install
