@@ -23,50 +23,35 @@ model_list:
       model: bedrock/global.anthropic.claude-sonnet-5
       aws_region_name: us-east-1
       additional_drop_params: ["temperature", "top_p"]
-  # Gemma 4 is served only on the bedrock-mantle endpoint, and only on its
-  # openai/v1 path, so api_base must be set explicitly.
-  #
-  # LiteLLM 1.83.14 (the newest stable image as of 2026-07) does not SigV4-sign
-  # mantle requests, so a Bedrock API key is required even though the container
-  # already has AWS credentials. LiteLLM 1.93.0 signs them correctly: verified
-  # that bedrock_mantle/google.gemma-4-31b succeeds there with AWS credentials
-  # alone, with and without api_base. Once the image reaches 1.93.0 or later,
-  # drop api_base and api_key from these entries, replace them with
-  # "aws_region_name: us-east-1", and remove BEDROCK_MANTLE_API_KEY from the
-  # role (tasks/main.yml and vars/main.yml).
+  # Gemma 4 is served only on the bedrock-mantle endpoint, so it does not get the
+  # bedrock/ prefix and the global. cross-region routing used above.
   - model_name: gemma-4-26b-a4b
     litellm_params:
       model: bedrock_mantle/google.gemma-4-26b-a4b
-      api_base: https://bedrock-mantle.us-east-1.api.aws/openai/v1
-      api_key: os.environ/BEDROCK_MANTLE_API_KEY
+      aws_region_name: us-east-1
   - model_name: gemma-4-31b
     litellm_params:
       model: bedrock_mantle/google.gemma-4-31b
-      api_base: https://bedrock-mantle.us-east-1.api.aws/openai/v1
-      api_key: os.environ/BEDROCK_MANTLE_API_KEY
+      aws_region_name: us-east-1
   - model_name: gemma-4-e2b
     litellm_params:
       model: bedrock_mantle/google.gemma-4-e2b
-      api_base: https://bedrock-mantle.us-east-1.api.aws/openai/v1
-      api_key: os.environ/BEDROCK_MANTLE_API_KEY
-  # The numbered GPT models answer only at /openai/v1/responses, which LiteLLM
+      aws_region_name: us-east-1
+  # The numbered GPT models answer only on the Responses API, which LiteLLM
   # reaches from this gateway's /v1/chat/completions since 1.89.0. They reject
   # temperature and top_p.
   - model_name: gpt-5.6-luna
     litellm_params:
       model: bedrock_mantle/openai.gpt-5.6-luna
-      api_base: https://bedrock-mantle.us-east-1.api.aws/openai/v1
-      api_key: os.environ/BEDROCK_MANTLE_API_KEY
+      aws_region_name: us-east-1
       additional_drop_params: ["temperature", "top_p"]
   - model_name: gpt-5.6-sol
     litellm_params:
       model: bedrock_mantle/openai.gpt-5.6-sol
-      api_base: https://bedrock-mantle.us-east-1.api.aws/openai/v1
-      api_key: os.environ/BEDROCK_MANTLE_API_KEY
+      aws_region_name: us-east-1
       additional_drop_params: ["temperature", "top_p"]
   - model_name: gpt-5.6-terra
     litellm_params:
       model: bedrock_mantle/openai.gpt-5.6-terra
-      api_base: https://bedrock-mantle.us-east-1.api.aws/openai/v1
-      api_key: os.environ/BEDROCK_MANTLE_API_KEY
+      aws_region_name: us-east-1
       additional_drop_params: ["temperature", "top_p"]
