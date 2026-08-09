@@ -37,7 +37,8 @@
         - litellm_docker_update
   vars:
     quarantine_repo: ghcr.io/berriai/litellm
-    quarantine_tag_pattern: '^v\d+\.\d+\.\d+-stable(\.patch\.\d+)?$'
+    # Upstream publishes no -stable tags; rc, dev and nightly must stay out.
+    quarantine_tag_pattern: '^v\d+\.\d+\.\d+$'
   tags:
     - litellm
     - update
