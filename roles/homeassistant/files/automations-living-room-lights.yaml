@@ -223,13 +223,14 @@
         entity_id: switch.living_room_tv_light_plug
     # Power cycling alone leaves the entity unavailable: once setup has failed
     # with "tuya-local device offline" the integration stops retrying, and only a
-    # config entry reload picks the device up again. How long the box takes to
-    # rejoin Wi-Fi varies, hence the loop. A "has already been setup" failure
-    # needs a Home Assistant restart instead, so the loop gives up and notifies.
+    # config entry reload picks the device up again. The box rejoins Wi-Fi about
+    # 20 seconds after power returns, but now and then it hangs and never rejoins,
+    # so the reload is retried a few times and then abandoned. A "has already been
+    # setup" failure needs a Home Assistant restart and no reload will clear it.
     - repeat:
         sequence:
           - delay:
-              minutes: 3
+              minutes: 1
           - action: homeassistant.reload_config_entry
             target:
               entity_id: light.living_room_tv_light
