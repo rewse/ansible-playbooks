@@ -1,4 +1,43 @@
 ---
+# Quick Keys calls each action by opening an application, which cannot pass
+# arguments, so every action needs its own bundle. args is passed to mediakey.
+darwin_mediakey_actions:
+  - name: Brightness Down
+    slug: brightness-down
+    args: brightness-down
+  - name: Brightness Up
+    slug: brightness-up
+    args: brightness-up
+  - name: Fast Forward
+    slug: fast-forward
+    args: fast-forward
+  - name: Mute
+    slug: mute
+    args: mute
+  - name: Next Track
+    slug: next
+    args: next
+  - name: Play Pause
+    slug: play-pause
+    args: play-pause
+  - name: Previous Track
+    slug: previous
+    args: previous
+  - name: Rewind
+    slug: rewind
+    args: rewind
+  - name: Volume Down
+    slug: volume-down
+    args: volume-down
+  - name: Volume Down x2
+    slug: volume-down-x2
+    args: volume-down 2
+  - name: Volume Up
+    slug: volume-up
+    args: volume-up
+  - name: Volume Up x2
+    slug: volume-up-x2
+    args: volume-up 2
 darwin_source_han_mono_version: 1.002
 darwin_source_han_sans_version: 2.004R
 darwin_source_han_serif_version: 2.003R
