@@ -221,11 +221,43 @@
     - action: switch.turn_on
       target:
         entity_id: switch.living_room_tv_light_plug
-    - delay:
-        seconds: 60
-    - action: automation.trigger
-      target:
-        entity_id: automation.turn_on_living_room_tv_light_scene
+    # Power cycling alone leaves the entity unavailable: once setup has failed
+    # with "tuya-local device offline" the integration stops retrying, and only a
+    # config entry reload picks the device up again. How long the box takes to
+    # rejoin Wi-Fi varies, hence the loop. A "has already been setup" failure
+    # needs a Home Assistant restart instead, so the loop gives up and notifies.
+    - repeat:
+        sequence:
+          - delay:
+              minutes: 3
+          - action: homeassistant.reload_config_entry
+            target:
+              entity_id: light.living_room_tv_light
+          - delay:
+              seconds: 20
+        until:
+          - condition: or
+            conditions:
+              - condition: not
+                conditions:
+                  - condition: state
+                    entity_id: light.living_room_tv_light
+                    state: "unavailable"
+              - condition: template
+                value_template: "{{ repeat.index >= 5 }}"
+    - if:
+        - condition: state
+          entity_id: light.living_room_tv_light
+          state: "unavailable"
+      then:
+        - action: notify.tats_devices
+          data:
+            title: "⚠️ UNAVAILABLE"
+            message: "Living Room TV Light: restart HA"
+      else:
+        - action: automation.trigger
+          target:
+            entity_id: automation.turn_on_living_room_tv_light_scene
   trace:
     stored_traces: 100
 - id: automation.turn_on_living_room_tv_light_scene
