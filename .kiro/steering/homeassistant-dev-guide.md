@@ -64,20 +64,25 @@ When using `trigger: time_pattern`, you MUST add `seconds` with a random number 
 
 ### tuya_local: Entity Unavailable
 
-When a `tuya_local` entity becomes `unavailable`:
+Assume the device has hung. That is the common case, and it clears with a power cycle followed by a config entry reload. Credential rotation is rare and is the last hypothesis, not the first.
 
-1. Check HA system logs for `tuya_local` errors:
-   - `"Check device key or version"` → Local key or Device ID has changed
-   - `"device offline"` → Network unreachable or key mismatch (tuya_local reports offline when handshake fails)
+Do not read `"Check device key or version"` (error 914) as evidence that the key changed. It appears whenever the handshake fails, including when the device has hung while holding a perfectly valid key.
 
-2. Verify network connectivity from HA server (`ssh fox`):
-   - DNS resolution: `dig +short <hostname>`
-   - Ping: `ping <ip>`
-   - Port: `nc -z -w 3 <ip> 6668`
+1. Power cycle the device, then reload its config entry:
+   ```bash
+   mcporter call home-assistant.ha_call_service domain=switch service=turn_off entity_id=<plug>
+   # wait 30 seconds
+   mcporter call home-assistant.ha_call_service domain=switch service=turn_on entity_id=<plug>
+   # wait a minute for the device to rejoin
+   mcporter call home-assistant.ha_call_service domain=homeassistant service=reload_config_entry entity_id=<entity>
+   ```
+   The reload is the step that matters. Once setup has failed with `"tuya-local device offline"`, the integration stops retrying, so the entity stays `unavailable` long after the device is back on the network. A device that reports `restored: true` is a registry placeholder with no integration behind it, which is what this state looks like from `ha_get_state`.
 
-3. If network is fine, try power cycling the device first. This resolves handshake issues without key rotation.
+2. If a reload logs `ValueError: Config entry ... has already been setup!`, restart Home Assistant. No number of reloads clears that state, and repeating them may prolong it.
 
-4. If power cycle does not help, the Device ID and/or Local Key likely rotated. Retrieve new credentials:
+3. If the device never comes back, separate "powered but hung" from "not powered": read the plug's power sensor, and check the UniFi connectivity log for a `Connected` event. `ssh fox 'nc -z -w 3 <ip> 6668'` tells you whether it is ready to talk. A device drawing power with no `Connected` event has hung beyond what a plug cycle fixes, and needs to be unplugged physically.
+
+4. Only once the device is confirmed on the network and reloads still fail, suspect the Device ID or Local Key. Retrieve new credentials:
    ```bash
    .venv/bin/python3 -m tinytuya wizard
    ```
@@ -97,6 +102,13 @@ When a `tuya_local` entity becomes `unavailable`:
      ```
 
 5. If Device ID changed, delete the old tuya_local entry in HA and re-add with new ID + key
+
+Stop as soon as the entity is back. Do not follow a recovery with unrelated tidying of the same entry: an options flow update reloads the entry and can leave it in the `has already been setup` state, turning a fixed problem into one that needs a restart.
+
+Reading the evidence:
+- UniFi's `last_seen` is the last observation of a client, not the time it connected. Take rejoin timing from `Connected` events in the connectivity log. The Fancy Sync Box associates about 20 seconds after power returns.
+- High ICMP latency from a device is not a signal problem. Compare against the UniFi site latency and the client's dBm before blaming the link.
+- tuya_local discovery overwrites `host` with the IP it discovers, so configuring a hostname does not stick.
 
 **Known causes of ID/key rotation:**
 - Removing and re-adding device in Tuya/Smart Life app
