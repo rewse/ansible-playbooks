@@ -71,9 +71,9 @@ smart_home:
       name: 書斎の北側の窓
     binary_sensor.study_window_s:
       name: 書斎の南側の窓
-    camera.moms_room_camera:
+    camera.eufy_mom:
       name: ママの部屋のカメラ
-    camera.guppy_living_room_camera:
+    camera.eufy_liv:
       name: リビングのカメラ
     climate.moms_room_ac:
       name: ママの部屋のエアコン

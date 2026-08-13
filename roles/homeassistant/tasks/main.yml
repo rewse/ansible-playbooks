@@ -800,6 +800,36 @@
     - homeassistant_custom
     - homeassistant_custom_init
 
+- name: "frigate : Clone integration"
+  ansible.builtin.git:
+    repo: https://github.com/blakeblackshear/frigate-hass-integration.git
+    dest: /tmp/frigate-hass-integration
+    version: "v{{ homeassistant_frigate_version }}"
+  register: homeassistant_frigate_git
+  tags:
+    - homeassistant
+    - install
+    - custom
+    - frigate
+    - homeassistant_frigate
+    - homeassistant_frigate_install
+
+- name: "frigate : Install integration"
+  ansible.builtin.copy:
+    src: /tmp/frigate-hass-integration/custom_components/frigate
+    dest: /srv/homeassistant/config/custom_components
+    remote_src: true
+    mode: '0644'
+  notify: "homeassistant: Restart"
+  tags:
+    - homeassistant
+    - config
+    - custom
+    - frigate
+    - homeassistant_frigate
+    - homeassistant_frigate_config
+    - homeassistant_frigate_install
+
 - name: "frosted-glass : Clone manager"
   ansible.builtin.git:
     repo: https://github.com/wessamlauf/frosted-glass-manager.git
