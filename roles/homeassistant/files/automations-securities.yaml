@@ -35,6 +35,14 @@
                   state: "home"
                   for:
                     minutes: 10
+            # A disarmed panel is a deliberate choice, usually to keep the indoor
+            # cameras running while working on them, and arriving home must not
+            # overwrite it. Only this branch honours it: the armed_away branch
+            # below still arms on departure, so leaving never goes unguarded.
+            - not:
+                - condition: state
+                  entity_id: alarm_control_panel.home
+                  state: "disarmed"
           sequence:
             - action: alarm_control_panel.alarm_arm_home
               target:
