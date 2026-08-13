@@ -1,0 +1,73 @@
+{{ ansible_managed | comment }}
+
+mqtt:
+  enabled: false
+
+ui:
+  # Without this the UI falls back to the browser's zone, which makes recording
+  # timestamps differ between clients. The first weekday of the review calendar
+  # is not configurable here: it lives in the UI settings per browser.
+  timezone: Asia/Tokyo
+
+# The detectors section is intentionally absent. Frigate defaults to a single CPU
+# detector, and an empty mapping instead leaves its label map uninitialised
+# (UnboundLocalError on labelmap_objects at startup). No inference actually runs
+# because every camera sets detect.enabled to false.
+
+go2rtc:
+  streams:
+{% for cam in nvr_cameras %}
+    {{ cam.name }}:
+      # Credentials are expanded by Frigate from the environment, so they are
+      # never written to this file.
+      - "rtsp://{FRIGATE_RTSP_USER}:{FRIGATE_RTSP_PASSWORD}@{{ cam.host }}:554/live0"
+{% endfor %}
+
+cameras:
+{% for cam in nvr_cameras %}
+  {{ cam.name }}:
+    enabled: true
+    ffmpeg:
+      # The cameras serve H.264 video and AAC audio, so both are copied without
+      # re-encoding, which keeps CPU usage near zero.
+      output_args:
+        record: preset-record-generic-audio-copy
+      inputs:
+        # Read through go2rtc rather than from the camera directly, so only one
+        # RTSP connection per camera is opened. Eufy C200 allows few.
+        - path: rtsp://127.0.0.1:8554/{{ cam.name }}
+          input_args: preset-rtsp-restream
+          roles:
+            - record
+    detect:
+      # The detect role is mandatory in Frigate, and the ffmpeg command adds a raw
+      # frame pipe whenever that role is present, without consulting this flag. So
+      # the stream is always decoded. Raspberry Pi 5 dropped the H.264 hardware
+      # decoder, making that software work unavoidable: shrinking the target only
+      # takes ffmpeg from 27% to 22% of one core (5% of the four available).
+      enabled: false
+      fps: 1
+      width: 640
+      height: 360
+    record:
+      enabled: true
+      continuous:
+        days: {{ nvr_retain_days }}
+      motion:
+        days: 0
+      alerts:
+        retain:
+          days: 0
+      detections:
+        retain:
+          days: 0
+    snapshots:
+      enabled: false
+{% endfor %}
+
+# Three of the four cameras stay powered off unless the house is empty, so
+# failed connections are the normal state rather than a fault.
+logger:
+  default: info
+  logs:
+    frigate.video: warning

@@ -1,0 +1,33 @@
+---
+# Bay 1 (SSD). Recordings go here rather than to Bay 3 (HDD) to avoid the noise
+# of a spindle writing around the clock.
+nvr_media_parent: /srv/nas/data
+nvr_media_dir: "{{ nvr_media_parent }}/nvr"
+
+# 265 kbps per camera measured from the SDP (134 kbps H.264 + 131 kbps AAC)
+# works out to 2.8 GB per camera-day, so 30 days of all four fits in 340 GB.
+nvr_retain_days: 30
+
+# 1920x1088, four cameras: (1920 * 1088 * 1.5 * 20 + 270480) / 1048576 = 60 MB
+# each, plus 40 MB the container uses for logs in shm.
+nvr_shm_size: 320m
+# Measured 802 MiB in steady state with four cameras, so 1g left no headroom and
+# risked an OOM kill. fox has 7.8 GB, and this still walls Frigate off from
+# taking Home Assistant down with it.
+nvr_mem_limit: 2g
+
+# In-memory staging for recording segments, per the upstream compose example.
+nvr_cache_size: 1000000000
+
+nvr_cameras:
+  - name: eufy-dad
+    host: eufy-dad.rewse.jp
+  - name: eufy-ent
+    host: eufy-ent.rewse.jp
+  - name: eufy-liv
+    host: eufy-liv.rewse.jp
+  - name: eufy-mom
+    host: eufy-mom.rewse.jp
+
+nvr_rtsp_username: "{{ lookup('pipe', 'op read \"op://ansible/Eufy - RTSP/username\"') }}"
+nvr_rtsp_password: "{{ lookup('pipe', 'op read \"op://ansible/Eufy - RTSP/password\"') }}"

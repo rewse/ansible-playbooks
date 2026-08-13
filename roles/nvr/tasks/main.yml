@@ -1,0 +1,152 @@
+---
+- name: "nvr : Fail when the recording volume is not mounted"
+  # Frigate would otherwise write recordings onto the root filesystem under an
+  # empty mount point, filling the NVMe and losing them once Bay 1 is mounted.
+  ansible.builtin.command:
+    cmd: mountpoint -q {{ nvr_media_parent }}
+  changed_when: false
+  tags:
+    - nvr
+    - config
+    - nvr_nvr
+    - nvr_nvr_init
+
+- name: "nvr : Create configuration directory"
+  ansible.builtin.file:
+    path: /srv/nvr
+    state: directory
+    owner: root
+    group: root
+    mode: '0755'
+  tags:
+    - nvr
+    - config
+    - nvr_nvr
+    - nvr_nvr_init
+
+- name: "nvr : Create recording directory"
+  ansible.builtin.file:
+    path: "{{ nvr_media_dir }}"
+    state: directory
+    owner: root
+    group: root
+    mode: '0755'
+  tags:
+    - nvr
+    - config
+    - nvr_nvr
+    - nvr_nvr_init
+
+- name: "nvr : Deploy configuration file"
+  ansible.builtin.template:
+    src: config.yml.j2
+    dest: /srv/nvr/config.yml
+    mode: '0644'
+    backup: true
+  notify: "nvr: Restart"
+  tags:
+    - nvr
+    - config
+    - nvr_nvr
+    - nvr_nvr_config
+
+- name: "docker : Resolve quarantined image"
+  ansible.builtin.include_role:
+    name: docker/quarantine
+    apply:
+      tags:
+        - nvr
+        - update
+        - docker
+        - quarantine
+        - nvr_docker
+        - nvr_docker_update
+  vars:
+    quarantine_repo: ghcr.io/blakeblackshear/frigate
+    # The container tags carry no leading "v" even though the GitHub releases do.
+    # Beta tags and hardware variants (-rk, -rocm, -tensorrt, -standard-arm64)
+    # must stay out; the bare tag already ships a linux/arm64 manifest.
+    quarantine_tag_pattern: '^\d+\.\d+\.\d+$'
+  tags:
+    - nvr
+    - update
+    - docker
+    - quarantine
+    - nvr_docker
+    - nvr_docker_update
+
+- name: "docker : Add Frigate service to compose"
+  ansible.builtin.blockinfile:
+    path: /etc/compose.yml
+    marker: "# {mark} ANSIBLE MANAGED BLOCK nvr"
+    block: |2
+        frigate:
+          container_name: frigate
+          image: {{ docker_quarantine_image_ref }}
+          ports:
+            - "8971:8971"
+            - "8554:8554"
+          volumes:
+            - /srv/nvr:/config
+            - {{ nvr_media_dir }}:/media/frigate
+            - /etc/localtime:/etc/localtime:ro
+            - type: tmpfs
+              target: /tmp/cache
+              tmpfs:
+                size: {{ nvr_cache_size }}
+          environment:
+            - FRIGATE_RTSP_USER={{ nvr_rtsp_username }}
+            - FRIGATE_RTSP_PASSWORD={{ nvr_rtsp_password }}
+          # 1920x1088 needs 60 MB per camera by the documented formula
+          # ((w * h * 1.5 * 20 + 270480) / 1048576), plus 40 MB for logs.
+          shm_size: {{ nvr_shm_size }}
+          mem_limit: {{ nvr_mem_limit }}
+          stop_grace_period: 30s
+          restart: unless-stopped
+  notify: "nvr: Restart"
+  when: docker_quarantine_image_ref | length > 0
+  tags:
+    - nvr
+    - config
+    - docker
+    - nvr_docker
+    - nvr_docker_config
+
+- name: "docker : Pull and update container"
+  community.docker.docker_compose_v2:
+    project_src: /etc
+    services: frigate
+    state: present
+    pull: missing
+  when: docker_quarantine_image_ref | length > 0
+  tags:
+    - nvr
+    - update
+    - docker
+    - nvr_docker
+    - nvr_docker_update
+
+- name: "nvr : Copy Apache vhost config"
+  ansible.builtin.copy:
+    src: nvr.rewse.jp.conf
+    dest: /etc/apache2/sites-available
+    mode: '0644'
+  notify: "apache: Reload"
+  tags:
+    - nvr
+    - config
+    - apache
+    - nvr_apache
+    - nvr_apache_config
+
+- name: "nvr : Enable Apache site"
+  ansible.builtin.command: a2ensite nvr.rewse.jp
+  register: nvr_a2ensite
+  changed_when: "'already enabled' not in nvr_a2ensite.stdout"
+  notify: "apache: Reload"
+  tags:
+    - nvr
+    - config
+    - apache
+    - nvr_apache
+    - nvr_apache_config

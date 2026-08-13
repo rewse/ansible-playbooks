@@ -14,6 +14,7 @@
     - lmstudio
     - matter_server
     - mosquitto
+    - nvr
     - syslogd
     - zabbix/server
     - zabbix/mcp
