@@ -1,7 +1,12 @@
 {{ ansible_managed | comment }}
 
 mqtt:
-  enabled: false
+  enabled: true
+  host: {{ nvr_mqtt_host }}
+  # Braces are left alone by Jinja2 because it looks for a pair of them, and
+  # Frigate expands these from the environment so no secret is written here.
+  user: "{FRIGATE_MQTT_USER}"
+  password: "{FRIGATE_MQTT_PASSWORD}"
 
 ui:
   # Without this the UI falls back to the browser's zone, which makes recording

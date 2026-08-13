@@ -86,6 +86,12 @@
           ports:
             - "8971:8971"
             - "8554:8554"
+            # Port 5000 has no authentication at all, so it is bound to the
+            # loopback address: the Home Assistant integration reaches it over
+            # host networking, and nothing off the host can. Using it avoids
+            # storing the admin password of 8971, which the web UI can change
+            # out from under Ansible.
+            - "127.0.0.1:5000:5000"
           volumes:
             - /srv/nvr:/config
             - {{ nvr_media_dir }}:/media/frigate
@@ -97,6 +103,8 @@
           environment:
             - FRIGATE_RTSP_USER={{ nvr_rtsp_username }}
             - FRIGATE_RTSP_PASSWORD={{ nvr_rtsp_password }}
+            - FRIGATE_MQTT_USER={{ nvr_mqtt_username }}
+            - FRIGATE_MQTT_PASSWORD={{ nvr_mqtt_password }}
           # 1920x1088 needs 60 MB per camera by the documented formula
           # ((w * h * 1.5 * 20 + 270480) / 1048576), plus 40 MB for logs.
           shm_size: {{ nvr_shm_size }}

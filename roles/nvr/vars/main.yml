@@ -31,3 +31,13 @@ nvr_cameras:
 
 nvr_rtsp_username: "{{ lookup('pipe', 'op read \"op://ansible/Eufy - RTSP/username\"') }}"
 nvr_rtsp_password: "{{ lookup('pipe', 'op read \"op://ansible/Eufy - RTSP/password\"') }}"
+
+# The Home Assistant integration needs MQTT: switches, sensors and the review
+# entities are published over it, and without a broker the integration only
+# exposes cameras. mosquitto runs on the host under systemd, reachable at the
+# gateway of the compose network this container joins. pub_client is used because
+# Frigate both publishes state and subscribes to command topics, and the two
+# accounts differ only in name (there is no ACL).
+nvr_mqtt_host: 172.18.0.1
+nvr_mqtt_username: pub_client
+nvr_mqtt_password: "{{ lookup('pipe', 'op read op://ansible/Mosquitto/credential') }}"
