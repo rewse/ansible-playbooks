@@ -1,0 +1,95 @@
+# {{ ansible_managed }}
+#
+# Options left at their defaults on purpose, verified against the vfs_fruit and
+# smb.conf manual pages for Samba 4.19:
+#
+#   fruit:resource = file       the AppleDouble ._ file. xattr and stream do not
+#                               fit ext4, whose extended attributes cap at one
+#                               block
+#   fruit:metadata = netatalk   an xattr. stream is documented as unsuitable
+#                               alongside streams_xattr for the same reason, and
+#                               as not fully working with encoding = native
+#   fruit:locking = none        nothing here speaks AFP
+#   fruit:model = MacSamba      only changes the Finder icon
+#   fruit:posix_rename = yes    lets a directory be renamed while files under it
+#                               are open
+#
+# fruit:time machine = yes also enforces durable handles = yes, kernel oplocks =
+# no, kernel share modes = no and posix locking = no on its share, so those are
+# not repeated below.
+[global]
+    workgroup = WORKGROUP
+    server string = {{ ansible_facts['hostname'] }}
+    server role = standalone server
+    security = user
+    # Advertise the name Avahi holds, which is the system hostname, rather than
+    # the NetBIOS name. The default is netbios, which is the hostname in capital
+    # letters and is what Finder would otherwise show.
+    mdns name = mdns
+    # Every share belongs to one person. Mapping a failed login to a guest would
+    # hand that person's files to anyone who reaches the port.
+    map to guest = never
+    restrict anonymous = 2
+    # The Synology still answered SMB1. Nothing here needs it.
+    server min protocol = SMB3
+    # The documented way to deny by default and then allow: where the lists
+    # conflict the allow list wins. This host runs no firewall, so the export of
+    # home directories and backups is bounded here.
+    hosts deny = 0.0.0.0/0
+    hosts allow = 192.168.0.0/24
+    load printers = no
+    printing = bsd
+    printcap name = /dev/null
+    disable spoolss = yes
+
+    # macOS interoperability. The order is fixed: catia, then fruit, then
+    # streams_xattr.
+    vfs objects = catia fruit streams_xattr
+    # Store the characters macOS forbids on NTFS by their ASCII value rather
+    # than in the Unicode private range, so restic, rsync and FileBrowser see
+    # the same names Finder does. Requires catia, which is loaded above. Safe to
+    # turn on here because no name already on the volume uses that range.
+    fruit:encoding = native
+    # Leave the ._ files visible. Vetoing them stops rsync from writing any file
+    # whose name begins with an underscore and breaks extracting Mac ZIPs.
+    fruit:veto_appledouble = no
+    # Do not let a client change the UNIX mode through NFS ACEs, which would
+    # undo the masks below.
+    fruit:nfs_aces = no
+    # Discard the 286 byte "this resource fork intentionally left blank" blob
+    # and the AppleDouble files left holding nothing.
+    fruit:wipe_intentionally_left_blank_rfork = yes
+    fruit:delete_empty_adfiles = yes
+
+[homes]
+    # %S is the resolved user: the manual page recommends it over %U here, which
+    # is only the name the client asked for.
+    path = {{ nas_data_path }}/homes/%S
+    valid users = %S
+    browseable = no
+    read only = no
+    # The Synology's ACLs left files readable by everyone. These keep anything
+    # arriving over SMB private to its owner.
+    create mask = 0600
+    directory mask = 0700
+
+[archive]
+    path = {{ nas_archive_path }}
+    valid users = {{ admin }}
+    read only = no
+    create mask = 0600
+    directory mask = 0700
+{% for share in nas_timemachine_shares %}
+
+[{{ share.name }}]
+    path = {{ nas_backup_path }}/timemachine/{{ share.name | replace('timemachine-', '') }}
+    valid users = {{ share.user }}
+    read only = no
+    create mask = 0600
+    directory mask = 0700
+    fruit:time machine = yes
+    # Reported as the volume size so macOS thins from the first backup instead
+    # of growing until the disk is full. Derived from the sparsebundle alone,
+    # which is why this share must hold nothing else.
+    fruit:time machine max size = {{ share.max_size }}
+{% endfor %}

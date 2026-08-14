@@ -108,6 +108,17 @@
     - nas_nfs
     - nas_nfs_install
 
+- name: "nas : Install Samba"
+  ansible.builtin.apt:
+    name: samba
+    state: present
+  tags:
+    - nas
+    - install
+    - samba
+    - nas_samba
+    - nas_samba_install
+
 - name: "nas : Create export directories"
   ansible.builtin.file:
     path: "{{ nas_backup_path }}/{{ item.name }}"
@@ -149,3 +160,124 @@
     - nfs
     - nas_nfs
     - nas_nfs_config
+
+- name: "nas : Create service users"
+  ansible.builtin.user:
+    name: "{{ item.name }}"
+    uid: "{{ item.uid }}"
+    shell: /usr/sbin/nologin
+    password: '!'
+    create_home: false
+  loop: "{{ nas_service_users }}"
+  loop_control:
+    label: "{{ item.name }}"
+  tags:
+    - nas
+    - config
+    - samba
+    - nas_samba
+    - nas_samba_config
+
+- name: "nas : Create home directories"
+  ansible.builtin.file:
+    path: "{{ nas_data_path }}/homes/{{ item }}"
+    state: directory
+    owner: "{{ item }}"
+    group: "{{ item }}"
+    mode: '0700'
+  loop: "{{ nas_samba_users }}"
+  tags:
+    - nas
+    - config
+    - samba
+    - nas_samba
+    - nas_samba_config
+
+- name: "nas : Create Time Machine parent directory"
+  # Created explicitly so it does not inherit the owner of whichever share came
+  # first in the loop below. Both users have to traverse it to reach their own
+  # directory, so it stays root owned and traversable.
+  ansible.builtin.file:
+    path: "{{ nas_backup_path }}/timemachine"
+    state: directory
+    owner: root
+    group: root
+    mode: '0755'
+  tags:
+    - nas
+    - config
+    - samba
+    - nas_samba
+    - nas_samba_config
+
+- name: "nas : Create Time Machine directories"
+  ansible.builtin.file:
+    path: "{{ nas_backup_path }}/timemachine/{{ item.name | replace('timemachine-', '') }}"
+    state: directory
+    owner: "{{ item.user }}"
+    group: "{{ item.user }}"
+    mode: '0700'
+  loop: "{{ nas_timemachine_shares }}"
+  loop_control:
+    label: "{{ item.name }}"
+  tags:
+    - nas
+    - config
+    - samba
+    - nas_samba
+    - nas_samba_config
+
+- name: "nas : Configure Samba"
+  ansible.builtin.template:
+    src: smb.conf.j2
+    dest: /etc/samba/smb.conf
+    mode: '0644'
+    validate: testparm -s %s
+  notify: "nas : Restart smbd"
+  tags:
+    - nas
+    - config
+    - samba
+    - nas_samba
+    - nas_samba_config
+
+- name: "nas : Read Samba database"
+  ansible.builtin.command: pdbedit --list
+  register: nas_pdbedit
+  changed_when: false
+  tags:
+    - nas
+    - config
+    - samba
+    - nas_samba
+    - nas_samba_config
+
+- name: "nas : Create Samba users"
+  ansible.builtin.command:
+    cmd: "smbpasswd -a -s {{ item }}"
+    # Passed on stdin rather than the command line so it stays out of the
+    # process list.
+    stdin: "{{ nas_samba_password }}\n{{ nas_samba_password }}\n"
+  vars:
+    nas_samba_password: "{{ lookup('pipe', 'op read \"op://ansible/Samba - ' ~ item ~ '/password\"') }}"
+  loop: "{{ nas_samba_users }}"
+  when: item not in nas_pdbedit.stdout
+  no_log: true
+  tags:
+    - nas
+    - config
+    - samba
+    - nas_samba
+    - nas_samba_config
+
+- name: "nas : Enable and start Samba"
+  ansible.builtin.systemd:
+    name: smbd
+    enabled: true
+    state: started
+  tags:
+    - nas
+    - config
+    - samba
+    - nas_samba
+    - nas_samba_config
