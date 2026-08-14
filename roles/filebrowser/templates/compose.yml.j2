@@ -16,5 +16,14 @@
       - {{ source.path }}:{{ source.path }}:ro
 {% endfor %}
       - /etc/localtime:/etc/localtime:ro
+    # The image checks port 80, which is where it listens only if the config says
+    # so. Overridden rather than dropped so an unreachable server still shows as
+    # unhealthy rather than as no opinion.
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:{{ filebrowser_port }}/health"]
+      interval: 30s
+      timeout: 3s
+      start_period: 10s
+      retries: 3
     mem_limit: {{ filebrowser_mem_limit }}
     restart: unless-stopped
