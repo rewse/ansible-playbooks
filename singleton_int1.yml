@@ -7,6 +7,7 @@
     - couchdb
     - docker
     - enecoq_data_fetcher
+    - filebrowser
     - homeassistant
     - homeassistant-ha/primary
     - httpd

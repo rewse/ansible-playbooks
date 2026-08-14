@@ -1,0 +1,127 @@
+---
+- name: "filebrowser : Fail when a published volume is not mounted"
+  # Indexing an empty mount point would publish an empty tree and, worse, record
+  # it as the state of the archive. The sources are read-only so nothing would be
+  # written there, but the index would have to be rebuilt to recover.
+  ansible.builtin.command:
+    cmd: mountpoint -q {{ item }}
+  changed_when: false
+  loop:
+    - /srv/nas/archive
+    - /srv/nas/data
+  tags:
+    - filebrowser
+    - config
+    - filebrowser_filebrowser
+    - filebrowser_filebrowser_init
+
+- name: "filebrowser : Create data directory"
+  ansible.builtin.file:
+    path: "{{ filebrowser_data_dir }}"
+    state: directory
+    owner: "{{ filebrowser_uid }}"
+    group: "{{ filebrowser_gid }}"
+    mode: '0750'
+  tags:
+    - filebrowser
+    - config
+    - filebrowser_filebrowser
+    - filebrowser_filebrowser_init
+
+- name: "filebrowser : Deploy configuration file"
+  ansible.builtin.template:
+    src: config.yaml.j2
+    dest: "{{ filebrowser_data_dir }}/config.yaml"
+    owner: "{{ filebrowser_uid }}"
+    group: "{{ filebrowser_gid }}"
+    # Carries the admin password and the token signing key.
+    mode: '0640'
+    backup: true
+  no_log: true
+  notify: "filebrowser: Restart"
+  tags:
+    - filebrowser
+    - config
+    - filebrowser_filebrowser
+    - filebrowser_filebrowser_config
+
+- name: "docker : Resolve quarantined image"
+  ansible.builtin.include_role:
+    name: docker/quarantine
+    apply:
+      tags:
+        - filebrowser
+        - update
+        - docker
+        - quarantine
+        - filebrowser_docker
+        - filebrowser_docker_update
+  vars:
+    quarantine_repo: ghcr.io/gtsteffaniak/filebrowser
+    # Only the stable line. The project ships beta and preview tags from the same
+    # repository, and v2 is still on preview releases. The suffix is part of the
+    # tag rather than a variant, so it has to be matched rather than stripped.
+    quarantine_tag_pattern: '^\d+\.\d+\.\d+-stable$'
+  tags:
+    - filebrowser
+    - update
+    - docker
+    - quarantine
+    - filebrowser_docker
+    - filebrowser_docker_update
+
+- name: "docker : Add FileBrowser service to compose"
+  ansible.builtin.blockinfile:
+    path: /etc/compose.yml
+    marker: "# {mark} ANSIBLE MANAGED BLOCK filebrowser"
+    # Kept in a template rather than written inline because the volume list is
+    # generated from filebrowser_sources, and a Jinja loop inside a YAML literal
+    # block ends the block at the first unindented line.
+    block: "{{ lookup('template', 'compose.yml.j2') }}"
+  notify: "filebrowser: Restart"
+  when: docker_quarantine_image_ref | length > 0
+  tags:
+    - filebrowser
+    - config
+    - docker
+    - filebrowser_docker
+    - filebrowser_docker_config
+
+- name: "docker : Pull and update container"
+  community.docker.docker_compose_v2:
+    project_src: /etc
+    services: filebrowser
+    state: present
+    pull: missing
+  when: docker_quarantine_image_ref | length > 0
+  tags:
+    - filebrowser
+    - update
+    - docker
+    - filebrowser_docker
+    - filebrowser_docker_update
+
+- name: "filebrowser : Copy Apache vhost config"
+  ansible.builtin.template:
+    src: nas.rewse.jp.conf.j2
+    dest: /etc/apache2/sites-available/{{ filebrowser_hostname }}.conf
+    mode: '0644'
+  notify: "apache: Reload"
+  tags:
+    - filebrowser
+    - config
+    - apache
+    - filebrowser_apache
+    - filebrowser_apache_config
+
+- name: "filebrowser : Enable Apache site"
+  ansible.builtin.command: a2ensite {{ filebrowser_hostname }}
+  register: filebrowser_a2ensite
+  changed_when: "'already enabled' not in filebrowser_a2ensite.stdout"
+  notify: "apache: Reload"
+  tags:
+    - filebrowser
+    - config
+    - apache
+    - filebrowser_apache
+    - filebrowser_apache_config

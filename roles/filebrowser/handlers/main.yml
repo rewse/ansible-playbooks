@@ -1,0 +1,13 @@
+---
+- name: "apache: Reload"
+  ansible.builtin.systemd:
+    name: apache2
+    state: reloaded
+
+- name: "filebrowser: Restart"
+  community.docker.docker_compose_v2:
+    project_src: /etc
+    services: filebrowser
+    state: restarted
+    pull: always
+    recreate: always

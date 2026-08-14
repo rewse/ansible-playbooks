@@ -1,0 +1,33 @@
+# {{ ansible_managed }}
+<VirtualHost *:443>
+    ServerAdmin hostmaster@rewse.jp
+    ServerName {{ filebrowser_hostname }}
+
+    ProxyPreserveHost on
+    ProxyRequests off
+
+    # The share endpoints are closed here as well as in the application, where the
+    # source is private and the share permission is off. Every critical advisory
+    # published against this project in 2026 was reachable through one of these
+    # two paths without authenticating, and nothing here uses the feature.
+    <LocationMatch "^/(api/)?public/">
+        Require all denied
+    </LocationMatch>
+
+    ProxyPass / http://localhost:{{ filebrowser_port }}/
+    ProxyPassReverse / http://localhost:{{ filebrowser_port }}/
+
+    RewriteEngine on
+    RewriteCond %{HTTP:Upgrade} =websocket [NC]
+    RewriteRule /(.*) ws://localhost:{{ filebrowser_port }}/$1 [P,L]
+    RewriteCond %{HTTP:Upgrade} !=websocket [NC]
+    RewriteRule /(.*) http://localhost:{{ filebrowser_port }}/$1 [P,L]
+
+    # Uploads and downloads of large media, and archive downloads the server
+    # builds on the fly.
+    ProxyTimeout 600
+
+    SSLCertificateFile /etc/letsencrypt/live/rewse.jp/fullchain.pem
+    SSLCertificateKeyFile /etc/letsencrypt/live/rewse.jp/privkey.pem
+    Include /etc/letsencrypt/options-ssl-apache.conf
+</VirtualHost>

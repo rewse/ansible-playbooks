@@ -1,0 +1,61 @@
+---
+# The container reads its config and writes its database and thumbnail cache
+# here. On the NVMe rather than under /srv/nas, so a USB disconnect of the
+# enclosure cannot take the database with it.
+filebrowser_data_dir: /srv/filebrowser
+
+# Published on the loopback address only, so nothing off the host reaches it
+# except through the Apache vhost, which is where the rate limiting, the fail2ban
+# jail and the deny rules for the share endpoints live.
+#
+# 8081 rather than the 8080 the project documents, because zabbix-mcp-server
+# already holds 8080 and the port is set explicitly in the config anyway. Moving
+# that service instead would mean redistributing the mcporter config, which
+# chezmoi carries to every host.
+filebrowser_port: 8081
+
+# The image bakes in uid 1000 and has no PUID/PGID support, so the runtime user
+# is overridden instead. It has to be tats: the archive is 0700 tats:tats and so
+# is the home directory below it, and nothing else can read them.
+filebrowser_uid: 2000
+filebrowser_gid: 2000
+
+filebrowser_hostname: nas.rewse.jp
+
+# Measured 802 MiB for Frigate taught the lesson: a limit with no headroom is an
+# OOM kill waiting to happen. The index holds roughly 293,000 items (271,000 in
+# the archive, 22,000 under homes) but lives in SQLite rather than on the heap,
+# so this is a wall against a runaway rather than a sizing estimate. Revisit
+# against the measured RSS.
+filebrowser_mem_limit: 1g
+
+# What gets published. Only these two paths: everything else on the enclosure is
+# outside them, so the Time Machine sparsebundles and the restic repositories on
+# Bay 2 are excluded by not being reachable rather than by a rule that could be
+# written wrong.
+#
+# readOnly because the purpose is search and browsing from a phone, and Macs
+# write over SMB. It also means a stolen session cannot delete anything, and that
+# an index built while the enclosure was absent cannot write into the empty mount
+# point.
+#
+# private stops shares being created from the source. The critical advisories
+# published against this project in 2026 are concentrated in the public share
+# paths, and the feature is not used here.
+# Paths are written out rather than taken from the nas role, whose vars are
+# scoped to it.
+filebrowser_sources:
+  - name: Archive
+    path: /srv/nas/archive
+    rules:
+      # Root-owned and unreadable, so it would only ever be an error in the log.
+      - folderName: lost+found
+  - name: Home
+    path: "/srv/nas/data/homes/{{ admin }}"
+    rules: []
+
+filebrowser_admin_password: "{{ lookup('pipe', 'op read \"op://ansible/FileBrowser Quantum/password\"') }}"
+# Supplied rather than generated so that rebuilding the container or losing the
+# database leaves sessions and share signatures valid. Without it the key is
+# random at first start and only the database remembers it.
+filebrowser_jwt_secret: "{{ lookup('pipe', 'op read \"op://ansible/FileBrowser Quantum/jwt token secret\"') }}"

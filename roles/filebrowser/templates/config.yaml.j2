@@ -1,0 +1,66 @@
+---
+# {{ ansible_managed }}
+server:
+  port: {{ filebrowser_port }}
+  baseURL: "/"
+  database: /home/filebrowser/data/database.db
+  # Thumbnails live beside the database on the NVMe and are pruned automatically,
+  # because a phone browsing the picture folders will generate a lot of them.
+  cacheDir: /home/filebrowser/data/cache
+  cacheDirCleanup: true
+  # Left on. This project published ten advisories in the first half of 2026,
+  # three of them critical, so being told about a release is worth a banner.
+  disableUpdateCheck: false
+  # Not used, and one less way in.
+  disableWebDAV: true
+  sources:
+{% for source in filebrowser_sources %}
+    - path: {{ source.path }}
+      name: {{ source.name }}
+      config:
+        readOnly: true
+        private: true
+        defaultEnabled: true
+        rules:
+          # Keeps .ssh and .config out of both the index and the interface. There
+          # are private keys under the first one.
+          - ignoreHidden: true
+{% for rule in source.rules %}
+{% for key, value in rule.items() %}
+          - {{ key }}: {{ value }}
+{% endfor %}
+{% endfor %}
+{% endfor %}
+
+auth:
+  adminUsername: {{ admin }}
+  adminPassword: "{{ filebrowser_admin_password }}"
+  key: "{{ filebrowser_jwt_secret }}"
+  methods:
+    password:
+      enabled: true
+    # Face ID on the phone, which is the whole point of reaching this over HTTPS
+    # rather than mounting SMB.
+    passkey:
+      enabled: true
+
+http:
+  # Without this the built-in rate limiting and the failed-login lockout count
+  # against Apache's address instead of the client's, which switches both off in
+  # practice. The session cookie domain, the WebAuthn origin and the audit log
+  # addresses read the same setting.
+  trustedHeaders:
+    - X-Forwarded-For
+
+userDefaults:
+  account:
+    permissions:
+      admin: false
+      api: false
+      create: false
+      delete: false
+      modify: false
+      # The 2026 critical advisories are concentrated in the public share paths:
+      # an unauthenticated traversal that deleted arbitrary files, a traversal in
+      # the public PATCH handler, and three ways around share passwords.
+      share: false

@@ -1,0 +1,20 @@
+  filebrowser:
+    container_name: filebrowser
+    image: {{ docker_quarantine_image_ref }}
+    # Reached only through the Apache vhost, which holds the deny rules for the
+    # share endpoints and feeds the access log fail2ban reads.
+    ports:
+      - "127.0.0.1:{{ filebrowser_port }}:{{ filebrowser_port }}"
+    # The image bakes in uid 1000 and supports no PUID/PGID, so the runtime user
+    # is overridden here. It has to be {{ admin }} to read a 0700 archive.
+    user: "{{ filebrowser_uid }}:{{ filebrowser_gid }}"
+    volumes:
+      - {{ filebrowser_data_dir }}:/home/filebrowser/data
+{% for source in filebrowser_sources %}
+      # Read-only at the mount as well as in the config, so a change to either
+      # alone cannot make the published tree writable.
+      - {{ source.path }}:{{ source.path }}:ro
+{% endfor %}
+      - /etc/localtime:/etc/localtime:ro
+    mem_limit: {{ filebrowser_mem_limit }}
+    restart: unless-stopped
