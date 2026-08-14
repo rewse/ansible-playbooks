@@ -1,0 +1,36 @@
+#!/usr/bin/bash
+# {{ ansible_managed }}
+#
+# The offsite half of 3-2-1. The local repository on Bay 2 is the second copy of
+# this host; this is the one that survives losing the house.
+#
+# Only the root filesystem: --one-file-system stops the walk there, so the
+# volumes in the enclosure are not pulled in. They have their own repositories,
+# reached by their own units.
+set -euo pipefail
+
+# Configuration
+readonly SRC="/"
+readonly EXCLUDE_FILE="/etc/restic.exclude"
+
+# Initialize repository on first run
+if ! restic cat config > /dev/null 2>&1; then
+  restic init
+fi
+
+# Run backup
+nice -n 10 restic backup "${SRC}" \
+  --verbose \
+  --one-file-system \
+  --exclude-file="${EXCLUDE_FILE}" \
+  --tag daily
+
+# Apply retention policy
+nice -n 10 restic forget \
+  --keep-daily 30 \
+  --keep-weekly 8 \
+  --keep-monthly 12 \
+  --prune
+
+# Mark successful completion for monitoring
+touch /var/lib/backup-s3-daily.success

@@ -1,0 +1,24 @@
+[Unit]
+Description=Weekly integrity check of the offsite repository
+After=network-online.target
+Wants=network-online.target
+OnFailure=failure-notify@%n.service
+
+[Service]
+Type=oneshot
+Environment=RESTIC_REPOSITORY=s3:s3.{{ raspberrypi_backup.s3_region }}.amazonaws.com/{{ raspberrypi_backup.s3_bucket }}/{{ ansible_facts['hostname'] }}
+Environment=RESTIC_PASSWORD_FILE=/etc/restic/password
+Environment=RESTIC_PROGRESS_FPS=0.0166
+Environment=XDG_CACHE_HOME=/var/cache/restic
+EnvironmentFile=/etc/restic/s3.env
+# Structural only, unlike the monthly check of the local repository. --read-data
+# would download every pack, and these objects reach Glacier Instant Retrieval
+# after 30 days where retrieval and egress are both billed. What it would catch
+# is bit rot, which S3 already checksums and repairs.
+#
+# What this does catch is what an upload can leave behind: a pack missing or
+# short because the transfer broke, an index that no longer matches, a prune that
+# did not finish. --with-cache reuses the metadata on disk instead of fetching
+# the index again into a fresh temporary cache.
+ExecStart=/usr/local/bin/restic check --with-cache --verbose
+ExecStartPost=/usr/bin/touch /var/lib/backup-s3-weekly-check.success

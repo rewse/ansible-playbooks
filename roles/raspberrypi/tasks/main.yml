@@ -541,6 +541,103 @@
     - raspberrypi_backup
     - raspberrypi_backup_config
 
+- name: "backup : Install S3 credentials"
+  # Owned here rather than in the nas role because every host that backs up needs
+  # it, not only the one holding the disks.
+  ansible.builtin.copy:
+    content: |
+      AWS_ACCESS_KEY_ID={{ lookup('pipe', 'op read "op://ansible/restic - AWS IAM/username"') }}
+      AWS_SECRET_ACCESS_KEY={{ lookup('pipe', 'op read "op://ansible/restic - AWS IAM/credential"') }}
+    dest: /etc/restic/s3.env
+    mode: '0600'
+  no_log: true
+  tags:
+    - raspberrypi
+    - config
+    - raspberrypi_backup
+    - raspberrypi_backup_config
+
+- name: "backup : Copy S3 script"
+  ansible.builtin.template:
+    src: backup-s3-daily.j2
+    dest: /usr/local/sbin/backup-s3-daily
+    mode: '0755'
+  tags:
+    - raspberrypi
+    - config
+    - raspberrypi_backup
+    - raspberrypi_backup_config
+
+- name: "backup : Copy S3 service"
+  ansible.builtin.template:
+    src: backup-s3-daily.service.j2
+    dest: /etc/systemd/system/backup-s3-daily.service
+    mode: '0644'
+  notify: "Reload systemd"
+  tags:
+    - raspberrypi
+    - config
+    - raspberrypi_backup
+    - raspberrypi_backup_config
+
+- name: "backup : Copy S3 timer"
+  ansible.builtin.template:
+    src: backup-s3-daily.timer.j2
+    dest: /etc/systemd/system/backup-s3-daily.timer
+    mode: '0644'
+  tags:
+    - raspberrypi
+    - config
+    - raspberrypi_backup
+    - raspberrypi_backup_config
+
+- name: "backup : Enable and start S3 timer"
+  ansible.builtin.systemd:
+    name: backup-s3-daily.timer
+    enabled: true
+    state: started
+    daemon_reload: true
+  tags:
+    - raspberrypi
+    - config
+    - raspberrypi_backup
+    - raspberrypi_backup_config
+
+- name: "backup : Copy S3 check service"
+  ansible.builtin.template:
+    src: backup-s3-weekly-check.service.j2
+    dest: /etc/systemd/system/backup-s3-weekly-check.service
+    mode: '0644'
+  notify: "Reload systemd"
+  tags:
+    - raspberrypi
+    - config
+    - raspberrypi_backup
+    - raspberrypi_backup_config
+
+- name: "backup : Copy S3 check timer"
+  ansible.builtin.template:
+    src: backup-s3-weekly-check.timer.j2
+    dest: /etc/systemd/system/backup-s3-weekly-check.timer
+    mode: '0644'
+  tags:
+    - raspberrypi
+    - config
+    - raspberrypi_backup
+    - raspberrypi_backup_config
+
+- name: "backup : Enable and start S3 check timer"
+  ansible.builtin.systemd:
+    name: backup-s3-weekly-check.timer
+    enabled: true
+    state: started
+    daemon_reload: true
+  tags:
+    - raspberrypi
+    - config
+    - raspberrypi_backup
+    - raspberrypi_backup_config
+
 - name: "backup : Enable and start monthly check timer"
   ansible.builtin.systemd:
     name: backup-monthly-check.timer

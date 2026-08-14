@@ -18,6 +18,10 @@ raspberrypi_backup:
   nas_sources:
     - /srv/nas/data/homes
   repo_root: /srv/nas/backup
+  # The offsite half of 3-2-1: one repository per host, named after it. Sits
+  # alongside the volume repositories the nas role writes to the same bucket.
+  s3_bucket: rewse-nas-bak
+  s3_region: ap-northeast-1
 raspberrypi_default_gateway: 192.168.0.1
 raspberrypi_default_gateway6: fe80::70a7:41ff:fea6:bd7a
 raspberrypi_netgear_gs108tv3_version: 7.0.6.2

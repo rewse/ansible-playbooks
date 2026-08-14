@@ -1,0 +1,13 @@
+[Unit]
+Description=Daily offsite backup to S3 timer
+
+[Timer]
+# After the local backup at 04:00, so the day's local snapshot exists before the
+# uplink is busy, and clear of the volume repositories on the NAS host at 05:00
+# and 06:00.
+OnCalendar=*-*-* 07:00:00
+RandomizedDelaySec=30m
+Persistent=true
+
+[Install]
+WantedBy=timers.target

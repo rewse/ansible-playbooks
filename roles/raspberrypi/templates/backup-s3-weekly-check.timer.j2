@@ -1,0 +1,12 @@
+[Unit]
+Description=Weekly integrity check of the offsite repository timer
+
+[Timer]
+# Sunday, clear of the backups that run from 04:00 to 07:00 and of the volume
+# checks at 09:00 on the NAS host.
+OnCalendar=Sun *-*-* 10:00:00
+RandomizedDelaySec=30m
+Persistent=true
+
+[Install]
+WantedBy=timers.target
