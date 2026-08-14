@@ -1,0 +1,4 @@
+# {{ ansible_managed }}
+{% for client in nas_nfs_clients %}
+{{ nas_backup_path }}/{{ client.name }} {{ client.address }}(rw,sync,no_subtree_check,no_root_squash)
+{% endfor %}

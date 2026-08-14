@@ -1,0 +1,4 @@
+---
+- name: "nas : Reload exports"
+  ansible.builtin.command: exportfs -ra
+  changed_when: true

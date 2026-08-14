@@ -1,19 +1,36 @@
 #!/usr/bin/bash
+{#
+  The repository lives on Bay 2 of the enclosure attached to the NAS host. That
+  host reaches it as a local directory, every other host mounts it over NFS.
+#}
+{% set backup_is_nas = ansible_facts['hostname'] == raspberrypi_backup.nas_host %}
+{% if backup_is_nas %}
+{% set backup_repo = raspberrypi_backup.repo_root ~ '/' ~ ansible_facts['hostname'] %}
+{% else %}
+{% set backup_repo = '/mnt/bak' %}
+{% endif %}
 set -euo pipefail
 
 # Configuration
-readonly REMOTE="guppy:/volume1/Backup/{{ ansible_facts['hostname'] }}"
-readonly MOUNT="/mnt/bak"
-readonly SRC="/"
+readonly REPO="{{ backup_repo }}"
 readonly EXCLUDE_FILE="/etc/restic.exclude"
+{% if backup_is_nas %}
+# --one-file-system stops the walk at the root filesystem, so the volumes in the
+# enclosure are named to be included rather than the rest being excluded.
+readonly SRC=(/ {{ raspberrypi_backup.nas_sources | join(' ') }})
+{% else %}
+readonly SRC=(/)
+{% endif %}
+{% if not backup_is_nas %}
+readonly REMOTE="{{ raspberrypi_backup.nas_host }}:{{ raspberrypi_backup.repo_root }}/{{ ansible_facts['hostname'] }}"
 
 # Cleanup function
 cleanup() {
   local exit_code="${1:-0}"
 
-  if mountpoint -q "${MOUNT}"; then
-    umount "${MOUNT}" || {
-      echo "Warning: Failed to unmount ${MOUNT}" >&2
+  if mountpoint -q "${REPO}"; then
+    umount "${REPO}" || {
+      echo "Warning: Failed to unmount ${REPO}" >&2
       exit_code=1
     }
   fi
@@ -25,20 +42,26 @@ cleanup() {
 trap 'cleanup 1' INT TERM EXIT
 
 # Mount remote if not already mounted
-if ! mountpoint -q "${MOUNT}"; then
-  mount "${REMOTE}" "${MOUNT}" || {
-    echo "Error: Failed to mount ${REMOTE} to ${MOUNT}" >&2
+if ! mountpoint -q "${REPO}"; then
+  mount "${REMOTE}" "${REPO}" || {
+    echo "Error: Failed to mount ${REMOTE} to ${REPO}" >&2
     exit 1
   }
 fi
+{% else %}
+
+# Nothing to mount: the repository is a directory on this host. The unit carries
+# RequiresMountsFor so systemd holds it back until the volume is mounted, which
+# a boot can otherwise complete without because crypttab uses nofail.
+{% endif %}
 
 # Initialize repository on first run
-if [ ! -f "${MOUNT}/config" ]; then
+if [ ! -f "${REPO}/config" ]; then
   restic init
 fi
 
 # Run backup
-nice -n 10 restic backup "${SRC}" \
+nice -n 10 restic backup "${SRC[@]}" \
   --verbose \
   --one-file-system \
   --pack-size 128 \
@@ -54,7 +77,9 @@ nice -n 10 restic forget \
 
 # Mark successful completion for monitoring
 touch /var/lib/backup-daily.success
+{% if not backup_is_nas %}
 
 # Cleanup with success status
 trap - INT TERM EXIT
 cleanup 0
+{% endif %}

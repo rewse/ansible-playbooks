@@ -7,6 +7,19 @@
 nas_keyfile: /etc/luks/nas.key
 nas_keyfile_content: "{{ lookup('pipe', 'op read \"op://ansible/LUKS - nas/password\"') }}"
 
+nas_backup_path: /srv/nas/backup
+
+# Hosts that keep their restic repository on Bay 2 and reach it over NFS. Each
+# is exported its own subdirectory rather than the whole volume, so a client
+# cannot read another host's backups or the Time Machine shares.
+#
+# no_root_squash is required because the client runs restic as root; combined
+# with sec=sys it means the export trusts the address, which is why one is
+# opened per client instead of a subnet.
+nas_nfs_clients:
+  - name: hotel
+    address: 192.168.0.40
+
 nas_volumes:
   # Bay 3. The archive is served to a single user, so the filesystem root itself
   # is closed; Samba enforces the same through valid users.
@@ -21,7 +34,7 @@ nas_volumes:
   # Bay 2. Stays traversable: Samba serves a Time Machine share per Mac below
   # it as separate users, while the restic repositories keep their own 0700 root.
   - name: nas-backup
-    path: /srv/nas/backup
+    path: "{{ nas_backup_path }}"
     luks_uuid: c340cf31-c585-407d-830f-7e83d3fbeda4
     owner: root
     group: root

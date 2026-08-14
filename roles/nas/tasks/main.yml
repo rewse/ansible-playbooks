@@ -96,3 +96,56 @@
     - storage
     - nas_storage
     - nas_storage_config
+
+- name: "nas : Install NFS server"
+  ansible.builtin.apt:
+    name: nfs-kernel-server
+    state: present
+  tags:
+    - nas
+    - install
+    - nfs
+    - nas_nfs
+    - nas_nfs_install
+
+- name: "nas : Create export directories"
+  ansible.builtin.file:
+    path: "{{ nas_backup_path }}/{{ item.name }}"
+    state: directory
+    owner: root
+    group: root
+    mode: '0700'
+  loop: "{{ nas_nfs_clients }}"
+  loop_control:
+    label: "{{ item.name }}"
+  tags:
+    - nas
+    - config
+    - nfs
+    - nas_nfs
+    - nas_nfs_config
+
+- name: "nas : Configure exports"
+  ansible.builtin.template:
+    src: exports.j2
+    dest: /etc/exports
+    mode: '0644'
+  notify: "nas : Reload exports"
+  tags:
+    - nas
+    - config
+    - nfs
+    - nas_nfs
+    - nas_nfs_config
+
+- name: "nas : Enable and start NFS server"
+  ansible.builtin.systemd:
+    name: nfs-server
+    enabled: true
+    state: started
+  tags:
+    - nas
+    - config
+    - nfs
+    - nas_nfs
+    - nas_nfs_config

@@ -1,5 +1,19 @@
 ---
 raspberrypi_aws_vpc_cidr: 10.0.0.0/16
+# Bay 2 of the enclosure on nas_host. That host writes to the directory, the
+# others mount it over NFS from there.
+#
+# nas_sources names the volumes on nas_host that --one-file-system will not
+# reach from /. Only homes belongs in the repository: the archive has its own
+# copy on Bay 3 and in S3, the Frigate recordings expire on their own, and the
+# staging directories are temporary copies of data that is backed up elsewhere.
+# Naming what to keep rather than what to skip is what keeps 2.7 TB of staging
+# out of a 1.9 TB volume.
+raspberrypi_backup:
+  nas_host: fox
+  nas_sources:
+    - /srv/nas/data/homes
+  repo_root: /srv/nas/backup
 raspberrypi_default_gateway: 192.168.0.1
 raspberrypi_default_gateway6: fe80::70a7:41ff:fea6:bd7a
 raspberrypi_netgear_gs108tv3_version: 7.0.6.2

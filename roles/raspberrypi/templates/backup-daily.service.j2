@@ -1,0 +1,28 @@
+{% set backup_is_nas = ansible_facts['hostname'] == raspberrypi_backup.nas_host %}
+{% if backup_is_nas %}
+{% set backup_repo = raspberrypi_backup.repo_root ~ '/' ~ ansible_facts['hostname'] %}
+{% else %}
+{% set backup_repo = '/mnt/bak' %}
+{% endif %}
+[Unit]
+Description=Daily backup to NAS
+After=network-online.target
+Wants=network-online.target
+OnFailure=failure-notify@%n.service
+{% if backup_is_nas %}
+# The repository is a directory on this host rather than a mount the script
+# makes itself, and crypttab uses nofail, so a boot can complete without the
+# volume. Hold the job back until it is there: an unguarded run would write a
+# second repository onto the root filesystem and report success. The source
+# volumes are listed too, so a missing one fails the unit instead of quietly
+# recording an empty directory.
+RequiresMountsFor={{ raspberrypi_backup.repo_root }} {{ raspberrypi_backup.nas_sources | join(' ') }}
+{% endif %}
+
+[Service]
+Type=oneshot
+Environment=RESTIC_REPOSITORY={{ backup_repo }}
+Environment=RESTIC_PASSWORD_FILE=/etc/restic/password
+Environment=RESTIC_PROGRESS_FPS=0.0166
+Environment=XDG_CACHE_HOME=/var/cache/restic
+ExecStart=/usr/local/sbin/backup-daily
