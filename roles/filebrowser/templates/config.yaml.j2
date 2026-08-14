@@ -3,6 +3,9 @@
 server:
   port: {{ filebrowser_port }}
   baseURL: "/"
+  # Share links are built from this. Without it they would carry the address the
+  # container sees, which is the loopback interface.
+  externalUrl: https://{{ filebrowser_hostname }}
   database: /home/filebrowser/data/database.db
   # Thumbnails live beside the database on the NVMe and are pruned automatically,
   # because a phone browsing the picture folders will generate a lot of them.
@@ -19,7 +22,6 @@ server:
       name: {{ source.name }}
       config:
         readOnly: true
-        private: true
         defaultEnabled: true
         rules:
           # Keeps .ssh and .config out of both the index and the interface. There
@@ -43,6 +45,12 @@ auth:
     # rather than mounting SMB.
     passkey:
       enabled: true
+      # Derived from the base URL when empty, which here is just "/" and yields no
+      # host. A passkey is bound to the relying party ID, so registering against
+      # the wrong one produces a credential that never matches at login.
+      rpId: {{ filebrowser_hostname }}
+      rpOrigins:
+        - https://{{ filebrowser_hostname }}
 
 http:
   # Without this the built-in rate limiting and the failed-login lockout count
@@ -60,7 +68,8 @@ userDefaults:
       create: false
       delete: false
       modify: false
-      # The 2026 critical advisories are concentrated in the public share paths:
-      # an unauthenticated traversal that deleted arbitrary files, a traversal in
-      # the public PATCH handler, and three ways around share passwords.
-      share: false
+      # Share links are used. Every advisory published against the public share
+      # paths in 2026 is patched by 1.4.3-beta at the latest, well behind the
+      # stable line this runs, but they are also where this project's bugs
+      # cluster, so the version is worth following closely.
+      share: true

@@ -5,14 +5,9 @@
 filebrowser_data_dir: /srv/filebrowser
 
 # Published on the loopback address only, so nothing off the host reaches it
-# except through the Apache vhost, which is where the rate limiting, the fail2ban
-# jail and the deny rules for the share endpoints live.
-#
-# 8081 rather than the 8080 the project documents, because zabbix-mcp-server
-# already holds 8080 and the port is set explicitly in the config anyway. Moving
-# that service instead would mean redistributing the mcporter config, which
-# chezmoi carries to every host.
-filebrowser_port: 8081
+# except through the Apache vhost, which is where the rate limiting and the
+# fail2ban jail live.
+filebrowser_port: 8080
 
 # The image bakes in uid 1000 and has no PUID/PGID support, so the runtime user
 # is overridden instead. It has to be tats: the archive is 0700 tats:tats and so
@@ -38,10 +33,6 @@ filebrowser_mem_limit: 1g
 # write over SMB. It also means a stolen session cannot delete anything, and that
 # an index built while the enclosure was absent cannot write into the empty mount
 # point.
-#
-# private stops shares being created from the source. The critical advisories
-# published against this project in 2026 are concentrated in the public share
-# paths, and the feature is not used here.
 # Paths are written out rather than taken from the nas role, whose vars are
 # scoped to it.
 filebrowser_sources:

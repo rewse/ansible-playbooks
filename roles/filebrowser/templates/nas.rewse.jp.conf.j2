@@ -6,14 +6,6 @@
     ProxyPreserveHost on
     ProxyRequests off
 
-    # The share endpoints are closed here as well as in the application, where the
-    # source is private and the share permission is off. Every critical advisory
-    # published against this project in 2026 was reachable through one of these
-    # two paths without authenticating, and nothing here uses the feature.
-    <LocationMatch "^/(api/)?public/">
-        Require all denied
-    </LocationMatch>
-
     ProxyPass / http://localhost:{{ filebrowser_port }}/
     ProxyPassReverse / http://localhost:{{ filebrowser_port }}/
 
