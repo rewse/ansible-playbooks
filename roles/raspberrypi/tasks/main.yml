@@ -459,10 +459,10 @@
     - raspberrypi_backup
     - raspberrypi_backup_config
 
-- name: "backup : Copy script"
+- name: "backup : Copy local backup script"
   ansible.builtin.template:
-    src: backup-daily.j2
-    dest: /usr/local/sbin/backup-daily
+    src: restic-local-backup.j2
+    dest: /usr/local/sbin/restic-local-backup
     mode: '0755'
   tags:
     - raspberrypi
@@ -470,10 +470,10 @@
     - raspberrypi_backup
     - raspberrypi_backup_config
 
-- name: "backup : Copy service"
+- name: "backup : Copy local backup service"
   ansible.builtin.template:
-    src: backup-daily.service.j2
-    dest: /etc/systemd/system/backup-daily.service
+    src: restic-local-backup@.service.j2
+    dest: /etc/systemd/system/restic-local-backup@.service
     mode: '0644'
   notify: "Reload systemd"
   tags:
@@ -482,21 +482,23 @@
     - raspberrypi_backup
     - raspberrypi_backup_config
 
-- name: "backup : Copy timer"
+- name: "backup : Copy local backup timer"
   ansible.builtin.copy:
-    src: backup-daily.timer
-    dest: /etc/systemd/system/backup-daily.timer
+    src: restic-local-backup@.timer
+    dest: /etc/systemd/system/restic-local-backup@.timer
     mode: '0644'
-  notify: "raspberrypi : Restart backup-daily timer"
+  notify: "raspberrypi : Restart local backup timer"
   tags:
     - raspberrypi
     - config
     - raspberrypi_backup
     - raspberrypi_backup_config
 
-- name: "backup : Enable and start timer"
+- name: "backup : Enable and start local backup timer"
+  # One instance per host, named after the repository it writes, which is named
+  # after the host.
   ansible.builtin.systemd:
-    name: backup-daily.timer
+    name: "restic-local-backup@{{ ansible_facts['hostname'] }}.timer"
     enabled: true
     state: started
     daemon_reload: true
@@ -506,10 +508,10 @@
     - raspberrypi_backup
     - raspberrypi_backup_config
 
-- name: "backup : Copy monthly check script"
+- name: "backup : Copy local check script"
   ansible.builtin.template:
-    src: backup-monthly-check.j2
-    dest: /usr/local/sbin/backup-monthly-check
+    src: restic-local-check.j2
+    dest: /usr/local/sbin/restic-local-check
     mode: '0755'
   tags:
     - raspberrypi
@@ -517,10 +519,10 @@
     - raspberrypi_backup
     - raspberrypi_backup_config
 
-- name: "backup : Copy monthly check service"
+- name: "backup : Copy local check service"
   ansible.builtin.template:
-    src: backup-monthly-check.service.j2
-    dest: /etc/systemd/system/backup-monthly-check.service
+    src: restic-local-check@.service.j2
+    dest: /etc/systemd/system/restic-local-check@.service
     mode: '0644'
   notify: "Reload systemd"
   tags:
@@ -529,12 +531,24 @@
     - raspberrypi_backup
     - raspberrypi_backup_config
 
-- name: "backup : Copy monthly check timer"
+- name: "backup : Copy local check timer"
   ansible.builtin.copy:
-    src: backup-monthly-check.timer
-    dest: /etc/systemd/system/backup-monthly-check.timer
+    src: restic-local-check@.timer
+    dest: /etc/systemd/system/restic-local-check@.timer
     mode: '0644'
-  notify: "raspberrypi : Restart backup-monthly-check timer"
+  notify: "raspberrypi : Restart local check timer"
+  tags:
+    - raspberrypi
+    - config
+    - raspberrypi_backup
+    - raspberrypi_backup_config
+
+- name: "backup : Enable and start local check timer"
+  ansible.builtin.systemd:
+    name: "restic-local-check@{{ ansible_facts['hostname'] }}.timer"
+    enabled: true
+    state: started
+    daemon_reload: true
   tags:
     - raspberrypi
     - config
@@ -557,10 +571,10 @@
     - raspberrypi_backup
     - raspberrypi_backup_config
 
-- name: "backup : Copy S3 script"
-  ansible.builtin.template:
-    src: backup-s3-daily.j2
-    dest: /usr/local/sbin/backup-s3-daily
+- name: "backup : Copy S3 backup script"
+  ansible.builtin.copy:
+    src: restic-s3-backup
+    dest: /usr/local/sbin/restic-s3-backup
     mode: '0755'
   tags:
     - raspberrypi
@@ -568,10 +582,10 @@
     - raspberrypi_backup
     - raspberrypi_backup_config
 
-- name: "backup : Copy S3 service"
+- name: "backup : Copy S3 backup service"
   ansible.builtin.template:
-    src: backup-s3-daily.service.j2
-    dest: /etc/systemd/system/backup-s3-daily.service
+    src: restic-s3-backup@.service.j2
+    dest: /etc/systemd/system/restic-s3-backup@.service
     mode: '0644'
   notify: "Reload systemd"
   tags:
@@ -580,10 +594,10 @@
     - raspberrypi_backup
     - raspberrypi_backup_config
 
-- name: "backup : Copy S3 timer"
-  ansible.builtin.template:
-    src: backup-s3-daily.timer.j2
-    dest: /etc/systemd/system/backup-s3-daily.timer
+- name: "backup : Copy S3 backup timer"
+  ansible.builtin.copy:
+    src: restic-s3-backup@.timer
+    dest: /etc/systemd/system/restic-s3-backup@.timer
     mode: '0644'
   tags:
     - raspberrypi
@@ -591,9 +605,57 @@
     - raspberrypi_backup
     - raspberrypi_backup_config
 
-- name: "backup : Enable and start S3 timer"
+- name: "backup : Create S3 drop-in directories"
+  # Drop-ins rather than unit files per instance: enabling a template instance
+  # links to the template, and a concrete file of the same name would leave that
+  # link pointing at the wrong place. The nas role adds its own for the volume
+  # repositories it owns.
+  ansible.builtin.file:
+    path: "/etc/systemd/system/{{ item }}"
+    state: directory
+    owner: root
+    group: root
+    mode: '0755'
+  loop:
+    - "restic-s3-backup@{{ ansible_facts['hostname'] }}.service.d"
+    - "restic-s3-backup@{{ ansible_facts['hostname'] }}.timer.d"
+    - "restic-s3-check@{{ ansible_facts['hostname'] }}.timer.d"
+  tags:
+    - raspberrypi
+    - config
+    - raspberrypi_backup
+    - raspberrypi_backup_config
+
+- name: "backup : Configure S3 backup source"
+  ansible.builtin.copy:
+    src: restic-s3-backup-host.conf
+    dest: "/etc/systemd/system/restic-s3-backup@{{ ansible_facts['hostname'] }}.service.d/source.conf"
+    mode: '0644'
+  notify: "Reload systemd"
+  tags:
+    - raspberrypi
+    - config
+    - raspberrypi_backup
+    - raspberrypi_backup_config
+
+- name: "backup : Configure S3 backup schedule"
+  ansible.builtin.template:
+    src: restic-timer-schedule.conf.j2
+    dest: "/etc/systemd/system/restic-s3-backup@{{ ansible_facts['hostname'] }}.timer.d/schedule.conf"
+    mode: '0644'
+  vars:
+    restic_timer_oncalendar: "{{ raspberrypi_backup.s3_backup_schedule }}"
+    restic_timer_delay: 30m
+  notify: "raspberrypi : Restart S3 backup timer"
+  tags:
+    - raspberrypi
+    - config
+    - raspberrypi_backup
+    - raspberrypi_backup_config
+
+- name: "backup : Enable and start S3 backup timer"
   ansible.builtin.systemd:
-    name: backup-s3-daily.timer
+    name: "restic-s3-backup@{{ ansible_facts['hostname'] }}.timer"
     enabled: true
     state: started
     daemon_reload: true
@@ -605,8 +667,8 @@
 
 - name: "backup : Copy S3 check service"
   ansible.builtin.template:
-    src: backup-s3-weekly-check.service.j2
-    dest: /etc/systemd/system/backup-s3-weekly-check.service
+    src: restic-s3-check@.service.j2
+    dest: /etc/systemd/system/restic-s3-check@.service
     mode: '0644'
   notify: "Reload systemd"
   tags:
@@ -616,10 +678,25 @@
     - raspberrypi_backup_config
 
 - name: "backup : Copy S3 check timer"
-  ansible.builtin.template:
-    src: backup-s3-weekly-check.timer.j2
-    dest: /etc/systemd/system/backup-s3-weekly-check.timer
+  ansible.builtin.copy:
+    src: restic-s3-check@.timer
+    dest: /etc/systemd/system/restic-s3-check@.timer
     mode: '0644'
+  tags:
+    - raspberrypi
+    - config
+    - raspberrypi_backup
+    - raspberrypi_backup_config
+
+- name: "backup : Configure S3 check schedule"
+  ansible.builtin.template:
+    src: restic-timer-schedule.conf.j2
+    dest: "/etc/systemd/system/restic-s3-check@{{ ansible_facts['hostname'] }}.timer.d/schedule.conf"
+    mode: '0644'
+  vars:
+    restic_timer_oncalendar: "{{ raspberrypi_backup.s3_check_schedule }}"
+    restic_timer_delay: 30m
+  notify: "raspberrypi : Restart S3 check timer"
   tags:
     - raspberrypi
     - config
@@ -628,19 +705,7 @@
 
 - name: "backup : Enable and start S3 check timer"
   ansible.builtin.systemd:
-    name: backup-s3-weekly-check.timer
-    enabled: true
-    state: started
-    daemon_reload: true
-  tags:
-    - raspberrypi
-    - config
-    - raspberrypi_backup
-    - raspberrypi_backup_config
-
-- name: "backup : Enable and start monthly check timer"
-  ansible.builtin.systemd:
-    name: backup-monthly-check.timer
+    name: "restic-s3-check@{{ ansible_facts['hostname'] }}.timer"
     enabled: true
     state: started
     daemon_reload: true

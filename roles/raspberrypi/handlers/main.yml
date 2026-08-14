@@ -29,15 +29,27 @@
   ansible.builtin.systemd:
     daemon_reload: true
 
-- name: "raspberrypi : Restart backup-daily timer"
+- name: "raspberrypi : Restart local backup timer"
   ansible.builtin.systemd:
-    name: backup-daily.timer
+    name: "restic-local-backup@{{ ansible_facts['hostname'] }}.timer"
     state: restarted
     daemon_reload: true
 
-- name: "raspberrypi : Restart backup-monthly-check timer"
+- name: "raspberrypi : Restart local check timer"
   ansible.builtin.systemd:
-    name: backup-monthly-check.timer
+    name: "restic-local-check@{{ ansible_facts['hostname'] }}.timer"
+    state: restarted
+    daemon_reload: true
+
+- name: "raspberrypi : Restart S3 backup timer"
+  ansible.builtin.systemd:
+    name: "restic-s3-backup@{{ ansible_facts['hostname'] }}.timer"
+    state: restarted
+    daemon_reload: true
+
+- name: "raspberrypi : Restart S3 check timer"
+  ansible.builtin.systemd:
+    name: "restic-s3-check@{{ ansible_facts['hostname'] }}.timer"
     state: restarted
     daemon_reload: true
 

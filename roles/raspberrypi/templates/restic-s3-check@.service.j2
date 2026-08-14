@@ -1,0 +1,29 @@
+[Unit]
+Description=Weekly integrity check of the S3 repository %i
+After=network-online.target
+Wants=network-online.target
+OnFailure=failure-notify@%n.service
+
+[Service]
+Type=oneshot
+# The instance name is the repository name. A check needs nothing else, so unlike
+# the backup this template covers a host and a volume without a drop-in.
+Environment=RESTIC_REPOSITORY=s3:s3.{{ raspberrypi_backup.s3_region }}.amazonaws.com/{{ raspberrypi_backup.s3_bucket }}/%i
+Environment=RESTIC_PASSWORD_FILE=/etc/restic/password
+Environment=RESTIC_PROGRESS_FPS=0.0166
+Environment=XDG_CACHE_HOME=/var/cache/restic
+EnvironmentFile=/etc/restic/s3.env
+# Structural only, and deliberately without --read-data. That flag downloads every
+# pack: for the archive it would pull 2.7 TB out of Glacier Instant Retrieval,
+# where retrieval and egress together come to several hundred dollars a run. What
+# it would catch is bit rot, which S3 already checksums and repairs.
+#
+# What this does catch is the failure this setup can actually produce: a pack left
+# missing or short by an upload that broke partway, an index that no longer
+# matches, a prune that did not finish. The default verifies snapshots, trees and
+# pack files, reading pack headers over ranged requests rather than whole packs.
+#
+# --with-cache reuses the metadata already on disk instead of fetching the index
+# again, which check otherwise does into a fresh temporary cache every run.
+ExecStart=/usr/local/bin/restic check --with-cache --verbose
+ExecStartPost=/usr/bin/touch /var/lib/restic-s3-check-%i.success

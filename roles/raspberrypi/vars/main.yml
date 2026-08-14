@@ -22,6 +22,13 @@ raspberrypi_backup:
   # alongside the volume repositories the nas role writes to the same bucket.
   s3_bucket: rewse-nas-bak
   s3_region: ap-northeast-1
+  # After the local backup at 04:00, so the day's local snapshot exists before the
+  # uplink is busy, and clear of the volume repositories on the NAS host at 05:00
+  # and 06:00. Reached through a drop-in, the template carrying no schedule.
+  s3_backup_schedule: '*-*-* 07:00:00'
+  # Sunday, clear of the backups that run from 04:00 to 07:00 and of the volume
+  # checks at 09:00 on the NAS host.
+  s3_check_schedule: 'Sun *-*-* 10:00:00'
 raspberrypi_default_gateway: 192.168.0.1
 raspberrypi_default_gateway6: fe80::70a7:41ff:fea6:bd7a
 raspberrypi_netgear_gs108tv3_version: 7.0.6.2

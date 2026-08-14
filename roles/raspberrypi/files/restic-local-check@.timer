@@ -1,5 +1,5 @@
 [Unit]
-Description=Monthly restic repository integrity check timer
+Description=Monthly integrity check of the local repository %i timer
 
 [Timer]
 OnCalendar=*-*-01 05:00:00

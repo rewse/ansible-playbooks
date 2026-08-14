@@ -1,24 +1,23 @@
 {% set backup_is_nas = ansible_facts['hostname'] == raspberrypi_backup.nas_host %}
-{% if backup_is_nas %}
-{% set backup_repo = raspberrypi_backup.repo_root ~ '/' ~ ansible_facts['hostname'] %}
-{% else %}
-{% set backup_repo = '/mnt/bak' %}
-{% endif %}
 [Unit]
-Description=Monthly restic repository integrity check
+Description=Monthly integrity check of the local repository %i
 After=network-online.target
 Wants=network-online.target
 OnFailure=failure-notify@%n.service
 {% if backup_is_nas %}
-# See backup-daily.service.j2: the volume can be absent after a boot because
+# See restic-local-backup@.service: the volume can be absent after a boot because
 # crypttab uses nofail, and a check against a missing repository fails anyway.
 RequiresMountsFor={{ raspberrypi_backup.repo_root }}
 {% endif %}
 
 [Service]
 Type=oneshot
-Environment=RESTIC_REPOSITORY={{ backup_repo }}
+{% if backup_is_nas %}
+Environment=RESTIC_REPOSITORY={{ raspberrypi_backup.repo_root }}/%i
+{% else %}
+Environment=RESTIC_REPOSITORY=/mnt/bak
+{% endif %}
 Environment=RESTIC_PASSWORD_FILE=/etc/restic/password
 Environment=RESTIC_PROGRESS_FPS=0.0166
 Environment=XDG_CACHE_HOME=/var/cache/restic
-ExecStart=/usr/local/sbin/backup-monthly-check
+ExecStart=/usr/local/sbin/restic-local-check %i

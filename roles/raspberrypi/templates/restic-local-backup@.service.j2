@@ -1,11 +1,6 @@
 {% set backup_is_nas = ansible_facts['hostname'] == raspberrypi_backup.nas_host %}
-{% if backup_is_nas %}
-{% set backup_repo = raspberrypi_backup.repo_root ~ '/' ~ ansible_facts['hostname'] %}
-{% else %}
-{% set backup_repo = '/mnt/bak' %}
-{% endif %}
 [Unit]
-Description=Daily backup to NAS
+Description=Daily backup of %i to the local repository
 After=network-online.target
 Wants=network-online.target
 OnFailure=failure-notify@%n.service
@@ -21,7 +16,12 @@ RequiresMountsFor={{ raspberrypi_backup.repo_root }} {{ raspberrypi_backup.nas_s
 
 [Service]
 Type=oneshot
-Environment=RESTIC_REPOSITORY={{ backup_repo }}
+# The instance name is the repository name, so one template covers every host.
+{% if backup_is_nas %}
+Environment=RESTIC_REPOSITORY={{ raspberrypi_backup.repo_root }}/%i
+{% else %}
+Environment=RESTIC_REPOSITORY=/mnt/bak
+{% endif %}
 Environment=RESTIC_PASSWORD_FILE=/etc/restic/password
 # Set here rather than as a flag so every restic command in the script uses it,
 # including the repacking prune does. Large packs were adopted when the
@@ -29,4 +29,4 @@ Environment=RESTIC_PASSWORD_FILE=/etc/restic/password
 Environment=RESTIC_PACK_SIZE={{ raspberrypi_backup.pack_size }}
 Environment=RESTIC_PROGRESS_FPS=0.0166
 Environment=XDG_CACHE_HOME=/var/cache/restic
-ExecStart=/usr/local/sbin/backup-daily
+ExecStart=/usr/local/sbin/restic-local-backup %i

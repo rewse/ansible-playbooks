@@ -1,0 +1,10 @@
+[Unit]
+# The source is a volume in the enclosure and crypttab uses nofail, so a boot can
+# complete without it. Without this a run would record an empty directory and
+# report success, and the retention policy would then age out the real snapshots.
+# Named per instance rather than in the template so that one repository does not
+# wait on another's volume.
+RequiresMountsFor={{ item.source }}
+
+[Service]
+Environment=BACKUP_SOURCE={{ item.source }}

@@ -1,20 +1,25 @@
 #!/usr/bin/bash
+# {{ ansible_managed }}
 {#
   The repository lives on Bay 2 of the enclosure attached to the NAS host. That
   host reaches it as a local directory, every other host mounts it over NFS.
 #}
 {% set backup_is_nas = ansible_facts['hostname'] == raspberrypi_backup.nas_host %}
-{% if backup_is_nas %}
-{% set backup_repo = raspberrypi_backup.repo_root ~ '/' ~ ansible_facts['hostname'] %}
-{% else %}
-{% set backup_repo = '/mnt/bak' %}
-{% endif %}
 set -euo pipefail
 
-# Configuration
-readonly REPO="{{ backup_repo }}"
-{% if not backup_is_nas %}
-readonly REMOTE="{{ raspberrypi_backup.nas_host }}:{{ raspberrypi_backup.repo_root }}/{{ ansible_facts['hostname'] }}"
+# The instance name of the calling unit, which is also the name of the repository
+# and of the marker this writes.
+readonly NAME="${1:?usage: restic-local-check <repository>}"
+
+{% if backup_is_nas %}
+readonly REPO="{{ raspberrypi_backup.repo_root }}/${NAME}"
+
+# Nothing to mount: the repository is a directory on this host. The unit carries
+# RequiresMountsFor so systemd holds it back until the volume is mounted, which
+# a boot can otherwise complete without because crypttab uses nofail.
+{% else %}
+readonly REPO="/mnt/bak"
+readonly REMOTE="{{ raspberrypi_backup.nas_host }}:{{ raspberrypi_backup.repo_root }}/${NAME}"
 
 # Cleanup function
 cleanup() {
@@ -40,15 +45,13 @@ if ! mountpoint -q "${REPO}"; then
     exit 1
   }
 fi
-{% else %}
-
-# Nothing to mount: the repository is a directory on this host. The unit carries
-# RequiresMountsFor so systemd holds it back until the volume is mounted, which
-# a boot can otherwise complete without because crypttab uses nofail.
 {% endif %}
 
 # Verify repository integrity (reads all pack files)
 nice -n 10 restic check --read-data --verbose
+
+# Mark successful completion for monitoring
+touch "/var/lib/restic-local-check-${NAME}.success"
 {% if not backup_is_nas %}
 
 # Cleanup with success status

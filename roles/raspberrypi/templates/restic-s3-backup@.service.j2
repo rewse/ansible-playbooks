@@ -1,0 +1,24 @@
+[Unit]
+Description=Daily offsite backup of %i to S3
+After=network-online.target
+Wants=network-online.target
+OnFailure=failure-notify@%n.service
+
+[Service]
+Type=oneshot
+# The instance name is the repository name, so this covers both a host and a
+# volume of the enclosure. What differs between them is the sources, which arrive
+# from a drop-in on the instance along with the mounts it needs; an instance
+# without one fails on the missing BACKUP_SOURCE rather than backing up the wrong
+# thing.
+Environment=RESTIC_REPOSITORY=s3:s3.{{ raspberrypi_backup.s3_region }}.amazonaws.com/{{ raspberrypi_backup.s3_bucket }}/%i
+Environment=RESTIC_PASSWORD_FILE=/etc/restic/password
+Environment=RESTIC_PROGRESS_FPS=0.0166
+Environment=XDG_CACHE_HOME=/var/cache/restic
+# Set here rather than as a flag so every restic command in the script uses it,
+# including the repacking prune does. The documented cost is temporary space of
+# pack size times connections plus one, which lands in /tmp on the root filesystem.
+Environment=RESTIC_PACK_SIZE={{ raspberrypi_backup.pack_size }}
+# The access key lives here rather than in this unit, which is world readable.
+EnvironmentFile=/etc/restic/s3.env
+ExecStart=/usr/local/sbin/restic-s3-backup %i

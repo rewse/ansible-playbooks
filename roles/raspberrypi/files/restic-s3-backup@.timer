@@ -1,0 +1,13 @@
+[Unit]
+Description=Daily offsite backup of %i to S3 timer
+
+[Timer]
+# No OnCalendar here: every instance brings its own in a drop-in, because the
+# order between them is the point. The uplink is shared, the first archive run
+# holds it for about a day, and a schedule inherited from the template with a
+# random delay could reverse the order. An instance without a drop-in fails to
+# start rather than picking up a time that means nothing for it.
+Persistent=true
+
+[Install]
+WantedBy=timers.target

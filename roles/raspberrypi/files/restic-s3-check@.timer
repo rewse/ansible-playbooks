@@ -1,0 +1,11 @@
+[Unit]
+Description=Weekly integrity check of the S3 repository %i timer
+
+[Timer]
+# No OnCalendar here, for the same reason as restic-s3-backup@.timer: each
+# instance brings its own in a drop-in. The order between checks does not matter,
+# but keeping them clear of the backups does.
+Persistent=true
+
+[Install]
+WantedBy=timers.target

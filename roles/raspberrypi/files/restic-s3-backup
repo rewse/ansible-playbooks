@@ -1,0 +1,54 @@
+#!/usr/bin/bash
+#
+# The offsite half of 3-2-1: one repository per invocation, named by the argument.
+# The unit is templated on the same name and carries the repository, the
+# credentials and the sources in its environment, so a host's root filesystem and
+# a volume of the enclosure both run through this.
+set -euo pipefail
+
+# The instance name of the calling unit, which is also the name of the repository
+# and of the marker this writes.
+readonly NAME="${1:?usage: restic-s3-backup <repository>}"
+
+# Word splitting is intended: a repository may name more than one source.
+read -r -a src <<< "${BACKUP_SOURCE:?BACKUP_SOURCE is not set}"
+
+opts=(--verbose --tag daily)
+
+# Only for a root filesystem, where it is what keeps the walk from wandering into
+# the volumes of the enclosure. They have repositories of their own.
+if [ "${BACKUP_ONE_FILE_SYSTEM:-0}" = 1 ]; then
+  opts+=(--one-file-system)
+fi
+
+# Also only for a root filesystem. The patterns carry no leading slash, which in
+# restic matches at any depth, so the list that keeps /tmp and /var/cache out of a
+# system backup would silently drop directories of those names from a volume.
+if [ -n "${BACKUP_EXCLUDE_FILE:-}" ]; then
+  opts+=(--exclude-file="${BACKUP_EXCLUDE_FILE}")
+fi
+
+# Initialize repository on first run
+if ! restic cat config > /dev/null 2>&1; then
+  restic init
+fi
+
+# Run backup. The pack size comes from the unit as RESTIC_PACK_SIZE, so it also
+# applies to the repacking prune does below; passing it as a flag here would leave
+# prune building packs at the 16 MiB default.
+nice -n 10 restic backup "${src[@]}" "${opts[@]}"
+
+# The same policy the local repositories use, so a snapshot found in one has a
+# counterpart in the other and there is one retention rule to reason about.
+#
+# prune only rewrites packs that deletions left partly unused, so it normally
+# transfers nothing. When it does have work, note that archive/data reaches
+# Glacier Instant Retrieval after a day and reads there are billed.
+nice -n 10 restic forget \
+  --keep-daily 30 \
+  --keep-weekly 8 \
+  --keep-monthly 12 \
+  --prune
+
+# Mark successful completion for monitoring
+touch "/var/lib/restic-s3-backup-${NAME}.success"

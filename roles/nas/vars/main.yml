@@ -25,24 +25,31 @@ nas_data_path: /srv/nas/data
 #
 # The archive is the reason step 23 waits: its staging copy on Bay 1 cannot go
 # until a complete snapshot exists here.
-# 128 MiB is restic's ceiling. Larger packs are what the tuning guide calls for
-# on a fast uplink: fewer objects to pay per-request for, and better throughput.
-# The cost is temporary space of this times the connection count plus one.
-nas_restic_pack_size: 128
-
-nas_s3_bucket: rewse-nas-bak
-nas_s3_region: ap-northeast-1
 #
-# homes runs first and the archive an hour later. The archive's first pass moves
-# 2.7 TB over about a day, and letting it start first would leave homes sharing a
-# saturated uplink for all of it.
+# The unit templates and the script belong to the raspberrypi role, which every
+# host that backs up gets: a repository name is a unit instance, so a host's root
+# filesystem and a volume here run through the same pair of units, and the bucket
+# is named there. Only the instances are configured below.
 nas_s3_repositories:
+  # homes runs first and the archive an hour later. The archive's first pass moves
+  # 2.7 TB over about a day, and letting it start first would leave homes sharing
+  # a saturated uplink for all of it. The schedules reach systemd through a
+  # drop-in on each instance, the unit templates carrying none: the order between
+  # these two is the point, and a shared schedule with a random delay could
+  # reverse it.
   - name: archive
-    schedule: '06:00'
     source: "{{ nas_archive_path }}"
+    backup_schedule: '*-*-* 06:00:00'
   - name: homes
-    schedule: '05:00'
     source: "{{ nas_data_path }}/homes"
+    backup_schedule: '*-*-* 05:00:00'
+
+# Sunday, after the nightly backups and before the host repositories are checked
+# at 10:00. Weekly rather than monthly like the local repositories: the archive
+# spends about a day uploading, so there is more room for a transfer to break here
+# than in a backup that finishes in minutes, and a structural check costs almost
+# nothing. The order between repositories does not matter, so both share this.
+nas_s3_check_schedule: 'Sun *-*-* 09:00:00'
 
 # Hosts that keep their restic repository on Bay 2 and reach it over NFS. Each
 # is exported its own subdirectory rather than the whole volume, so a client
