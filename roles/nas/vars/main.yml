@@ -11,6 +11,26 @@ nas_archive_path: /srv/nas/archive
 nas_backup_path: /srv/nas/backup
 nas_data_path: /srv/nas/data
 
+# Offsite copies. Two repositories rather than one because the local side keeps
+# only homes: sharing a repository would make a prune driven by the archive
+# affect it. There is next to no overlap between the two, so nothing is lost by
+# not sharing deduplication.
+#
+# The archive is the reason step 23 waits: its staging copy on Bay 1 cannot go
+# until a complete snapshot exists here.
+# 128 MiB is restic's ceiling. Larger packs are what the tuning guide calls for
+# on a fast uplink: fewer objects to pay per-request for, and better throughput.
+# The cost is temporary space of this times the connection count plus one.
+nas_restic_pack_size: 128
+
+nas_s3_bucket: rewse-nas-bak
+nas_s3_region: ap-northeast-1
+nas_s3_repositories:
+  - name: archive
+    source: "{{ nas_archive_path }}"
+  - name: homes
+    source: "{{ nas_data_path }}/homes"
+
 # Hosts that keep their restic repository on Bay 2 and reach it over NFS. Each
 # is exported its own subdirectory rather than the whole volume, so a client
 # cannot read another host's backups or the Time Machine shares.

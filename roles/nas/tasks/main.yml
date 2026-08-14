@@ -281,3 +281,70 @@
     - samba
     - nas_samba
     - nas_samba_config
+
+- name: "nas : Install S3 credentials"
+  ansible.builtin.copy:
+    content: |
+      AWS_ACCESS_KEY_ID={{ lookup('pipe', 'op read "op://ansible/restic - AWS IAM/username"') }}
+      AWS_SECRET_ACCESS_KEY={{ lookup('pipe', 'op read "op://ansible/restic - AWS IAM/credential"') }}
+    dest: /etc/restic/s3.env
+    mode: '0600'
+  no_log: true
+  tags:
+    - nas
+    - config
+    - s3
+    - nas_s3
+    - nas_s3_config
+
+- name: "nas : Copy S3 backup script"
+  ansible.builtin.template:
+    src: nas-backup-s3.j2
+    dest: /usr/local/sbin/nas-backup-s3
+    mode: '0755'
+  tags:
+    - nas
+    - config
+    - s3
+    - nas_s3
+    - nas_s3_config
+
+- name: "nas : Copy S3 backup service"
+  ansible.builtin.template:
+    src: nas-backup-s3@.service.j2
+    dest: /etc/systemd/system/nas-backup-s3@.service
+    mode: '0644'
+  tags:
+    - nas
+    - config
+    - s3
+    - nas_s3
+    - nas_s3_config
+
+- name: "nas : Copy S3 backup timer"
+  ansible.builtin.template:
+    src: nas-backup-s3@.timer.j2
+    dest: /etc/systemd/system/nas-backup-s3@.timer
+    mode: '0644'
+  tags:
+    - nas
+    - config
+    - s3
+    - nas_s3
+    - nas_s3_config
+
+- name: "nas : Enable and start S3 backup timers"
+  ansible.builtin.systemd:
+    name: "nas-backup-s3@{{ item.name }}.timer"
+    enabled: true
+    state: started
+    daemon_reload: true
+  loop: "{{ nas_s3_repositories }}"
+  loop_control:
+    label: "{{ item.name }}"
+  tags:
+    - nas
+    - config
+    - s3
+    - nas_s3
+    - nas_s3_config
