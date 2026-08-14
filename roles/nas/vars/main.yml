@@ -4,6 +4,13 @@
 #
 # Bay 1 holds the live data (homes and Frigate recordings), Bay 2 the backups
 # (restic and Time Machine), Bay 3 the archive.
+# How long a mount waits for its device, which appears only once the LUKS open
+# finishes. Opening measures 6 to 14 seconds per volume here, argon2id having been
+# tuned to 386 MB of memory at format time, so this holds roughly three times the
+# slowest for a cold cache or a busy bus. Mount units start in parallel, so a boot
+# without the enclosure is delayed by this once rather than per volume.
+nas_device_timeout: 45s
+
 nas_keyfile: /etc/luks/nas.key
 nas_keyfile_content: "{{ lookup('pipe', 'op read \"op://ansible/LUKS - nas/password\"') }}"
 

@@ -79,13 +79,15 @@
   # mounted, and a converge run must never remount one while restic, Samba or
   # Frigate hold files open on it. Mounting is left to boot.
   #
-  # nofail alone still stalls a boot for the 90 second default device timeout
-  # when the enclosure is absent, so the timeout is shortened as well.
+  # nofail alone still stalls a boot for the 90 second default device timeout when
+  # the enclosure is absent, so the timeout is shortened. It has to outlast the
+  # LUKS open: the mapper device the mount waits for does not exist until then,
+  # and argon2id spends several seconds per volume deriving the key.
   ansible.posix.mount:
     src: "/dev/mapper/{{ item.name }}"
     path: "{{ item.path }}"
     fstype: ext4
-    opts: defaults,nofail,x-systemd.device-timeout=15s
+    opts: "defaults,nofail,x-systemd.device-timeout={{ nas_device_timeout }}"
     state: present
   loop: "{{ nas_volumes }}"
   loop_control:
