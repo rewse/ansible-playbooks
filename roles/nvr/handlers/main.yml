@@ -11,3 +11,8 @@
     state: restarted
     pull: always
     recreate: always
+
+- name: "nvr : Restart zabbix-agent"
+  ansible.builtin.systemd:
+    name: zabbix-agent
+    state: restarted

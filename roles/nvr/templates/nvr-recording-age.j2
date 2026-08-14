@@ -1,0 +1,18 @@
+#!/usr/bin/bash
+# {{ ansible_managed }}
+#
+# Seconds since Frigate last wrote a recording segment, which is what tells a
+# stopped recording apart from a running container. The directory holding the
+# newest segments is timestamped by the writes into it, so only the camera
+# directories are stat'ed: the tree holds tens of thousands of segments, and
+# walking them every poll would cost more than it reports.
+#
+# Frigate lays the tree out as recordings/<date>/<hour>/<camera>, in UTC.
+set -euo pipefail
+
+readonly DIR="{{ nvr_media_dir }}/recordings"
+
+newest=$(find "${DIR}" -mindepth 3 -maxdepth 3 -type d -printf '%T@\n' 2>/dev/null \
+  | sort -n | tail -1 | cut -d. -f1)
+
+echo $(($(date +%s) - ${newest:-0}))

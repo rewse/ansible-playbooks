@@ -143,6 +143,31 @@
     - nvr_docker
     - nvr_docker_update
 
+- name: "nvr : Copy recording age script"
+  ansible.builtin.template:
+    src: nvr-recording-age.j2
+    dest: /usr/local/sbin/nvr-recording-age
+    mode: '0755'
+  tags:
+    - nvr
+    - config
+    - monitor
+    - nvr_monitor
+    - nvr_monitor_config
+
+- name: "nvr : Copy Zabbix agent config"
+  ansible.builtin.copy:
+    src: nvr.conf
+    dest: /etc/zabbix/zabbix_agentd.d
+    mode: '0644'
+  notify: "nvr : Restart zabbix-agent"
+  tags:
+    - nvr
+    - config
+    - monitor
+    - nvr_monitor
+    - nvr_monitor_config
+
 - name: "nvr : Copy Apache vhost config"
   ansible.builtin.copy:
     src: nvr.rewse.jp.conf

@@ -311,6 +311,19 @@
     - nas_samba
     - nas_samba_config
 
+- name: "nas : Copy Zabbix agent config"
+  ansible.builtin.copy:
+    src: nas.conf
+    dest: /etc/zabbix/zabbix_agentd.d
+    mode: '0644'
+  notify: "nas : Restart zabbix-agent"
+  tags:
+    - nas
+    - config
+    - monitor
+    - nas_monitor
+    - nas_monitor_config
+
 - name: "nas : Check the restic S3 units are installed"
   # The templates and the script belong to the raspberrypi role, which every host
   # that backs up gets and which runs before this one. Only the instances for the
