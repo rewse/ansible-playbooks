@@ -1,0 +1,19 @@
+# {{ ansible_managed }}
+#
+# enabled follows the frontend's presence, only one of these hosts serving the
+# Zabbix UI.
+#
+# Zabbix blocks an account itself after 5 failures, for 30 seconds, which leaves
+# 600 attempts an hour per account and does nothing about one address working
+# through a list of user names. This jail bans the address instead.
+#
+# backend is stated because jail.d/defaults-debian.conf from the package sets
+# systemd for every jail and jail.d is read after jail.local. Reading the journal
+# is what this jail used to do, and Apache sends only its error log there, so it
+# watched for lines that appear solely in a file.
+[zabbix-web]
+enabled = {{ 'true' if ubuntu_zabbix_frontend.stat.exists else 'false' }}
+backend = auto
+port = http,https
+filter = zabbix-web
+logpath = /var/log/apache2/access.log

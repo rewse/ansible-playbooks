@@ -610,6 +610,8 @@
       path: /var/log/apache2/other_vhosts_access.log
     - key: homeassistant
       path: /srv/homeassistant/config/home-assistant.log
+    - key: zabbix_frontend
+      path: /usr/share/zabbix/ui
   loop_control:
     label: "{{ item.key }}"
   tags:
@@ -623,6 +625,7 @@
   ansible.builtin.set_fact:
     ubuntu_couchdb_log: "{{ ubuntu_fail2ban_log.results[0] }}"
     ubuntu_homeassistant_log: "{{ ubuntu_fail2ban_log.results[1] }}"
+    ubuntu_zabbix_frontend: "{{ ubuntu_fail2ban_log.results[2] }}"
   tags:
     - ubuntu
     - config
@@ -683,8 +686,8 @@
     - ubuntu_fail2ban_config
 
 - name: "fail2ban : Copy zabbix-web jail config"
-  ansible.builtin.copy:
-    src: zabbix-web.conf
+  ansible.builtin.template:
+    src: zabbix-web.conf.j2
     dest: /etc/fail2ban/jail.d/zabbix-web.conf
     mode: '0644'
   notify: "fail2ban: Restart"
