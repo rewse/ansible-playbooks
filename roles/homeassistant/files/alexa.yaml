@@ -18,8 +18,6 @@ smart_home:
       - binary_sensor.study_motion
       - binary_sensor.study_window_n
       - binary_sensor.study_window_s
-      - camera.guppy_living_room_camera
-      - camera.guppy_moms_room_camera
       - climate.moms_room_hvac
       - climate.living_room_hvac
       - cover.moms_room_curtains
