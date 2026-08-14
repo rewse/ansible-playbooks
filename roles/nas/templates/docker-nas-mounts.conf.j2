@@ -1,0 +1,14 @@
+[Unit]
+# Docker starts its containers itself through their restart policy, so any that
+# bind a directory on these volumes race the mount. cryptsetup spends several
+# seconds per volume deriving the key with argon2id, and Docker creates a missing
+# bind source rather than failing, so losing that race means binding an empty
+# directory on the root filesystem: Frigate records there and expires nothing on
+# Bay 1, FileBrowser publishes and indexes nothing.
+#
+# Ordering only, deliberately not Requires: the volumes are mounted with nofail so
+# the host boots without the enclosure, and Home Assistant and the other
+# containers here have nothing to do with it. A missing enclosure therefore costs
+# a boot the device timeout and then starts Docker anyway, at which point the
+# containers that need a volume fail loudly, their bind sources being absent.
+After={% for volume in nas_volumes | sort(attribute='path') %}{{ volume.path | regex_replace('^/', '') | regex_replace('/', '-') }}.mount{{ ' ' if not loop.last }}{% endfor %}

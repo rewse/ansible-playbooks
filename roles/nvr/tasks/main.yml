@@ -94,7 +94,16 @@
             - "127.0.0.1:5000:5000"
           volumes:
             - /srv/nvr:/config
-            - {{ nvr_media_dir }}:/media/frigate
+            # The long form because create_host_path has to be off. Docker
+            # creates a missing bind source rather than failing, so a start
+            # before the volume is mounted binds an empty directory on the root
+            # filesystem: recordings land there and nothing on Bay 1 is ever
+            # expired, with no failure to look at. Refusing to start is louder.
+            - type: bind
+              source: {{ nvr_media_dir }}
+              target: /media/frigate
+              bind:
+                create_host_path: false
             - /etc/localtime:/etc/localtime:ro
             - type: tmpfs
               target: /tmp/cache

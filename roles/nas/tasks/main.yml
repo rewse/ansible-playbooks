@@ -99,6 +99,33 @@
     - nas_storage
     - nas_storage_config
 
+- name: "nas : Create Docker override directory"
+  ansible.builtin.file:
+    path: /etc/systemd/system/docker.service.d
+    state: directory
+    owner: root
+    group: root
+    mode: '0755'
+  tags:
+    - nas
+    - config
+    - storage
+    - nas_storage
+    - nas_storage_config
+
+- name: "nas : Order Docker after the volumes"
+  ansible.builtin.template:
+    src: docker-nas-mounts.conf.j2
+    dest: /etc/systemd/system/docker.service.d/nas-mounts.conf
+    mode: '0644'
+  notify: "nas : Reload systemd"
+  tags:
+    - nas
+    - config
+    - storage
+    - nas_storage
+    - nas_storage_config
+
 - name: "nas : Install NFS server"
   ansible.builtin.apt:
     name: nfs-kernel-server

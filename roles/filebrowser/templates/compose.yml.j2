@@ -13,7 +13,17 @@
 {% for source in filebrowser_sources %}
       # Read-only at the mount as well as in the config, so a change to either
       # alone cannot make the published tree writable.
-      - {{ source.path }}:{{ source.path }}:ro
+      #
+      # The long form because create_host_path has to be off. Docker creates a
+      # missing bind source rather than failing, so a start before the volume is
+      # mounted publishes an empty directory on the root filesystem and indexes
+      # that, leaving the web UI answering nothing found rather than erroring.
+      - type: bind
+        source: {{ source.path }}
+        target: {{ source.path }}
+        read_only: true
+        bind:
+          create_host_path: false
 {% endfor %}
       - /etc/localtime:/etc/localtime:ro
     # The image checks port 80, which is where it listens only if the config says
