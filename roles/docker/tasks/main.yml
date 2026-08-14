@@ -23,6 +23,21 @@
     - docker_docker
     - docker_docker_config
 
+- name: "docker : Configure the daemon"
+  # Caps the json-file driver, which is unbounded by default. The limit applies to
+  # containers created after it, so a running container keeps its own until it is
+  # recreated.
+  ansible.builtin.copy:
+    src: daemon.json
+    dest: /etc/docker/daemon.json
+    mode: '0644'
+  notify: "docker: Reload"
+  tags:
+    - docker
+    - config
+    - docker_docker
+    - docker_docker_config
+
 - name: "docker : Create compose.yml"
   ansible.builtin.file:
     path: /etc/compose.yml
