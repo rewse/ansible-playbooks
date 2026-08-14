@@ -125,3 +125,29 @@
     - apache
     - filebrowser_apache
     - filebrowser_apache_config
+
+- name: "filebrowser : Copy fail2ban filter"
+  ansible.builtin.template:
+    src: fail2ban-filter.conf.j2
+    dest: /etc/fail2ban/filter.d/filebrowser.conf
+    mode: '0644'
+  notify: "fail2ban: Restart"
+  tags:
+    - filebrowser
+    - config
+    - fail2ban
+    - filebrowser_fail2ban
+    - filebrowser_fail2ban_config
+
+- name: "filebrowser : Copy fail2ban jail config"
+  ansible.builtin.template:
+    src: fail2ban-jail.conf.j2
+    dest: /etc/fail2ban/jail.d/filebrowser.conf
+    mode: '0644'
+  notify: "fail2ban: Restart"
+  tags:
+    - filebrowser
+    - config
+    - fail2ban
+    - filebrowser_fail2ban
+    - filebrowser_fail2ban_config

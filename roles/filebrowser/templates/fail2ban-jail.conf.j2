@@ -1,0 +1,22 @@
+# {{ ansible_managed }}
+#
+# The second layer in front of a service the internet can reach: Quantum's own
+# rate limiting slows a password guess down, and this stops it.
+#
+# bantime, findtime and maxretry are left to jail.local in the ubuntu role, which
+# gives every jail here five attempts in ten minutes and an hour of ban.
+#
+# No ignoreip, matching the other jails. Home clients reach this over global IPv6
+# and so can ban themselves, which is the intended behaviour and clears itself;
+# worth remembering while testing the login endpoint with curl.
+#
+# backend has to be stated. jail.d/defaults-debian.conf from the package sets
+# systemd for every jail, and jail.d is read after jail.local, so a jail that
+# names a logpath without this reads the journal instead and monitors no file at
+# all. fail2ban-client get <jail> logpath is what tells the two apart.
+[filebrowser]
+enabled = true
+backend = auto
+port = http,https
+filter = filebrowser
+logpath = /var/log/apache2/other_vhosts_access.log

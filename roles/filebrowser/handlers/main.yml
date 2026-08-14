@@ -4,6 +4,11 @@
     name: apache2
     state: reloaded
 
+- name: "fail2ban: Restart"
+  ansible.builtin.systemd:
+    name: fail2ban
+    state: restarted
+
 - name: "filebrowser: Restart"
   community.docker.docker_compose_v2:
     project_src: /etc

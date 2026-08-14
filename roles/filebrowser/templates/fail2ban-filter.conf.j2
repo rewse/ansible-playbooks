@@ -1,0 +1,16 @@
+# {{ ansible_managed }}
+#
+# Quantum answers a wrong password with 401, and once a passkey is registered it
+# answers a password-only attempt with 403, so both count as a failure.
+#
+# Only the password endpoint is matched. A passkey prompt that the user dismisses
+# also answers 4xx, on the webauthn paths, and banning someone for closing a
+# dialog costs more than the brute force it would stop, WebAuthn not being
+# guessable to begin with.
+#
+# The virtual host is pinned because other_vhosts_access.log carries every name
+# Apache serves, and the vhost_combined format puts %v:%p ahead of the client
+# address, which is why <HOST> is the second field rather than the first.
+[Definition]
+failregex = ^{{ filebrowser_hostname | regex_escape }}:\d+ <HOST> \S+ \S+ \[\] "POST /api/auth/login\S* HTTP/[\d.]+" (?:401|403) \d+
+ignoreregex =
