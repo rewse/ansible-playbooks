@@ -1,12 +1,12 @@
   filebrowser:
     container_name: filebrowser
     image: {{ docker_quarantine_image_ref }}
-    # Reached only through the Apache vhost, which holds the deny rules for the
-    # share endpoints and feeds the access log fail2ban reads.
+    # Reached only through the Apache vhost, which terminates TLS and is the only
+    # place a client can arrive from.
     ports:
       - "127.0.0.1:{{ filebrowser_port }}:{{ filebrowser_port }}"
-    # The image bakes in uid 1000 and supports no PUID/PGID, so the runtime user
-    # is overridden here. It has to be {{ admin }} to read a 0700 archive.
+    # The image bakes in uid 1000 and supports no PUID/PGID, so the runtime user is
+    # overridden here. It has to be {{ admin }} to read a 0700 home directory.
     user: "{{ filebrowser_uid }}:{{ filebrowser_gid }}"
     volumes:
       - {{ filebrowser_data_dir }}:/home/filebrowser/data

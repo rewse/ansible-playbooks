@@ -5,30 +5,27 @@
 filebrowser_data_dir: /srv/filebrowser
 
 # Published on the loopback address only, so nothing off the host reaches it
-# except through the Apache vhost, which is where the rate limiting and the
-# fail2ban jail live.
+# except through the Apache vhost, which terminates TLS and logs the requests.
 filebrowser_port: 8080
 
-# The image bakes in uid 1000 and has no PUID/PGID support, so the runtime user
-# is overridden instead. It has to be tats: the archive is 0700 tats:tats and so
-# is the home directory below it, and nothing else can read them.
+# The image bakes in uid 1000 and has no PUID/PGID support, so the runtime user is
+# overridden instead. It has to own the published directory, which is 0700.
 filebrowser_uid: 2000
 filebrowser_gid: 2000
 
 filebrowser_hostname: nas.rewse.jp
 
-# Measured 802 MiB for Frigate taught the lesson: a limit with no headroom is an
-# OOM kill waiting to happen. The index holds around 18,000 items and lives in
-# SQLite rather than on the heap, so this is a wall against a runaway rather than
-# a sizing estimate. Measured 99.8 MiB steady state.
+# A wall against a runaway rather than a sizing estimate: the index holds around
+# 18,000 items and lives in SQLite rather than on the heap, and steady state
+# measures 99.8 MiB. The headroom is deliberate, since a limit met exactly is an
+# OOM kill waiting to happen.
 filebrowser_mem_limit: 1g
 
-# What gets published. Only the home directory: everything else on the enclosure
-# is outside it, so the Time Machine sparsebundles and the restic repositories on
-# Bay 2 are excluded by not being reachable rather than by a rule that could be
-# written wrong. The archive is not published either -- it is cold storage that
-# nothing browses from a phone, and leaving it out keeps 271,000 items out of the
-# index.
+# What gets published. The home directory and nothing else, so the Time Machine
+# sparsebundles and the restic repositories on Bay 2 are kept out by not being
+# reachable rather than by an exclusion rule that could be written wrong. The
+# archive stays out for the same reason: it is cold storage that nothing browses
+# from a phone, and its 271,000 items would dominate the index.
 #
 # readOnly because the purpose is search and browsing from a phone, and Macs
 # write over SMB. It also means a stolen session cannot delete anything, and that
