@@ -1,0 +1,37 @@
+---
+# The three bays of the ORICO 9948C3, each LUKS2 over the whole device with ext4
+# inside. UUIDs come from nas-luks-init.sh, which prints both after formatting.
+#
+# Bay 1 holds the live data (homes and Frigate recordings), Bay 2 the backups
+# (restic and Time Machine), Bay 3 the archive.
+nas_keyfile: /etc/luks/nas.key
+nas_keyfile_content: "{{ lookup('pipe', 'op read \"op://ansible/LUKS - nas/password\"') }}"
+
+nas_volumes:
+  # Bay 3. The archive is served to a single user, so the filesystem root itself
+  # is closed; Samba enforces the same through valid users.
+  #
+  # No discard: the ST4000VN000 is a spindle and reports DISC-MAX 0B.
+  - name: nas-archive
+    path: /srv/nas/archive
+    luks_uuid: 1f51b48f-5827-4eb3-9146-1e798e89c85b
+    owner: "{{ admin }}"
+    group: "{{ admin }}"
+    mode: '0700'
+  # Bay 2. Stays traversable: Samba serves a Time Machine share per Mac below
+  # it as separate users, while the restic repositories keep their own 0700 root.
+  - name: nas-backup
+    path: /srv/nas/backup
+    luks_uuid: c340cf31-c585-407d-830f-7e83d3fbeda4
+    owner: root
+    group: root
+    mode: '0755'
+    discard: true
+  # Bay 1. Traversable so Samba can expand %U under homes.
+  - name: nas-data
+    path: /srv/nas/data
+    luks_uuid: 84e1c6c0-9fb4-4e57-aa1b-6ec010de9f2f
+    owner: root
+    group: root
+    mode: '0755'
+    discard: true

@@ -1,0 +1,98 @@
+---
+- name: "nas : Create key directory"
+  ansible.builtin.file:
+    path: "{{ nas_keyfile | dirname }}"
+    state: directory
+    owner: root
+    group: root
+    mode: '0700'
+  tags:
+    - nas
+    - config
+    - luks
+    - nas_luks
+    - nas_luks_config
+
+- name: "nas : Deploy LUKS key file"
+  # The key lives on the NVMe so the volumes open without a passphrase after a
+  # power cut. This trades away protection against theft of the whole host,
+  # which the Synology it replaces did not offer either; the point of LUKS here
+  # is that discarding the key wipes a disk that cannot be securely erased.
+  ansible.builtin.copy:
+    content: "{{ nas_keyfile_content }}"
+    dest: "{{ nas_keyfile }}"
+    owner: root
+    group: root
+    mode: '0400'
+  no_log: true
+  tags:
+    - nas
+    - config
+    - luks
+    - nas_luks
+    - nas_luks_config
+
+- name: "nas : Create mount points"
+  ansible.builtin.file:
+    path: "{{ item.path }}"
+    state: directory
+    owner: "{{ item.owner }}"
+    group: "{{ item.group }}"
+    mode: "{{ item.mode }}"
+  loop: "{{ nas_volumes }}"
+  loop_control:
+    label: "{{ item.path }}"
+  tags:
+    - nas
+    - config
+    - storage
+    - nas_storage
+    - nas_storage_config
+
+- name: "nas : Configure crypttab"
+  community.general.crypttab:
+    name: "{{ item.name }}"
+    backing_device: "UUID={{ item.luks_uuid }}"
+    password: "{{ nas_keyfile }}"
+    # nofail keeps a boot going when the enclosure is off or unplugged. argon2id
+    # asks for 386 MB per volume, so opening all three peaks around 1.2 GB.
+    #
+    # discard lets the weekly fstrim reach the SSDs through dm-crypt, which
+    # otherwise blocks it and leaves the drive unable to reclaim free blocks.
+    # Bay 1 ran out of SLC cache during the migration for want of it. The cost is
+    # that the pattern of used blocks stops being hidden, which does not weaken
+    # the goal here: making a disk unreadable when its key is discarded.
+    opts: "luks,nofail{{ ',discard' if item.discard | default(false) else '' }}"
+    state: present
+  loop: "{{ nas_volumes }}"
+  loop_control:
+    label: "{{ item.name }}"
+  tags:
+    - nas
+    - config
+    - storage
+    - nas_storage
+    - nas_storage_config
+
+- name: "nas : Configure fstab"
+  # state=present writes the entry without mounting: these volumes are already
+  # mounted, and a converge run must never remount one while restic, Samba or
+  # Frigate hold files open on it. Mounting is left to boot.
+  #
+  # nofail alone still stalls a boot for the 90 second default device timeout
+  # when the enclosure is absent, so the timeout is shortened as well.
+  ansible.posix.mount:
+    src: "/dev/mapper/{{ item.name }}"
+    path: "{{ item.path }}"
+    fstype: ext4
+    opts: defaults,nofail,x-systemd.device-timeout=15s
+    state: present
+  loop: "{{ nas_volumes }}"
+  loop_control:
+    label: "{{ item.path }}"
+  tags:
+    - nas
+    - config
+    - storage
+    - nas_storage
+    - nas_storage_config
