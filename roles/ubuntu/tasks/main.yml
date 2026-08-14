@@ -598,9 +598,41 @@
     - ubuntu_fail2ban
     - ubuntu_fail2ban_config
 
+- name: "fail2ban : Look for the logs the jails read"
+  # Each jail is enabled only where its log exists. The services behind them do
+  # not all run on every host, and fail2ban given a path that is not there
+  # complains on every reload.
+  ansible.builtin.stat:
+    path: "{{ item.path }}"
+  register: ubuntu_fail2ban_log
+  loop:
+    - key: couchdb
+      path: /var/log/apache2/other_vhosts_access.log
+    - key: homeassistant
+      path: /srv/homeassistant/config/home-assistant.log
+  loop_control:
+    label: "{{ item.key }}"
+  tags:
+    - ubuntu
+    - config
+    - fail2ban
+    - ubuntu_fail2ban
+    - ubuntu_fail2ban_config
+
+- name: "fail2ban : Name the stat results"
+  ansible.builtin.set_fact:
+    ubuntu_couchdb_log: "{{ ubuntu_fail2ban_log.results[0] }}"
+    ubuntu_homeassistant_log: "{{ ubuntu_fail2ban_log.results[1] }}"
+  tags:
+    - ubuntu
+    - config
+    - fail2ban
+    - ubuntu_fail2ban
+    - ubuntu_fail2ban_config
+
 - name: "fail2ban : Copy couchdb jail config"
-  ansible.builtin.copy:
-    src: couchdb.conf
+  ansible.builtin.template:
+    src: couchdb.conf.j2
     dest: /etc/fail2ban/jail.d/couchdb.conf
     mode: '0644'
   notify: "fail2ban: Restart"
@@ -625,8 +657,8 @@
     - ubuntu_fail2ban_config
 
 - name: "fail2ban : Copy homeassistant jail config"
-  ansible.builtin.copy:
-    src: homeassistant.conf
+  ansible.builtin.template:
+    src: homeassistant.conf.j2
     dest: /etc/fail2ban/jail.d/homeassistant.conf
     mode: '0644'
   notify: "fail2ban: Restart"

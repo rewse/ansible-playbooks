@@ -1,0 +1,18 @@
+# {{ ansible_managed }}
+#
+# Reads the Apache log rather than CouchDB's own, for the reason in the filter.
+#
+# enabled follows the log's presence: hosts without an Apache virtual host log
+# have no CouchDB in front of it either, and a jail naming a path that is not
+# there only makes fail2ban complain.
+#
+# backend is stated because jail.d/defaults-debian.conf from the package sets
+# systemd for every jail and jail.d is read after jail.local. Without it the jail
+# reads the journal and watches no file, while fail2ban-client status still
+# reports it enabled; get <jail> logpath is what tells the two apart.
+[couchdb]
+enabled = {{ 'true' if ubuntu_couchdb_log.stat.exists else 'false' }}
+backend = auto
+port = http,https
+filter = couchdb
+logpath = /var/log/apache2/other_vhosts_access.log

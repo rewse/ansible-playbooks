@@ -1,0 +1,16 @@
+# {{ ansible_managed }}
+#
+# Home Assistant writes the failed logins itself, at a path that does not move,
+# so this one reads the application log. enabled follows its presence, since only
+# some of these hosts run Home Assistant.
+#
+# backend is stated because jail.d/defaults-debian.conf from the package sets
+# systemd for every jail and jail.d is read after jail.local. Without it the jail
+# reads the journal and watches no file, while fail2ban-client status still
+# reports it enabled; get <jail> logpath is what tells the two apart.
+[homeassistant]
+enabled = {{ 'true' if ubuntu_homeassistant_log.stat.exists else 'false' }}
+backend = auto
+port = http,https
+filter = homeassistant
+logpath = /srv/homeassistant/config/home-assistant.log
