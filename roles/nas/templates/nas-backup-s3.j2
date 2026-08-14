@@ -26,17 +26,15 @@ nice -n 10 restic backup "${SRC}" \
   --verbose \
   --tag daily
 
-# Retention here is the history that survives losing the house. 45 days at daily
-# granularity, then a year of monthlies. The weekly window falls inside the daily
-# one and so selects nothing today; it is kept so the shape matches the local
-# repositories.
+# The same policy the local repositories use, so a snapshot found in one has a
+# counterpart in the other and there is one retention rule to reason about.
 #
 # prune only rewrites packs that deletions left partly unused, so it normally
 # transfers nothing. When it does have work, note that archive/data reaches
 # Glacier Instant Retrieval after a day and reads there are billed.
 nice -n 10 restic forget \
-  --keep-daily 45 \
-  --keep-weekly 4 \
+  --keep-daily 30 \
+  --keep-weekly 8 \
   --keep-monthly 12 \
   --prune
 
