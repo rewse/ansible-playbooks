@@ -1,6 +1,6 @@
 [Unit]
 Description=MH-Z19 CO2 sensor to MQTT
-After=network-online.target
+After=network-online.target nss-lookup.target
 Wants=network-online.target
 OnFailure=failure-notify@%n.service
 
