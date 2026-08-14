@@ -59,6 +59,9 @@ http:
   # addresses read the same setting.
   trustedHeaders:
     - X-Forwarded-For
+    # TLS ends at Apache, so this is how the external scheme is known. It decides
+    # the origin the WebAuthn check compares against rpOrigins.
+    - X-Forwarded-Proto
 
 userDefaults:
   account:

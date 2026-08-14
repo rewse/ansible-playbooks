@@ -6,6 +6,12 @@
     ProxyPreserveHost on
     ProxyRequests off
 
+    # mod_proxy sends X-Forwarded-For, -Host and -Server on its own but not
+    # -Proto, and TLS ends here. Without it the backend sees a plain request and
+    # builds its own origin as http://, which fails the WebAuthn origin check
+    # against the https:// entry in rpOrigins, so no passkey can be registered.
+    RequestHeader set X-Forwarded-Proto "https"
+
     ProxyPass / http://localhost:{{ filebrowser_port }}/
     ProxyPassReverse / http://localhost:{{ filebrowser_port }}/
 
