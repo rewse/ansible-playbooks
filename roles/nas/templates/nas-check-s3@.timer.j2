@@ -1,0 +1,17 @@
+[Unit]
+Description=Weekly integrity check of the S3 repository %i timer
+
+[Timer]
+# Sunday, after the nightly backups. Weekly rather than monthly like the local
+# repositories: the archive spends about a day uploading, so there is more room
+# for a transfer to break here than in a backup that finishes in minutes, and a
+# structural check costs almost nothing. The order between repositories does not
+# matter, so a shared schedule with a random delay is enough.
+#
+# Clear of the backups, which run from 04:00 to 07:00.
+OnCalendar=Sun *-*-* 09:00:00
+RandomizedDelaySec=30m
+Persistent=true
+
+[Install]
+WantedBy=timers.target

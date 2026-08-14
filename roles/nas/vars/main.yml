@@ -25,10 +25,16 @@ nas_restic_pack_size: 128
 
 nas_s3_bucket: rewse-nas-bak
 nas_s3_region: ap-northeast-1
+#
+# homes runs first and the archive an hour later. The archive's first pass moves
+# 2.7 TB over about a day, and letting it start first would leave homes sharing a
+# saturated uplink for all of it.
 nas_s3_repositories:
   - name: archive
+    schedule: '06:00'
     source: "{{ nas_archive_path }}"
   - name: homes
+    schedule: '05:00'
     source: "{{ nas_data_path }}/homes"
 
 # Hosts that keep their restic repository on Bay 2 and reach it over NFS. Each

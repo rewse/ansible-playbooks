@@ -1,0 +1,7 @@
+[Timer]
+# Reset the list the template set before adding this instance's own time: the
+# ordering between homes and the archive is the point, and a shared schedule with
+# a random delay could reverse it.
+OnCalendar=
+OnCalendar=*-*-* {{ item.schedule }}:00
+RandomizedDelaySec=15m

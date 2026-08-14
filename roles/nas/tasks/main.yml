@@ -282,21 +282,6 @@
     - nas_samba
     - nas_samba_config
 
-- name: "nas : Install S3 credentials"
-  ansible.builtin.copy:
-    content: |
-      AWS_ACCESS_KEY_ID={{ lookup('pipe', 'op read "op://ansible/restic - AWS IAM/username"') }}
-      AWS_SECRET_ACCESS_KEY={{ lookup('pipe', 'op read "op://ansible/restic - AWS IAM/credential"') }}
-    dest: /etc/restic/s3.env
-    mode: '0600'
-  no_log: true
-  tags:
-    - nas
-    - config
-    - s3
-    - nas_s3
-    - nas_s3_config
-
 - name: "nas : Copy S3 backup script"
   ansible.builtin.template:
     src: nas-backup-s3.j2
@@ -333,15 +318,74 @@
     - nas_s3
     - nas_s3_config
 
-- name: "nas : Enable and start S3 backup timers"
-  ansible.builtin.systemd:
-    name: "nas-backup-s3@{{ item.name }}.timer"
-    enabled: true
-    state: started
-    daemon_reload: true
+- name: "nas : Create S3 backup schedule overrides"
+  # A drop-in rather than a unit file per instance: enabling a template instance
+  # links to the template, and a concrete file of the same name would leave that
+  # link pointing at the wrong place.
+  ansible.builtin.file:
+    path: "/etc/systemd/system/nas-backup-s3@{{ item.name }}.timer.d"
+    state: directory
+    owner: root
+    group: root
+    mode: '0755'
   loop: "{{ nas_s3_repositories }}"
   loop_control:
     label: "{{ item.name }}"
+  tags:
+    - nas
+    - config
+    - s3
+    - nas_s3
+    - nas_s3_config
+
+- name: "nas : Configure S3 backup schedules"
+  ansible.builtin.template:
+    src: nas-backup-s3-schedule.conf.j2
+    dest: "/etc/systemd/system/nas-backup-s3@{{ item.name }}.timer.d/schedule.conf"
+    mode: '0644'
+  loop: "{{ nas_s3_repositories }}"
+  loop_control:
+    label: "{{ item.name }}"
+  tags:
+    - nas
+    - config
+    - s3
+    - nas_s3
+    - nas_s3_config
+
+- name: "nas : Copy S3 check service"
+  ansible.builtin.template:
+    src: nas-check-s3@.service.j2
+    dest: /etc/systemd/system/nas-check-s3@.service
+    mode: '0644'
+  tags:
+    - nas
+    - config
+    - s3
+    - nas_s3
+    - nas_s3_config
+
+- name: "nas : Copy S3 check timer"
+  ansible.builtin.template:
+    src: nas-check-s3@.timer.j2
+    dest: /etc/systemd/system/nas-check-s3@.timer
+    mode: '0644'
+  tags:
+    - nas
+    - config
+    - s3
+    - nas_s3
+    - nas_s3_config
+
+- name: "nas : Enable and start S3 timers"
+  ansible.builtin.systemd:
+    name: "{{ item.0 }}@{{ item.1.name }}.timer"
+    enabled: true
+    state: started
+    daemon_reload: true
+  loop: "{{ ['nas-backup-s3', 'nas-check-s3'] | product(nas_s3_repositories) | list }}"
+  loop_control:
+    label: "{{ item.0 }}@{{ item.1.name }}"
   tags:
     - nas
     - config
