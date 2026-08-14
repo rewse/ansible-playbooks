@@ -16,7 +16,4 @@ if systemctl is-active --quiet apache2; then
     systemctl restart apache2
 fi
 
-echo "$(date '+%Y-%m-%d %H:%M:%S') - Syncing certificates to Synology NAS"
-/usr/local/sbin/sync-cert-to-synology
-
 echo "$(date '+%Y-%m-%d %H:%M:%S') - Certbot renewal completed"
