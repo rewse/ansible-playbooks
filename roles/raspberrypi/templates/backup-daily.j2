@@ -64,7 +64,6 @@ fi
 nice -n 10 restic backup "${SRC[@]}" \
   --verbose \
   --one-file-system \
-  --pack-size 128 \
   --exclude-file="${EXCLUDE_FILE}" \
   --tag daily
 

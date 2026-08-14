@@ -11,6 +11,10 @@ raspberrypi_aws_vpc_cidr: 10.0.0.0/16
 # out of a 1.9 TB volume.
 raspberrypi_backup:
   nas_host: fox
+  # 128 MiB is restic's ceiling. Adopted when the repository was reached over
+  # NFS, where each small file cost a round trip; still worthwhile for the host
+  # that now reaches it locally, which gains fewer files and less metadata.
+  pack_size: 128
   nas_sources:
     - /srv/nas/data/homes
   repo_root: /srv/nas/backup

@@ -23,6 +23,10 @@ RequiresMountsFor={{ raspberrypi_backup.repo_root }} {{ raspberrypi_backup.nas_s
 Type=oneshot
 Environment=RESTIC_REPOSITORY={{ backup_repo }}
 Environment=RESTIC_PASSWORD_FILE=/etc/restic/password
+# Set here rather than as a flag so every restic command in the script uses it,
+# including the repacking prune does. Large packs were adopted when the
+# repository was reached over NFS and many small files cost a round trip each.
+Environment=RESTIC_PACK_SIZE={{ raspberrypi_backup.pack_size }}
 Environment=RESTIC_PROGRESS_FPS=0.0166
 Environment=XDG_CACHE_HOME=/var/cache/restic
 ExecStart=/usr/local/sbin/backup-daily
