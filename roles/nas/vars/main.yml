@@ -62,6 +62,20 @@ nas_nfs_clients:
   - name: hotel
     address: 192.168.0.40
 
+# The only interface Avahi may publish on. Time Machine reaches this host
+# through the mDNS service instance Samba registers, so the name Avahi holds has
+# to stay put.
+#
+# Unset, Avahi publishes on every interface, and this host offers it the LAN
+# twice: wlan0 carries a second static address on the same segment as a fallback
+# path, alongside Docker veths that come and go. Avahi that meets its own records
+# while probing takes them for another host and renames itself, which strands
+# every saved Time Machine destination on a hostname that no longer resolves.
+#
+# The cost is that mDNS follows eth0: nothing is published while the fallback
+# carries the host. SMB over DNS or the address still works.
+nas_mdns_interface: eth0
+
 # Samba accounts. The password is only read when the account is missing from the
 # Samba database, which keeps the run idempotent; rotating one in 1Password
 # therefore does not propagate, so remove it with pdbedit -x first.

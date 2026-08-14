@@ -12,6 +12,13 @@
     name: zabbix-agent
     state: restarted
 
+- name: "nas : Restart avahi-daemon"
+  # Ahead of smbd on purpose: smbd registers its mDNS service through Avahi, so
+  # the name has to be settled before it does.
+  ansible.builtin.systemd:
+    name: avahi-daemon
+    state: restarted
+
 - name: "nas : Restart smbd"
   ansible.builtin.systemd:
     name: smbd

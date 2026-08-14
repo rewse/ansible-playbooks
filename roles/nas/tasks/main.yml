@@ -256,6 +256,22 @@
     - nas_samba
     - nas_samba_config
 
+- name: "nas : Confine Avahi to one interface"
+  ansible.builtin.lineinfile:
+    path: /etc/avahi/avahi-daemon.conf
+    regexp: '^#?allow-interfaces='
+    line: "allow-interfaces={{ nas_mdns_interface }}"
+    insertafter: '^\[server\]'
+  notify:
+    - "nas : Restart avahi-daemon"
+    - "nas : Restart smbd"
+  tags:
+    - nas
+    - config
+    - samba
+    - nas_samba
+    - nas_samba_config
+
 - name: "nas : Configure Samba"
   ansible.builtin.template:
     src: smb.conf.j2
