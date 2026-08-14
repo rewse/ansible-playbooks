@@ -83,6 +83,7 @@
     - mcporter
     - mo
     - node
+    - officecli
     - osv-scanner
     - pandoc
     - php
