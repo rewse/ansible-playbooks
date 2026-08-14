@@ -1,14 +1,14 @@
 ---
-- name: "filebrowser : Fail when a published volume is not mounted"
-  # Indexing an empty mount point would publish an empty tree and, worse, record
-  # it as the state of the archive. The sources are read-only so nothing would be
+- name: "filebrowser : Fail when the published volume is not mounted"
+  # Indexing an empty mount point would publish an empty tree and record it as the
+  # state of the home directory. The source is read-only so nothing would be
   # written there, but the index would have to be rebuilt to recover.
+  #
+  # Bay 1 rather than the source path, which sits below it and is not a mount
+  # point of its own.
   ansible.builtin.command:
-    cmd: mountpoint -q {{ item }}
+    cmd: mountpoint -q /srv/nas/data
   changed_when: false
-  loop:
-    - /srv/nas/archive
-    - /srv/nas/data
   tags:
     - filebrowser
     - config
