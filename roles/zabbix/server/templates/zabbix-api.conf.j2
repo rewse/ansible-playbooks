@@ -1,0 +1,24 @@
+{# {{ ansible_managed }} #}
+# The API answers a wrong credential with 200, the JSON-RPC error sitting in the
+# body, so a failed login cannot be told from a successful one by status and
+# fail2ban has nothing to match on. The frontend's own login is a different matter
+# and is covered by the zabbix-web jail, which reads the 200 that a re-rendered
+# login form returns.
+#
+# Scanners find this path. The access log holds probes from three addresses that
+# also swept for SugarCRM, iLO and Oracle IDM URLs.
+#
+# Nothing beyond the LAN needs it: the MCP server that consumes the API runs on
+# this host and reaches it from here, and its own port is not forwarded, so a
+# client away from home has no route to it either way.
+#
+# Location rather than Directory, because zabbix.conf from the package grants the
+# frontend through a Directory block and Location is merged after Directory
+# whichever order the files load in.
+<Location "/zabbix/api_jsonrpc.php">
+    Require ip 127.0.0.1
+    Require ip ::1
+    Require ip 192.168.0.0/24
+    Require ip {{ ipv6.home }}
+    Require ip {{ ipv6.home_ula }}
+</Location>
