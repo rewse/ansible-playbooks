@@ -64,6 +64,11 @@ nice -n 10 restic backup "${SRC[@]}" \
   --exclude-file="${EXCLUDE_FILE}" \
   --tag daily
 
+# The data is safe at this point. Marking it here keeps a failure below from
+# reading as an absent backup: the monitoring threshold is an age in hours, so a
+# marker left behind by a retention error would report the data as missing.
+touch "/var/lib/restic-local-backup-${NAME}.success"
+
 # Apply retention policy
 nice -n 10 restic forget \
   --keep-daily 30 \
@@ -71,8 +76,9 @@ nice -n 10 restic forget \
   --keep-monthly 12 \
   --prune
 
-# Mark successful completion for monitoring
-touch "/var/lib/restic-local-backup-${NAME}.success"
+# Retention is a separate promise from the backup, and only this marker means it
+# was kept. A failure above still fails the unit, which mails through OnFailure.
+touch "/var/lib/restic-local-backup-${NAME}.retention"
 {% if not backup_is_nas %}
 
 # Cleanup with success status

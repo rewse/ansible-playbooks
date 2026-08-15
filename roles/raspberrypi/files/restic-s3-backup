@@ -38,6 +38,11 @@ fi
 # prune building packs at the 16 MiB default.
 nice -n 10 restic backup "${src[@]}" "${opts[@]}"
 
+# The data is safe at this point. Marking it here keeps a failure below from
+# reading as an absent backup: the monitoring threshold is an age in days, so a
+# marker left behind by a retention error would report the data as missing.
+touch "/var/lib/restic-s3-backup-${NAME}.success"
+
 # The same policy the local repositories use, so a snapshot found in one has a
 # counterpart in the other and there is one retention rule to reason about.
 #
@@ -50,5 +55,6 @@ nice -n 10 restic forget \
   --keep-monthly 12 \
   --prune
 
-# Mark successful completion for monitoring
-touch "/var/lib/restic-s3-backup-${NAME}.success"
+# Retention is a separate promise from the backup, and only this marker means it
+# was kept. A failure above still fails the unit, which mails through OnFailure.
+touch "/var/lib/restic-s3-backup-${NAME}.retention"
