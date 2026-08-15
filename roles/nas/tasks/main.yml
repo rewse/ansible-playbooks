@@ -127,6 +127,33 @@
     - nas_storage
     - nas_storage_config
 
+- name: "nas : Copy the container start unit"
+  ansible.builtin.template:
+    src: nas-containers.service.j2
+    dest: /etc/systemd/system/nas-containers.service
+    mode: '0644'
+  notify: "nas : Reload systemd"
+  tags:
+    - nas
+    - config
+    - storage
+    - nas_storage
+    - nas_storage_config
+
+- name: "nas : Enable the container start unit"
+  # Enabling is what links it under each mount unit's wants directory, the
+  # WantedBy in the unit naming the mounts rather than a target.
+  ansible.builtin.systemd:
+    name: nas-containers.service
+    enabled: true
+    daemon_reload: true
+  tags:
+    - nas
+    - config
+    - storage
+    - nas_storage
+    - nas_storage_config
+
 - name: "nas : Create Docker override directory"
   ansible.builtin.file:
     path: /etc/systemd/system/docker.service.d

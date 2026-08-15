@@ -1,0 +1,32 @@
+[Unit]
+Description=Start the containers that bind the enclosure volumes
+Documentation=man:docker-compose-start(1)
+# Docker resolves a bind source when the container starts and refuses to start
+# while one is missing, and it applies no restart policy to a container that
+# failed to start. So a boot without the enclosure, or a run of nas-detach,
+# leaves these containers down and nothing brings them back once the volumes
+# arrive. This is what brings them back.
+#
+# The volumes arrive together, the enclosure carrying a single power switch, so
+# whichever mount is last to appear is the one that finds every condition met;
+# the earlier ones skip on the conditions and cost nothing.
+Requires=docker.service
+After=docker.service
+{% for volume in nas_volumes | sort(attribute='path') %}
+After={{ volume.path | regex_replace('^/', '') | regex_replace('/', '-') }}.mount
+{% endfor %}
+{% for volume in nas_volumes | sort(attribute='path') %}
+ConditionPathIsMountPoint={{ volume.path }}
+{% endfor %}
+
+[Service]
+Type=oneshot
+# start, not up: up recreates a container whose definition has drifted from the
+# running one, which would take Home Assistant down with it. start only starts
+# what is stopped and leaves what is running alone.
+ExecStart=/usr/bin/docker compose -f /etc/compose.yml start
+
+[Install]
+{% for volume in nas_volumes | sort(attribute='path') %}
+WantedBy={{ volume.path | regex_replace('^/', '') | regex_replace('/', '-') }}.mount
+{% endfor %}
