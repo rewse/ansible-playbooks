@@ -112,6 +112,21 @@
     - nas_storage
     - nas_storage_config
 
+- name: "nas : Copy the enclosure detach script"
+  ansible.builtin.template:
+    src: nas-detach.j2
+    dest: /usr/local/sbin/nas-detach
+    mode: '0755'
+    # The script writes Docker format strings, which share Jinja's delimiters.
+    variable_start_string: "[%"
+    variable_end_string: "%]"
+  tags:
+    - nas
+    - config
+    - storage
+    - nas_storage
+    - nas_storage_config
+
 - name: "nas : Create Docker override directory"
   ansible.builtin.file:
     path: /etc/systemd/system/docker.service.d

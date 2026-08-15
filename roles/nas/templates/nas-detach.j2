@@ -1,0 +1,193 @@
+#!/usr/bin/bash
+#
+# Releases the ORICO enclosure so it can be powered off or unplugged: stops
+# whatever holds the volumes, unmounts them and closes the LUKS mappings.
+#
+# Nothing is needed to put it back. 99-nas-hotplug.rules names the unlock and
+# the mount from udev, so attaching the enclosure brings both back on its own.
+#
+# Unplugging a mounted volume is what this exists to avoid: doing so once added
+# 91 ATA errors to Bay 1's SMART counters.
+
+set -euo pipefail
+
+readonly MOUNT_PATHS=({% for volume in nas_volumes | sort(attribute='path') %}"[% volume.path %]"[% ' ' if not loop.last %]{% endfor %})
+readonly VOLUMES=({% for volume in nas_volumes | sort(attribute='name') %}"[% volume.name %]"[% ' ' if not loop.last %]{% endfor %})
+
+# Samba and NFS serve the volumes and hold files open on them. The restic timers
+# are stopped because a backup starting partway through this would reopen Bay 2
+# after it has been released.
+readonly SERVICES=(nfs-kernel-server nmbd smbd)
+
+stopped_services=()
+stopped_timers=()
+stopped_containers=()
+
+log() {
+  printf '%s\n' "$*"
+}
+
+fail() {
+  printf 'error: %s\n' "$*" >&2
+  exit 1
+}
+
+# Puts back what was stopped, for when a volume turns out to be busy. The
+# enclosure is still attached at that point, so leaving the host unable to serve
+# it would be the wrong place to stop.
+restore() {
+  local name
+
+  log "restoring what was stopped"
+
+  for name in ${stopped_services[@]+"${stopped_services[@]}"}; do
+    systemctl start "${name}" || true
+  done
+
+  for name in ${stopped_timers[@]+"${stopped_timers[@]}"}; do
+    systemctl start "${name}" || true
+  done
+
+  for name in ${stopped_containers[@]+"${stopped_containers[@]}"}; do
+    docker start "${name}" >/dev/null || true
+  done
+}
+
+# Containers are matched by their bind sources rather than by name, so one added
+# under these paths later is covered without editing this.
+containers_on_volumes() {
+  local container pattern sources
+  local IFS='|'
+
+  pattern="^(${MOUNT_PATHS[*]})(/|$)"
+  unset IFS
+
+  for container in $(docker ps --format '{{.Names}}'); do
+    sources=$(docker inspect "${container}" --format '{{range .Mounts}}{{println .Source}}{{end}}')
+
+    if printf '%s\n' "${sources}" | grep -qE "${pattern}"; then
+      printf '%s\n' "${container}"
+    fi
+  done
+}
+
+stop_timers() {
+  local timer
+
+  while read -r timer; do
+    [[ -n "${timer}" ]] || continue
+    systemctl stop "${timer}"
+    stopped_timers+=("${timer}")
+    log "  ${timer}"
+  done < <(systemctl list-units 'restic-*.timer' --state=active --plain --no-pager --no-legend 2>/dev/null | awk '{print $1}')
+}
+
+stop_containers() {
+  local container
+
+  while read -r container; do
+    [[ -n "${container}" ]] || continue
+    docker stop "${container}" >/dev/null
+    stopped_containers+=("${container}")
+    log "  ${container}"
+  done < <(containers_on_volumes)
+}
+
+stop_services() {
+  local unit
+
+  for unit in "${SERVICES[@]}"; do
+    if [[ "$(systemctl is-active "${unit}")" == active ]]; then
+      systemctl stop "${unit}"
+      stopped_services+=("${unit}")
+      log "  ${unit}"
+    fi
+  done
+}
+
+assert_idle() {
+  local path
+
+  for path in "${MOUNT_PATHS[@]}"; do
+    mountpoint -q "${path}" || continue
+
+    if fuser -m "${path}" >/dev/null 2>&1; then
+      printf 'error: %s is still in use\n' "${path}" >&2
+      fuser -mv "${path}" || true
+      restore
+      exit 1
+    fi
+  done
+}
+
+unmount_all() {
+  local path unit
+
+  for path in "${MOUNT_PATHS[@]}"; do
+    unit=$(systemd-escape --path --suffix=mount "${path}")
+
+    if ! systemctl stop "${unit}"; then
+      printf 'error: could not unmount %s\n' "${path}" >&2
+      restore
+      exit 1
+    fi
+
+    log "  ${path}"
+  done
+}
+
+# Stopping the unit rather than calling cryptsetup keeps systemd's view of the
+# mapping in step with reality; closing it behind systemd's back leaves the unit
+# active, and a later attach then finds nothing to start.
+close_all() {
+  local volume unit
+
+  for volume in "${VOLUMES[@]}"; do
+    unit="systemd-cryptsetup@$(systemd-escape "${volume}").service"
+    systemctl stop "${unit}"
+    log "  ${volume}"
+  done
+}
+
+verify_released() {
+  local path volume
+
+  for path in "${MOUNT_PATHS[@]}"; do
+    ! mountpoint -q "${path}" || fail "${path} is still mounted"
+  done
+
+  for volume in "${VOLUMES[@]}"; do
+    [[ ! -e "/dev/mapper/${volume}" ]] || fail "/dev/mapper/${volume} is still open"
+  done
+}
+
+main() {
+  [[ ${EUID} -eq 0 ]] || fail "run as root"
+
+  log "stopping the restic timers"
+  stop_timers
+
+  log "stopping the containers that bind the volumes"
+  stop_containers
+
+  log "stopping Samba and NFS"
+  stop_services
+
+  sync
+
+  assert_idle
+
+  log "unmounting"
+  unmount_all
+
+  log "closing the LUKS mappings"
+  close_all
+
+  verify_released
+
+  log ""
+  log "the enclosure can now be powered off or unplugged"
+  log "attaching it again unlocks and mounts on its own"
+}
+
+main "$@"
