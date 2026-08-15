@@ -99,6 +99,19 @@
     - nas_storage
     - nas_storage_config
 
+- name: "nas : Unlock and mount on hot-plug via udev"
+  ansible.builtin.template:
+    src: 99-nas-hotplug.rules.j2
+    dest: /etc/udev/rules.d/99-nas-hotplug.rules
+    mode: '0644'
+  notify: "nas : Reload udev rules"
+  tags:
+    - nas
+    - config
+    - storage
+    - nas_storage
+    - nas_storage_config
+
 - name: "nas : Create Docker override directory"
   ansible.builtin.file:
     path: /etc/systemd/system/docker.service.d

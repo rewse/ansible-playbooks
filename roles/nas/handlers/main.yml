@@ -7,6 +7,10 @@
   ansible.builtin.systemd:
     daemon_reload: true
 
+- name: "nas : Reload udev rules"
+  ansible.builtin.command: udevadm control --reload-rules
+  changed_when: false
+
 - name: "nas : Restart zabbix-agent"
   ansible.builtin.systemd:
     name: zabbix-agent

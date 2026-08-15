@@ -1,0 +1,26 @@
+# Ansible managed
+#
+# The enclosure may be plugged in after boot, and nothing then asks for the
+# volumes: cryptsetup.target and local-fs.target pull them while booting only,
+# and the BindsTo the crypttab generator writes acts when a device goes away
+# rather than when one appears. Naming the units here gives each device
+# something that wants it, so a later plug unlocks and mounts on its own and no
+# script is needed.
+#
+# The first rule fires on the LUKS container, whose ID_FS_UUID is the header
+# UUID crypttab matches; the second fires on the mapper the unlock creates,
+# which is what the mount waits for.
+#
+# Unit names spell - as \x2d, written here with two backslashes: udev consumes
+# one while parsing the rule, and systemd needs the remaining one to name the
+# instance the crypttab generator created. A single backslash reaches systemd as
+# nasx2ddata and silently names a unit that does not exist.
+#
+# The instance is always given. Left empty, systemd fills it with the device's
+# escaped sysfs path instead of the name meant here.
+{% for volume in nas_volumes | sort(attribute='name') %}
+
+# {{ volume.path }}
+ACTION=="add", SUBSYSTEM=="block", ENV{ID_FS_UUID}=="{{ volume.luks_uuid }}", ENV{SYSTEMD_WANTS}+="systemd-cryptsetup@{{ volume.name | replace('-', '\\\\x2d') }}.service"
+ACTION=="add", SUBSYSTEM=="block", ENV{DM_NAME}=="{{ volume.name }}", ENV{SYSTEMD_WANTS}+="{{ volume.path | regex_replace('^/', '') | regex_replace('/', '-') }}.mount"
+{% endfor %}
