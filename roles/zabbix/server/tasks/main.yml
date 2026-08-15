@@ -21,6 +21,7 @@
       - zabbix-apache-conf
       - zabbix-get
       - fonts-noto-cjk
+      - fping
       - mosquitto-clients
       - php-pgsql
     update_cache: true
@@ -138,6 +139,35 @@
     insertafter: "^# HistoryCacheSize="
     regexp: "^HistoryCacheSize="
     line: "HistoryCacheSize=64M"
+  notify: "zabbix-server: Restart"
+  tags:
+    - zabbix-server
+    - config
+    - zabbix-server_zabbix-server
+    - zabbix-server_zabbix-server_config
+
+# Debian ships fping in /usr/bin, while Zabbix defaults to /usr/sbin, so the
+# simple checks icmpping, icmppingloss and icmppingsec need the path spelled out.
+# fping6 is a symlink to the same binary, which handles both address families.
+- name: "zabbix-server : Set FpingLocation"
+  ansible.builtin.lineinfile:
+    dest: /etc/zabbix/zabbix_server.conf
+    insertafter: "^# FpingLocation="
+    regexp: "^FpingLocation="
+    line: "FpingLocation=/usr/bin/fping"
+  notify: "zabbix-server: Restart"
+  tags:
+    - zabbix-server
+    - config
+    - zabbix-server_zabbix-server
+    - zabbix-server_zabbix-server_config
+
+- name: "zabbix-server : Set Fping6Location"
+  ansible.builtin.lineinfile:
+    dest: /etc/zabbix/zabbix_server.conf
+    insertafter: "^# Fping6Location="
+    regexp: "^Fping6Location="
+    line: "Fping6Location=/usr/bin/fping6"
   notify: "zabbix-server: Restart"
   tags:
     - zabbix-server
