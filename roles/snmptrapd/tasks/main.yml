@@ -2,6 +2,9 @@
 - name: "snmptrapd : Install packages"
   ansible.builtin.apt:
     name:
+      # snmptt refuses to start without Net::IP while ipv6_enable is on, and the
+      # snmptt package does not depend on it.
+      - libnet-ip-perl
       - snmptrapd
       - snmptt
     update_cache: true

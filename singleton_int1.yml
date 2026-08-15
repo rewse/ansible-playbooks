@@ -17,6 +17,7 @@
     - mosquitto
     - nas
     - nvr
+    - snmptrapd
     - syslogd
     - zabbix/server
     - zabbix/mcp
