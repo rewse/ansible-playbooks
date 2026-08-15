@@ -14,6 +14,7 @@ API_WAIT_TIMEOUT=120
 API_WAIT_INTERVAL=5
 LOG_TAG="homeassistant-failback"
 MAIL_TO="[% email.primary %]"
+NAME_SWITCH="/usr/local/bin/homeassistant-name-switch"
 
 # -----------------------------------------------------------------------------
 # Argument parsing
@@ -312,14 +313,27 @@ fi
 log "Primary API is responding (took ~${elapsed}s)."
 
 # -----------------------------------------------------------------------------
-# Step 8: Restart failover timer
+# Step 8: Move the name back to the primary
+# -----------------------------------------------------------------------------
+# Only now that the primary answers, so the name is never pointed at something
+# that cannot serve it. homeassistant-failover would do this within 5 minutes on
+# its next run, which would leave the name here with nothing behind it until then.
+if "${NAME_SWITCH}" primary; then
+    name_detail="Name moved back to ${PRIMARY_HOST}."
+else
+    log "WARNING: could not move the name back; homeassistant-failover will retry"
+    name_detail="Name NOT moved back; homeassistant-failover retries every 5 minutes."
+fi
+
+# -----------------------------------------------------------------------------
+# Step 9: Restart failover timer
 # -----------------------------------------------------------------------------
 restore_failover_timer
 
 # -----------------------------------------------------------------------------
-# Step 9: Notify and exit
+# Step 10: Notify and exit
 # -----------------------------------------------------------------------------
 log "=== Failback completed successfully ==="
-send_notification "SUCCESS" "Failback from $(hostname) to ${PRIMARY_HOST} completed. Merge strategy: ${MERGE_STRATEGY}. API ready in ~${elapsed}s."
+send_notification "SUCCESS" "Failback from $(hostname) to ${PRIMARY_HOST} completed. Merge strategy: ${MERGE_STRATEGY}. API ready in ~${elapsed}s. ${name_detail}"
 
 exit 0
