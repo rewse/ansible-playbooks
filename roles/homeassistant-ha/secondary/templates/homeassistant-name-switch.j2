@@ -1,0 +1,187 @@
+#!/bin/bash
+# Move the name Home Assistant is reached by between the primary and this host.
+#
+# Three things decide where a request lands, and all three live in UniFi:
+#   - the internal CNAME, for clients resolving through the console
+#   - the WAN forward of 443, for requests arriving from the internet
+#   - the WAN forward of 80, which the force-SSL redirect answers
+#
+# Requests from the internet arrive at the same WAN address either way, so the
+# forward is what decides the host, not the public DNS record.
+set -uo pipefail
+
+readonly TARGET="${1:?usage: homeassistant-name-switch <primary|standby>}"
+
+DOMAIN="[% homeassistant_ha_domain %]"
+PRIMARY_HOST="fox.rewse.jp"
+STANDBY_HOST="hotel.rewse.jp"
+PRIMARY_IP="[% homeassistant_ha_primary_ip %]"
+STANDBY_IP="[% homeassistant_ha_standby_ip %]"
+CONSOLE_NAME="[% homeassistant_ha_unifi_console %]"
+API_KEY="[% homeassistant_ha_unifi_api_key %]"
+# A key generated at unifi.ui.com authenticates here but not against the
+# console's own address, so every call goes through the connector.
+CLOUD="https://api.ui.com"
+FORWARDED_PORTS=(443 80)
+# Long enough to be cached usefully, short enough that a switch is not waited on.
+TTL_SECONDS=30
+STATE_DIR="/var/lib/homeassistant-ha"
+# Present while the name points at this host, so a failed switch back can be
+# retried on a later run instead of leaving the name here.
+SWITCHED_FILE="${STATE_DIR}/name-switched"
+LOG_TAG="homeassistant-name-switch"
+
+case "${TARGET}" in
+    primary) want_host="${PRIMARY_HOST}"; want_ip="${PRIMARY_IP}" ;;
+    standby) want_host="${STANDBY_HOST}"; want_ip="${STANDBY_IP}" ;;
+    *) echo "usage: $(basename "$0") <primary|standby>" >&2; exit 2 ;;
+esac
+
+log() {
+    logger -t "${LOG_TAG}" "$1"
+    echo "$(date '+%Y-%m-%d %H:%M:%S') $1"
+}
+
+api() {
+    local method="$1" path="$2" body="${3:-}"
+    local args=(--silent --show-error --max-time 30
+                -H "X-API-KEY: ${API_KEY}" -H "Accept: application/json"
+                -X "${method}" "${CLOUD}${path}")
+    if [ -n "${body}" ]; then
+        args+=(-H "Content-Type: application/json" -d "${body}")
+    fi
+    curl "${args[@]}"
+}
+
+# jq is not installed here, and the shapes are small enough to pick apart in one
+# expression each.
+pluck() {
+    python3 -c "$1" 2>/dev/null
+}
+
+mkdir -p "${STATE_DIR}"
+
+# -----------------------------------------------------------------------------
+# Locate the console, the site and the objects to change
+# -----------------------------------------------------------------------------
+hosts_json=$(api GET /ea/hosts) || { log "Cannot reach ${CLOUD}"; exit 1; }
+
+console_id=$(printf '%s' "${hosts_json}" | pluck "
+import json,sys
+d=json.load(sys.stdin)
+for h in d.get('data',[]):
+    if (h.get('reportedState') or {}).get('name') == '${CONSOLE_NAME}':
+        print(h['id']); break
+")
+
+if [ -z "${console_id}" ]; then
+    log "No console named ${CONSOLE_NAME} in this account"
+    exit 1
+fi
+
+# Every call below is a path under the connector, api() prefixing the host.
+readonly NET_PATH="/v1/connector/consoles/${console_id}/proxy/network"
+
+site_id=$(api GET "${NET_PATH}/integration/v1/sites" | pluck "
+import json,sys
+for s in json.load(sys.stdin).get('data',[]):
+    print(s['id']); break
+")
+
+if [ -z "${site_id}" ]; then
+    log "Cannot list sites on ${CONSOLE_NAME}"
+    exit 1
+fi
+
+failed=0
+
+# -----------------------------------------------------------------------------
+# The internal name
+# -----------------------------------------------------------------------------
+policies=$(api GET "${NET_PATH}/integration/v1/sites/${site_id}/dns/policies")
+read -r dns_id dns_target <<< "$(printf '%s' "${policies}" | pluck "
+import json,sys
+for p in json.load(sys.stdin).get('data',[]):
+    if p.get('domain') == '${DOMAIN}' and p.get('type') == 'CNAME_RECORD':
+        print(p['id'], p.get('targetDomain','')); break
+")"
+
+if [ -z "${dns_id:-}" ]; then
+    log "No CNAME for ${DOMAIN} on ${CONSOLE_NAME}"
+    failed=1
+elif [ "${dns_target}" = "${want_host}" ]; then
+    log "${DOMAIN} already resolves to ${want_host}"
+else
+    body=$(printf '{"type":"CNAME_RECORD","enabled":true,"domain":"%s","targetDomain":"%s","ttlSeconds":%s}' \
+        "${DOMAIN}" "${want_host}" "${TTL_SECONDS}")
+    if api PUT "${NET_PATH}/integration/v1/sites/${site_id}/dns/policies/${dns_id}" "${body}" \
+        | grep -q "\"targetDomain\":\"${want_host}\""; then
+        log "${DOMAIN} now resolves to ${want_host}"
+    else
+        log "Failed to point ${DOMAIN} at ${want_host}"
+        failed=1
+    fi
+fi
+
+# -----------------------------------------------------------------------------
+# The forwards that carry requests from the internet
+# -----------------------------------------------------------------------------
+# Matched on the port rather than the name, which stays as whichever host the
+# rule was created for and would be wrong half the time.
+forwards=$(api GET "${NET_PATH}/api/s/default/rest/portforward")
+
+for port in "${FORWARDED_PORTS[@]}"; do
+    rule=$(printf '%s' "${forwards}" | pluck "
+import json,sys
+for r in json.load(sys.stdin).get('data',[]):
+    if str(r.get('dst_port')) == '${port}' and r.get('proto') in ('tcp','tcp_udp'):
+        print(json.dumps(r)); break
+")
+
+    if [ -z "${rule}" ]; then
+        log "No forward of port ${port} to move"
+        failed=1
+        continue
+    fi
+
+    rule_id=$(printf '%s' "${rule}" | pluck "import json,sys; print(json.load(sys.stdin)['_id'])")
+    rule_fwd=$(printf '%s' "${rule}" | pluck "import json,sys; print(json.load(sys.stdin).get('fwd',''))")
+
+    if [ "${rule_fwd}" = "${want_ip}" ]; then
+        log "Port ${port} already forwards to ${want_ip}"
+        continue
+    fi
+
+    # The whole object goes back, the legacy endpoint replacing rather than
+    # patching what it is given.
+    body=$(printf '%s' "${rule}" | pluck "
+import json,sys
+r=json.load(sys.stdin)
+r['fwd']='${want_ip}'
+print(json.dumps(r))
+")
+
+    if api PUT "${NET_PATH}/api/s/default/rest/portforward/${rule_id}" "${body}" \
+        | grep -q '"rc":"ok"'; then
+        log "Port ${port} now forwards to ${want_ip}"
+    else
+        log "Failed to forward port ${port} to ${want_ip}"
+        failed=1
+    fi
+done
+
+# -----------------------------------------------------------------------------
+# Remember where the name is
+# -----------------------------------------------------------------------------
+if [ "${failed}" -ne 0 ]; then
+    log "Finished with errors; the name may be split between hosts"
+    exit 1
+fi
+
+if [ "${TARGET}" = "standby" ]; then
+    date +%s > "${SWITCHED_FILE}"
+else
+    rm -f "${SWITCHED_FILE}"
+fi
+
+log "${DOMAIN} is served by the ${TARGET}"

@@ -21,6 +21,10 @@ LOCK_FILE="/var/run/homeassistant-failover.lock"
 LOG_TAG="homeassistant-failover"
 MAIL_TO="[% email.primary %]"
 COMPOSE_DIR="/etc"
+DOMAIN="[% homeassistant_ha_domain %]"
+NAME_SWITCH="/usr/local/bin/homeassistant-name-switch"
+# Written by the name switch while the name points here.
+NAME_SWITCHED_FILE="${STATE_DIR}/name-switched"
 
 log() {
     logger -t "${LOG_TAG}" "$1"
@@ -95,6 +99,15 @@ if local_ha_running; then
 
     log "Primary is answering again; standing down on ${hostname_local}"
 
+    # The name goes back first: stopping the container while the name still points
+    # here would answer requests with a proxy error rather than the primary.
+    if "${NAME_SWITCH}" primary; then
+        name_status="moved back to the primary"
+    else
+        name_status="NOT moved back, still points here"
+        log "Continuing to stand down even though the name did not move"
+    fi
+
     if docker compose -f "${COMPOSE_DIR}/compose.yml" stop homeassistant; then
         log "Stopped Home Assistant on ${hostname_local}"
         standdown_status="SUCCESS"
@@ -114,6 +127,7 @@ Stand-down time : $(date '+%Y-%m-%d %H:%M:%S %Z')
 Standby host    : ${hostname_local}
 Primary host    : ${PRIMARY_HOST}
 Result          : ${standdown_status}
+Name            : ${name_status}
 
 Configuration changes made here while it was serving are discarded:
 homeassistant-sync resumes now that the container is stopped and mirrors the
@@ -137,6 +151,12 @@ if check_primary_api; then
     if [ -f "${DOWN_SINCE_FILE}" ]; then
         log "Primary is answering again; clearing the clock without failing over."
         rm -f "${DOWN_SINCE_FILE}"
+    fi
+    # A stand-down whose name switch failed leaves the name here with nothing
+    # serving it, so it is retried for as long as the marker says it is ours.
+    if [ -f "${NAME_SWITCHED_FILE}" ]; then
+        log "The name still points here while the primary serves; moving it back."
+        "${NAME_SWITCH}" primary || log "Could not move the name back; will retry."
     fi
     exit 0
 fi
@@ -203,6 +223,13 @@ else
     failover_status="FAILED"
 fi
 
+# After the container, so the name is only moved to something that can answer.
+if "${NAME_SWITCH}" standby; then
+    name_status="now points here"
+else
+    name_status="NOT moved, still points at the primary"
+fi
+
 send_mail \
     "[ALERT] Home Assistant Failover: ${PRIMARY_HOST} -> ${hostname_local}" \
     "$(cat <<EOF
@@ -213,13 +240,14 @@ Primary host  : ${PRIMARY_HOST}
 Standby host  : ${hostname_local}
 Reason        : Primary container is ${reason}, unreachable for ${elapsed}s
 Result        : ${failover_status}
+Name          : ${DOMAIN} ${name_status}
 
 Current status on standby:
 $(docker ps --filter name=homeassistant --format 'table {{.Names}}\t{{.Status}}\t{{.Ports}}')
 
 Nothing has to be done to go back. Once ${PRIMARY_HOST} answers again, its own
-container starts with the host and this one stops itself within 5 minutes, which
-discards the configuration changes made here in the meantime.
+container starts with the host, the name moves back and this one stops itself
+within 5 minutes, which discards the configuration changes made here meanwhile.
 
 To keep serving from ${hostname_local} regardless, create ${HOLD_FILE}.
 To carry this host's configuration over to ${PRIMARY_HOST} instead of losing it,

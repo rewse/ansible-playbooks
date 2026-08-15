@@ -1,0 +1,9 @@
+[Unit]
+Description=Fetch the primary's certificate for the name this host can take over
+After=network-online.target
+Wants=network-online.target
+OnFailure=failure-notify@%n.service
+
+[Service]
+Type=oneshot
+ExecStart=/usr/local/bin/sslcert-sync

@@ -134,6 +134,84 @@
     variable_end_string: "%]"
   tags: [homeassistant-ha-secondary, config]
 
+- name: "name-switch : Copy script"
+  ansible.builtin.template:
+    src: homeassistant-name-switch.j2
+    dest: /usr/local/bin/homeassistant-name-switch
+    mode: '0700'
+    variable_start_string: "[%"
+    variable_end_string: "%]"
+  tags: [homeassistant-ha-secondary, config]
+
+- name: "sslcert-sync : Copy script"
+  ansible.builtin.copy:
+    src: sslcert-sync
+    dest: /usr/local/bin/sslcert-sync
+    mode: '0755'
+  tags: [homeassistant-ha-secondary, config]
+
+- name: "sslcert-sync : Copy service unit"
+  ansible.builtin.copy:
+    src: sslcert-sync.service
+    dest: /etc/systemd/system/sslcert-sync.service
+    mode: '0644'
+  notify: "systemd: Reload"
+  tags: [homeassistant-ha-secondary, config]
+
+- name: "sslcert-sync : Copy timer unit"
+  ansible.builtin.copy:
+    src: sslcert-sync.timer
+    dest: /etc/systemd/system/sslcert-sync.timer
+    mode: '0644'
+  notify: "systemd: Reload"
+  tags: [homeassistant-ha-secondary, config]
+
+- name: "sslcert-sync : Enable timer"
+  ansible.builtin.systemd:
+    name: sslcert-sync.timer
+    enabled: true
+    state: started
+    daemon_reload: true
+  when: not ansible_check_mode
+  tags: [homeassistant-ha-secondary, config]
+
+- name: "sslcert-sync : Fetch the certificate now"
+  ansible.builtin.command: /usr/local/bin/sslcert-sync
+  register: homeassistant_ha_sslcert_sync
+  changed_when: "'updated' in homeassistant_ha_sslcert_sync.stdout"
+  when: not ansible_check_mode
+  tags: [homeassistant-ha-secondary, config]
+
+# The vhost proxies to the container over HTTP and upgrades the websocket, which
+# the base httpd role has no reason to enable.
+- name: "apache : Enable proxy modules"
+  community.general.apache2_module:
+    name: "{{ item }}"
+  loop:
+    - proxy
+    - proxy_http
+    - proxy_wstunnel
+  notify: "apache: Restart"
+  tags: [homeassistant-ha-secondary, config]
+
+# The primary serves this name while it is up; the standby answers on it only
+# after homeassistant-name-switch points the name here. Same file as the primary
+# uses, so the two cannot drift.
+- name: "apache : Copy vhost configuration"
+  ansible.builtin.copy:
+    src: "{{ playbook_dir }}/roles/homeassistant/files/hass.rewse.jp.conf"
+    dest: /etc/apache2/sites-available/hass.rewse.jp.conf
+    mode: '0644'
+  notify: "apache: Reload"
+  tags: [homeassistant-ha-secondary, config]
+
+- name: "apache : Enable site"
+  ansible.builtin.command: a2ensite hass.rewse.jp
+  register: homeassistant_ha_a2ensite
+  changed_when: "'already enabled' not in homeassistant_ha_a2ensite.stdout"
+  notify: "apache: Reload"
+  tags: [homeassistant-ha-secondary, config]
+
 - name: "zabbix : Copy userparameter config"
   ansible.builtin.copy:
     src: homeassistant-ha.conf

@@ -13,3 +13,14 @@ log file = /var/log/rsyncd.log
     list = yes
     hosts allow = 192.168.0.0/24 {{ ipv6.home }}
     hosts deny = *
+
+# The standby serves hass.rewse.jp while it stands in for this host, which needs
+# the same certificate. Narrower than the module above because this one carries
+# the private key of a wildcard certificate.
+[letsencrypt]
+    path = /etc/letsencrypt
+    comment = Certificates for the host standing in for this one
+    read only = yes
+    list = no
+    hosts allow = {{ homeassistant_ha_standby_ip }}
+    hosts deny = *

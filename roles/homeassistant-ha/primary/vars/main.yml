@@ -1,2 +1,4 @@
 ---
 homeassistant_ha_token: "{{ lookup('pipe', 'op read \"op://ansible/Home Assistant - homeassistant-ha/credential\"') }}"
+# The one host allowed to read the certificate this host renews.
+homeassistant_ha_standby_ip: 192.168.0.40

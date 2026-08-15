@@ -1,0 +1,60 @@
+#!/bin/bash
+# Keep a copy of the primary's certificate so this host can serve the name it
+# takes over. Pulling means a primary that is down costs nothing but a retry
+# tomorrow, and the primary does not need to know this host exists.
+set -uo pipefail
+
+SOURCE="rsync://fox.rewse.jp/letsencrypt/"
+DEST="/etc/letsencrypt/"
+LOG_TAG="sslcert-sync"
+
+log() {
+    logger -t "${LOG_TAG}" "$1"
+    echo "$(date '+%Y-%m-%d %H:%M:%S') $1"
+}
+
+# live/ holds symlinks into archive/, so they are dereferenced into real files
+# here rather than carried over as links pointing at paths that are not synced.
+# options-ssl-apache.conf comes along because the vhost includes it and no
+# certbot runs here to write it.
+# --ipv4 because the module is restricted to this host's address, and the name
+# resolves to a global IPv6 whose prefix the ISP changes. rsyncd reports a host it
+# refuses as an unknown module, so a mismatch here looks like a missing module.
+out=$(rsync \
+        --archive \
+        --copy-links \
+        --delete \
+        --itemize-changes \
+        --ipv4 \
+        --include='live/' \
+        --include='live/**' \
+        --include='options-ssl-apache.conf' \
+        --exclude='*' \
+        "${SOURCE}" \
+        "${DEST}" 2>&1)
+status=$?
+
+if [ "${status}" -ne 0 ]; then
+    log "Failed to fetch the certificate from ${SOURCE}: ${out}"
+    exit "${status}"
+fi
+
+if [ -z "${out}" ]; then
+    log "Certificate is unchanged"
+    exit 0
+fi
+
+log "Certificate updated"
+echo "${out}"
+
+# Apache reads the certificate at startup, so it only has the new one after a
+# reload. Reloading on an unchanged certificate would be a daily restart for
+# nothing, which is why this is inside the branch.
+if systemctl is-active --quiet apache2; then
+    if systemctl reload apache2; then
+        log "Reloaded Apache"
+    else
+        log "Failed to reload Apache"
+        exit 1
+    fi
+fi

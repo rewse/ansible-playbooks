@@ -1,0 +1,13 @@
+[Unit]
+Description=Fetch the primary's certificate daily
+
+[Timer]
+# Renewal happens 30 days before expiry, so a day of granularity leaves weeks of
+# slack, and a run missed while the primary was down is made up on the next boot.
+OnCalendar=daily
+RandomizedDelaySec=1h
+Persistent=true
+Unit=sslcert-sync.service
+
+[Install]
+WantedBy=timers.target
