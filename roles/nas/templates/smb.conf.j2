@@ -35,8 +35,16 @@
     # The documented way to deny by default and then allow: where the lists
     # conflict the allow list wins. This host runs no firewall, so the export of
     # home directories and backups is bounded here.
-    hosts deny = 0.0.0.0/0
-    hosts allow = 192.168.0.0/24
+    #
+    # ALL denies both address families. A mask denies only the family it is
+    # written in, and a client matching neither list is one Samba allows.
+    #
+    # Every IPv6 range the LAN uses has to be named. mDNS advertises this host as
+    # a global address and a ULA, and macOS answers from whichever family it
+    # reaches, so both are listed. Link-local is not, being absent from what mDNS
+    # hands out. The global prefix is delegated by the ISP and changes with it.
+    hosts deny = ALL
+    hosts allow = 192.168.0.0/24 {{ ipv6.home }} {{ ipv6.home_ula }}
     load printers = no
     printing = bsd
     printcap name = /dev/null

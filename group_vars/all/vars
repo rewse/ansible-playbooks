@@ -7,5 +7,6 @@ global_ip:
   home_ip: 106.163.184.9
   office: 27.0.0.0/22
 ipv6:
-  home: 240f:143:f60c:1::/64
   aws: 2406:da14:b2b:e400::/56
+  home: 240f:143:f60c:1::/64
+  home_ula: fd20:2400:ab3d:5b1e::/64
