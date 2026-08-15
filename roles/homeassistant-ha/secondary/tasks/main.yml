@@ -84,6 +84,13 @@
   when: docker_quarantine_image_ref | length > 0
   tags: [homeassistant-ha-secondary, update]
 
+- name: "failover : Create state directory"
+  ansible.builtin.file:
+    path: /var/lib/homeassistant-ha
+    state: directory
+    mode: '0755'
+  tags: [homeassistant-ha-secondary, init]
+
 - name: "failover : Copy script"
   ansible.builtin.template:
     src: homeassistant-failover.j2

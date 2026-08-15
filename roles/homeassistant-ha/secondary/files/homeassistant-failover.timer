@@ -1,5 +1,5 @@
 [Unit]
-Description=Home Assistant failover health check (every 30 seconds)
+Description=Home Assistant failover health check (every 5 minutes)
 
 [Timer]
 OnBootSec=5min

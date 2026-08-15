@@ -25,7 +25,12 @@ usage() {
     cat <<EOF
 Usage: $(basename "$0") [OPTIONS]
 
-Perform failback from hotel (secondary) to fox (primary).
+Carry this host's configuration back to fox (primary) and hand serving over.
+
+Once the primary answers again, homeassistant-failover stops the container here
+by itself and the next sync mirrors the primary's configuration over this one,
+which discards whatever was changed here. This command is the way to keep those
+changes instead, and it has to run before that happens.
 
 Options:
   -y, --yes              Non-interactive mode. Requires --merge to be set.

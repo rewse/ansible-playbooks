@@ -1,5 +1,5 @@
 [Unit]
-Description=Sync Home Assistant configuration from fox (every minute)
+Description=Sync Home Assistant configuration from fox (every 5 minutes)
 
 [Timer]
 OnBootSec=5min

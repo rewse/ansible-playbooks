@@ -7,7 +7,16 @@ PRIMARY_SSH_PORT="11022"
 PRIMARY_SSH_USER="[% admin %]"
 HA_TOKEN="[% homeassistant_ha_token %]"
 HEALTHCHECK_TIMEOUT=5
-RETRY_WAIT=60
+# How long the primary has to stay unreachable before the standby takes over.
+# The timer fires every 5 minutes, so the clock is kept in a file rather than by
+# retrying within one run: a primary that reboots is back long before this.
+FAILOVER_AFTER=[% homeassistant_ha_failover_after %]
+STATE_DIR="/var/lib/homeassistant-ha"
+# When the primary was first seen unreachable, absent while it answers.
+DOWN_SINCE_FILE="${STATE_DIR}/down-since"
+# Present while someone runs Home Assistant here on purpose, which keeps this
+# from stopping it the moment the primary answers again.
+HOLD_FILE="${STATE_DIR}/hold"
 LOCK_FILE="/var/run/homeassistant-failover.lock"
 LOG_TAG="homeassistant-failover"
 MAIL_TO="[% email.primary %]"
@@ -22,25 +31,26 @@ cleanup() {
     rm -f "${LOCK_FILE}"
 }
 
-# Prevent double execution
-if [ -e "${LOCK_FILE}" ]; then
-    log "Lock file exists; another instance is running. Exiting."
-    exit 0
-fi
+send_mail() {
+    local subject="$1"
+    local body="$2"
 
-touch "${LOCK_FILE}"
-trap cleanup EXIT
+    if command -v mail >/dev/null 2>&1; then
+        echo "${body}" | mail -s "${subject}" "${MAIL_TO}" || \
+            log "Failed to send notification email to ${MAIL_TO}"
+    else
+        log "mail command not found; skipping email notification"
+    fi
+}
 
-# Skip if local Home Assistant is already running (failover already active)
-if docker ps --format '{{.Names}}' | grep -q '^homeassistant$'; then
-    log "Local Home Assistant is already running (failover active). Exiting."
-    exit 0
-fi
+local_ha_running() {
+    docker ps --format '{{.Names}}' | grep -q '^homeassistant$'
+}
 
+# 2xx/3xx means Home Assistant is up and the token is accepted.
 check_primary_api() {
     local http_code
     http_code=$(curl --silent --max-time "${HEALTHCHECK_TIMEOUT}" -o /dev/null -w "%{http_code}" -H "Authorization: Bearer ${HA_TOKEN}" "${PRIMARY_API}" 2>/dev/null || echo "000")
-    # 2xx/3xx means HA is up and authenticated.
     case "${http_code}" in
         2??|3??)
             return 0
@@ -52,21 +62,109 @@ check_primary_api() {
     esac
 }
 
-# First API check
-if check_primary_api; then
+# Prevent double execution
+if [ -e "${LOCK_FILE}" ]; then
+    log "Lock file exists; another instance is running. Exiting."
     exit 0
 fi
 
-log "Primary API check failed; waiting ${RETRY_WAIT}s before retry"
-sleep "${RETRY_WAIT}"
+touch "${LOCK_FILE}"
+trap cleanup EXIT
 
-# Second API check
-if check_primary_api; then
-    log "Primary API recovered on retry"
+# The clock lives here, so failover stops working silently if the directory is gone.
+mkdir -p "${STATE_DIR}"
+
+hostname_local=$(hostname)
+
+# -----------------------------------------------------------------------------
+# Standby is serving: stand down once the primary is back
+# -----------------------------------------------------------------------------
+# The primary starts its own container on boot (unless-stopped), so without this
+# both would run against the same MQTT broker until someone noticed. Checking the
+# primary before stopping anything means there is no moment with neither serving.
+if local_ha_running; then
+    if [ -e "${HOLD_FILE}" ]; then
+        log "Standby is serving and ${HOLD_FILE} is present; leaving it alone."
+        exit 0
+    fi
+
+    if ! check_primary_api; then
+        log "Standby is serving and the primary is still unreachable; staying."
+        exit 0
+    fi
+
+    log "Primary is answering again; standing down on ${hostname_local}"
+
+    if docker compose -f "${COMPOSE_DIR}/compose.yml" stop homeassistant; then
+        log "Stopped Home Assistant on ${hostname_local}"
+        standdown_status="SUCCESS"
+    else
+        log "Failed to stop Home Assistant on ${hostname_local}"
+        standdown_status="FAILED"
+    fi
+
+    rm -f "${DOWN_SINCE_FILE}"
+
+    send_mail \
+        "[INFO] Home Assistant Stand-down: ${hostname_local} -> ${PRIMARY_HOST} (${standdown_status})" \
+        "$(cat <<EOF
+The primary is serving again, so the standby has stopped its Home Assistant.
+
+Stand-down time : $(date '+%Y-%m-%d %H:%M:%S %Z')
+Standby host    : ${hostname_local}
+Primary host    : ${PRIMARY_HOST}
+Result          : ${standdown_status}
+
+Configuration changes made here while it was serving are discarded:
+homeassistant-sync resumes now that the container is stopped and mirrors the
+primary's configuration back over this one.
+
+Current status on ${hostname_local}:
+$(docker ps -a --filter name=homeassistant --format 'table {{.Names}}\t{{.Status}}')
+
+--
+${LOG_TAG} on ${hostname_local}
+EOF
+)"
+
     exit 0
 fi
 
-log "Primary API check failed twice; checking container status via SSH"
+# -----------------------------------------------------------------------------
+# Standby is idle: take over once the primary has been down long enough
+# -----------------------------------------------------------------------------
+if check_primary_api; then
+    if [ -f "${DOWN_SINCE_FILE}" ]; then
+        log "Primary is answering again; clearing the clock without failing over."
+        rm -f "${DOWN_SINCE_FILE}"
+    fi
+    exit 0
+fi
+
+now=$(date +%s)
+
+if [ ! -f "${DOWN_SINCE_FILE}" ]; then
+    echo "${now}" > "${DOWN_SINCE_FILE}"
+    log "Primary is unreachable; waiting ${FAILOVER_AFTER}s before failing over."
+    exit 0
+fi
+
+down_since=$(cat "${DOWN_SINCE_FILE}" 2>/dev/null)
+# An unreadable clock would postpone failover forever, so start it again.
+if ! [ "${down_since}" -gt 0 ] 2>/dev/null; then
+    log "Clock file ${DOWN_SINCE_FILE} is unusable; starting it again."
+    echo "${now}" > "${DOWN_SINCE_FILE}"
+    exit 0
+fi
+
+elapsed=$((now - down_since))
+
+if [ "${elapsed}" -lt "${FAILOVER_AFTER}" ]; then
+    log "Primary has been unreachable for ${elapsed}s of ${FAILOVER_AFTER}s; waiting."
+    exit 0
+fi
+
+log "Primary has been unreachable for ${elapsed}s; checking container status via SSH"
 
 # Check container status via SSH
 ssh_container_status=$(ssh \
@@ -95,46 +193,43 @@ esac
 
 log "Triggering failover: primary=${reason}"
 
-# Start Home Assistant on hotel
+# Start Home Assistant on the standby
 failover_time=$(date '+%Y-%m-%d %H:%M:%S %Z')
 if docker compose -f "${COMPOSE_DIR}/compose.yml" up -d homeassistant; then
-    log "Failover succeeded: homeassistant started on $(hostname)"
+    log "Failover succeeded: homeassistant started on ${hostname_local}"
     failover_status="SUCCESS"
 else
-    log "Failover failed: could not start homeassistant on $(hostname)"
+    log "Failover failed: could not start homeassistant on ${hostname_local}"
     failover_status="FAILED"
 fi
 
-# Send email notification
-hostname_local=$(hostname)
-mail_subject="[ALERT] Home Assistant Failover: ${PRIMARY_HOST} -> ${hostname_local}"
-mail_body=$(cat <<EOF
+send_mail \
+    "[ALERT] Home Assistant Failover: ${PRIMARY_HOST} -> ${hostname_local}" \
+    "$(cat <<EOF
 Home Assistant failover was triggered.
 
 Failover time : ${failover_time}
 Primary host  : ${PRIMARY_HOST}
 Standby host  : ${hostname_local}
-Reason        : Primary container is ${reason} (API unreachable after retry)
+Reason        : Primary container is ${reason}, unreachable for ${elapsed}s
 Result        : ${failover_status}
 
 Current status on standby:
 $(docker ps --filter name=homeassistant --format 'table {{.Names}}\t{{.Status}}\t{{.Ports}}')
 
-Next steps:
-  1. Investigate the cause on ${PRIMARY_HOST}.
-  2. Once recovered, run 'sudo homeassistant-failback' on $(hostname)
-     to fail back to ${PRIMARY_HOST}. See operations.md for details.
+Nothing has to be done to go back. Once ${PRIMARY_HOST} answers again, its own
+container starts with the host and this one stops itself within 5 minutes, which
+discards the configuration changes made here in the meantime.
+
+To keep serving from ${hostname_local} regardless, create ${HOLD_FILE}.
+To carry this host's configuration over to ${PRIMARY_HOST} instead of losing it,
+run 'sudo homeassistant-failback' before that happens.
+
+Investigate the cause on ${PRIMARY_HOST}.
 
 --
 ${LOG_TAG} on ${hostname_local}
 EOF
-)
-
-if command -v mail >/dev/null 2>&1; then
-    echo "${mail_body}" | mail -s "${mail_subject}" "${MAIL_TO}" || \
-        log "Failed to send notification email to ${MAIL_TO}"
-else
-    log "mail command not found; skipping email notification"
-fi
+)"
 
 exit 0
