@@ -1,3 +1,12 @@
 UserParameter=homeassistant.rsync.active,systemctl is-active rsync
 UserParameter=homeassistant.container.running,sudo docker inspect --format '{{.State.Running}}' homeassistant 2>/dev/null || echo false
+# The tag of the image the container would run, which is what has to match the
+# other host: a standby whose image is older than the version that wrote the
+# synced config refuses to start. Reported from the container rather than from
+# .HA_VERSION, that file arriving on the standby as a copy of the primary's and
+# so always agreeing with it.
+#
+# Nothing is printed when the container or Docker is missing, leaving the item
+# unsupported rather than naming a version that was not read.
+UserParameter=homeassistant.version,sudo docker inspect --format '{{.Config.Image}}' homeassistant 2>/dev/null | sed -E 's|@[^@]*$||; s|^.*:||'
 UserParameter=homeassistant.api.http_code,curl -s -o /dev/null -w '%{http_code}' --max-time 5 -H 'Authorization: Bearer [% homeassistant_ha_token %]' http://localhost:8123/api/ || echo 000
