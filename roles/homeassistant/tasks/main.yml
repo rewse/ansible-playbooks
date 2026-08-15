@@ -1054,12 +1054,15 @@
         customize: !include customize.yaml
       http:
         use_x_forwarded_for: true
+        # Apache proxies from localhost, so those two entries are the ones that
+        # decide whether the forwarded client address is believed. What is
+        # believed matters beyond the logs: the homeassistant fail2ban jail bans
+        # the address this yields, and an untrusted proxy would yield the proxy's.
         trusted_proxies:
           - "127.0.0.0/8"
           - "192.168.0.0/24"
           - "::1/128"
           - "fe80::/10"
-          - "240f:78:31e9:1::/64"
       logger:
         default: warning
         logs:

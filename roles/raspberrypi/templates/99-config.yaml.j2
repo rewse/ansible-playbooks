@@ -17,9 +17,13 @@ network:
         - to: {{ raspberrypi_aws_vpc_cidr }}
           via: {{ raspberrypi_default_gateway }}
       nameservers:
+        # IPv4 only. The router announces its own IPv6 address for this through
+        # router advertisement, which accept-ra takes, so naming one here would
+        # only add a second copy that goes stale: the address carries the prefix
+        # the ISP delegates. A stale one is not obvious either, DNS interception
+        # on the router answering queries sent to an address that is gone.
         addresses:
           - {{ raspberrypi_resolved1.ip }}
-          - {{ raspberrypi_resolved1.ipv6 }}
         search:
           - rewse.jp
   wifis:
@@ -44,8 +48,8 @@ network:
         - to: {{ raspberrypi_aws_vpc_cidr }}
           via: {{ raspberrypi_default_gateway }}
       nameservers:
+        # IPv4 only, for the reason given on eth0.
         addresses:
           - {{ raspberrypi_resolved1.ip }}
-          - {{ raspberrypi_resolved1.ipv6 }}
         search:
           - rewse.jp
