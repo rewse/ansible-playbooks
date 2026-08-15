@@ -82,6 +82,16 @@ Print nothing from a UserParameter that cannot read its value. Empty output make
 
 Pass `search` without `searchWildcardsEnabled` when a substring match is wanted. With the flag on, a pattern holding no `*` becomes an exact match: `search: {key_: "icmpping"}` returned 1 item of 23 and hid every `icmppingloss` and `icmppingsec`.
 
+### UniFi
+
+Call the Network API through the Site Manager Cloud Connector, not the console's own address. A key generated at unifi.ui.com authenticates against `https://api.ui.com/v1/connector/consoles/{consoleId}/proxy/network/...` and is refused with 401 on `https://<console>/proxy/network/...`, which only accepts a key created in the console's own Integrations section. Both are listed as `servers` in the OpenAPI document.
+
+Reach for the older endpoints when the documented API has no call for something. The connector proxies whatever follows `proxy/network/`, so `api/s/default/rest/portforward` works with the same key even though port forwarding is absent from the v10.4.57 endpoint list. No CSRF token is needed on this path, and the legacy endpoints replace the object they are given rather than patching it, so send back what was read.
+
+Match objects by name or port rather than by id. A port forward keeps the name of whichever host it was created for, so `fox: HTTPS` is the rule to move even when it points elsewhere; matching on `dst_port` survives that, and looking rules up each time survives one being rebuilt in the UI.
+
+Expect a DNS record with `ttlSeconds: 0` to be cached for the default 300 seconds. Set it explicitly when the record is one that moves between hosts.
+
 ### A Raspberry Pi Whose NVMe Has Stopped Answering
 
 Remove the power and wait minutes. Neither a reboot nor a PoE blink clears it, and UniFi can only blink PoE, so this needs someone at the machine.
