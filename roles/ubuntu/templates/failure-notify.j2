@@ -14,6 +14,28 @@ readonly RESULT=$(systemctl show -p Result --value "${UNIT}" 2>/dev/null || echo
 readonly EXIT_CODE=$(systemctl show -p ExecMainStatus --value "${UNIT}" 2>/dev/null || echo "?")
 readonly INVOCATION_ID=$(systemctl show -p InvocationID --value "${UNIT}" 2>/dev/null || echo "unknown")
 
+# A unit on a short timer keeps failing for as long as its cause lasts, and one
+# cause reaching the inbox once is enough: a five minute timer against an outage
+# that lasts an hour would otherwise send twelve copies of the same mail. The
+# first failure always sends, and the suppressed ones are logged where they can
+# be found.
+readonly STATE_DIR=/var/lib/failure-notify
+readonly REPEAT_AFTER={{ ubuntu_failure_notify_repeat_after }}
+readonly STAMP="${STATE_DIR}/$(systemd-escape "${UNIT}").stamp"
+
+mkdir -p "${STATE_DIR}"
+
+if [[ -f "${STAMP}" ]]; then
+  since=$(( $(date +%s) - $(stat -c %Y "${STAMP}") ))
+
+  if (( since < REPEAT_AFTER )); then
+    printf 'not mailing for %s: already reported %d seconds ago\n' "${UNIT}" "${since}"
+    exit 0
+  fi
+fi
+
+touch "${STAMP}"
+
 {
   echo "From: alert@rewse.jp"
   echo "To: {{ email.primary }}"
@@ -25,6 +47,7 @@ readonly INVOCATION_ID=$(systemctl show -p InvocationID --value "${UNIT}" 2>/dev
   echo "Severity: High"
   echo "Operational data: Result=${RESULT}, ExitCode=${EXIT_CODE}"
   echo "Original problem ID: ${INVOCATION_ID}"
+  echo "Repeats within ${REPEAT_AFTER} seconds are suppressed"
   echo ""
   echo "--- Unit status ---"
   systemctl status --no-pager --full "${UNIT}" 2>&1 | head -30 || true
