@@ -16,6 +16,21 @@
     - raspberrypi_package
     - raspberrypi_package_install
 
+- name: "package : Install packages for NVMe"
+  # The tooling has to be present before it is needed: once the controller drops
+  # off the PCIe link, / turns read-only and apt can no longer install anything.
+  # smartctl reaches the health summary over the SATA translation layer, while
+  # the NVMe error log and the vendor log pages need nvme-cli.
+  ansible.builtin.apt:
+    name:
+      - nvme-cli
+  when: ansible_facts['devices']['nvme0n1'] is defined
+  tags:
+    - raspberrypi
+    - install
+    - raspberrypi_package
+    - raspberrypi_package_install
+
 - name: "claude: Download Claude Code installer"
   ansible.builtin.get_url:
     url: https://claude.ai/install.sh
