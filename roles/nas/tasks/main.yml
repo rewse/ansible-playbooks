@@ -112,6 +112,18 @@
     - nas_storage
     - nas_storage_config
 
+- name: "nas : Copy the enclosure attach script"
+  ansible.builtin.template:
+    src: nas-attach.j2
+    dest: /usr/local/sbin/nas-attach
+    mode: '0755'
+  tags:
+    - nas
+    - config
+    - storage
+    - nas_storage
+    - nas_storage_config
+
 - name: "nas : Copy the enclosure detach script"
   ansible.builtin.template:
     src: nas-detach.j2
@@ -127,10 +139,10 @@
     - nas_storage
     - nas_storage_config
 
-- name: "nas : Copy the container start unit"
+- name: "nas : Copy the attach unit"
   ansible.builtin.template:
-    src: nas-containers.service.j2
-    dest: /etc/systemd/system/nas-containers.service
+    src: nas-attach.service.j2
+    dest: /etc/systemd/system/nas-attach.service
     mode: '0644'
   notify: "nas : Reload systemd"
   tags:
@@ -140,11 +152,11 @@
     - nas_storage
     - nas_storage_config
 
-- name: "nas : Enable the container start unit"
+- name: "nas : Enable the attach unit"
   # Enabling is what links it under each mount unit's wants directory, the
   # WantedBy in the unit naming the mounts rather than a target.
   ansible.builtin.systemd:
-    name: nas-containers.service
+    name: nas-attach.service
     enabled: true
     daemon_reload: true
   tags:

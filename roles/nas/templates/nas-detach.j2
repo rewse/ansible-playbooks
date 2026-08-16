@@ -4,7 +4,9 @@
 # whatever holds the volumes, unmounts them and closes the LUKS mappings.
 #
 # Nothing is needed to put it back. 99-nas-hotplug.rules names the unlock and
-# the mount from udev, so attaching the enclosure brings both back on its own.
+# the mount from udev, and nas-attach.service runs nas-attach once the mounts are
+# up, which starts what is stopped here. nas-attach is the way to do it by hand
+# when that does not happen.
 #
 # Unplugging a mounted volume is what this exists to avoid: doing so once added
 # 91 ATA errors to Bay 1's SMART counters.

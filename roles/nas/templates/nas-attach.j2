@@ -1,0 +1,187 @@
+#!/usr/bin/bash
+#
+# Brings the ORICO enclosure back into service: unlocks the LUKS mappings, mounts
+# the volumes and starts everything that reads them.
+#
+# 99-nas-hotplug.rules unlocks and mounts from udev and nas-attach.service runs
+# this once the mounts are up, so attaching the enclosure needs nothing by hand.
+# This is the same work run by hand, for when that does not happen. Every step
+# leaves alone what is already running, so this is also how to finish an attach
+# that stopped halfway.
+
+set -euo pipefail
+
+readonly COMPOSE_FILE=/etc/compose.yml
+
+# One run at a time, a run by hand being able to meet the one nas-attach.service
+# starts. Whichever arrives second has nothing left to do, so it leaves instead
+# of waiting: waiting would hold the unit past its start timeout.
+readonly LOCK_PATH=/run/lock/nas-attach.lock
+
+# The services nas-detach stops. The restic timers it stops are found from their
+# enable symlinks instead, in stop_timers' counterpart below.
+readonly SERVICES=(nfs-kernel-server nmbd smbd)
+
+readonly VOLUMES=({% for volume in nas_volumes | sort(attribute='name') %}"{{ volume.name }}"{{ ' ' if not loop.last }}{% endfor %})
+
+declare -rA LUKS_UUIDS=({% for volume in nas_volumes | sort(attribute='name') %}[{{ volume.name }}]="{{ volume.luks_uuid }}"{{ ' ' if not loop.last }}{% endfor %})
+
+declare -rA MOUNT_PATHS=({% for volume in nas_volumes | sort(attribute='name') %}[{{ volume.name }}]="{{ volume.path }}"{{ ' ' if not loop.last }}{% endfor %})
+
+log() {
+  printf '%s\n' "$*"
+}
+
+fail() {
+  printf 'error: %s\n' "$*" >&2
+  exit 1
+}
+
+# The LUKS header UUID is what crypttab matches, so a device carrying one is the
+# enclosure being present as far as the unlock is concerned. An open mapping
+# counts too: the header is no longer readable through the mapper.
+assert_attached() {
+  local missing=()
+  local volume
+
+  for volume in "${VOLUMES[@]}"; do
+    if [[ -e "/dev/mapper/${volume}" ]]; then
+      continue
+    fi
+
+    if [[ ! -e "/dev/disk/by-uuid/${LUKS_UUIDS[${volume}]}" ]]; then
+      missing+=("${volume}")
+    fi
+  done
+
+  # Tested through the joined elements rather than the element count, whose
+  # spelling opens a Jinja comment and cannot appear in this template.
+  if [[ -n "${missing[*]:-}" ]]; then
+    fail "the enclosure is not attached: ${missing[*]} has no device"
+  fi
+}
+
+# Starting the unit rather than calling cryptsetup keeps systemd's view of the
+# mapping in step with reality, the same reason nas-detach stops it. A mapping
+# that is already open is skipped: the unit refuses to create one twice, and
+# udev may have opened it while this ran.
+#
+# argon2id spends 6 to 14 seconds per volume here, so each name is printed
+# before the wait rather than after it.
+open_all() {
+  local unit volume
+
+  for volume in "${VOLUMES[@]}"; do
+    if [[ -e "/dev/mapper/${volume}" ]]; then
+      continue
+    fi
+
+    log "  ${volume}"
+    unit="systemd-cryptsetup@$(systemd-escape "${volume}").service"
+    systemctl start "${unit}"
+  done
+}
+
+mount_all() {
+  local path unit volume
+
+  for volume in "${VOLUMES[@]}"; do
+    path="${MOUNT_PATHS[${volume}]}"
+
+    if mountpoint -q "${path}"; then
+      continue
+    fi
+
+    unit=$(systemd-escape --path --suffix=mount "${path}")
+    systemctl start "${unit}"
+    log "  ${path}"
+  done
+}
+
+start_services() {
+  local unit
+
+  for unit in "${SERVICES[@]}"; do
+    if [[ "$(systemctl is-active "${unit}")" != active ]]; then
+      systemctl start "${unit}"
+      log "  ${unit}"
+    fi
+  done
+}
+
+# The instances come from the enable symlinks rather than from systemctl: a
+# template instance that is stopped can be unloaded, and systemctl list-units
+# then does not name it, which is exactly the state this has to repair.
+start_timers() {
+  local link timer
+
+  for link in /etc/systemd/system/timers.target.wants/restic-*.timer; do
+    if [[ ! -e "${link}" ]]; then
+      continue
+    fi
+
+    timer="${link##*/}"
+
+    if [[ "$(systemctl is-active "${timer}")" != active ]]; then
+      systemctl start "${timer}"
+      log "  ${timer}"
+    fi
+  done
+}
+
+# start, not up: up recreates a container whose definition has drifted from the
+# running one, which would take Home Assistant down with it. start only starts
+# what is stopped and leaves what is running alone.
+start_containers() {
+  docker compose -f "${COMPOSE_FILE}" start
+}
+
+verify_attached() {
+  local path unit volume
+
+  for volume in "${VOLUMES[@]}"; do
+    path="${MOUNT_PATHS[${volume}]}"
+
+    [[ -e "/dev/mapper/${volume}" ]] || fail "/dev/mapper/${volume} is not open"
+    mountpoint -q "${path}" || fail "${path} is not mounted"
+  done
+
+  for unit in "${SERVICES[@]}"; do
+    [[ "$(systemctl is-active "${unit}")" == active ]] || fail "${unit} is not running"
+  done
+}
+
+main() {
+  [[ ${EUID} -eq 0 ]] || fail "run as root"
+
+  exec 9>"${LOCK_PATH}"
+
+  if ! flock -n 9; then
+    log "another nas-attach is running, leaving it to finish"
+    exit 0
+  fi
+
+  assert_attached
+
+  log "unlocking the LUKS mappings"
+  open_all
+
+  log "mounting"
+  mount_all
+
+  log "starting Samba and NFS"
+  start_services
+
+  log "starting the restic timers"
+  start_timers
+
+  log "starting the containers that bind the volumes"
+  start_containers
+
+  verify_attached
+
+  log ""
+  log "the enclosure is back in service"
+}
+
+main "$@"
