@@ -75,13 +75,22 @@ if ! pmset -g batt | grep -q "AC Power"; then
 fi
 
 # -----------------------------------------------------------------------------
+# Materialise iCloud Drive
+# -----------------------------------------------------------------------------
+# iCloud evicts what it can and leaves a placeholder. Reading one through restic
+# answers "resource deadlock avoided" instead of fetching it, so the file has to
+# be pulled down first, which reading it here does. Whatever stays evicted after
+# this fails the backup rather than passing as saved.
+log "Materialising evicted iCloud files"
+find "{{ home }}/Library/Mobile Documents" -type f -flags +dataless -exec cat {} + > /dev/null 2>&1 || true
+log "Still evicted: $(find "{{ home }}/Library/Mobile Documents" -type f -flags +dataless 2>/dev/null | wc -l | tr -d ' ')"
+
+# -----------------------------------------------------------------------------
 # Back up
 # -----------------------------------------------------------------------------
-if ! restic cat config >/dev/null 2>&1; then
-    log "Initialising ${RESTIC_REPOSITORY}"
-    restic init
-fi
-
+# The repository is created by the role, not here. A transient S3 failure looks
+# exactly like a missing repository from this side, and answering it by trying to
+# initialise turns a retryable moment into a fatal one.
 log "=== Backup started ==="
 # Without --verbose restic reports counts and sizes but not every path, which is
 # what keeps a log this small enough to read.

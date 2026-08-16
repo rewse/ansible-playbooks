@@ -1,0 +1,73 @@
+#!/bin/bash
+#
+# Weekly integrity check of the S3 repository holding this Mac.
+#
+# The volumes on the NAS get the same treatment: a backup that has been running
+# for months proves nothing about whether the repository can still be read.
+
+set -euo pipefail
+
+CONFIG_DIR="{{ home }}/.config/restic"
+LOG_FILE="{{ home }}/Library/Logs/restic-s3-check.log"
+LOG_TAG="restic-s3-check"
+MARKER="{{ home }}/.local/state/restic-s3-check.success"
+MIN_INTERVAL=$(( {{ restic_darwin.check_min_interval_days }} * 86400 ))
+
+export RESTIC_REPOSITORY="s3:s3.{{ restic_darwin.s3_region }}.amazonaws.com/{{ restic_darwin.s3_bucket }}/{{ restic_darwin.repo_name }}"
+export RESTIC_PASSWORD_FILE="${CONFIG_DIR}/password"
+export RESTIC_PROGRESS_FPS=0.0166
+export PATH="/opt/homebrew/bin:/usr/bin:/bin:/usr/sbin:/sbin"
+
+set -a
+# shellcheck source=/dev/null
+. "${CONFIG_DIR}/s3.env"
+set +a
+
+log() {
+    echo "$(date '+%Y-%m-%d %H:%M:%S') $*"
+}
+
+# See restic-s3-backup for why the rotation copies and truncates rather than
+# renaming, and why it runs before the first line is written.
+rotate_log() {
+    [ -f "${LOG_FILE}" ] || return 0
+    [ "$(stat -f %z "${LOG_FILE}")" -lt 5242880 ] && return 0
+    cp "${LOG_FILE}" "${LOG_FILE}.1"
+    : > "${LOG_FILE}"
+}
+rotate_log
+
+notify() {
+    osascript -e "display notification \"$1\" with title \"${LOG_TAG}\"" 2>/dev/null || true
+}
+
+on_error() {
+    log "FAILED at line $1"
+    notify "Integrity check failed. See ~/Library/Logs/${LOG_TAG}.log"
+}
+trap 'on_error $LINENO' ERR
+
+if [ -f "${MARKER}" ]; then
+    age=$(( $(date +%s) - $(stat -f %m "${MARKER}") ))
+    if [ "${age}" -lt "${MIN_INTERVAL}" ]; then
+        log "Last check was ${age}s ago, under ${MIN_INTERVAL}s. Nothing to do."
+        exit 0
+    fi
+fi
+
+if ! pmset -g batt | grep -q "AC Power"; then
+    log "On battery. Deferring to the next run."
+    exit 0
+fi
+
+# Deliberately without --read-data, which would pull every pack back out of S3.
+# What this catches is the failure this setup can produce: an upload that broke
+# partway, an index that no longer matches, a prune that did not finish.
+#
+# --retry-lock waits for the nightly backup or its prune instead of reporting a
+# scheduling collision as a fault.
+log "=== Check started ==="
+nice -n 10 restic check --with-cache --retry-lock=2h
+
+touch "${MARKER}"
+log "=== Check completed ==="

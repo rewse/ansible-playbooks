@@ -14,6 +14,11 @@ restic_darwin:
   min_interval_hours: 20
   hour: 3
   minute: 7
+  # Sunday, after the volume and host checks on the NAS at nine and ten.
+  check_min_interval_days: 6
+  check_weekday: 0
+  check_hour: 11
+  check_minute: 13
 
 restic_darwin_password: "{{ lookup('pipe', 'op read \"op://ansible/restic/password\"') }}"
 restic_darwin_aws_key: "{{ lookup('pipe', 'op read \"op://ansible/restic - AWS IAM/username\"') }}"

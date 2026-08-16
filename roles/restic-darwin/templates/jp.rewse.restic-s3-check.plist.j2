@@ -1,0 +1,41 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
+<plist version="1.0">
+<dict>
+    <key>Label</key>
+    <string>jp.rewse.restic-s3-check</string>
+
+    <key>ProgramArguments</key>
+    <array>
+        <string>{{ home }}/.local/bin/restic-s3-check</string>
+    </array>
+
+    <!-- After the volume and host checks on the NAS, which run at nine and ten. -->
+    <key>StartCalendarInterval</key>
+    <dict>
+        <key>Weekday</key>
+        <integer>{{ restic_darwin.check_weekday }}</integer>
+        <key>Hour</key>
+        <integer>{{ restic_darwin.check_hour }}</integer>
+        <key>Minute</key>
+        <integer>{{ restic_darwin.check_minute }}</integer>
+    </dict>
+
+    <!-- A laptop asleep on Sunday morning never sees the schedule, so the agent
+         also runs at login and the script decides whether a week has passed. -->
+    <key>RunAtLoad</key>
+    <true/>
+
+    <key>Nice</key>
+    <integer>10</integer>
+    <key>LowPriorityIO</key>
+    <true/>
+    <key>ProcessType</key>
+    <string>Background</string>
+
+    <key>StandardOutPath</key>
+    <string>{{ home }}/Library/Logs/restic-s3-check.log</string>
+    <key>StandardErrorPath</key>
+    <string>{{ home }}/Library/Logs/restic-s3-check.log</string>
+</dict>
+</plist>

@@ -65,11 +65,35 @@
     - restic-darwin_restic
     - restic-darwin_restic_config
 
-- name: "restic : Copy backup script"
+# Creating the repository belongs here rather than in the nightly script, where a
+# transient S3 failure is indistinguishable from a repository that does not exist
+# yet and would be answered by trying to initialise over the top of one.
+- name: "restic : Initialise the repository"
+  ansible.builtin.shell: |
+    set -a
+    . "${HOME}/.config/restic/s3.env"
+    set +a
+    export RESTIC_REPOSITORY="s3:s3.{{ restic_darwin.s3_region }}.amazonaws.com/{{ restic_darwin.s3_bucket }}/{{ restic_darwin.repo_name }}"
+    export RESTIC_PASSWORD_FILE="${HOME}/.config/restic/password"
+    export PATH="/opt/homebrew/bin:${PATH}"
+    restic cat config >/dev/null 2>&1 && exit 0
+    restic init
+  register: restic_init
+  changed_when: "'created restic repository' in restic_init.stdout"
+  tags:
+    - restic-darwin
+    - init
+    - restic-darwin_restic
+    - restic-darwin_restic_init
+
+- name: "restic : Copy scripts"
   ansible.builtin.template:
-    src: restic-s3-backup.j2
-    dest: "{{ ansible_facts['env']['HOME'] }}/.local/bin/restic-s3-backup"
+    src: "{{ item }}.j2"
+    dest: "{{ ansible_facts['env']['HOME'] }}/.local/bin/{{ item }}"
     mode: '0755'
+  loop:
+    - restic-s3-backup
+    - restic-s3-check
   vars:
     home: "{{ ansible_facts['env']['HOME'] }}"
   tags:
@@ -78,14 +102,17 @@
     - restic-darwin_restic
     - restic-darwin_restic_config
 
-- name: "restic : Copy launchd agent"
+- name: "restic : Copy launchd agents"
   ansible.builtin.template:
-    src: jp.rewse.restic-s3-backup.plist.j2
-    dest: "{{ ansible_facts['env']['HOME'] }}/Library/LaunchAgents/jp.rewse.restic-s3-backup.plist"
+    src: "jp.rewse.{{ item }}.plist.j2"
+    dest: "{{ ansible_facts['env']['HOME'] }}/Library/LaunchAgents/jp.rewse.{{ item }}.plist"
     mode: '0644'
+  loop:
+    - restic-s3-backup
+    - restic-s3-check
   vars:
     home: "{{ ansible_facts['env']['HOME'] }}"
-  register: restic_agent
+  register: restic_agents
   tags:
     - restic-darwin
     - config
@@ -94,11 +121,13 @@
 
 # bootout before bootstrap because launchd keeps the definition it loaded and
 # ignores a rewritten file until the job is replaced.
-- name: "restic : Reload launchd agent"
+- name: "restic : Reload launchd agents"
   ansible.builtin.shell: |
-    launchctl bootout gui/$(id -u)/jp.rewse.restic-s3-backup 2>/dev/null || true
-    launchctl bootstrap gui/$(id -u) "{{ ansible_facts['env']['HOME'] }}/Library/LaunchAgents/jp.rewse.restic-s3-backup.plist"
-  when: restic_agent is changed
+    launchctl bootout gui/$(id -u)/jp.rewse.{{ item.item }} 2>/dev/null || true
+    launchctl bootstrap gui/$(id -u) "{{ ansible_facts['env']['HOME'] }}/Library/LaunchAgents/jp.rewse.{{ item.item }}.plist"
+  loop: "{{ restic_agents.results | selectattr('changed') | list }}"
+  loop_control:
+    label: "{{ item.item }}"
   tags:
     - restic-darwin
     - config

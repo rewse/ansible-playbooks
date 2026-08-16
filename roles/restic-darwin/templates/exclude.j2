@@ -20,7 +20,6 @@
 {{ home }}/.agent-browser
 {{ home }}/.cache
 {{ home }}/.local
-{{ home }}/.lmstudio
 {{ home }}/.npm
 
 # Cloud providers mount here as dataless placeholders: 144 GB of names whose
@@ -29,10 +28,9 @@
 # it somewhere it already is.
 {{ home }}/Library/CloudStorage
 
-# iCloud Drive evicts what it can and leaves a placeholder, which reports
-# "resource deadlock avoided" when read rather than downloading on demand, so
-# these files cannot be captured without materialising them first.
-{{ home }}/Library/Mobile Documents
+# iCloud Drive is included: it holds the household's records back to 2008, and
+# iCloud synchronises rather than archives, so a deletion there propagates. The
+# backup script materialises the evicted files before reading them.
 
 # Unreadable with Full Disk Access granted. A backup that cannot read a file is a
 # backup that reports failure every night.
