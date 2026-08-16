@@ -45,13 +45,36 @@ publish_mqtt() {
   return 1
 }
 
+read_co2() {
+  local attempt
+  local co2
+
+  # The sensor answers over PWM, where a reading is taken by timing edges, so a
+  # host with something else to do misses one and the library gives up. Roughly
+  # one reading in five hundred, and the next attempt succeeds. Retried here
+  # because the timer's next run is five minutes out, which is long enough for
+  # the reading to be stale, and because a failure raises a notification through
+  # OnFailure.
+  for attempt in 1 2 3; do
+    if co2=$(python3 -m mh_z19 --pwm 2>/dev/null | grep -oP "(?<='co2': )\d+") \
+      && [[ -n "${co2}" ]]; then
+      echo "${co2}"
+      return 0
+    fi
+
+    [[ "${attempt}" -lt 3 ]] && sleep 5
+  done
+
+  return 1
+}
+
 send_co2() {
   local co2
   local datetime
 
-  co2=$(python3 -m mh_z19 --pwm | grep -oP "(?<='co2': )\d+")
-
-  if [[ -z "${co2}" ]]; then
+  # Availability is published before the exit so Home Assistant shows the sensor
+  # as unavailable rather than holding the last reading as though it were current.
+  if ! co2=$(read_co2); then
     publish_mqtt "${TOPIC_BASE}/state" "offline"
     return 1
   fi
