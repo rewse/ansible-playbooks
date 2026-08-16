@@ -8,16 +8,23 @@ nvr_media_dir: "{{ nvr_media_parent }}/nvr"
 # works out to 2.8 GB per camera-day, so 30 days of all four fits in 340 GB.
 nvr_retain_days: 30
 
-# 1920x1088, four cameras: (1920 * 1088 * 1.5 * 20 + 270480) / 1048576 = 60 MB
-# each, plus 40 MB the container uses for logs in shm.
-nvr_shm_size: 320m
-# Measured 802 MiB in steady state with four cameras, so 1g left no headroom and
-# risked an OOM kill. fox has 7.8 GB, and this still walls Frigate off from
-# taking Home Assistant down with it.
+# Frigate asks for 162 MB with four cameras and warns every ten seconds below it,
+# so this clears its own figure rather than the 73 MB actually used. The gap is
+# headroom for frames in flight: the buffers are 49 per camera at the detect
+# resolution of 640 * 360 * 1.5, which is 17 MB each, and they are allocated per
+# configured camera rather than per connected one. A camera powered off therefore
+# costs the same as one streaming, which is why usage held constant for an hour.
+nvr_shm_size: 192m
+# 951 MiB peak with four cameras, reached while the hourly preview compilation
+# runs. The headroom is not about freeing RAM, fox having 7.8 GB: it walls Frigate
+# off from taking Home Assistant down with it, and 1g risked an OOM kill.
 nvr_mem_limit: 2g
 
-# In-memory staging for recording segments, per the upstream compose example.
-nvr_cache_size: 1000000000
+# Staging for recording segments and for the preview frames, which accumulate
+# until they are compiled into one file an hour. That compilation is what empties
+# this, so the peak arrives just before the hour: 74 MB with four cameras, growing
+# 1.2 MB a minute. 256 MiB covers a compilation cycle being missed.
+nvr_cache_size: 268435456
 
 nvr_cameras:
   - name: eufy-dad
