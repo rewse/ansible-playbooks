@@ -1,0 +1,111 @@
+#!/bin/bash
+#
+# Offsite backup of this Mac's home directory to S3.
+#
+# Time Machine holds the local copy. This one exists for the case where the house
+# and the enclosure in it are gone, so it runs unattended from a launchd agent and
+# has to survive a laptop that sleeps through its schedule.
+
+set -euo pipefail
+
+CONFIG_DIR="{{ home }}/.config/restic"
+LOG_FILE="{{ home }}/Library/Logs/restic-s3-backup.log"
+LOG_TAG="restic-s3-backup"
+MARKER_SUCCESS="{{ home }}/.local/state/restic-s3-backup.success"
+MARKER_RETENTION="{{ home }}/.local/state/restic-s3-backup.retention"
+MIN_INTERVAL=$(( {{ restic_darwin.min_interval_hours }} * 3600 ))
+
+export RESTIC_REPOSITORY="s3:s3.{{ restic_darwin.s3_region }}.amazonaws.com/{{ restic_darwin.s3_bucket }}/{{ restic_darwin.repo_name }}"
+export RESTIC_PASSWORD_FILE="${CONFIG_DIR}/password"
+export RESTIC_PROGRESS_FPS=0.0166
+export PATH="/opt/homebrew/bin:/usr/bin:/bin:/usr/sbin:/sbin"
+
+set -a
+# shellcheck source=/dev/null
+. "${CONFIG_DIR}/s3.env"
+set +a
+
+log() {
+    echo "$(date '+%Y-%m-%d %H:%M:%S') $*"
+}
+
+# The agent appends to one file with nothing to trim it, and macOS has no
+# journald to age it out. Copying and then truncating in place keeps the
+# descriptor launchd opened in append mode pointing at the right file, which
+# renaming would not, and this runs before anything is logged so the rotation
+# never takes this run's own lines with it.
+rotate_log() {
+    [ -f "${LOG_FILE}" ] || return 0
+    [ "$(stat -f %z "${LOG_FILE}")" -lt 5242880 ] && return 0
+    cp "${LOG_FILE}" "${LOG_FILE}.1"
+    : > "${LOG_FILE}"
+}
+rotate_log
+
+# launchd has no OnFailure, so the script raises its own alarm. A silent offsite
+# backup that stopped working is the failure this is meant to prevent.
+notify() {
+    osascript -e "display notification \"$1\" with title \"${LOG_TAG}\"" 2>/dev/null || true
+}
+
+on_error() {
+    log "FAILED at line $1"
+    notify "Backup failed. See ~/Library/Logs/${LOG_TAG}.log"
+}
+trap 'on_error $LINENO' ERR
+
+# -----------------------------------------------------------------------------
+# Decide whether to run
+# -----------------------------------------------------------------------------
+# The agent also loads at login, which is what picks up a night spent asleep.
+# Without this the backup would start every time the lid opened.
+if [ -f "${MARKER_SUCCESS}" ]; then
+    age=$(( $(date +%s) - $(stat -f %m "${MARKER_SUCCESS}") ))
+    if [ "${age}" -lt "${MIN_INTERVAL}" ]; then
+        log "Last success was ${age}s ago, under ${MIN_INTERVAL}s. Nothing to do."
+        exit 0
+    fi
+fi
+
+# Uploading tens of gigabytes on battery drains it, and the connection is as
+# likely to be a phone as the house.
+if ! pmset -g batt | grep -q "AC Power"; then
+    log "On battery. Deferring to the next run."
+    exit 0
+fi
+
+# -----------------------------------------------------------------------------
+# Back up
+# -----------------------------------------------------------------------------
+if ! restic cat config >/dev/null 2>&1; then
+    log "Initialising ${RESTIC_REPOSITORY}"
+    restic init
+fi
+
+log "=== Backup started ==="
+# Without --verbose restic reports counts and sizes but not every path, which is
+# what keeps a log this small enough to read.
+nice -n 10 restic backup "{{ home }}" \
+  --exclude-file="${CONFIG_DIR}/exclude" \
+  --exclude-caches \
+  --one-file-system \
+  --tag daily
+
+# Written before retention runs. A single marker covering both would report the
+# data as missing when it is only the pruning that failed.
+mkdir -p "$(dirname "${MARKER_SUCCESS}")"
+touch "${MARKER_SUCCESS}"
+log "Backup completed"
+
+# -----------------------------------------------------------------------------
+# Apply retention
+# -----------------------------------------------------------------------------
+nice -n 10 restic forget \
+  --keep-daily {{ restic_darwin.keep_daily }} \
+  --keep-weekly {{ restic_darwin.keep_weekly }} \
+  --keep-monthly {{ restic_darwin.keep_monthly }} \
+  --prune \
+  --retry-lock=2h
+
+touch "${MARKER_RETENTION}"
+log "=== Retention completed ==="

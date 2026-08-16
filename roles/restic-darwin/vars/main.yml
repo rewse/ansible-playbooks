@@ -1,0 +1,20 @@
+---
+# The repository is named after the host so that a second Mac lands beside this
+# one in the same bucket, next to the volume repositories the NAS writes.
+restic_darwin:
+  repo_name: "{{ inventory_hostname_short }}"
+  s3_bucket: rewse-nas-bak
+  s3_region: ap-northeast-1
+  # Retention matches the volumes in the same bucket.
+  keep_daily: 30
+  keep_weekly: 8
+  keep_monthly: 12
+  # A run is skipped when the last one succeeded this recently, so loading the
+  # agent at every login costs nothing while a day missed to sleep is picked up.
+  min_interval_hours: 20
+  hour: 3
+  minute: 7
+
+restic_darwin_password: "{{ lookup('pipe', 'op read \"op://ansible/restic/password\"') }}"
+restic_darwin_aws_key: "{{ lookup('pipe', 'op read \"op://ansible/restic - AWS IAM/username\"') }}"
+restic_darwin_aws_secret: "{{ lookup('pipe', 'op read \"op://ansible/restic - AWS IAM/credential\"') }}"

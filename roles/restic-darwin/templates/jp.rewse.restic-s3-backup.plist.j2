@@ -1,0 +1,39 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
+<plist version="1.0">
+<dict>
+    <key>Label</key>
+    <string>jp.rewse.restic-s3-backup</string>
+
+    <key>ProgramArguments</key>
+    <array>
+        <string>{{ home }}/.local/bin/restic-s3-backup</string>
+    </array>
+
+    <key>StartCalendarInterval</key>
+    <dict>
+        <key>Hour</key>
+        <integer>{{ restic_darwin.hour }}</integer>
+        <key>Minute</key>
+        <integer>{{ restic_darwin.minute }}</integer>
+    </dict>
+
+    <!-- A laptop asleep at the scheduled hour never sees it, so the agent also
+         runs at login and the script decides whether enough time has passed. -->
+    <key>RunAtLoad</key>
+    <true/>
+
+    <!-- The backup is never the reason the machine is awake. -->
+    <key>Nice</key>
+    <integer>10</integer>
+    <key>LowPriorityIO</key>
+    <true/>
+    <key>ProcessType</key>
+    <string>Background</string>
+
+    <key>StandardOutPath</key>
+    <string>{{ home }}/Library/Logs/restic-s3-backup.log</string>
+    <key>StandardErrorPath</key>
+    <string>{{ home }}/Library/Logs/restic-s3-backup.log</string>
+</dict>
+</plist>

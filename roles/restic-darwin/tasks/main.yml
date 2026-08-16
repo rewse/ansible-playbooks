@@ -1,0 +1,106 @@
+---
+- name: "restic : Install restic"
+  community.general.homebrew:
+    name: restic
+    state: present
+  tags:
+    - restic-darwin
+    - install
+    - homebrew
+    - restic-darwin_homebrew
+    - restic-darwin_homebrew_install
+
+- name: "restic : Create directories"
+  ansible.builtin.file:
+    path: "{{ item }}"
+    state: directory
+    mode: '0700'
+  loop:
+    - "{{ ansible_facts['env']['HOME'] }}/.config/restic"
+    - "{{ ansible_facts['env']['HOME'] }}/.local/state"
+  tags:
+    - restic-darwin
+    - config
+    - restic-darwin_restic
+    - restic-darwin_restic_config
+
+# The secrets are resolved on the control machine and land as files, because a
+# launchd agent has no 1Password session to read them from at the time it runs.
+- name: "restic : Install repository password"
+  ansible.builtin.copy:
+    content: "{{ restic_darwin_password }}"
+    dest: "{{ ansible_facts['env']['HOME'] }}/.config/restic/password"
+    mode: '0600'
+  no_log: true
+  tags:
+    - restic-darwin
+    - config
+    - restic-darwin_restic
+    - restic-darwin_restic_config
+
+- name: "restic : Install S3 credentials"
+  ansible.builtin.copy:
+    content: |
+      AWS_ACCESS_KEY_ID={{ restic_darwin_aws_key }}
+      AWS_SECRET_ACCESS_KEY={{ restic_darwin_aws_secret }}
+    dest: "{{ ansible_facts['env']['HOME'] }}/.config/restic/s3.env"
+    mode: '0600'
+  no_log: true
+  tags:
+    - restic-darwin
+    - config
+    - restic-darwin_restic
+    - restic-darwin_restic_config
+
+- name: "restic : Copy exclude patterns"
+  ansible.builtin.template:
+    src: exclude.j2
+    dest: "{{ ansible_facts['env']['HOME'] }}/.config/restic/exclude"
+    mode: '0644'
+  vars:
+    home: "{{ ansible_facts['env']['HOME'] }}"
+  tags:
+    - restic-darwin
+    - config
+    - restic-darwin_restic
+    - restic-darwin_restic_config
+
+- name: "restic : Copy backup script"
+  ansible.builtin.template:
+    src: restic-s3-backup.j2
+    dest: "{{ ansible_facts['env']['HOME'] }}/.local/bin/restic-s3-backup"
+    mode: '0755'
+  vars:
+    home: "{{ ansible_facts['env']['HOME'] }}"
+  tags:
+    - restic-darwin
+    - config
+    - restic-darwin_restic
+    - restic-darwin_restic_config
+
+- name: "restic : Copy launchd agent"
+  ansible.builtin.template:
+    src: jp.rewse.restic-s3-backup.plist.j2
+    dest: "{{ ansible_facts['env']['HOME'] }}/Library/LaunchAgents/jp.rewse.restic-s3-backup.plist"
+    mode: '0644'
+  vars:
+    home: "{{ ansible_facts['env']['HOME'] }}"
+  register: restic_agent
+  tags:
+    - restic-darwin
+    - config
+    - restic-darwin_restic
+    - restic-darwin_restic_config
+
+# bootout before bootstrap because launchd keeps the definition it loaded and
+# ignores a rewritten file until the job is replaced.
+- name: "restic : Reload launchd agent"
+  ansible.builtin.shell: |
+    launchctl bootout gui/$(id -u)/jp.rewse.restic-s3-backup 2>/dev/null || true
+    launchctl bootstrap gui/$(id -u) "{{ ansible_facts['env']['HOME'] }}/Library/LaunchAgents/jp.rewse.restic-s3-backup.plist"
+  when: restic_agent is changed
+  tags:
+    - restic-darwin
+    - config
+    - restic-darwin_restic
+    - restic-darwin_restic_config

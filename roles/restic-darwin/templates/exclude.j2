@@ -1,0 +1,56 @@
+{{ ansible_managed | comment }}
+# Patterns for restic --exclude-file. The backup covers the whole home directory
+# so that a new place to keep things is included without being named here.
+#
+# Time Machine holds the copy that restores this machine as it was. This one is
+# for the house burning down, so it carries what cannot be fetched again and
+# leaves what can.
+
+# Time Machine excludes these by an extended attribute restic cannot see, so they
+# have to be named again.
+{{ home }}/.Trash
+{{ home }}/Library/Biome
+{{ home }}/Library/Caches
+{{ home }}/Library/Logs
+{{ home }}/Library/Metadata
+{{ home }}/Library/Mail/V10/MailData/Envelope Index
+{{ home }}/Pictures/Photos Library.photoslibrary/database/Photos.sqlite
+
+# Tool caches and runtimes, reinstallable.
+{{ home }}/.agent-browser
+{{ home }}/.cache
+{{ home }}/.local
+{{ home }}/.lmstudio
+{{ home }}/.npm
+
+# Cloud providers mount here as dataless placeholders: 144 GB of names whose
+# contents live on a server and occupy 436 KB locally. Reading one downloads it,
+# so backing this up would pull the whole remote copy through this machine to put
+# it somewhere it already is.
+{{ home }}/Library/CloudStorage
+
+# iCloud Drive evicts what it can and leaves a placeholder, which reports
+# "resource deadlock avoided" when read rather than downloading on demand, so
+# these files cannot be captured without materialising them first.
+{{ home }}/Library/Mobile Documents
+
+# Unreadable with Full Disk Access granted. A backup that cannot read a file is a
+# backup that reports failure every night.
+{{ home }}/Library/Application Support/FileProvider
+{{ home }}/Library/Group Containers/group.com.apple.secure-control-center-preferences
+{{ home }}/Library/NGL
+
+# Application data that a reinstall or a sign-in restores. Browser profiles come
+# back through their own sync, and the models download again.
+{{ home }}/Library/Application Support/Arc
+{{ home }}/Library/Application Support/com.apple.container
+{{ home }}/Library/Application Support/FluidAudio
+{{ home }}/Library/Application Support/Google
+{{ home }}/Library/Application Support/Kiro
+{{ home }}/Library/Application Support/open-webui-desktop
+{{ home }}/Library/Daemon Containers/*/Data/Library/HybridSearch
+
+# Photos and Mail are left out on purpose: iCloud Photos and IMAP hold them, and
+# together they are 56 GB of the 241 GB here.
+{{ home }}/Library/Mail
+{{ home }}/Pictures
