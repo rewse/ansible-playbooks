@@ -1,4 +1,8 @@
 ---
 zabbix_agent:
-  server: zabbix.rewse.jp
+  # The address accompanies the name because the name is internal only. A host
+  # outside the LAN resolves it to NXDOMAIN, which empties the allow list and
+  # makes the agent refuse every connection, and the server reports that as the
+  # agent dropping the connection on access permissions.
+  server: zabbix.rewse.jp,192.168.0.30
   version: 7.4
