@@ -48,7 +48,12 @@ fi
 {% endif %}
 
 # Verify repository integrity (reads all pack files)
-nice -n 10 restic check --read-data --verbose
+#
+# --retry-lock waits for a backup or a prune to finish rather than giving up. A
+# check that lands on a repository still being written exits 11 and mails, which
+# says nothing about integrity, and only 13 minutes separate the backup from this
+# check. A repository still locked after the wait is a real fault and still fails.
+nice -n 10 restic check --read-data --verbose --retry-lock=2h
 
 # Mark successful completion for monitoring
 touch "/var/lib/restic-local-check-${NAME}.success"

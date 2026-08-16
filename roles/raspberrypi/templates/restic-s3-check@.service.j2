@@ -25,5 +25,11 @@ EnvironmentFile=/etc/restic/s3.env
 #
 # --with-cache reuses the metadata already on disk instead of fetching the index
 # again, which check otherwise does into a fresh temporary cache every run.
-ExecStart=/usr/local/bin/restic check --with-cache --verbose
+#
+# --retry-lock waits for a backup or a prune to finish rather than giving up.
+# Without it a check that lands on a repository still being written exits 11 and
+# mails, which says nothing about integrity: the archive takes over five hours on
+# a full run, so the daily backup and this weekly check can overlap. A repository
+# still locked after the wait is a real fault and still fails.
+ExecStart=/usr/local/bin/restic check --with-cache --verbose --retry-lock=2h
 ExecStartPost=/usr/bin/touch /var/lib/restic-s3-check-%i.success
