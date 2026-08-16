@@ -31,6 +31,10 @@ fi
 start_time=$(date --iso-8601=seconds --date '1 hour ago')
 end_time=$(date --iso-8601=seconds)
 
+# The caller feeds this output straight into a numeric Zabbix item, and the agent
+# takes standard error as part of an item's value, so a diagnostic printed here
+# arrives as the reading. Failing silently leaves the item unsupported, which is
+# the state that means the value could not be read.
 aws cloudwatch get-metric-statistics \
   --region ap-northeast-1 \
   --namespace $namespace \
@@ -41,5 +45,5 @@ aws cloudwatch get-metric-statistics \
   --period 300 \
   --statistics $statistics \
   --query Datapoints[*].["Timestamp","$statistics"] \
-  --output text |
+  --output text 2> /dev/null |
   sort | tail -1 | awk '{print $2}'

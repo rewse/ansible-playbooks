@@ -4,6 +4,19 @@ trap 'my_exit 1' 1 2 3 15
 
 readonly tmpfile=$(mktemp --tmpdir ec2.XXXXXXXXXX)
 
+# {{{ metadata()
+
+# The instance answers nothing without a token, so a plain GET returns an empty
+# string and every dimension built from it is rejected by the API.
+metadata() {
+    local token=$(curl -s -m 3 -X PUT http://169.254.169.254/latest/api/token \
+        -H "X-aws-ec2-metadata-token-ttl-seconds: 60")
+
+    curl -s -m 3 -H "X-aws-ec2-metadata-token: ${token}" \
+        http://169.254.169.254/latest/meta-data/$1
+}
+
+# }}}
 # {{{ my_exit()
 
 my_exit() {
@@ -19,7 +32,7 @@ send_instance_type() {
     zabbix_sender \
         -c /etc/zabbix/zabbix_agentd.conf \
         -k ec2.instance_type \
-        -o $(GET http://169.254.169.254/latest/meta-data/instance-type) \
+        -o $(metadata instance-type) \
         > /dev/null 2>&1
 }
 
@@ -27,7 +40,13 @@ send_instance_type() {
 # {{{ obtain_ids()
 
 obtain_ids() {
-    instance_id=$(GET http://169.254.169.254/latest/meta-data/instance-id)
+    instance_id=$(metadata instance-id)
+
+    # Without an id the metrics below would be requested for an empty dimension,
+    # which the API rejects one call at a time.
+    if [ -z "$instance_id" ]; then
+        my_exit 1
+    fi
 
     aws ec2 describe-volumes \
         --region ap-northeast-1 \
@@ -105,15 +124,12 @@ send_ec2() {
 # }}}
 # {{{ send_ebs()
 
+# BurstBalance is absent here because it belongs to gp2, where a volume earns and
+# spends I/O credits. Every volume attached is gp3, whose throughput is
+# provisioned rather than earned.
 send_ebs() {
     for volume_id in $(awk '{print $1}' $tmpfile); do
         local device_name=$(grep $volume_id $tmpfile | awk '{print $2}' | xargs basename)
-
-        zabbix_sender \
-            -c /etc/zabbix/zabbix_agentd.conf \
-            -k cloudwatch.ebs.burst_balance[$device_name] \
-            -o $(cloudwatch -n AWS/EBS -m BurstBalance -d Name=VolumeId,Value=$volume_id -s Average) \
-            > /dev/null 2>&1
 
         zabbix_sender \
             -c /etc/zabbix/zabbix_agentd.conf \
