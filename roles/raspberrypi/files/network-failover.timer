@@ -1,9 +1,12 @@
 [Unit]
 Description=Network Failover Monitor Timer
 
+# A backstop for what the networkd-dispatcher hooks miss, which is why minutes
+# rather than the one it used to run at: a carrier change reaches the script as
+# an event now, so nothing waits for this.
 [Timer]
 OnBootSec=1min
-OnUnitActiveSec=1min
+OnUnitActiveSec=5min
 
 [Install]
 WantedBy=timers.target

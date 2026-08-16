@@ -39,6 +39,14 @@ network:
       ipv6-mtu: 1500
       accept-ra: true
       optional: true
+      # networkd leaves the admin state alone, so this address reaches the
+      # segment only once network-failover brings the link up. Left to come up
+      # with eth0, it puts two addresses of the same host on one segment for as
+      # long as it takes something to notice, and Avahi renames the host inside
+      # that window. Configuration still applies the moment the link goes up,
+      # and wpa_supplicant waits on the device rather than the link, so the
+      # fallback needs no hand.
+      activation-mode: manual
       addresses:
          - {{ local.ip_2 }}/24
       routes:

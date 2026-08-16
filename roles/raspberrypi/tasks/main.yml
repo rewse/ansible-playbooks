@@ -270,10 +270,27 @@
     - raspberrypi_sysctl_config
 
 - name: "network-failover : Copy script"
-  ansible.builtin.copy:
-    src: network-failover
-    dest: /usr/local/sbin
+  ansible.builtin.template:
+    src: network-failover.j2
+    dest: /usr/local/sbin/network-failover
     mode: '0755'
+  tags:
+    - raspberrypi
+    - config
+    - raspberrypi_network-failover
+    - raspberrypi_network-failover_config
+
+# routable covers eth0 regaining the segment and wlan0 having come up, no-carrier
+# the cable going away. networkd-dispatcher refuses a hook that anyone but root
+# can write, which the target already satisfies.
+- name: "network-failover : Hook the dispatcher"
+  ansible.builtin.file:
+    src: /usr/local/sbin/network-failover
+    dest: "/etc/networkd-dispatcher/{{ item }}/network-failover"
+    state: link
+  loop:
+    - no-carrier.d
+    - routable.d
   tags:
     - raspberrypi
     - config
