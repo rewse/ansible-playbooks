@@ -38,6 +38,7 @@ auth:
   adminUsername: {{ admin }}
   adminPassword: "{{ filebrowser_admin_password }}"
   key: "{{ filebrowser_jwt_secret }}"
+  tokenExpirationHours: {{ filebrowser_token_expiration_hours }}
   methods:
     password:
       enabled: true

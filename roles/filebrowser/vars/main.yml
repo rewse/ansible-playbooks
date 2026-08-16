@@ -21,6 +21,12 @@ filebrowser_hostname: nas.rewse.jp
 # OOM kill waiting to happen.
 filebrowser_mem_limit: 1g
 
+# How long a web UI session lasts. Upstream defaults to 2 hours, which expires
+# between visits from the phone, and every re-entry costs a password and a passkey
+# prompt. The exposure is that a leaked token stays usable for this long; it is
+# accepted because the published source is read-only.
+filebrowser_token_expiration_hours: 720
+
 # What gets published. The home directory and nothing else, so the Time Machine
 # sparsebundles and the restic repositories on Bay 2 are kept out by not being
 # reachable rather than by an exclusion rule that could be written wrong. The
