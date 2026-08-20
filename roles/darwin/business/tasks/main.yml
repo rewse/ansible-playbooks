@@ -117,7 +117,12 @@
     - darwin_kiro_install
 
 - name: "aim : Install MCP servers"
-  ansible.builtin.command: aim mcp install --print-client-config {{ item }}
+  # --clients selects which client configs to edit. Naming an unregistered
+  # client leaves all of them alone, keeping aim away from the codex and kiro
+  # configs that chezmoi owns. Do not reach for --print-client-config instead:
+  # it also skips the ~/.aim/mcp-servers wrapper, so the server never lands on
+  # PATH and the install reports success while leaving nothing runnable.
+  ansible.builtin.command: aim mcp install --clients=none {{ item }}
   changed_when: false
   loop:
     - amazon-quick-mcp
