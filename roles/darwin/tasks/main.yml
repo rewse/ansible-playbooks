@@ -93,6 +93,7 @@
     - pv
     - pwgen
     - python3
+    - ripgrep
     - rsync
     - skopeo
     - switchaudio-osx
