@@ -1,7 +1,45 @@
 ---
+- name: "mysql : Read installed apt config version"
+  ansible.builtin.command:
+    argv:
+      - dpkg-query
+      - --show
+      - '--showformat=${Version}'
+      - mysql-apt-config
+  register: client_mysql_apt_config_installed
+  changed_when: false
+  failed_when: false
+  check_mode: false
+  tags:
+    - database-client
+    - install
+    - mysql
+    - database-client_mysql
+    - database-client_mysql_config
+
+- name: "mysql : Compare apt config version"
+  ansible.builtin.command:
+    argv:
+      - dpkg
+      - --compare-versions
+      - "{{ client_mysql_apt_config_installed.stdout }}"
+      - ge
+      - "{{ database_mysql_apt_config_version }}"
+  register: client_mysql_apt_config_version_check
+  changed_when: false
+  failed_when: false
+  check_mode: false
+  tags:
+    - database-client
+    - install
+    - mysql
+    - database-client_mysql
+    - database-client_mysql_config
+
 - name: "mysql : Add apt repository"
   ansible.builtin.apt:
     deb: https://repo.mysql.com//mysql-apt-config_{{ database_mysql_apt_config_version }}_all.deb
+  when: client_mysql_apt_config_version_check.rc != 0
   tags:
     - database-client
     - install
