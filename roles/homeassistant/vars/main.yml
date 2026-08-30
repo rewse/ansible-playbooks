@@ -27,4 +27,7 @@ homeassistant_regza:
   password: "{{ lookup('pipe', 'op read op://ansible/REGZA/credential') }}"
 homeassistant_simple_thermostat_version: 2.5.0
 homeassistant_simple_weather_card_version: 0.8.5
+homeassistant_tesla_fleet:
+  private_key: "{{ lookup('pipe', 'op read \"op://ansible/Tesla Fleet/private key base64\" | openssl base64 -d -A') }}"
+  public_key: "{{ lookup('pipe', 'op read \"op://ansible/Tesla Fleet/private key base64\" | openssl base64 -d -A | openssl ec -pubout') }}"
 homeassistant_tuya_local_version: 2026.7.2

@@ -1083,6 +1083,46 @@
     - homeassistant
     - config
 
+- name: "tesla-fleet : Copy private key"
+  ansible.builtin.copy:
+    content: "{{ homeassistant_tesla_fleet.private_key }}\n"
+    dest: /srv/homeassistant/config/tesla_fleet.key
+    mode: '0600'
+  no_log: true
+  notify: "homeassistant: Restart"
+  tags:
+    - homeassistant
+    - config
+    - tesla-fleet
+    - homeassistant_tesla-fleet
+    - homeassistant_tesla-fleet_config
+
+- name: "tesla-fleet : Create public key directory"
+  ansible.builtin.file:
+    path: /srv/www/tesla
+    state: directory
+    mode: '0755'
+  tags:
+    - homeassistant
+    - init
+    - tesla-fleet
+    - homeassistant_tesla-fleet
+    - homeassistant_tesla-fleet_init
+
+# Tesla pairs a vehicle against the key published under the domain, so this file
+# must stay derived from the private key Home Assistant signs commands with.
+- name: "tesla-fleet : Copy public key"
+  ansible.builtin.copy:
+    content: "{{ homeassistant_tesla_fleet.public_key }}\n"
+    dest: /srv/www/tesla/com.tesla.3p.public-key.pem
+    mode: '0644'
+  tags:
+    - homeassistant
+    - config
+    - tesla-fleet
+    - homeassistant_tesla-fleet
+    - homeassistant_tesla-fleet_config
+
 - name: "apache : Enable proxy modules"
   community.general.apache2_module:
     name: "{{ item }}"
