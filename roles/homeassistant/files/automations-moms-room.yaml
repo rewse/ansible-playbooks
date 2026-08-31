@@ -13,10 +13,10 @@
     - action: automation.turn_off
       target:
         entity_id:
-          - automation.adjust_living_room_ac_temperature
-          - automation.change_living_room_ac_mode
-          - automation.toggle_living_room_ac_cool
-          - automation.toggle_living_room_ac_dry
+          - automation.adjust_moms_room_ac_temperature
+          - automation.change_moms_room_ac_mode
+          - automation.toggle_moms_room_ac_cooldry
+          - automation.toggle_moms_room_ac_heat
     - action: notify.tats_devices
       data:
         title: "⚠️ ALARM"
@@ -47,10 +47,10 @@
     - action: automation.turn_off
       target:
         entity_id:
-          - automation.adjust_living_room_ac_temperature
-          - automation.change_living_room_ac_mode
-          - automation.toggle_living_room_ac_cool
-          - automation.toggle_living_room_ac_dry
+          - automation.adjust_moms_room_ac_temperature
+          - automation.change_moms_room_ac_mode
+          - automation.toggle_moms_room_ac_cooldry
+          - automation.toggle_moms_room_ac_heat
     - action: notify.tats_devices
       data:
         title: "⚠️ ALARM"

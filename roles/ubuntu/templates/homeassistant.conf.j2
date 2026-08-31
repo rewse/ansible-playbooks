@@ -8,6 +8,11 @@
 # systemd for every jail and jail.d is read after jail.local. Without it the jail
 # reads the journal and watches no file, while fail2ban-client status still
 # reports it enabled; get <jail> logpath is what tells the two apart.
+#
+# The address banned here is the one Home Assistant logged, which is the client's
+# only while Apache is a trusted proxy. Those proxies are listed in the UI under
+# Settings > System > Network, and an Apache address missing from them makes this
+# jail ban the proxy itself.
 [homeassistant]
 enabled = {{ 'true' if ubuntu_homeassistant_log.stat.exists else 'false' }}
 backend = auto

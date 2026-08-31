@@ -15,8 +15,8 @@
         entity_id:
           - automation.adjust_living_room_ac_temperature
           - automation.change_living_room_ac_mode
-          - automation.toggle_living_room_ac_cool
-          - automation.toggle_living_room_ac_dry
+          - automation.toggle_living_room_ac_cooldry
+          - automation.toggle_living_room_ac_heat
           - automation.toggle_living_area_floor_heating
     - action: notify.tats_devices
       data:
@@ -50,8 +50,8 @@
         entity_id:
           - automation.adjust_living_room_ac_temperature
           - automation.change_living_room_ac_mode
-          - automation.toggle_living_room_ac_cool
-          - automation.toggle_living_room_ac_dry
+          - automation.toggle_living_room_ac_cooldry
+          - automation.toggle_living_room_ac_heat
           - automation.toggle_living_area_floor_heating
     - action: notify.tats_devices
       data:

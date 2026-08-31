@@ -262,19 +262,6 @@
     unit_of_measurement: "pt"
     state_class: measurement
     icon: "mdi:water-percent-alert"
-  - unique_id: sensor.dads_room_temp_difference
-    name: "Dad’s Room Temperature Difference"
-    state: >-
-      {{
-        (
-          float(states('sensor.dads_room_temperature')) -
-          float(states('sensor.dads_room_switchbot_meter_temperature'))
-        ) | abs
-      }}
-    unit_of_measurement: "°C"
-    state_class: measurement
-    device_class: temperature
-    icon: "mdi:thermometer-alert"
   - unique_id: sensor.dads_room_wbgt
     name: "Dad’s Room WBGT"
     state: >-
@@ -337,19 +324,6 @@
     unit_of_measurement: "pt"
     state_class: measurement
     icon: "mdi:water-percent-alert"
-  - unique_id: sensor.living_room_temp_difference
-    name: "Living Room Temperature Difference"
-    state: >-
-      {{
-        (
-          float(states('sensor.living_room_temperature')) -
-          float(states('sensor.living_room_switchbot_hub_2_temperature'))
-        ) | abs
-      }}
-    unit_of_measurement: "°C"
-    state_class: measurement
-    device_class: temperature
-    icon: "mdi:thermometer-alert"
   - unique_id: sensor.living_room_wbgt
     name: "Living Room WBGT"
     state: >-
@@ -388,19 +362,6 @@
     unit_of_measurement: "pt"
     state_class: measurement
     icon: "mdi:water-percent-alert"
-  - unique_id: sensor.moms_room_temp_difference
-    name: "Mom’s Room Temperature Difference"
-    state: >-
-      {{
-        (
-          float(states('sensor.moms_room_temperature')) -
-          float(states('sensor.moms_room_switchbot_meter_temperature'))
-        ) | abs
-      }}
-    unit_of_measurement: "°C"
-    state_class: measurement
-    device_class: temperature
-    icon: "mdi:thermometer-alert"
   - unique_id: sensor.moms_room_wbgt
     name: "Mom’s Room WBGT"
     state: >-
@@ -791,3 +752,88 @@
           }}
         {% endif %}
       icon: "mdi:clock"
+
+# Trigger-based temperature differences
+# Dad’s Room
+- triggers:
+    - trigger: state
+      entity_id: sensor.dads_room_temperature
+  conditions:
+    - condition: template
+      value_template: >-
+        {{
+          is_number(trigger.to_state.state) and
+          is_number(states('sensor.dads_room_switchbot_meter_temperature'))
+        }}
+  sensor:
+    - unique_id: sensor.dads_room_temp_difference
+      name: "Dad’s Room Temperature Difference"
+      state: >-
+        {{
+          (
+            (trigger.to_state.state | float) -
+            (states('sensor.dads_room_switchbot_meter_temperature') | float)
+          ) | abs | round(2)
+        }}
+      attributes:
+        sampled_at: "{{ trigger.to_state.last_updated.isoformat() }}"
+      unit_of_measurement: "°C"
+      state_class: measurement
+      device_class: temperature
+      icon: "mdi:thermometer-alert"
+
+# Living Room
+- triggers:
+    - trigger: state
+      entity_id: sensor.living_room_temperature
+  conditions:
+    - condition: template
+      value_template: >-
+        {{
+          is_number(trigger.to_state.state) and
+          is_number(states('sensor.living_room_switchbot_hub_2_temperature'))
+        }}
+  sensor:
+    - unique_id: sensor.living_room_temp_difference
+      name: "Living Room Temperature Difference"
+      state: >-
+        {{
+          (
+            (trigger.to_state.state | float) -
+            (states('sensor.living_room_switchbot_hub_2_temperature') | float)
+          ) | abs | round(2)
+        }}
+      attributes:
+        sampled_at: "{{ trigger.to_state.last_updated.isoformat() }}"
+      unit_of_measurement: "°C"
+      state_class: measurement
+      device_class: temperature
+      icon: "mdi:thermometer-alert"
+
+# Mom’s Room
+- triggers:
+    - trigger: state
+      entity_id: sensor.moms_room_temperature
+  conditions:
+    - condition: template
+      value_template: >-
+        {{
+          is_number(trigger.to_state.state) and
+          is_number(states('sensor.moms_room_switchbot_meter_temperature'))
+        }}
+  sensor:
+    - unique_id: sensor.moms_room_temp_difference
+      name: "Mom’s Room Temperature Difference"
+      state: >-
+        {{
+          (
+            (trigger.to_state.state | float) -
+            (states('sensor.moms_room_switchbot_meter_temperature') | float)
+          ) | abs | round(2)
+        }}
+      attributes:
+        sampled_at: "{{ trigger.to_state.last_updated.isoformat() }}"
+      unit_of_measurement: "°C"
+      state_class: measurement
+      device_class: temperature
+      icon: "mdi:thermometer-alert"
