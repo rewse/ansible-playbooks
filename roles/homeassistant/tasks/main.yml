@@ -196,6 +196,7 @@
     - automations-modes.yaml
     - automations-others.yaml
     - automations-securities.yaml
+    - automations-tesla.yaml
   tags:
     - homeassistant
     - config

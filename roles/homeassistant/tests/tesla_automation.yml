@@ -1,0 +1,24 @@
+---
+- name: Test Tesla automation
+  hosts: localhost
+  connection: local
+  gather_facts: false
+  tasks:
+    - name: "tesla-test : Parse automation"
+      ansible.builtin.set_fact:
+        homeassistant_tesla_automations: >-
+          {{ lookup('file', '../files/automations-tesla.yaml') | from_yaml }}
+
+    - name: "tesla-test : Verify refresh contract"
+      ansible.builtin.assert:
+        that:
+          - homeassistant_tesla_automations | length == 1
+          - homeassistant_tesla_automations[0].id == 'automation.refresh_tesla_fleet_data'
+          - homeassistant_tesla_automations[0].triggers | length == 1
+          - homeassistant_tesla_automations[0].triggers[0].trigger == 'time_pattern'
+          - homeassistant_tesla_automations[0].triggers[0].minutes == '/30'
+          - homeassistant_tesla_automations[0].triggers[0].seconds == 43
+          - homeassistant_tesla_automations[0].actions | length == 1
+          - homeassistant_tesla_automations[0].actions[0].action == 'homeassistant.update_entity'
+          - homeassistant_tesla_automations[0].actions[0].target.entity_id == 'sensor.model_y_battery_level'
+          - homeassistant_tesla_automations[0].mode == 'single'

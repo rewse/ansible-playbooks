@@ -43,6 +43,8 @@
           - "'DATABASE_SSL_CA_CERT_FILE=/etc/ssl/certs/aws-rds-global-bundle.pem' in teslamate_test_env_output"
           - "'VIRTUAL_HOST=teslamate.rewse.jp' in teslamate_test_env_output"
           - "'CHECK_ORIGIN=true' in teslamate_test_env_output"
+          - "'MQTT_HOME_ASSISTANT_DISCOVERY=true' in teslamate_test_env_output"
+          - "'MQTT_HOME_ASSISTANT_DISCOVERY_URL=https://teslamate.rewse.jp' in teslamate_test_env_output"
           - (teslamate_database_password | replace('$', '$$')) in teslamate_test_env_output
           - teslamate_encryption_key in teslamate_test_env_output
           - (teslamate_mqtt_password | replace('$', '$$')) in teslamate_test_env_output
