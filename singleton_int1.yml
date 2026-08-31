@@ -18,6 +18,7 @@
     - nas
     - nvr
     - syslogd
+    - teslamate
     - zabbix/server
     - zabbix/mcp
     - zabbix/money/market

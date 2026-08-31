@@ -1,0 +1,22 @@
+---
+teslamate_basic_auth_password: "{{ lookup('pipe', 'op read op://ansible/TeslaMate/password') }}"
+teslamate_basic_auth_username: "{{ lookup('pipe', 'op read op://ansible/TeslaMate/username') }}"
+teslamate_data_dir: /srv/teslamate
+teslamate_database_ca_checksum: sha256:e5bb2084ccf45087bda1c9bffdea0eb15ee67f0b91646106e466714f9de3c7e3
+teslamate_database_ca_url: https://truststore.pki.rds.amazonaws.com/global/global-bundle.pem
+teslamate_database_tls_host: rewse-pg.cluster-c8xun5aepybs.ap-northeast-1.rds.amazonaws.com
+teslamate_database_name: "{{ lookup('pipe', 'op read \"op://ansible/PostgreSQL - TeslaMate/database\"') }}"
+teslamate_database_password: "{{ lookup('pipe', 'op read \"op://ansible/PostgreSQL - TeslaMate/password\"') }}"
+teslamate_database_port: 5432
+teslamate_database_username: "{{ lookup('pipe', 'op read \"op://ansible/PostgreSQL - TeslaMate/username\"') }}"
+teslamate_encryption_key: "{{ lookup('pipe', 'op read \"op://ansible/TeslaMate/encryption key\"') }}"
+teslamate_grafana_admin_password: "{{ lookup('pipe', 'op read \"op://ansible/Grafana - TeslaMate/password\"') }}"
+teslamate_grafana_admin_username: "{{ lookup('pipe', 'op read \"op://ansible/Grafana - TeslaMate/username\"') }}"
+teslamate_grafana_hostname: grafana.rewse.jp
+teslamate_grafana_port: 3000
+teslamate_hostname: teslamate.rewse.jp
+teslamate_mqtt_host: host.docker.internal
+teslamate_mqtt_password: "{{ lookup('pipe', 'op read op://ansible/Mosquitto/credential') }}"
+teslamate_mqtt_port: 1883
+teslamate_mqtt_username: pub_client
+teslamate_port: 4001

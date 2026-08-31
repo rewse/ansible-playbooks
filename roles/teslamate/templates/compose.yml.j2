@@ -1,0 +1,30 @@
+  teslamate:
+    container_name: teslamate
+    image: {{ teslamate_image_ref }}
+    env_file:
+      - {{ teslamate_data_dir }}/teslamate.env
+    extra_hosts:
+      - "host.docker.internal:host-gateway"
+    ports:
+      - "127.0.0.1:{{ teslamate_port }}:4000"
+    volumes:
+      - {{ teslamate_data_dir }}/global-bundle.pem:/etc/ssl/certs/aws-rds-global-bundle.pem:ro
+      - {{ teslamate_data_dir }}/import:/opt/app/import
+      - /etc/localtime:/etc/localtime:ro
+    cap_drop:
+      - all
+    restart: unless-stopped
+
+  teslamate-grafana:
+    container_name: teslamate-grafana
+    image: {{ teslamate_grafana_image_ref }}
+    env_file:
+      - {{ teslamate_data_dir }}/grafana.env
+    ports:
+      - "127.0.0.1:{{ teslamate_grafana_port }}:3000"
+    volumes:
+      - {{ teslamate_data_dir }}/grafana:/var/lib/grafana
+      - /etc/localtime:/etc/localtime:ro
+    cap_drop:
+      - all
+    restart: unless-stopped

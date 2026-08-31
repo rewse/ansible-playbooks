@@ -1,0 +1,20 @@
+# {{ ansible_managed }}
+<VirtualHost *:443>
+    ServerAdmin hostmaster@rewse.jp
+    ServerName {{ teslamate_grafana_hostname }}
+
+    SSLEngine on
+
+    ProxyPreserveHost on
+    ProxyRequests off
+    RequestHeader set X-Forwarded-Proto "https"
+
+    ProxyPass /api/live/ws ws://127.0.0.1:{{ teslamate_grafana_port }}/api/live/ws
+    ProxyPassReverse /api/live/ws ws://127.0.0.1:{{ teslamate_grafana_port }}/api/live/ws
+    ProxyPass / http://127.0.0.1:{{ teslamate_grafana_port }}/
+    ProxyPassReverse / http://127.0.0.1:{{ teslamate_grafana_port }}/
+
+    SSLCertificateFile /etc/letsencrypt/live/rewse.jp/fullchain.pem
+    SSLCertificateKeyFile /etc/letsencrypt/live/rewse.jp/privkey.pem
+    Include /etc/letsencrypt/options-ssl-apache.conf
+</VirtualHost>

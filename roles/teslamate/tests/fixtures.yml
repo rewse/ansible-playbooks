@@ -1,0 +1,22 @@
+---
+teslamate_basic_auth_password: DUMMY_BASIC_AUTH_PASSWORD
+teslamate_basic_auth_username: test-user
+teslamate_data_dir: /srv/teslamate
+teslamate_database_tls_host: database.cluster.example.test
+teslamate_database_name: teslamate
+teslamate_database_password: DUMMY_DB_PASSWORD_$VALUE#=
+teslamate_database_port: 5432
+teslamate_database_username: teslamate
+teslamate_encryption_key: DUMMY_ENCRYPTION_KEY
+teslamate_grafana_admin_password: DUMMY_GRAFANA_PASSWORD_$VALUE#=
+teslamate_grafana_admin_username: test-admin
+teslamate_grafana_hostname: grafana.rewse.jp
+teslamate_grafana_image_ref: teslamate/grafana:4.2.0@sha256:bbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbb
+teslamate_grafana_port: 3000
+teslamate_hostname: teslamate.rewse.jp
+teslamate_image_ref: teslamate/teslamate:4.2.0@sha256:aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa
+teslamate_mqtt_host: host.docker.internal
+teslamate_mqtt_password: DUMMY_MQTT_PASSWORD_$VALUE#=
+teslamate_mqtt_port: 1883
+teslamate_mqtt_username: pub_client
+teslamate_port: 4001

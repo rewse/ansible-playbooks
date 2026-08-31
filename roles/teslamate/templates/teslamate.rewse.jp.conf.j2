@@ -1,0 +1,32 @@
+# {{ ansible_managed }}
+<VirtualHost *:443>
+    ServerAdmin hostmaster@rewse.jp
+    ServerName {{ teslamate_hostname }}
+
+    SSLEngine on
+
+    ProxyPreserveHost on
+    ProxyRequests off
+    RequestHeader set X-Forwarded-Proto "https"
+
+    ProxyPass /live/websocket ws://127.0.0.1:{{ teslamate_port }}/live/websocket
+    ProxyPassReverse /live/websocket ws://127.0.0.1:{{ teslamate_port }}/live/websocket
+    ProxyPass / http://127.0.0.1:{{ teslamate_port }}/
+    ProxyPassReverse / http://127.0.0.1:{{ teslamate_port }}/
+
+    <Proxy "http://127.0.0.1:{{ teslamate_port }}/*">
+        AuthType Basic
+        AuthName "TeslaMate"
+        AuthUserFile /etc/apache2/.teslamate.htpasswd
+        <RequireAny>
+            <RequireAll>
+                Require expr %{REQUEST_URI} =~ m#^/live/websocket#
+            </RequireAll>
+            Require valid-user
+        </RequireAny>
+    </Proxy>
+
+    SSLCertificateFile /etc/letsencrypt/live/rewse.jp/fullchain.pem
+    SSLCertificateKeyFile /etc/letsencrypt/live/rewse.jp/privkey.pem
+    Include /etc/letsencrypt/options-ssl-apache.conf
+</VirtualHost>

@@ -1,0 +1,77 @@
+---
+- name: Test TeslaMate templates
+  hosts: localhost
+  connection: local
+  gather_facts: false
+  vars_files:
+    - fixtures.yml
+  tasks:
+    - name: "teslamate-test : Render templates"
+      ansible.builtin.set_fact:
+        teslamate_test_compose_output: "{{ lookup('template', '../templates/compose.yml.j2') }}"
+        teslamate_test_env_output: "{{ lookup('template', '../templates/teslamate.env.j2') }}"
+        teslamate_test_grafana_env_output: "{{ lookup('template', '../templates/grafana.env.j2') }}"
+        teslamate_test_grafana_vhost_output: "{{ lookup('template', '../templates/grafana.rewse.jp.conf.j2') }}"
+        teslamate_test_vhost_output: "{{ lookup('template', '../templates/teslamate.rewse.jp.conf.j2') }}"
+
+    - name: "teslamate-test : Parse compose template"
+      ansible.builtin.set_fact:
+        teslamate_test_compose: >-
+          {{ teslamate_test_compose_output | from_yaml }}
+
+    - name: "teslamate-test : Verify compose contract"
+      ansible.builtin.assert:
+        that:
+          - teslamate_test_compose.teslamate.image == teslamate_image_ref
+          - teslamate_test_compose['teslamate-grafana'].image == teslamate_grafana_image_ref
+          - teslamate_test_compose.teslamate.ports == ['127.0.0.1:4001:4000']
+          - teslamate_test_compose['teslamate-grafana'].ports == ['127.0.0.1:3000:3000']
+          - teslamate_test_compose.teslamate.cap_drop == ['all']
+          - teslamate_test_compose['teslamate-grafana'].cap_drop == ['all']
+          - teslamate_test_compose.teslamate.extra_hosts == ['host.docker.internal:host-gateway']
+          - "'/srv/teslamate/global-bundle.pem:/etc/ssl/certs/aws-rds-global-bundle.pem:ro' in teslamate_test_compose.teslamate.volumes"
+          - teslamate_database_password not in teslamate_test_compose_output
+          - teslamate_encryption_key not in teslamate_test_compose_output
+          - teslamate_grafana_admin_password not in teslamate_test_compose_output
+          - teslamate_mqtt_password not in teslamate_test_compose_output
+
+    - name: "teslamate-test : Verify TeslaMate environment contract"
+      ansible.builtin.assert:
+        that:
+          - "'DATABASE_SSL=true' in teslamate_test_env_output"
+          - "'DATABASE_HOST=database.cluster.example.test' in teslamate_test_env_output"
+          - "'DATABASE_SSL_CA_CERT_FILE=/etc/ssl/certs/aws-rds-global-bundle.pem' in teslamate_test_env_output"
+          - "'VIRTUAL_HOST=teslamate.rewse.jp' in teslamate_test_env_output"
+          - "'CHECK_ORIGIN=true' in teslamate_test_env_output"
+          - (teslamate_database_password | replace('$', '$$')) in teslamate_test_env_output
+          - teslamate_encryption_key in teslamate_test_env_output
+          - (teslamate_mqtt_password | replace('$', '$$')) in teslamate_test_env_output
+
+    - name: "teslamate-test : Verify Grafana environment contract"
+      ansible.builtin.assert:
+        that:
+          - "'DATABASE_SSL_MODE=require' in teslamate_test_grafana_env_output"
+          - "'DATABASE_HOST=\\\"database.cluster.example.test\\\"' in teslamate_test_grafana_env_output"
+          - "'GF_AUTH_ANONYMOUS_ENABLED=false' in teslamate_test_grafana_env_output"
+          - "'GF_SERVER_ROOT_URL=https://grafana.rewse.jp' in teslamate_test_grafana_env_output"
+          - (teslamate_database_password | replace('$', '$$')) in teslamate_test_grafana_env_output
+          - (teslamate_grafana_admin_password | replace('$', '$$')) in teslamate_test_grafana_env_output
+
+    - name: "teslamate-test : Verify TeslaMate vhost contract"
+      ansible.builtin.assert:
+        that:
+          - "'ServerName teslamate.rewse.jp' in teslamate_test_vhost_output"
+          - "'AuthType Basic' in teslamate_test_vhost_output"
+          - "'AuthUserFile /etc/apache2/.teslamate.htpasswd' in teslamate_test_vhost_output"
+          - "'ProxyPass /live/websocket ws://127.0.0.1:4001/live/websocket' in teslamate_test_vhost_output"
+          - "'RequestHeader set X-Forwarded-Proto \"https\"' in teslamate_test_vhost_output"
+          - "'SSLCertificateFile /etc/letsencrypt/live/rewse.jp/fullchain.pem' in teslamate_test_vhost_output"
+
+    - name: "teslamate-test : Verify Grafana vhost contract"
+      ansible.builtin.assert:
+        that:
+          - "'ServerName grafana.rewse.jp' in teslamate_test_grafana_vhost_output"
+          - "'AuthType Basic' not in teslamate_test_grafana_vhost_output"
+          - "'ProxyPass /api/live/ws ws://127.0.0.1:3000/api/live/ws' in teslamate_test_grafana_vhost_output"
+          - "'RequestHeader set X-Forwarded-Proto \"https\"' in teslamate_test_grafana_vhost_output"
+          - "'SSLCertificateFile /etc/letsencrypt/live/rewse.jp/fullchain.pem' in teslamate_test_grafana_vhost_output"
