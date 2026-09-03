@@ -10,16 +10,16 @@ Tesla Fleet統合の標準pollingは10分間隔である。実装は無料の車
 
 - TeslaMateのHome Assistant MQTT discoveryを有効にし、読み取り用entityを自動登録する。
 - Tesla Fleet統合の標準pollingを停止し、車両操作用entityを残す。
-- Tesla Fleetデータを30分間隔で手動更新する。
+- 読み取り値はTeslaMateを使い、Tesla Fleetの読み取り専用entityを無効化する。
+- TeslaMateがactive状態へ遷移したときと、active中の10分間隔でTesla Fleetデータを手動更新する。
 - 車両を更新のためにwakeしない。
 - Tesla Fleet APIの月額利用を無料クレジット内に収める。
 - 設定をテストし、Ansibleで再現できる部分はAnsible管理にする。
 
 ## 非目標
 
-- TeslaMate entityを既存のdashboardやautomationへ組み込まない。
+- TeslaMate MQTT値をTesla Fleet entityへ書き戻さない。
 - Tesla Fleet統合や操作用entityを削除しない。
-- TeslaMateとTesla Fleetのentity IDを統一しない。
 - Fleet Telemetry serverを追加しない。
 
 ## 構成
@@ -29,7 +29,7 @@ flowchart LR
     Car[Tesla Model Y] --> TM[TeslaMate]
     TM -->|vehicle data| MQTT[Mosquitto]
     MQTT -->|MQTT discovery| HA[Home Assistant]
-    HA -->|30分ごとに update_entity| TF[Tesla Fleet API]
+    HA -->|active transition + active中10分| TF[Tesla Fleet API]
     TF -->|free state check| Car
     TF -->|online時だけ paid vehicle_data| HA
     HA -->|明示操作時のみ command| TF
@@ -39,22 +39,22 @@ TeslaMateは`MQTT_HOME_ASSISTANT_DISCOVERY=true`でdiscovery payloadをpublish�
 
 Tesla Fleet config entryの`pref_disable_polling`を`true`にする。この値はHome Assistantのstorage設定なので、MCPから`config_entries/update` WebSocket commandを呼んで永続化する。秘密情報や`.storage`ファイルをAnsibleから直接編集しない。
 
-Home AssistantにはTesla専用automationファイルを追加する。`time_pattern` triggerを30分間隔とし、同時刻の集中を避けるため0から59の固定秒を設定する。actionは`homeassistant.update_entity`を一度だけ呼び、対象を`tesla_fleet` coordinatorに属する`sensor.model_y_battery_level`とする。coordinatorが全車両データを共有するため、複数entityを同時に更新しない。
+Home AssistantにはTesla専用automationファイルを置く。`sensor.model_y_state`が`Online`、`Driving`、`Charging`のいずれかへ遷移したときに即時更新し、その状態が続く間は`time_pattern` triggerで10分ごとに更新する。時刻の集中を避けるため`seconds: 43`を設定する。actionは`homeassistant.update_entity`を一度だけ呼び、対象を残したTesla Fleet操作entityの`climate.model_y_climate`とする。coordinatorが全車両データを共有するため、複数entityを同時に更新しない。
 
 ## API利用量
 
-30分間隔を30日間、車両が常時onlineという最大条件で計算する。
+車両が30日間常時activeという最大条件で計算する。
 
 ```text
-2 calls/hour * 24 hours/day * 30 days = 1,440 Vehicle Data calls/month
-1,440 calls / 500 calls per dollar = $2.88/month
+6 calls/hour * 24 hours/day * 30 days = 4,320 Vehicle Data calls/month
+4,320 calls / 500 calls per dollar = $8.64/month
 ```
 
-無料クレジット$10に対して$7.12をcommandや手動操作に残す。各定期更新は最初に無料の車両状態APIを呼ぶ。車両がofflineまたはasleepならVehicle Data APIを呼ばず、wake commandも送らないため、通常の有料呼び出しは最大条件より少ない。
+無料クレジット$10に対して$1.36をcommandや手動操作に残す。実際にはTeslaMateが`Offline`、`Asleep`、`Suspended`、`unknown`、`unavailable`の間はautomationのconditionで更新を行わないため、有料呼び出しは最大条件より少ない。active遷移時の即時更新は上記の定期更新とは別に発生するが、車両利用開始時だけである。automationからwake commandは送らない。
 
 ## エラー処理
 
-定期更新が認証エラー、rate limit、通信エラーで失敗してもwakeや即時再試行を行わない。Home Assistantのautomation traceとTesla Fleet integration logへ記録し、次の30分triggerで再試行する。TeslaMate discoveryはTeslaMate起動時に再publishされる。
+定期更新が認証エラー、rate limit、通信エラーで失敗してもwakeや即時再試行を行わない。Home Assistantのautomation traceとTesla Fleet integration logへ記録し、active状態が続いていれば次の10分triggerで再試行する。inactive状態では更新しない。TeslaMate discoveryはTeslaMate起動時に再publishされる。
 
 ## 実装範囲
 

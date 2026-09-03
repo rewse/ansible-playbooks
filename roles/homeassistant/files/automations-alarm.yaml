@@ -34,7 +34,7 @@
   alias: "ALARM: Device Battery Level"
   triggers:
     - trigger: numeric_state
-      entity_id: 
+      entity_id:
         - sensor.balcony_camera_battery
         - sensor.balcony_switchbot_meter_battery
         - sensor.balcony_switchbot_outdoor_meter_battery
@@ -55,9 +55,10 @@
         - sensor.living_room_motion_sensor_battery
         - sensor.living_room_thermometer_battery
         - sensor.living_room_window_sensor_battery
+        - sensor.model_y_battery
         - sensor.moms_room_1_button_switch_battery
         - sensor.moms_room_4_button_switch_battery
-        - sensor.moms_room_curtain_left_battery 
+        - sensor.moms_room_curtain_left_battery
         - sensor.moms_room_curtain_right_battery
         - sensor.moms_room_curtains_remote_battery
         - sensor.moms_room_humidifier_battery
@@ -96,7 +97,7 @@
   alias: "ALARM: Device is Offline"
   triggers:
     - trigger: state
-      entity_id: 
+      entity_id:
         - binary_sensor.aqarahub
         - binary_sensor.aventage
         - binary_sensor.brother
@@ -244,7 +245,7 @@
   alias: "ALARM: Matter Sensor is Offline"
   triggers:
     - trigger: state
-      entity_id: 
+      entity_id:
         - binary_sensor.dads_room_thermometer_connectivity
         - binary_sensor.living_room_floor_thermometer_connectivity
         - binary_sensor.living_room_thermometer_connectivity
@@ -274,7 +275,7 @@
   alias: "ALARM: Plug Switch is Offline"
   triggers:
     - trigger: state
-      entity_id: 
+      entity_id:
         - switch.bathroom_washing_machine
         - switch.kitchen_refrigerator_plug
         - switch.kitchen_rice_cooker_plug

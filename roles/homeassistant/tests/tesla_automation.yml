@@ -3,6 +3,9 @@
   hosts: localhost
   connection: local
   gather_facts: false
+  vars:
+    homeassistant_tesla_active_states_template: !unsafe >-
+      {{ states('sensor.model_y_state') in ['Online', 'Driving', 'Charging'] }}
   tasks:
     - name: "tesla-test : Parse automation"
       ansible.builtin.set_fact:
@@ -14,11 +17,20 @@
         that:
           - homeassistant_tesla_automations | length == 1
           - homeassistant_tesla_automations[0].id == 'automation.refresh_tesla_fleet_data'
-          - homeassistant_tesla_automations[0].triggers | length == 1
-          - homeassistant_tesla_automations[0].triggers[0].trigger == 'time_pattern'
-          - homeassistant_tesla_automations[0].triggers[0].minutes == '/30'
-          - homeassistant_tesla_automations[0].triggers[0].seconds == 43
+          - homeassistant_tesla_automations[0].triggers | length == 2
+          - homeassistant_tesla_automations[0].triggers[0].trigger == 'template'
+          - >-
+            homeassistant_tesla_automations[0].triggers[0].value_template
+            == homeassistant_tesla_active_states_template
+          - homeassistant_tesla_automations[0].triggers[1].trigger == 'time_pattern'
+          - homeassistant_tesla_automations[0].triggers[1].minutes == '/10'
+          - homeassistant_tesla_automations[0].triggers[1].seconds == 43
+          - homeassistant_tesla_automations[0].conditions | length == 1
+          - homeassistant_tesla_automations[0].conditions[0].condition == 'template'
+          - >-
+            homeassistant_tesla_automations[0].conditions[0].value_template
+            == homeassistant_tesla_active_states_template
           - homeassistant_tesla_automations[0].actions | length == 1
           - homeassistant_tesla_automations[0].actions[0].action == 'homeassistant.update_entity'
-          - homeassistant_tesla_automations[0].actions[0].target.entity_id == 'sensor.model_y_battery_level'
+          - homeassistant_tesla_automations[0].actions[0].target.entity_id == 'climate.model_y_climate'
           - homeassistant_tesla_automations[0].mode == 'single'

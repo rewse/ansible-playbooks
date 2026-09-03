@@ -1,19 +1,21 @@
 # TeslaMate Home Assistant discovery Implementation Plan
 
+> **Current refresh contract:** `sensor.model_y_state`がactiveな間だけ10分ごとに`climate.model_y_climate`を更新する。Task 2以下の30分契約は初回配備時の実行記録であり、現在の動作は`design.md`、automation、契約テストを正とする。
 > **For agentic workers:** REQUIRED SUB-SKILL: Use subagent-driven-development or execute the tasks inline in order. Steps use checkbox (`- [x]`) syntax for tracking.
 
-**Goal:** TeslaMate MQTT discoveryを有効化し、Tesla Fleet標準pollingを停止したうえで30分間隔の手動更新を無料クレジット内で実行する。
+**Goal:** TeslaMate MQTT discoveryを有効化し、Tesla Fleet標準pollingを停止したうえでactive状態の間だけ10分間隔で手動更新する。
 
-**Architecture:** TeslaMateはMQTT discovery payloadを既存Mosquittoへpublishし、Home Assistantが読み取り用entityを自動登録する。Tesla Fleet config entryの標準pollingはHome Assistantのstorage設定で停止し、YAML automationが30分ごとに共有coordinatorを1回だけ手動更新する。
+**Architecture:** TeslaMateはMQTT discovery payloadを既存Mosquittoへpublishし、Home Assistantが読み取り用entityを自動登録する。Tesla Fleet config entryの標準pollingはHome Assistantのstorage設定で停止する。YAML automationは`sensor.model_y_state`がactiveへ遷移したときとactive中の10分ごとに共有coordinatorを1回だけ手動更新する。
 
 **Tech Stack:** Ansible、YAML、Jinja2、Home Assistant 2026.8、TeslaMate 4.2、Mosquitto、Home Assistant MCP、Tesla Fleet API
 
 ## Global Constraints
 
 - Tesla FleetのVehicle Data単価は500回/$1、個人利用向け無料クレジットは月$10として計算する。
-- 更新間隔は30分、`time_pattern`の`seconds`は43とする。
+- `sensor.model_y_state`が`Online`、`Driving`、`Charging`の間だけ更新する。
+- active遷移時と10分間隔で更新し、`time_pattern`の`seconds`は43とする。
 - 定期更新からwake commandを呼ばない。
-- `homeassistant.update_entity`の対象は`sensor.model_y_battery_level`一つだけにする。
+- `homeassistant.update_entity`の対象は`climate.model_y_climate`一つだけにする。
 - Tesla Fleetの操作用entityとconfig entryを削除しない。
 - Home Assistantの`.storage`ファイルを直接編集しない。
 - 秘密値をcommand output、diff、ログへ出さない。
