@@ -420,8 +420,8 @@
   ansible.builtin.command:
     cmd: >
       xurl auth apps add kiro-rewse
-      --client-id "{{ lookup('pipe', 'op read op://ansible/X/username') }}"
-      --client-secret "{{ lookup('pipe', 'op read op://ansible/X/credential') }}"
+      --client-id "{{ lookup('pipe', 'op read op://ansible/3mpawbf6a3ipmepznocniqqes4/username') }}"
+      --client-secret "{{ lookup('pipe', 'op read op://ansible/3mpawbf6a3ipmepznocniqqes4/credential') }}"
     creates: ~/.xurl
   tags:
     - darwin

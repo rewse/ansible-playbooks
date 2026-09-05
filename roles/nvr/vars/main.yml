@@ -36,8 +36,8 @@ nvr_cameras:
   - name: eufy-mom
     host: eufy-mom.rewse.jp
 
-nvr_rtsp_username: "{{ lookup('pipe', 'op read \"op://ansible/Eufy - RTSP/username\"') }}"
-nvr_rtsp_password: "{{ lookup('pipe', 'op read \"op://ansible/Eufy - RTSP/password\"') }}"
+nvr_rtsp_username: "{{ lookup('pipe', 'op read \"op://ansible/qrxadrmc7glxk2c3z7hwufligm/username\"') }}"
+nvr_rtsp_password: "{{ lookup('pipe', 'op read \"op://ansible/qrxadrmc7glxk2c3z7hwufligm/password\"') }}"
 
 # The Home Assistant integration needs MQTT: switches, sensors and the review
 # entities are published over it, and without a broker the integration only
@@ -47,4 +47,4 @@ nvr_rtsp_password: "{{ lookup('pipe', 'op read \"op://ansible/Eufy - RTSP/passwo
 # accounts differ only in name (there is no ACL).
 nvr_mqtt_host: 172.18.0.1
 nvr_mqtt_username: pub_client
-nvr_mqtt_password: "{{ lookup('pipe', 'op read op://ansible/Mosquitto/credential') }}"
+nvr_mqtt_password: "{{ lookup('pipe', 'op read op://ansible/utsespwfv247vhgklpbbpbtboe/credential') }}"

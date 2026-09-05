@@ -38,15 +38,19 @@ This repository uses 1Password Service Accounts for authentication. The Service 
 
 ```bash
 # Verify authentication the way Ansible reaches it
-direnv exec . op read op://ansible/database/password
+direnv exec . op read op://ansible/citpxpqr6evzwwndtzjugdoesi/password
 
 # Read secrets
-op read op://ansible/database/password
+op read op://ansible/citpxpqr6evzwwndtzjugdoesi/password
 
 # Usage example in Ansible
 # In playbooks or vars files:
-# db_password: "{{ lookup('pipe', 'op read op://ansible/database/password') }}"
+# db_password: "{{ lookup('pipe', 'op read op://ansible/citpxpqr6evzwwndtzjugdoesi/password') }}"
 ```
+
+Name items in the `ansible` vault as `System - Consumer` when both parts meaningfully identify the credential. Keep the complete product name as the System. Use a meaningful username or service account as the Consumer when one exists; do not use access key IDs, client IDs, UUIDs, MAC addresses, or other machine identifiers. Omit the Consumer instead of adding a generic purpose that does not distinguish the item, as in `restic` or `Zabbix MCP Server`. Omit the System when it would only be a generic category rather than a specific product or service, as in `Tats Shibata` or `xray-legacy`. Keep credentials for different systems in separate items.
+
+Use item IDs rather than item titles in committed Secret References so renaming an item does not break automation. For references selected dynamically, map the meaningful selector to an item ID in variables.
 
 **Note**: Service Accounts work in interactive shells but may fail in automated contexts due to a known 1Password CLI limitation.
 

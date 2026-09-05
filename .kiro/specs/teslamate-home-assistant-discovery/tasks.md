@@ -262,7 +262,7 @@ Expected: CRITICAL、HIGH、MEDIUMの未解決指摘が0件。
 Run:
 
 ```bash
-direnv exec . op read "op://ansible/TeslaMate/encryption key" >/dev/null
+direnv exec . op read "op://ansible/vt2ez35yutq5ikwrbp46q56oke/encryption key" >/dev/null
 direnv exec . ansible-playbook singleton_int1.yml \
   --limit fox.rewse.jp \
   --tags teslamate,homeassistant_automation \

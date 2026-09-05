@@ -29,9 +29,9 @@ LiteLLMがホストの4000番ポートを使用しているため、TeslaMateは
 
 接続情報は次の1Password項目から取得する。
 
-- `op://ansible/PostgreSQL - TeslaMate/database`
-- `op://ansible/PostgreSQL - TeslaMate/username`
-- `op://ansible/PostgreSQL - TeslaMate/password`
+- `op://ansible/f6jqsrpzvfqjxge4ntvalkwbte/database`
+- `op://ansible/f6jqsrpzvfqjxge4ntvalkwbte/username`
+- `op://ansible/f6jqsrpzvfqjxge4ntvalkwbte/password`
 
 ポートは5432を使用する。TeslaMateの`DATABASE_HOST`には証明書SANと一致するAurora writer endpoint `rewse-pg.cluster-c8xun5aepybs.ap-northeast-1.rds.amazonaws.com`を指定する。AWS公式RDS global CA bundleをSHA-256で固定してfoxへ配備し、コンテナへread-only mountしたうえで`DATABASE_SSL=true`と`DATABASE_SSL_CA_CERT_FILE`を設定する。Grafana datasourceは同じwriter endpointへ`DATABASE_SSL_MODE=require`で接続する。
 
@@ -39,7 +39,7 @@ Aurora 16.11には、Ansible管理外の一回限りの初期化として`teslam
 
 ### Mosquitto
 
-TeslaMateはDocker host gateway経由でfox上のMosquitto 2.0.18へ接続する。ユーザー名は`pub_client`、パスワードは`op://ansible/Mosquitto/credential`を使う。Mosquittoは匿名接続を許可しない。接続はホスト内に閉じるためMQTT TLSは使わない。
+TeslaMateはDocker host gateway経由でfox上のMosquitto 2.0.18へ接続する。ユーザー名は`pub_client`、パスワードは`op://ansible/utsespwfv247vhgklpbbpbtboe/credential`を使う。Mosquittoは匿名接続を許可しない。接続はホスト内に閉じるためMQTT TLSは使わない。
 
 ## 秘密値
 
@@ -47,14 +47,14 @@ TeslaMateの環境変数は`/srv/teslamate/teslamate.env`、Grafanaの環境変�
 
 TeslaMateの暗号化キーとApache Basic Authは次の項目を使う。
 
-- `op://ansible/TeslaMate/encryption key`
-- `op://ansible/TeslaMate/username`
-- `op://ansible/TeslaMate/password`
+- `op://ansible/vt2ez35yutq5ikwrbp46q56oke/encryption key`
+- `op://ansible/vt2ez35yutq5ikwrbp46q56oke/username`
+- `op://ansible/vt2ez35yutq5ikwrbp46q56oke/password`
 
 Grafana管理者は次の項目を使う。
 
-- `op://ansible/Grafana - TeslaMate/username`
-- `op://ansible/Grafana - TeslaMate/password`
+- `op://ansible/oy677zzpeppxyn3b4xfdfapqvy/username`
+- `op://ansible/oy677zzpeppxyn3b4xfdfapqvy/password`
 
 TeslaMateの暗号化キーはTesla APIトークンの復号に必要なため、運用開始後に変更しない。
 

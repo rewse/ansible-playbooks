@@ -592,8 +592,8 @@
   # it, not only the one holding the disks.
   ansible.builtin.copy:
     content: |
-      AWS_ACCESS_KEY_ID={{ lookup('pipe', 'op read "op://ansible/restic - AWS IAM/username"') }}
-      AWS_SECRET_ACCESS_KEY={{ lookup('pipe', 'op read "op://ansible/restic - AWS IAM/credential"') }}
+      AWS_ACCESS_KEY_ID={{ lookup('pipe', 'op read "op://ansible/dy5i5xgji3f27wjczj7tadoghe/username"') }}
+      AWS_SECRET_ACCESS_KEY={{ lookup('pipe', 'op read "op://ansible/dy5i5xgji3f27wjczj7tadoghe/credential"') }}
     dest: /etc/restic/s3.env
     mode: '0600'
   no_log: true

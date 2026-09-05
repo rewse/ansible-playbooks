@@ -20,6 +20,6 @@ restic_darwin:
   check_hour: 11
   check_minute: 13
 
-restic_darwin_password: "{{ lookup('pipe', 'op read \"op://ansible/restic/password\"') }}"
-restic_darwin_aws_key: "{{ lookup('pipe', 'op read \"op://ansible/restic - AWS IAM/username\"') }}"
-restic_darwin_aws_secret: "{{ lookup('pipe', 'op read \"op://ansible/restic - AWS IAM/credential\"') }}"
+restic_darwin_password: "{{ lookup('pipe', 'op read \"op://ansible/qcixpveqyndiyu6wph2xxvsh7q/password\"') }}"
+restic_darwin_aws_key: "{{ lookup('pipe', 'op read \"op://ansible/dy5i5xgji3f27wjczj7tadoghe/username\"') }}"
+restic_darwin_aws_secret: "{{ lookup('pipe', 'op read \"op://ansible/dy5i5xgji3f27wjczj7tadoghe/credential\"') }}"

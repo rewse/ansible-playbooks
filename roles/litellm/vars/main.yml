@@ -1,5 +1,5 @@
 ---
-litellm_aws_access_key_id: "{{ lookup('pipe', 'op read \"op://ansible/AWS - LiteLLM/username\"') }}"
-litellm_aws_secret_access_key: "{{ lookup('pipe', 'op read \"op://ansible/AWS - LiteLLM/credential\"') }}"
-litellm_master_key: "{{ lookup('pipe', 'op read \"op://ansible/AWS - LiteLLM/master key\"') }}"
-litellm_salt_key: "{{ lookup('pipe', 'op read \"op://ansible/AWS - LiteLLM/salt key\"') }}"
+litellm_aws_access_key_id: "{{ lookup('pipe', 'op read \"op://ansible/lqqboxodgnnmnudjnuutkil7si/username\"') }}"
+litellm_aws_secret_access_key: "{{ lookup('pipe', 'op read \"op://ansible/lqqboxodgnnmnudjnuutkil7si/credential\"') }}"
+litellm_master_key: "{{ lookup('pipe', 'op read \"op://ansible/z4xaablyobjlntjcoogg7rvffm/master key\"') }}"
+litellm_salt_key: "{{ lookup('pipe', 'op read \"op://ansible/z4xaablyobjlntjcoogg7rvffm/salt key\"') }}"

@@ -12,7 +12,7 @@
 nas_device_timeout: 45s
 
 nas_keyfile: /etc/luks/nas.key
-nas_keyfile_content: "{{ lookup('pipe', 'op read \"op://ansible/LUKS - nas/password\"') }}"
+nas_keyfile_content: "{{ lookup('pipe', 'op read \"op://ansible/ltgujyvgqmynqygurtuqkpwqji/password\"') }}"
 
 nas_archive_path: /srv/nas/archive
 nas_backup_path: /srv/nas/backup
@@ -79,6 +79,10 @@ nas_mdns_interface: eth0
 # Samba accounts. The password is only read when the account is missing from the
 # Samba database, which keeps the run idempotent; rotating one in 1Password
 # therefore does not propagate, so remove it with pdbedit -x first.
+nas_samba_item_ids:
+  tats: pmy67r547swjyu5ipz4zuw6jnq
+  ubiqu: loyagzmfx4q37jqpxisswspzwq
+
 nas_samba_users:
   - tats
   - ubiqu

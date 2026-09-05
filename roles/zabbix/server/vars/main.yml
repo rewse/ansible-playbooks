@@ -1,5 +1,5 @@
 ---
 zabbix_server:
-  db_host: "{{ lookup('pipe', 'op read \"op://ansible/PostgreSQL - Zabbix/server\"') }}"
-  db_password: "{{ lookup('pipe', 'op read \"op://ansible/PostgreSQL - Zabbix/password\"') }}"
+  db_host: "{{ lookup('pipe', 'op read \"op://ansible/hrmsun2hbhhvrr6ou6yungdfwi/server\"') }}"
+  db_password: "{{ lookup('pipe', 'op read \"op://ansible/hrmsun2hbhhvrr6ou6yungdfwi/password\"') }}"
   version: 7.4

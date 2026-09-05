@@ -1,2 +1,2 @@
 ---
-mosquitto_password: "{{ lookup('pipe', 'op read op://ansible/Mosquitto/credential') }}"
+mosquitto_password: "{{ lookup('pipe', 'op read op://ansible/utsespwfv247vhgklpbbpbtboe/credential') }}"

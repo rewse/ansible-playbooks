@@ -1,5 +1,5 @@
 ---
-homeassistant_ha_token: "{{ lookup('pipe', 'op read \"op://ansible/Home Assistant - homeassistant-ha/credential\"') }}"
+homeassistant_ha_token: "{{ lookup('pipe', 'op read \"op://ansible/5xhph5yv3c3vzkubj5v33cgkya/credential\"') }}"
 # 15 minutes filters a primary that is only rebooting, which accounted for one of
 # the two failovers seen so far, while still covering the hour-long outage of the
 # other one.
@@ -12,4 +12,4 @@ homeassistant_ha_standby_ip: 192.168.0.40
 # Reached through the Site Manager Cloud Connector rather than the console's own
 # address, because a key generated at unifi.ui.com is refused locally.
 homeassistant_ha_unifi_console: sierra
-homeassistant_ha_unifi_api_key: "{{ lookup('pipe', 'op read \"op://ansible/UniFi API/credential\"') }}"
+homeassistant_ha_unifi_api_key: "{{ lookup('pipe', 'op read \"op://ansible/bvdayezevkxx6kmhjc3kmug7u4/credential\"') }}"

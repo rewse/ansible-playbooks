@@ -371,7 +371,7 @@
     # process list.
     stdin: "{{ nas_samba_password }}\n{{ nas_samba_password }}\n"
   vars:
-    nas_samba_password: "{{ lookup('pipe', 'op read \"op://ansible/Samba - ' ~ item ~ '/password\"') }}"
+    nas_samba_password: "{{ lookup('pipe', 'op read \"op://ansible/' ~ nas_samba_item_ids[item] ~ '/password\"') }}"
   loop: "{{ nas_samba_users }}"
   when: item not in nas_pdbedit.stdout
   no_log: true
