@@ -7,6 +7,7 @@ roles/database/client/gui/files/sqldeveloper*
 
 # Environment files
 .env
+.envrc
 .venv/
 
 # TinyTuya (contains API keys and device local keys)
