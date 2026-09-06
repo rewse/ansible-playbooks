@@ -252,11 +252,16 @@
     icon: "mdi:thermometer-check"
   - unique_id: sensor.dads_room_humidity_difference
     name: "Dad’s Room Humidity Difference"
+    availability: >-
+      {{
+        is_number(states('sensor.dads_room_humidity')) and
+        is_number(states('sensor.dads_room_switchbot_meter_humidity'))
+      }}
     state: >-
       {{
         (
-          float(states('sensor.dads_room_humidity')) -
-          float(states('sensor.dads_room_switchbot_meter_humidity'))
+          (states('sensor.dads_room_humidity') | float(0)) -
+          (states('sensor.dads_room_switchbot_meter_humidity') | float(0))
         ) | abs
       }}
     unit_of_measurement: "pt"
@@ -314,11 +319,16 @@
     icon: "mdi:thermometer"
   - unique_id: sensor.living_room_humidity_difference
     name: "Living Room Humidity Difference"
+    availability: >-
+      {{
+        is_number(states('sensor.living_room_humidity')) and
+        is_number(states('sensor.living_room_switchbot_hub_2_humidity'))
+      }}
     state: >-
       {{
         (
-          float(states('sensor.living_room_humidity')) -
-          float(states('sensor.living_room_switchbot_hub_2_humidity'))
+          (states('sensor.living_room_humidity') | float(0)) -
+          (states('sensor.living_room_switchbot_hub_2_humidity') | float(0))
         ) | abs
       }}
     unit_of_measurement: "pt"
@@ -353,11 +363,17 @@
     icon: "mdi:thermometer-check"
   - unique_id: sensor.moms_room_humidity_difference
     name: "Mom’s Room Humidity Difference"
+    availability: >-
+      {{
+        is_number(states('sensor.moms_room_humidity')) and
+        is_number(states('sensor.moms_room_switchbot_meter_humidity'))
+      }}
     state: >-
       {{
-        float(states('sensor.moms_room_humidity')) -
-        float(states('sensor.moms_room_switchbot_meter_humidity'))
-        | abs
+        (
+          (states('sensor.moms_room_humidity') | float(0)) -
+          (states('sensor.moms_room_switchbot_meter_humidity') | float(0))
+        ) | abs
       }}
     unit_of_measurement: "pt"
     state_class: measurement
