@@ -2,107 +2,30 @@
 inclusion: always
 ---
 
-# Project Structure
+# Ansible Conventions
 
-## Top-Level Organization
+## Roles and Tasks
 
-- **Playbooks**: Root-level YAML files (e.g., `site.yml`, `ubuntu.yml`, `ec2.yml`)
-- **Inventory**: Host definitions in `hosts` file
-- **Configuration**: Ansible configuration in `ansible.cfg`
-- **Group Variables**: Stored in `group_vars/` directory
-- **Roles**: Modular components in `roles/` directory
+- Place related roles in nested directories when the hierarchy is meaningful, such as `zabbix/agent/ubuntu`.
+- Name tasks `"{submodule} : {Description}"`; keep the submodule lowercase and start the description with a capital letter.
+- Store role-specific variables in `roles/<role>/vars/main.yml` and shared inventory values in `group_vars/<group>/vars`.
 
-## Playbook Structure
+## Tags
 
-Playbooks follow a consistent pattern:
-- Define target hosts
-- Set common parameters (become, remote_user)
-- Apply relevant roles
+- Write tags as an indented YAML list.
+- Include the applicable role, operation (`init`, `install`, `config`, or `update`), component, and composite tags such as `{role}_{component}` and `{role}_{component}_{operation}`.
+- Make every advertised granular tag independently runnable by including its prerequisite directory, checkout, and configuration tasks.
 
-Example:
-```yaml
----
-- hosts: ubuntu
-  become: yes
-  remote_user: ubuntu
-  tags: [ubuntu]
-  roles:
-    - ubuntu
-    - postfix/client
-    - dotfiles/linux
-```
-
-Task example:
-```yaml
-- name: "ntp : Configure NTP servers"
-  ansible.builtin.lineinfile:
-    path: /etc/systemd/timesyncd.conf
-    regexp: '^#?NTP='
-    line: 'NTP=ntp.nict.jp ntp.jst.mfeed.ad.jp'
-  notify: "systemd-timesyncd: Restart"
-  tags:
-    - raspberrypi
-    - config
-    - time
-    - raspberrypi_ntp
-    - raspberrypi_ntp_config
-```
-
-## Role Structure
-
-Each role follows standard Ansible directory structure:
-- `tasks/`: main.yml containing role tasks
-- `handlers/`: Event handlers triggered by tasks
-- `templates/`: Jinja2 templates (*.j2)
-- `files/`: Static files to copy to hosts
-- `vars/`: Role-specific variables
-- `meta/`: Role dependencies and metadata
-
-## Variable Hierarchy
-
-1. **Group Variables**: `group_vars/group_name/vars`
-2. **Role Variables**: `roles/role_name/vars/main.yml`
-3. **Host Variables**: Defined in inventory or separate files
-
-## Naming Conventions
-
-- **Files**: Use lowercase with underscores or hyphens
-- **Variables**: Use snake_case (lowercase with underscores)
-- **Roles**: Use lowercase descriptive names reflecting their purpose
-- **Submodules**: Use lowercase names (e.g., `ntp`, `swap`, `ssh`)
-- **Task Names**: Format as `"{submodule} : {Description}"` where:
-  - Submodule name is lowercase
-  - Description starts with uppercase letter
-  - Example: `"ntp : Configure NTP servers"`, `"ec2 : Install packages"`
-- **Tags**: All lowercase (e.g., `raspberrypi`, `config`, `raspberrypi_ntp_config`)
-- **Common Tag Categories**: `install`, `config`, `update`, `init`
-
-### Tag Structure
-
-Tags should follow a hierarchical pattern for flexible filtering:
-1. **Role name**: Base role identifier (e.g., `raspberrypi`)
-2. **Category**: Action type (e.g., `install`, `config`, `init`, `update`)
-3. **Submodule**: Specific component being configured (e.g., `ntp`, `swap`, `ssh`)
-4. **Combined tags**: For precise targeting
-   - `{role}_{submodule}` (e.g., `raspberrypi_ntp`)
-   - `{role}_{submodule}_{category}` (e.g., `raspberrypi_ntp_config`)
-
-Example tag set:
 ```yaml
 tags:
-  - raspberrypi          # Role level
-  - config               # Category level
-  - ntp                  # Submodule level
-  - raspberrypi_ntp      # Role + submodule
-  - raspberrypi_ntp_config  # Role + submodule + category
+  - raspberrypi
+  - config
+  - ntp
+  - raspberrypi_ntp
+  - raspberrypi_ntp_config
 ```
 
-## Best Practices
+## Idempotency
 
-- You MUST organize related roles in subdirectories (e.g., `zabbix/agent/ubuntu`)
-- You SHOULD use tags consistently for selective execution
-- You MUST write tags in YAML list format with proper indentation
-- You MUST focus roles on single responsibility
-- You SHOULD leverage handlers for service restarts and other triggered actions
-- You SHOULD use templates for dynamic configuration files
-- YOu MUST store sensitive data in 1Password
+- Notify restart handlers only when managed content changes.
+- Keep check mode non-mutating. If a dry-run checkout does not create the source needed by a deployment task, skip that deployment and report why.
