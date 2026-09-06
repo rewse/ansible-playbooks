@@ -669,37 +669,10 @@
     - homeassistant_shell-command
     - homeassistant_shell-command_config
 
-- name: "switch : Configure include"
-  ansible.builtin.lineinfile:
-    path: /srv/homeassistant/config/configuration.yaml
-    insertafter: '^shell_command:'
-    regexp: '^switch:'
-    line: "switch: !include switches.yaml"
-  notify: "homeassistant: Restart"
-  tags:
-    - homeassistant
-    - config
-    - switch
-    - homeassistant_switch
-    - homeassistant_switch_config
-
-- name: "switch : Copy configuration"
-  ansible.builtin.copy:
-    src: switches.yaml
-    dest: /srv/homeassistant/config
-    mode: '0644'
-  notify: "homeassistant: Restart"
-  tags:
-    - homeassistant
-    - config
-    - switch
-    - homeassistant_switch
-    - homeassistant_switch_config
-
 - name: "template : Configure include"
   ansible.builtin.lineinfile:
     path: /srv/homeassistant/config/configuration.yaml
-    insertafter: '^switch:'
+    insertafter: '^shell_command:'
     regexp: '^template:'
     line: "template: !include templates.yaml"
   notify: "homeassistant: Restart"

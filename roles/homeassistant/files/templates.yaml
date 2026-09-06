@@ -60,11 +60,6 @@
       }}
     device_class: cold
     icon: "mdi:snowflake"
-  - unique_id: binary_sensor.living_room_floor_thermometer_connectivity
-    name: "Living Room Floor Thermometer Connectivity"
-    state: >-
-      {{ (now() - states.sensor.living_room_floor_temperature.last_updated).total_seconds() < 3600 }}
-    device_class: connectivity
   - unique_id: binary_sensor.living_room_humidity_high
     name: "Living Room Humidity High"
     state: >-
@@ -306,17 +301,6 @@
     state_class: measurement
     device_class: temperature
     icon: "mdi:thermometer-check"
-  - unique_id: sensor.living_room_floor_heating_effect
-    name: Living Room Floor Heating Effect
-    state: >-
-      {{
-        float(states('sensor.living_room_floor_temperature')) -
-        float(states('sensor.living_room_temperature'))
-      }}
-    unit_of_measurement: "°C"
-    state_class: measurement
-    device_class: temperature
-    icon: "mdi:thermometer"
   - unique_id: sensor.living_room_humidity_difference
     name: "Living Room Humidity Difference"
     availability: >-
@@ -531,21 +515,6 @@
     name: Dad’s Room Humidifier
     state: '{{ float(states(''sensor.dads_room_humidifier_plug_power'')) > 3 }}'
   # Living Room
-  - unique_id: switch.living_room_floor_heating
-    turn_on:
-    - action: switch.toggle
-      target:
-        entity_id:
-        - switch.living_room_floor_heating_switch
-    turn_off:
-    - action: switch.toggle
-      target:
-        entity_id:
-        - switch.living_room_floor_heating_switch
-    default_entity_id: switch.living_room_floor_heating
-    icon: mdi:heating-coil
-    name: Living Room Floor Heating
-    state: '{{ float(states(''sensor.living_room_floor_heating_effect'')) > 1 }}'
   - unique_id: switch.living_room_humidifier
     turn_on:
     - action: switch.toggle
@@ -572,21 +541,6 @@
     availability: '{{ states(''switch.living_room_tv_plug'') }}'
     name: Living Room TV
     state: '{{ float(states(''sensor.living_room_tv_plug_power'')) > 50 }}'
-  - unique_id: switch.study_floor_heating
-    turn_on:
-    - action: switch.toggle
-      target:
-        entity_id:
-        - switch.study_floor_heating_switch
-    turn_off:
-    - action: switch.toggle
-      target:
-        entity_id:
-        - switch.study_floor_heating_switch
-    default_entity_id: switch.study_floor_heating
-    icon: mdi:heating-coil
-    name: Study Floor Heating
-    state: '{{ float(states(''sensor.living_room_floor_heating_effect'')) > 1 }}'
   # Mom’s Room
   - unique_id: switch.moms_room_humidifier
     turn_on:

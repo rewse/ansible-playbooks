@@ -1,0 +1,129 @@
+---
+- name: Test ECHONET Lite floor heater migration
+  hosts: localhost
+  connection: local
+  gather_facts: false
+  vars:
+    floor_heater_operation_status_entities:
+      - switch.living_room_floor_heater_operation_status
+      - switch.study_floor_heater_operation_status
+  tasks:
+    - name: "floor-heater-migration-test : Check retired switch file"
+      ansible.builtin.stat:
+        path: "{{ playbook_dir }}/../files/switches.yaml"
+      register: homeassistant_switches_file
+
+    - name: "floor-heater-migration-test : Read configurations"
+      ansible.builtin.set_fact:
+        homeassistant_alarm_automations_raw: >-
+          {{ lookup('file', '../files/automations-alarm.yaml') }}
+        homeassistant_alexa_raw: >-
+          {{ lookup('file', '../files/alexa.yaml') }}
+        homeassistant_customize_raw: >-
+          {{ lookup('file', '../files/customize.yaml') }}
+        homeassistant_living_room_climate_automations: >-
+          {{ lookup('file', '../files/automations-living-room-climates.yaml') | from_yaml }}
+        homeassistant_role_tasks_raw: >-
+          {{ lookup('file', '../tasks/main.yml') }}
+        homeassistant_scripts: >-
+          {{ lookup('file', '../files/scripts.yaml') | from_yaml }}
+        homeassistant_templates_raw: >-
+          {{ lookup('file', '../files/templates.yaml') }}
+
+    - name: "floor-heater-migration-test : Select automations"
+      ansible.builtin.set_fact:
+        homeassistant_toggle_floor_heating_automations: >-
+          {{ homeassistant_living_room_climate_automations
+             | selectattr('id', 'equalto', 'automation.toggle_living_area_floor_heating')
+             | list }}
+        homeassistant_toggle_living_room_ac_heat_automations: >-
+          {{ homeassistant_living_room_climate_automations
+             | selectattr('id', 'equalto', 'automation.toggle_living_room_ac_heat')
+             | list }}
+
+    - name: "floor-heater-migration-test : Verify automations exist"
+      ansible.builtin.assert:
+        that:
+          - homeassistant_toggle_floor_heating_automations | length == 1
+          - homeassistant_toggle_living_room_ac_heat_automations | length == 1
+
+    - name: "floor-heater-migration-test : Store automations"
+      ansible.builtin.set_fact:
+        homeassistant_toggle_floor_heating: >-
+          {{ homeassistant_toggle_floor_heating_automations[0] }}
+        homeassistant_toggle_living_room_ac_heat: >-
+          {{ homeassistant_toggle_living_room_ac_heat_automations[0] }}
+
+    - name: "floor-heater-migration-test : Verify retired configuration"
+      ansible.builtin.assert:
+        that:
+          - not homeassistant_switches_file.stat.exists
+          - "'binary_sensor.living_room_floor_thermometer_connectivity' not in homeassistant_templates_raw"
+          - "'sensor.living_room_floor_heating_effect' not in homeassistant_templates_raw"
+          - "'sensor.living_room_floor_temperature' not in homeassistant_templates_raw"
+          - "'switch.living_room_floor_heating' not in homeassistant_templates_raw"
+          - "'switch.study_floor_heating' not in homeassistant_templates_raw"
+          - "'switch.living_room_floor_heating' not in homeassistant_customize_raw"
+          - "'switch.study_floor_heating' not in homeassistant_customize_raw"
+          - "'sensor.living_room_floor_thermometer_battery' not in homeassistant_alarm_automations_raw"
+          - "'binary_sensor.living_room_floor_thermometer_connectivity' not in homeassistant_alarm_automations_raw"
+          - "'switch.living_area_floor_heatings' not in homeassistant_alexa_raw"
+          - "'switch.study_floor_heater_operation_status' not in homeassistant_alexa_raw"
+          - "'switch.living_room_floor_heater_operation_status' in homeassistant_alexa_raw"
+          - "'line: \"switch: !include switches.yaml\"' not in homeassistant_role_tasks_raw"
+          - "'src: switches.yaml' not in homeassistant_role_tasks_raw"
+          - "'path: /srv/homeassistant/config/switches.yaml' not in homeassistant_role_tasks_raw"
+          - >-
+            "regexp: '^switch:'" not in homeassistant_role_tasks_raw
+          - >-
+            "regexp: '^template:'" in homeassistant_role_tasks_raw
+          - >-
+            'line: "template: !include templates.yaml"' in homeassistant_role_tasks_raw
+          - >-
+            "insertafter: '^shell_command:'" in homeassistant_role_tasks_raw
+
+    - name: "floor-heater-migration-test : Verify floor heating automation"
+      ansible.builtin.assert:
+        that:
+          - >-
+            homeassistant_toggle_floor_heating.actions[0].choose[0].conditions[1].entity_id
+            == floor_heater_operation_status_entities
+          - homeassistant_toggle_floor_heating.actions[0].choose[0].conditions[1].match == 'any'
+          - homeassistant_toggle_floor_heating.actions[0].choose[0].conditions[1].state == 'off'
+          - >-
+            homeassistant_toggle_floor_heating.actions[0].choose[0].sequence[0].choose[1].sequence[0].action
+            == 'switch.turn_on'
+          - >-
+            homeassistant_toggle_floor_heating.actions[0].choose[0].sequence[0].choose[1].sequence[0].target.entity_id
+            == floor_heater_operation_status_entities
+          - homeassistant_toggle_floor_heating.actions[0].choose[1].conditions[0].entity_id == 'binary_sensor.living_room_temp_high'
+          - homeassistant_toggle_floor_heating.actions[0].choose[1].conditions[0]['for'].hours == 1
+          - >-
+            homeassistant_toggle_floor_heating.actions[0].choose[1].conditions[1].entity_id
+            == floor_heater_operation_status_entities
+          - homeassistant_toggle_floor_heating.actions[0].choose[1].conditions[1].match == 'any'
+          - homeassistant_toggle_floor_heating.actions[0].choose[1].conditions[1].state == 'on'
+          - "'for' not in homeassistant_toggle_floor_heating.actions[0].choose[1].conditions[1]"
+          - homeassistant_toggle_floor_heating.actions[0].choose[1].sequence[0].action == 'switch.turn_off'
+          - >-
+            homeassistant_toggle_floor_heating.actions[0].choose[1].sequence[0].target.entity_id
+            == floor_heater_operation_status_entities
+
+    - name: "floor-heater-migration-test : Verify AC heat automation"
+      ansible.builtin.assert:
+        that:
+          - >-
+            homeassistant_toggle_living_room_ac_heat.actions[0].choose[0].conditions[1].entity_id
+            == floor_heater_operation_status_entities
+          - homeassistant_toggle_living_room_ac_heat.actions[0].choose[0].conditions[1].match == 'any'
+          - homeassistant_toggle_living_room_ac_heat.actions[0].choose[0].conditions[1].state == 'on'
+          - "'for' not in homeassistant_toggle_living_room_ac_heat.actions[0].choose[0].conditions[1]"
+
+    - name: "floor-heater-migration-test : Verify Darken Living Room script"
+      ansible.builtin.assert:
+        that:
+          - homeassistant_scripts.darken_living_room.sequence[2]['if'][0].entity_id == floor_heater_operation_status_entities
+          - homeassistant_scripts.darken_living_room.sequence[2]['if'][0].match == 'any'
+          - homeassistant_scripts.darken_living_room.sequence[2]['if'][0].state == 'on'
+          - homeassistant_scripts.darken_living_room.sequence[2]['then'][0].action == 'switch.turn_off'
+          - homeassistant_scripts.darken_living_room.sequence[2]['then'][0].target.entity_id == floor_heater_operation_status_entities

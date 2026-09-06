@@ -937,10 +937,11 @@
               entity_id: binary_sensor.living_room_temp_low
               state: "on"
             - condition: state
-              entity_id: switch.living_area_floor_heatings
+              entity_id:
+                - switch.living_room_floor_heater_operation_status
+                - switch.study_floor_heater_operation_status
+              match: any
               state: "on"
-              for:
-                hours: 1
             - condition: state
               entity_id: input_boolean.living_room_window_mode
               state: "off"
@@ -1203,6 +1204,82 @@
                 entity_id: fan.living_room_fan
   trace:
     stored_traces: 100
+- id: automation.sync_living_area_floor_heater_operation_status
+  alias: "Sync Living Area Floor Heater Operation Status"
+  description: >-
+    Keep the living room and study floor heater operation statuses synchronized
+    after either status remains stable for 10 seconds.
+  triggers:
+    - id: living_room_off
+      trigger: state
+      entity_id: switch.living_room_floor_heater_operation_status
+      to: "off"
+      for:
+        seconds: 10
+    - id: living_room_on
+      trigger: state
+      entity_id: switch.living_room_floor_heater_operation_status
+      to: "on"
+      for:
+        seconds: 10
+    - id: study_off
+      trigger: state
+      entity_id: switch.study_floor_heater_operation_status
+      to: "off"
+      for:
+        seconds: 10
+    - id: study_on
+      trigger: state
+      entity_id: switch.study_floor_heater_operation_status
+      to: "on"
+      for:
+        seconds: 10
+  actions:
+    - choose:
+        - conditions:
+            - condition: trigger
+              id: living_room_off
+            - condition: state
+              entity_id: switch.study_floor_heater_operation_status
+              state: "on"
+          sequence:
+            - action: switch.turn_off
+              target:
+                entity_id: switch.study_floor_heater_operation_status
+        - conditions:
+            - condition: trigger
+              id: living_room_on
+            - condition: state
+              entity_id: switch.study_floor_heater_operation_status
+              state: "off"
+          sequence:
+            - action: switch.turn_on
+              target:
+                entity_id: switch.study_floor_heater_operation_status
+        - conditions:
+            - condition: trigger
+              id: study_off
+            - condition: state
+              entity_id: switch.living_room_floor_heater_operation_status
+              state: "on"
+          sequence:
+            - action: switch.turn_off
+              target:
+                entity_id: switch.living_room_floor_heater_operation_status
+        - conditions:
+            - condition: trigger
+              id: study_on
+            - condition: state
+              entity_id: switch.living_room_floor_heater_operation_status
+              state: "off"
+          sequence:
+            - action: switch.turn_on
+              target:
+                entity_id: switch.living_room_floor_heater_operation_status
+  mode: queued
+  max: 4
+  trace:
+    stored_traces: 100
 - id: automation.toggle_living_area_floor_heating
   alias: "Toggle Living Area Floor Heating"
   triggers:
@@ -1232,7 +1309,10 @@
               entity_id: binary_sensor.living_room_temp_low
               state: "on"
             - condition: state
-              entity_id: switch.living_area_floor_heatings
+              entity_id:
+                - switch.living_room_floor_heater_operation_status
+                - switch.study_floor_heater_operation_status
+              match: any
               state: "off"
             - not:
                 - condition: state
@@ -1261,10 +1341,9 @@
                   sequence:
                     - action: switch.turn_on
                       target:
-                        entity_id: switch.living_room_floor_heating
-                    - action: switch.turn_on
-                      target:
-                        entity_id: switch.study_floor_heating
+                        entity_id:
+                          - switch.living_room_floor_heater_operation_status
+                          - switch.study_floor_heater_operation_status
                     - action: notify.all_devices
                       data:
                         message: >-
@@ -1283,10 +1362,11 @@
               for:
                 hours: 1
             - condition: state
-              entity_id: switch.living_area_floor_heatings
+              entity_id:
+                - switch.living_room_floor_heater_operation_status
+                - switch.study_floor_heater_operation_status
+              match: any
               state: "on"
-              for:
-                hours: 1
             - not:
                 - condition: state
                   entity_id: alarm_control_panel.home
@@ -1294,10 +1374,9 @@
           sequence:
             - action: switch.turn_off
               target:
-                entity_id: switch.living_room_floor_heating
-            - action: switch.turn_off
-              target:
-                entity_id: switch.study_floor_heating
+                entity_id:
+                  - switch.living_room_floor_heater_operation_status
+                  - switch.study_floor_heater_operation_status
             - action: notify.all_devices
               data:
                 message: >-

@@ -22,7 +22,7 @@ smart_home:
       - climate.living_room_hvac
       - cover.moms_room_curtains
       - fan.living_room_ceiling_fans
-      - switch.living_area_floor_heatings
+      - switch.living_room_floor_heater_operation_status
       - light.bathroom_lights
       - light.moms_room_light
       - light.living_area_dimming_downlights
@@ -81,7 +81,7 @@ smart_home:
       name: ママの部屋のカーテン
     fan.living_room_ceiling_fans:
       name: リビングのシーリングファン
-    switch.living_area_floor_heatings:
+    switch.living_room_floor_heater_operation_status:
       name: リビングの床暖房
       display_categories: SWITCH
     light.bathroom_lights:

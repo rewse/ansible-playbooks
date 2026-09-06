@@ -1,0 +1,116 @@
+---
+- name: Test floor heater operation status sync automation
+  hosts: localhost
+  connection: local
+  gather_facts: false
+  tasks:
+    - name: "floor-heater-sync-test : Parse automations"
+      ansible.builtin.set_fact:
+        homeassistant_living_room_climate_automations: >-
+          {{ lookup('file', '../files/automations-living-room-climates.yaml') | from_yaml }}
+
+    - name: "floor-heater-sync-test : Select automation"
+      ansible.builtin.set_fact:
+        homeassistant_floor_heater_sync_automations: >-
+          {{ homeassistant_living_room_climate_automations
+             | selectattr('id', 'equalto', 'automation.sync_living_area_floor_heater_operation_status')
+             | list }}
+
+    - name: "floor-heater-sync-test : Verify automation exists"
+      ansible.builtin.assert:
+        that:
+          - homeassistant_floor_heater_sync_automations | length == 1
+
+    - name: "floor-heater-sync-test : Store automation"
+      ansible.builtin.set_fact:
+        homeassistant_floor_heater_sync_automation: >-
+          {{ homeassistant_floor_heater_sync_automations[0] }}
+
+    - name: "floor-heater-sync-test : Verify sync contract"
+      ansible.builtin.assert:
+        that:
+          - homeassistant_floor_heater_sync_automation.triggers | length == 4
+          - homeassistant_floor_heater_sync_automation.triggers[0].id == 'living_room_off'
+          - homeassistant_floor_heater_sync_automation.triggers[0].trigger == 'state'
+          - >-
+            homeassistant_floor_heater_sync_automation.triggers[0].entity_id
+            == 'switch.living_room_floor_heater_operation_status'
+          - homeassistant_floor_heater_sync_automation.triggers[0].to == 'off'
+          - homeassistant_floor_heater_sync_automation.triggers[0]['for'].seconds == 10
+          - homeassistant_floor_heater_sync_automation.triggers[1].id == 'living_room_on'
+          - homeassistant_floor_heater_sync_automation.triggers[1].trigger == 'state'
+          - >-
+            homeassistant_floor_heater_sync_automation.triggers[1].entity_id
+            == 'switch.living_room_floor_heater_operation_status'
+          - homeassistant_floor_heater_sync_automation.triggers[1].to == 'on'
+          - homeassistant_floor_heater_sync_automation.triggers[1]['for'].seconds == 10
+          - homeassistant_floor_heater_sync_automation.triggers[2].id == 'study_off'
+          - homeassistant_floor_heater_sync_automation.triggers[2].trigger == 'state'
+          - >-
+            homeassistant_floor_heater_sync_automation.triggers[2].entity_id
+            == 'switch.study_floor_heater_operation_status'
+          - homeassistant_floor_heater_sync_automation.triggers[2].to == 'off'
+          - homeassistant_floor_heater_sync_automation.triggers[2]['for'].seconds == 10
+          - homeassistant_floor_heater_sync_automation.triggers[3].id == 'study_on'
+          - homeassistant_floor_heater_sync_automation.triggers[3].trigger == 'state'
+          - >-
+            homeassistant_floor_heater_sync_automation.triggers[3].entity_id
+            == 'switch.study_floor_heater_operation_status'
+          - homeassistant_floor_heater_sync_automation.triggers[3].to == 'on'
+          - homeassistant_floor_heater_sync_automation.triggers[3]['for'].seconds == 10
+          - homeassistant_floor_heater_sync_automation.actions | length == 1
+          - homeassistant_floor_heater_sync_automation.actions[0].choose | length == 4
+          - >-
+            homeassistant_floor_heater_sync_automation.actions[0].choose[0].conditions[0].id
+            == 'living_room_off'
+          - >-
+            homeassistant_floor_heater_sync_automation.actions[0].choose[0].conditions[1].entity_id
+            == 'switch.study_floor_heater_operation_status'
+          - homeassistant_floor_heater_sync_automation.actions[0].choose[0].conditions[1].state == 'on'
+          - >-
+            homeassistant_floor_heater_sync_automation.actions[0].choose[0].sequence[0].action
+            == 'switch.turn_off'
+          - >-
+            homeassistant_floor_heater_sync_automation.actions[0].choose[0].sequence[0].target.entity_id
+            == 'switch.study_floor_heater_operation_status'
+          - >-
+            homeassistant_floor_heater_sync_automation.actions[0].choose[1].conditions[0].id
+            == 'living_room_on'
+          - >-
+            homeassistant_floor_heater_sync_automation.actions[0].choose[1].conditions[1].entity_id
+            == 'switch.study_floor_heater_operation_status'
+          - homeassistant_floor_heater_sync_automation.actions[0].choose[1].conditions[1].state == 'off'
+          - >-
+            homeassistant_floor_heater_sync_automation.actions[0].choose[1].sequence[0].action
+            == 'switch.turn_on'
+          - >-
+            homeassistant_floor_heater_sync_automation.actions[0].choose[1].sequence[0].target.entity_id
+            == 'switch.study_floor_heater_operation_status'
+          - >-
+            homeassistant_floor_heater_sync_automation.actions[0].choose[2].conditions[0].id
+            == 'study_off'
+          - >-
+            homeassistant_floor_heater_sync_automation.actions[0].choose[2].conditions[1].entity_id
+            == 'switch.living_room_floor_heater_operation_status'
+          - homeassistant_floor_heater_sync_automation.actions[0].choose[2].conditions[1].state == 'on'
+          - >-
+            homeassistant_floor_heater_sync_automation.actions[0].choose[2].sequence[0].action
+            == 'switch.turn_off'
+          - >-
+            homeassistant_floor_heater_sync_automation.actions[0].choose[2].sequence[0].target.entity_id
+            == 'switch.living_room_floor_heater_operation_status'
+          - >-
+            homeassistant_floor_heater_sync_automation.actions[0].choose[3].conditions[0].id
+            == 'study_on'
+          - >-
+            homeassistant_floor_heater_sync_automation.actions[0].choose[3].conditions[1].entity_id
+            == 'switch.living_room_floor_heater_operation_status'
+          - homeassistant_floor_heater_sync_automation.actions[0].choose[3].conditions[1].state == 'off'
+          - >-
+            homeassistant_floor_heater_sync_automation.actions[0].choose[3].sequence[0].action
+            == 'switch.turn_on'
+          - >-
+            homeassistant_floor_heater_sync_automation.actions[0].choose[3].sequence[0].target.entity_id
+            == 'switch.living_room_floor_heater_operation_status'
+          - homeassistant_floor_heater_sync_automation.mode == 'queued'
+          - homeassistant_floor_heater_sync_automation.max == 4

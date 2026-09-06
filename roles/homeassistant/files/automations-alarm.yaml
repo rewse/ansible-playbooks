@@ -50,7 +50,6 @@
         - sensor.entrance_door_sensor_battery
         - sensor.living_room_1_button_switch_battery
         - sensor.living_room_floor_heating_battery
-        - sensor.living_room_floor_thermometer_battery
         - sensor.living_room_humidifer_battery
         - sensor.living_room_motion_sensor_battery
         - sensor.living_room_thermometer_battery
@@ -247,7 +246,6 @@
     - trigger: state
       entity_id:
         - binary_sensor.dads_room_thermometer_connectivity
-        - binary_sensor.living_room_floor_thermometer_connectivity
         - binary_sensor.living_room_thermometer_connectivity
         - binary_sensor.moms_room_thermometer_connectivity
       to: "off"
