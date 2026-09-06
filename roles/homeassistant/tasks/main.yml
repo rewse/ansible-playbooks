@@ -826,6 +826,22 @@
     remote_src: true
     mode: '0644'
   notify: "homeassistant: Restart"
+  when: not ansible_check_mode
+  tags:
+    - homeassistant
+    - config
+    - custom
+    - frigate
+    - homeassistant_frigate
+    - homeassistant_frigate_config
+    - homeassistant_frigate_install
+
+- name: "frigate : Report installation deferred in check mode"
+  ansible.builtin.debug:
+    msg: >-
+      Frigate integration file installation is deferred in check mode because
+      the requested checkout is not created during a dry run.
+  when: ansible_check_mode
   tags:
     - homeassistant
     - config
