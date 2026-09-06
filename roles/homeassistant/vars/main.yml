@@ -31,4 +31,4 @@ homeassistant_simple_weather_card_version: 0.8.5
 homeassistant_tesla_fleet:
   private_key: "{{ lookup('pipe', 'op read \"op://ansible/a43jcxbfn53ohsi5hbvw7qozie/private key base64\" | openssl base64 -d -A') }}"
   public_key: "{{ lookup('pipe', 'op read \"op://ansible/a43jcxbfn53ohsi5hbvw7qozie/private key base64\" | openssl base64 -d -A | openssl ec -pubout') }}"
-homeassistant_tuya_local_version: 2026.7.2
+homeassistant_tuya_local_version: 2026.9.0

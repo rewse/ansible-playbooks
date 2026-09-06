@@ -993,6 +993,22 @@
     remote_src: true
     mode: '0644'
   notify: "homeassistant: Restart"
+  when: not ansible_check_mode
+  tags:
+    - homeassistant
+    - config
+    - custom
+    - tuya
+    - homeassistant_tuya
+    - homeassistant_tuya_config
+    - homeassistant_tuya_install
+
+- name: "tuya : Report installation deferred in check mode"
+  ansible.builtin.debug:
+    msg: >-
+      Tuya Local integration file installation is deferred in check mode because
+      the requested checkout is not created during a dry run.
+  when: ansible_check_mode
   tags:
     - homeassistant
     - config
