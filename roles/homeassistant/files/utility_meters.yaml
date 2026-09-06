@@ -1,3 +1,11 @@
+balcony_gas_cost_daily:
+  unique_id: sensor.balcony_gas_cost_daily
+  source: sensor.balcony_gas_meter_cumulative_amount_of_gas_consumption_measurement_value_cost
+  cycle: daily
+balcony_hot_water_cost_daily:
+  unique_id: sensor.balcony_hot_water_cost_daily
+  source: sensor.balcony_water_flowmeter_measured_cumulative_amount_of_flowing_water_cost
+  cycle: daily
 enecoq_co2_emission_daily:
   unique_id: sensor.enecoq_co2_emission_daily
   source: sensor.enecoq_co2_emission
@@ -10,6 +18,14 @@ enecoq_power_usage_daily:
   unique_id: sensor.enecoq_power_usage_daily
   source: sensor.enecoq_power_usage
   cycle: daily
+balcony_gas_cost_hourly:
+  unique_id: sensor.balcony_gas_cost_hourly
+  source: sensor.balcony_gas_meter_cumulative_amount_of_gas_consumption_measurement_value_cost
+  cycle: hourly
+balcony_hot_water_cost_hourly:
+  unique_id: sensor.balcony_hot_water_cost_hourly
+  source: sensor.balcony_water_flowmeter_measured_cumulative_amount_of_flowing_water_cost
+  cycle: hourly
 enecoq_co2_emission_hourly:
   unique_id: sensor.enecoq_co2_emission_hourly
   source: sensor.enecoq_co2_emission

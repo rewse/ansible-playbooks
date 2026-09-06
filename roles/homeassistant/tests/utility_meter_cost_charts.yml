@@ -1,0 +1,33 @@
+---
+- name: Test gas and hot water cost utility meters
+  hosts: localhost
+  connection: local
+  gather_facts: false
+  vars:
+    gas_cost_source: sensor.balcony_gas_meter_cumulative_amount_of_gas_consumption_measurement_value_cost
+    hot_water_cost_source: sensor.balcony_water_flowmeter_measured_cumulative_amount_of_flowing_water_cost
+  tasks:
+    - name: "utility-meter-cost-test : Parse configuration"
+      ansible.builtin.set_fact:
+        homeassistant_utility_meters: >-
+          {{ lookup('file', '../files/utility_meters.yaml') | from_yaml }}
+
+    - name: "utility-meter-cost-test : Verify gas meters"
+      ansible.builtin.assert:
+        that:
+          - homeassistant_utility_meters.balcony_gas_cost_daily.unique_id == 'sensor.balcony_gas_cost_daily'
+          - homeassistant_utility_meters.balcony_gas_cost_daily.source == gas_cost_source
+          - homeassistant_utility_meters.balcony_gas_cost_daily.cycle == 'daily'
+          - homeassistant_utility_meters.balcony_gas_cost_hourly.unique_id == 'sensor.balcony_gas_cost_hourly'
+          - homeassistant_utility_meters.balcony_gas_cost_hourly.source == gas_cost_source
+          - homeassistant_utility_meters.balcony_gas_cost_hourly.cycle == 'hourly'
+
+    - name: "utility-meter-cost-test : Verify hot water meters"
+      ansible.builtin.assert:
+        that:
+          - homeassistant_utility_meters.balcony_hot_water_cost_daily.unique_id == 'sensor.balcony_hot_water_cost_daily'
+          - homeassistant_utility_meters.balcony_hot_water_cost_daily.source == hot_water_cost_source
+          - homeassistant_utility_meters.balcony_hot_water_cost_daily.cycle == 'daily'
+          - homeassistant_utility_meters.balcony_hot_water_cost_hourly.unique_id == 'sensor.balcony_hot_water_cost_hourly'
+          - homeassistant_utility_meters.balcony_hot_water_cost_hourly.source == hot_water_cost_source
+          - homeassistant_utility_meters.balcony_hot_water_cost_hourly.cycle == 'hourly'
