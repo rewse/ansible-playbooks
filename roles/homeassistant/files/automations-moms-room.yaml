@@ -35,13 +35,19 @@
 - id: automation.alarm_moms_room_temp_difference
   alias: "ALARM: Mom’s Room Temperature Difference"
   triggers:
-    - trigger: state
-      entity_id: sensor.moms_room_switchbot_meter_temperature
-  conditions:
-    - condition: numeric_state
+    - trigger: numeric_state
       entity_id:
         - sensor.moms_room_temp_difference
         - sensor.moms_room_temp_difference_average
+      above: 0.5
+      for:
+        minutes: 30
+  conditions:
+    - condition: numeric_state
+      entity_id: sensor.moms_room_temp_difference
+      above: 0.5
+    - condition: numeric_state
+      entity_id: sensor.moms_room_temp_difference_average
       above: 0.5
   actions:
     - action: automation.turn_off

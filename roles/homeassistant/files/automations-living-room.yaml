@@ -36,13 +36,19 @@
 - id: automation.alarm_living_room_temperature_difference
   alias: "ALARM: Living Room Temperature Difference"
   triggers:
-    - trigger: state
-      entity_id: sensor.living_room_switchbot_hub_2_temperature
-  conditions:
-    - condition: numeric_state
+    - trigger: numeric_state
       entity_id:
         - sensor.living_room_temp_difference
         - sensor.living_room_temp_difference_average
+      above: 0.5
+      for:
+        minutes: 30
+  conditions:
+    - condition: numeric_state
+      entity_id: sensor.living_room_temp_difference
+      above: 0.5
+    - condition: numeric_state
+      entity_id: sensor.living_room_temp_difference_average
       above: 0.5
   actions:
     - action: automation.turn_off
