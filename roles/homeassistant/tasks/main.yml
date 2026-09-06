@@ -798,8 +798,12 @@
     - homeassistant
     - init
     - custom
+    - echonet-lite
     - homeassistant_custom
     - homeassistant_custom_init
+    - homeassistant_echonet_lite
+    - homeassistant_echonet_lite_config
+    - homeassistant_echonet_lite_install
 
 - name: "frigate : Clone integration"
   ansible.builtin.git:
@@ -860,6 +864,97 @@
     - homeassistant_frosted-glass
     - homeassistant_frosted-glass_config
     - homeassistant_frosted-glass_install
+
+- name: "echonet-lite : Create checkout directory"
+  ansible.builtin.file:
+    path: /var/lib/ansible/homeassistant
+    state: directory
+    owner: root
+    group: root
+    mode: '0700'
+  tags:
+    - homeassistant
+    - install
+    - config
+    - custom
+    - echonet-lite
+    - homeassistant_echonet_lite
+    - homeassistant_echonet_lite_config
+    - homeassistant_echonet_lite_install
+
+- name: "echonet-lite : Clone HEMS integration"
+  ansible.builtin.git:
+    repo: https://github.com/sayurin/hems_echonet_lite.git
+    dest: /var/lib/ansible/homeassistant/hems-echonet-lite
+    version: "{{ homeassistant_hems_echonet_lite_version }}"
+    force: true
+  register: homeassistant_hems_echonet_lite_git
+  tags:
+    - homeassistant
+    - install
+    - config
+    - custom
+    - echonet-lite
+    - homeassistant_echonet_lite
+    - homeassistant_echonet_lite_config
+    - homeassistant_echonet_lite_install
+
+- name: "echonet-lite : Clean HEMS integration checkout"
+  ansible.builtin.command:
+    argv:
+      - git
+      - -C
+      - /var/lib/ansible/homeassistant/hems-echonet-lite
+      - clean
+      - -ffdx
+  register: homeassistant_hems_echonet_lite_clean
+  changed_when: >-
+    homeassistant_hems_echonet_lite_clean.stdout | default('') | length > 0
+  tags:
+    - homeassistant
+    - install
+    - config
+    - custom
+    - echonet-lite
+    - homeassistant_echonet_lite
+    - homeassistant_echonet_lite_config
+    - homeassistant_echonet_lite_install
+
+# Source and destination are both on the managed host.
+- name: "echonet-lite : Synchronize HEMS integration"  # noqa command-instead-of-module
+  ansible.builtin.command:
+    cmd: >-
+      rsync --archive --delete --itemize-changes --omit-dir-times
+      --exclude=__pycache__/
+      /var/lib/ansible/homeassistant/hems-echonet-lite/custom_components/echonet_lite/
+      /srv/homeassistant/config/custom_components/echonet_lite/
+  register: homeassistant_hems_echonet_lite_sync
+  changed_when: homeassistant_hems_echonet_lite_sync.stdout | length > 0
+  notify: "homeassistant: Restart"
+  when: not ansible_check_mode
+  tags:
+    - homeassistant
+    - config
+    - custom
+    - echonet-lite
+    - homeassistant_echonet_lite
+    - homeassistant_echonet_lite_config
+    - homeassistant_echonet_lite_install
+
+- name: "echonet-lite : Report synchronization deferred in check mode"
+  ansible.builtin.debug:
+    msg: >-
+      HEMS integration file synchronization is deferred in check mode because
+      the pinned checkout is not modified during a dry run.
+  when: ansible_check_mode
+  tags:
+    - homeassistant
+    - config
+    - custom
+    - echonet-lite
+    - homeassistant_echonet_lite
+    - homeassistant_echonet_lite_config
+    - homeassistant_echonet_lite_install
 
 - name: "tuya : Clone local integration"
   ansible.builtin.git:
