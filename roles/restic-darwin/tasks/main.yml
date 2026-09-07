@@ -17,6 +17,8 @@
     mode: '0700'
   loop:
     - "{{ ansible_facts['env']['HOME'] }}/.config/restic"
+    - "{{ ansible_facts['env']['HOME'] }}/.local/bin"
+    - "{{ ansible_facts['env']['HOME'] }}/.local/libexec"
     - "{{ ansible_facts['env']['HOME'] }}/.local/state"
   tags:
     - restic-darwin
@@ -85,6 +87,108 @@
     - init
     - restic-darwin_restic
     - restic-darwin_restic_init
+
+- name: "restic : Copy iCloud download helper source"
+  ansible.builtin.copy:
+    src: restic-icloud-download.swift
+    dest: "{{ ansible_facts['env']['HOME'] }}/.local/libexec/restic-icloud-download.swift"
+    mode: '0644'
+  register: restic_icloud_download_source
+  tags:
+    - restic-darwin
+    - config
+    - restic-darwin_restic
+    - restic-darwin_restic_config
+
+- name: "restic : Check iCloud download helper"
+  ansible.builtin.stat:
+    path: "{{ ansible_facts['env']['HOME'] }}/.local/bin/restic-icloud-download"
+    checksum_algorithm: sha256
+  register: restic_icloud_download_binary
+  tags:
+    - restic-darwin
+    - config
+    - restic-darwin_restic
+    - restic-darwin_restic_config
+
+- name: "restic : Check iCloud download helper checksum"
+  ansible.builtin.stat:
+    path: "{{ ansible_facts['env']['HOME'] }}/.local/libexec/restic-icloud-download.checksum"
+  register: restic_icloud_download_marker
+  tags:
+    - restic-darwin
+    - config
+    - restic-darwin_restic
+    - restic-darwin_restic_config
+
+- name: "restic : Read iCloud download helper checksum"
+  ansible.builtin.slurp:
+    src: "{{ ansible_facts['env']['HOME'] }}/.local/libexec/restic-icloud-download.checksum"
+  when: restic_icloud_download_marker.stat.exists
+  register: restic_icloud_download_marker_content
+  tags:
+    - restic-darwin
+    - config
+    - restic-darwin_restic
+    - restic-darwin_restic_config
+
+- name: "restic : Compile iCloud download helper"
+  ansible.builtin.shell: |
+    set -e
+    output="{{ ansible_facts['env']['HOME'] }}/.local/bin/restic-icloud-download.new"
+    trap 'rm -f "${output}"' EXIT
+    xcrun swiftc -O \
+      "{{ ansible_facts['env']['HOME'] }}/.local/libexec/restic-icloud-download.swift" \
+      -o "${output}"
+    chmod 0755 "${output}"
+    mv "${output}" "{{ ansible_facts['env']['HOME'] }}/.local/bin/restic-icloud-download"
+  when: >-
+    not restic_icloud_download_binary.stat.exists or
+    not restic_icloud_download_marker.stat.exists or
+    (restic_icloud_download_marker_content.content | default('') | b64decode | trim) !=
+    (restic_icloud_download_source.checksum ~ ' ' ~ (restic_icloud_download_binary.stat.checksum | default('')))
+  register: restic_icloud_download_compile
+  changed_when: true
+  tags:
+    - restic-darwin
+    - config
+    - restic-darwin_restic
+    - restic-darwin_restic_config
+
+- name: "restic : Check compiled iCloud download helper"
+  ansible.builtin.stat:
+    path: "{{ ansible_facts['env']['HOME'] }}/.local/bin/restic-icloud-download"
+    checksum_algorithm: sha256
+  register: restic_icloud_download_compiled_binary
+  tags:
+    - restic-darwin
+    - config
+    - restic-darwin_restic
+    - restic-darwin_restic_config
+
+- name: "restic : Record iCloud download helper checksum"
+  ansible.builtin.copy:
+    content: "{{ restic_icloud_download_source.checksum }} {{ restic_icloud_download_compiled_binary.stat.checksum }}\n"
+    dest: "{{ ansible_facts['env']['HOME'] }}/.local/libexec/restic-icloud-download.checksum"
+    mode: '0600'
+  when: restic_icloud_download_compiled_binary.stat.checksum is defined
+  tags:
+    - restic-darwin
+    - config
+    - restic-darwin_restic
+    - restic-darwin_restic_config
+
+- name: "restic : Set iCloud download helper permissions"
+  ansible.builtin.file:
+    path: "{{ ansible_facts['env']['HOME'] }}/.local/bin/restic-icloud-download"
+    state: file
+    mode: '0755'
+  when: restic_icloud_download_compiled_binary.stat.exists
+  tags:
+    - restic-darwin
+    - config
+    - restic-darwin_restic
+    - restic-darwin_restic_config
 
 - name: "restic : Copy scripts"
   ansible.builtin.template:

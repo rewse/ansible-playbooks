@@ -5,6 +5,10 @@ logs
 roles/database/client/files/oracle*
 roles/database/client/gui/files/sqldeveloper*
 
+# Python
+*.py[cod]
+__pycache__/
+
 # Environment files
 .env
 .envrc

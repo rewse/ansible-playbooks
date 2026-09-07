@@ -9,10 +9,13 @@
 set -euo pipefail
 
 CONFIG_DIR="{{ home }}/.config/restic"
+ICLOUD_DOWNLOAD="{{ home }}/.local/bin/restic-icloud-download"
+ICLOUD_ROOT="{{ home }}/Library/Mobile Documents"
 LOG_FILE="{{ home }}/Library/Logs/restic-s3-backup.log"
 LOG_TAG="restic-s3-backup"
 MARKER_SUCCESS="{{ home }}/.local/state/restic-s3-backup.success"
 MARKER_RETENTION="{{ home }}/.local/state/restic-s3-backup.retention"
+MATERIALISE_TIMEOUT={{ restic_darwin.materialise_timeout_seconds }}
 MIN_INTERVAL=$(( {{ restic_darwin.min_interval_hours }} * 3600 ))
 
 export RESTIC_REPOSITORY="s3:s3.{{ restic_darwin.s3_region }}.amazonaws.com/{{ restic_darwin.s3_bucket }}/{{ restic_darwin.repo_name }}"
@@ -77,13 +80,31 @@ fi
 # -----------------------------------------------------------------------------
 # Materialise iCloud Drive
 # -----------------------------------------------------------------------------
-# iCloud evicts what it can and leaves a placeholder. Reading one through restic
-# answers "resource deadlock avoided" instead of fetching it, so the file has to
-# be pulled down first, which reading it here does. Whatever stays evicted after
-# this fails the backup rather than passing as saved.
+# Reading a placeholder from a launchd process returns "resource deadlock
+# avoided" instead of asking File Provider to download it. Request downloads
+# through FileManager's ubiquitous-item API, materialising directories before
+# descending into them. Trash is excluded from backup and need not be fetched.
 log "Materialising evicted iCloud files"
-find "{{ home }}/Library/Mobile Documents" -type f -flags +dataless -exec cat {} + > /dev/null 2>&1 || true
-log "Still evicted: $(find "{{ home }}/Library/Mobile Documents" -type f -flags +dataless 2>/dev/null | wc -l | tr -d ' ')"
+materialise_deadline=$(( $(date +%s) + MATERIALISE_TIMEOUT ))
+previous_evicted=-1
+while true; do
+    find "${ICLOUD_ROOT}" -path "${ICLOUD_ROOT}/.Trash" -prune -o \
+      -type d -flags +dataless -exec "${ICLOUD_DOWNLOAD}" {} \; || true
+    find "${ICLOUD_ROOT}" -path "${ICLOUD_ROOT}/.Trash" -prune -o \
+      -type f -flags +dataless -exec "${ICLOUD_DOWNLOAD}" {} + || true
+    still_evicted=$(find "${ICLOUD_ROOT}" -path "${ICLOUD_ROOT}/.Trash" -prune -o \
+      -flags +dataless -exec printf . \; | wc -c | tr -d ' ') || true
+    if [ "${still_evicted}" != "${previous_evicted}" ]; then
+        log "Still evicted: ${still_evicted}"
+        previous_evicted=${still_evicted}
+    fi
+    [ "${still_evicted}" -eq 0 ] && break
+    if [ "$(date +%s)" -ge "${materialise_deadline}" ]; then
+        log "Timed out waiting for ${still_evicted} iCloud files"
+        break
+    fi
+    sleep 5
+done
 
 # -----------------------------------------------------------------------------
 # Back up
@@ -93,12 +114,24 @@ log "Still evicted: $(find "{{ home }}/Library/Mobile Documents" -type f -flags 
 # initialise turns a retryable moment into a fatal one.
 log "=== Backup started ==="
 # Without --verbose restic reports counts and sizes but not every path, which is
-# what keeps a log this small enough to read.
+# what keeps a log this small enough to read. Exit code 3 means the snapshot was
+# saved but one or more source files were unreadable; retain that snapshot and
+# continue to retention while leaving the affected paths in the log.
+backup_rc=0
 nice -n 10 restic backup "{{ home }}" \
   --exclude-file="${CONFIG_DIR}/exclude" \
   --exclude-caches \
   --one-file-system \
-  --tag daily
+  --tag daily || backup_rc=$?
+
+if [ "${backup_rc}" -eq 3 ]; then
+    log "Backup completed with unreadable source files"
+    notify "Backup completed with unreadable files. See ~/Library/Logs/${LOG_TAG}.log"
+elif [ "${backup_rc}" -ne 0 ]; then
+    log "restic backup failed with exit code ${backup_rc}"
+    notify "Backup failed. See ~/Library/Logs/${LOG_TAG}.log"
+    exit "${backup_rc}"
+fi
 
 # Written before retention runs. A single marker covering both would report the
 # data as missing when it is only the pruning that failed.

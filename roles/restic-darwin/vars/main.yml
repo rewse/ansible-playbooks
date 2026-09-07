@@ -9,6 +9,9 @@ restic_darwin:
   keep_daily: 30
   keep_weekly: 8
   keep_monthly: 12
+  # Stop waiting for iCloud downloads eventually; any remaining placeholders are
+  # reported by restic as an incomplete snapshot rather than blocking forever.
+  materialise_timeout_seconds: 600
   # A run is skipped when the last one succeeded this recently, so loading the
   # agent at every login costs nothing while a day missed to sleep is picked up.
   min_interval_hours: 20
