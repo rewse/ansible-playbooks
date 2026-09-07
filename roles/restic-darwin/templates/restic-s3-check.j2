@@ -7,6 +7,7 @@
 
 set -euo pipefail
 
+CACHE_ENV="{{ home }}/.config/environment/cache.sh"
 CONFIG_DIR="{{ home }}/.config/restic"
 LOG_FILE="{{ home }}/Library/Logs/restic-s3-check.log"
 LOG_TAG="restic-s3-check"
@@ -17,6 +18,11 @@ export RESTIC_REPOSITORY="s3:s3.{{ restic_darwin.s3_region }}.amazonaws.com/{{ r
 export RESTIC_PASSWORD_FILE="${CONFIG_DIR}/password"
 export RESTIC_PROGRESS_FPS=0.0166
 export PATH="/opt/homebrew/bin:/usr/bin:/bin:/usr/sbin:/sbin"
+
+if [ -r "${CACHE_ENV}" ]; then
+    # shellcheck source=/dev/null
+    . "${CACHE_ENV}"
+fi
 
 set -a
 # shellcheck source=/dev/null

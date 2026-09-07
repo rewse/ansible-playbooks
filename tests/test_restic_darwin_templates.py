@@ -269,6 +269,35 @@ class ResticDarwinTemplateTest(unittest.TestCase):
         )
         self.assertIn("{{ home }}/Library/Mobile Documents/.Trash", template)
 
+    def test_restic_scripts_source_shared_cache_environment(self) -> None:
+        for name in ("restic-s3-backup.j2", "restic-s3-check.j2"):
+            with self.subTest(template=name):
+                template = (TEMPLATES / name).read_text()
+                self.assertIn(
+                    'CACHE_ENV="{{ home }}/.config/environment/cache.sh"',
+                    template,
+                )
+                self.assertIn('. "${CACHE_ENV}"', template)
+
+    def test_role_preserves_shared_local_bin_permissions(self) -> None:
+        tasks = TASKS.read_text()
+
+        self.assertIn(
+            '- path: "{{ ansible_facts[\'env\'][\'HOME\'] }}/.local/bin"\n      mode: \'0755\'',
+            tasks,
+        )
+
+    def test_repository_initialization_sources_shared_cache_environment(self) -> None:
+        tasks = TASKS.read_text()
+        initialize_task = tasks.split('- name: "restic : Initialise the repository"', 1)[1]
+        initialize_task = initialize_task.split('- name: "restic : Copy iCloud', 1)[0]
+
+        self.assertIn('. "${HOME}/.config/environment/cache.sh"', initialize_task)
+        self.assertLess(
+            initialize_task.index('. "${HOME}/.config/environment/cache.sh"'),
+            initialize_task.index("restic cat config"),
+        )
+
 
 if __name__ == "__main__":
     unittest.main()

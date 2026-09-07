@@ -12,14 +12,20 @@
 
 - name: "restic : Create directories"
   ansible.builtin.file:
-    path: "{{ item }}"
+    path: "{{ item.path }}"
     state: directory
-    mode: '0700'
+    mode: "{{ item.mode }}"
   loop:
-    - "{{ ansible_facts['env']['HOME'] }}/.config/restic"
-    - "{{ ansible_facts['env']['HOME'] }}/.local/bin"
-    - "{{ ansible_facts['env']['HOME'] }}/.local/libexec"
-    - "{{ ansible_facts['env']['HOME'] }}/.local/state"
+    - path: "{{ ansible_facts['env']['HOME'] }}/.config/restic"
+      mode: '0700'
+    - path: "{{ ansible_facts['env']['HOME'] }}/.local/bin"
+      mode: '0755'
+    - path: "{{ ansible_facts['env']['HOME'] }}/.local/libexec"
+      mode: '0700'
+    - path: "{{ ansible_facts['env']['HOME'] }}/.local/state"
+      mode: '0700'
+  loop_control:
+    label: "{{ item.path }}"
   tags:
     - restic-darwin
     - config
@@ -72,6 +78,9 @@
 # yet and would be answered by trying to initialise over the top of one.
 - name: "restic : Initialise the repository"
   ansible.builtin.shell: |
+    if [ -r "${HOME}/.config/environment/cache.sh" ]; then
+      . "${HOME}/.config/environment/cache.sh"
+    fi
     set -a
     . "${HOME}/.config/restic/s3.env"
     set +a
