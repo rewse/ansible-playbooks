@@ -23,6 +23,7 @@
       ansible.builtin.assert:
         that:
           - teslamate_test_compose.teslamate.image == teslamate_image_ref
+          - teslamate_test_compose.teslamate.image is match('^ghcr.io/rewse/teslamate:main@sha256:[0-9a-f]{64}$')
           - teslamate_test_compose['teslamate-grafana'].image == teslamate_grafana_image_ref
           - teslamate_test_compose.teslamate.ports == ['127.0.0.1:4001:4000']
           - teslamate_test_compose['teslamate-grafana'].ports == ['127.0.0.1:3000:3000']

@@ -16,6 +16,7 @@ teslamate_grafana_hostname: grafana.rewse.jp
 teslamate_grafana_port: 3000
 teslamate_grafana_excluded_geofence: Yamate-dori Ave., Shinjuku
 teslamate_hostname: teslamate.rewse.jp
+teslamate_image_ref: ghcr.io/rewse/teslamate:main@sha256:47c926dd0fdbff31f221ec784abb6af062ede1ca760a25c86ebb75bc227aeeb6
 teslamate_mqtt_host: host.docker.internal
 teslamate_mqtt_password: "{{ lookup('pipe', 'op read op://ansible/utsespwfv247vhgklpbbpbtboe/credential') }}"
 teslamate_mqtt_port: 1883
