@@ -160,3 +160,13 @@ EXPLAIN (ANALYZE, BUFFERS, FORMAT JSON)
 Grafanaコンテナの直近10分、400行を検査し、dashboard provisioning、PostgreSQL query、JSON読み込みに関係するエラーは0件だった。ブラウザーページ由来のエラーも0件だった。Chrome拡張由来の同一エラーが2件あったが、Grafanaの表示、クエリ、リンクには影響しなかった。
 
 同じPlaybookの再実行は`ok=39 changed=0 failed=0`だった。Grafana restart handlerは実行されず、再作成も発生しなかった。全受け入れ条件を満たしたためロールバックは実行していない。
+
+## 上流標準ツールの再検証
+
+PR文面レビュー後、TeslaMate開発ガイドに記載された正規チェックを追加実行した。
+
+- `treefmt 2.6.0`、`Elixir 1.20.4`、`Erlang/OTP 29.0.6`、`Hex 2.5.1`、`rebar3 3.27.0`を使用した。
+- `treefmt --fail-on-change`は終了コード0。860ファイルを走査し、720ファイルを処理対象として評価、423ファイルをformatし、変更は0件だった。
+- PostgreSQL 18.6を一時コンテナで起動し、`mix ci`を実行した。終了コード0、746 tests passed、実行時間62.9秒だった。
+- 固定版`nixos/nix:2.35.2`でもflakeの`nix run .#lint`を実行した。変更対象外の既存migration 16件をformatterが変更するため`--fail-on-change`は終了コード1になった。Vampire Drain JSONは`treefmt.toml`で除外対象であり、feature branchへ生じた16件の自動変更はすべて復元した。このベースライン事象は公開PR本文には記載せず、成功した`treefmt`と`mix ci`だけをValidationへ記載する。
+- 検証後、TeslaMate Forkの作業ツリーがcleanで、`1422deb092ae670aa1bc72dec551b83197a736a1`とremote branchが一致することを再確認した。
