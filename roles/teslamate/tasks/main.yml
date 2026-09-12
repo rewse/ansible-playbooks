@@ -212,6 +212,34 @@
     - teslamate_grafana
     - teslamate_grafana_config
 
+- name: "teslamate : Remove stale Vampire Drain dashboard source container"
+  ansible.builtin.command:
+    argv:
+      - docker
+      - rm
+      - --force
+      - teslamate-grafana-vampire-drain-source
+  register: teslamate_grafana_vampire_drain_source_cleanup
+  changed_when: false
+  failed_when:
+    - teslamate_grafana_vampire_drain_source_cleanup.rc != 0
+    - "'No such container' not in teslamate_grafana_vampire_drain_source_cleanup.stderr"
+  when:
+    - teslamate_image_ref | length > 0
+    - teslamate_grafana_image_ref | length > 0
+    - not ansible_check_mode
+  tags:
+    - teslamate
+    - update
+    - config
+    - docker
+    - grafana
+    - teslamate_docker
+    - teslamate_docker_config
+    - teslamate_docker_update
+    - teslamate_grafana
+    - teslamate_grafana_config
+
 - name: "teslamate : Extract upstream Vampire Drain dashboard"
   when:
     - teslamate_image_ref | length > 0
