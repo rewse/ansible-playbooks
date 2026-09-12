@@ -170,3 +170,19 @@ PR文面レビュー後、TeslaMate開発ガイドに記載された正規チェ
 - PostgreSQL 18.6を一時コンテナで起動し、`mix ci`を実行した。終了コード0、746 tests passed、実行時間62.9秒だった。
 - 固定版`nixos/nix:2.35.2`でもflakeの`nix run .#lint`を実行した。変更対象外の既存migration 16件をformatterが変更するため`--fail-on-change`は終了コード1になった。Vampire Drain JSONは`treefmt.toml`で除外対象であり、feature branchへ生じた16件の自動変更はすべて復元した。このベースライン事象は公開PR本文には記載せず、成功した`treefmt`と`mix ci`だけをValidationへ記載する。
 - 検証後、TeslaMate Forkの作業ツリーがcleanで、`1422deb092ae670aa1bc72dec551b83197a736a1`とremote branchが一致することを再確認した。
+
+## 上流PR作成後の再適用
+
+2026-09-12に上流PR [teslamate-org/teslamate#5729](https://github.com/teslamate-org/teslamate/pull/5729) を作成した。Ansibleの一時パッチャーにはこのURLと廃止条件を記載した。PRがマージされただけでは削除せず、修正を含む公式TeslaMate Grafanaイメージを本番へ導入し、Vampire Drainの表示を確認した後に削除する。
+
+Task 3のローカル検証を再実行した。Pythonは15テストすべて成功し、Ansibleのsyntax check、テンプレート契約、ansible-lint、`git diff --check`も終了コード0だった。ansible-lintには既存の`.yamllint`設定と推奨設定の非互換警告が出たが、対象2ファイルはfailure 0、warning 0だった。
+
+本番check modeは`ok=27 changed=1 failed=0`で、差分はPR URLと廃止条件を含むパッチャーの配備だけだった。本適用は`ok=39 changed=1 failed=0`で、同じパッチャーだけを更新した。Grafana restart handlerは実行されず、コンテナ再作成も発生しなかった。適用中の公式Grafanaイメージは`teslamate/grafana@sha256:4e6fe5ded7d614bf22d0297f9565ff00d8db36d18c73395a06bc040a1ffa05af`だった。
+
+本適用後、生成JSON、配備済みコメント、read-only mount、Grafana health、Grafana APIを再検証した。生成JSONとAPIの`rawSql`は一致し、実経過秒の式は1件、重複クリップと半開区間条件は各2件、旧式は0件だった。`/api/health`は`database=ok`を返した。直近10分のGrafanaログは1行で、dashboard provisioning、PostgreSQL query、JSON読み込みに関係するエラーは0件だった。
+
+認証済みの専用agent-browserセッションで90日表示を再確認した。7行は境界横断の修正対象1行、真のオンライン区間1行、修正前から正常な区間5行に分類できた。全行のStandbyは0%から100%の範囲にあり、97%から100%は6行だった。Vampire Drainパネル、期間、車両、最小駐車時間、距離単位、航続距離、TeslaMateリンク、7件のDrive Detailsリンクは正常だった。ページとconsoleにGrafana由来のエラーはなかった。検証用スクリーンショットは確認後に削除した。
+
+同じPlaybookの再実行は`ok=39 changed=0 failed=0`だった。Grafana restart handlerは実行されず、再作成も発生しなかった。
+
+PRのNetlify deploy previewは成功した。CLA Assistantの`license/cla`は未署名のためpendingであり、マージにはContributor License Agreementの手続きが必要である。

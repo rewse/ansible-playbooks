@@ -1,6 +1,10 @@
 #!/usr/bin/env python3
 """Patch TeslaMate's Vampire Drain dashboard standby calculations."""
 
+# Temporary workaround for https://github.com/teslamate-org/teslamate/pull/5729.
+# Remove this patch after deploying an official TeslaMate Grafana image
+# that contains the upstream fix.
+
 import argparse
 import copy
 import json
