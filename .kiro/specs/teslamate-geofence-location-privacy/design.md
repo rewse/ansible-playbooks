@@ -28,10 +28,12 @@ GeoFenceごとに位置詳細の表示可否を設定し、対象GeoFence内の�
 
 GeoFenceの作成・編集フォームでNameとCostの間に次の行を追加する。
 
-- 行ラベル: `Visibility`、日本語は「表示」
-- checkbox: `Hide location details`、日本語は「位置情報の詳細を非表示」
+- 行ラベルのmsgid: `Visibility`
+- checkboxのmsgid: `Hide location details`
 - control: 既存Settings画面と同じ`switch is-rounded is-success`
-- 補足文: `Hide addresses in Locations and route points in Trip, Visited and Drive Details. The underlying location data remains stored.`
+- 補足文のmsgid: `Hide addresses in Locations and route points in Trip, Visited and Drive Details. The underlying location data remains stored.`
+
+英語はmsgidを使用する。TeslaMateが対応する`ca`、`da`、`de`、`en`、`es`、`fi`、`fr`、`hu`、`it`、`ja`、`ko`、`nb`、`nl`、`sv`、`th`、`tr`、`uk`、`zh_Hans`、`zh_Hant`の全localeを対象とし、英語以外の18個の`priv/gettext/<locale>/LC_MESSAGES/default.po`へ3文字列の翻訳済み`msgstr`を追加する。日本語では順に「表示」、「位置情報の詳細を非表示」、「Locationsの住所とTrip、Visited、Drive Detailsの経路点を非表示にする。元の位置データは保存される。」とする。新規3文字列に空の`msgstr`を残さない。
 
 補足文は対象パネルとデータ保持を常時表示し、完全な匿名化や記録停止との誤解を避ける。`Hidden`はGeoFence自体が消えるように読めるため使わない。`Privacy zone`は保存停止や全画面での秘匿を連想させるため使わない。
 
@@ -144,7 +146,10 @@ TeslaMate本体が起動しない場合は直前の公式本体digestへ戻す�
 - changesetが`true`と`false`を保存できることを確認する。
 - LiveViewでラベル、switch、補足文、checked状態、保存後の再表示を確認する。
 - `hide_details`だけの変更で充電料金再計算モーダルが開かないことを確認する。
-- `mix gettext.extract --merge`で翻訳メッセージを更新する。
+- `mix gettext.extract --merge`で`default.pot`と19個の`default.po`を更新する。
+- 英語以外の18 localeで新規3文字列の`msgstr`が空でないことを検証する。
+- 既存の各言語の用語と表記に合わせ、補足文を含む3文字列の翻訳を確認する。
+- CIの`mix gettext.extract --check-up-to-date`を通す。
 - `treefmt`または`nix run .#lint`と`mix ci`を実行する。
 
 ### Grafana SQL
@@ -159,9 +164,9 @@ TeslaMate開発ガイドに従い、4クエリを修正前後で`EXPLAIN (ANALYZ
 
 ### UIと本番
 
-- 1123px幅で既存ラベル列との整列を確認する。
-- 375px幅で縦積み、横スクロール、文字切れを確認する。
-- keyboard操作とlabel関連付けを確認する。
+- 19 localeすべてを1123px幅と375px幅で描画し、ラベル、checkbox、補足文に横スクロールや文字切れがないことをDOM寸法で確認する。
+- 長い翻訳は既存のfield内で折り返し、200pxのラベル列やモバイルレイアウトを拡張しないことを確認する。
+- 各localeでkeyboard操作とlabel関連付けを確認する。
 - 本番相当データでAddressesと3経路だけが変わり、維持対象が変わらないことを確認する。
 - TeslaMateとGrafanaのログにLiveViewエラーやSQLエラーがないことを確認する。
 
@@ -178,7 +183,7 @@ TeslaMate開発ガイドに従い、4クエリを修正前後で`EXPLAIN (ANALYZ
 
 ## 上流PR
 
-新しい上流PRにはmigration、GeoFence schemaとLiveView、翻訳メッセージ、テスト、4ダッシュボードだけを含める。Ansible、rewse用イメージ参照、実データは含めない。外部ForkのPRには公式のPR用イメージが生成されないため、ローカルテストとrewse GHCRイメージによる検証結果を記載する。
+新しい上流PRにはmigration、GeoFence schemaとLiveView、`default.pot`、19 localeの`default.po`、テスト、4ダッシュボードだけを含める。英語以外の18 localeでは新規3文字列を翻訳済みにし、空の`msgstr`を残さない。Ansible、rewse用イメージ参照、実データは含めない。外部ForkのPRには公式のPR用イメージが生成されないため、ローカルテストとrewse GHCRイメージによる検証結果を記載する。
 
 TeslaMate開発ガイドに従い、必要なFLA 2.0対応を行い、PR本文末尾にAI支援を次の形式で開示する。
 
@@ -201,7 +206,7 @@ Vampire Drain修正が公式リリースへ入った後は、Forkの重複commit
 
 ## 完了条件
 
-- `hide_details`の保存、解除、既定値、翻訳、レスポンシブUIのテストが通る。
+- `hide_details`の保存、解除、既定値が正しく、19 localeで3つのUI文字列とレスポンシブ表示のテストが通る。
 - 4対象クエリだけがGeoFence内部の住所・位置点を除外する。
 - 性能比較が基準を満たす。
 - Forkの本体・Grafanaイメージを同じmain commitから生成し、Ansibleが検証済みdigestを参照する。
