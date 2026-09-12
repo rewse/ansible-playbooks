@@ -109,7 +109,7 @@ EXTRACT(
 
 本番表示に問題がある場合は、このマウントだけを除去してGrafanaコンテナを再作成する。DBデータとTeslaMate本体は変更しないため、データ復旧は不要である。
 
-PR作成後、Ansibleへ次の趣旨の英語コメントを追加する。
+PR作成後、Ansibleへ次の趣旨の英語コメントを追加する。`<PR URL>`は説明用の記号であり、実装時には作成済みPRの完全なURLへ置換する。記号をソースへ残してはならない。
 
 ```python
 # Temporary workaround for <PR URL>.
@@ -144,7 +144,7 @@ Forkでは次を実行する。
 - JSON構文検査
 - `git diff --check`
 - `treefmt`または`nix run .#lint`
-- 環境を準備できる場合は`mix ci`
+- Nix開発環境と`teslamate_test`データベースを既存手順で準備できる場合は`mix ci`。準備できない場合は、実行できなかった理由と代替検証をPR本文へ記載する。
 
 Ansibleでは次を実行する。
 
