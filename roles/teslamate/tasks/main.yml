@@ -167,6 +167,124 @@
     - teslamate_grafana
     - teslamate_grafana_config
 
+- name: "teslamate : Create Vampire Drain dashboard directory"
+  ansible.builtin.file:
+    path: "{{ teslamate_data_dir }}/grafana-dashboards"
+    state: directory
+    owner: root
+    group: root
+    mode: '0755'
+  when:
+    - teslamate_image_ref | length > 0
+    - teslamate_grafana_image_ref | length > 0
+  tags:
+    - teslamate
+    - config
+    - update
+    - docker
+    - grafana
+    - teslamate_docker
+    - teslamate_docker_config
+    - teslamate_docker_update
+    - teslamate_grafana
+    - teslamate_grafana_config
+
+- name: "teslamate : Deploy Vampire Drain dashboard patcher"
+  ansible.builtin.copy:
+    src: patch_vampire_drain_dashboard.py
+    dest: "{{ teslamate_data_dir }}/patch_vampire_drain_dashboard.py"
+    owner: root
+    group: root
+    mode: '0755'
+  when:
+    - teslamate_image_ref | length > 0
+    - teslamate_grafana_image_ref | length > 0
+    - not ansible_check_mode or teslamate_data_dir_status.stat.exists
+  tags:
+    - teslamate
+    - config
+    - update
+    - docker
+    - grafana
+    - teslamate_docker
+    - teslamate_docker_config
+    - teslamate_docker_update
+    - teslamate_grafana
+    - teslamate_grafana_config
+
+- name: "teslamate : Extract upstream Vampire Drain dashboard"
+  when:
+    - teslamate_image_ref | length > 0
+    - teslamate_grafana_image_ref | length > 0
+    - not ansible_check_mode
+  tags:
+    - teslamate
+    - update
+    - config
+    - docker
+    - grafana
+    - teslamate_docker
+    - teslamate_docker_config
+    - teslamate_docker_update
+    - teslamate_grafana
+    - teslamate_grafana_config
+  block:
+    - name: "teslamate : Create Vampire Drain dashboard source container"
+      ansible.builtin.command:
+        argv:
+          - docker
+          - create
+          - --name
+          - teslamate-grafana-vampire-drain-source
+          - "{{ teslamate_grafana_image_ref }}"
+      changed_when: false
+
+    - name: "teslamate : Copy upstream Vampire Drain dashboard"
+      ansible.builtin.command:
+        argv:
+          - docker
+          - cp
+          - teslamate-grafana-vampire-drain-source:/dashboards/vampire-drain.json
+          - "{{ teslamate_data_dir }}/grafana-dashboards/vampire-drain.upstream.json"
+      changed_when: false
+  always:
+    - name: "teslamate : Remove Vampire Drain dashboard source container"
+      ansible.builtin.command:
+        argv:
+          - docker
+          - rm
+          - --force
+          - teslamate-grafana-vampire-drain-source
+      changed_when: false
+
+- name: "teslamate : Patch Vampire Drain dashboard"
+  ansible.builtin.command:
+    argv:
+      - python3
+      - "{{ teslamate_data_dir }}/patch_vampire_drain_dashboard.py"
+      - --input
+      - "{{ teslamate_data_dir }}/grafana-dashboards/vampire-drain.upstream.json"
+      - --output
+      - "{{ teslamate_data_dir }}/grafana-dashboards/vampire-drain.json"
+  register: teslamate_grafana_vampire_drain_patch
+  changed_when: teslamate_grafana_vampire_drain_patch.stdout == 'changed'
+  notify: "teslamate-grafana: Restart"
+  when:
+    - teslamate_image_ref | length > 0
+    - teslamate_grafana_image_ref | length > 0
+    - not ansible_check_mode
+  tags:
+    - teslamate
+    - update
+    - config
+    - docker
+    - grafana
+    - teslamate_docker
+    - teslamate_docker_config
+    - teslamate_docker_update
+    - teslamate_grafana
+    - teslamate_grafana_config
+
 - name: "teslamate : Add services to compose"
   ansible.builtin.blockinfile:
     path: /etc/compose.yml

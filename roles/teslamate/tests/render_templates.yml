@@ -29,6 +29,7 @@
           - teslamate_test_compose.teslamate.cap_drop == ['all']
           - teslamate_test_compose['teslamate-grafana'].cap_drop == ['all']
           - teslamate_test_compose.teslamate.extra_hosts == ['host.docker.internal:host-gateway']
+          - "'/srv/teslamate/grafana-dashboards/vampire-drain.json:/dashboards/vampire-drain.json:ro' in teslamate_test_compose['teslamate-grafana'].volumes"
           - "'/srv/teslamate/global-bundle.pem:/etc/ssl/certs/aws-rds-global-bundle.pem:ro' in teslamate_test_compose.teslamate.volumes"
           - teslamate_database_password not in teslamate_test_compose_output
           - teslamate_encryption_key not in teslamate_test_compose_output
