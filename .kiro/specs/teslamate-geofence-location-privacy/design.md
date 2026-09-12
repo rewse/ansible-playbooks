@@ -96,7 +96,7 @@ flowchart LR
 
 Forkの既存GHCR workflowはTeslaMate本体とGrafanaを同じcommitからビルドする。`main`へのpushで生成されたイメージを検証し、Ansibleには可変タグだけでなくmanifest digestを含む参照を保存する。`main`タグが更新されても本番は自動更新しない。
 
-2026年9月12日の確認時点で、`rewse/teslamate`のActions APIはworkflow 0件を返し、`rewse`のGHCRコンテナパッケージも0件だった。実装時にForkのGitHub Actionsを有効化し、最初のビルド後にfoxからpullできる公開範囲または認証を確認する。公開リポジトリのビルド成果物としてGHCR packageを公開し、foxに追加のpull credentialを持たせない構成を第一候補とする。packageを公開できない場合は、Ansible vaultの1Password参照を使うpull認証を別途設計し、無断で追加しない。
+2026年9月12日の確認時点で、`rewse/teslamate`のActions APIはworkflow 0件を返し、`rewse`のGHCRコンテナパッケージも0件だった。実装時にForkのGitHub Actionsを有効化する。最初のビルドで作成した本体・Grafana packageはpublicに設定し、foxからpull credentialなしで取得できることをAnsible変更前に確認する。packageをpublicにできない場合は配備を止め、pull認証の設計と1Password参照の追加について改めて承認を得る。
 
 ## Ansibleの最終状態
 
