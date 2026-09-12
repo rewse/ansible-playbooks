@@ -5,31 +5,46 @@
     apply:
       tags:
         - teslamate
+        - config
         - update
         - docker
+        - grafana
         - quarantine
         - teslamate_docker
+        - teslamate_docker_config
         - teslamate_docker_update
+        - teslamate_grafana
+        - teslamate_grafana_config
   vars:
     quarantine_repo: teslamate/teslamate
     quarantine_tag_pattern: '^\d+\.\d+\.\d+$'
   tags:
     - teslamate
+    - config
     - update
     - docker
+    - grafana
     - quarantine
     - teslamate_docker
+    - teslamate_docker_config
     - teslamate_docker_update
+    - teslamate_grafana
+    - teslamate_grafana_config
 
 - name: "teslamate : Preserve TeslaMate image reference"
   ansible.builtin.set_fact:
     teslamate_image_ref: "{{ docker_quarantine_image_ref }}"
   tags:
     - teslamate
+    - config
     - update
     - docker
+    - grafana
     - teslamate_docker
+    - teslamate_docker_config
     - teslamate_docker_update
+    - teslamate_grafana
+    - teslamate_grafana_config
 
 - name: "teslamate : Resolve Grafana image"
   ansible.builtin.include_role:
@@ -37,31 +52,48 @@
     apply:
       tags:
         - teslamate
+        - config
         - update
         - docker
+        - grafana
         - quarantine
         - teslamate_docker
+        - teslamate_docker_config
         - teslamate_docker_update
+        - teslamate_grafana
+        - teslamate_grafana_config
   vars:
     quarantine_repo: teslamate/grafana
     quarantine_tag_pattern: '^\d+\.\d+\.\d+$'
   tags:
     - teslamate
+    - config
     - update
     - docker
+    - grafana
     - quarantine
     - teslamate_docker
+    - teslamate_docker_config
     - teslamate_docker_update
+    - teslamate_grafana
+    - teslamate_grafana_config
 
 - name: "teslamate : Preserve Grafana image reference"
   ansible.builtin.set_fact:
+    teslamate_grafana_image_digest_ref: >-
+      {{ docker_quarantine_image_ref | regex_replace(':[^/@]+@', '@') }}
     teslamate_grafana_image_ref: "{{ docker_quarantine_image_ref }}"
   tags:
     - teslamate
+    - config
     - update
     - docker
+    - grafana
     - teslamate_docker
+    - teslamate_docker_config
     - teslamate_docker_update
+    - teslamate_grafana
+    - teslamate_grafana_config
 
 - name: "teslamate : Check data directory"
   ansible.builtin.stat:
@@ -70,6 +102,14 @@
   tags:
     - teslamate
     - config
+    - update
+    - docker
+    - grafana
+    - teslamate_docker
+    - teslamate_docker_config
+    - teslamate_docker_update
+    - teslamate_grafana
+    - teslamate_grafana_config
     - teslamate_teslamate
     - teslamate_teslamate_init
 
@@ -89,6 +129,10 @@
       owner: '472'
       group: '0'
       mode: '0750'
+    - path: "{{ teslamate_data_dir }}/grafana-dashboards"
+      owner: root
+      group: root
+      mode: '0755'
     - path: "{{ teslamate_data_dir }}/import"
       owner: root
       group: root
@@ -99,6 +143,14 @@
   tags:
     - teslamate
     - config
+    - update
+    - docker
+    - grafana
+    - teslamate_docker
+    - teslamate_docker_config
+    - teslamate_docker_update
+    - teslamate_grafana
+    - teslamate_grafana_config
     - teslamate_teslamate
     - teslamate_teslamate_init
 
@@ -167,6 +219,29 @@
     - teslamate_grafana
     - teslamate_grafana_config
 
+- name: "teslamate : Deploy Visited dashboard patcher"
+  ansible.builtin.copy:
+    src: patch_visited_dashboard.py
+    dest: "{{ teslamate_data_dir }}/patch_visited_dashboard.py"
+    owner: root
+    group: root
+    mode: '0755'
+  when:
+    - teslamate_image_ref | length > 0
+    - teslamate_grafana_image_ref | length > 0
+    - not ansible_check_mode or teslamate_data_dir_status.stat.exists
+  tags:
+    - teslamate
+    - config
+    - update
+    - docker
+    - grafana
+    - teslamate_docker
+    - teslamate_docker_config
+    - teslamate_docker_update
+    - teslamate_grafana
+    - teslamate_grafana_config
+
 - name: "teslamate : Create Vampire Drain dashboard directory"
   ansible.builtin.file:
     path: "{{ teslamate_data_dir }}/grafana-dashboards"
@@ -211,6 +286,128 @@
     - teslamate_docker_update
     - teslamate_grafana
     - teslamate_grafana_config
+
+- name: "teslamate : Check Grafana dashboard source image"
+  community.docker.docker_image_info:
+    name: "{{ teslamate_grafana_image_digest_ref }}"
+  register: teslamate_grafana_dashboard_source_image
+  when:
+    - teslamate_image_ref | length > 0
+    - teslamate_grafana_image_ref | length > 0
+  tags:
+    - teslamate
+    - update
+    - config
+    - docker
+    - grafana
+    - teslamate_docker
+    - teslamate_docker_config
+    - teslamate_docker_update
+    - teslamate_grafana
+    - teslamate_grafana_config
+
+- name: "teslamate : Pull Grafana dashboard source image"
+  community.docker.docker_image:
+    name: "{{ teslamate_grafana_image_ref }}"
+    source: pull
+  when:
+    - teslamate_image_ref | length > 0
+    - teslamate_grafana_image_ref | length > 0
+    - teslamate_grafana_dashboard_source_image.images | length == 0
+    - not ansible_check_mode
+  tags:
+    - teslamate
+    - update
+    - config
+    - docker
+    - grafana
+    - teslamate_docker
+    - teslamate_docker_config
+    - teslamate_docker_update
+    - teslamate_grafana
+    - teslamate_grafana_config
+
+- name: "teslamate : Remove stale Grafana dashboard source container"
+  ansible.builtin.command:
+    argv:
+      - docker
+      - rm
+      - --force
+      - teslamate-grafana-dashboard-source
+  register: teslamate_grafana_dashboard_source_cleanup
+  changed_when: false
+  failed_when:
+    - teslamate_grafana_dashboard_source_cleanup.rc != 0
+    - "'No such container' not in teslamate_grafana_dashboard_source_cleanup.stderr"
+  when:
+    - teslamate_image_ref | length > 0
+    - teslamate_grafana_image_ref | length > 0
+    - not ansible_check_mode
+  tags:
+    - teslamate
+    - update
+    - config
+    - docker
+    - grafana
+    - teslamate_docker
+    - teslamate_docker_config
+    - teslamate_docker_update
+    - teslamate_grafana
+    - teslamate_grafana_config
+
+- name: "teslamate : Extract upstream Grafana dashboards"
+  when:
+    - teslamate_image_ref | length > 0
+    - teslamate_grafana_image_ref | length > 0
+    - not ansible_check_mode
+  tags:
+    - teslamate
+    - update
+    - config
+    - docker
+    - grafana
+    - teslamate_docker
+    - teslamate_docker_config
+    - teslamate_docker_update
+    - teslamate_grafana
+    - teslamate_grafana_config
+  block:
+    - name: "teslamate : Create Grafana dashboard source container"
+      ansible.builtin.command:
+        argv:
+          - docker
+          - create
+          - --name
+          - teslamate-grafana-dashboard-source
+          - "{{ teslamate_grafana_image_ref }}"
+      changed_when: false
+
+    - name: "teslamate : Copy upstream Grafana dashboards"
+      ansible.builtin.command:
+        argv:
+          - docker
+          - cp
+          - "teslamate-grafana-dashboard-source:{{ item.source }}"
+          - "{{ teslamate_data_dir }}/grafana-dashboards/{{ item.name }}.upstream.json"
+      loop:
+        - name: drive-details
+          source: /dashboards_internal/drive-details.json
+        - name: trip
+          source: /dashboards/trip.json
+        - name: visited
+          source: /dashboards/visited.json
+      loop_control:
+        label: "{{ item.name }}"
+      changed_when: false
+  always:
+    - name: "teslamate : Remove Grafana dashboard source container"
+      ansible.builtin.command:
+        argv:
+          - docker
+          - rm
+          - --force
+          - teslamate-grafana-dashboard-source
+      changed_when: false
 
 - name: "teslamate : Remove stale Vampire Drain dashboard source container"
   ansible.builtin.command:
@@ -313,6 +510,40 @@
     - teslamate_grafana
     - teslamate_grafana_config
 
+- name: "teslamate : Patch Grafana dashboards"
+  ansible.builtin.command:
+    argv:
+      - python3
+      - "{{ teslamate_data_dir }}/patch_visited_dashboard.py"
+      - --input
+      - "{{ teslamate_data_dir }}/grafana-dashboards/{{ item }}.upstream.json"
+      - --output
+      - "{{ teslamate_data_dir }}/grafana-dashboards/{{ item }}.json"
+      - --geofence
+      - "{{ teslamate_grafana_excluded_geofence }}"
+  loop:
+    - drive-details
+    - trip
+    - visited
+  register: teslamate_grafana_dashboard_patch
+  changed_when: teslamate_grafana_dashboard_patch.stdout == 'changed'
+  notify: "teslamate-grafana: Restart"
+  when:
+    - teslamate_image_ref | length > 0
+    - teslamate_grafana_image_ref | length > 0
+    - not ansible_check_mode
+  tags:
+    - teslamate
+    - update
+    - config
+    - docker
+    - grafana
+    - teslamate_docker
+    - teslamate_docker_config
+    - teslamate_docker_update
+    - teslamate_grafana
+    - teslamate_grafana_config
+
 - name: "teslamate : Add services to compose"
   ansible.builtin.blockinfile:
     path: /etc/compose.yml
@@ -327,9 +558,14 @@
   tags:
     - teslamate
     - config
+    - update
     - docker
+    - grafana
     - teslamate_docker
     - teslamate_docker_config
+    - teslamate_docker_update
+    - teslamate_grafana
+    - teslamate_grafana_config
 
 - name: "teslamate : Pull and update containers"
   community.docker.docker_compose_v2:
@@ -345,10 +581,15 @@
     - not ansible_check_mode
   tags:
     - teslamate
+    - config
     - update
     - docker
+    - grafana
     - teslamate_docker
+    - teslamate_docker_config
     - teslamate_docker_update
+    - teslamate_grafana
+    - teslamate_grafana_config
 
 - name: "teslamate : Install Apache authentication utility"
   ansible.builtin.apt:

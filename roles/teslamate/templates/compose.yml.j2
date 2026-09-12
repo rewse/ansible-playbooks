@@ -24,6 +24,9 @@
       - "127.0.0.1:{{ teslamate_grafana_port }}:3000"
     volumes:
       - {{ teslamate_data_dir }}/grafana:/var/lib/grafana
+      - {{ teslamate_data_dir }}/grafana-dashboards/drive-details.json:/dashboards_internal/drive-details.json:ro
+      - {{ teslamate_data_dir }}/grafana-dashboards/trip.json:/dashboards/trip.json:ro
+      - {{ teslamate_data_dir }}/grafana-dashboards/visited.json:/dashboards/visited.json:ro
       - {{ teslamate_data_dir }}/grafana-dashboards/vampire-drain.json:/dashboards/vampire-drain.json:ro
       - /etc/localtime:/etc/localtime:ro
     cap_drop:

@@ -14,6 +14,7 @@ teslamate_grafana_admin_password: "{{ lookup('pipe', 'op read \"op://ansible/oy6
 teslamate_grafana_admin_username: "{{ lookup('pipe', 'op read \"op://ansible/oy677zzpeppxyn3b4xfdfapqvy/username\"') }}"
 teslamate_grafana_hostname: grafana.rewse.jp
 teslamate_grafana_port: 3000
+teslamate_grafana_excluded_geofence: Yamate-dori Ave., Shinjuku
 teslamate_hostname: teslamate.rewse.jp
 teslamate_mqtt_host: host.docker.internal
 teslamate_mqtt_password: "{{ lookup('pipe', 'op read op://ansible/utsespwfv247vhgklpbbpbtboe/credential') }}"
