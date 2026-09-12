@@ -327,7 +327,7 @@ direnv exec . ansible-playbook singleton_int1.yml \
   --check --diff
 ```
 
-Expected: `failed=0`、Vampire Drain JSONとmountだけが新規差分として現れる。予期しない変更があれば停止する。
+Expected: `failed=0`、Vampire Drain専用patcherの配備とcomposeのread-only mountだけが新規差分として現れる。非変更のcheck modeではイメージからの抽出とJSON生成をskipし、生成JSONは本適用後のStep 3でassertする。予期しない変更があれば停止する。
 
 - [ ] **Step 2: 本番へ適用する**
 

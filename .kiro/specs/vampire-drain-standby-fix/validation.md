@@ -123,7 +123,7 @@ ORDER BY p.name;
 | A | 69,445秒 | 68,314秒 | 1,131秒 | 0.984 | PASS |
 | B | 28,422秒 | 104秒 | 28,318秒 | 0.004 | PASS |
 
-修正SQLが返した全7行を検査し、全行が`0 <= standby <= 1`を満たした。現行SQLで97%から100%と表示される完全内包区間は6行あり、整数パーセントへの丸め表示は全6行で変わらなかった。
+修正SQLが返した全7行を検査し、全行が`0 <= standby <= 1`を満たした。内訳は修正対象の境界横断区間1行、真のオンライン区間1行、修正前から正常な区間5行である。修正後に97%から100%と表示される6行には修正対象の1行が含まれ、修正前から正常な5行は整数パーセントへの丸め表示を維持した。
 
 ## 実行計画
 
@@ -151,11 +151,11 @@ EXPLAIN (ANALYZE, BUFFERS, FORMAT JSON)
 
 ## 本番一時適用と表示検証
 
-2026-09-12に`singleton_int1.yml`を対象ホスト1台へ`--tags teslamate`で適用した。check modeは`ok=27 changed=2 failed=0`で、差分はVampire Drain専用patcherの新規配備とread-only mountの追加だけだった。本適用は`ok=41 changed=6 failed=0`で、生成JSON、compose更新、コンテナ更新、Grafana再作成が完了した。
+2026-09-12に`singleton_int1.yml`を対象ホスト1台へ`--tags teslamate`で適用した。check modeは`ok=27 changed=2 failed=0`で、差分はVampire Drain専用patcherの新規配備とcomposeへのread-only mount追加だけだった。非変更のcheck modeではイメージからの抽出とJSON生成を意図的にskipした。本適用は`ok=41 changed=6 failed=0`で、生成JSON、compose更新、コンテナ更新、Grafana再作成が完了した。本適用後に生成JSONの内容をassertした。
 
 生成JSONのVampire Drainクエリは、実経過秒の式が1件、`LEAST`と`GREATEST`による重複クリップが各2件、半開区間の重複条件が各2件だった。旧`age()`式、旧集計式、完全内包条件は残っていなかった。Grafanaコンテナの`/dashboards/vampire-drain.json` mountは1件でread-only、`/api/health`の`database`は`ok`だった。`/api/dashboards/uid/zhHx2Fggk`が返した読み込み済み`rawSql`は生成ファイルと一致した。資格情報とSQL本文は記録していない。
 
-認証済みの専用agent-browserセッションで90日表示を確認した。結果は7行で、境界横断区間はStandby約98%、真のオンライン区間はStandby約0%かつSoC -3%、既存正常区間は6行すべて97%から100%だった。Vampire Drainパネル、90日の期間、車両、最小駐車時間、距離単位、航続距離の各変数、TeslaMateリンク、全行のDrive Detailsリンクは正常だった。スクリーンショットはローカル検証後に削除し、VIN、実時刻、位置、車両IDを本書へ記録していない。
+認証済みの専用agent-browserセッションで90日表示を確認した。7行の内訳は、境界横断の修正対象1行、真のオンライン区間1行、修正前から正常な区間5行だった。境界横断区間はStandby約98%、真のオンライン区間はStandby約0%かつSoC -3%だった。97%から100%の6行には修正対象の1行が含まれ、修正前から正常な5行も同じ表示範囲を維持した。Vampire Drainパネル、90日の期間、車両、最小駐車時間、距離単位、航続距離の各変数、TeslaMateリンク、全行のDrive Detailsリンクは正常だった。スクリーンショットはローカル検証後に削除し、VIN、実時刻、位置、車両IDを本書へ記録していない。
 
 Grafanaコンテナの直近10分、400行を検査し、dashboard provisioning、PostgreSQL query、JSON読み込みに関係するエラーは0件だった。ブラウザーページ由来のエラーも0件だった。Chrome拡張由来の同一エラーが2件あったが、Grafanaの表示、クエリ、リンクには影響しなかった。
 
