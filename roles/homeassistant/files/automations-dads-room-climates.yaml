@@ -10,6 +10,12 @@
       event: start
   conditions:
     - condition: state
+      entity_id: binary_sensor.dads_room_thermometer_fault
+      state: "off"
+    - condition: state
+      entity_id: binary_sensor.dads_room_hygrometer_fault
+      state: "off"
+    - condition: state
       entity_id: climate.dads_room_ac
       state:
         - "cool"
@@ -54,7 +60,14 @@
     - trigger: state
       entity_id: climate.dads_room_ac
       to: "heat_cool"
-  action:
+  conditions:
+    - condition: state
+      entity_id: binary_sensor.dads_room_thermometer_fault
+      state: "off"
+    - condition: state
+      entity_id: binary_sensor.dads_room_hygrometer_fault
+      state: "off"
+  actions:
     - choose:
         - conditions:
             - condition: state
@@ -151,6 +164,12 @@
     - trigger: homeassistant
       event: start
   conditions:
+    - condition: state
+      entity_id: binary_sensor.dads_room_thermometer_fault
+      state: "off"
+    - condition: state
+      entity_id: binary_sensor.dads_room_hygrometer_fault
+      state: "off"
     - condition: state
       entity_id: climate.dads_room_ac
       state:
@@ -690,6 +709,12 @@
       event: start
   conditions:
     - condition: state
+      entity_id: binary_sensor.dads_room_thermometer_fault
+      state: "off"
+    - condition: state
+      entity_id: binary_sensor.dads_room_hygrometer_fault
+      state: "off"
+    - condition: state
       entity_id: input_select.season_mode
       state: "Summer"
       for:
@@ -792,6 +817,12 @@
     - trigger: homeassistant
       event: start
   conditions:
+    - condition: state
+      entity_id: binary_sensor.dads_room_thermometer_fault
+      state: "off"
+    - condition: state
+      entity_id: binary_sensor.dads_room_hygrometer_fault
+      state: "off"
     - condition: state
       entity_id: input_select.season_mode
       state: "Winter"

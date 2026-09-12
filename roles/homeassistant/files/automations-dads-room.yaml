@@ -2,75 +2,56 @@
   alias: "ALARM: Dad’s Room Humidity Difference"
   triggers:
     - trigger: state
-      entity_id: sensor.dads_room_switchbot_meter_humidity
-  conditions:
-    - condition: numeric_state
-      entity_id:
-        - sensor.dads_room_humidity_difference
-        - sensor.dads_room_humidity_difference_average
-      above: 5
+      entity_id: binary_sensor.dads_room_hygrometer_fault
+      to: "on"
   actions:
-    - action: automation.turn_off
-      target:
-        entity_id:
-          - automation.adjust_dads_room_ac_temperature
-          - automation.change_dads_room_ac_mode
-          - automation.toggle_dads_room_ac_cool
-          - automation.toggle_dads_room_ac_dry
-          - automation.toggle_dads_room_ac_heat
     - action: notify.tats_devices
       data:
         title: "⚠️ ALARM"
         message: >-
-          Dad’s Room Humidity Difference is Too Large.
+          Dad’s Room humidity sensors may be faulty.
           Current: {{ states('sensor.dads_room_humidity') }}% /
-          {{ states('sensor.dads_room_switchbot_meter_humidity') }}%
+          {{ states('sensor.dads_room_switchbot_meter_humidity') }}%.
+          Smoothed difference:
+          {% set primary_smoothed = states('sensor.dads_room_humidity_smoothed') %}
+          {% set secondary_smoothed = states('sensor.dads_room_switchbot_meter_humidity_smoothed') %}
+          {% if is_number(primary_smoothed) and is_number(secondary_smoothed) %}
+            {{ (primary_smoothed | float - secondary_smoothed | float) | abs | round(2) }}pt
+          {% else %}
+            unavailable
+          {% endif %}
         data:
           push:
             interruption-level: time-sensitive
           url: "/lovelace/overview"
-    - delay:
-        hours: 8
   trace:
     stored_traces: 100
 - id: automation.alarm_dads_room_temp_difference
   alias: "ALARM: Dad’s Room Temperature Difference"
   triggers:
-    - trigger: numeric_state
-      entity_id:
-        - sensor.dads_room_temp_difference
-        - sensor.dads_room_temp_difference_average
-      above: 0.5
-      for:
-        minutes: 30
-  conditions:
-    - condition: numeric_state
-      entity_id: sensor.dads_room_temp_difference
-      above: 0.5
-    - condition: numeric_state
-      entity_id: sensor.dads_room_temp_difference_average
-      above: 0.5
+    - trigger: state
+      entity_id: binary_sensor.dads_room_thermometer_fault
+      to: "on"
   actions:
-    - action: automation.turn_off
-      target:
-        entity_id:
-          - automation.adjust_dads_room_ac_temperature
-          - automation.change_dads_room_ac_mode
-          - automation.toggle_dads_room_ac_cooldry
-          - automation.toggle_dads_room_ac_heat
     - action: notify.tats_devices
       data:
         title: "⚠️ ALARM"
         message: >-
-          Dad’s Room Temperature Difference is Too Large.
+          Dad’s Room temperature sensors may be faulty.
           Current: {{ states('sensor.dads_room_temperature') }}°C /
-          {{ states('sensor.dads_room_switchbot_meter_temperature') }}°C
+          {{ states('sensor.dads_room_switchbot_meter_temperature') }}°C.
+          Smoothed difference:
+          {% set primary_smoothed = states('sensor.dads_room_temperature_smoothed') %}
+          {% set secondary_smoothed = states('sensor.dads_room_switchbot_meter_temperature_smoothed') %}
+          {% if is_number(primary_smoothed) and is_number(secondary_smoothed) %}
+            {{ (primary_smoothed | float - secondary_smoothed | float) | abs | round(2) }}°C
+          {% else %}
+            unavailable
+          {% endif %}
         data:
           push:
             interruption-level: time-sensitive
           url: "/lovelace/overview"
-    - delay:
-        hours: 8
   trace:
     stored_traces: 100
 - id: automation.alarm_dads_room_co2

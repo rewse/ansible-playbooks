@@ -10,6 +10,12 @@
       event: start
   conditions:
     - condition: state
+      entity_id: binary_sensor.living_room_thermometer_fault
+      state: "off"
+    - condition: state
+      entity_id: binary_sensor.living_room_hygrometer_fault
+      state: "off"
+    - condition: state
       entity_id: climate.living_room_ac
       state:
         - "cool"
@@ -54,6 +60,13 @@
     - trigger: state
       entity_id: climate.living_room_ac
       to: "heat_cool"
+  conditions:
+    - condition: state
+      entity_id: binary_sensor.living_room_thermometer_fault
+      state: "off"
+    - condition: state
+      entity_id: binary_sensor.living_room_hygrometer_fault
+      state: "off"
   actions:
     - choose:
         - conditions:
@@ -198,6 +211,12 @@
     - trigger: homeassistant
       event: start
   conditions:
+    - condition: state
+      entity_id: binary_sensor.living_room_thermometer_fault
+      state: "off"
+    - condition: state
+      entity_id: binary_sensor.living_room_hygrometer_fault
+      state: "off"
     - condition: state
       entity_id: climate.living_room_ac
       state:
@@ -760,6 +779,12 @@
       event: start
   conditions:
     - condition: state
+      entity_id: binary_sensor.living_room_thermometer_fault
+      state: "off"
+    - condition: state
+      entity_id: binary_sensor.living_room_hygrometer_fault
+      state: "off"
+    - condition: state
       entity_id: input_select.season_mode
       state: "Summer"
       for:
@@ -925,6 +950,12 @@
     - trigger: homeassistant
       event: start
   conditions:
+    - condition: state
+      entity_id: binary_sensor.living_room_thermometer_fault
+      state: "off"
+    - condition: state
+      entity_id: binary_sensor.living_room_hygrometer_fault
+      state: "off"
     - condition: state
       entity_id: input_select.season_mode
       state: "Winter"
@@ -1297,6 +1328,12 @@
     - trigger: homeassistant
       event: start
   conditions:
+    - condition: state
+      entity_id: binary_sensor.living_room_thermometer_fault
+      state: "off"
+    - condition: state
+      entity_id: binary_sensor.living_room_hygrometer_fault
+      state: "off"
     - condition: state
       entity_id: input_select.season_mode
       state: "Winter"

@@ -9,6 +9,21 @@
       }}
     device_class: cold
     icon: "mdi:snowflake"
+  # Reports a persistent mismatch between the paired sensors.
+  - unique_id: binary_sensor.dads_room_humidity_disagreement
+    name: "Dad’s Room Humidity Disagreement"
+    state: >-
+      {{
+        is_number(states('sensor.dads_room_humidity_smoothed')) and
+        is_number(states('sensor.dads_room_switchbot_meter_humidity_smoothed')) and
+        (
+          states('sensor.dads_room_humidity_smoothed') | float -
+          states('sensor.dads_room_switchbot_meter_humidity_smoothed') | float
+        ) | abs > 10
+      }}
+    delay_on:
+      hours: 2
+    device_class: problem
   - unique_id: binary_sensor.dads_room_humidity_high
     name: "Dad's Room Humidity High"
     state: >-
@@ -27,6 +42,31 @@
         float(states('input_number.dads_room_humidity_min_diff'))
       }}
     icon: "mdi:water-percent-alert"
+  # Provides the fault state used by alarms and climate controls.
+  - unique_id: binary_sensor.dads_room_hygrometer_fault
+    name: "Dad’s Room Hygrometer Fault"
+    state: >-
+      {% set primary = states('sensor.dads_room_humidity') %}
+      {% set secondary = states('sensor.dads_room_switchbot_meter_humidity') %}
+      {{
+        not is_number(primary) or
+        primary | float < 1 or
+        primary | float > 99 or
+        (
+          not is_number(secondary) and
+          (now() - states.sensor.dads_room_switchbot_meter_humidity.last_changed).total_seconds() >= 1800
+        ) or
+        (
+          is_number(secondary) and
+          (secondary | float < 1 or secondary | float > 99)
+        ) or
+        (now() - states.sensor.dads_room_humidity.last_reported).total_seconds() >= 7200 or
+        (now() - states.sensor.dads_room_switchbot_meter_humidity.last_reported).total_seconds() >= 7200 or
+        is_state('binary_sensor.dads_room_humidity_disagreement', 'on')
+      }}
+    delay_off:
+      hours: 1
+    device_class: problem
   - unique_id: binary_sensor.dads_room_temp_high
     name: "Dad's Room Temperature High"
     state: >-
@@ -45,11 +85,51 @@
         float(states('input_number.dads_room_temp_min_diff'))
       }}
     icon: "mdi:thermometer-low"
+  # Reports a persistent mismatch between the paired sensors.
+  - unique_id: binary_sensor.dads_room_temperature_disagreement
+    name: "Dad’s Room Temperature Disagreement"
+    state: >-
+      {{
+        is_number(states('sensor.dads_room_switchbot_meter_temperature_smoothed')) and
+        is_number(states('sensor.dads_room_temperature_smoothed')) and
+        (
+          states('sensor.dads_room_switchbot_meter_temperature_smoothed') | float -
+          states('sensor.dads_room_temperature_smoothed') | float
+        ) | abs > 1.5
+      }}
+    delay_on:
+      hours: 2
+    device_class: problem
   - unique_id: binary_sensor.dads_room_thermometer_connectivity
     name: "Dad's Room Thermometer Connectivity"
     state: >-
-      {{ (now() - states.sensor.dads_room_temperature.last_updated).total_seconds() < 3600 }}
+      {{ (now() - states.sensor.dads_room_temperature.last_reported).total_seconds() < 3600 }}
     device_class: connectivity
+  # Provides the fault state used by alarms and climate controls.
+  - unique_id: binary_sensor.dads_room_thermometer_fault
+    name: "Dad’s Room Thermometer Fault"
+    state: >-
+      {% set primary = states('sensor.dads_room_temperature') %}
+      {% set secondary = states('sensor.dads_room_switchbot_meter_temperature') %}
+      {{
+        not is_number(primary) or
+        primary | float < 5 or
+        primary | float > 40 or
+        (
+          not is_number(secondary) and
+          (now() - states.sensor.dads_room_switchbot_meter_temperature.last_changed).total_seconds() >= 1800
+        ) or
+        (
+          is_number(secondary) and
+          (secondary | float < 5 or secondary | float > 40)
+        ) or
+        (now() - states.sensor.dads_room_temperature.last_reported).total_seconds() >= 7200 or
+        (now() - states.sensor.dads_room_switchbot_meter_temperature.last_reported).total_seconds() >= 7200 or
+        is_state('binary_sensor.dads_room_temperature_disagreement', 'on')
+      }}
+    delay_off:
+      hours: 1
+    device_class: problem
   # Living Room
   - unique_id: binary_sensor.living_room_ac_cooldry
     name: "Living Room AC CoolDry"
@@ -60,6 +140,21 @@
       }}
     device_class: cold
     icon: "mdi:snowflake"
+  # Reports a persistent mismatch between the paired sensors.
+  - unique_id: binary_sensor.living_room_humidity_disagreement
+    name: "Living Room Humidity Disagreement"
+    state: >-
+      {{
+        is_number(states('sensor.living_room_humidity_smoothed')) and
+        is_number(states('sensor.living_room_switchbot_hub_2_humidity_smoothed')) and
+        (
+          states('sensor.living_room_humidity_smoothed') | float -
+          states('sensor.living_room_switchbot_hub_2_humidity_smoothed') | float
+        ) | abs > 10
+      }}
+    delay_on:
+      hours: 2
+    device_class: problem
   - unique_id: binary_sensor.living_room_humidity_high
     name: "Living Room Humidity High"
     state: >-
@@ -78,6 +173,26 @@
         float(states('input_number.living_room_humidity_min_diff'))
       }}
     icon: "mdi:water-percent-alert"
+  # Provides the fault state used by alarms and climate controls.
+  - unique_id: binary_sensor.living_room_hygrometer_fault
+    name: "Living Room Hygrometer Fault"
+    state: >-
+      {% set primary = states('sensor.living_room_humidity') %}
+      {% set secondary = states('sensor.living_room_switchbot_hub_2_humidity') %}
+      {{
+        not is_number(primary) or
+        not is_number(secondary) or
+        primary | float < 1 or
+        primary | float > 99 or
+        secondary | float < 1 or
+        secondary | float > 99 or
+        (now() - states.sensor.living_room_humidity.last_reported).total_seconds() >= 7200 or
+        (now() - states.sensor.living_room_switchbot_hub_2_humidity.last_reported).total_seconds() >= 7200 or
+        is_state('binary_sensor.living_room_humidity_disagreement', 'on')
+      }}
+    delay_off:
+      hours: 1
+    device_class: problem
   - unique_id: binary_sensor.living_room_temp_high
     name: "Living Room Temperature High"
     state: >-
@@ -96,11 +211,46 @@
         float(states('input_number.living_room_temp_min_diff'))
       }}
     icon: "mdi:thermometer-low"
+  # Reports a persistent mismatch between the paired sensors.
+  - unique_id: binary_sensor.living_room_temperature_disagreement
+    name: "Living Room Temperature Disagreement"
+    state: >-
+      {{
+        is_number(states('sensor.living_room_switchbot_hub_2_temperature_smoothed')) and
+        is_number(states('sensor.living_room_temperature_smoothed')) and
+        (
+          states('sensor.living_room_switchbot_hub_2_temperature_smoothed') | float -
+          states('sensor.living_room_temperature_smoothed') | float
+        ) | abs > 1.5
+      }}
+    delay_on:
+      hours: 2
+    device_class: problem
   - unique_id: binary_sensor.living_room_thermometer_connectivity
     name: "Living Room Thermometer Connectivity"
     state: >-
-      {{ (now() - states.sensor.living_room_temperature.last_updated).total_seconds() < 3600 }}
+      {{ (now() - states.sensor.living_room_temperature.last_reported).total_seconds() < 3600 }}
     device_class: connectivity
+  # Provides the fault state used by alarms and climate controls.
+  - unique_id: binary_sensor.living_room_thermometer_fault
+    name: "Living Room Thermometer Fault"
+    state: >-
+      {% set primary = states('sensor.living_room_temperature') %}
+      {% set secondary = states('sensor.living_room_switchbot_hub_2_temperature') %}
+      {{
+        not is_number(primary) or
+        not is_number(secondary) or
+        primary | float < 5 or
+        primary | float > 40 or
+        secondary | float < 5 or
+        secondary | float > 40 or
+        (now() - states.sensor.living_room_temperature.last_reported).total_seconds() >= 7200 or
+        (now() - states.sensor.living_room_switchbot_hub_2_temperature.last_reported).total_seconds() >= 7200 or
+        is_state('binary_sensor.living_room_temperature_disagreement', 'on')
+      }}
+    delay_off:
+      hours: 1
+    device_class: problem
   # Mom’s Room
   - unique_id: binary_sensor.moms_room_ac_cooldry
     name: "Mom’s Room AC CoolDry"
@@ -111,6 +261,21 @@
       }}
     device_class: cold
     icon: "mdi:snowflake"
+  # Reports a persistent mismatch between the paired sensors.
+  - unique_id: binary_sensor.moms_room_humidity_disagreement
+    name: "Mom’s Room Humidity Disagreement"
+    state: >-
+      {{
+        is_number(states('sensor.moms_room_humidity_smoothed')) and
+        is_number(states('sensor.moms_room_switchbot_meter_humidity_smoothed')) and
+        (
+          states('sensor.moms_room_humidity_smoothed') | float -
+          states('sensor.moms_room_switchbot_meter_humidity_smoothed') | float
+        ) | abs > 10
+      }}
+    delay_on:
+      hours: 2
+    device_class: problem
   - unique_id: binary_sensor.moms_room_humidity_high
     name: "Mom's Room Humidity High"
     state: >-
@@ -129,6 +294,26 @@
         float(states('input_number.moms_room_humidity_min_diff'))
       }}
     icon: "mdi:water-percent-alert"
+  # Provides the fault state used by alarms and climate controls.
+  - unique_id: binary_sensor.moms_room_hygrometer_fault
+    name: "Mom’s Room Hygrometer Fault"
+    state: >-
+      {% set primary = states('sensor.moms_room_humidity') %}
+      {% set secondary = states('sensor.moms_room_switchbot_meter_humidity') %}
+      {{
+        not is_number(primary) or
+        not is_number(secondary) or
+        primary | float < 1 or
+        primary | float > 99 or
+        secondary | float < 1 or
+        secondary | float > 99 or
+        (now() - states.sensor.moms_room_humidity.last_reported).total_seconds() >= 7200 or
+        (now() - states.sensor.moms_room_switchbot_meter_humidity.last_reported).total_seconds() >= 7200 or
+        is_state('binary_sensor.moms_room_humidity_disagreement', 'on')
+      }}
+    delay_off:
+      hours: 1
+    device_class: problem
   - unique_id: binary_sensor.moms_room_temp_high
     name: "Mom's Room Temperature High"
     state: >-
@@ -147,10 +332,46 @@
         float(states('input_number.moms_room_temp_min_diff'))
       }}
     icon: "mdi:thermometer-low"
+  # Reports a persistent mismatch between the paired sensors.
+  - unique_id: binary_sensor.moms_room_temperature_disagreement
+    name: "Mom’s Room Temperature Disagreement"
+    state: >-
+      {{
+        is_number(states('sensor.moms_room_switchbot_meter_temperature_smoothed')) and
+        is_number(states('sensor.moms_room_temperature_smoothed')) and
+        (
+          states('sensor.moms_room_switchbot_meter_temperature_smoothed') | float -
+          states('sensor.moms_room_temperature_smoothed') | float
+        ) | abs > 1.5
+      }}
+    delay_on:
+      hours: 2
+    device_class: problem
   - unique_id: binary_sensor.moms_room_thermometer_connectivity
     name: "Mom's Room Thermometer Connectivity"
     state: >-
-      {{ (now() - states.sensor.moms_room_temperature.last_updated).total_seconds() < 3600 }}
+      {{ (now() - states.sensor.moms_room_temperature.last_reported).total_seconds() < 3600 }}
+    device_class: connectivity
+  # Provides the fault state used by alarms and climate controls.
+  - unique_id: binary_sensor.moms_room_thermometer_fault
+    name: "Mom’s Room Thermometer Fault"
+    state: >-
+      {% set primary = states('sensor.moms_room_temperature') %}
+      {% set secondary = states('sensor.moms_room_switchbot_meter_temperature') %}
+      {{
+        not is_number(primary) or
+        not is_number(secondary) or
+        primary | float < 5 or
+        primary | float > 40 or
+        secondary | float < 5 or
+        secondary | float > 40 or
+        (now() - states.sensor.moms_room_temperature.last_reported).total_seconds() >= 7200 or
+        (now() - states.sensor.moms_room_switchbot_meter_temperature.last_reported).total_seconds() >= 7200 or
+        is_state('binary_sensor.moms_room_temperature_disagreement', 'on')
+      }}
+    delay_off:
+      hours: 1
+    device_class: problem
 - fan:
   - unique_id: fan.living_room_fan
     turn_on:
@@ -245,23 +466,6 @@
     state_class: measurement
     device_class: temperature
     icon: "mdi:thermometer-check"
-  - unique_id: sensor.dads_room_humidity_difference
-    name: "Dad’s Room Humidity Difference"
-    availability: >-
-      {{
-        is_number(states('sensor.dads_room_humidity')) and
-        is_number(states('sensor.dads_room_switchbot_meter_humidity'))
-      }}
-    state: >-
-      {{
-        (
-          (states('sensor.dads_room_humidity') | float(0)) -
-          (states('sensor.dads_room_switchbot_meter_humidity') | float(0))
-        ) | abs
-      }}
-    unit_of_measurement: "pt"
-    state_class: measurement
-    icon: "mdi:water-percent-alert"
   - unique_id: sensor.dads_room_wbgt
     name: "Dad’s Room WBGT"
     state: >-
@@ -301,23 +505,6 @@
     state_class: measurement
     device_class: temperature
     icon: "mdi:thermometer-check"
-  - unique_id: sensor.living_room_humidity_difference
-    name: "Living Room Humidity Difference"
-    availability: >-
-      {{
-        is_number(states('sensor.living_room_humidity')) and
-        is_number(states('sensor.living_room_switchbot_hub_2_humidity'))
-      }}
-    state: >-
-      {{
-        (
-          (states('sensor.living_room_humidity') | float(0)) -
-          (states('sensor.living_room_switchbot_hub_2_humidity') | float(0))
-        ) | abs
-      }}
-    unit_of_measurement: "pt"
-    state_class: measurement
-    icon: "mdi:water-percent-alert"
   - unique_id: sensor.living_room_wbgt
     name: "Living Room WBGT"
     state: >-
@@ -345,23 +532,6 @@
     state_class: measurement
     device_class: temperature
     icon: "mdi:thermometer-check"
-  - unique_id: sensor.moms_room_humidity_difference
-    name: "Mom’s Room Humidity Difference"
-    availability: >-
-      {{
-        is_number(states('sensor.moms_room_humidity')) and
-        is_number(states('sensor.moms_room_switchbot_meter_humidity'))
-      }}
-    state: >-
-      {{
-        (
-          (states('sensor.moms_room_humidity') | float(0)) -
-          (states('sensor.moms_room_switchbot_meter_humidity') | float(0))
-        ) | abs
-      }}
-    unit_of_measurement: "pt"
-    state_class: measurement
-    icon: "mdi:water-percent-alert"
   - unique_id: sensor.moms_room_wbgt
     name: "Mom’s Room WBGT"
     state: >-
@@ -722,94 +892,3 @@
           }}
         {% endif %}
       icon: "mdi:clock"
-
-# Trigger-based temperature differences
-# Dad’s Room
-- triggers:
-    - trigger: state
-      entity_id:
-        - sensor.dads_room_switchbot_meter_temperature
-        - sensor.dads_room_temperature
-  conditions:
-    - condition: template
-      value_template: >-
-        {{
-          is_number(states('sensor.dads_room_switchbot_meter_temperature')) and
-          is_number(states('sensor.dads_room_temperature'))
-        }}
-  sensor:
-    - unique_id: sensor.dads_room_temp_difference
-      name: "Dad’s Room Temperature Difference"
-      state: >-
-        {{
-          (
-            (states('sensor.dads_room_temperature') | float) -
-            (states('sensor.dads_room_switchbot_meter_temperature') | float)
-          ) | abs | round(2)
-        }}
-      attributes:
-        sampled_at: "{{ now().isoformat() }}"
-      unit_of_measurement: "°C"
-      state_class: measurement
-      device_class: temperature
-      icon: "mdi:thermometer-alert"
-
-# Living Room
-- triggers:
-    - trigger: state
-      entity_id:
-        - sensor.living_room_switchbot_hub_2_temperature
-        - sensor.living_room_temperature
-  conditions:
-    - condition: template
-      value_template: >-
-        {{
-          is_number(states('sensor.living_room_switchbot_hub_2_temperature')) and
-          is_number(states('sensor.living_room_temperature'))
-        }}
-  sensor:
-    - unique_id: sensor.living_room_temp_difference
-      name: "Living Room Temperature Difference"
-      state: >-
-        {{
-          (
-            (states('sensor.living_room_temperature') | float) -
-            (states('sensor.living_room_switchbot_hub_2_temperature') | float)
-          ) | abs | round(2)
-        }}
-      attributes:
-        sampled_at: "{{ now().isoformat() }}"
-      unit_of_measurement: "°C"
-      state_class: measurement
-      device_class: temperature
-      icon: "mdi:thermometer-alert"
-
-# Mom’s Room
-- triggers:
-    - trigger: state
-      entity_id:
-        - sensor.moms_room_switchbot_meter_temperature
-        - sensor.moms_room_temperature
-  conditions:
-    - condition: template
-      value_template: >-
-        {{
-          is_number(states('sensor.moms_room_switchbot_meter_temperature')) and
-          is_number(states('sensor.moms_room_temperature'))
-        }}
-  sensor:
-    - unique_id: sensor.moms_room_temp_difference
-      name: "Mom’s Room Temperature Difference"
-      state: >-
-        {{
-          (
-            (states('sensor.moms_room_temperature') | float) -
-            (states('sensor.moms_room_switchbot_meter_temperature') | float)
-          ) | abs | round(2)
-        }}
-      attributes:
-        sampled_at: "{{ now().isoformat() }}"
-      unit_of_measurement: "°C"
-      state_class: measurement
-      device_class: temperature
-      icon: "mdi:thermometer-alert"

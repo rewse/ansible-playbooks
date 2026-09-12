@@ -1,0 +1,105 @@
+---
+- name: Test hygrometer fault detection
+  hosts: localhost
+  connection: local
+  gather_facts: false
+  vars:
+    retired_sensor_ids:
+      - sensor.dads_room_humidity_difference
+      - sensor.dads_room_humidity_difference_average
+      - sensor.dads_room_temp_difference
+      - sensor.dads_room_temp_difference_average
+      - sensor.living_room_humidity_difference
+      - sensor.living_room_humidity_difference_average
+      - sensor.living_room_temp_difference
+      - sensor.living_room_temp_difference_average
+      - sensor.moms_room_humidity_difference
+      - sensor.moms_room_humidity_difference_average
+      - sensor.moms_room_temp_difference
+      - sensor.moms_room_temp_difference_average
+    room_contracts:
+      - alarm_file: automations-dads-room.yaml
+        alarm_id: automation.alarm_dads_room_humidity_difference
+        climate_file: automations-dads-room-climates.yaml
+        control_automation_ids:
+          - automation.adjust_dads_room_ac_temp
+          - automation.change_dads_room_ac_from_heatcool
+          - automation.change_dads_room_ac_mode
+          - automation.toggle_dads_room_ac_cooldry
+          - automation.toggle_dads_room_ac_heat
+        fault_entity_id: binary_sensor.dads_room_hygrometer_fault
+        prefix: dads_room
+        secondary_entity_id: sensor.dads_room_switchbot_meter_humidity
+        secondary_unavailable_seconds: 1800
+        smoothed_entity_ids:
+          - sensor.dads_room_humidity_smoothed
+          - sensor.dads_room_switchbot_meter_humidity_smoothed
+        source_entity_ids:
+          - sensor.dads_room_humidity
+          - sensor.dads_room_switchbot_meter_humidity
+      - alarm_file: automations-living-room.yaml
+        alarm_id: automation.alarm_living_room_humidity_difference
+        climate_file: automations-living-room-climates.yaml
+        control_automation_ids:
+          - automation.adjust_living_room_ac_temp
+          - automation.change_living_room_ac_from_heatcool
+          - automation.change_living_room_ac_mode
+          - automation.toggle_living_area_floor_heating
+          - automation.toggle_living_room_ac_cooldry
+          - automation.toggle_living_room_ac_heat
+        fault_entity_id: binary_sensor.living_room_hygrometer_fault
+        prefix: living_room
+        smoothed_entity_ids:
+          - sensor.living_room_humidity_smoothed
+          - sensor.living_room_switchbot_hub_2_humidity_smoothed
+        source_entity_ids:
+          - sensor.living_room_humidity
+          - sensor.living_room_switchbot_hub_2_humidity
+      - alarm_file: automations-moms-room.yaml
+        alarm_id: automation.alarm_moms_room_humidity_difference
+        climate_file: automations-moms-room-climates.yaml
+        control_automation_ids:
+          - automation.adjust_moms_room_ac_temp
+          - automation.change_moms_room_ac_from_heatcool
+          - automation.change_moms_room_ac_mode
+          - automation.toggle_moms_room_ac_cooldry
+          - automation.toggle_moms_room_ac_heat
+        fault_entity_id: binary_sensor.moms_room_hygrometer_fault
+        prefix: moms_room
+        smoothed_entity_ids:
+          - sensor.moms_room_humidity_smoothed
+          - sensor.moms_room_switchbot_meter_humidity_smoothed
+        source_entity_ids:
+          - sensor.moms_room_humidity
+          - sensor.moms_room_switchbot_meter_humidity
+  tasks:
+    - name: "hygrometer-fault-test : Parse shared configuration"
+      ansible.builtin.set_fact:
+        homeassistant_sensors: "{{ lookup('file', '../files/sensors.yaml') | from_yaml }}"
+        homeassistant_templates: "{{ lookup('file', '../files/templates.yaml') | from_yaml }}"
+
+    - name: "hygrometer-fault-test : Collect template entities"
+      ansible.builtin.set_fact:
+        homeassistant_template_binary_sensors: >-
+          {{ homeassistant_templates
+             | selectattr('binary_sensor', 'defined')
+             | map(attribute='binary_sensor')
+             | flatten }}
+        homeassistant_template_sensors: >-
+          {{ homeassistant_templates
+             | selectattr('sensor', 'defined')
+             | map(attribute='sensor')
+             | flatten }}
+
+    - name: "hygrometer-fault-test : Verify each room contract"
+      ansible.builtin.include_tasks: hygrometer_fault_detection_room.yml
+      loop: "{{ room_contracts }}"
+      loop_control:
+        loop_var: room_contract
+
+    - name: "hygrometer-fault-test : Verify retired sensors are absent"
+      ansible.builtin.assert:
+        that:
+          - item not in (homeassistant_sensors | map(attribute='unique_id') | list)
+          - item not in (homeassistant_template_sensors | map(attribute='unique_id') | list)
+      loop: "{{ retired_sensor_ids }}"

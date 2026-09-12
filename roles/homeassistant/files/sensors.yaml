@@ -24,13 +24,14 @@
 
 # Dad’s Room
 
+# Provides a stable value for comparison with the paired sensor.
 - platform: statistics
-  unique_id: sensor.dads_room_humidity_difference_average
-  name: "Dad’s Room Humidity Difference Average"
-  entity_id: sensor.dads_room_humidity_difference
-  state_characteristic: mean
+  unique_id: sensor.dads_room_humidity_smoothed
+  name: "Dad’s Room Humidity Smoothed"
+  entity_id: sensor.dads_room_humidity
+  state_characteristic: average_step
   max_age:
-    hours: 8
+    hours: 1
 - platform: statistics
   unique_id: sensor.dads_room_motion_count
   name: "Dad’s Room Motion Count"
@@ -38,13 +39,30 @@
   state_characteristic: count
   max_age:
     minutes: 10
+# Provides a stable value for comparison with the paired sensor.
 - platform: statistics
-  unique_id: sensor.dads_room_temp_difference_average
-  name: "Dad’s Room Temperature Difference Average"
-  entity_id: sensor.dads_room_temp_difference
-  state_characteristic: mean
+  unique_id: sensor.dads_room_switchbot_meter_humidity_smoothed
+  name: "Dad’s Room SwitchBot Meter Humidity Smoothed"
+  entity_id: sensor.dads_room_switchbot_meter_humidity
+  state_characteristic: average_step
   max_age:
-    hours: 8
+    hours: 1
+# Provides a stable value for comparison with the paired sensor.
+- platform: statistics
+  unique_id: sensor.dads_room_switchbot_meter_temperature_smoothed
+  name: "Dad’s Room SwitchBot Meter Temperature Smoothed"
+  entity_id: sensor.dads_room_switchbot_meter_temperature
+  state_characteristic: average_step
+  max_age:
+    hours: 1
+# Provides a stable value for comparison with the paired sensor.
+- platform: statistics
+  unique_id: sensor.dads_room_temperature_smoothed
+  name: "Dad’s Room Temperature Smoothed"
+  entity_id: sensor.dads_room_temperature
+  state_characteristic: average_step
+  max_age:
+    hours: 1
 - platform: integration
   unique_id: sensor.dads_room_youth_energy_total
   name: "Dad’s Room youth Energy Total"
@@ -56,20 +74,38 @@
 
 # Living Room
 
+# Provides a stable value for comparison with the paired sensor.
 - platform: statistics
-  unique_id: sensor.living_room_humidity_difference_average
-  name: "Living Room Humidity Difference Average"
-  entity_id: sensor.living_room_humidity_difference
-  state_characteristic: mean
+  unique_id: sensor.living_room_humidity_smoothed
+  name: "Living Room Humidity Smoothed"
+  entity_id: sensor.living_room_humidity
+  state_characteristic: average_step
   max_age:
-    hours: 8
+    hours: 1
+# Provides a stable value for comparison with the paired sensor.
 - platform: statistics
-  unique_id: sensor.living_room_temp_difference_average
-  name: "Living Room Temperature Difference Average"
-  entity_id: sensor.living_room_temp_difference
-  state_characteristic: mean
+  unique_id: sensor.living_room_switchbot_hub_2_humidity_smoothed
+  name: "Living Room SwitchBot Hub 2 Humidity Smoothed"
+  entity_id: sensor.living_room_switchbot_hub_2_humidity
+  state_characteristic: average_step
   max_age:
-    hours: 8
+    hours: 1
+# Provides a stable value for comparison with the paired sensor.
+- platform: statistics
+  unique_id: sensor.living_room_switchbot_hub_2_temperature_smoothed
+  name: "Living Room SwitchBot Hub 2 Temperature Smoothed"
+  entity_id: sensor.living_room_switchbot_hub_2_temperature
+  state_characteristic: average_step
+  max_age:
+    hours: 1
+# Provides a stable value for comparison with the paired sensor.
+- platform: statistics
+  unique_id: sensor.living_room_temperature_smoothed
+  name: "Living Room Temperature Smoothed"
+  entity_id: sensor.living_room_temperature
+  state_characteristic: average_step
+  max_age:
+    hours: 1
 - platform: statistics
   unique_id: sensor.study_motion_count
   name: "Study Motion Count"
@@ -80,13 +116,14 @@
 
 # Mom’s Room
 
+# Provides a stable value for comparison with the paired sensor.
 - platform: statistics
-  unique_id: sensor.moms_room_humidity_difference_average
-  name: "Mom’s Room Humidity Difference Average"
-  entity_id: sensor.moms_room_humidity_difference
-  state_characteristic: mean
+  unique_id: sensor.moms_room_humidity_smoothed
+  name: "Mom’s Room Humidity Smoothed"
+  entity_id: sensor.moms_room_humidity
+  state_characteristic: average_step
   max_age:
-    hours: 8
+    hours: 1
 - platform: statistics
   unique_id: sensor.moms_room_motion_count
   name: "Mom’s Room Motion Count"
@@ -94,10 +131,27 @@
   state_characteristic: count
   max_age:
     minutes: 10
+# Provides a stable value for comparison with the paired sensor.
 - platform: statistics
-  unique_id: sensor.moms_room_temp_difference_average
-  name: "Mom’s Room Temperature Difference Average"
-  entity_id: sensor.moms_room_temp_difference
-  state_characteristic: mean
+  unique_id: sensor.moms_room_switchbot_meter_humidity_smoothed
+  name: "Mom’s Room SwitchBot Meter Humidity Smoothed"
+  entity_id: sensor.moms_room_switchbot_meter_humidity
+  state_characteristic: average_step
   max_age:
-    hours: 8
+    hours: 1
+# Provides a stable value for comparison with the paired sensor.
+- platform: statistics
+  unique_id: sensor.moms_room_switchbot_meter_temperature_smoothed
+  name: "Mom’s Room SwitchBot Meter Temperature Smoothed"
+  entity_id: sensor.moms_room_switchbot_meter_temperature
+  state_characteristic: average_step
+  max_age:
+    hours: 1
+# Provides a stable value for comparison with the paired sensor.
+- platform: statistics
+  unique_id: sensor.moms_room_temperature_smoothed
+  name: "Mom’s Room Temperature Smoothed"
+  entity_id: sensor.moms_room_temperature
+  state_characteristic: average_step
+  max_age:
+    hours: 1
