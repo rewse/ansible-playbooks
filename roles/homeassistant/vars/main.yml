@@ -13,8 +13,11 @@ homeassistant_hems_echonet_lite_version: 2f17cf23bbfb2503cdc3cf239376bbfdc51fd02
 homeassistant_token: "{{ lookup('pipe', 'op read \"op://ansible/jdyfywcw5p3xcet3nxlkvlbonm/credential\"') }}"
 homeassistant_latlng:
   home:
-    lat: "{{ lookup('pipe', 'op read \"op://ansible/weohbz5qszb2gbs6rz6cbr2wee/latitude\"') }}"
-    lng: "{{ lookup('pipe', 'op read \"op://ansible/weohbz5qszb2gbs6rz6cbr2wee/longitude\"') }}"
+    lat: "{{ lookup('pipe', 'op read \"op://ansible/weohbz5qszb2gbs6rz6cbr2wee/home latitude\"') }}"
+    lng: "{{ lookup('pipe', 'op read \"op://ansible/weohbz5qszb2gbs6rz6cbr2wee/home longitude\"') }}"
+  office:
+    lat: "{{ lookup('pipe', 'op read \"op://ansible/weohbz5qszb2gbs6rz6cbr2wee/office latitude\"') }}"
+    lng: "{{ lookup('pipe', 'op read \"op://ansible/weohbz5qszb2gbs6rz6cbr2wee/office longtitude\"') }}"
 homeassistant_mini_graph_card_version: 0.13.0
 homeassistant_mini_media_player_version: 1.16.9
 homeassistant_mosquitto_password: "{{ lookup('pipe', 'op read op://ansible/utsespwfv247vhgklpbbpbtboe/credential') }}"

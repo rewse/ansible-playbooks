@@ -12,25 +12,92 @@
         homeassistant_tesla_automations: >-
           {{ lookup('file', '../files/automations-tesla.yaml') | from_yaml }}
 
+    - name: "tesla-test : Find refresh automation"
+      ansible.builtin.set_fact:
+        homeassistant_refresh_automations: >-
+          {{ homeassistant_tesla_automations
+             | selectattr('id', 'equalto', 'automation.refresh_tesla_fleet_data')
+             | list }}
+
     - name: "tesla-test : Verify refresh contract"
       ansible.builtin.assert:
         that:
-          - homeassistant_tesla_automations | length == 1
-          - homeassistant_tesla_automations[0].id == 'automation.refresh_tesla_fleet_data'
-          - homeassistant_tesla_automations[0].triggers | length == 2
-          - homeassistant_tesla_automations[0].triggers[0].trigger == 'template'
+          - homeassistant_tesla_automations | length == 2
           - >-
-            homeassistant_tesla_automations[0].triggers[0].value_template
-            == homeassistant_tesla_active_states_template
-          - homeassistant_tesla_automations[0].triggers[1].trigger == 'time_pattern'
-          - homeassistant_tesla_automations[0].triggers[1].minutes == '/10'
-          - homeassistant_tesla_automations[0].triggers[1].seconds == 43
-          - homeassistant_tesla_automations[0].conditions | length == 1
-          - homeassistant_tesla_automations[0].conditions[0].condition == 'template'
+            (homeassistant_tesla_automations | map(attribute='alias') | list)
+            == ['Enable Tesla Sentry at TNS Azabudai 3-chome', 'Refresh Tesla Fleet Data']
+          - homeassistant_refresh_automations | length == 1
+          - homeassistant_refresh_automations[0].id == 'automation.refresh_tesla_fleet_data'
+          - homeassistant_refresh_automations[0].triggers | length == 2
           - >-
-            homeassistant_tesla_automations[0].conditions[0].value_template
-            == homeassistant_tesla_active_states_template
-          - homeassistant_tesla_automations[0].actions | length == 1
-          - homeassistant_tesla_automations[0].actions[0].action == 'homeassistant.update_entity'
-          - homeassistant_tesla_automations[0].actions[0].target.entity_id == 'climate.model_y_climate'
-          - homeassistant_tesla_automations[0].mode == 'single'
+            {
+              'trigger': 'template',
+              'value_template': homeassistant_tesla_active_states_template
+            } in homeassistant_refresh_automations[0].triggers
+          - >-
+            {
+              'trigger': 'time_pattern',
+              'minutes': '/10',
+              'seconds': 43
+            } in homeassistant_refresh_automations[0].triggers
+          - homeassistant_refresh_automations[0].conditions | length == 1
+          - >-
+            {
+              'condition': 'template',
+              'value_template': homeassistant_tesla_active_states_template
+            } in homeassistant_refresh_automations[0].conditions
+          - homeassistant_refresh_automations[0].actions | length == 1
+          - >-
+            {
+              'action': 'homeassistant.update_entity',
+              'target': {'entity_id': 'climate.model_y_climate'}
+            } in homeassistant_refresh_automations[0].actions
+          - homeassistant_refresh_automations[0].mode == 'single'
+
+
+    - name: "tesla-test : Find TNS sentry automation"
+      ansible.builtin.set_fact:
+        homeassistant_tns_sentry_automations: >-
+          {{ homeassistant_tesla_automations
+             | selectattr('id', 'equalto', 'automation.enable_tesla_sentry_at_tns_azabudai_3_chome')
+             | list }}
+
+    - name: "tesla-test : Verify TNS sentry contract"
+      ansible.builtin.assert:
+        that:
+          - homeassistant_tns_sentry_automations | length == 1
+          - homeassistant_tns_sentry_automations[0].triggers | length == 1
+          - >-
+            {
+              'trigger': 'state',
+              'entity_id': 'binary_sensor.model_y_user',
+              'from': 'on',
+              'to': 'off',
+              'for': {'minutes': 3}
+            } in homeassistant_tns_sentry_automations[0].triggers
+          - homeassistant_tns_sentry_automations[0].conditions | length == 2
+          - >-
+            {
+              'condition': 'state',
+              'entity_id': 'sensor.model_y_geofence',
+              'state': 'TNS Azabudai 3-chome'
+            } in homeassistant_tns_sentry_automations[0].conditions
+          - >-
+            {
+              'condition': 'not',
+              'conditions': [
+                {
+                  'condition': 'state',
+                  'entity_id': 'binary_sensor.model_y_sentry_mode',
+                  'state': 'on'
+                }
+              ]
+            } in homeassistant_tns_sentry_automations[0].conditions
+          - homeassistant_tns_sentry_automations[0].actions | length == 1
+          - >-
+            {
+              'action': 'switch.turn_on',
+              'target': {'entity_id': 'switch.model_y_sentry_mode'}
+            } in homeassistant_tns_sentry_automations[0].actions
+          - homeassistant_tns_sentry_automations[0].mode == 'single'
+          - homeassistant_tns_sentry_automations[0].trace.stored_traces == 100

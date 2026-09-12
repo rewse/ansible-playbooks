@@ -1,4 +1,30 @@
 ---
+- id: automation.enable_tesla_sentry_at_tns_azabudai_3_chome
+  alias: "Enable Tesla Sentry at TNS Azabudai 3-chome"
+  triggers:
+    - trigger: state
+      entity_id: binary_sensor.model_y_user
+      from: "on"
+      to: "off"
+      for:
+        minutes: 3
+  conditions:
+    - condition: state
+      entity_id: sensor.model_y_geofence
+      state: "TNS Azabudai 3-chome"
+    - condition: not
+      conditions:
+        - condition: state
+          entity_id: binary_sensor.model_y_sentry_mode
+          state: "on"
+  actions:
+    - action: switch.turn_on
+      target:
+        entity_id: switch.model_y_sentry_mode
+  mode: single
+  trace:
+    stored_traces: 100
+
 - id: automation.refresh_tesla_fleet_data
   alias: "Refresh Tesla Fleet Data"
   triggers:

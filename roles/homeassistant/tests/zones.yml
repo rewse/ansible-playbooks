@@ -1,0 +1,49 @@
+---
+- name: Test Home Assistant zones
+  hosts: localhost
+  connection: local
+  gather_facts: false
+  tasks:
+    - name: "zone-test : Read configuration"
+      ansible.builtin.set_fact:
+        homeassistant_secrets_template: >-
+          {{ lookup('file', '../templates/secrets.yaml.j2') }}
+        homeassistant_vars_raw: >-
+          {{ lookup('file', '../vars/main.yml') }}
+        homeassistant_zones_raw: >-
+          {{ lookup('file', '../files/zones.yaml') }}
+
+    - name: "zone-test : Parse configuration"
+      ansible.builtin.set_fact:
+        homeassistant_zones: >-
+          {{ homeassistant_zones_raw
+             | regex_replace('!secret ', '')
+             | from_yaml }}
+
+    - name: "zone-test : Find office zone"
+      ansible.builtin.set_fact:
+        homeassistant_office_zones: >-
+          {{ homeassistant_zones
+             | selectattr('name', 'equalto', 'Office')
+             | list }}
+
+    - name: "zone-test : Verify office zone"
+      ansible.builtin.assert:
+        that:
+          - homeassistant_office_zones | length == 1
+          - homeassistant_office_zones[0].latitude == 'latlng_office_lat'
+          - homeassistant_office_zones[0].longitude == 'latlng_office_lng'
+          - homeassistant_office_zones[0].radius == 150
+          - homeassistant_office_zones[0].icon == 'mdi:briefcase'
+          - "'latlng_office_lat: [% homeassistant_latlng.office.lat %]' in homeassistant_secrets_template"
+          - "'latlng_office_lng: [% homeassistant_latlng.office.lng %]' in homeassistant_secrets_template"
+          - "'op://ansible/weohbz5qszb2gbs6rz6cbr2wee/home latitude' in homeassistant_vars_raw"
+          - "'op://ansible/weohbz5qszb2gbs6rz6cbr2wee/home longitude' in homeassistant_vars_raw"
+          - "'op://ansible/weohbz5qszb2gbs6rz6cbr2wee/office latitude' in homeassistant_vars_raw"
+          - "'op://ansible/weohbz5qszb2gbs6rz6cbr2wee/office longtitude' in homeassistant_vars_raw"
+  tags:
+    - homeassistant
+    - config
+    - zone
+    - homeassistant_zone
+    - homeassistant_zone_config
