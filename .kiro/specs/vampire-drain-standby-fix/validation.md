@@ -148,3 +148,15 @@ EXPLAIN (ANALYZE, BUFFERS, FORMAT JSON)
 - 実データの時刻、ホスト名、位置、VIN、資格情報を記録していない。
 - 実行時間とshared blockは単発値ではなく3回の中央値で判定した。
 - `states`アクセスは現行と修正を比較し、修正で無条件Seq Scanが追加されていないことを確認した。
+
+## 本番一時適用と表示検証
+
+2026-09-12に`singleton_int1.yml`を対象ホスト1台へ`--tags teslamate`で適用した。check modeは`ok=27 changed=2 failed=0`で、差分はVampire Drain専用patcherの新規配備とread-only mountの追加だけだった。本適用は`ok=41 changed=6 failed=0`で、生成JSON、compose更新、コンテナ更新、Grafana再作成が完了した。
+
+生成JSONのVampire Drainクエリは、実経過秒の式が1件、`LEAST`と`GREATEST`による重複クリップが各2件、半開区間の重複条件が各2件だった。旧`age()`式、旧集計式、完全内包条件は残っていなかった。Grafanaコンテナの`/dashboards/vampire-drain.json` mountは1件でread-only、`/api/health`の`database`は`ok`だった。`/api/dashboards/uid/zhHx2Fggk`が返した読み込み済み`rawSql`は生成ファイルと一致した。資格情報とSQL本文は記録していない。
+
+認証済みの専用agent-browserセッションで90日表示を確認した。結果は7行で、境界横断区間はStandby約98%、真のオンライン区間はStandby約0%かつSoC -3%、既存正常区間は6行すべて97%から100%だった。Vampire Drainパネル、90日の期間、車両、最小駐車時間、距離単位、航続距離の各変数、TeslaMateリンク、全行のDrive Detailsリンクは正常だった。スクリーンショットはローカル検証後に削除し、VIN、実時刻、位置、車両IDを本書へ記録していない。
+
+Grafanaコンテナの直近10分、400行を検査し、dashboard provisioning、PostgreSQL query、JSON読み込みに関係するエラーは0件だった。ブラウザーページ由来のエラーも0件だった。Chrome拡張由来の同一エラーが2件あったが、Grafanaの表示、クエリ、リンクには影響しなかった。
+
+同じPlaybookの再実行は`ok=39 changed=0 failed=0`だった。Grafana restart handlerは実行されず、再作成も発生しなかった。全受け入れ条件を満たしたためロールバックは実行していない。
