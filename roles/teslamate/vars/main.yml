@@ -13,10 +13,10 @@ teslamate_encryption_key: "{{ lookup('pipe', 'op read \"op://ansible/vt2ez35yutq
 teslamate_grafana_admin_password: "{{ lookup('pipe', 'op read \"op://ansible/oy677zzpeppxyn3b4xfdfapqvy/password\"') }}"
 teslamate_grafana_admin_username: "{{ lookup('pipe', 'op read \"op://ansible/oy677zzpeppxyn3b4xfdfapqvy/username\"') }}"
 teslamate_grafana_hostname: grafana.rewse.jp
-teslamate_grafana_image_ref: ghcr.io/rewse/teslamate/grafana:main@sha256:6bc8752fe0273f96550bc7a76ee95c698d061205089032c6495a8be60b3a192c
+teslamate_grafana_image_ref: ghcr.io/rewse/teslamate/grafana:main@sha256:1617379d09ff97d5cdd1a920c43a85b7711e4ecb38b2f50479b2f280cc86fb4e
 teslamate_grafana_port: 3000
 teslamate_hostname: teslamate.rewse.jp
-teslamate_image_ref: ghcr.io/rewse/teslamate:main@sha256:47c926dd0fdbff31f221ec784abb6af062ede1ca760a25c86ebb75bc227aeeb6
+teslamate_image_ref: ghcr.io/rewse/teslamate:main@sha256:eeb6841bf2b86d9ba03475400f61cb2655b4bf35c3bc20032ff1fe9b3fe76219
 teslamate_mqtt_host: host.docker.internal
 teslamate_mqtt_password: "{{ lookup('pipe', 'op read op://ansible/utsespwfv247vhgklpbbpbtboe/credential') }}"
 teslamate_mqtt_port: 1883
