@@ -36,6 +36,8 @@
           - automation.toggle_living_room_ac_heat
         fault_entity_id: binary_sensor.living_room_thermometer_fault
         prefix: living_room
+        secondary_entity_id: sensor.living_room_switchbot_hub_2_temperature
+        secondary_unavailable_seconds: 86400
         smoothed_entity_ids:
           - sensor.living_room_switchbot_hub_2_temperature_smoothed
           - sensor.living_room_temperature_smoothed
@@ -53,6 +55,8 @@
           - automation.toggle_moms_room_ac_heat
         fault_entity_id: binary_sensor.moms_room_thermometer_fault
         prefix: moms_room
+        secondary_entity_id: sensor.moms_room_switchbot_meter_temperature
+        secondary_unavailable_seconds: 86400
         smoothed_entity_ids:
           - sensor.moms_room_switchbot_meter_temperature_smoothed
           - sensor.moms_room_temperature_smoothed

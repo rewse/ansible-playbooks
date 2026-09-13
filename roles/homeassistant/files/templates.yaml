@@ -187,13 +187,21 @@
       {% set secondary = states('sensor.living_room_switchbot_hub_2_humidity') %}
       {{
         not is_number(primary) or
-        not is_number(secondary) or
         primary | float < 1 or
         primary | float > 99 or
-        secondary | float < 1 or
-        secondary | float > 99 or
+        (
+          not is_number(secondary) and
+          (now() - states.sensor.living_room_switchbot_hub_2_humidity.last_changed).total_seconds() >= 86400
+        ) or
+        (
+          is_number(secondary) and
+          (secondary | float < 1 or secondary | float > 99)
+        ) or
         (now() - states.sensor.living_room_humidity.last_reported).total_seconds() >= 7200 or
-        (now() - states.sensor.living_room_switchbot_hub_2_humidity.last_reported).total_seconds() >= 7200 or
+        (
+          is_number(secondary) and
+          (now() - states.sensor.living_room_switchbot_hub_2_humidity.last_reported).total_seconds() >= 7200
+        ) or
         is_state('binary_sensor.living_room_humidity_disagreement', 'on')
       }}
     delay_off:
@@ -245,13 +253,21 @@
       {% set secondary = states('sensor.living_room_switchbot_hub_2_temperature') %}
       {{
         not is_number(primary) or
-        not is_number(secondary) or
         primary | float < 5 or
         primary | float > 40 or
-        secondary | float < 5 or
-        secondary | float > 40 or
+        (
+          not is_number(secondary) and
+          (now() - states.sensor.living_room_switchbot_hub_2_temperature.last_changed).total_seconds() >= 86400
+        ) or
+        (
+          is_number(secondary) and
+          (secondary | float < 5 or secondary | float > 40)
+        ) or
         (now() - states.sensor.living_room_temperature.last_reported).total_seconds() >= 7200 or
-        (now() - states.sensor.living_room_switchbot_hub_2_temperature.last_reported).total_seconds() >= 7200 or
+        (
+          is_number(secondary) and
+          (now() - states.sensor.living_room_switchbot_hub_2_temperature.last_reported).total_seconds() >= 7200
+        ) or
         is_state('binary_sensor.living_room_temperature_disagreement', 'on')
       }}
     delay_off:
@@ -308,13 +324,21 @@
       {% set secondary = states('sensor.moms_room_switchbot_meter_humidity') %}
       {{
         not is_number(primary) or
-        not is_number(secondary) or
         primary | float < 1 or
         primary | float > 99 or
-        secondary | float < 1 or
-        secondary | float > 99 or
+        (
+          not is_number(secondary) and
+          (now() - states.sensor.moms_room_switchbot_meter_humidity.last_changed).total_seconds() >= 86400
+        ) or
+        (
+          is_number(secondary) and
+          (secondary | float < 1 or secondary | float > 99)
+        ) or
         (now() - states.sensor.moms_room_humidity.last_reported).total_seconds() >= 7200 or
-        (now() - states.sensor.moms_room_switchbot_meter_humidity.last_reported).total_seconds() >= 7200 or
+        (
+          is_number(secondary) and
+          (now() - states.sensor.moms_room_switchbot_meter_humidity.last_reported).total_seconds() >= 7200
+        ) or
         is_state('binary_sensor.moms_room_humidity_disagreement', 'on')
       }}
     delay_off:
@@ -366,13 +390,21 @@
       {% set secondary = states('sensor.moms_room_switchbot_meter_temperature') %}
       {{
         not is_number(primary) or
-        not is_number(secondary) or
         primary | float < 5 or
         primary | float > 40 or
-        secondary | float < 5 or
-        secondary | float > 40 or
+        (
+          not is_number(secondary) and
+          (now() - states.sensor.moms_room_switchbot_meter_temperature.last_changed).total_seconds() >= 86400
+        ) or
+        (
+          is_number(secondary) and
+          (secondary | float < 5 or secondary | float > 40)
+        ) or
         (now() - states.sensor.moms_room_temperature.last_reported).total_seconds() >= 7200 or
-        (now() - states.sensor.moms_room_switchbot_meter_temperature.last_reported).total_seconds() >= 7200 or
+        (
+          is_number(secondary) and
+          (now() - states.sensor.moms_room_switchbot_meter_temperature.last_reported).total_seconds() >= 7200
+        ) or
         is_state('binary_sensor.moms_room_temperature_disagreement', 'on')
       }}
     delay_off:

@@ -49,6 +49,8 @@
           - automation.toggle_living_room_ac_heat
         fault_entity_id: binary_sensor.living_room_hygrometer_fault
         prefix: living_room
+        secondary_entity_id: sensor.living_room_switchbot_hub_2_humidity
+        secondary_unavailable_seconds: 86400
         smoothed_entity_ids:
           - sensor.living_room_humidity_smoothed
           - sensor.living_room_switchbot_hub_2_humidity_smoothed
@@ -66,6 +68,8 @@
           - automation.toggle_moms_room_ac_heat
         fault_entity_id: binary_sensor.moms_room_hygrometer_fault
         prefix: moms_room
+        secondary_entity_id: sensor.moms_room_switchbot_meter_humidity
+        secondary_unavailable_seconds: 86400
         smoothed_entity_ids:
           - sensor.moms_room_humidity_smoothed
           - sensor.moms_room_switchbot_meter_humidity_smoothed

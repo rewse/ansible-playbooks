@@ -4,7 +4,7 @@
 
 各温湿度計にHome Assistantのstatisticsセンサーを追加し、`state_characteristic: average_step`と`max_age: 1 hour`で時間加重平均を求める。各部屋に平滑化後の差を評価するtemperature disagreementとhumidity disagreementを置き、`delay_on: 2 hours`で持続判定する。温度差のしきい値は1.5℃、湿度差のしきい値は10ポイントとする。
 
-各部屋のthermometer faultとhygrometer faultは、非数値、範囲外、更新停止、または対応するdisagreementをOR条件で集約する。Dad’s RoomのSwitchBotはBluetooth距離による一時切断があるため、secondary sensorの非数値状態が24時間継続した場合だけ故障条件へ含め、2時間の鮮度判定はsecondary sensorが数値の場合だけ適用する。異常は即時反映し、`delay_off: 1 hour`で正常状態の持続を確認してから自動復旧する。鮮度は値の変化時刻ではなく`last_reported`で判断する。
+各部屋のthermometer faultとhygrometer faultは、非数値、範囲外、更新停止、または対応するdisagreementをOR条件で集約する。secondary温湿度計は一時的に接続不能になることがあるため、全非数値状態が24時間継続した場合だけ故障条件へ含め、2時間の鮮度判定はsecondary sensorが数値の場合だけ適用する。異常は即時反映し、`delay_off: 1 hour`で正常状態の持続を確認してから自動復旧する。鮮度は値の変化時刻ではなく`last_reported`で判断する。
 
 温湿度差アラームは対応するfault binary sensorのoffからonへの遷移で通知する。Climate制御automationは両faultがoffであることを実行条件にし、アラームからautomation自体を無効化しない。これにより、内部クリーン復旧処理などがautomationを再有効化しても故障中の制御は再開しない。
 
