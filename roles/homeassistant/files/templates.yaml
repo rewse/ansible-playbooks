@@ -54,14 +54,17 @@
         primary | float > 99 or
         (
           not is_number(secondary) and
-          (now() - states.sensor.dads_room_switchbot_meter_humidity.last_changed).total_seconds() >= 1800
+          (now() - states.sensor.dads_room_switchbot_meter_humidity.last_changed).total_seconds() >= 86400
         ) or
         (
           is_number(secondary) and
           (secondary | float < 1 or secondary | float > 99)
         ) or
         (now() - states.sensor.dads_room_humidity.last_reported).total_seconds() >= 7200 or
-        (now() - states.sensor.dads_room_switchbot_meter_humidity.last_reported).total_seconds() >= 7200 or
+        (
+          is_number(secondary) and
+          (now() - states.sensor.dads_room_switchbot_meter_humidity.last_reported).total_seconds() >= 7200
+        ) or
         is_state('binary_sensor.dads_room_humidity_disagreement', 'on')
       }}
     delay_off:
@@ -117,14 +120,17 @@
         primary | float > 40 or
         (
           not is_number(secondary) and
-          (now() - states.sensor.dads_room_switchbot_meter_temperature.last_changed).total_seconds() >= 1800
+          (now() - states.sensor.dads_room_switchbot_meter_temperature.last_changed).total_seconds() >= 86400
         ) or
         (
           is_number(secondary) and
           (secondary | float < 5 or secondary | float > 40)
         ) or
         (now() - states.sensor.dads_room_temperature.last_reported).total_seconds() >= 7200 or
-        (now() - states.sensor.dads_room_switchbot_meter_temperature.last_reported).total_seconds() >= 7200 or
+        (
+          is_number(secondary) and
+          (now() - states.sensor.dads_room_switchbot_meter_temperature.last_reported).total_seconds() >= 7200
+        ) or
         is_state('binary_sensor.dads_room_temperature_disagreement', 'on')
       }}
     delay_off:

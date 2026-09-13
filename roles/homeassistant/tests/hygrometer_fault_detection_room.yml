@@ -93,13 +93,19 @@
           ".last_changed).total_seconds() >= " ~
           room_contract.secondary_unavailable_seconds
         ) in (room_fault_sensor.state | regex_replace('\\s+', ' '))
+      - >-
+        (
+          "is_number(secondary) and (now() - states." ~
+          room_contract.secondary_entity_id ~
+          ".last_reported).total_seconds() >= 7200"
+        ) in (room_fault_sensor.state | regex_replace('\\s+', ' '))
   when: room_contract.secondary_unavailable_seconds is defined
 
 - name: "hygrometer-fault-test : Verify {{ room_contract.prefix }} has no secondary availability delay"
   ansible.builtin.assert:
     that:
       - "'.last_changed' not in room_fault_sensor.state"
-      - "'1800' not in room_fault_sensor.state"
+      - "'86400' not in room_fault_sensor.state"
   when: room_contract.secondary_unavailable_seconds is not defined
 
 - name: "hygrometer-fault-test : Verify {{ room_contract.prefix }} alarm"

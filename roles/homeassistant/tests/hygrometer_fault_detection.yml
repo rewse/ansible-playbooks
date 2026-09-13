@@ -30,7 +30,7 @@
         fault_entity_id: binary_sensor.dads_room_hygrometer_fault
         prefix: dads_room
         secondary_entity_id: sensor.dads_room_switchbot_meter_humidity
-        secondary_unavailable_seconds: 1800
+        secondary_unavailable_seconds: 86400
         smoothed_entity_ids:
           - sensor.dads_room_humidity_smoothed
           - sensor.dads_room_switchbot_meter_humidity_smoothed
