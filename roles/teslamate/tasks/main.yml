@@ -119,6 +119,29 @@
     - teslamate_grafana
     - teslamate_grafana_config
 
+- name: "teslamate : Pre-pull deployment images"
+  community.docker.docker_image:
+    name: "{{ item }}"
+    source: pull
+  loop:
+    - "{{ teslamate_image_ref }}"
+    - "{{ teslamate_grafana_image_ref }}"
+  when:
+    - teslamate_image_ref | length > 0
+    - teslamate_grafana_image_ref | length > 0
+    - not ansible_check_mode
+  tags:
+    - teslamate
+    - config
+    - update
+    - docker
+    - grafana
+    - teslamate_docker
+    - teslamate_docker_config
+    - teslamate_docker_update
+    - teslamate_grafana
+    - teslamate_grafana_config
+
 - name: "teslamate : Add services to compose"
   ansible.builtin.blockinfile:
     path: /etc/compose.yml
@@ -145,7 +168,7 @@
 - name: "teslamate : Pull and update containers"
   community.docker.docker_compose_v2:
     project_src: /etc
-    pull: missing
+    pull: never
     services:
       - teslamate
       - teslamate-grafana
