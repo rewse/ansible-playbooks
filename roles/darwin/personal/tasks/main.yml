@@ -16,6 +16,155 @@
     - darwin_package
     - darwin_package_install
 
+- name: "treefmt : Install or update by homebrew"
+  community.general.homebrew:
+    name: treefmt
+    state: latest
+    update_homebrew: true
+  tags:
+    - darwin
+    - darwin_personal
+    - install
+    - update
+    - treefmt
+    - darwin_personal_treefmt
+    - darwin_personal_treefmt_install
+    - darwin_personal_treefmt_update
+
+- name: "nix : Check installation"
+  ansible.builtin.stat:
+    path: /nix/var/nix/profiles/default/bin/nix
+  register: darwin_personal_nix_binary
+  tags:
+    - darwin
+    - darwin_personal
+    - install
+    - update
+    - nix
+    - darwin_personal_nix
+    - darwin_personal_nix_install
+    - darwin_personal_nix_update
+
+- name: "nix : Download installer"
+  ansible.builtin.get_url:
+    url: https://nixos.org/nix/install
+    dest: /tmp/nix-install.sh
+    mode: '0755'
+  become: "{{ not ansible_check_mode }}"
+  when: not darwin_personal_nix_binary.stat.exists
+  tags:
+    - darwin
+    - darwin_personal
+    - install
+    - update
+    - nix
+    - darwin_personal_nix
+    - darwin_personal_nix_install
+    - darwin_personal_nix_update
+
+- name: "nix : Install"
+  ansible.builtin.command: sh /tmp/nix-install.sh --yes
+  args:
+    creates: /nix/var/nix/profiles/default/bin/nix
+  become: "{{ not ansible_check_mode }}"
+  when: not darwin_personal_nix_binary.stat.exists
+  tags:
+    - darwin
+    - darwin_personal
+    - install
+    - update
+    - nix
+    - darwin_personal_nix
+    - darwin_personal_nix_install
+    - darwin_personal_nix_update
+
+- name: "nix : Check current version"
+  ansible.builtin.command: /nix/var/nix/profiles/default/bin/nix --version
+  changed_when: false
+  check_mode: false
+  register: darwin_personal_nix_current_version_command
+  when: darwin_personal_nix_binary.stat.exists
+  tags:
+    - darwin
+    - darwin_personal
+    - install
+    - update
+    - nix
+    - darwin_personal_nix
+    - darwin_personal_nix_install
+    - darwin_personal_nix_update
+
+- name: "nix : Check latest stable version"
+  ansible.builtin.command:
+    argv:
+      - /nix/var/nix/profiles/default/bin/nix
+      - --extra-experimental-features
+      - nix-command
+      - upgrade-nix
+      - --dry-run
+      - --profile
+      - /nix/var/nix/profiles/default
+  changed_when: false
+  check_mode: false
+  register: darwin_personal_nix_upgrade_check
+  when: darwin_personal_nix_binary.stat.exists
+  tags:
+    - darwin
+    - darwin_personal
+    - install
+    - update
+    - nix
+    - darwin_personal_nix
+    - darwin_personal_nix_install
+    - darwin_personal_nix_update
+
+- name: "nix : Parse versions"
+  ansible.builtin.set_fact:
+    darwin_personal_nix_current_version: >-
+      {{ darwin_personal_nix_current_version_command.stdout |
+      regex_findall('[0-9]+(?:\.[0-9]+)+') | first }}
+    darwin_personal_nix_upgrade_version: >-
+      {{ darwin_personal_nix_upgrade_check.stderr |
+      regex_findall('would upgrade to version ([0-9]+(?:\.[0-9]+)+)') |
+      first | default('') }}
+  when: darwin_personal_nix_binary.stat.exists
+  tags:
+    - darwin
+    - darwin_personal
+    - install
+    - update
+    - nix
+    - darwin_personal_nix
+    - darwin_personal_nix_install
+    - darwin_personal_nix_update
+
+- name: "nix : Update"
+  ansible.builtin.command:
+    argv:
+      - /nix/var/nix/profiles/default/bin/nix
+      - --extra-experimental-features
+      - nix-command
+      - upgrade-nix
+      - --profile
+      - /nix/var/nix/profiles/default
+  become: "{{ not ansible_check_mode }}"
+  changed_when: true
+  when:
+    - darwin_personal_nix_binary.stat.exists
+    - darwin_personal_nix_upgrade_version | length > 0
+    - >-
+      darwin_personal_nix_upgrade_version is version(
+      darwin_personal_nix_current_version, '>')
+  tags:
+    - darwin
+    - darwin_personal
+    - install
+    - update
+    - nix
+    - darwin_personal_nix
+    - darwin_personal_nix_install
+    - darwin_personal_nix_update
+
 # Use loop for the same reason as the homebrew task above: a list aborts at the
 # first failing cask, which is common when an app already exists at the target
 # path, leaving the rest uninstalled.
