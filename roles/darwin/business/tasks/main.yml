@@ -132,6 +132,7 @@
     - aws-insights-mcp
     - aws-outlook-mcp
     - builder-mcp
+    - chorus-mcp
     - emburse-mcp
     - pippin-mcp
     - slack-mcp
