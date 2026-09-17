@@ -1,0 +1,109 @@
+---
+- name: Test HILLS CARD notification
+  hosts: localhost
+  connection: local
+  gather_facts: false
+  vars:
+    homeassistant_hills_card_message: !unsafe >-
+      {{ states('sensor.hills_card_time') }}に{{ states('sensor.hills_card_amount') }}円の利用がありました
+    homeassistant_hills_card_sample: |
+      ●利用日時：2026/09/17 20:10
+      ●利用先：Mastercard加盟店
+      ●利用金額：７，９００円
+  tasks:
+    - name: "hills-card-test : Parse configuration"
+      ansible.builtin.set_fact:
+        homeassistant_info_automations: >-
+          {{ lookup('file', '../files/automations-info.yaml') | from_yaml }}
+        homeassistant_template_groups: >-
+          {{ lookup('file', '../files/templates.yaml') | from_yaml }}
+
+    - name: "hills-card-test : Parse sample email body"
+      ansible.builtin.set_fact:
+        homeassistant_hills_card_sample_amount: >-
+          {{
+            (homeassistant_hills_card_sample |
+             regex_findall('利用金額：([０-９，]+)円') | first) |
+            replace('０', '0') |
+            replace('１', '1') |
+            replace('２', '2') |
+            replace('３', '3') |
+            replace('４', '4') |
+            replace('５', '5') |
+            replace('６', '6') |
+            replace('７', '7') |
+            replace('８', '8') |
+            replace('９', '9') |
+            replace('，', '') | int
+          }}
+        homeassistant_hills_card_sample_time: >-
+          {{
+            homeassistant_hills_card_sample |
+            regex_findall('利用日時：[0-9]{4}/[0-9]{2}/[0-9]{2} ([0-9]{1,2}:[0-9]{2})') |
+            first
+          }}
+
+    - name: "hills-card-test : Find notification automation"
+      ansible.builtin.set_fact:
+        homeassistant_hills_card_automations: >-
+          {{ homeassistant_info_automations
+             | selectattr('id', 'equalto', 'automation.info_hills_card')
+             | list }}
+
+    - name: "hills-card-test : Find email template group"
+      ansible.builtin.set_fact:
+        homeassistant_hills_card_template_groups: >-
+          {{ homeassistant_template_groups
+             | selectattr('triggers', 'defined')
+             | selectattr('triggers.0.event_data.sender', 'defined')
+             | selectattr('triggers.0.event_data.sender', 'equalto', 'e-ask@orico.co.jp')
+             | list }}
+
+    - name: "hills-card-test : Verify notification contract"
+      ansible.builtin.assert:
+        that:
+          - homeassistant_hills_card_automations | length == 1
+          - >-
+            homeassistant_hills_card_automations[0].alias
+            == 'INFO: HILLS CARD'
+          - >-
+            homeassistant_hills_card_automations[0].triggers
+            == [{'trigger': 'state', 'entity_id': 'sensor.hills_card'}]
+          - homeassistant_hills_card_automations[0].conditions | length == 2
+          - homeassistant_hills_card_automations[0].conditions[1].condition == 'template'
+          - "\"is_number(states('sensor.hills_card_amount'))\" in homeassistant_hills_card_automations[0].conditions[1].value_template"
+          - "\"regex_match('^[0-9]{1,2}:[0-9]{2}$')\" in homeassistant_hills_card_automations[0].conditions[1].value_template"
+          - homeassistant_hills_card_automations[0].actions[0].delay.seconds == 5
+          - homeassistant_hills_card_automations[0].actions[1].action == 'notify.tats_devices'
+          - homeassistant_hills_card_automations[0].actions[1].data.title == '💳 HILLS CARD'
+          - >-
+            homeassistant_hills_card_automations[0].actions[1].data.message
+            == homeassistant_hills_card_message
+          - homeassistant_hills_card_automations[0].actions[1].data.data.push['interruption-level'] == 'time-sensitive'
+
+    - name: "hills-card-test : Store email template group"
+      ansible.builtin.set_fact:
+        homeassistant_hills_card_template: >-
+          {{ homeassistant_hills_card_template_groups[0] }}
+
+    - name: "hills-card-test : Verify email parsing contract"
+      ansible.builtin.assert:
+        that:
+          - homeassistant_hills_card_template.triggers[0].trigger == 'event'
+          - homeassistant_hills_card_template.triggers[0].event_type == 'imap_content'
+          - >-
+            homeassistant_hills_card_template.triggers[0].event_data.subject
+            == '【eオリコ】カードご利用のお知らせ（速報）'
+          - >-
+            (homeassistant_hills_card_template.sensor
+             | map(attribute='unique_id') | list)
+            == ['sensor.hills_card', 'sensor.hills_card_amount', 'sensor.hills_card_time']
+          - homeassistant_hills_card_sample_amount | int == 7900
+          - homeassistant_hills_card_sample_time == '20:10'
+          - "\"trigger.event.data['text']\" in homeassistant_hills_card_template.sensor[1].state"
+          - "\"state_attr('sensor.hills_card', 'Message')\" not in homeassistant_hills_card_template.sensor[1].state"
+          - "'利用金額：([０-９，]+)円' in homeassistant_hills_card_template.sensor[1].state"
+          - "\"replace('７', '7')\" in homeassistant_hills_card_template.sensor[1].state"
+          - "\"replace('，', '')\" in homeassistant_hills_card_template.sensor[1].state"
+          - "\"trigger.event.data['text']\" in homeassistant_hills_card_template.sensor[2].state"
+          - "'利用日時：[0-9]{4}/[0-9]{2}/[0-9]{2} ([0-9]{1,2}:[0-9]{2})' in homeassistant_hills_card_template.sensor[2].state"

@@ -16,6 +16,31 @@
           push:
             interruption-level: time-sensitive
           url: "/lovelace/others"
+- id: automation.info_hills_card
+  alias: "INFO: HILLS CARD"
+  triggers:
+    - trigger: state
+      entity_id: sensor.hills_card
+  conditions:
+    - "{{ (as_timestamp(now()) - as_timestamp(state_attr('sensor.hills_card', 'Date'))) < 180 }}"
+    - condition: template
+      value_template: >-
+        {{
+          is_number(states('sensor.hills_card_amount')) and
+          states('sensor.hills_card_time') |
+          regex_match('^[0-9]{1,2}:[0-9]{2}$')
+        }}
+  actions:
+    - delay:
+        seconds: 5
+    - action: notify.tats_devices
+      data:
+        title: "💳 HILLS CARD"
+        message: "{{ states('sensor.hills_card_time') }}に{{ states('sensor.hills_card_amount') }}円の利用がありました"
+        data:
+          push:
+            interruption-level: time-sensitive
+          url: "/lovelace/others"
 - id: automation.info_mamorail
   alias: "INFO: Mamorail"
   triggers:

@@ -819,6 +819,59 @@
       icon: "mdi:credit-card-clock"
 - triggers:
     - trigger: event
+      event_type: "imap_content"
+      id: "custom_event"
+      event_data:
+        sender: "e-ask@orico.co.jp"
+        subject: "【eオリコ】カードご利用のお知らせ（速報）"
+  sensor:
+    - unique_id: sensor.hills_card
+      name: "HILLS CARD"
+      state: "{{ trigger.event.data['subject'] }}"
+      attributes:
+        Message: "{{ trigger.event.data['text'] }}"
+        Server: "{{ trigger.event.data['server'] }}"
+        Username: "{{ trigger.event.data['username'] }}"
+        Search: "{{ trigger.event.data['search'] }}"
+        Folder: "{{ trigger.event.data['folder'] }}"
+        Sender: "{{ trigger.event.data['sender'] }}"
+        Date: "{{ trigger.event.data['date'] }}"
+        Subject: "{{ trigger.event.data['subject'] }}"
+        To: "{{ trigger.event.data['headers']['Delivered-To'][0] }}"
+        Return_Path: "{{ trigger.event.data['headers']['Return-Path'][0] }}"
+        Received-first: "{{ trigger.event.data['headers']['Received'][0] }}"
+        Received-last: "{{ trigger.event.data['headers']['Received'][-1] }}"
+      icon: "mdi:credit-card"
+    - unique_id: sensor.hills_card_amount
+      name: "HILLS CARD Amount"
+      state: >-
+        {{
+          trigger.event.data['text'] |
+          regex_findall_index('利用金額：([０-９，]+)円') |
+          replace('０', '0') |
+          replace('１', '1') |
+          replace('２', '2') |
+          replace('３', '3') |
+          replace('４', '4') |
+          replace('５', '5') |
+          replace('６', '6') |
+          replace('７', '7') |
+          replace('８', '8') |
+          replace('９', '9') |
+          replace('，', '') | int
+        }}
+      icon: "mdi:credit-card-check"
+      unit_of_measurement: "JPY"
+    - unique_id: sensor.hills_card_time
+      name: "HILLS CARD Time"
+      state: >-
+        {{
+          trigger.event.data['text'] |
+          regex_findall_index('利用日時：[0-9]{4}/[0-9]{2}/[0-9]{2} ([0-9]{1,2}:[0-9]{2})')
+        }}
+      icon: "mdi:credit-card-clock"
+- triggers:
+    - trigger: event
       event_type: imap_content
       id: "custom_event"
       event_data:
