@@ -2,7 +2,7 @@
 
 ## 機能要件
 
-- Home Assistantに`sayurin/hems_echonet_lite`の安定リリース`v0.8.8`を導入する。
+- Home Assistantに`sayurin/hems_echonet_lite`の安定リリース`v0.8.9`を導入する。
 - integration domainは`echonet_lite`とし、ネットワークインターフェース`Auto`（`0.0.0.0`）で構成する。
 - Rinnai MBC-342VをECHONET Liteのマルチキャスト探索で検出する。
 - 瞬間式給湯器クラス`0x0272`が公開するentitiesをHome Assistantから参照できるようにする。
