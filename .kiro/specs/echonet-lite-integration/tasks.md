@@ -2,15 +2,15 @@
 
 > **For agentic workers:** REQUIRED SUB-SKILL: Use subagent-driven-development or inline execution to implement this plan task-by-task. Steps use checkbox (`- [ ]`) syntax for tracking.
 
-**Goal:** Home AssistantへHEMS Echonet Lite v0.8.8を再現可能なAnsible構成で導入し、Rinnai MBC-342Vを検出する。
+**Goal:** Home AssistantへHEMS Echonet Lite v0.8.9を再現可能なAnsible構成で導入し、Rinnai MBC-342Vを検出する。
 
-**Architecture:** 既存のcustom integration管理方式に合わせ、`v0.8.8`のimmutable commitをroot管理checkoutへ取得し、`custom_components/echonet_lite`を完全同期する。Home Assistant再起動後にconfig flowをMCP経由で実行し、UDPマルチキャスト探索で機器とentitiesを登録する。
+**Architecture:** 既存のcustom integration管理方式に合わせ、`v0.8.9`のimmutable commitをroot管理checkoutへ取得し、`custom_components/echonet_lite`を完全同期する。Home Assistant再起動後にconfig flowをMCP経由で実行し、UDPマルチキャスト探索で機器とentitiesを登録する。
 
-**Tech Stack:** Ansible、Home Assistant Core 2026.8.3 Container、HEMS Echonet Lite v0.8.8、mcporter Home Assistant MCP
+**Tech Stack:** Ansible、Home Assistant Core 2026.8.3 Container、HEMS Echonet Lite v0.8.9、mcporter Home Assistant MCP
 
 ## Global Constraints
 
-- リポジトリは`https://github.com/sayurin/hems_echonet_lite.git`を使い、versionは`v0.8.8`のcommit `2f17cf23bbfb2503cdc3cf239376bbfdc51fd02f`へ固定する。
+- リポジトリは`https://github.com/sayurin/hems_echonet_lite.git`を使い、versionは`v0.8.9`のcommit `b14a14c244b60e093274839bf4ed4d8db3a2a425`へ固定する。
 - Home Assistant設定ディレクトリはホスト側`/srv/homeassistant/config`、コンテナ側`/config`とする。
 - Home Assistant Containerの既存`network_mode: host`を変更しない。
 - 機器IPの固定やDHCP reservationを本変更へ含めない。
@@ -34,7 +34,7 @@
 `roles/homeassistant/vars/main.yml`のアルファベット順を保ち、次を追加する。
 
 ```yaml
-homeassistant_hems_echonet_lite_version: 2f17cf23bbfb2503cdc3cf239376bbfdc51fd02f  # v0.8.8
+homeassistant_hems_echonet_lite_version: b14a14c244b60e093274839bf4ed4d8db3a2a425  # v0.8.9
 ```
 
 - [ ] **Step 2: cloneタスクを追加する**

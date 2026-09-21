@@ -6,7 +6,7 @@ Home Assistant に HEMS Echonet Lite integration を導入し、Rinnai MBC-342V�
 
 ## 採用方式
 
-`sayurin/hems_echonet_lite` の安定リリース `v0.8.8` を採用する。Home Assistant 2026.3以降を対象とし、ECHONET Liteの瞬間式給湯器クラス `0x0272` を安定対応クラスとして扱うため、現在の Home Assistant Core 2026.8.3 と対象機器に適合する。
+`sayurin/hems_echonet_lite` の安定リリース `v0.8.9` を採用する。Home Assistant 2026.3以降を対象とし、ECHONET Liteの瞬間式給湯器クラス `0x0272` を安定対応クラスとして扱うため、現在の Home Assistant Core 2026.8.3 と対象機器に適合する。
 
 従来版 `scottyphillips/echonetlite_homeassistant` はRinnai機器の利用実績がある一方でメンテナンスモードであり、機器IPを個別設定する。新規導入では、開発が継続しておりマルチキャスト自動検出を行うHEMS版を優先する。
 
@@ -14,7 +14,7 @@ Home Assistant に HEMS Echonet Lite integration を導入し、Rinnai MBC-342V�
 
 既存のHome Assistant Ansibleロールのcustom integration管理方式に合わせる。
 
-- `roles/homeassistant/vars/main.yml` に `v0.8.8` が指すimmutable commit SHA `2f17cf23bbfb2503cdc3cf239376bbfdc51fd02f` のバージョン変数を追加する。
+- `roles/homeassistant/vars/main.yml` に `v0.8.9` が指すimmutable commit SHA `b14a14c244b60e093274839bf4ed4d8db3a2a425` のバージョン変数を追加する。
 - `roles/homeassistant/tasks/main.yml` にrootだけが書き込める`/var/lib/ansible/homeassistant`（mode `0700`）を作成し、リポジトリを指定commitでcloneするタスクを追加する。共有`/tmp`はcheckoutに使用しない。通常実行ではtracked変更を`force: true`で破棄し、`git clean -ffdx`でuntracked/ignoredファイルも除去して、同期元を固定commitと一致させる。check modeではAnsible標準の予測だけを行い、checkoutの変更・清掃・配置先同期は実行しない。
 - `custom_components/echonet_lite` を `rsync --archive --delete` で `/srv/homeassistant/config/custom_components/echonet_lite` へ同期する。Home Assistantが生成する`__pycache__`と実行時に変化するdirectory mtimeは同期対象外とし、upstreamファイルが同一なら再起動を発生させない。旧式の隣接`*.pyc`は削除対象に残す。check modeではcheckoutと配置先を変更せず、同期を延期したことを報告する。
 - ファイル更新時は既存のHome Assistant再起動handlerへ通知する。
