@@ -12,6 +12,99 @@
     - power-monitor_homebrew
     - power-monitor_homebrew_install
 
+- name: "power-monitor : Get installed application version"
+  ansible.builtin.command:
+    argv:
+      - /usr/libexec/PlistBuddy
+      - -c
+      - "Print :CFBundleShortVersionString"
+      - "/Applications/Power Monitor.app/Contents/Info.plist"
+  check_mode: false
+  changed_when: false
+  failed_when: false
+  register: power_monitor_current_version
+  tags:
+    - power-monitor
+    - install
+    - update
+    - app
+    - power-monitor_app
+    - power-monitor_app_install
+    - power-monitor_app_update
+
+- name: "power-monitor : Determine whether application update is required"
+  ansible.builtin.set_fact:
+    power_monitor_install_required: >-
+      {{
+        power_monitor_current_version.rc != 0 or
+        power_monitor_version is version(
+          power_monitor_current_version.stdout | trim, '>'
+        )
+      }}
+  tags:
+    - power-monitor
+    - install
+    - update
+    - app
+    - power-monitor_app
+    - power-monitor_app_install
+    - power-monitor_app_update
+
+- name: "power-monitor : Download application package"
+  ansible.builtin.get_url:
+    url: "{{ power_monitor_package_url }}"
+    dest: "/tmp/PowerMonitor_{{ power_monitor_version }}.pkg"
+    checksum: "{{ power_monitor_package_checksum }}"
+    mode: '0644'
+  when: power_monitor_install_required
+  tags:
+    - power-monitor
+    - install
+    - update
+    - app
+    - power-monitor_app
+    - power-monitor_app_install
+    - power-monitor_app_update
+
+- name: "power-monitor : Install application package"
+  ansible.builtin.command:
+    argv:
+      - /usr/sbin/installer
+      - -pkg
+      - "/tmp/PowerMonitor_{{ power_monitor_version }}.pkg"
+      - -target
+      - /
+  become: true
+  changed_when: true
+  when:
+    - power_monitor_install_required
+    - not ansible_check_mode
+  tags:
+    - power-monitor
+    - install
+    - update
+    - app
+    - power-monitor_app
+    - power-monitor_app_install
+    - power-monitor_app_update
+
+- name: "power-monitor : Report application update deferred in check mode"
+  ansible.builtin.debug:
+    msg: >-
+      Power Monitor {{ power_monitor_version }} installation is deferred in
+      check mode because installing the package would modify the system.
+  when:
+    - power_monitor_install_required
+    - ansible_check_mode
+  tags:
+    - power-monitor
+    - install
+    - update
+    - app
+    - power-monitor_app
+    - power-monitor_app_install
+    - power-monitor_app_update
+
 - name: "power-monitor : Create directories"
   ansible.builtin.file:
     path: "{{ item }}"

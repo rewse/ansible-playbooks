@@ -264,6 +264,11 @@ class ResticDarwinTemplateTest(unittest.TestCase):
         template = (TEMPLATES / "exclude.j2").read_text()
 
         self.assertIn(
+            "{{ home }}/Library/Daemon Containers/*/Data/com.apple.milod",
+            template,
+        )
+        self.assertIn("{{ home }}/Library/DuetExpertCenter", template)
+        self.assertIn(
             "{{ home }}/Library/Group Containers/group.com.apple.CoreSpeech",
             template,
         )
