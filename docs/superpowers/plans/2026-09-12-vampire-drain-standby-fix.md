@@ -25,12 +25,12 @@
 ### Task 1: SQLの正しさと性能を読み取り専用で検証する
 
 **Files:**
-- Create: `/Volumes/ExternalHD/git/ansible-playbooks/.kiro/specs/vampire-drain-standby-fix/validation.md`
+- Create: `docs/superpowers/specs/2026-09-12-vampire-drain-standby-fix-validation.md`
 - Inspect: `/Users/tats/Playground/teslamate/grafana/dashboards/vampire-drain.json`
 
 **Interfaces:**
 - Consumes: GrafanaのTeslaMate PostgreSQL datasource、設計書の半開区間仕様
-- Produces: 実データ比較、合成境界ケース、`EXPLAIN (ANALYZE, BUFFERS)`の結果を記録した`validation.md`
+- Produces: 実データ比較、合成境界ケース、`EXPLAIN (ANALYZE, BUFFERS)`の結果を記録した`2026-09-12-vampire-drain-standby-fix-validation.md`
 
 - [ ] **Step 1: 現行SQLと修正SQLを抽出する**
 
@@ -114,11 +114,11 @@ Expected:
 
 Run: Grafana datasource API経由で両クエリへ`EXPLAIN (ANALYZE, BUFFERS, FORMAT JSON)`を実行する。
 
-Expected: 3回実行の中央値で、修正SQLの実行時間とshared block read/hit合計が現行SQLの2倍以内に収まり、`states`への新しい無条件Seq Scanがない。閾値を超えた場合はPRへ進まず、実行計画とインデックス利用を再検討する。結果を`validation.md`へ記録する。
+Expected: 3回実行の中央値で、修正SQLの実行時間とshared block read/hit合計が現行SQLの2倍以内に収まり、`states`への新しい無条件Seq Scanがない。閾値を超えた場合はPRへ進まず、実行計画とインデックス利用を再検討する。結果を`2026-09-12-vampire-drain-standby-fix-validation.md`へ記録する。
 
 - [ ] **Step 5: 検証記録をレビューする**
 
-`validation.md`にはSQL、匿名化した結果、実行計画の要約、判定を記載する。ホスト名、位置、VIN、実時刻は記載しない。
+`2026-09-12-vampire-drain-standby-fix-validation.md`にはSQL、匿名化した結果、実行計画の要約、判定を記載する。ホスト名、位置、VIN、実時刻は記載しない。
 
 ---
 
@@ -310,7 +310,7 @@ Expected: 全コマンド成功。
 ### Task 4: 本番へ一時適用して表示を検証する
 
 **Files:**
-- Update: `/Volumes/ExternalHD/git/ansible-playbooks/.kiro/specs/vampire-drain-standby-fix/validation.md`
+- Update: `docs/superpowers/specs/2026-09-12-vampire-drain-standby-fix-validation.md`
 
 **Interfaces:**
 - Consumes: Task 3の一時パッチ、`singleton_int1.yml`、fox.rewse.jp
@@ -379,7 +379,7 @@ Expected: `changed=0`。一時コンテナの作成・削除タスクは運用�
 
 - [ ] **Step 8: 失敗時だけロールバックする**
 
-Vampire Drainのmountを除去し、Grafanaを再作成する。DBやTeslaMate本体は変更しない。失敗内容を`validation.md`へ記録し、Forkのcommit/pushへ進まない。
+Vampire Drainのmountを除去し、Grafanaを再作成する。DBやTeslaMate本体は変更しない。失敗内容を`2026-09-12-vampire-drain-standby-fix-validation.md`へ記録し、Forkのcommit/pushへ進まない。
 
 ---
 
@@ -419,7 +419,7 @@ Nix開発環境と`teslamate_test`を既存手順で準備できる場合は次�
 mix ci
 ```
 
-実行できない場合は理由と代替検証を`validation.md`およびPR本文へ記載する。
+実行できない場合は理由と代替検証を`2026-09-12-vampire-drain-standby-fix-validation.md`およびPR本文へ記載する。
 
 - [ ] **Step 3: 最終コードレビューを実施する**
 
@@ -507,7 +507,7 @@ Include synthetic boundary cases, anonymized real-data results, EXPLAIN ANALYZE 
 
 **Files:**
 - Modify: `/Volumes/ExternalHD/git/ansible-playbooks/roles/teslamate/files/patch_vampire_drain_dashboard.py`
-- Modify: `/Volumes/ExternalHD/git/ansible-playbooks/.kiro/specs/vampire-drain-standby-fix/validation.md`
+- Modify: `docs/superpowers/specs/2026-09-12-vampire-drain-standby-fix-validation.md`
 - Partially stage: `/Volumes/ExternalHD/git/ansible-playbooks/roles/teslamate/tasks/main.yml`
 - Partially stage: `/Volumes/ExternalHD/git/ansible-playbooks/roles/teslamate/templates/compose.yml.j2`
 - Partially stage: `/Volumes/ExternalHD/git/ansible-playbooks/roles/teslamate/tests/render_templates.yml`
@@ -555,7 +555,7 @@ Task 3の全ローカル検証、check mode、本適用、Grafana API確認、br
 ```bash
 git add roles/teslamate/files/patch_vampire_drain_dashboard.py
 git add roles/teslamate/tests/test_patch_vampire_drain_dashboard.py
-git add .kiro/specs/vampire-drain-standby-fix/validation.md
+git add docs/superpowers/specs/2026-09-12-vampire-drain-standby-fix-validation.md
 git add -p roles/teslamate/tasks/main.yml
 git add -p roles/teslamate/templates/compose.yml.j2
 git add -p roles/teslamate/tests/render_templates.yml
@@ -571,7 +571,7 @@ git commit -m 'fix(teslamate): patch Vampire Drain standby calculation'
 
 - [ ] **Step 6: 最終状態を記録する**
 
-`validation.md`へPR URL、適用した公式イメージdigest、Grafana API確認、browser-automation結果、冪等性結果、将来の削除条件を記録する。
+`2026-09-12-vampire-drain-standby-fix-validation.md`へPR URL、適用した公式イメージdigest、Grafana API確認、browser-automation結果、冪等性結果、将来の削除条件を記録する。
 
 ---
 

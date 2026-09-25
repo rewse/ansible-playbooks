@@ -19,12 +19,12 @@
 **目的:** 設計、タスク、運用手順をドキュメント化
 
 **実装:**
-- [x] `.kiro/specs/homeassistant-ha/` ディレクトリを作成
-- [x] `requirements.md`: 要件定義
-- [x] `design.md`: 設計ドキュメント（アーキテクチャ図、コンポーネント説明）
-- [x] `tasks.md`: タスク一覧とチェックリスト
-- [x] `operations.md`: 運用手順（手動復旧、設定変更時の注意点、フェイルオーバー確認方法）
-- [x] `troubleshooting.md`: トラブルシューティング（よくある問題と解決方法）
+- [x] `docs/superpowers/` に設計書と計画書を作成
+- [x] `2026-03-06-homeassistant-ha-requirements.md`: 要件定義
+- [x] `2026-03-06-homeassistant-ha-design.md`: 設計ドキュメント（アーキテクチャ図、コンポーネント説明）
+- [x] `2026-03-06-homeassistant-ha.md`: タスク一覧とチェックリスト
+- [x] `2026-03-06-homeassistant-ha-operations.md`: 運用手順（手動復旧、設定変更時の注意点、フェイルオーバー確認方法）
+- [x] `2026-03-06-homeassistant-ha-troubleshooting.md`: トラブルシューティング（よくある問題と解決方法）
 
 **テスト:**
 - [x] ドキュメントをレビューし、不足している情報がないか確認
@@ -209,7 +209,7 @@
   - [x] フェイルオーバータイマーを再開
   - [x] 成功/失敗のメール通知
 - [x] エラー発生時に自動でフェイルオーバータイマーを再開してから終了
-- [x] `operations.md` にスクリプト使用方法を追記
+- [x] `2026-03-06-homeassistant-ha-operations.md` にスクリプト使用方法を追記
 
 **テスト:**
 - [x] スクリプトを `--help` で実行し、使い方が表示されることを確認

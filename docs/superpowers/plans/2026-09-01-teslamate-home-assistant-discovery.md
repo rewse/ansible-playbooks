@@ -1,6 +1,6 @@
 # TeslaMate Home Assistant discovery Implementation Plan
 
-> **Current refresh contract:** `sensor.model_y_state`がactiveな間だけ10分ごとに`climate.model_y_climate`を更新する。Task 2以下の30分契約は初回配備時の実行記録であり、現在の動作は`design.md`、automation、契約テストを正とする。
+> **Current refresh contract:** `sensor.model_y_state`がactiveな間だけ10分ごとに`climate.model_y_climate`を更新する。Task 2以下の30分契約は初回配備時の実行記録であり、現在の動作は`2026-09-01-teslamate-home-assistant-discovery-design.md`、automation、契約テストを正とする。
 > **For agentic workers:** REQUIRED SUB-SKILL: Use subagent-driven-development or execute the tasks inline in order. Steps use checkbox (`- [x]`) syntax for tracking.
 
 **Goal:** TeslaMate MQTT discoveryを有効化し、Tesla Fleet標準pollingを停止したうえでactive状態の間だけ10分間隔で手動更新する。
@@ -227,7 +227,7 @@ git -P diff --check -- \
   roles/homeassistant/tests/tesla_automation.yml \
   roles/homeassistant/files/automations-tesla.yaml \
   roles/homeassistant/tasks/main.yml \
-  .kiro/specs/teslamate-home-assistant-discovery
+  docs/superpowers/plans/2026-09-01-teslamate-home-assistant-discovery.md docs/superpowers/specs/2026-09-01-teslamate-home-assistant-discovery-design.md
 ```
 
 Expected: lintとdiff checkがexit code 0。既存ファイル由来のlint違反が出た場合は、変更行に新規違反がないことをbaseline比較で確認する。

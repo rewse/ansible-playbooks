@@ -301,7 +301,7 @@ Expected: exit 0。envとhtpasswdのタスクは`no_log`により秘密値を表
 
 ```bash
 git -P status --short
-git -P diff -- singleton_int1.yml roles/teslamate .kiro/specs/teslamate-fox | cat
+git -P diff -- singleton_int1.yml roles/teslamate docs/superpowers/plans/2026-09-01-teslamate-fox.md docs/superpowers/specs/2026-09-01-teslamate-fox-design.md | cat
 ```
 
 Expected: TeslaMate spec、role、`singleton_int1.yml`だけが今回の変更であり、既存のHome Assistant変更内容は変わっていない。

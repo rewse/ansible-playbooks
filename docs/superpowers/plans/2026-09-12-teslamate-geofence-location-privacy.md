@@ -8,7 +8,7 @@
 
 **Tech Stack:** Elixir 1.20.2-otp-29、Ecto、Phoenix LiveView 1.2.8、Gettext/Expo、PostgreSQL 18、`cube`/`earthdistance`、Grafana 13.2.1、GitHub Actions、GHCR、Ansible、Docker Compose、agent-browser
 
-**Spec:** `.kiro/specs/teslamate-geofence-location-privacy/design.md`
+**Spec:** `docs/superpowers/specs/2026-09-12-teslamate-geofence-location-privacy-design.md`
 
 ## Global Constraints
 
@@ -56,7 +56,7 @@
 - Delete: `roles/teslamate/files/patch_visited_dashboard.py`
 - Delete: `roles/teslamate/tests/test_patch_vampire_drain_dashboard.py`
 - Delete: `roles/teslamate/tests/test_patch_visited_dashboard.py`
-- Create: `.kiro/specs/teslamate-geofence-location-privacy/validation.md`。匿名化した検証結果とrollback判定を記録する。
+- Create: `docs/superpowers/specs/2026-09-12-teslamate-geofence-location-privacy-validation.md`。匿名化した検証結果とrollback判定を記録する。
 
 ---
 
@@ -1192,7 +1192,7 @@ Expected: Task 6のGrafana ref、dashboard mount 0、`g.hide_details`を含むda
 ### Task 9: 本番表示・性能・冪等性を検証して記録する
 
 **Files:**
-- Create: `/Volumes/ExternalHD/git/ansible-playbooks/.kiro/specs/teslamate-geofence-location-privacy/validation.md`
+- Create: `docs/superpowers/specs/2026-09-12-teslamate-geofence-location-privacy-validation.md`
 - Verify: TeslaMate、Grafana、Aurora PostgreSQL、Ansible role
 
 **Interfaces:**
@@ -1346,7 +1346,7 @@ Expected: 旧公式Grafana digestと生成済みdashboard mountが復元され�
 - [ ] **Step 11: validation記録をcommitする**
 
 ```bash
-git add .kiro/specs/teslamate-geofence-location-privacy/validation.md
+git add docs/superpowers/specs/2026-09-12-teslamate-geofence-location-privacy-validation.md
 git commit -m "docs(teslamate): record geofence privacy validation"
 ```
 
