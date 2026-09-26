@@ -26,7 +26,7 @@ flowchart LR
 |---|---|
 | 1. 規約と Lint 基盤 | AGENTS.md の規約、ansible-lint、pre-commit、CI、Dependabot、見本ロール `filebrowser` の移行 |
 | 2. inventory と playbook 構造 | `singleton_*` グループの扱い、inventory のディレクトリ化、`host_vars` の導入、README の構成図 |
-| 3. 更新方針の実装 | cooldown 付き最新版解決を GitHub Release、git、HA カスタムコンポーネントへ広げる。`docker/quarantine` の改名と一般化 |
+| 3. 更新方針の実装 | cooldown 付き最新版解決を GitHub Release、git、HA カスタムコンポーネントへ広げる。`docker/quarantine` の改名と一般化。共有の `/etc/compose.yml` への `blockinfile` をやめ、ロールごとに `/etc/compose/<role>/compose.yml` を `template` で持つ別の compose プロジェクトにする |
 | 4. 既存ロールの移行 | 残りのロールを規約に合わせる。ロールごとの命名判断、大きいファイルの分割、詰め合わせロールからの格上げ |
 
 HA の YAML（`roles/homeassistant/files/`）のリファクターはどのサブプロジェクトにも含めず、別セッションで扱う。
