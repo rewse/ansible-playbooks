@@ -9,7 +9,7 @@ network:
       accept-ra: true
       optional: true
       addresses:
-         - {{ local.ip }}/24
+         - {{ raspberrypi_primary_address }}/24
       routes:
         - to: default
           via: {{ raspberrypi_default_gateway }}
@@ -48,7 +48,7 @@ network:
       # fallback needs no hand.
       activation-mode: manual
       addresses:
-         - {{ local.ip_2 }}/24
+         - {{ raspberrypi_secondary_address }}/24
       routes:
         - to: default
           via: {{ raspberrypi_default_gateway }}

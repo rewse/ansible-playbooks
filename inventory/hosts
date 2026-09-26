@@ -1,28 +1,28 @@
+[cloud_workstation]
+alfa.rewse.jp
+
 [darwin_business]
 7cf34ded5d65.local
 
 [darwin_personal]
 youth.local
 
-[ubuntu]
-alfa.rewse.jp
-fox.rewse.jp
-hotel.rewse.jp
-
 [ec2]
 alfa.rewse.jp
+
+[home_primary]
+fox.rewse.jp
+
+[home_secondary]
+hotel.rewse.jp
 
 [raspberrypi]
 fox.rewse.jp
 hotel.rewse.jp
 
-[singleton_ext1]
+[ubuntu]
 alfa.rewse.jp
-
-[singleton_int1]
 fox.rewse.jp
-
-[singleton_int2]
 hotel.rewse.jp
 
 [udm]

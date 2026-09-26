@@ -1,9 +1,0 @@
----
-local:
-    fqdn: hotel.rewse.jp
-    ip: 192.168.0.40
-    ip_2: 192.168.0.42
-location: dads_room
-ssh_port: 21022
-zabbix:
-  server: zabbix.rewse.jp
