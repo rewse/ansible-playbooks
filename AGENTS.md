@@ -84,6 +84,14 @@ Use only these tags, written as an indented YAML list:
 - Put a Secret Reference in the role's `vars/main.yml` when it is the same on every host and in the inventory when it differs.
 - Do not use play vars, `include_vars` outside `set_vars.yml`, or extra vars for desired state.
 
+### Quoting
+
+- Quote YAML strings with double quotes, and strings inside Jinja expressions with single quotes: `"{{ x | default('a') }}"`.
+- Leave keywords, numbers, booleans, and paths unquoted unless YAML syntax requires quotes, such as a value starting with `{` or containing `: `.
+- Write `mode` as a double-quoted four-digit octal string, such as `"0644"`.
+- Use single quotes for strings with backslashes, such as regular expressions, so they need no escaping.
+- Quote a task name only when it contains `: `.
+
 ### Quality
 
 - Keep check mode non-mutating and free of failures. If a dry-run checkout does not create the source a later task needs, skip that task and report why.
