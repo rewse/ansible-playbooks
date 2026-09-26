@@ -95,6 +95,7 @@
     - python3
     - ripgrep
     - rsync
+    - shellcheck
     - skopeo
     - switchaudio-osx
     - svn
