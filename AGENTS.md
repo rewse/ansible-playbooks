@@ -88,6 +88,7 @@ Use only these tags, written as an indented YAML list:
 
 - Keep check mode non-mutating and free of failures. If a dry-run checkout does not create the source a later task needs, skip that task and report why.
 - Make a second run report `changed=0`. Notify restart handlers only when managed content changes.
+- Judge a run by its process exit code, not only PLAY RECAP. If every host in a play fails, later imported playbooks can be skipped while their hosts still show `failed=0`.
 - Use `command` or `shell` only when no module exists, state why in a comment, and always set `changed_when`.
 - Pass package lists to the package module at once instead of looping over `item`.
 - Use `set_fact` only when a value must be computed at run time.
@@ -111,17 +112,6 @@ Use only these tags, written as an indented YAML list:
 - Verify access with a real read through the same environment Ansible uses: `direnv exec . op read op://ansible/<item-id>/<field>`. Do not infer Service Account access from `op whoami` or SSH connectivity; a locked workstation can break lookups independently.
 - A failed lookup can leave a host partially converged because earlier tasks remain applied. Restore secret access and rerun the play.
 
-### Playbook Results
-
-Judge a playbook by its process exit code, not only PLAY RECAP. If every host in a play fails, later imported playbooks can be skipped while their hosts still show `failed=0`.
-
-### Zabbix
-
-- Restart `zabbix-server` after creating an item or trigger through the API; `config_cache_reload` can acknowledge the request without making the object evaluate.
-- Test agent keys with `zabbix_get` from an address allowed by the agent's `Server=` setting. `zabbix_agentd -t` tests as the invoking user, and localhost is not an allowed source on fox; use `zabbix.rewse.jp` there.
-- Emit no value when a UserParameter cannot read its source. Empty output correctly marks the item unsupported; `0` or an epoch-derived age reports false data.
-- Omit `searchWildcardsEnabled` for substring searches. Enabling it without `*` changes the match to exact.
-
 ### UniFi
 
 - Use Site Manager API keys through `https://api.ui.com/v1/connector/consoles/{consoleId}/proxy/network/...`; a console-local endpoint requires a key created in that console's Integrations settings.
@@ -129,12 +119,12 @@ Judge a playbook by its process exit code, not only PLAY RECAP. If every host in
 - Match movable objects such as port forwards by stable meaning (name or port), not controller-generated IDs.
 - Set `ttlSeconds` explicitly for records that move; `0` uses the 300-second default cache.
 
-### Raspberry Pi NVMe Recovery
+### Zabbix
 
-- For `Unable to change power state from D3cold to D0`, remove physical power for several seconds. Rebooting or briefly cycling PoE does not reset the controller.
-- Identify the failing boundary before changing configuration: failure confined to `/` while USB volumes remain available points to the NVMe path.
-- Use shell builtins and `/proc` when binaries under `/usr/bin` are unreadable.
-- Suspect the ribbon, HAT, and connectors before the drive when kernel errors are path-related and NVMe SMART reports no media errors.
+- Restart `zabbix-server` after creating an item or trigger through the API; `config_cache_reload` can acknowledge the request without making the object evaluate.
+- Test agent keys with `zabbix_get` from an address allowed by the agent's `Server=` setting. `zabbix_agentd -t` tests as the invoking user, and localhost is not an allowed source on fox; use `zabbix.rewse.jp` there.
+- Emit no value when a UserParameter cannot read its source. Empty output correctly marks the item unsupported; `0` or an epoch-derived age reports false data.
+- Omit `searchWildcardsEnabled` for substring searches. Enabling it without `*` changes the match to exact.
 
 ## Home Assistant
 
@@ -147,6 +137,15 @@ Read the `mcporter` skill and use `mcporter call home-assistant.<tool>` for live
 - Follow the Home Assistant YAML Style Guide and use the canonical schema: `triggers`, `conditions`, and `actions`; `trigger` inside trigger entries; `action` for service calls; and `target` for entity, device, or area selection.
 - Sort new peer entities alphabetically when their order has no behavior or priority.
 - Give every `time_pattern` trigger a chosen `seconds` value from 0 through 59 so periodic automations do not start together.
+
+## Troubleshooting
+
+### Raspberry Pi NVMe Recovery
+
+- For `Unable to change power state from D3cold to D0`, remove physical power for several seconds. Rebooting or briefly cycling PoE does not reset the controller.
+- Identify the failing boundary before changing configuration: failure confined to `/` while USB volumes remain available points to the NVMe path.
+- Use shell builtins and `/proc` when binaries under `/usr/bin` are unreadable.
+- Suspect the ribbon, HAT, and connectors before the drive when kernel errors are path-related and NVMe SMART reports no media errors.
 
 ### `tuya_local` Recovery
 
