@@ -285,6 +285,10 @@ Expected: 2 回目が `changed=0`
 
 spec の表どおり。Oracle は `instantclient-{basic,sqlplus,...}-linux{-arm64|x64}.zip` を `unarchive` し、`ansible.builtin.find` で `/srv/instantclient_*` を求めて以後の参照に使う。MySQL の apt 設定は固定 URL の deb にし、既存の版比較のタスクを消す。Connector/J は `apt-cache policy mysql-connector-j` で存在を確かめ、あれば `apt` で入れる。ない場合は ledger に `Ruling:` を残し、配布元の最新版の URL を探す。
 
+- [ ] **Step 1b: Node.js の LTS を NodeSource から入れる**
+
+`roles/ubuntu/tasks/main.yml` に `nodejs` の component を足す。`ansible.builtin.uri` で `https://nodejs.org/dist/index.json` を読み、`lts` が false でない最初の要素の `version` からメジャーを求める（`check_mode: false`）。GPG キーを `/etc/apt/keyrings/nodesource.gpg` に置き、`deb822_repository` で `https://deb.nodesource.com/node_<major>.x`、suite `nodistro` を定義し、旧 `/etc/apt/sources.list.d/nodesource.list` を削除し、`nodejs` を `state: latest` で入れる。fox で `node --version` が LTS のメジャーになり、`npm install -g --dry-run agent-browser@latest` に EBADENGINE が出ないことを確かめる
+
 - [ ] **Step 2: インストーラの自己更新を足す**
 
 各ツールに `<tool> : Update` のタスクを足し、`update` タグを付ける。コマンド: `uv self update`、`claude update`、`deno upgrade`、kiro-cli・nix・zinit は各ツールの公式の更新コマンドを確かめて使う。`changed_when` は出力で判定する。

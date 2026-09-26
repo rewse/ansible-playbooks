@@ -150,6 +150,7 @@ cooldown なしで最新版にする。
 | `httpd_php_version` | Ubuntu が配布する PHP のメジャーバージョンなので固定ではない。`roles/httpd/vars/ubuntu.yml` の定数にし、Ubuntu の版に従う旨をコメントに書く |
 | Corretto（`database_corretto_version`） | 現在の LTS（25）の定数とし、DBeaver と SCT が動く Java の版に合わせる旨をコメントに書く。パッケージ自体は apt で最新になる |
 | `raspberrypi_netgear_gs108tv3_version` | 参照がないので削除する |
+| Node.js（Ubuntu） | nodejs.org が apt 向けに案内する NodeSource のリポジトリを `ubuntu` ロールで管理する。LTS のメジャーは `https://nodejs.org/dist/index.json` から毎回求め、`deb.nodesource.com/node_<major>.x` を指す。手で置かれた `/etc/apt/sources.list.d/nodesource.list` は deb822 の定義に置き換える。Mac は Homebrew の `node` のまま |
 
 Oracle と SCT は、URL がすべて HTTP 200 を返すことを 2026-09-27 に確かめた。Redshift JDBC の `latest` の URL は 403 だったため、GitHub Release に切り替える。
 
