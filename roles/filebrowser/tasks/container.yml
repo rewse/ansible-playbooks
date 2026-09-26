@@ -26,7 +26,7 @@
     # block ends the block at the first unindented line.
     block: "{{ lookup('template', 'compose.yml.j2') }}"
   notify: Restart filebrowser
-  when: docker_quarantine_image_ref | length > 0
+  when: docker_quarantine_image_ref | default('') | length > 0
 
 - name: container | Start container
   community.docker.docker_compose_v2:
@@ -34,4 +34,4 @@
     services: filebrowser
     state: present
     pull: missing
-  when: docker_quarantine_image_ref | length > 0
+  when: docker_quarantine_image_ref | default('') | length > 0

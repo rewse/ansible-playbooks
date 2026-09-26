@@ -47,10 +47,12 @@ Use only these tags, written as an indented YAML list:
 | Role name | On the role in the playbook | Run or skip one role |
 | `<role>_<component>` | On the `import_tasks` in `tasks/main.yml` | Run one component |
 | `update` | On the `import_tasks` of components that resolve or apply new versions, and on `upgrade.yml` | Run updates only |
+| `always` | On `set_vars.yml` and fact setup only | Load values every other tag needs |
 
 - Make every component file self-contained, including its prerequisite directories, checkouts, and configuration, so each tag runs alone.
 - Tag the whole component with `update`, not just the version lookup, so the resolved version is also applied.
-- Use `always` only for `set_vars.yml` and fact setup. Do not add operation tags such as `install` or `config`.
+- Repeat the role, component, and any `update` tag in `apply.tags` of a dynamic `include_role` or `include_tasks`; tags on a dynamic include select only the include itself, not the tasks it loads.
+- Do not add operation tags such as `install` or `config`.
 
 ```yaml
 - name: Import container tasks
@@ -101,7 +103,7 @@ Use only these tags, written as an indented YAML list:
 - Pass package lists to the package module at once instead of looping over `item`.
 - Use `set_fact` only when a value must be computed at run time.
 - Use `template` for files the role owns entirely; reserve `lineinfile` for one-line edits to system files.
-- Start every template with `{{ ansible_managed | comment }}`. Do not use `backup: true`.
+- Start every template with `{{ ansible_managed | comment }}`, after `---` in a YAML template. A template rendered into a `blockinfile` block is exempt because the block marker identifies it. Do not use `backup: true`.
 - Give every `debug` a `verbosity`.
 
 ### Lint
