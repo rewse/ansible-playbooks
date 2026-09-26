@@ -14,6 +14,7 @@
 ### Role Design
 
 - Write one playbook per host type, one role per function, and one `tasks/<component>.yml` per component.
+- Name a host type after its role, not its host: the playbook with hyphens (`home-primary.yml`) and its inventory group with underscores (`home_primary`).
 - Keep in an OS role (`ubuntu`, `darwin`) or platform role (`raspberrypi`, `ec2`) only configuration that is meaningful on that OS or platform alone, such as timezone, ssh, sysctl, journald, swap, and the package list.
 - Promote a component to its own role when it is used by more than one OS or host type, when it is an application or service with its own configuration, handlers, or version lifecycle, or when it no longer fits in one task file.
 - Express differences between host types as inventory data (for example `darwin_extra_packages`) or as separate roles in the type's playbook, not as per-type roles.
@@ -79,11 +80,12 @@ Use only these tags, written as an indented YAML list:
 | `vars/main.yml` | Constants identical on every host: values used more than once, lists, URLs, ports, UIDs, and Secret References |
 | `vars/<distribution>.yml` | Constants that differ by OS |
 | `defaults/main.yml` | Inputs the inventory may override; list inputs without a meaningful default commented out |
-| Inventory `group_vars` / `host_vars` | Desired state per group or host, one file per role |
-| `group_vars/all/` | Site-wide shared values |
+| `inventory/group_vars/<group>/<role>.yml`, `inventory/host_vars/<host>/<role>.yml` | Desired state per group or host, one file per role |
+| `inventory/host_vars/<host>/ansible.yml` | Connection variables such as `ansible_port` only |
+| `inventory/group_vars/all/site.yml` | Site-wide shared values |
 
 - Prefix every variable a role defines with the role name. Prefix `register` and `set_fact` results with `__<role>_`.
-- Only these shared values in `group_vars/all/` go without a prefix: `admin`, `email`, `global_ip`, `ipv6`, and `supply_chain_cooldown_days`. Give a new shared value a specific name (`local_network`, not `local`) and add it here.
+- Only these shared values in `inventory/group_vars/all/site.yml` go without a prefix: `admin`, `email`, `global_ip`, `ipv6`, and `supply_chain_cooldown_days`. Give a new shared value a specific name (`local_network`, not `local`) and add it here.
 - Put a Secret Reference in the role's `vars/main.yml` when it is the same on every host and in the inventory when it differs.
 - Do not use play vars, `include_vars` outside `set_vars.yml`, or extra vars for desired state.
 

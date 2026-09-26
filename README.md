@@ -13,20 +13,19 @@ This repository contains Ansible playbooks and roles for managing infrastructure
 
 ```
 .
-├── ansible.cfg           # Ansible configuration file
-├── hosts                 # Inventory file
-├── site.yml              # Main playbook
-├── ubuntu.yml            # Playbook for Ubuntu servers
-├── ec2.yml               # Playbook for EC2 instances
-├── raspberrypi.yml       # Playbook for Raspberry Pi
-├── darwin-business.yml   # Playbook for macOS business
-├── darwin-personal.yml   # Playbook for macOS personal
-├── group_vars/           # Group variables
-│   ├── all/              # Variables common to all hosts
-│   ├── singleton_ext1/   # External singleton host variables
-│   ├── singleton_int1/   # Internal singleton host 1 variables
-│   └── singleton_int2/   # Internal singleton host 2 variables
-└── roles/                # Ansible roles (services, applications, configuration management)
+├── ansible.cfg              # Ansible configuration file
+├── inventory/
+│   ├── hosts                # Hosts and groups only
+│   ├── group_vars/all/      # Site-wide shared values
+│   └── host_vars/<host>/    # Per-host values, one file per role
+├── site.yml                 # All Ubuntu host types
+├── home-primary.yml         # Home primary (fox)
+├── home-secondary.yml       # Home secondary (hotel)
+├── cloud-workstation.yml    # Cloud workstation on EC2 (alfa)
+├── darwin-business.yml      # macOS business
+├── darwin-personal.yml      # macOS personal
+├── udm.yml                  # UniFi Dream Machine
+└── roles/                   # One role per function
 ```
 
 ## Usage
@@ -83,17 +82,14 @@ The `.envrc` file contains the Service Account token and will be automatically l
 ansible-playbook site.yml
 ```
 
-#### Run specific playbooks
+#### Run one host type
+
+Each host type has one playbook that fully configures its hosts.
 
 ```bash
-# Ubuntu servers only
-ansible-playbook ubuntu.yml
-
-# EC2 instances only
-ansible-playbook ec2.yml
-
-# Raspberry Pi only
-ansible-playbook raspberrypi.yml
+ansible-playbook home-primary.yml
+ansible-playbook home-secondary.yml
+ansible-playbook cloud-workstation.yml
 ```
 
 #### Run against specific hosts
@@ -108,10 +104,10 @@ Tags follow the rules in `AGENTS.md`: a role-name tag, a `<role>_<component>` ta
 
 ```bash
 # One role
-ansible-playbook ubuntu.yml --tags ubuntu
+ansible-playbook home-primary.yml --tags ubuntu
 
 # One component of a role
-ansible-playbook singleton_int1.yml --tags filebrowser_container
+ansible-playbook home-primary.yml --tags filebrowser_container
 
 # Package upgrades and new third-party releases only
 ansible-playbook site.yml --tags update
@@ -125,24 +121,20 @@ ansible-playbook site.yml --check
 
 ## Inventory
 
-Hosts are classified into the following groups:
+`inventory/hosts` defines one group per host type and a few groups for ad hoc commands:
 
-- `darwin_business`: Business macOS machines
-- `darwin_personal`: Personal macOS machines
-- `ubuntu`: Ubuntu servers
-- `ec2`: AWS EC2 instances
-- `internal`: Internal network hosts
-- `raspberrypi`: Raspberry Pi devices
-- `singleton_ext1`: External singleton host
-- `singleton_int1`: Internal singleton host 1
-- `singleton_int2`: Internal singleton host 2
+- `cloud_workstation`, `home_primary`, `home_secondary`: Ubuntu host types
+- `darwin_business`, `darwin_personal`: macOS host types
+- `udm`: UniFi Dream Machine
+- `ec2`, `raspberrypi`, `ubuntu`: Hosts by platform or OS, for ad hoc commands such as `ansible raspberrypi -m ping`
 
 ## Variable Management
 
 `AGENTS.md` defines where each kind of variable belongs. In short:
 
-- `group_vars/all/`: A short list of site-wide shared values
-- `group_vars/<group>/`: Desired state per group
+- `inventory/group_vars/all/site.yml`: A short list of site-wide shared values
+- `inventory/host_vars/<host>/<role>.yml`: Desired state per host
+- `inventory/host_vars/<host>/ansible.yml`: Connection variables such as `ansible_port`
 - `roles/<role>/defaults/main.yml`: Role inputs the inventory may override
 - `roles/<role>/vars/main.yml`: Role constants
 
