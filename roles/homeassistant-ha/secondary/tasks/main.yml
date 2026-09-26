@@ -43,45 +43,63 @@
   when: not ansible_check_mode
   tags: [homeassistant-ha-secondary, config]
 
-- name: "docker : Resolve quarantined image"
-  ansible.builtin.include_role:
-    name: docker/quarantine
-    apply:
-      tags: [homeassistant-ha-secondary, update, quarantine]
-  vars:
-    quarantine_repo: ghcr.io/home-assistant/home-assistant
-    quarantine_tag_pattern: '^\d{4}\.\d+\.\d+$'
-  tags: [homeassistant-ha-secondary, update, quarantine]
+- name: "docker : Resolve aged image"
+  ansible.builtin.set_fact:
+    __homeassistant_ha_secondary_image: >-
+      {{ lookup('aged_release', 'oci:ghcr.io/home-assistant/home-assistant', pattern='^\d{4}\.\d+\.\d+$', platform='linux/' ~ ('arm64' if ansible_facts['architecture'] == 'aarch64' else 'amd64')) }}
+  tags: [homeassistant-ha-secondary, update]
 
-- name: "docker : Add compose service"
+# The same path and project name as the primary, so the failover and failback
+# scripts address the service identically on both hosts.
+- name: "docker : Create compose directory"
+  ansible.builtin.file:
+    path: /etc/compose/homeassistant
+    state: directory
+    mode: "0755"
+  tags: [homeassistant-ha-secondary, config]
+
+- name: "docker : Deploy compose file"
+  ansible.builtin.template:
+    src: compose.yaml.j2
+    dest: /etc/compose/homeassistant/compose.yaml
+    mode: "0644"
+  register: __homeassistant_ha_secondary_compose
+  tags: [homeassistant-ha-secondary, config]
+
+# The container kept its name when it moved out of the shared /etc project, so
+# the old one has to go before the new project can create it. These run before
+# the pull, against the usual order, and can be deleted once every host has
+# converged.
+- name: "docker : Read legacy container"
+  community.docker.docker_container_info:
+    name: homeassistant
+  register: __homeassistant_ha_secondary_legacy
+  tags: [homeassistant-ha-secondary, config]
+
+- name: "docker : Remove legacy container"
+  community.docker.docker_container:
+    name: homeassistant
+    state: absent
+  when:
+    - __homeassistant_ha_secondary_legacy.exists
+    - __homeassistant_ha_secondary_legacy.container.Config.Labels['com.docker.compose.project'] | default('') == 'etc'
+    # Never remove a standby that failover has started.
+    - not __homeassistant_ha_secondary_legacy.container.State.Running
+  tags: [homeassistant-ha-secondary, config]
+
+- name: "docker : Remove legacy compose block"
   ansible.builtin.blockinfile:
     path: /etc/compose.yml
-    create: true
-    mode: '0644'
     marker: "# {mark} ANSIBLE MANAGED BLOCK homeassistant"
-    block: |2
-        homeassistant:
-          container_name: homeassistant
-          image: {{ docker_quarantine_image_ref }}
-          volumes:
-            - /etc/localtime:/etc/localtime:ro
-            - /run/dbus:/run/dbus:ro
-            - /srv/homeassistant/config:/config
-          security_opt:
-            - apparmor:unconfined
-          network_mode: host
-          privileged: true
-          restart: "no"
-  when: docker_quarantine_image_ref | length > 0
+    state: absent
   tags: [homeassistant-ha-secondary, config]
 
 - name: "docker : Pull image (standby, do not start)"
   community.docker.docker_compose_v2:
-    project_src: /etc
-    services: homeassistant
+    project_src: /etc/compose/homeassistant
     state: stopped
     pull: missing
-  when: docker_quarantine_image_ref | length > 0
+  when: not (ansible_check_mode and __homeassistant_ha_secondary_compose is changed)
   tags: [homeassistant-ha-secondary, update]
 
 - name: "failover : Create state directory"

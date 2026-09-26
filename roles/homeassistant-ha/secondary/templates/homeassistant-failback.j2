@@ -8,7 +8,7 @@ PRIMARY_SSH_USER="[% admin %]"
 HA_TOKEN="[% homeassistant_ha_token %]"
 CONFIG_DIR="/srv/homeassistant/config"
 RSYNC_MODULE="rsync://${PRIMARY_HOST}/homeassistant-config/"
-COMPOSE_DIR="/etc"
+COMPOSE_FILE="/etc/compose/homeassistant/compose.yaml"
 FAILOVER_TIMER="homeassistant-failover.timer"
 API_WAIT_TIMEOUT=120
 API_WAIT_INTERVAL=5
@@ -245,7 +245,7 @@ log "Merge strategy: ${MERGE_STRATEGY}"
 # Step 4: Stop Home Assistant on hotel
 # -----------------------------------------------------------------------------
 log "Stopping Home Assistant on $(hostname)..."
-if ! docker compose -f "${COMPOSE_DIR}/compose.yml" stop homeassistant; then
+if ! docker compose -f "${COMPOSE_FILE}" stop homeassistant; then
     restore_failover_timer
     abort "Failed to stop Home Assistant on $(hostname)."
 fi
@@ -282,7 +282,7 @@ fi
 # Step 6: Start Home Assistant on fox
 # -----------------------------------------------------------------------------
 log "Starting Home Assistant on ${PRIMARY_HOST}..."
-if ! ssh_primary "sudo docker compose -f ${COMPOSE_DIR}/compose.yml up -d homeassistant"; then
+if ! ssh_primary "sudo docker compose -f ${COMPOSE_FILE} up -d homeassistant"; then
     restore_failover_timer
     abort "Failed to start Home Assistant on ${PRIMARY_HOST}."
 fi

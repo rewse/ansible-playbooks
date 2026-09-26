@@ -1,0 +1,16 @@
+{{ ansible_managed | comment }}
+name: homeassistant
+
+services:
+  homeassistant:
+    container_name: homeassistant
+    image: {{ __homeassistant_ha_secondary_image.ref }}
+    volumes:
+      - /etc/localtime:/etc/localtime:ro
+      - /run/dbus:/run/dbus:ro
+      - /srv/homeassistant/config:/config
+    security_opt:
+      - apparmor:unconfined
+    network_mode: host
+    privileged: true
+    restart: "no"

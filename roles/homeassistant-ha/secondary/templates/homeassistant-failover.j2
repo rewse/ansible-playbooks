@@ -20,7 +20,7 @@ HOLD_FILE="${STATE_DIR}/hold"
 LOCK_FILE="/var/run/homeassistant-failover.lock"
 LOG_TAG="homeassistant-failover"
 MAIL_TO="[% email.primary %]"
-COMPOSE_DIR="/etc"
+COMPOSE_FILE="/etc/compose/homeassistant/compose.yaml"
 DOMAIN="[% homeassistant_ha_domain %]"
 NAME_SWITCH="/usr/local/bin/homeassistant-name-switch"
 # Written by the name switch while the name points here.
@@ -108,7 +108,7 @@ if local_ha_running; then
         log "Continuing to stand down even though the name did not move"
     fi
 
-    if docker compose -f "${COMPOSE_DIR}/compose.yml" stop homeassistant; then
+    if docker compose -f "${COMPOSE_FILE}" stop homeassistant; then
         log "Stopped Home Assistant on ${hostname_local}"
         standdown_status="SUCCESS"
     else
@@ -215,7 +215,7 @@ log "Triggering failover: primary=${reason}"
 
 # Start Home Assistant on the standby
 failover_time=$(date '+%Y-%m-%d %H:%M:%S %Z')
-if docker compose -f "${COMPOSE_DIR}/compose.yml" up -d homeassistant; then
+if docker compose -f "${COMPOSE_FILE}" up -d homeassistant; then
     log "Failover succeeded: homeassistant started on ${hostname_local}"
     failover_status="SUCCESS"
 else
