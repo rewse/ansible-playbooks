@@ -156,6 +156,7 @@ component ファイルの中は次の順にする。
 - パッケージは `item` でループせず、リストで一度に渡す
 - `set_fact` は必要なときだけ使う。ファイル全体を管理するなら `template` を使い、`lineinfile` はシステムファイルの 1 行を直す用途に限る
 - テンプレートの先頭に `{{ ansible_managed | comment }}` を入れる
+- `backup: true` は使わない
 - `debug` には `verbosity` を付ける
 
 ### 採用しない CoP の項目
@@ -166,7 +167,7 @@ component ファイルの中は次の順にする。
 | 4.1.20 `argument_specs` | ロールを外部に提供しない |
 | 12.3 Molecule | launchd、GPIO、NVMe などコンテナで再現しにくい対象が多い。check mode と 2 回目の実行で代える |
 | 3.3 動詞-名詞の playbook 名 | type ごとの playbook 名（`ubuntu.yml`）のほうが 2.2 と整合する |
-| 4.1.14 `backup: true` の常用 | 変更履歴は Git で追える。既存の指定は残す |
+| 4.1.14 `backup: true` の常用 | 変更履歴は Git で追え、ホストにバックアップファイルがたまるだけになる。`backup: true` は使わず、既存の指定はロールの移行時に消す |
 | 5、10、11、13.4 以降 | Collection、AAP、リリース管理、CD は使わない |
 
 ## Lint と CI
@@ -246,7 +247,7 @@ roles/filebrowser/tasks/
 - テンプレートの先頭を `{{ ansible_managed | comment }}` に揃える。compose のブロックは `blockinfile` の marker が管理を示すので対象外とする
 - `singleton_int1.yml` で `filebrowser` ロールにタグ `filebrowser` を付ける
 - `docker/quarantine` の呼び出しは残す。改名と一般化はサブプロジェクト 3 で行う
-- 既存の `backup: true` とコメントは残す
+- `config.yaml` のテンプレートタスクから `backup: true` を消す。既存のコメントは残す
 
 ### 検証
 
