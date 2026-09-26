@@ -163,6 +163,8 @@ Oracle と SCT は、URL がすべて HTTP 200 を返すことを 2026-09-27 に
 
 ## 公式のインストーラ
 
+ツールは、配布元が公式に案内するインストール方法を優先して入れる（公式の apt リポジトリ、Homebrew、インストーラのスクリプトなど）。サードパーティのパッケージや独自の手順は、公式の方法がその OS やプラットフォームで使えないときだけ使い、理由をコメントに書く。公式の方法に従うと、配布元の更新の仕組みや署名の検証をそのまま使える。既存のタスクがこれに反している場合の置き換えはサブプロジェクト 4 で行う。
+
 uv、kiro-cli、Claude Code、nix、deno、zinit は、インストール後も `update` タグの component で各ツールの自己更新を流して最新版を保つ（`uv self update`、`claude update`、`deno upgrade` など）。kiro-cli、nix、zinit の更新コマンドは実装時に確かめる。`command` を使う理由と `changed_when` は規約どおり書く。
 
 ## 進め方
@@ -188,6 +190,7 @@ uv、kiro-cli、Claude Code、nix、deno、zinit は、インストール後も 
 AGENTS.md に次を反映する。
 
 - Update Policy: 解決は `aged_release` の lookup で行い、digest、sha256、SHA で固定する。npm と uv の cooldown は chezmoi が持ち、日数を `supply_chain_cooldown_days` と揃える。GitHub 以外の配布元とインストーラは固定せず最新版にする
+- インストール方法: 配布元の公式のインストール方法を優先し、使えないときだけ別の方法を使って理由をコメントに書く
 - 置き場所: `/usr/local/src/<name>`、`/opt/<name>`、`/srv/<role>`、`/etc/compose/<role>/compose.yaml`
 - filebrowser を新しい形に直し、引き続き見本とする
 
