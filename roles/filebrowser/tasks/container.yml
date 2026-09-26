@@ -22,29 +22,6 @@
     mode: "0644"
   register: __filebrowser_compose
 
-# The container kept its name when it moved out of the shared /etc project, so
-# the old one has to go before the new project can create it. These run before
-# the start, against the usual order, and can be deleted once every host has
-# converged.
-- name: container | Read legacy container
-  community.docker.docker_container_info:
-    name: filebrowser
-  register: __filebrowser_legacy
-
-- name: container | Remove legacy container
-  community.docker.docker_container:
-    name: filebrowser
-    state: absent
-  when:
-    - __filebrowser_legacy.exists
-    - __filebrowser_legacy.container.Config.Labels['com.docker.compose.project'] | default('') == 'etc'
-
-- name: container | Remove legacy compose block
-  ansible.builtin.blockinfile:
-    path: /etc/compose.yml
-    marker: "# {mark} ANSIBLE MANAGED BLOCK filebrowser"
-    state: absent
-
 - name: container | Report skipped start in check mode
   ansible.builtin.debug:
     msg: Start skipped because the compose file is not written in check mode

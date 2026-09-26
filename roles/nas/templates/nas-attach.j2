@@ -11,7 +11,7 @@
 
 set -euo pipefail
 
-readonly COMPOSE_FILE=/etc/compose.yml
+readonly COMPOSE_DIR=/etc/compose
 
 # One run at a time, a run by hand being able to meet the one nas-attach.service
 # starts. Whichever arrives second has nothing left to do, so it leaves instead
@@ -133,7 +133,11 @@ start_timers() {
 # running one, which would take Home Assistant down with it. start only starts
 # what is stopped and leaves what is running alone.
 start_containers() {
-  docker compose -f "${COMPOSE_FILE}" start
+  local file
+
+  for file in "${COMPOSE_DIR}"/*/compose.yaml; do
+    docker compose -f "${file}" start
+  done
 }
 
 verify_attached() {

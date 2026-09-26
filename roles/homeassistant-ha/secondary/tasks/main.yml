@@ -66,34 +66,6 @@
   register: __homeassistant_ha_secondary_compose
   tags: [homeassistant-ha-secondary, config]
 
-# The container kept its name when it moved out of the shared /etc project, so
-# the old one has to go before the new project can create it. These run before
-# the pull, against the usual order, and can be deleted once every host has
-# converged.
-- name: "docker : Read legacy container"
-  community.docker.docker_container_info:
-    name: homeassistant
-  register: __homeassistant_ha_secondary_legacy
-  tags: [homeassistant-ha-secondary, config]
-
-- name: "docker : Remove legacy container"
-  community.docker.docker_container:
-    name: homeassistant
-    state: absent
-  when:
-    - __homeassistant_ha_secondary_legacy.exists
-    - __homeassistant_ha_secondary_legacy.container.Config.Labels['com.docker.compose.project'] | default('') == 'etc'
-    # Never remove a standby that failover has started.
-    - not __homeassistant_ha_secondary_legacy.container.State.Running
-  tags: [homeassistant-ha-secondary, config]
-
-- name: "docker : Remove legacy compose block"
-  ansible.builtin.blockinfile:
-    path: /etc/compose.yml
-    marker: "# {mark} ANSIBLE MANAGED BLOCK homeassistant"
-    state: absent
-  tags: [homeassistant-ha-secondary, config]
-
 - name: "docker : Pull image (standby, do not start)"
   community.docker.docker_compose_v2:
     project_src: /etc/compose/homeassistant

@@ -47,26 +47,11 @@
     - docker
     - docker_docker
 
-- name: "docker : Create compose.yml"
+- name: "docker : Remove shared compose file"
+  # Every service runs in its own project under /etc/compose.
   ansible.builtin.file:
     path: /etc/compose.yml
-    state: touch
-    mode: '0644'
+    state: absent
   tags:
     - docker
-    - init
     - docker_docker
-    - docker_docker_init
-
-- name: "docker : Add services section to compose.yml"
-  ansible.builtin.lineinfile:
-    path: /etc/compose.yml
-    insertbefore: BOF
-    regexp: '^services:'
-    line: 'services:'
-  tags:
-    - docker
-    - init
-    - docker_docker
-    - docker_docker_init
-    - docker_docker_config
