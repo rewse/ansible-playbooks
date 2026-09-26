@@ -46,7 +46,7 @@ Use only these tags, written as an indented YAML list:
 
 | Tag | Where | Purpose |
 |---|---|---|
-| Role name | On the role in the playbook | Run or skip one role |
+| Role name | On the role in the playbook and on the same role in `meta/main.yml` dependencies | Run or skip one role and its dependencies |
 | `<role>_<component>` | On the `import_tasks` in `tasks/main.yml` | Run one component |
 | `update` | On the `import_tasks` of components that resolve or apply new versions, and on `upgrade.yml` | Run updates only |
 | `always` | On `set_vars.yml` and fact setup only | Load values every other tag needs |

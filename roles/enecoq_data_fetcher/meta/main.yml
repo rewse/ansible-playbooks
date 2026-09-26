@@ -1,3 +1,5 @@
 ---
 dependencies:
   - role: homeassistant
+    tags:
+      - homeassistant

@@ -1,6 +1,14 @@
 ---
 dependencies:
-  - {role: httpd}
-  - {role: docker}
-  - {role: matter_server}
-  - {role: sslcert}
+  - role: httpd
+    tags:
+      - httpd
+  - role: docker
+    tags:
+      - docker
+  - role: matter_server
+    tags:
+      - matter_server
+  - role: sslcert
+    tags:
+      - sslcert

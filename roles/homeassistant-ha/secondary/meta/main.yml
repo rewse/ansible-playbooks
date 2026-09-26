@@ -1,4 +1,8 @@
 ---
 dependencies:
-  - {role: docker}
-  - {role: httpd}
+  - role: docker
+    tags:
+      - docker
+  - role: httpd
+    tags:
+      - httpd

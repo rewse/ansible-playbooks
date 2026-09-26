@@ -1,3 +1,5 @@
 ---
 dependencies:
-  - {role: httpd}
+  - role: httpd
+    tags:
+      - httpd
