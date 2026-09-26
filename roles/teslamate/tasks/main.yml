@@ -37,9 +37,6 @@
       owner: root
       group: root
       mode: '0755'
-  when:
-    - teslamate_image_ref | length > 0
-    - teslamate_grafana_image_ref | length > 0
   tags:
     - teslamate
     - config
@@ -64,8 +61,6 @@
     mode: '0644'
   notify: "teslamate: Restart"
   when:
-    - teslamate_image_ref | length > 0
-    - teslamate_grafana_image_ref | length > 0
     # Check mode does not create the parent directory on a first run.
     - not ansible_check_mode or teslamate_data_dir_status.stat.exists
   tags:
@@ -86,8 +81,6 @@
   no_log: true
   notify: "teslamate: Restart"
   when:
-    - teslamate_image_ref | length > 0
-    - teslamate_grafana_image_ref | length > 0
     # Check mode does not create the parent directory, so a first run cannot
     # stage this file. The local template contract test still renders it.
     - not ansible_check_mode or teslamate_data_dir_status.stat.exists
@@ -108,8 +101,6 @@
   no_log: true
   notify: "teslamate-grafana: Restart"
   when:
-    - teslamate_image_ref | length > 0
-    - teslamate_grafana_image_ref | length > 0
     # Check mode does not create the parent directory, so a first run cannot
     # stage this file. The local template contract test still renders it.
     - not ansible_check_mode or teslamate_data_dir_status.stat.exists
@@ -119,16 +110,35 @@
     - teslamate_grafana
     - teslamate_grafana_config
 
+- name: "teslamate : Resolve fork images"
+  ansible.builtin.set_fact:
+    # The fork is this account's own build, so it follows main without a cooldown.
+    __teslamate_image: >-
+      {{ lookup('aged_release', 'oci:ghcr.io/rewse/teslamate', pattern='^main$', days=0, platform='linux/' ~ ('arm64' if ansible_facts['architecture'] == 'aarch64' else 'amd64')) }}
+    __teslamate_grafana_image: >-
+      {{ lookup('aged_release', 'oci:ghcr.io/rewse/teslamate/grafana', pattern='^main$', days=0, platform='linux/' ~ ('arm64' if ansible_facts['architecture'] == 'aarch64' else 'amd64')) }}
+  tags:
+    - teslamate
+    - config
+    - update
+    - docker
+    - grafana
+    - teslamate_docker
+    - teslamate_docker_config
+    - teslamate_docker_update
+    - teslamate_grafana
+    - teslamate_grafana_config
+
 - name: "teslamate : Pre-pull deployment images"
   community.docker.docker_image:
     name: "{{ item }}"
     source: pull
+  # By digest alone: docker_image cannot match a local image to a tag@digest
+  # name, so that form pulls again on every run.
   loop:
-    - "{{ teslamate_image_ref }}"
-    - "{{ teslamate_grafana_image_ref }}"
+    - "{{ __teslamate_image.ref | regex_replace(':[^:@/]+@', '@') }}"
+    - "{{ __teslamate_grafana_image.ref | regex_replace(':[^:@/]+@', '@') }}"
   when:
-    - teslamate_image_ref | length > 0
-    - teslamate_grafana_image_ref | length > 0
     - not ansible_check_mode
   tags:
     - teslamate
@@ -142,17 +152,124 @@
     - teslamate_grafana
     - teslamate_grafana_config
 
-- name: "teslamate : Add services to compose"
+- name: "teslamate : Create compose directory"
+  ansible.builtin.file:
+    path: /etc/compose/teslamate
+    state: directory
+    mode: "0755"
+  tags:
+    - teslamate
+    - config
+    - update
+    - docker
+    - grafana
+    - teslamate_docker
+    - teslamate_docker_config
+    - teslamate_docker_update
+    - teslamate_grafana
+    - teslamate_grafana_config
+
+- name: "teslamate : Deploy compose file"
+  ansible.builtin.template:
+    src: compose.yaml.j2
+    dest: /etc/compose/teslamate/compose.yaml
+    mode: "0644"
+  register: __teslamate_compose
+  tags:
+    - teslamate
+    - config
+    - update
+    - docker
+    - grafana
+    - teslamate_docker
+    - teslamate_docker_config
+    - teslamate_docker_update
+    - teslamate_grafana
+    - teslamate_grafana_config
+
+# The container kept its name when it moved out of the shared /etc project, so
+# the old one has to go before the new project can create it. These run before
+# the start, against the usual order, and can be deleted once every host has
+# converged.
+- name: "teslamate : Read legacy container teslamate"
+  community.docker.docker_container_info:
+    name: teslamate
+  register: __teslamate_legacy_teslamate
+  tags:
+    - teslamate
+    - config
+    - update
+    - docker
+    - grafana
+    - teslamate_docker
+    - teslamate_docker_config
+    - teslamate_docker_update
+    - teslamate_grafana
+    - teslamate_grafana_config
+
+- name: "teslamate : Remove legacy container teslamate"
+  community.docker.docker_container:
+    name: teslamate
+    state: absent
+  when:
+    - __teslamate_legacy_teslamate.exists
+    - __teslamate_legacy_teslamate.container.Config.Labels['com.docker.compose.project'] | default('') == 'etc'
+  tags:
+    - teslamate
+    - config
+    - update
+    - docker
+    - grafana
+    - teslamate_docker
+    - teslamate_docker_config
+    - teslamate_docker_update
+    - teslamate_grafana
+    - teslamate_grafana_config
+
+# The container kept its name when it moved out of the shared /etc project, so
+# the old one has to go before the new project can create it. These run before
+# the start, against the usual order, and can be deleted once every host has
+# converged.
+- name: "teslamate : Read legacy container teslamate-grafana"
+  community.docker.docker_container_info:
+    name: teslamate-grafana
+  register: __teslamate_legacy_teslamate_grafana
+  tags:
+    - teslamate
+    - config
+    - update
+    - docker
+    - grafana
+    - teslamate_docker
+    - teslamate_docker_config
+    - teslamate_docker_update
+    - teslamate_grafana
+    - teslamate_grafana_config
+
+- name: "teslamate : Remove legacy container teslamate-grafana"
+  community.docker.docker_container:
+    name: teslamate-grafana
+    state: absent
+  when:
+    - __teslamate_legacy_teslamate_grafana.exists
+    - __teslamate_legacy_teslamate_grafana.container.Config.Labels['com.docker.compose.project'] | default('') == 'etc'
+  tags:
+    - teslamate
+    - config
+    - update
+    - docker
+    - grafana
+    - teslamate_docker
+    - teslamate_docker_config
+    - teslamate_docker_update
+    - teslamate_grafana
+    - teslamate_grafana_config
+
+- name: "teslamate : Remove legacy compose block teslamate"
   ansible.builtin.blockinfile:
     path: /etc/compose.yml
     marker: "# {mark} ANSIBLE MANAGED BLOCK teslamate"
-    block: "{{ lookup('template', 'compose.yml.j2') }}"
-  notify:
-    - "teslamate: Restart"
-    - "teslamate-grafana: Restart"
-  when:
-    - teslamate_image_ref | length > 0
-    - teslamate_grafana_image_ref | length > 0
+    state: absent
   tags:
     - teslamate
     - config
@@ -167,16 +284,10 @@
 
 - name: "teslamate : Pull and update containers"
   community.docker.docker_compose_v2:
-    project_src: /etc
+    project_src: /etc/compose/teslamate
     pull: never
-    services:
-      - teslamate
-      - teslamate-grafana
     state: present
-  when:
-    - teslamate_image_ref | length > 0
-    - teslamate_grafana_image_ref | length > 0
-    - not ansible_check_mode
+  when: not ansible_check_mode
   tags:
     - teslamate
     - config
@@ -197,9 +308,6 @@
     - "{{ teslamate_data_dir }}/patch_vampire_drain_dashboard.py"
     - "{{ teslamate_data_dir }}/patch_visited_dashboard.py"
     - "{{ teslamate_data_dir }}/grafana-dashboards"
-  when:
-    - teslamate_image_ref | length > 0
-    - teslamate_grafana_image_ref | length > 0
   tags:
     - teslamate
     - config

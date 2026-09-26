@@ -21,7 +21,7 @@ class DeploymentOrderTest(unittest.TestCase):
 
     def test_deployment_images_are_staged_before_compose_changes(self):
         pre_pull_name = "teslamate : Pre-pull deployment images"
-        compose_name = "teslamate : Add services to compose"
+        compose_name = "teslamate : Deploy compose file"
         update_name = "teslamate : Pull and update containers"
         cleanup_name = "teslamate : Remove legacy dashboard patch assets"
 
@@ -33,7 +33,10 @@ class DeploymentOrderTest(unittest.TestCase):
         )
         self.assertEqual(
             pre_pull["loop"],
-            ["{{ teslamate_image_ref }}", "{{ teslamate_grafana_image_ref }}"],
+            [
+                "{{ __teslamate_image.ref | regex_replace(':[^:@/]+@', '@') }}",
+                "{{ __teslamate_grafana_image.ref | regex_replace(':[^:@/]+@', '@') }}",
+            ],
         )
         self.assertIn("not ansible_check_mode", pre_pull["when"])
 

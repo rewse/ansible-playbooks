@@ -1,6 +1,10 @@
+{{ ansible_managed | comment }}
+name: teslamate
+
+services:
   teslamate:
     container_name: teslamate
-    image: {{ teslamate_image_ref }}
+    image: {{ __teslamate_image.ref }}
     env_file:
       - {{ teslamate_data_dir }}/teslamate.env
     extra_hosts:
@@ -17,7 +21,7 @@
 
   teslamate-grafana:
     container_name: teslamate-grafana
-    image: {{ teslamate_grafana_image_ref }}
+    image: {{ __teslamate_grafana_image.ref }}
     env_file:
       - {{ teslamate_data_dir }}/grafana.env
     ports:

@@ -11,10 +11,12 @@ teslamate_encryption_key: DUMMY_ENCRYPTION_KEY
 teslamate_grafana_admin_password: DUMMY_GRAFANA_PASSWORD_$VALUE#=
 teslamate_grafana_admin_username: test-admin
 teslamate_grafana_hostname: grafana.rewse.jp
-teslamate_grafana_image_ref: ghcr.io/rewse/teslamate/grafana:main@sha256:bbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbb
+__teslamate_grafana_image:
+  ref: ghcr.io/rewse/teslamate/grafana:main@sha256:bbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbb
 teslamate_grafana_port: 3000
 teslamate_hostname: teslamate.rewse.jp
-teslamate_image_ref: ghcr.io/rewse/teslamate:main@sha256:aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa
+__teslamate_image:
+  ref: ghcr.io/rewse/teslamate:main@sha256:aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa
 teslamate_mqtt_host: host.docker.internal
 teslamate_mqtt_password: DUMMY_MQTT_PASSWORD_$VALUE#=
 teslamate_mqtt_port: 1883

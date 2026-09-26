@@ -1,8 +1,7 @@
 ---
 - name: "teslamate: Restart"
   community.docker.docker_compose_v2:
-    project_src: /etc
-    recreate: always
+    project_src: /etc/compose/teslamate
     services:
       - teslamate
     state: restarted
@@ -10,8 +9,7 @@
 
 - name: "teslamate-grafana: Restart"
   community.docker.docker_compose_v2:
-    project_src: /etc
-    recreate: always
+    project_src: /etc/compose/teslamate
     services:
       - teslamate-grafana
     state: restarted

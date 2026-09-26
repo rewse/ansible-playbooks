@@ -8,7 +8,7 @@
   tasks:
     - name: "teslamate-test : Render templates"
       ansible.builtin.set_fact:
-        teslamate_test_compose_output: "{{ lookup('template', '../templates/compose.yml.j2') }}"
+        teslamate_test_compose_output: "{{ lookup('template', '../templates/compose.yaml.j2') }}"
         teslamate_test_env_output: "{{ lookup('template', '../templates/teslamate.env.j2') }}"
         teslamate_test_grafana_env_output: "{{ lookup('template', '../templates/grafana.env.j2') }}"
         teslamate_test_grafana_vhost_output: "{{ lookup('template', '../templates/grafana.rewse.jp.conf.j2') }}"
@@ -22,17 +22,17 @@
     - name: "teslamate-test : Verify compose contract"
       ansible.builtin.assert:
         that:
-          - teslamate_test_compose.teslamate.image == teslamate_image_ref
-          - teslamate_test_compose.teslamate.image is match('^ghcr.io/rewse/teslamate:main@sha256:[0-9a-f]{64}$')
-          - teslamate_test_compose['teslamate-grafana'].image == teslamate_grafana_image_ref
-          - teslamate_test_compose['teslamate-grafana'].image is match('^ghcr.io/rewse/teslamate/grafana:main@sha256:[0-9a-f]{64}$')
-          - teslamate_test_compose.teslamate.ports == ['127.0.0.1:4001:4000']
-          - teslamate_test_compose['teslamate-grafana'].ports == ['127.0.0.1:3000:3000']
-          - teslamate_test_compose.teslamate.cap_drop == ['all']
-          - teslamate_test_compose['teslamate-grafana'].cap_drop == ['all']
-          - teslamate_test_compose.teslamate.extra_hosts == ['host.docker.internal:host-gateway']
+          - teslamate_test_compose.services.teslamate.image == __teslamate_image.ref
+          - teslamate_test_compose.services.teslamate.image is match('^ghcr.io/rewse/teslamate:main@sha256:[0-9a-f]{64}$')
+          - teslamate_test_compose.services['teslamate-grafana'].image == __teslamate_grafana_image.ref
+          - teslamate_test_compose.services['teslamate-grafana'].image is match('^ghcr.io/rewse/teslamate/grafana:main@sha256:[0-9a-f]{64}$')
+          - teslamate_test_compose.services.teslamate.ports == ['127.0.0.1:4001:4000']
+          - teslamate_test_compose.services['teslamate-grafana'].ports == ['127.0.0.1:3000:3000']
+          - teslamate_test_compose.services.teslamate.cap_drop == ['all']
+          - teslamate_test_compose.services['teslamate-grafana'].cap_drop == ['all']
+          - teslamate_test_compose.services.teslamate.extra_hosts == ['host.docker.internal:host-gateway']
           - "'grafana-dashboards' not in teslamate_test_compose_output"
-          - "'/srv/teslamate/global-bundle.pem:/etc/ssl/certs/aws-rds-global-bundle.pem:ro' in teslamate_test_compose.teslamate.volumes"
+          - "'/srv/teslamate/global-bundle.pem:/etc/ssl/certs/aws-rds-global-bundle.pem:ro' in teslamate_test_compose.services.teslamate.volumes"
           - teslamate_database_password not in teslamate_test_compose_output
           - teslamate_encryption_key not in teslamate_test_compose_output
           - teslamate_grafana_admin_password not in teslamate_test_compose_output
