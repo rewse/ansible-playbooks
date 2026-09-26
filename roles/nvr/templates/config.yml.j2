@@ -76,3 +76,7 @@ logger:
   default: info
   logs:
     frigate.video: warning
+
+# Frigate migrates and rewrites a config whose version is older than its own
+# schema, so stating the schema of the running release keeps the file stable.
+version: {{ __nvr_image.version | regex_replace('^v?(\\d+\\.\\d+).*$', '\\1') }}-0

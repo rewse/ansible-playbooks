@@ -1,0 +1,44 @@
+{{ ansible_managed | comment }}
+name: nvr
+
+services:
+  frigate:
+    container_name: frigate
+    image: {{ __nvr_image.ref }}
+    ports:
+      - "8971:8971"
+      - "8554:8554"
+      # Port 5000 has no authentication at all, so it is bound to the
+      # loopback address: the Home Assistant integration reaches it over
+      # host networking, and nothing off the host can. Using it avoids
+      # storing the admin password of 8971, which the web UI can change
+      # out from under Ansible.
+      - "127.0.0.1:5000:5000"
+    volumes:
+      - /srv/nvr:/config
+      # The long form because create_host_path has to be off. Docker
+      # creates a missing bind source rather than failing, so a start
+      # before the volume is mounted binds an empty directory on the root
+      # filesystem: recordings land there and nothing on Bay 1 is ever
+      # expired, with no failure to look at. Refusing to start is louder.
+      - type: bind
+        source: {{ nvr_media_dir }}
+        target: /media/frigate
+        bind:
+          create_host_path: false
+      - /etc/localtime:/etc/localtime:ro
+      - type: tmpfs
+        target: /tmp/cache
+        tmpfs:
+          size: {{ nvr_cache_size }}
+    environment:
+      - FRIGATE_RTSP_USER={{ nvr_rtsp_username }}
+      - FRIGATE_RTSP_PASSWORD={{ nvr_rtsp_password }}
+      - FRIGATE_MQTT_USER={{ nvr_mqtt_username }}
+      - FRIGATE_MQTT_PASSWORD={{ nvr_mqtt_password }}
+    # 1920x1088 needs 60 MB per camera by the documented formula
+    # ((w * h * 1.5 * 20 + 270480) / 1048576), plus 40 MB for logs.
+    shm_size: {{ nvr_shm_size }}
+    mem_limit: {{ nvr_mem_limit }}
+    stop_grace_period: 30s
+    restart: unless-stopped
