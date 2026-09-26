@@ -1,37 +1,59 @@
 ---
 - name: container | Resolve aged image
-  ansible.builtin.include_role:
-    # Nested path until docker_quarantine is flattened with the cooldown rework.
-    name: docker/quarantine  # noqa: role-name[path]
-    # Tags on a dynamic include select only the include itself; apply passes them
-    # to the included tasks so --tags filebrowser_container or update runs them.
-    apply:
-      tags:
-        - filebrowser
-        - filebrowser_container
-        - update
-  vars:
-    quarantine_repo: ghcr.io/gtsteffaniak/filebrowser
+  ansible.builtin.set_fact:
     # Only the stable line. The project ships beta and preview tags from the same
     # repository, and v2 is still on preview releases. The suffix is part of the
     # tag rather than a variant, so it has to be matched rather than stripped.
-    quarantine_tag_pattern: '^\d+\.\d+\.\d+-stable$'
+    __filebrowser_image: >-
+      {{ lookup('aged_release', 'oci:ghcr.io/gtsteffaniak/filebrowser',
+                pattern='^\d+\.\d+\.\d+-stable$',
+                platform='linux/' ~ ('arm64' if ansible_facts['architecture'] == 'aarch64' else 'amd64')) }}
 
-- name: container | Add service to compose
+- name: container | Create compose directory
+  ansible.builtin.file:
+    path: /etc/compose/filebrowser
+    state: directory
+    mode: "0755"
+
+- name: container | Deploy compose file
+  ansible.builtin.template:
+    src: compose.yaml.j2
+    dest: /etc/compose/filebrowser/compose.yaml
+    mode: "0644"
+  register: __filebrowser_compose
+
+# The container kept its name when it moved out of the shared /etc project, so
+# the old one has to go before the new project can create it. These run before
+# the start, against the usual order, and can be deleted once every host has
+# converged.
+- name: container | Read legacy container
+  community.docker.docker_container_info:
+    name: filebrowser
+  register: __filebrowser_legacy
+
+- name: container | Remove legacy container
+  community.docker.docker_container:
+    name: filebrowser
+    state: absent
+  when:
+    - __filebrowser_legacy.exists
+    - __filebrowser_legacy.container.Config.Labels['com.docker.compose.project'] | default('') == 'etc'
+
+- name: container | Remove legacy compose block
   ansible.builtin.blockinfile:
     path: /etc/compose.yml
     marker: "# {mark} ANSIBLE MANAGED BLOCK filebrowser"
-    # Kept in a template rather than written inline because the volume list is
-    # generated from filebrowser_sources, and a Jinja loop inside a YAML literal
-    # block ends the block at the first unindented line.
-    block: "{{ lookup('template', 'compose.yml.j2') }}"
-  notify: Restart filebrowser
-  when: docker_quarantine_image_ref | default('') | length > 0
+    state: absent
+
+- name: container | Report skipped start in check mode
+  ansible.builtin.debug:
+    msg: Start skipped because the compose file is not written in check mode
+    verbosity: 0
+  when: ansible_check_mode and __filebrowser_compose is changed
 
 - name: container | Start container
   community.docker.docker_compose_v2:
-    project_src: /etc
-    services: filebrowser
+    project_src: /etc/compose/filebrowser
     state: present
     pull: missing
-  when: docker_quarantine_image_ref | default('') | length > 0
+  when: not (ansible_check_mode and __filebrowser_compose is changed)

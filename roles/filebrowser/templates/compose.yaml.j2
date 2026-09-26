@@ -1,6 +1,10 @@
+{{ ansible_managed | comment }}
+name: filebrowser
+
+services:
   filebrowser:
     container_name: filebrowser
-    image: {{ docker_quarantine_image_ref }}
+    image: {{ __filebrowser_image.ref }}
     # Reached only through the Apache vhost, which terminates TLS and is the only
     # place a client can arrive from.
     ports:

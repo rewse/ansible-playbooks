@@ -11,8 +11,5 @@
 
 - name: Restart filebrowser
   community.docker.docker_compose_v2:
-    project_src: /etc
-    services: filebrowser
+    project_src: /etc/compose/filebrowser
     state: restarted
-    pull: always
-    recreate: always

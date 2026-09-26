@@ -38,6 +38,15 @@
     - docker_docker
     - docker_docker_config
 
+- name: "docker : Create compose directory"
+  ansible.builtin.file:
+    path: /etc/compose
+    state: directory
+    mode: "0755"
+  tags:
+    - docker
+    - docker_docker
+
 - name: "docker : Create compose.yml"
   ansible.builtin.file:
     path: /etc/compose.yml
