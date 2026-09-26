@@ -2,31 +2,104 @@
 
 ## Ansible Conventions
 
-### Roles and Tasks
+`roles/filebrowser` is the reference implementation of these rules. Roles not yet migrated still have entries in `.ansible-lint-ignore`; migrate a role by making it lint-clean and deleting its lines there.
 
-- Place related roles in nested directories when the hierarchy is meaningful, such as `zabbix/agent/ubuntu`.
-- Name tasks `"{submodule} : {Description}"`; keep the submodule lowercase and start the description with a capital letter.
-- Store role-specific variables in `roles/<role>/vars/main.yml` and shared inventory values in `group_vars/<group>/vars`.
+### Update Policy
+
+- Upgrade OS package managers (apt, brew) and their official repositories to the latest version on every run, in the OS role's final `upgrade.yml`.
+- Resolve third-party container images, GitHub releases, git repositories, and Home Assistant custom components at run time to the newest release published at least `supply_chain_cooldown_days` days ago. Track release tags rather than branches; for a repository without tags, use the newest commit that old.
+- Track the default branch of repositories owned by this account without a cooldown.
+- Pin a version only as an exception: define `<role>_<component>_version` and state the reason in a comment. Do not otherwise keep versions in variables.
+
+### Role Design
+
+- Write one playbook per host type, one role per function, and one `tasks/<component>.yml` per component.
+- Keep in an OS role (`ubuntu`, `darwin`) or platform role (`raspberrypi`, `ec2`) only configuration that is meaningful on that OS or platform alone, such as timezone, ssh, sysctl, journald, swap, and the package list.
+- Promote a component to its own role when it is used by more than one OS or host type, when it is an application or service with its own configuration, handlers, or version lifecycle, or when it no longer fits in one task file.
+- Express differences between host types as inventory data (for example `darwin_extra_packages`) or as separate roles in the type's playbook, not as per-type roles.
+
+### Platform Differences
+
+- When only values differ (package names, paths, service names), load `vars/<distribution>.yml` from `tasks/set_vars.yml`.
+- When steps differ slightly, include `tasks/<variant>.yml` selected by a fact or an inventory variable such as `zabbix_agent_platform`. Never select by inventory group name.
+- When the implementations are unrelated, write separate roles.
+- Name an OS by its lowercase Ansible fact: `distribution` for Linux (`ubuntu`) and `system` for macOS (`darwin`, never `macos`). Name hardware and clouds (`raspberrypi`, `ec2`) as platforms, distinct from OS names.
+
+### Role Names
+
+- Use flat snake_case matching `^[a-z][a-z0-9_]*$`, with no nested role directories and no hyphens. Express hierarchy with a prefix, such as `zabbix_server` or `postfix_client`. Nested roles are resolved by their last directory name, which breaks variable prefixes.
+- Name a role that installs and configures one product after the product (`mosquitto`, `restic`). Name a role that combines several products for one purpose after the function (`nas`, `nvr`, `sslcert`).
+- Playbook file names use hyphens (`darwin-personal.yml`).
+
+### Task Names
+
+- Write every task, handler, and play name in the imperative with a leading capital, without the role name; Ansible prefixes the role name in its output.
+- Keep `tasks/main.yml` to `ansible.builtin.import_tasks` lines, one per component file.
+- Prefix task names in a component file with the component name: `container | Resolve aged image`. Name components after what they manage and never repeat the role name.
+- Put Jinja only at the end of a name.
 
 ### Tags
 
-- Write tags as an indented YAML list.
-- Include the applicable role, operation (`init`, `install`, `config`, or `update`), component, and composite tags such as `{role}_{component}` and `{role}_{component}_{operation}`.
-- Make every advertised granular tag independently runnable by including its prerequisite directory, checkout, and configuration tasks.
+Use only these tags, written as an indented YAML list:
+
+| Tag | Where | Purpose |
+|---|---|---|
+| Role name | On the role in the playbook | Run or skip one role |
+| `<role>_<component>` | On the `import_tasks` in `tasks/main.yml` | Run one component |
+| `update` | On the `import_tasks` of components that resolve or apply new versions, and on `upgrade.yml` | Run updates only |
+
+- Make every component file self-contained, including its prerequisite directories, checkouts, and configuration, so each tag runs alone.
+- Tag the whole component with `update`, not just the version lookup, so the resolved version is also applied.
+- Use `always` only for `set_vars.yml` and fact setup. Do not add operation tags such as `install` or `config`.
 
 ```yaml
-tags:
-  - raspberrypi
-  - config
-  - ntp
-  - raspberrypi_ntp
-  - raspberrypi_ntp_config
+- name: Import container tasks
+  ansible.builtin.import_tasks: container.yml
+  tags:
+    - filebrowser_container
+    - update
 ```
 
-### Idempotency
+### Ordering
 
-- Notify restart handlers only when managed content changes.
-- Keep check mode non-mutating. If a dry-run checkout does not create the source needed by a deployment task, skip that deployment and report why.
+- In a playbook, order roles by tier (OS, platform, cross-OS tools, services) and alphabetically within a tier. Declare real ordering dependencies in `meta/main.yml`.
+- In `tasks/main.yml`, import `set_vars.yml` and fact setup first, then components in dependency order and otherwise alphabetically; an OS role ends with `upgrade.yml`.
+- In a component file, order tasks as prerequisites, version resolution, installation, configuration, service enablement, and removal of legacy state.
+- Restart services through handlers. Add `meta: flush_handlers` only when a later component needs the restarted service.
+- Delete a legacy-removal task (`state: absent`) once every host has converged.
+
+### Variables
+
+| Location | Contents |
+|---|---|
+| Inline in the task | A value used by one task and clear in place, such as `mode` |
+| `vars/main.yml` | Constants identical on every host: values used more than once, lists, URLs, ports, UIDs, and Secret References |
+| `vars/<distribution>.yml` | Constants that differ by OS |
+| `defaults/main.yml` | Inputs the inventory may override; list inputs without a meaningful default commented out |
+| Inventory `group_vars` / `host_vars` | Desired state per group or host, one file per role |
+| `group_vars/all/` | Site-wide shared values |
+
+- Prefix every variable a role defines with the role name. Prefix `register` and `set_fact` results with `__<role>_`.
+- Only these shared values in `group_vars/all/` go without a prefix: `admin`, `email`, `global_ip`, `ipv6`, and `supply_chain_cooldown_days`. Give a new shared value a specific name (`local_network`, not `local`) and add it here.
+- Put a Secret Reference in the role's `vars/main.yml` when it is the same on every host and in the inventory when it differs.
+- Do not use play vars, `include_vars` outside `set_vars.yml`, or extra vars for desired state.
+
+### Quality
+
+- Keep check mode non-mutating and free of failures. If a dry-run checkout does not create the source a later task needs, skip that task and report why.
+- Make a second run report `changed=0`. Notify restart handlers only when managed content changes.
+- Use `command` or `shell` only when no module exists, state why in a comment, and always set `changed_when`.
+- Pass package lists to the package module at once instead of looping over `item`.
+- Use `set_fact` only when a value must be computed at run time.
+- Use `template` for files the role owns entirely; reserve `lineinfile` for one-line edits to system files.
+- Start every template with `{{ ansible_managed | comment }}`. Do not use `backup: true`.
+- Give every `debug` a `verbosity`.
+
+### Lint
+
+- Lint with ansible-lint only, through pre-commit (`uvx pre-commit run --all-files`) locally and in CI. `.yamllint` configures ansible-lint's `yaml` rule; do not run yamllint separately.
+- `roles/homeassistant/files/` is excluded from lint.
+- Do not add entries to `.ansible-lint-ignore` for new code.
 
 ## Repository Operations
 

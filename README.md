@@ -104,12 +104,17 @@ ansible-playbook site.yml --limit "fox.rewse.jp"
 
 #### Run with specific tags
 
-```bash
-# Ubuntu basic configuration and package installation only
-ansible-playbook ubuntu.yml --tags ubuntu,package
+Tags follow the rules in `AGENTS.md`: a role-name tag, a `<role>_<component>` tag per component, and `update` for version updates.
 
-# Docker related only
-ansible-playbook site.yml --tags docker
+```bash
+# One role
+ansible-playbook ubuntu.yml --tags ubuntu
+
+# One component of a role
+ansible-playbook singleton_int1.yml --tags filebrowser_container
+
+# Package upgrades and new third-party releases only
+ansible-playbook site.yml --tags update
 ```
 
 #### Check mode (dry run)
@@ -134,36 +139,20 @@ Hosts are classified into the following groups:
 
 ## Variable Management
 
-### Group Variables
+`AGENTS.md` defines where each kind of variable belongs. In short:
 
-Group-specific variables are placed in the `group_vars/<group_name>/` directory:
+- `group_vars/all/`: A short list of site-wide shared values
+- `group_vars/<group>/`: Desired state per group
+- `roles/<role>/defaults/main.yml`: Role inputs the inventory may override
+- `roles/<role>/vars/main.yml`: Role constants
 
-- `vars`: Regular variables and references to 1Password secrets using `lookup('pipe', 'op read ...')`
-
-### Role Variables
-
-Role-specific variables are defined in each role's `vars/main.yml`.
-
-## Using Tags
-
-For efficient execution, tasks are tagged appropriately:
-
-```bash
-# Example: Ubuntu basic configuration only
-ansible-playbook ubuntu.yml --tags ubuntu
-
-# Example: Package installation only
-ansible-playbook ubuntu.yml --tags package
-
-# Example: Docker related only
-ansible-playbook site.yml --tags docker
-```
+Secrets live in the 1Password `ansible` vault. Commit only Secret References that point to item IDs, never secret values.
 
 ## Best Practices
 
-1. **Verify before changes**: Use the `--check` option before applying to production
+1. **Verify before changes**: Use `--check --diff` before applying to a live host
 2. **Utilize tags**: Use tags to execute only necessary parts
-3. **Use 1Password**: Always store sensitive information in 1Password and reference via `lookup('pipe', 'op read ...')`
+3. **Use 1Password**: Store sensitive information in 1Password and commit only Secret References
 4. **Gradual application**: Test large changes on specific hosts first
-5. **Check logs**: Review logs after execution to ensure no issues
-
+5. **Check results**: Judge a run by its exit code, and confirm a second run reports `changed=0`
+6. **Lint**: Run `uvx pre-commit run --all-files` before committing

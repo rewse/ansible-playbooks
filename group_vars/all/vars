@@ -10,3 +10,5 @@ ipv6:
   aws: 2406:da14:b2b:e400::/56
   home: 240f:143:f60c:1::/64
   home_ula: fd20:2400:ab3d:5b1e::/64
+# Minimum age in days of a third-party release before a run adopts it.
+supply_chain_cooldown_days: 4
