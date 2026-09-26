@@ -12,6 +12,7 @@
 
 - name: "enecoq-data-fetcher : Install/update chromium via playwright"
   ansible.builtin.command: npx playwright install chromium --force
+  environment: "{{ supply_chain_cooldown_environment }}"
   changed_when: false
   tags:
     - enecoq-data-fetcher

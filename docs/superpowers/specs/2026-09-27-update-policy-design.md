@@ -20,7 +20,7 @@ AGENTS.md の Update Policy は、サードパーティのものを公開から 
 |---|---|---|
 | apt、brew | なし | 既存の OS ロールの `upgrade.yml` |
 | GitHub 以外の配布元、公式のインストーラ | なし | 配布元の最新版の URL、apt、各ツールの自己更新 |
-| npm、PyPI | `supply_chain_cooldown_days` 日 | chezmoi が管理する npmrc と uv.toml |
+| npm、PyPI | `supply_chain_cooldown_days` 日 | npm と uv のタスクに渡す環境変数（`NPM_CONFIG_BEFORE`、`UV_EXCLUDE_NEWER`） |
 | コンテナイメージ、GitHub の git と Release（HA の git コンポーネントを含む） | `supply_chain_cooldown_days` 日 | lookup プラグイン `aged_release` |
 | 自分のリポジトリとパッケージ | なし | デフォルトブランチを追う、または cooldown の除外設定 |
 
@@ -155,11 +155,11 @@ Oracle と SCT は、URL がすべて HTTP 200 を返すことを 2026-09-27 に
 
 ## npm と uv
 
-- npm と uv の cooldown は chezmoi リポジトリ（`rewse/chezmoi`）が持つ。ふだんの手動のインストールと Ansible からの実行で同じ設定を使うためである
-- chezmoi の `dot_config/npm/npmrc` に `min-release-age=4` を足す。自分のパッケージがあれば `min-release-age-exclude` で外す
-- chezmoi の `dot_config/uv/uv.toml` は既に `exclude-newer = "4 days"` を持つ。`enecoq-data-fetcher` は自分のパッケージなので、`exclude-newer-package` で cooldown から外す
-- npm は `NPM_CONFIG_USERCONFIG` がないと `~/.config/npm/npmrc` を読まない。この環境変数は `.zshenv` で設定されており、Ansible の実行では読まれない。npm を動かすタスクには `environment` で `NPM_CONFIG_USERCONFIG: "{{ ansible_env.HOME }}/.config/npm/npmrc"` を渡す
-- chezmoi の日数は `supply_chain_cooldown_days` と揃える。この対応を AGENTS.md に書く
+Ansible が動かす npm と uv の cooldown は Ansible が持つ。共有値 `supply_chain_cooldown_environment` に、今から `supply_chain_cooldown_days` 日前の UTC の日時を `NPM_CONFIG_BEFORE` と `UV_EXCLUDE_NEWER` として定義し、npm と uv を動かすタスクに `environment` で渡す。
+
+- 相対の指定（npm の `min-release-age`、uv の `"4 days"`）は使わない。Ubuntu のパッケージの npm 10 は `min-release-age` に対応せず、hosts の root が使う uv 0.9 は相対の期間を読めない。絶対の日時はどちらの版でも効く
+- chezmoi の設定は root に apply されておらず、Ansible の実行には効かない。chezmoi の npmrc と uv.toml は手で使うときの設定として残し、npmrc に `min-release-age=4` を足し、uv.toml で `enecoq-data-fetcher` を `exclude-newer-package` で除外する。日数は `supply_chain_cooldown_days` と揃える
+- `enecoq-data-fetcher` のようにサービスが実行時に `uvx` で動かすものは、そのユーザーの uv の設定に従う
 
 ## 公式のインストーラ
 
@@ -170,7 +170,7 @@ uv、kiro-cli、Claude Code、nix、deno、zinit は、インストール後も 
 ## 進め方
 
 1. lookup プラグインを作り、pytest を通す
-2. chezmoi の npmrc と uv.toml を直す（別リポジトリへの書き込みのため、実行前にユーザーの確認を取る）。Ansible の npm のタスクに `NPM_CONFIG_USERCONFIG` を渡す
+2. chezmoi の npmrc と uv.toml を直す（別リポジトリへの書き込みのため、実行前にユーザーの確認を取る）。Ansible の npm と uv のタスクに `supply_chain_cooldown_environment` を渡す
 3. compose をロールごとに切り替える。順は filebrowser、litellm、couchdb、teslamate、nvr、matter_server、homeassistant（fox）、homeassistant-ha/secondary（hotel）。Matter と HA は続けて行う。各ロールの反映はユーザーの確認を取ってから行う。最後に docker ロールを直し、`/etc/compose.yml` と `docker/quarantine` を消す
 4. git と Release を lookup に置き換える。HA のコンポーネント、ubuntu、raspberrypi、darwin、power_monitor、zabbix、desktop、database の順
 5. GitHub 以外の配布元とインストーラを最新版にする
@@ -189,7 +189,7 @@ uv、kiro-cli、Claude Code、nix、deno、zinit は、インストール後も 
 
 AGENTS.md に次を反映する。
 
-- Update Policy: 解決は `aged_release` の lookup で行い、digest、sha256、SHA で固定する。npm と uv の cooldown は chezmoi が持ち、日数を `supply_chain_cooldown_days` と揃える。GitHub 以外の配布元とインストーラは固定せず最新版にする
+- Update Policy: 解決は `aged_release` の lookup で行い、digest、sha256、SHA で固定する。Ansible の npm と uv のタスクには `supply_chain_cooldown_environment` を渡す。chezmoi の手動用の設定も日数を `supply_chain_cooldown_days` と揃える。GitHub 以外の配布元とインストーラは固定せず最新版にする
 - インストール方法: 配布元の公式のインストール方法を優先し、使えないときだけ別の方法を使って理由をコメントに書く
 - 置き場所: `/usr/local/src/<name>`、`/opt/<name>`、`/srv/<role>`、`/etc/compose/<role>/compose.yaml`
 - filebrowser を新しい形に直し、引き続き見本とする

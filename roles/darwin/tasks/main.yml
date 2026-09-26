@@ -197,6 +197,7 @@
 
 - name: "package: Install global npm packages"
   ansible.builtin.command: npm install -g {{ item }}
+  environment: "{{ supply_chain_cooldown_environment }}"
   changed_when: false
   loop:
     - "@aikidosec/safe-chain"
@@ -212,6 +213,7 @@
 
 - name: "package : Install package by uv"
   ansible.builtin.command: uv tool install {{ item }}
+  environment: "{{ supply_chain_cooldown_environment }}"
   changed_when: false
   loop:
     # Web search through a Bedrock AgentCore Gateway, signed with local AWS
@@ -257,6 +259,7 @@
 
 - name: "package : Update npm"
   ansible.builtin.command: npm install -g npm@latest
+  environment: "{{ supply_chain_cooldown_environment }}"
   changed_when: false
   tags:
     - ubuntu
@@ -267,6 +270,7 @@
 
 - name: "package : Update global npm packages"
   ansible.builtin.command: npm update -g
+  environment: "{{ supply_chain_cooldown_environment }}"
   changed_when: false
   tags:
     - darwin
@@ -277,6 +281,7 @@
 
 - name: "package : Upgrade all uv tools"
   ansible.builtin.command: uv tool upgrade --all
+  environment: "{{ supply_chain_cooldown_environment }}"
   changed_when: false
   tags:
     - darwin

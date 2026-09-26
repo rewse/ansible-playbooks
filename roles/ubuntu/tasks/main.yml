@@ -360,6 +360,7 @@
 
 - name: "uv : Install package by uv"
   ansible.builtin.command: uv tool install {{ item }}
+  environment: "{{ supply_chain_cooldown_environment }}"
   changed_when: false
   loop:
     # Web search through a Bedrock AgentCore Gateway, signed with local AWS
@@ -378,6 +379,7 @@
 
 - name: "uv : Upgrade all uv tools"
   ansible.builtin.command: uv tool upgrade --all
+  environment: "{{ supply_chain_cooldown_environment }}"
   changed_when: false
   tags:
     - ubuntu
@@ -758,6 +760,7 @@
 
 - name: "skills : Install"
   ansible.builtin.command: npm install -g skills
+  environment: "{{ supply_chain_cooldown_environment }}"
   changed_when: false
   tags:
     - ubuntu
@@ -768,6 +771,7 @@
 
 - name: "agent-browser : Install"
   ansible.builtin.command: npm install -g agent-browser
+  environment: "{{ supply_chain_cooldown_environment }}"
   changed_when: false
   tags:
     - ubuntu
@@ -799,6 +803,7 @@
 
 - name: "package : Update global npm packages"
   ansible.builtin.command: npm update -g
+  environment: "{{ supply_chain_cooldown_environment }}"
   changed_when: false
   tags:
     - ubuntu

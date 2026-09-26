@@ -55,8 +55,7 @@
 - name: "mcp : Install package"
   ansible.builtin.command:
     cmd: uv pip install /opt/zabbix-mcp/src
-  environment:
-    VIRTUAL_ENV: /opt/zabbix-mcp/venv
+  environment: "{{ supply_chain_cooldown_environment | combine({'VIRTUAL_ENV': '/opt/zabbix-mcp/venv'}) }}"
   changed_when: false
   notify: "zabbix-mcp-server: Restart"
   tags:

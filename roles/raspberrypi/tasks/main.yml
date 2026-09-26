@@ -399,6 +399,7 @@
     name: "@qwen-code/qwen-code@latest"
     global: true
     state: present
+  environment: "{{ supply_chain_cooldown_environment }}"
   tags:
     - raspberrypi
     - install

@@ -12,3 +12,8 @@ ipv6:
   home_ula: fd20:2400:ab3d:5b1e::/64
 # Minimum age in days of a third-party release before a run adopts it.
 supply_chain_cooldown_days: 4
+# Environment for npm and uv tasks: both refuse releases newer than the cutoff.
+# An absolute timestamp works with every npm and uv version on the hosts.
+supply_chain_cooldown_environment:
+  NPM_CONFIG_BEFORE: "{{ '%Y-%m-%dT%H:%M:%SZ' | strftime(now().timestamp() - supply_chain_cooldown_days * 86400, utc=true) }}"
+  UV_EXCLUDE_NEWER: "{{ '%Y-%m-%dT%H:%M:%SZ' | strftime(now().timestamp() - supply_chain_cooldown_days * 86400, utc=true) }}"

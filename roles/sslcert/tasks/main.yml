@@ -37,8 +37,7 @@
     certbot
     certbot-apache
     certbot-dns-route53
-  environment:
-    VIRTUAL_ENV: /opt/certbot
+  environment: "{{ supply_chain_cooldown_environment | combine({'VIRTUAL_ENV': '/opt/certbot'}) }}"
   changed_when: false
   tags:
     - sslcert
