@@ -1,0 +1,16 @@
+{{ ansible_managed | comment }}
+name: couchdb
+
+services:
+  couchdb:
+    container_name: couchdb
+    image: {{ __couchdb_image.ref }}
+    ports:
+      - "5984:5984"
+    volumes:
+      - /srv/couchdb/data:/opt/couchdb/data
+      - /srv/couchdb/etc/local.d:/opt/couchdb/etc/local.d
+    environment:
+      - COUCHDB_USER=tats
+      - COUCHDB_PASSWORD={{ couchdb_password }}
+    restart: unless-stopped
