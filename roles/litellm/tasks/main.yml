@@ -24,68 +24,100 @@
     - litellm_litellm
     - litellm_litellm_config
 
-- name: "docker : Resolve quarantined image"
-  ansible.builtin.include_role:
-    name: docker/quarantine
-    apply:
-      tags:
-        - litellm
-        - update
-        - docker
-        - quarantine
-        - litellm_docker
-        - litellm_docker_update
-  vars:
-    quarantine_repo: ghcr.io/berriai/litellm
+- name: "docker : Resolve aged image"
+  ansible.builtin.set_fact:
     # Upstream publishes no -stable tags; rc, dev and nightly must stay out.
-    quarantine_tag_pattern: '^v\d+\.\d+\.\d+$'
+    __litellm_image: >-
+      {{ lookup('aged_release', 'oci:ghcr.io/berriai/litellm', pattern='^v\d+\.\d+\.\d+$',
+                platform='linux/' ~ ('arm64' if ansible_facts['architecture'] == 'aarch64' else 'amd64')) }}
   tags:
     - litellm
     - update
     - docker
-    - quarantine
     - litellm_docker
-    - litellm_docker_update
 
-- name: "docker : Add LiteLLM service to compose"
+- name: "docker : Create compose directory"
+  ansible.builtin.file:
+    path: /etc/compose/litellm
+    state: directory
+    mode: "0755"
+  tags:
+    - litellm
+    - update
+    - docker
+    - litellm_docker
+
+- name: "docker : Deploy compose file"
+  ansible.builtin.template:
+    src: compose.yaml.j2
+    dest: /etc/compose/litellm/compose.yaml
+    mode: "0640"
+  # Carries credentials in the environment, so no diff.
+  diff: false
+  register: __litellm_compose
+  tags:
+    - litellm
+    - update
+    - docker
+    - litellm_docker
+
+# The container kept its name when it moved out of the shared /etc project, so
+# the old one has to go before the new project can create it. These run before
+# the start, against the usual order, and can be deleted once every host has
+# converged.
+- name: "docker : Read legacy container litellm"
+  community.docker.docker_container_info:
+    name: litellm
+  register: __litellm_legacy_litellm
+  tags:
+    - litellm
+    - update
+    - docker
+    - litellm_docker
+
+- name: "docker : Remove legacy container litellm"
+  community.docker.docker_container:
+    name: litellm
+    state: absent
+  when:
+    - __litellm_legacy_litellm.exists
+    - __litellm_legacy_litellm.container.Config.Labels['com.docker.compose.project'] | default('') == 'etc'
+  tags:
+    - litellm
+    - update
+    - docker
+    - litellm_docker
+
+- name: "docker : Remove legacy compose block litellm"
   ansible.builtin.blockinfile:
     path: /etc/compose.yml
     marker: "# {mark} ANSIBLE MANAGED BLOCK litellm"
-    block: |2
-        litellm:
-          container_name: litellm
-          image: {{ docker_quarantine_image_ref }}
-          ports:
-            - "4000:4000"
-          volumes:
-            - /srv/litellm/config.yml:/app/config.yml:ro
-          environment:
-            - AWS_ACCESS_KEY_ID={{ litellm_aws_access_key_id }}
-            - AWS_SECRET_ACCESS_KEY={{ litellm_aws_secret_access_key }}
-            - AWS_REGION_NAME=us-east-1
-            - LITELLM_MASTER_KEY={{ litellm_master_key }}
-            - LITELLM_SALT_KEY={{ litellm_salt_key }}
-          restart: unless-stopped
-          command: ["--config", "/app/config.yml", "--port", "4000"]
-  notify: "litellm: Restart"
-  when: docker_quarantine_image_ref | length > 0
-  tags:
-    - litellm
-    - config
-    - docker
-    - litellm_docker
-    - litellm_docker_config
-
-- name: "docker : Pull and update container"
-  community.docker.docker_compose_v2:
-    project_src: /etc
-    services: litellm
-    state: present
-    pull: missing
-  when: docker_quarantine_image_ref | length > 0
+    state: absent
   tags:
     - litellm
     - update
     - docker
     - litellm_docker
-    - litellm_docker_update
+
+- name: "docker : Report skipped start in check mode"
+  ansible.builtin.debug:
+    msg: Start skipped because the compose file is not written in check mode
+    verbosity: 0
+  when: ansible_check_mode and __litellm_compose is changed
+  tags:
+    - litellm
+    - update
+    - docker
+    - litellm_docker
+
+- name: "docker : Start containers"
+  community.docker.docker_compose_v2:
+    project_src: /etc/compose/litellm
+    state: present
+    pull: missing
+  when: not (ansible_check_mode and __litellm_compose is changed)
+  tags:
+    - litellm
+    - update
+    - docker
+    - litellm_docker

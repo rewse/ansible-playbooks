@@ -1,8 +1,5 @@
 ---
 - name: "litellm: Restart"
   community.docker.docker_compose_v2:
-    project_src: /etc
-    services: litellm
+    project_src: /etc/compose/litellm
     state: restarted
-    pull: always
-    recreate: always
