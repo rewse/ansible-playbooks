@@ -17,4 +17,7 @@ jobs:
       - uses: astral-sh/setup-uv@c18668ad3cf93ea998bef934396af7bb5c839dc7  # v10.2.0
 
       # Same hooks and versions as local commits, so CI and pre-commit agree.
-      - run: uvx pre-commit run --all-files --show-diff-on-failure
+      # pre-commit-uv builds hook environments with uv, which finds the
+      # uv-managed Python that uvx runs on; plain virtualenv looks for it on PATH
+      # and fails on the runner.
+      - run: uvx --with pre-commit-uv==4.3.0 pre-commit@4.6.2 run --all-files --show-diff-on-failure
