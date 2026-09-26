@@ -1,8 +1,0 @@
----
-- hosts: raspberrypi
-  become: true
-  remote_user: ubuntu
-  roles:
-    - raspberrypi
-    - mhz19
-    - zabbix/agent/raspberrypi

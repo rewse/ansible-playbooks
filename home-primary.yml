@@ -1,0 +1,84 @@
+---
+- name: Configure home primary
+  hosts: home_primary
+  become: true
+  remote_user: ubuntu
+  roles:
+    - role: ubuntu
+      tags:
+        - ubuntu
+    - role: raspberrypi
+      tags:
+        - raspberrypi
+    - role: chezmoi
+      tags:
+        - chezmoi
+    - role: postfix/client
+      tags:
+        - postfix_client
+    - role: zabbix/agent/ubuntu
+      tags:
+        - zabbix_agent
+    - role: zabbix/agent/raspberrypi
+      tags:
+        - zabbix_agent
+    - role: mhz19
+      tags:
+        - mhz19
+    - role: autodiscover
+      tags:
+        - autodiscover
+    - role: couchdb
+      tags:
+        - couchdb
+    - role: docker
+      tags:
+        - docker
+    - role: enecoq_data_fetcher
+      tags:
+        - enecoq_data_fetcher
+    - role: filebrowser
+      tags:
+        - filebrowser
+    - role: homeassistant
+      tags:
+        - homeassistant
+    - role: homeassistant-ha/primary
+      tags:
+        - homeassistant_ha_primary
+    - role: httpd
+      tags:
+        - httpd
+    - role: litellm
+      tags:
+        - litellm
+    - role: lmstudio
+      tags:
+        - lmstudio
+    - role: matter_server
+      tags:
+        - matter_server
+    - role: mosquitto
+      tags:
+        - mosquitto
+    - role: nas
+      tags:
+        - nas
+    - role: nvr
+      tags:
+        - nvr
+    - role: syslogd
+      tags:
+        - syslogd
+    - role: teslamate
+      tags:
+        - teslamate
+    - role: zabbix/server
+      tags:
+        - zabbix_server
+    - role: zabbix/mcp
+      tags:
+        - zabbix_mcp
+    - role: zabbix/money/market
+      tags:
+        - zabbix_money_market

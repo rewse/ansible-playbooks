@@ -1,7 +1,0 @@
----
-- hosts: singleton_int2
-  become: true
-  remote_user: ubuntu
-  roles:
-    - docker
-    - homeassistant-ha/secondary

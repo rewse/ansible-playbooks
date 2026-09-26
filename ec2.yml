@@ -1,7 +1,0 @@
----
-- hosts: ec2
-  become: true
-  remote_user: ubuntu
-  roles:
-    - ec2
-    - zabbix/agent/ec2

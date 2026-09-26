@@ -1,7 +1,9 @@
 ---
-- import_playbook: ubuntu.yml
-- import_playbook: ec2.yml
-- import_playbook: raspberrypi.yml
-- import_playbook: singleton_ext1.yml
-- import_playbook: singleton_int1.yml
-- import_playbook: singleton_int2.yml
+- name: Import cloud workstation
+  ansible.builtin.import_playbook: cloud-workstation.yml
+
+- name: Import home primary
+  ansible.builtin.import_playbook: home-primary.yml
+
+- name: Import home secondary
+  ansible.builtin.import_playbook: home-secondary.yml

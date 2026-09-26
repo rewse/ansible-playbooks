@@ -1,0 +1,36 @@
+---
+- name: Configure cloud workstation
+  hosts: cloud_workstation
+  become: true
+  remote_user: ubuntu
+  roles:
+    - role: ubuntu
+      tags:
+        - ubuntu
+    - role: ec2
+      tags:
+        - ec2
+    - role: chezmoi
+      tags:
+        - chezmoi
+    - role: postfix/client
+      tags:
+        - postfix_client
+    - role: zabbix/agent/ubuntu
+      tags:
+        - zabbix_agent
+    - role: zabbix/agent/ec2
+      tags:
+        - zabbix_agent
+    - role: desktop
+      tags:
+        - desktop
+    - role: database/client
+      tags:
+        - database_client
+    - role: database/client/gui
+      tags:
+        - database_client_gui
+    - role: zabbix/aws
+      tags:
+        - zabbix_aws

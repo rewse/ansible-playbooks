@@ -1,9 +1,0 @@
----
-- hosts: singleton_ext1
-  become: true
-  remote_user: ubuntu
-  roles:
-    - desktop
-    - database/client
-    - database/client/gui
-    - zabbix/aws
