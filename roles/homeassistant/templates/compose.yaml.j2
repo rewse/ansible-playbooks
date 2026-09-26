@@ -1,0 +1,19 @@
+{{ ansible_managed | comment }}
+name: homeassistant
+
+services:
+  homeassistant:
+    container_name: homeassistant
+    image: {{ __homeassistant_image.ref }}
+    devices:
+      - /dev/ttyUSB0:/dev/ttyUSB0
+    volumes:
+      - /dev/serial/by-id:/dev/serial/by-id
+      - /etc/localtime:/etc/localtime:ro
+      - /run/dbus:/run/dbus:ro
+      - /srv/homeassistant/config:/config
+    security_opt:
+      - apparmor:unconfined
+    network_mode: host
+    privileged: true
+    restart: unless-stopped

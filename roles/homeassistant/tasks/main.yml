@@ -34,71 +34,100 @@
     - homeassistant_certs
     - homeassistant_certs_config
 
-- name: "docker : Resolve quarantined image"
-  ansible.builtin.include_role:
-    name: docker/quarantine
-    apply:
-      tags:
-        - homeassistant
-        - update
-        - docker
-        - quarantine
-        - homeassistant_docker
-        - homeassistant_docker_update
-  vars:
-    quarantine_repo: ghcr.io/home-assistant/home-assistant
-    quarantine_tag_pattern: '^\d{4}\.\d+\.\d+$'
+- name: "docker : Resolve aged image"
+  ansible.builtin.set_fact:
+    __homeassistant_image: >-
+      {{ lookup('aged_release', 'oci:ghcr.io/home-assistant/home-assistant', pattern='^\d{4}\.\d+\.\d+$',
+                platform='linux/' ~ ('arm64' if ansible_facts['architecture'] == 'aarch64' else 'amd64')) }}
   tags:
     - homeassistant
     - update
     - docker
-    - quarantine
     - homeassistant_docker
-    - homeassistant_docker_update
 
-- name: "docker : Add compose service"
+- name: "docker : Create compose directory"
+  ansible.builtin.file:
+    path: /etc/compose/homeassistant
+    state: directory
+    mode: "0755"
+  tags:
+    - homeassistant
+    - update
+    - docker
+    - homeassistant_docker
+
+- name: "docker : Deploy compose file"
+  ansible.builtin.template:
+    src: compose.yaml.j2
+    dest: /etc/compose/homeassistant/compose.yaml
+    mode: "0644"
+  register: __homeassistant_compose
+  tags:
+    - homeassistant
+    - update
+    - docker
+    - homeassistant_docker
+
+# The container kept its name when it moved out of the shared /etc project, so
+# the old one has to go before the new project can create it. These run before
+# the start, against the usual order, and can be deleted once every host has
+# converged.
+- name: "docker : Read legacy container homeassistant"
+  community.docker.docker_container_info:
+    name: homeassistant
+  register: __homeassistant_legacy_homeassistant
+  tags:
+    - homeassistant
+    - update
+    - docker
+    - homeassistant_docker
+
+- name: "docker : Remove legacy container homeassistant"
+  community.docker.docker_container:
+    name: homeassistant
+    state: absent
+  when:
+    - __homeassistant_legacy_homeassistant.exists
+    - __homeassistant_legacy_homeassistant.container.Config.Labels['com.docker.compose.project'] | default('') == 'etc'
+  tags:
+    - homeassistant
+    - update
+    - docker
+    - homeassistant_docker
+
+- name: "docker : Remove legacy compose block homeassistant"
   ansible.builtin.blockinfile:
     path: /etc/compose.yml
     marker: "# {mark} ANSIBLE MANAGED BLOCK homeassistant"
-    block: |2
-        homeassistant:
-          container_name: homeassistant
-          image: {{ docker_quarantine_image_ref }}
-          devices:
-            - /dev/ttyUSB0:/dev/ttyUSB0
-          volumes:
-            - /dev/serial/by-id:/dev/serial/by-id
-            - /etc/localtime:/etc/localtime:ro
-            - /run/dbus:/run/dbus:ro
-            - /srv/homeassistant/config:/config
-          security_opt:
-            - apparmor:unconfined
-          network_mode: host
-          privileged: true
-          restart: unless-stopped
-  notify: "homeassistant: Restart"
-  when: docker_quarantine_image_ref | length > 0
-  tags:
-    - homeassistant
-    - config
-    - docker
-    - homeassistant_docker
-    - homeassistant_docker_config
-
-- name: "docker : Pull and update container"
-  community.docker.docker_compose_v2:
-    project_src: /etc
-    services: homeassistant
-    state: present
-    pull: missing
-  when: docker_quarantine_image_ref | length > 0
+    state: absent
   tags:
     - homeassistant
     - update
     - docker
     - homeassistant_docker
-    - homeassistant_docker_update
 
+- name: "docker : Report skipped start in check mode"
+  ansible.builtin.debug:
+    msg: Start skipped because the compose file is not written in check mode
+    verbosity: 0
+  when: ansible_check_mode and __homeassistant_compose is changed
+  tags:
+    - homeassistant
+    - update
+    - docker
+    - homeassistant_docker
+
+- name: "docker : Start containers"
+  community.docker.docker_compose_v2:
+    project_src: /etc/compose/homeassistant
+    state: present
+    pull: missing
+  when: not (ansible_check_mode and __homeassistant_compose is changed)
+  tags:
+    - homeassistant
+    - update
+    - docker
+    - homeassistant_docker
 # Ref: https://github.com/home-assistant/core/issues/117768
 - name: "apparmor : Download docker-default"
   ansible.builtin.get_url:
