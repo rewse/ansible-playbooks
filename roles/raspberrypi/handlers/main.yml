@@ -16,6 +16,7 @@
 
 - name: "ssh: Restart socket"
   ansible.builtin.systemd:
+    daemon_reload: true
     name: ssh.socket
     state: restarted
 
