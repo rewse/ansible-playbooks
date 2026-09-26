@@ -163,3 +163,14 @@ def test_lookup_caches_identical_calls(monkeypatch):
     second = lookup.run(["github-commit:o/r"], variables)
     assert first == second == [{"commit": "abc"}]
     assert len(run.calls) == 2
+
+
+def test_default_pattern_ignores_single_number_tags():
+    run = FakeRun({
+        "gh api repos/o/r/tags?per_page=100": [
+            {"name": "14", "commit": {"sha": "old"}},
+            {"name": "v4.2.1", "commit": {"sha": "new"}},
+        ],
+        "gh api repos/o/r/commits/new": {"commit": {"committer": {"date": iso(10)}}},
+    })
+    assert resolve("github-tag:o/r", run) == {"version": "v4.2.1", "commit": "new"}

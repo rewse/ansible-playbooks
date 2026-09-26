@@ -28,7 +28,7 @@ options:
     required: true
   pattern:
     description: Regular expression a tag must match.
-    default: '^v?\d+(\.\d+)*$'
+    default: '^v?\d+(\.\d+)+$'
   days:
     description: Minimum age in days. Defaults to supply_chain_cooldown_days.
     type: int
@@ -45,7 +45,7 @@ _raw:
   elements: dict
 """
 
-DEFAULT_PATTERN = r"^v?\d+(\.\d+)*$"
+DEFAULT_PATTERN = r"^v?\d+(\.\d+)+$"
 
 _CACHE: dict[tuple, dict] = {}
 _display = Display()
