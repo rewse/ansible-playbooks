@@ -17,7 +17,7 @@
 - Keep in an OS role (`ubuntu`, `darwin`) or platform role (`raspberrypi`, `ec2`) only configuration that is meaningful on that OS or platform alone, such as timezone, ssh, sysctl, journald, swap, and the package list.
 - Promote a component to its own role when it is used by more than one OS or host type, when it is an application or service with its own configuration, handlers, or version lifecycle, or when it no longer fits in one task file.
 - Express differences between host types as inventory data (for example `darwin_extra_packages`) or as separate roles in the type's playbook, not as per-type roles.
-- When a role on fox or hotel publishes a service that requires a login, give it a `fail2ban` component with a filter and a jail for that service, as `roles/filebrowser` does.
+- When a role publishes a service that requires a login, give it a `fail2ban` component with a filter and a jail for that service, as `roles/filebrowser` does.
 
 ### Platform Differences
 
