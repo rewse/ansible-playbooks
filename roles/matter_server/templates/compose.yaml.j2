@@ -1,0 +1,14 @@
+{{ ansible_managed | comment }}
+name: matter_server
+
+services:
+  matter-server:
+    container_name: matter-server
+    image: {{ __matter_server_image.ref }}
+    volumes:
+      - /run/dbus:/run/dbus:ro
+      - /srv/matter-server/data:/data
+    security_opt:
+      - apparmor:unconfined
+    network_mode: host
+    restart: unless-stopped

@@ -1,8 +1,7 @@
 ---
 - name: "matter-server: Restart"
   community.docker.docker_compose_v2:
-    project_src: /etc
-    services: matter-server
+    project_src: /etc/compose/matter_server
     state: restarted
-    pull: always
-    recreate: always
+  # The project directory may not exist yet in check mode.
+  when: not ansible_check_mode
