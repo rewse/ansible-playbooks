@@ -1,0 +1,37 @@
+---
+- name: container | Resolve aged image
+  ansible.builtin.include_role:
+    # Nested path until docker_quarantine is flattened with the cooldown rework.
+    name: docker/quarantine  # noqa: role-name[path]
+    # Tags on a dynamic include select only the include itself; apply passes them
+    # to the included tasks so --tags filebrowser_container or update runs them.
+    apply:
+      tags:
+        - filebrowser
+        - filebrowser_container
+        - update
+  vars:
+    quarantine_repo: ghcr.io/gtsteffaniak/filebrowser
+    # Only the stable line. The project ships beta and preview tags from the same
+    # repository, and v2 is still on preview releases. The suffix is part of the
+    # tag rather than a variant, so it has to be matched rather than stripped.
+    quarantine_tag_pattern: '^\d+\.\d+\.\d+-stable$'
+
+- name: container | Add service to compose
+  ansible.builtin.blockinfile:
+    path: /etc/compose.yml
+    marker: "# {mark} ANSIBLE MANAGED BLOCK filebrowser"
+    # Kept in a template rather than written inline because the volume list is
+    # generated from filebrowser_sources, and a Jinja loop inside a YAML literal
+    # block ends the block at the first unindented line.
+    block: "{{ lookup('template', 'compose.yml.j2') }}"
+  notify: Restart filebrowser
+  when: docker_quarantine_image_ref | length > 0
+
+- name: container | Start container
+  community.docker.docker_compose_v2:
+    project_src: /etc
+    services: filebrowser
+    state: present
+    pull: missing
+  when: docker_quarantine_image_ref | length > 0

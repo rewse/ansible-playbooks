@@ -1,15 +1,15 @@
 ---
-- name: "apache: Reload"
+- name: Reload Apache
   ansible.builtin.systemd:
     name: apache2
     state: reloaded
 
-- name: "fail2ban: Restart"
+- name: Restart fail2ban
   ansible.builtin.systemd:
     name: fail2ban
     state: restarted
 
-- name: "filebrowser: Restart"
+- name: Restart filebrowser
   community.docker.docker_compose_v2:
     project_src: /etc
     services: filebrowser

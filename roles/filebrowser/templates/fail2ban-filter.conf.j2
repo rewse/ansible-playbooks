@@ -1,4 +1,4 @@
-# {{ ansible_managed }}
+{{ ansible_managed | comment }}
 #
 # Quantum answers a wrong password with 401, and once a passkey is registered it
 # answers a password-only attempt with 403, so both count as a failure.

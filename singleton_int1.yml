@@ -7,7 +7,9 @@
     - couchdb
     - docker
     - enecoq_data_fetcher
-    - filebrowser
+    - role: filebrowser
+      tags:
+        - filebrowser
     - homeassistant
     - homeassistant-ha/primary
     - httpd

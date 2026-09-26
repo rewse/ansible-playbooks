@@ -1,0 +1,30 @@
+---
+- name: config | Fail when the published volume is not mounted
+  # Indexing an empty mount point would publish an empty tree and record it as the
+  # state of the home directory. The source is read-only so nothing would be
+  # written there, but the index would have to be rebuilt to recover.
+  #
+  # Bay 1 rather than the source path, which sits below it and is not a mount
+  # point of its own.
+  ansible.builtin.command:
+    cmd: mountpoint -q /srv/nas/data
+  changed_when: false
+
+- name: config | Create data directory
+  ansible.builtin.file:
+    path: "{{ filebrowser_data_dir }}"
+    state: directory
+    owner: "{{ filebrowser_uid }}"
+    group: "{{ filebrowser_gid }}"
+    mode: "0750"
+
+- name: config | Deploy configuration file
+  ansible.builtin.template:
+    src: config.yaml.j2
+    dest: "{{ filebrowser_data_dir }}/config.yaml"
+    owner: "{{ filebrowser_uid }}"
+    group: "{{ filebrowser_gid }}"
+    # Carries the admin password and the token signing key.
+    mode: "0640"
+  no_log: true
+  notify: Restart filebrowser

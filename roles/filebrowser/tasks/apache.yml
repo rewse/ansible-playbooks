@@ -1,0 +1,14 @@
+---
+- name: apache | Deploy vhost config
+  ansible.builtin.template:
+    src: nas.rewse.jp.conf.j2
+    dest: /etc/apache2/sites-available/{{ filebrowser_hostname }}.conf
+    mode: "0644"
+  notify: Reload Apache
+
+- name: apache | Enable site
+  # No module manages Apache site symlinks the way a2ensite does.
+  ansible.builtin.command: a2ensite {{ filebrowser_hostname }}
+  register: __filebrowser_a2ensite
+  changed_when: "'already enabled' not in __filebrowser_a2ensite.stdout"
+  notify: Reload Apache
