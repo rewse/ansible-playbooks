@@ -112,6 +112,13 @@ Use only these tags, written as an indented YAML list:
 - Verify access with a real read through the same environment Ansible uses: `direnv exec . op read op://ansible/<item-id>/<field>`. Do not infer Service Account access from `op whoami` or SSH connectivity; a locked workstation can break lookups independently.
 - A failed lookup can leave a host partially converged because earlier tasks remain applied. Restore secret access and rerun the play.
 
+### Home Assistant
+
+- Read the `mcporter` skill and use `mcporter call home-assistant.<tool>` for live entity discovery, control, configuration, logs, and troubleshooting. Query actual entity IDs and state instead of guessing them.
+- Follow the Home Assistant YAML Style Guide and use the canonical schema: `triggers`, `conditions`, and `actions`; `trigger` inside trigger entries; `action` for service calls; and `target` for entity, device, or area selection.
+- Sort new peer entities alphabetically when their order has no behavior or priority.
+- Give every `time_pattern` trigger a chosen `seconds` value from 0 through 59 so periodic automations do not start together.
+
 ### UniFi
 
 - Use Site Manager API keys through `https://api.ui.com/v1/connector/consoles/{consoleId}/proxy/network/...`; a console-local endpoint requires a key created in that console's Integrations settings.
@@ -125,18 +132,6 @@ Use only these tags, written as an indented YAML list:
 - Test agent keys with `zabbix_get` from an address allowed by the agent's `Server=` setting. `zabbix_agentd -t` tests as the invoking user, and localhost is not an allowed source on fox; use `zabbix.rewse.jp` there.
 - Emit no value when a UserParameter cannot read its source. Empty output correctly marks the item unsupported; `0` or an epoch-derived age reports false data.
 - Omit `searchWildcardsEnabled` for substring searches. Enabling it without `*` changes the match to exact.
-
-## Home Assistant
-
-### Live Operations
-
-Read the `mcporter` skill and use `mcporter call home-assistant.<tool>` for live entity discovery, control, configuration, logs, and troubleshooting. Query actual entity IDs and state instead of guessing them.
-
-### YAML
-
-- Follow the Home Assistant YAML Style Guide and use the canonical schema: `triggers`, `conditions`, and `actions`; `trigger` inside trigger entries; `action` for service calls; and `target` for entity, device, or area selection.
-- Sort new peer entities alphabetically when their order has no behavior or priority.
-- Give every `time_pattern` trigger a chosen `seconds` value from 0 through 59 so periodic automations do not start together.
 
 ## Troubleshooting
 
