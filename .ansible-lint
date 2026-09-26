@@ -1,8 +1,8 @@
 ---
-skip_list:
-  - name[casing]
-  - name[play]
-  - role-name[path]
+profile: production
+
+enable_list:
+  - name[prefix]
 
 exclude_paths:
   - roles/homeassistant/files/
