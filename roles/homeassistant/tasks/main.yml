@@ -769,12 +769,23 @@
     - homeassistant_echonet_lite_config
     - homeassistant_echonet_lite_install
 
+- name: "frigate : Resolve aged tag frigate-hass-integration"
+  ansible.builtin.set_fact:
+    __homeassistant_frigate: "{{ lookup('aged_release', 'github-tag:blakeblackshear/frigate-hass-integration') }}"
+  tags:
+    - homeassistant
+    - install
+    - custom
+    - frigate
+    - homeassistant_frigate
+    - homeassistant_frigate_install
+
 - name: "frigate : Clone integration"
   ansible.builtin.git:
     repo: https://github.com/blakeblackshear/frigate-hass-integration.git
-    dest: /tmp/frigate-hass-integration
-    version: "v{{ homeassistant_frigate_version }}"
-  register: homeassistant_frigate_git
+    dest: /usr/local/src/frigate-hass-integration
+    version: "{{ __homeassistant_frigate.commit }}"
+  register: __homeassistant_frigate_git
   tags:
     - homeassistant
     - install
@@ -785,12 +796,12 @@
 
 - name: "frigate : Install integration"
   ansible.builtin.copy:
-    src: /tmp/frigate-hass-integration/custom_components/frigate
+    src: /usr/local/src/frigate-hass-integration/custom_components/frigate
     dest: /srv/homeassistant/config/custom_components
     remote_src: true
     mode: '0644'
   notify: "homeassistant: Restart"
-  when: not ansible_check_mode
+  when: not ansible_check_mode or __homeassistant_frigate_git.before is not none
   tags:
     - homeassistant
     - config
@@ -805,7 +816,8 @@
     msg: >-
       Frigate integration file installation is deferred in check mode because
       the requested checkout is not created during a dry run.
-  when: ansible_check_mode
+    verbosity: 0
+  when: ansible_check_mode and __homeassistant_frigate_git.before is none
   tags:
     - homeassistant
     - config
@@ -815,12 +827,23 @@
     - homeassistant_frigate_config
     - homeassistant_frigate_install
 
+- name: "frosted-glass : Resolve aged tag frosted-glass-manager"
+  ansible.builtin.set_fact:
+    __homeassistant_frosted_glass_manager: "{{ lookup('aged_release', 'github-tag:wessamlauf/frosted-glass-manager') }}"
+  tags:
+    - homeassistant
+    - install
+    - custom
+    - frosted-glass
+    - homeassistant_frosted-glass
+    - homeassistant_frosted-glass_install
+
 - name: "frosted-glass : Clone manager"
   ansible.builtin.git:
     repo: https://github.com/wessamlauf/frosted-glass-manager.git
-    dest: /tmp/frosted-glass-manager
-    version: "v{{ homeassistant_frosted_glass_manager_version }}"
-  register: homeassistant_frosted_glass_manager_git
+    dest: /usr/local/src/frosted-glass-manager
+    version: "{{ __homeassistant_frosted_glass_manager.commit }}"
+  register: __homeassistant_frosted_glass_manager_git
   tags:
     - homeassistant
     - install
@@ -831,11 +854,13 @@
 
 - name: "frosted-glass : Install manager"
   ansible.builtin.copy:
-    src: /tmp/frosted-glass-manager/custom_components/frosted_glass_manager
+    src: /usr/local/src/frosted-glass-manager/custom_components/frosted_glass_manager
     dest: /srv/homeassistant/config/custom_components
     remote_src: true
     mode: '0644'
   notify: "homeassistant: Restart"
+  # A dry run does not create a first checkout.
+  when: not ansible_check_mode or __homeassistant_frosted_glass_manager_git.before is not none
   tags:
     - homeassistant
     - config
@@ -845,13 +870,9 @@
     - homeassistant_frosted-glass_config
     - homeassistant_frosted-glass_install
 
-- name: "echonet-lite : Create checkout directory"
-  ansible.builtin.file:
-    path: /var/lib/ansible/homeassistant
-    state: directory
-    owner: root
-    group: root
-    mode: '0700'
+- name: "echonet-lite : Resolve aged tag hems_echonet_lite"
+  ansible.builtin.set_fact:
+    __homeassistant_hems_echonet_lite: "{{ lookup('aged_release', 'github-tag:sayurin/hems_echonet_lite') }}"
   tags:
     - homeassistant
     - install
@@ -865,8 +886,8 @@
 - name: "echonet-lite : Clone HEMS integration"
   ansible.builtin.git:
     repo: https://github.com/sayurin/hems_echonet_lite.git
-    dest: /var/lib/ansible/homeassistant/hems-echonet-lite
-    version: "{{ homeassistant_hems_echonet_lite_version }}"
+    dest: /usr/local/src/hems-echonet-lite
+    version: "{{ __homeassistant_hems_echonet_lite.commit }}"
     force: true
   register: homeassistant_hems_echonet_lite_git
   tags:
@@ -884,7 +905,7 @@
     argv:
       - git
       - -C
-      - /var/lib/ansible/homeassistant/hems-echonet-lite
+      - /usr/local/src/hems-echonet-lite
       - clean
       - -ffdx
   register: homeassistant_hems_echonet_lite_clean
@@ -906,7 +927,7 @@
     cmd: >-
       rsync --archive --delete --itemize-changes --omit-dir-times
       --exclude=__pycache__/
-      /var/lib/ansible/homeassistant/hems-echonet-lite/custom_components/echonet_lite/
+      /usr/local/src/hems-echonet-lite/custom_components/echonet_lite/
       /srv/homeassistant/config/custom_components/echonet_lite/
   register: homeassistant_hems_echonet_lite_sync
   changed_when: homeassistant_hems_echonet_lite_sync.stdout | length > 0
@@ -936,12 +957,23 @@
     - homeassistant_echonet_lite_config
     - homeassistant_echonet_lite_install
 
+- name: "tuya : Resolve aged tag tuya-local"
+  ansible.builtin.set_fact:
+    __homeassistant_tuya_local: "{{ lookup('aged_release', 'github-tag:make-all/tuya-local') }}"
+  tags:
+    - homeassistant
+    - install
+    - custom
+    - tuya
+    - homeassistant_tuya
+    - homeassistant_tuya_install
+
 - name: "tuya : Clone local integration"
   ansible.builtin.git:
     repo: https://github.com/make-all/tuya-local.git
-    dest: /tmp/tuya-local
-    version: "{{ homeassistant_tuya_local_version }}"
-  register: homeassistant_tuya_local_git
+    dest: /usr/local/src/tuya-local
+    version: "{{ __homeassistant_tuya_local.commit }}"
+  register: __homeassistant_tuya_local_git
   tags:
     - homeassistant
     - install
@@ -952,12 +984,12 @@
 
 - name: "tuya : Install local integration"
   ansible.builtin.copy:
-    src: /tmp/tuya-local/custom_components/tuya_local
+    src: /usr/local/src/tuya-local/custom_components/tuya_local
     dest: /srv/homeassistant/config/custom_components
     remote_src: true
     mode: '0644'
   notify: "homeassistant: Restart"
-  when: not ansible_check_mode
+  when: not ansible_check_mode or __homeassistant_tuya_local_git.before is not none
   tags:
     - homeassistant
     - config
@@ -972,7 +1004,8 @@
     msg: >-
       Tuya Local integration file installation is deferred in check mode because
       the requested checkout is not created during a dry run.
-  when: ansible_check_mode
+    verbosity: 0
+  when: ansible_check_mode and __homeassistant_tuya_local_git.before is none
   tags:
     - homeassistant
     - config
@@ -994,12 +1027,23 @@
     - homeassistant_theme
     - homeassistant_theme_init
 
+- name: "frosted-glass : Resolve aged tag homeassistant-frosted-glass-themes"
+  ansible.builtin.set_fact:
+    __homeassistant_frosted_glass_themes: "{{ lookup('aged_release', 'github-tag:wessamlauf/homeassistant-frosted-glass-themes') }}"
+  tags:
+    - homeassistant
+    - install
+    - theme
+    - frosted-glass
+    - homeassistant_frosted-glass
+    - homeassistant_frosted-glass_install
+
 - name: "frosted-glass : Clone themes"
   ansible.builtin.git:
     repo: https://github.com/wessamlauf/homeassistant-frosted-glass-themes.git
-    dest: /tmp/homeassistant-frosted-glass-themes
-    version: "v{{ homeassistant_frosted_glass_version }}"
-  register: homeassistant_frosted_glass_themes_git
+    dest: /usr/local/src/homeassistant-frosted-glass-themes
+    version: "{{ __homeassistant_frosted_glass_themes.commit }}"
+  register: __homeassistant_frosted_glass_themes_git
   tags:
     - homeassistant
     - install
@@ -1010,7 +1054,7 @@
 
 - name: "frosted-glass : Install themes"
   ansible.builtin.copy:
-    src: /tmp/homeassistant-frosted-glass-themes/themes/{{ item }}
+    src: /usr/local/src/homeassistant-frosted-glass-themes/themes/{{ item }}
     dest: /srv/homeassistant/config/themes
     remote_src: true
     mode: '0644'
@@ -1018,6 +1062,8 @@
     - Frosted Glass.yaml
     - Frosted Glass Dark.yaml
     - Frosted Glass Light.yaml
+  # A dry run does not create a first checkout.
+  when: not ansible_check_mode or __homeassistant_frosted_glass_themes_git.before is not none
   tags:
     - homeassistant
     - config
@@ -1039,12 +1085,22 @@
     - homeassistant_lovelace
     - homeassistant_lovelace_init
 
+- name: "card-mod : Resolve aged tag lovelace-card-mod"
+  ansible.builtin.set_fact:
+    __homeassistant_card_mod: "{{ lookup('aged_release', 'github-tag:thomasloven/lovelace-card-mod') }}"
+  tags:
+    - homeassistant
+    - install
+    - card-mod
+    - homeassistant_card-mod
+    - homeassistant_card-mod_install
+
 - name: "card-mod : Clone repository"
   ansible.builtin.git:
     repo: https://github.com/thomasloven/lovelace-card-mod.git
-    dest: /tmp/lovelace-card-mod
-    version: "v{{ homeassistant_card_mod_version }}"
-  register: homeassistant_card_mod_git
+    dest: /usr/local/src/lovelace-card-mod
+    version: "{{ __homeassistant_card_mod.commit }}"
+  register: __homeassistant_card_mod_git
   tags:
     - homeassistant
     - install
@@ -1054,11 +1110,13 @@
 
 - name: "card-mod : Install"
   ansible.builtin.copy:
-    src: /tmp/lovelace-card-mod/card-mod.js
+    src: /usr/local/src/lovelace-card-mod/card-mod.js
     dest: /srv/homeassistant/config/www
     remote_src: true
     mode: '0644'
   notify: "homeassistant: Restart"
+  # A dry run does not create a first checkout.
+  when: not ansible_check_mode or __homeassistant_card_mod_git.before is not none
   tags:
     - homeassistant
     - config
@@ -1085,11 +1143,26 @@
     - homeassistant_card-mod
     - homeassistant_card-mod_config
 
+- name: "mini-graph-card : Resolve aged release"
+  ansible.builtin.set_fact:
+    __homeassistant_mini_graph_card: "{{ lookup('aged_release', 'github-release:kalkih/mini-graph-card', asset='mini-graph-card-bundle.js') }}"
+  tags:
+    - homeassistant
+    - install
+    - lovelace
+    - mini-graph-card
+    - homeassistant_mini-graph-card
+    - homeassistant_mini-graph-card_install
+
 - name: "mini-graph-card : Install"
   ansible.builtin.get_url:
-    url: https://github.com/kalkih/mini-graph-card/releases/download/v{{ homeassistant_mini_graph_card_version }}/mini-graph-card-bundle.js
-    dest: /srv/homeassistant/config/www
-    mode: '0644'
+    url: "{{ __homeassistant_mini_graph_card.url }}"
+    dest: /srv/homeassistant/config/www/mini-graph-card-bundle.js
+    mode: "0644"
+    checksum: "{{ __homeassistant_mini_graph_card.checksum | default(omit, true) }}"
+    # The file name carries no version, so without a checksum only a fresh
+    # download reveals a new release.
+    force: "{{ __homeassistant_mini_graph_card.checksum == '' }}"
   notify: "homeassistant: Restart"
   tags:
     - homeassistant
@@ -1099,11 +1172,26 @@
     - homeassistant_mini-graph-card
     - homeassistant_mini-graph-card_install
 
+- name: "mini-media-player : Resolve aged release"
+  ansible.builtin.set_fact:
+    __homeassistant_mini_media_player: "{{ lookup('aged_release', 'github-release:kalkih/mini-media-player', asset='mini-media-player-bundle.js') }}"
+  tags:
+    - homeassistant
+    - install
+    - lovelace
+    - mini-media-player
+    - homeassistant_mini-media-player
+    - homeassistant_mini-media-player_install
+
 - name: "mini-media-player : Install"
   ansible.builtin.get_url:
-    url: https://github.com/kalkih/mini-media-player/releases/download/v{{ homeassistant_mini_media_player_version }}/mini-media-player-bundle.js
-    dest: /srv/homeassistant/config/www
-    mode: '0644'
+    url: "{{ __homeassistant_mini_media_player.url }}"
+    dest: /srv/homeassistant/config/www/mini-media-player-bundle.js
+    mode: "0644"
+    checksum: "{{ __homeassistant_mini_media_player.checksum | default(omit, true) }}"
+    # The file name carries no version, so without a checksum only a fresh
+    # download reveals a new release.
+    force: "{{ __homeassistant_mini_media_player.checksum == '' }}"
   notify: "homeassistant: Restart"
   tags:
     - homeassistant
@@ -1113,11 +1201,26 @@
     - homeassistant_mini-media-player
     - homeassistant_mini-media-player_install
 
+- name: "simple-weather-card : Resolve aged release"
+  ansible.builtin.set_fact:
+    __homeassistant_simple_weather_card: "{{ lookup('aged_release', 'github-release:kalkih/simple-weather-card', asset='simple-weather-card-bundle.js') }}"
+  tags:
+    - homeassistant
+    - install
+    - lovelace
+    - simple-weather-card
+    - homeassistant_simple-weather-card
+    - homeassistant_simple-weather-card_install
+
 - name: "simple-weather-card : Install"
   ansible.builtin.get_url:
-    url: https://github.com/kalkih/simple-weather-card/releases/download/v{{ homeassistant_simple_weather_card_version }}/simple-weather-card-bundle.js
-    dest: /srv/homeassistant/config/www
-    mode: '0644'
+    url: "{{ __homeassistant_simple_weather_card.url }}"
+    dest: /srv/homeassistant/config/www/simple-weather-card-bundle.js
+    mode: "0644"
+    checksum: "{{ __homeassistant_simple_weather_card.checksum | default(omit, true) }}"
+    # The file name carries no version, so without a checksum only a fresh
+    # download reveals a new release.
+    force: "{{ __homeassistant_simple_weather_card.checksum == '' }}"
   notify: "homeassistant: Restart"
   tags:
     - homeassistant
@@ -1243,3 +1346,76 @@
     - apache
     - homeassistant_apache
     - homeassistant_apache_config
+
+- name: "frigate : Remove legacy checkout frigate-hass-integration"
+  ansible.builtin.file:
+    path: /tmp/frigate-hass-integration
+    state: absent
+  tags:
+    - homeassistant
+    - install
+    - custom
+    - frigate
+    - homeassistant_frigate
+    - homeassistant_frigate_install
+
+- name: "frosted-glass : Remove legacy checkout frosted-glass-manager"
+  ansible.builtin.file:
+    path: /tmp/frosted-glass-manager
+    state: absent
+  tags:
+    - homeassistant
+    - install
+    - custom
+    - frosted-glass
+    - homeassistant_frosted-glass
+    - homeassistant_frosted-glass_install
+
+- name: "frosted-glass : Remove legacy checkout homeassistant-frosted-glass-themes"
+  ansible.builtin.file:
+    path: /tmp/homeassistant-frosted-glass-themes
+    state: absent
+  tags:
+    - homeassistant
+    - install
+    - theme
+    - frosted-glass
+    - homeassistant_frosted-glass
+    - homeassistant_frosted-glass_install
+
+- name: "tuya : Remove legacy checkout tuya-local"
+  ansible.builtin.file:
+    path: /tmp/tuya-local
+    state: absent
+  tags:
+    - homeassistant
+    - install
+    - custom
+    - tuya
+    - homeassistant_tuya
+    - homeassistant_tuya_install
+
+- name: "card-mod : Remove legacy checkout lovelace-card-mod"
+  ansible.builtin.file:
+    path: /tmp/lovelace-card-mod
+    state: absent
+  tags:
+    - homeassistant
+    - install
+    - card-mod
+    - homeassistant_card-mod
+    - homeassistant_card-mod_install
+
+- name: "echonet-lite : Remove legacy checkout"
+  ansible.builtin.file:
+    path: /var/lib/ansible/homeassistant
+    state: absent
+  tags:
+    - homeassistant
+    - install
+    - config
+    - custom
+    - echonet-lite
+    - homeassistant_echonet_lite
+    - homeassistant_echonet_lite_config
+    - homeassistant_echonet_lite_install
