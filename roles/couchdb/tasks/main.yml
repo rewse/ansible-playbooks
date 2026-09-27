@@ -21,3 +21,8 @@
   ansible.builtin.import_tasks: apache.yml
   tags:
     - couchdb_apache
+
+- name: Import fail2ban tasks
+  ansible.builtin.import_tasks: fail2ban.yml
+  tags:
+    - couchdb_fail2ban
