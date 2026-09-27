@@ -21,8 +21,8 @@
   - `Restart zabbix-agent`: `ansible.builtin.systemd: {name: zabbix-agent, state: restarted}`
   - `Reload systemd`: `ansible.builtin.systemd: {daemon_reload: true}`
 - 波 2 以降のロールが使う旧名の handler（`apache: Reload` など）は、そのロールの移行まで残す
-- `/srv/matter-server` のパスは変えない（Matter の fabric のデータを動かさないため）
-- 意図した変更（check の差分に出てよいもの）は次だけである: couchdb の init スクリプトの置き場所、mosquitto のパスワードのスタンプ、power_monitor の `config.dist`、matter_server のデータディレクトリの作成先、古い `/etc/matter-server` の削除
+- matter_server のデータは `/srv/matter-server` から AGENTS.md どおりの `/srv/matter_server` に移す
+- 意図した変更（check の差分に出てよいもの）は次だけである: couchdb の init スクリプトの置き場所、mosquitto のパスワードのスタンプ、power_monitor の `config.dist`、matter_server のデータの `/srv/matter_server` への移動と compose のマウント、古い `/etc/matter-server` の削除
 - ホストへの反映は Task 9 でまとめて行い、`--check --diff` の差分を見せて承認を得てからにする
 
 ## Review Focus
@@ -163,7 +163,11 @@ Expected: exit 0。docker の `group` 以外は `changed=0`
 | nvr | `storage`、`config`、`container`、`zabbix`、`apache` | `container` は `update` タグ。`backup: true` を消す |
 
 - couchdb の init スクリプトは、`aged_release` の `github-commit:vrtmrz/obsidian-livesync` で得たコミットの raw URL から `/usr/local/src/couchdb-init.sh` に取得する。`Run init script` はダウンロードが changed のときだけ流す
-- matter_server のデータディレクトリの作成先を `/srv/matter-server/data`（compose がマウントしている場所）に直し、空の `/etc/matter-server` を消すタスクを置く
+- matter_server のデータを `/srv/matter_server` に移す。`container` の先頭で次の順に行う
+  - `/srv/matter-server` を `stat` し、あれば `docker_compose_v2` で `state: stopped` にしてから `command: mv /srv/matter-server /srv/matter_server`（`creates: /srv/matter_server`、`removes: /srv/matter-server`。モジュールがないため `command` にする）
+  - `/srv/matter_server/data` を作り、compose のマウントを `/srv/matter_server/data:/data` にする。compose の変更で `Start containers` がコンテナを作り直す
+  - 空の `/etc/matter-server` を消す
+  - 移動の前に `/srv/matter-server/data` を `/srv/nas` 以外の場所に退避しない。2.9M の JSON 2 つで、`mv` は同じファイルシステム内の rename なので途中で壊れない
 - filebrowser、litellm、couchdb の restart handler に、nvr と同じ `when: not ansible_check_mode` を付ける
 
 - [ ] **Step 1: 分割して lint を通す**
@@ -174,7 +178,7 @@ Expected: `Passed: 0 failure(s)`
 - [ ] **Step 2: check を確かめる**
 
 Run: `home-primary.yml --check --diff --tags couchdb,litellm,matter_server,nvr,filebrowser`
-Expected: exit 0。changed は couchdb の init スクリプト（新しい場所への初回の取得）と matter_server のディレクトリだけ
+Expected: exit 0。changed は couchdb の init スクリプト（新しい場所への初回の取得）、matter_server の停止と移動（check では skip）、データディレクトリ、compose のマウントの差分、`/etc/matter-server` の削除だけ
 
 - [ ] **Step 3: ロールごとにコミット**
 
@@ -302,7 +306,7 @@ Expected: 波 1 のロールの差分が「意図した変更」だけ。fox の
 
 - [ ] **Step 5: 2 回目を流す**
 
-Expected: 波 1 のロールのタスクがすべて `changed=0`
+Expected: 波 1 のロールのタスクがすべて `changed=0`。fox で `/srv/matter_server/data/*.json` があり、`/srv/matter-server` がなく、HA の Matter のエンティティが available（`mcporter call home-assistant.<tool>` で確かめる）
 
 - [ ] **Step 6: main にマージする**
 
