@@ -1,0 +1,6 @@
+---
+- name: browser | Install Chromium with Playwright
+  # Playwright manages its own browser builds; no package or module provides them.
+  ansible.builtin.command: npx playwright install chromium --force
+  environment: "{{ supply_chain_cooldown_environment }}"
+  changed_when: false

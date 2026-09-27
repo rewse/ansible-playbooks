@@ -1,0 +1,35 @@
+---
+- name: service | Create data directory
+  ansible.builtin.file:
+    path: /srv/homeassistant/config/data
+    state: directory
+    mode: "0755"
+
+- name: service | Install script
+  ansible.builtin.template:
+    src: enecoq-data-fetcher.j2
+    dest: /usr/local/sbin/enecoq-data-fetcher
+    variable_start_string: "[%"
+    variable_end_string: "%]"
+    mode: "0700"
+
+- name: service | Install systemd service
+  ansible.builtin.copy:
+    src: enecoq-data-fetcher.service
+    dest: /etc/systemd/system/enecoq-data-fetcher.service
+    mode: "0644"
+  notify: Reload systemd
+
+- name: service | Install systemd timer
+  ansible.builtin.copy:
+    src: enecoq-data-fetcher.timer
+    dest: /etc/systemd/system/enecoq-data-fetcher.timer
+    mode: "0644"
+  notify: Restart enecoq-data-fetcher timer
+
+- name: service | Enable and start timer
+  ansible.builtin.systemd:
+    name: enecoq-data-fetcher.timer
+    enabled: true
+    state: started
+    daemon_reload: true

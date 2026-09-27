@@ -1,71 +1,11 @@
 ---
-- name: "enecoq-data-fetcher : Create data directory"
-  ansible.builtin.file:
-    path: /srv/homeassistant/config/data
-    state: directory
-    mode: '0755'
+- name: Import browser tasks
+  ansible.builtin.import_tasks: browser.yml
   tags:
-    - enecoq-data-fetcher
-    - init
-    - enecoq-data-fetcher_enecoq-data-fetcher
-    - enecoq-data-fetcher_enecoq-data-fetcher_init
-
-- name: "enecoq-data-fetcher : Install/update chromium via playwright"
-  ansible.builtin.command: npx playwright install chromium --force
-  environment: "{{ supply_chain_cooldown_environment }}"
-  changed_when: false
-  tags:
-    - enecoq-data-fetcher
-    - install
+    - enecoq_data_fetcher_browser
     - update
-    - enecoq-data-fetcher_enecoq-data-fetcher
-    - enecoq-data-fetcher_enecoq-data-fetcher_install
 
-- name: "enecoq-data-fetcher : Install script"
-  ansible.builtin.template:
-    src: enecoq-data-fetcher.j2
-    dest: /usr/local/sbin/enecoq-data-fetcher
-    variable_start_string: '[%'
-    variable_end_string: '%]'
-    mode: '0700'
+- name: Import service tasks
+  ansible.builtin.import_tasks: service.yml
   tags:
-    - enecoq-data-fetcher
-    - config
-    - enecoq-data-fetcher_enecoq-data-fetcher
-    - enecoq-data-fetcher_enecoq-data-fetcher_config
-
-- name: "enecoq-data-fetcher : Install systemd service"
-  ansible.builtin.copy:
-    src: enecoq-data-fetcher.service
-    dest: /etc/systemd/system/enecoq-data-fetcher.service
-    mode: '0644'
-  notify: "Reload systemd"
-  tags:
-    - enecoq-data-fetcher
-    - config
-    - enecoq-data-fetcher_enecoq-data-fetcher
-    - enecoq-data-fetcher_enecoq-data-fetcher_config
-
-- name: "enecoq-data-fetcher : Install systemd timer"
-  ansible.builtin.copy:
-    src: enecoq-data-fetcher.timer
-    dest: /etc/systemd/system/enecoq-data-fetcher.timer
-    mode: '0644'
-  notify: "enecoq-data-fetcher : Restart timer"
-  tags:
-    - enecoq-data-fetcher
-    - config
-    - enecoq-data-fetcher_enecoq-data-fetcher
-    - enecoq-data-fetcher_enecoq-data-fetcher_config
-
-- name: "enecoq-data-fetcher : Enable and start timer"
-  ansible.builtin.systemd:
-    name: enecoq-data-fetcher.timer
-    enabled: true
-    state: started
-    daemon_reload: true
-  tags:
-    - enecoq-data-fetcher
-    - config
-    - enecoq-data-fetcher_enecoq-data-fetcher
-    - enecoq-data-fetcher_enecoq-data-fetcher_config
+    - enecoq_data_fetcher_service

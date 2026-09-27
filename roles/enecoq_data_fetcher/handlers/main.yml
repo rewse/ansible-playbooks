@@ -1,9 +1,9 @@
 ---
-- name: "Reload systemd"
+- name: Reload systemd
   ansible.builtin.systemd:
     daemon_reload: true
 
-- name: "enecoq-data-fetcher : Restart timer"
+- name: Restart enecoq-data-fetcher timer
   ansible.builtin.systemd:
     name: enecoq-data-fetcher.timer
     state: restarted
