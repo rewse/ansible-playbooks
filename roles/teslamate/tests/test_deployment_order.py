@@ -47,7 +47,9 @@ class DeploymentOrderTest(unittest.TestCase):
             self.task_names.index(compose_name), self.task_names.index(update_name)
         )
         self.assertEqual(
-            self.tasks_by_name[update_name]["community.docker.docker_compose_v2"]["pull"],
+            self.tasks_by_name[update_name]["community.docker.docker_compose_v2"][
+                "pull"
+            ],
             "never",
         )
         self.assertLess(

@@ -86,7 +86,9 @@ class ResticDarwinTemplateTest(unittest.TestCase):
 
         script = root / "restic-s3-backup"
         rendered = self.render_backup(home, bin_dir)
-        rendered = rendered.replace("    sleep 5", f"    sleep {materialise_poll_seconds}")
+        rendered = rendered.replace(
+            "    sleep 5", f"    sleep {materialise_poll_seconds}"
+        )
         script.write_text(rendered)
         script.chmod(0o755)
         environment = os.environ.copy()
@@ -116,7 +118,9 @@ class ResticDarwinTemplateTest(unittest.TestCase):
         self.assertEqual(calls.splitlines(), ["backup", "forget"])
         self.assertEqual(notifications, "")
 
-    def test_backup_exit_code_three_warns_marks_success_and_runs_retention(self) -> None:
+    def test_backup_exit_code_three_warns_marks_success_and_runs_retention(
+        self,
+    ) -> None:
         result, home, calls, notifications = self.run_backup(3)
 
         self.assertEqual(result.returncode, 0, result.stdout + result.stderr)
@@ -139,7 +143,9 @@ class ResticDarwinTemplateTest(unittest.TestCase):
     def test_icloud_materialisation_uses_download_helper_and_waits(self) -> None:
         template = (TEMPLATES / "restic-s3-backup.j2").read_text()
 
-        self.assertIn('ICLOUD_DOWNLOAD="{{ home }}/.local/bin/restic-icloud-download"', template)
+        self.assertIn(
+            'ICLOUD_DOWNLOAD="{{ home }}/.local/bin/restic-icloud-download"', template
+        )
         self.assertIn("-type d -flags +dataless", template)
         self.assertIn('-exec "${ICLOUD_DOWNLOAD}" {} \\;', template)
         self.assertIn("-type f -flags +dataless", template)
@@ -236,7 +242,13 @@ class ResticDarwinTemplateTest(unittest.TestCase):
         with tempfile.TemporaryDirectory() as temporary_directory:
             binary = pathlib.Path(temporary_directory) / "restic-icloud-download"
             compile_result = subprocess.run(
-                ["xcrun", "swiftc", str(FILES / "restic-icloud-download.swift"), "-o", str(binary)],
+                [
+                    "xcrun",
+                    "swiftc",
+                    str(FILES / "restic-icloud-download.swift"),
+                    "-o",
+                    str(binary),
+                ],
                 capture_output=True,
                 check=False,
                 text=True,
@@ -246,7 +258,9 @@ class ResticDarwinTemplateTest(unittest.TestCase):
                 0,
                 compile_result.stdout + compile_result.stderr,
             )
-            result = subprocess.run([str(binary)], capture_output=True, check=False, text=True)
+            result = subprocess.run(
+                [str(binary)], capture_output=True, check=False, text=True
+            )
             self.assertEqual(result.returncode, 64)
 
     def test_role_installs_and_compiles_download_helper(self) -> None:
@@ -256,8 +270,10 @@ class ResticDarwinTemplateTest(unittest.TestCase):
         self.assertIn("xcrun swiftc", tasks)
         self.assertIn("restic-icloud-download.checksum", tasks)
         self.assertIn("restic-icloud-download.new", tasks)
-        self.assertIn("restic_icloud_download_compiled_binary.stat.checksum is defined", tasks)
-        self.assertIn('mode: \'0755\'', tasks)
+        self.assertIn(
+            "restic_icloud_download_compiled_binary.stat.checksum is defined", tasks
+        )
+        self.assertIn("mode: '0755'", tasks)
         self.assertIn("restic-icloud-download", tasks)
 
     def test_excludes_unreadable_and_disposable_paths(self) -> None:
@@ -288,13 +304,15 @@ class ResticDarwinTemplateTest(unittest.TestCase):
         tasks = TASKS.read_text()
 
         self.assertIn(
-            '- path: "{{ ansible_facts[\'env\'][\'HOME\'] }}/.local/bin"\n      mode: \'0755\'',
+            "- path: \"{{ ansible_facts['env']['HOME'] }}/.local/bin\"\n      mode: '0755'",
             tasks,
         )
 
     def test_repository_initialization_sources_shared_cache_environment(self) -> None:
         tasks = TASKS.read_text()
-        initialize_task = tasks.split('- name: "restic : Initialise the repository"', 1)[1]
+        initialize_task = tasks.split(
+            '- name: "restic : Initialise the repository"', 1
+        )[1]
         initialize_task = initialize_task.split('- name: "restic : Copy iCloud', 1)[0]
 
         self.assertIn('. "${HOME}/.config/environment/cache.sh"', initialize_task)
