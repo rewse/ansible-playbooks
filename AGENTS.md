@@ -7,10 +7,10 @@
 ### Update Policy
 
 - Upgrade OS package managers (apt, brew) and their official repositories to the latest version on every run, in the OS role's final `upgrade.yml`.
-- Resolve third-party container images, GitHub releases, git repositories, and Home Assistant custom components at run time with the `aged_release` lookup, which returns the newest release published at least `supply_chain_cooldown_days` days ago. Pin the result by content: an image as `tag@digest`, a release asset by its sha256, and a checkout by commit SHA.
+- Resolve third-party container images, GitHub releases, git repositories, and Home Assistant custom components at run time with the `aged_release` lookup, which returns the newest release published at least `supply_chain_cooldown_days` days ago. Pin the result by content: an image as `tag@digest`, a release asset by its sha256 when the release publishes one, and a checkout by commit SHA.
 - Track release tags rather than branches; for a repository without tags, use `github-commit:` for the newest commit that old.
 - Track the default branch of repositories and images owned by this account without a cooldown (`days=0`).
-- Pass `supply_chain_cooldown_environment` as `environment` to every task that runs npm or uv, so npm and PyPI releases get the same cooldown. Keep `min-release-age` in the chezmoi npmrc and `exclude-newer` in the chezmoi uv.toml at the same number of days for interactive use.
+- Pass `supply_chain_cooldown_environment` as `environment` to every task that runs npm or uv, so npm and PyPI releases get the same cooldown. A `uv sync` against a committed lockfile of this account's own repository is exempt. Keep `min-release-age` in the chezmoi npmrc and `exclude-newer` in the chezmoi uv.toml at the same number of days for interactive use.
 - Install the latest release of software outside GitHub and of vendor installers without a cooldown, as with OS packages: use the vendor's unversioned download or apt repository, and update installed tools with their own update command under the `update` tag.
 - Install software by the method its vendor documents (official apt repository, Homebrew, installer script). Use another method only when the official one is unavailable on that OS or platform, and state why in a comment.
 - Pin a version only as an exception: define `<role>_<component>_version` and state the reason in a comment. Do not otherwise keep versions in variables.
@@ -28,6 +28,7 @@
 
 - Deploy each containerized service as its own Compose project in `/etc/compose/<role>/compose.yaml`, rendered from `templates/compose.yaml.j2` with `name: <role>`. The file name follows Docker's preference and is the one exception to the `.yml` extension.
 - Keep service data in `/srv/<role>`.
+- `homeassistant_ha_secondary` uses the `homeassistant` project at the primary's path so the failover scripts address both hosts alike.
 - Check out source that is copied into place under `/usr/local/src/<name>`, and software that runs from its checkout under `/opt/<name>`.
 
 ### Platform Differences

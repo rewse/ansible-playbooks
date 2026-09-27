@@ -48,7 +48,7 @@ AGENTS.md の Update Policy は、サードパーティのものを公開から 
 
 共通の引数:
 
-- `pattern`: 対象にするタグの正規表現。既定は `'^v?\d+(\.\d+)*$'`
+- `pattern`: 対象にするタグの正規表現。既定は `'^v?\d+(\.\d+)+$'`（ドット区切りの数字が 2 つ以上）
 - `days`: cooldown の日数。既定は変数 `supply_chain_cooldown_days`
 
 `asset` にはバージョンを含むファイル名のために `{version}` を書ける（例: `restic_{version}_linux_arm64.bz2`）。

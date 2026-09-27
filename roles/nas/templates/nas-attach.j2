@@ -133,11 +133,14 @@ start_timers() {
 # running one, which would take Home Assistant down with it. start only starts
 # what is stopped and leaves what is running alone.
 start_containers() {
-  local file
+  local file rc=0
 
+  shopt -s nullglob
+  # Try every project so one failure does not leave the others stopped.
   for file in "${COMPOSE_DIR}"/*/compose.yaml; do
-    docker compose -f "${file}" start
+    docker compose -f "${file}" start || rc=1
   done
+  return "${rc}"
 }
 
 verify_attached() {

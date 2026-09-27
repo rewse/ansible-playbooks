@@ -68,8 +68,8 @@
 - name: "claude: Update Claude Code"
   # The native installer has no module; claude update fetches the newest release.
   ansible.builtin.command: "{{ ansible_facts['env']['HOME'] }}/.local/bin/claude update"
-  register: __claude_update
-  changed_when: "'Successfully updated' in __claude_update.stdout"
+  register: __raspberrypi_claude_update
+  changed_when: "'Successfully updated' in __raspberrypi_claude_update.stdout"
   tags:
     - raspberrypi
     - update
