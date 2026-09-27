@@ -128,6 +128,10 @@ Use only these tags, written as an indented YAML list:
 
 ## Repository Operations
 
+### Running Playbooks
+
+- Limit every check and apply to the changed roles or components with `--tags`, because a full playbook run takes a long time. Run a full playbook only when a change can affect roles you did not edit, such as a renamed handler or a shared variable, and for the final verification of a change set.
+
 ### 1Password
 
 - Store credentials in the `ansible` vault and commit only Secret References.
