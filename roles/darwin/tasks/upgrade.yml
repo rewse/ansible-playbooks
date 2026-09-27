@@ -1,9 +1,22 @@
 ---
+- name: upgrade | List outdated Homebrew packages
+  # The homebrew module reports any output of brew upgrade as a change, and brew
+  # lists outdated pinned formulae on every run, so decide from outdated first.
+  ansible.builtin.command: brew outdated --json=v2
+  register: __darwin_brew_outdated
+  changed_when: false
+  check_mode: false
+
 # Some casks need sudo to upgrade; when this fails asking for a terminal, run
 # brew upgrade by hand.
 - name: upgrade | Upgrade all Homebrew packages
   community.general.homebrew:
     upgrade_all: true
+  vars:
+    __darwin_brew_outdated_json: "{{ __darwin_brew_outdated.stdout | from_json }}"
+  when: >-
+    (__darwin_brew_outdated_json.formulae | rejectattr('pinned') | list
+     + __darwin_brew_outdated_json.casks) | length > 0
 
 - name: upgrade | Update npm
   ansible.builtin.command: npm install -g npm@latest
