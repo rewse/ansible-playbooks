@@ -48,3 +48,18 @@
     state: present
     pull: missing
   when: not (ansible_check_mode and __nvr_compose is changed)
+
+- name: container | Find backups of the configuration file
+  ansible.builtin.find:
+    paths: /srv/nvr
+    patterns: config.yml.*~
+  register: __nvr_config_backups
+
+- name: container | Remove backups of the configuration file
+  # They hold camera credentials and are no longer written.
+  ansible.builtin.file:
+    path: "{{ item.path }}"
+    state: absent
+  loop: "{{ __nvr_config_backups.files }}"
+  loop_control:
+    label: "{{ item.path }}"
