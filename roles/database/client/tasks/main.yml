@@ -191,11 +191,23 @@
     - database-client_oracle
     - database-client_oracle_init
 
+- name: "redshift : Resolve aged release"
+  ansible.builtin.set_fact:
+    # Releases on GitHub carry no jar; the jar lives on S3 under the same version.
+    __database_client_redshift_version: "{{ lookup('aged_release', 'github-release:aws/amazon-redshift-jdbc-driver').version | regex_replace('^v', '') }}"
+  tags:
+    - database-client
+    - install
+    - redshift
+    - database-client_redshift
+    - database-client_redshift_download
+
 - name: "redshift : Download JDBC driver"
   ansible.builtin.get_url:
-    url: https://s3.amazonaws.com/redshift-downloads/drivers/jdbc/{{ database_redshift_jdbc_version }}/redshift-jdbc42-{{ database_redshift_jdbc_version }}.jar
+    url: https://s3.amazonaws.com/redshift-downloads/drivers/jdbc/{{ __database_client_redshift_version }}/redshift-jdbc42-{{ __database_client_redshift_version }}.jar
     dest: /usr/share/java
     mode: '0644'
+  register: __database_client_redshift_download
   tags:
     - database-client
     - install
@@ -205,12 +217,14 @@
 
 - name: "redshift : Create symlinks for JDBC driver"
   ansible.builtin.file:
-    src: redshift-jdbc42-{{ database_redshift_jdbc_version }}.jar
+    src: redshift-jdbc42-{{ __database_client_redshift_version }}.jar
     dest: /usr/share/java/{{ item }}
     state: link
   loop:
     - redshift-jdbc42.jar
     - redshift-jdbc.jar
+  # A dry run does not download a new version for the links to point at.
+  when: not (ansible_check_mode and __database_client_redshift_download is changed)
   tags:
     - database-client
     - config
