@@ -15,7 +15,7 @@
 次の 3 つは例外として扱う。
 
 - homeassistant は tasks、handlers、templates、vars、`tests/` を移行する。HA の YAML（`files/`）は別の HA YAML セッションが直しているため触らず、コミットされていない `tests/model_y_full_charge_due.yml` にも触らない。ただし `configuration.yaml` はロールのテンプレートにし、HA 標準のコピー（`files/configuration.yaml`）を消す。コピーした標準ファイルを lineinfile と blockinfile で書き換える今の形は、行の挿入位置を考える手間がかかるうえ、毎回 changed になるため
-- darwin_business のホスト（`7cf34ded5d65.local`）は `connection: local` で、そのマシンでしか流せない。このため darwin_business 向けの変更は置き場所の移動と命名の整理に限り、動作を変えない。例外は Claude Code を toolbox の一覧に足す 1 行だけである。検証は syntax-check と lint までとし、実機での確認手順を完了報告に書く
+- darwin_business のホスト（`7cf34ded5d65.local`）は `connection: local` で、そのマシンでしか流せない。このため darwin_business 向けの変更は置き場所の移動と命名の整理に限り、動作を変えない。例外は、Claude Code を toolbox の一覧に足す 1 行と、darwin の共通部分で毎回 changed になる箇所の修正（mas と `/etc/paths.d` は足りないときだけ実行し、npm は新しい版があるものだけ更新し、brew の upgrade は pin されていない古いパッケージがあるときだけ実行し、Safe Chain はリリースに付いたインストーラで入れる）である。この修正はユーザーの承認を得て加えた。検証は syntax-check と lint までとし、実機での確認手順を完了報告に書く
 - litellm と couchdb のポートを全インターフェースで公開している件は、動作が変わるため範囲外とし、別に相談する
 
 ## ロールの対応表
@@ -108,4 +108,4 @@ restic と zabbix_agent は、systemd と launchd のユニット名、設定フ
 
 - HA の YAML（`roles/homeassistant/files/`、HA YAML セッション）。`configuration.yaml` は除く
 - litellm と couchdb のポートの公開範囲
-- darwin_business の動作の変更（Claude Code の追加を除く）
+- darwin_business の動作の変更（上に挙げた例外を除く）

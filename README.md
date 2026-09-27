@@ -150,5 +150,5 @@ Secrets live in the 1Password `ansible` vault. Commit only Secret References tha
 2. **Utilize tags**: Use tags to execute only necessary parts
 3. **Use 1Password**: Store sensitive information in 1Password and commit only Secret References
 4. **Gradual application**: Test large changes on specific hosts first
-5. **Check results**: Judge a run by its exit code, and confirm a second run reports `changed=0`
+5. **Check results**: Judge a run by its exit code, and confirm a second run reports `changed=0`. On macOS, a run in which Homebrew upgrades Ansible itself fails once with a module result error; run it again
 6. **Lint**: Run `uvx --with pre-commit-uv==4.3.0 pre-commit@4.6.2 run --all-files --show-diff-on-failure` before committing
