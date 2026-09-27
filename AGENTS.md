@@ -7,8 +7,12 @@
 ### Update Policy
 
 - Upgrade OS package managers (apt, brew) and their official repositories to the latest version on every run, in the OS role's final `upgrade.yml`.
-- Resolve third-party container images, GitHub releases, git repositories, and Home Assistant custom components at run time to the newest release published at least `supply_chain_cooldown_days` days ago. Track release tags rather than branches; for a repository without tags, use the newest commit that old.
-- Track the default branch of repositories owned by this account without a cooldown.
+- Resolve third-party container images, GitHub releases, git repositories, and Home Assistant custom components at run time with the `aged_release` lookup, which returns the newest release published at least `supply_chain_cooldown_days` days ago. Pin the result by content: an image as `tag@digest`, a release asset by its sha256, and a checkout by commit SHA.
+- Track release tags rather than branches; for a repository without tags, use `github-commit:` for the newest commit that old.
+- Track the default branch of repositories and images owned by this account without a cooldown (`days=0`).
+- Pass `supply_chain_cooldown_environment` as `environment` to every task that runs npm or uv, so npm and PyPI releases get the same cooldown. Keep `min-release-age` in the chezmoi npmrc and `exclude-newer` in the chezmoi uv.toml at the same number of days for interactive use.
+- Install the latest release of software outside GitHub and of vendor installers without a cooldown, as with OS packages: use the vendor's unversioned download or apt repository, and update installed tools with their own update command under the `update` tag.
+- Install software by the method its vendor documents (official apt repository, Homebrew, installer script). Use another method only when the official one is unavailable on that OS or platform, and state why in a comment.
 - Pin a version only as an exception: define `<role>_<component>_version` and state the reason in a comment. Do not otherwise keep versions in variables.
 
 ### Role Design
@@ -19,6 +23,12 @@
 - Promote a component to its own role when it is used by more than one OS or host type, when it is an application or service with its own configuration, handlers, or version lifecycle, or when it no longer fits in one task file.
 - Express differences between host types as inventory data (for example `darwin_extra_packages`) or as separate roles in the type's playbook, not as per-type roles.
 - When a role publishes a service that requires a login, give it a `fail2ban` component with a filter and a jail for that service, as `roles/filebrowser` does.
+
+### File Locations
+
+- Deploy each containerized service as its own Compose project in `/etc/compose/<role>/compose.yaml`, rendered from `templates/compose.yaml.j2` with `name: <role>`. The file name follows Docker's preference and is the one exception to the `.yml` extension.
+- Keep service data in `/srv/<role>`.
+- Check out source that is copied into place under `/usr/local/src/<name>`, and software that runs from its checkout under `/opt/<name>`.
 
 ### Platform Differences
 
@@ -85,7 +95,7 @@ Use only these tags, written as an indented YAML list:
 | `inventory/group_vars/all/site.yml` | Site-wide shared values |
 
 - Prefix every variable a role defines with the role name. Prefix `register` and `set_fact` results with `__<role>_`.
-- Only these shared values in `inventory/group_vars/all/site.yml` go without a prefix: `admin`, `email`, `global_ip`, `ipv6`, and `supply_chain_cooldown_days`. Give a new shared value a specific name (`local_network`, not `local`) and add it here.
+- Only these shared values in `inventory/group_vars/all/site.yml` go without a prefix: `admin`, `email`, `global_ip`, `ipv6`, `supply_chain_cooldown_days`, and `supply_chain_cooldown_environment`. Give a new shared value a specific name (`local_network`, not `local`) and add it here.
 - Put a Secret Reference in the role's `vars/main.yml` when it is the same on every host and in the inventory when it differs.
 - Do not use play vars, `include_vars` outside `set_vars.yml`, or extra vars for desired state.
 

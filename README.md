@@ -25,6 +25,8 @@ This repository contains Ansible playbooks and roles for managing infrastructure
 ├── darwin-business.yml      # macOS business
 ├── darwin-personal.yml      # macOS personal
 ├── udm.yml                  # UniFi Dream Machine
+├── plugins/lookup/          # aged_release: newest release past the supply-chain cooldown
+├── tests/                   # pytest tests for plugins and templates
 └── roles/                   # One role per function
 ```
 
@@ -33,6 +35,7 @@ This repository contains Ansible playbooks and roles for managing infrastructure
 ### Prerequisites
 
 - Ansible 2.10 or later installed
+- `gh` (authenticated) and `skopeo` on the controller, used by the `aged_release` lookup
 - SSH access configured to target hosts
 - 1Password CLI (`op`) installed (version 2.18.0 or later)
 - direnv installed (optional but recommended)
