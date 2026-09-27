@@ -1,10 +1,4 @@
 # This file contains ignores rule violations for ansible-lint
-cloud-workstation.yml role-name[path]
-home-primary.yml role-name[path]
-home-secondary.yml role-name[path]
-roles/homeassistant/handlers/main.yml name[casing]
-roles/homeassistant/tasks/main.yml name[casing]
-roles/homeassistant/tasks/main.yml role-name[path]
 roles/homeassistant/tests/echonet_floor_heater_migration.yml name[casing]
 roles/homeassistant/tests/floor_heater_operation_status_sync.yml name[casing]
 roles/homeassistant/tests/hills_card_notification.yml name[casing]
