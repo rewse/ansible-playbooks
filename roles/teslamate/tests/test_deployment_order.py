@@ -1,10 +1,9 @@
 """Deployment ordering contracts for the TeslaMate role."""
 
-from pathlib import Path
 import unittest
+from pathlib import Path
 
-import yaml
-
+import yaml  # pyright: ignore[reportMissingModuleSource]  PyYAML ships with Ansible on the control node, outside the hook environment
 
 TASKS_PATH = Path(__file__).parents[1] / "tasks" / "main.yml"
 

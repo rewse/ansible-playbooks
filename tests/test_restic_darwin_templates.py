@@ -9,7 +9,6 @@ import tempfile
 import textwrap
 import unittest
 
-
 REPO_ROOT = pathlib.Path(__file__).resolve().parents[1]
 ROLE = REPO_ROOT / "roles" / "restic-darwin"
 FILES = ROLE / "files"

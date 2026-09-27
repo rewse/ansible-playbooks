@@ -11,8 +11,9 @@
 
 trap 'my_exit 1' 1 2 3 15
 
-readonly queryfile=$(mktemp --tmpdir ec2.XXXXXXXXXX)
-readonly resultfile=$(mktemp --tmpdir ec2.XXXXXXXXXX)
+queryfile=$(mktemp --tmpdir ec2.XXXXXXXXXX)
+resultfile=$(mktemp --tmpdir ec2.XXXXXXXXXX)
+readonly queryfile resultfile
 readonly region=ap-northeast-1
 
 # EC2 and EBS publish every five minutes. The window reaches back an hour and the
@@ -30,9 +31,9 @@ queries=()
 # {{{ my_exit()
 
 my_exit() {
-    rm -f $queryfile $resultfile
-    echo $1
-    exit $1
+    rm -f "$queryfile" "$resultfile"
+    echo "$1"
+    exit "$1"
 }
 
 # }}}
@@ -41,11 +42,13 @@ my_exit() {
 # The instance answers nothing without a token, so a plain GET returns an empty
 # string and every dimension built from it is rejected by the API.
 metadata() {
-    local token=$(curl -s -m 3 -X PUT http://169.254.169.254/latest/api/token \
+    local token
+
+    token=$(curl -s -m 3 -X PUT http://169.254.169.254/latest/api/token \
         -H "X-aws-ec2-metadata-token-ttl-seconds: 60")
 
     curl -s -m 3 -H "X-aws-ec2-metadata-token: ${token}" \
-        http://169.254.169.254/latest/meta-data/$1
+        "http://169.254.169.254/latest/meta-data/$1"
 }
 
 # }}}
@@ -67,7 +70,9 @@ query_id() {
 add_query() {
     local key=$1 namespace=$2 metric=$3 dimension=$4 value=$5 stat=$6
     local mul=${7:-1} div=${8:-1} over=${9:-}
-    local id=$(query_id "$key")
+    local id
+
+    id=$(query_id "$key")
 
     query_key[$id]=$key
     query_mul[$id]=$mul
@@ -85,16 +90,16 @@ add_query() {
 plan_ec2() {
     local d=InstanceId v=$1
 
-    add_query cloudwatch.ec2.cpu_credit_balance           AWS/EC2 CPUCreditBalance           $d $v Average
-    add_query cloudwatch.ec2.cpu_credit_usage             AWS/EC2 CPUCreditUsage             $d $v Sum     12
-    add_query cloudwatch.ec2.cpu_utilization              AWS/EC2 CPUUtilization             $d $v Average
-    add_query cloudwatch.ec2.network_in                   AWS/EC2 NetworkIn                  $d $v Sum      1 $period
-    add_query cloudwatch.ec2.network_out                  AWS/EC2 NetworkOut                 $d $v Sum      1 $period
-    add_query cloudwatch.ec2.network_packets_in           AWS/EC2 NetworkPacketsIn           $d $v Sum      1 $period
-    add_query cloudwatch.ec2.network_packets_out          AWS/EC2 NetworkPacketsOut          $d $v Sum      1 $period
-    add_query cloudwatch.ec2.status_check_failed          AWS/EC2 StatusCheckFailed          $d $v Maximum
-    add_query cloudwatch.ec2.status_check_failed_instance AWS/EC2 StatusCheckFailed_Instance $d $v Maximum
-    add_query cloudwatch.ec2.status_check_failed_system   AWS/EC2 StatusCheckFailed_System   $d $v Maximum
+    add_query cloudwatch.ec2.cpu_credit_balance           AWS/EC2 CPUCreditBalance           "$d" "$v" Average
+    add_query cloudwatch.ec2.cpu_credit_usage             AWS/EC2 CPUCreditUsage             "$d" "$v" Sum     12
+    add_query cloudwatch.ec2.cpu_utilization              AWS/EC2 CPUUtilization             "$d" "$v" Average
+    add_query cloudwatch.ec2.network_in                   AWS/EC2 NetworkIn                  "$d" "$v" Sum      1 "$period"
+    add_query cloudwatch.ec2.network_out                  AWS/EC2 NetworkOut                 "$d" "$v" Sum      1 "$period"
+    add_query cloudwatch.ec2.network_packets_in           AWS/EC2 NetworkPacketsIn           "$d" "$v" Sum      1 "$period"
+    add_query cloudwatch.ec2.network_packets_out          AWS/EC2 NetworkPacketsOut          "$d" "$v" Sum      1 "$period"
+    add_query cloudwatch.ec2.status_check_failed          AWS/EC2 StatusCheckFailed          "$d" "$v" Maximum
+    add_query cloudwatch.ec2.status_check_failed_instance AWS/EC2 StatusCheckFailed_Instance "$d" "$v" Maximum
+    add_query cloudwatch.ec2.status_check_failed_system   AWS/EC2 StatusCheckFailed_System   "$d" "$v" Maximum
 }
 
 # }}}
@@ -107,27 +112,27 @@ plan_ebs() {
     local device=$1 volume=$2
     local d=VolumeId
 
-    add_query "cloudwatch.ebs.volume_idle_time[$device]"       AWS/EBS VolumeIdleTime     $d $volume Sum   100 $period
-    add_query "cloudwatch.ebs.volume_queue_length[$device]"    AWS/EBS VolumeQueueLength  $d $volume Average
-    add_query "cloudwatch.ebs.volume_read_bytes[$device]"      AWS/EBS VolumeReadBytes    $d $volume Sum     1 $period
-    add_query "cloudwatch.ebs.volume_read_opts[$device]"       AWS/EBS VolumeReadOps      $d $volume Sum     1 $period
-    add_query "cloudwatch.ebs.volume_write_bytes[$device]"     AWS/EBS VolumeWriteBytes   $d $volume Sum     1 $period
-    add_query "cloudwatch.ebs.volume_write_opts[$device]"      AWS/EBS VolumeWriteOps     $d $volume Sum     1 $period
+    add_query "cloudwatch.ebs.volume_idle_time[$device]"       AWS/EBS VolumeIdleTime     "$d" "$volume" Sum   100 "$period"
+    add_query "cloudwatch.ebs.volume_queue_length[$device]"    AWS/EBS VolumeQueueLength  "$d" "$volume" Average
+    add_query "cloudwatch.ebs.volume_read_bytes[$device]"      AWS/EBS VolumeReadBytes    "$d" "$volume" Sum     1 "$period"
+    add_query "cloudwatch.ebs.volume_read_opts[$device]"       AWS/EBS VolumeReadOps      "$d" "$volume" Sum     1 "$period"
+    add_query "cloudwatch.ebs.volume_write_bytes[$device]"     AWS/EBS VolumeWriteBytes   "$d" "$volume" Sum     1 "$period"
+    add_query "cloudwatch.ebs.volume_write_opts[$device]"      AWS/EBS VolumeWriteOps     "$d" "$volume" Sum     1 "$period"
 
     # Per operation rather than per period, which needs the operation count as a
     # denominator. The Average statistic does not answer this: EBS publishes at a
     # one minute granularity, so averaging over five of them gives the mean bytes
     # per minute, which reads as tens of megabytes for an operation that cannot
     # exceed 256 KiB.
-    add_query "cloudwatch.ebs.volume_read_bpop[$device]"  AWS/EBS VolumeReadBytes  $d $volume Sum 1 1 \
+    add_query "cloudwatch.ebs.volume_read_bpop[$device]"  AWS/EBS VolumeReadBytes  "$d" "$volume" Sum 1 1 \
         "cloudwatch.ebs.volume_read_opts[$device]"
-    add_query "cloudwatch.ebs.volume_write_bpop[$device]" AWS/EBS VolumeWriteBytes $d $volume Sum 1 1 \
+    add_query "cloudwatch.ebs.volume_write_bpop[$device]" AWS/EBS VolumeWriteBytes "$d" "$volume" Sum 1 1 \
         "cloudwatch.ebs.volume_write_opts[$device]"
 
     # Seconds spent divided by the operations that spent them, in milliseconds.
-    add_query "cloudwatch.ebs.volume_total_read_time[$device]"  AWS/EBS VolumeTotalReadTime  $d $volume Sum 1000 1 \
+    add_query "cloudwatch.ebs.volume_total_read_time[$device]"  AWS/EBS VolumeTotalReadTime  "$d" "$volume" Sum 1000 1 \
         "cloudwatch.ebs.volume_read_opts[$device]"
-    add_query "cloudwatch.ebs.volume_total_write_time[$device]" AWS/EBS VolumeTotalWriteTime $d $volume Sum 1000 1 \
+    add_query "cloudwatch.ebs.volume_total_write_time[$device]" AWS/EBS VolumeTotalWriteTime "$d" "$volume" Sum 1000 1 \
         "cloudwatch.ebs.volume_write_opts[$device]"
 }
 
@@ -138,8 +143,8 @@ plan_ebs() {
 # the account, including those of other instances and those attached to nothing.
 volumes() {
     aws ec2 describe-volumes \
-        --region $region \
-        --filters Name=attachment.instance-id,Values=$1 \
+        --region "$region" \
+        --filters Name=attachment.instance-id,Values="$1" \
         --query "Volumes[*].Attachments[*].[VolumeId,Device]" \
         --output text 2> /dev/null
 }
@@ -153,10 +158,10 @@ volumes() {
 fetch() {
     local IFS=,
 
-    printf '[%s]' "${queries[*]}" > $queryfile
+    printf '[%s]' "${queries[*]}" > "$queryfile"
 
     aws cloudwatch get-metric-data \
-        --region $region \
+        --region "$region" \
         --metric-data-queries "file://$queryfile" \
         --start-time "$(date --iso-8601=seconds --date "$window")" \
         --end-time "$(date --iso-8601=seconds)" \
@@ -173,7 +178,7 @@ payload() {
 
     # The instance type changes only when someone resizes the instance, and it is
     # a string where the rest are numbers.
-    if [ $(date +%M) -lt 5 ]; then
+    if [ "$(date +%M)" -lt 5 ]; then
         printf -- '- ec2.instance_type %s\n' "$(metadata instance-type)"
     fi
 
@@ -208,19 +213,19 @@ if [ -z "$instance_id" ]; then
     my_exit 1
 fi
 
-plan_ec2 $instance_id
+plan_ec2 "$instance_id"
 
 while read -r volume device; do
     [ -z "$volume" ] && continue
-    plan_ebs $(basename $device) $volume
-done < <(volumes $instance_id)
+    plan_ebs "$(basename "$device")" "$volume"
+done < <(volumes "$instance_id")
 
-fetch > $resultfile
+fetch > "$resultfile"
 
 while read -r id value; do
-    [ -z "$id" -o "$value" = "None" ] && continue
+    { [ -z "$id" ] || [ "$value" = "None" ]; } && continue
     raw_value[$id]=$value
-done < $resultfile
+done < "$resultfile"
 
 payload | zabbix_sender -c /etc/zabbix/zabbix_agentd.conf -i - > /dev/null 2>&1
 
