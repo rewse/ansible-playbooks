@@ -1,45 +1,9 @@
 ---
-- name: "mysql : Read installed apt config version"
-  ansible.builtin.command:
-    argv:
-      - dpkg-query
-      - --show
-      - '--showformat=${Version}'
-      - mysql-apt-config
-  register: client_mysql_apt_config_installed
-  changed_when: false
-  failed_when: false
-  check_mode: false
-  tags:
-    - database-client
-    - install
-    - mysql
-    - database-client_mysql
-    - database-client_mysql_config
-
-- name: "mysql : Compare apt config version"
-  ansible.builtin.command:
-    argv:
-      - dpkg
-      - --compare-versions
-      - "{{ client_mysql_apt_config_installed.stdout }}"
-      - ge
-      - "{{ database_mysql_apt_config_version }}"
-  register: client_mysql_apt_config_version_check
-  changed_when: false
-  failed_when: false
-  check_mode: false
-  tags:
-    - database-client
-    - install
-    - mysql
-    - database-client_mysql
-    - database-client_mysql_config
-
 - name: "mysql : Add apt repository"
   ansible.builtin.apt:
-    deb: https://repo.mysql.com//mysql-apt-config_{{ database_mysql_apt_config_version }}_all.deb
-  when: client_mysql_apt_config_version_check.rc != 0
+    # The unversioned name always serves the newest release; apt then keeps the
+    # repository's packages current.
+    deb: https://repo.mysql.com/mysql-apt-config.deb
   tags:
     - database-client
     - install
@@ -63,7 +27,8 @@
 
 - name: "mysql : Install connector-j"
   ansible.builtin.apt:
-    deb: https://cdn.mysql.com//Downloads/Connector-J/mysql-connector-j_{{ database_mysql_connector_version }}ubuntu{{ ansible_facts['distribution_version'] }}_all.deb
+    name: mysql-connector-j
+    state: present
   tags:
     - database-client
     - install
@@ -71,15 +36,61 @@
     - database-client_mysql
     - database-client_mysql_install
 
-- name: "oracle : Extract instantclient archives"
-  ansible.builtin.unarchive:
-    src: https://download.oracle.com/otn_software/linux/instantclient/{{ database_oracle_instantclient_version | replace('.', '') }}/instantclient-{{ item }}-linux.x64-{{ database_oracle_instantclient_version }}.zip
-    dest: /srv
-    remote_src: true
+# Oracle serves the newest release under an unversioned name, so every run
+# downloads it and extracts only when the archive changed.
+- name: "oracle : Download instantclient archives"
+  ansible.builtin.get_url:
+    url: "https://download.oracle.com/otn_software/linux/instantclient/instantclient-{{ item }}-{{ ('linux-arm64' if ansible_facts['architecture'] == 'aarch64' else 'linuxx64') }}.zip"
+    dest: "/usr/local/src/instantclient-{{ item }}.zip"
+    mode: "0644"
+    force: true
   loop:
     - basic
     - sqlplus
     - tools
+  register: __database_client_instantclient_download
+  tags:
+    - database-client
+    - install
+    - oracle
+    - database-client_oracle
+    - database-client_oracle_install
+
+- name: "oracle : Extract instantclient archives"
+  ansible.builtin.unarchive:
+    src: "{{ item.dest }}"
+    dest: /srv
+    remote_src: true
+  loop: "{{ __database_client_instantclient_download.results }}"
+  loop_control:
+    label: "{{ item.item }}"
+  # A dry run does not download the archive to extract.
+  when: item is changed and not ansible_check_mode
+  tags:
+    - database-client
+    - install
+    - oracle
+    - database-client_oracle
+    - database-client_oracle_install
+
+- name: "oracle : Find instantclient directories"
+  ansible.builtin.find:
+    paths: /srv
+    patterns: "instantclient_*"
+    file_type: directory
+  register: __database_client_instantclient_dirs
+  tags:
+    - database-client
+    - install
+    - oracle
+    - database-client_oracle
+    - database-client_oracle_install
+
+- name: "oracle : Select newest instantclient directory"
+  ansible.builtin.set_fact:
+    __database_client_instantclient_dir: >-
+      {{ __database_client_instantclient_dirs.files | map(attribute='path')
+         | community.general.version_sort | last }}
   tags:
     - database-client
     - install
@@ -113,7 +124,7 @@
 
 - name: "oracle : Create symlink for ojdbc.jar"
   ansible.builtin.file:
-    src: /srv/instantclient_{{ database_oracle_instantclient_version.split('.')[0] }}_{{ database_oracle_instantclient_version.split('.')[1] }}/ojdbc8.jar
+    src: "{{ __database_client_instantclient_dir }}/ojdbc8.jar"
     dest: /usr/share/java/ojdbc11.jar
     state: link
   tags:

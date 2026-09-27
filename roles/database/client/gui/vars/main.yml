@@ -1,3 +1,4 @@
 ---
+# The current LTS, which DBeaver and the Schema Conversion Tool run on. The
+# package itself stays current through apt; only the major is chosen here.
 database_corretto_version: 25
-database_sct_version: 1.0.676

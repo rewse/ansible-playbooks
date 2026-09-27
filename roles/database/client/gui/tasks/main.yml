@@ -53,9 +53,18 @@
     remote_src: true
   tags: [database-client-gui, install, sct]
 
+- name: "sct : Find package"
+  ansible.builtin.find:
+    paths: /usr/local/src
+    patterns: "aws-schema-conversion-tool-*.deb"
+  register: __database_client_gui_sct_debs
+  tags: [database-client-gui, install, sct]
+
 - name: "sct : Install package"
   ansible.builtin.apt:
-    deb: /usr/local/src/aws-schema-conversion-tool-{{ database_sct_version }}.deb
+    deb: "{{ __database_client_gui_sct_debs.files | map(attribute='path') | community.general.version_sort | last }}"
+  # A dry run does not extract a first archive.
+  when: __database_client_gui_sct_debs.matched > 0
   tags: [database-client-gui, install, sct]
 
 - name: "dbeaver : Install package"
