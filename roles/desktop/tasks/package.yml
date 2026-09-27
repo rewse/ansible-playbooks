@@ -1,0 +1,7 @@
+---
+- name: package | Install packages
+  ansible.builtin.apt:
+    name:
+      - fonts-ricty-diminished
+      - tigervnc-standalone-server
+      - ubuntu-desktop

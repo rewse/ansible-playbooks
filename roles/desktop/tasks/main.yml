@@ -1,70 +1,11 @@
 ---
-- name: "desktop : Install packages"
-  ansible.builtin.apt:
-    name:
-      - fonts-ricty-diminished
-      - tigervnc-standalone-server
-      - ubuntu-desktop
+- name: Import package tasks
+  ansible.builtin.import_tasks: package.yml
   tags:
-    - desktop
-    - install
-    - desktop_desktop
-    - desktop_desktop_install
+    - desktop_package
 
-- name: "terminal : Resolve aged commit one-gnome-terminal"
-  ansible.builtin.set_fact:
-    __desktop_one_gnome_terminal: "{{ lookup('aged_release', 'github-commit:denysdovhan/one-gnome-terminal') }}"
+- name: Import terminal tasks
+  ansible.builtin.import_tasks: terminal.yml
   tags:
-    - desktop
-    - install
-    - terminal
     - desktop_terminal
-    - desktop_terminal_config
-
-- name: "terminal : Clone one-gnome-terminal theme"
-  ansible.builtin.git:
-    repo: https://github.com/denysdovhan/one-gnome-terminal.git
-    dest: /usr/local/src/one-gnome-terminal
-    version: "{{ __desktop_one_gnome_terminal.commit }}"
-  tags:
-    - desktop
-    - install
-    - terminal
-    - desktop_terminal
-    - desktop_terminal_config
-
-
-- name: "terminal : Remove legacy checkout"
-  ansible.builtin.file:
-    path: /srv/git/one-gnome-terminal
-    state: absent
-  tags:
-    - desktop
-    - install
-    - terminal
-    - desktop_terminal
-    - desktop_terminal_config
-
-- name: "terminal : Apply one-dark theme"
-  become: true
-  become_user: "{{ admin }}"
-  ansible.builtin.command: bash /usr/local/src/one-gnome-terminal/one-dark.sh
-  changed_when: false
-  tags:
-    - desktop
-    - config
-    - terminal
-    - desktop_terminal
-    - desktop_terminal_config
-
-- name: "terminal : Set font to Ricty Diminished"
-  become: true
-  become_user: "{{ admin }}"
-  ansible.builtin.command: gsettings set org.gnome.desktop.interface monospace-font-name "Ricty Diminished Regular 12"
-  changed_when: false
-  tags:
-    - desktop
-    - config
-    - terminal
-    - desktop_terminal
-    - desktop_terminal_config
+    - update

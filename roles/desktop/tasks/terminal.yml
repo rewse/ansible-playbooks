@@ -1,0 +1,24 @@
+---
+- name: terminal | Resolve aged commit
+  ansible.builtin.set_fact:
+    __desktop_one_gnome_terminal: "{{ lookup('aged_release', 'github-commit:denysdovhan/one-gnome-terminal') }}"
+
+- name: terminal | Check out one-gnome-terminal
+  ansible.builtin.git:
+    repo: https://github.com/denysdovhan/one-gnome-terminal.git
+    dest: /usr/local/src/one-gnome-terminal
+    version: "{{ __desktop_one_gnome_terminal.commit }}"
+
+- name: terminal | Apply one-dark theme
+  # The theme ships only as a script that writes the GNOME Terminal profile.
+  ansible.builtin.command: bash /usr/local/src/one-gnome-terminal/one-dark.sh
+  changed_when: false
+  become: true
+  become_user: "{{ admin }}"
+
+- name: terminal | Set font to Ricty Diminished
+  # community.general.dconf needs a D-Bus session, which a non-interactive login lacks.
+  ansible.builtin.command: gsettings set org.gnome.desktop.interface monospace-font-name "Ricty Diminished Regular 12"
+  changed_when: false
+  become: true
+  become_user: "{{ admin }}"
