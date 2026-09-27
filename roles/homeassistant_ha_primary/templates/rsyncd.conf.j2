@@ -1,3 +1,4 @@
+{{ ansible_managed | comment }}
 uid = root
 gid = root
 use chroot = yes
@@ -22,5 +23,5 @@ log file = /var/log/rsyncd.log
     comment = Certificates for the host standing in for this one
     read only = yes
     list = no
-    hosts allow = {{ homeassistant_ha_standby_ip }}
+    hosts allow = {{ homeassistant_ha_primary_standby_ip }}
     hosts deny = *

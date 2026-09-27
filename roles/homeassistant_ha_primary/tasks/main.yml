@@ -1,0 +1,10 @@
+---
+- name: Import rsync tasks
+  ansible.builtin.import_tasks: rsync.yml
+  tags:
+    - homeassistant_ha_primary_rsync
+
+- name: Import zabbix tasks
+  ansible.builtin.import_tasks: zabbix.yml
+  tags:
+    - homeassistant_ha_primary_zabbix
