@@ -1,0 +1,13 @@
+---
+- name: guardduty | Copy monitoring script
+  ansible.builtin.copy:
+    src: guardduty.sh
+    dest: /usr/lib/zabbix/agentscripts
+    mode: "0755"
+
+- name: guardduty | Copy agent config
+  ansible.builtin.copy:
+    src: guardduty.conf
+    dest: /etc/zabbix/zabbix_agentd.d
+    mode: "0644"
+  notify: Restart zabbix-agent

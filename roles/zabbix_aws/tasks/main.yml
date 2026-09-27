@@ -1,0 +1,5 @@
+---
+- name: Import guardduty tasks
+  ansible.builtin.import_tasks: guardduty.yml
+  tags:
+    - zabbix_aws_guardduty
