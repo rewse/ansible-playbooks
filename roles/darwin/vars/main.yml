@@ -119,8 +119,9 @@ darwin_casks:
   - zed
   - zoom
 
+# Aikido Safe Chain is not listed: its official installer in the security
+# component removes the npm copy in favour of its own binary.
 darwin_npm_packages:
-  - "@aikidosec/safe-chain"
   - ctx7
   - "@playwright/mcp@latest"
   - skills
