@@ -1,0 +1,46 @@
+---
+- name: app | Check existing checkout
+  ansible.builtin.stat:
+    path: /opt/stock-price-fetcher/.git
+  register: __zabbix_money_market_checkout
+
+- name: app | Trust the checkout for root
+  # git refuses a repository owned by another user; the checkout is owned by zabbix.
+  community.general.git_config:
+    name: safe.directory
+    scope: global
+    value: /opt/stock-price-fetcher
+
+- name: app | Check out repository
+  # This account's own repository follows main without a cooldown.
+  ansible.builtin.git:
+    repo: git@github.com:rewse/stock-price-fetcher.git
+    dest: /opt/stock-price-fetcher
+    accept_hostkey: true
+    key_file: /home/{{ admin }}/.ssh/id_rsa
+    version: main
+
+- name: app | Set ownership
+  ansible.builtin.file:
+    path: /opt/stock-price-fetcher
+    owner: zabbix
+    group: zabbix
+    recurse: true
+
+- name: app | Sync dependencies
+  # uv has no Ansible module. The committed lockfile of this account's own
+  # repository pins every version, so the cooldown environment does not apply.
+  ansible.builtin.command: uv sync
+  args:
+    chdir: /opt/stock-price-fetcher
+  become: true
+  become_user: zabbix
+  register: __zabbix_money_market_sync
+  changed_when: "'Installed' in __zabbix_money_market_sync.stderr or 'Uninstalled' in __zabbix_money_market_sync.stderr"
+  # A dry run does not create a first checkout.
+  when: not ansible_check_mode or __zabbix_money_market_checkout.stat.exists
+
+- name: app | Remove legacy checkout
+  ansible.builtin.file:
+    path: /usr/lib/zabbix/stock-price-fetcher
+    state: absent

@@ -9,7 +9,7 @@ provider="${2:-}"
 
 LOCK_FILE="/run/zabbix/stock-price-fetcher.lock"
 
-cd /usr/lib/zabbix/stock-price-fetcher
+cd /opt/stock-price-fetcher
 
 # Serialize execution to prevent agent-browser session conflicts
 exec 9>"$LOCK_FILE"

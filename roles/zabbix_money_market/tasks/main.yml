@@ -1,0 +1,11 @@
+---
+- name: Import app tasks
+  ansible.builtin.import_tasks: app.yml
+  tags:
+    - zabbix_money_market_app
+    - update
+
+- name: Import script tasks
+  ansible.builtin.import_tasks: script.yml
+  tags:
+    - zabbix_money_market_script
