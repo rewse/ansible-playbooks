@@ -1,9 +1,0 @@
----
-- name: sudo | Allow passwordless sudo for admin
-  ansible.builtin.lineinfile:
-    dest: /etc/sudoers.d/00-{{ admin }}
-    regexp: "^{{ admin }}"
-    line: "{{ admin }} ALL=(ALL) NOPASSWD: ALL"
-    create: true
-    mode: "0440"
-    validate: visudo -cf %s

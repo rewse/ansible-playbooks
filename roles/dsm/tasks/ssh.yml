@@ -1,7 +1,0 @@
----
-- name: ssh | Disable StrictModes
-  ansible.builtin.lineinfile:
-    path: /etc/ssh/sshd_config
-    insertafter: '^#StrictModes yes'
-    line: StrictModes no
-  notify: Restart ssh
