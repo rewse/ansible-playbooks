@@ -1,0 +1,6 @@
+---
+- name: compose | Create compose directory
+  ansible.builtin.file:
+    path: /etc/compose
+    state: directory
+    mode: "0755"

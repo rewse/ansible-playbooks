@@ -1,12 +1,7 @@
 ---
-- name: "docker: Reload"
+- name: Reload docker
   # Reload rather than restart: a restart takes every container down with it, while
   # SIGHUP is enough for the daemon to reread daemon.json.
   ansible.builtin.systemd:
     name: docker
     state: reloaded
-
-- name: "docker : Restart zabbix-agent"
-  ansible.builtin.systemd:
-    name: zabbix-agent
-    state: restarted
