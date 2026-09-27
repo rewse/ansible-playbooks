@@ -1,7 +1,7 @@
 ---
-- name: database | Resolve aged commit of the init script
+- name: database | Resolve aged release of the init script
   ansible.builtin.set_fact:
-    __couchdb_livesync: "{{ lookup('aged_release', 'github-commit:vrtmrz/obsidian-livesync') }}"
+    __couchdb_livesync: "{{ lookup('aged_release', 'github-tag:vrtmrz/obsidian-livesync') }}"
 
 # Fetched with uri and written with copy rather than get_url, which in check mode
 # reports a forced download as changed without comparing content.

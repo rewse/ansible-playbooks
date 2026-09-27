@@ -15,6 +15,7 @@
   ansible.builtin.import_tasks: database.yml
   tags:
     - couchdb_database
+    - update
 
 - name: Import apache tasks
   ansible.builtin.import_tasks: apache.yml
