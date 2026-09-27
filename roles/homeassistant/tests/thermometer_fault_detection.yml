@@ -64,12 +64,12 @@
           - sensor.moms_room_switchbot_meter_temperature
           - sensor.moms_room_temperature
   tasks:
-    - name: "thermometer-fault-test : Parse shared configuration"
+    - name: Parse shared configuration
       ansible.builtin.set_fact:
         homeassistant_sensors: "{{ lookup('file', '../files/sensors.yaml') | from_yaml }}"
         homeassistant_templates: "{{ lookup('file', '../files/templates.yaml') | from_yaml }}"
 
-    - name: "thermometer-fault-test : Collect template binary sensors"
+    - name: Collect template binary sensors
       ansible.builtin.set_fact:
         homeassistant_template_binary_sensors: >-
           {{ homeassistant_templates
@@ -77,7 +77,7 @@
              | map(attribute='binary_sensor')
              | flatten }}
 
-    - name: "thermometer-fault-test : Verify each room contract"
+    - name: Verify each room contract
       ansible.builtin.include_tasks: thermometer_fault_detection_room.yml
       loop: "{{ room_contracts }}"
       loop_control:

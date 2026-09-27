@@ -4,7 +4,7 @@
   connection: local
   gather_facts: false
   tasks:
-    - name: "zone-test : Read configuration"
+    - name: Read configuration
       ansible.builtin.set_fact:
         homeassistant_secrets_template: >-
           {{ lookup('file', '../templates/secrets.yaml.j2') }}
@@ -13,21 +13,21 @@
         homeassistant_zones_raw: >-
           {{ lookup('file', '../files/zones.yaml') }}
 
-    - name: "zone-test : Parse configuration"
+    - name: Parse configuration
       ansible.builtin.set_fact:
         homeassistant_zones: >-
           {{ homeassistant_zones_raw
              | regex_replace('!secret ', '')
              | from_yaml }}
 
-    - name: "zone-test : Find office zone"
+    - name: Find office zone
       ansible.builtin.set_fact:
         homeassistant_office_zones: >-
           {{ homeassistant_zones
              | selectattr('name', 'equalto', 'Office')
              | list }}
 
-    - name: "zone-test : Verify office zone"
+    - name: Verify office zone
       ansible.builtin.assert:
         that:
           - homeassistant_office_zones | length == 1

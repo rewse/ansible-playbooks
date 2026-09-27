@@ -1,89 +1,89 @@
 ---
-- name: "hygrometer-fault-test : Parse {{ room_contract.prefix }} automations"
+- name: tests | hygrometer_fault_detection_room | Parse automations for {{ room_contract.prefix }}
   ansible.builtin.set_fact:
-    room_alarm_automations: >-
+    homeassistant_test_room_alarm_automations: >-
       {{ lookup('file', '../files/' ~ room_contract.alarm_file) | from_yaml }}
-    room_climate_automations: >-
+    homeassistant_test_room_climate_automations: >-
       {{ lookup('file', '../files/' ~ room_contract.climate_file) | from_yaml }}
 
-- name: "hygrometer-fault-test : Select {{ room_contract.prefix }} entities"
+- name: tests | hygrometer_fault_detection_room | Select entities for {{ room_contract.prefix }}
   ansible.builtin.set_fact:
-    room_alarm_automation: >-
-      {{ room_alarm_automations
+    homeassistant_test_room_alarm_automation: >-
+      {{ homeassistant_test_room_alarm_automations
          | selectattr('id', 'equalto', room_contract.alarm_id)
          | list }}
-    room_control_automations: >-
-      {{ room_climate_automations
+    homeassistant_test_room_control_automations: >-
+      {{ homeassistant_test_room_climate_automations
          | selectattr('id', 'in', room_contract.control_automation_ids)
          | list }}
-    room_disagreement_sensors: >-
+    homeassistant_test_room_disagreement_sensors: >-
       {{ homeassistant_template_binary_sensors
          | selectattr('unique_id', 'equalto', 'binary_sensor.' ~ room_contract.prefix ~ '_humidity_disagreement')
          | list }}
-    room_fault_sensors: >-
+    homeassistant_test_room_fault_sensors: >-
       {{ homeassistant_template_binary_sensors
          | selectattr('unique_id', 'equalto', room_contract.fault_entity_id)
          | list }}
-    room_smoothed_sensors: >-
+    homeassistant_test_room_smoothed_sensors: >-
       {{ homeassistant_sensors
          | selectattr('unique_id', 'match', '^sensor\.' ~ room_contract.prefix ~ '_.*humidity_smoothed$')
          | list }}
 
-- name: "hygrometer-fault-test : Verify {{ room_contract.prefix }} entities exist"
+- name: tests | hygrometer_fault_detection_room | Verify entities exist for {{ room_contract.prefix }}
   ansible.builtin.assert:
     that:
-      - room_alarm_automation | length == 1
-      - room_control_automations | length == room_contract.control_automation_ids | length
-      - room_disagreement_sensors | length == 1
-      - room_fault_sensors | length == 1
-      - room_smoothed_sensors | length == 2
+      - homeassistant_test_room_alarm_automation | length == 1
+      - homeassistant_test_room_control_automations | length == room_contract.control_automation_ids | length
+      - homeassistant_test_room_disagreement_sensors | length == 1
+      - homeassistant_test_room_fault_sensors | length == 1
+      - homeassistant_test_room_smoothed_sensors | length == 2
 
-- name: "hygrometer-fault-test : Store {{ room_contract.prefix }} entities"
+- name: tests | hygrometer_fault_detection_room | Store entities for {{ room_contract.prefix }}
   ansible.builtin.set_fact:
-    room_alarm_automation_value: "{{ room_alarm_automation[0] }}"
-    room_disagreement_sensor: "{{ room_disagreement_sensors[0] }}"
-    room_fault_sensor: "{{ room_fault_sensors[0] }}"
+    homeassistant_test_room_alarm_automation_value: "{{ homeassistant_test_room_alarm_automation[0] }}"
+    homeassistant_test_room_disagreement_sensor: "{{ homeassistant_test_room_disagreement_sensors[0] }}"
+    homeassistant_test_room_fault_sensor: "{{ homeassistant_test_room_fault_sensors[0] }}"
 
-- name: "hygrometer-fault-test : Verify {{ room_contract.prefix }} smoothing"
+- name: tests | hygrometer_fault_detection_room | Verify smoothing for {{ room_contract.prefix }}
   ansible.builtin.assert:
     that:
       - item.entity_id in room_contract.source_entity_ids
       - item.state_characteristic == 'average_step'
       - item.max_age.hours == 1
       - item.unique_id in room_contract.smoothed_entity_ids
-  loop: "{{ room_smoothed_sensors }}"
+  loop: "{{ homeassistant_test_room_smoothed_sensors }}"
 
-- name: "hygrometer-fault-test : Verify {{ room_contract.prefix }} smoothed wiring"
+- name: tests | hygrometer_fault_detection_room | Verify smoothed wiring for {{ room_contract.prefix }}
   ansible.builtin.assert:
     that:
-      - "(\"states('\" ~ item ~ \"')\") in room_disagreement_sensor.state"
-      - "(\"is_number(states('\" ~ item ~ \"'))\") in room_disagreement_sensor.state"
-      - "(\"states('\" ~ item ~ \"')\") in room_alarm_automation_value.actions[0].data.message"
+      - "(\"states('\" ~ item ~ \"')\") in homeassistant_test_room_disagreement_sensor.state"
+      - "(\"is_number(states('\" ~ item ~ \"'))\") in homeassistant_test_room_disagreement_sensor.state"
+      - "(\"states('\" ~ item ~ \"')\") in homeassistant_test_room_alarm_automation_value.actions[0].data.message"
   loop: "{{ room_contract.smoothed_entity_ids }}"
 
-- name: "hygrometer-fault-test : Verify {{ room_contract.prefix }} persistence"
+- name: tests | hygrometer_fault_detection_room | Verify persistence for {{ room_contract.prefix }}
   ansible.builtin.assert:
     that:
-      - room_disagreement_sensor.delay_on.hours == 2
-      - room_fault_sensor.delay_off.hours == 1
-      - "'> 10' in room_disagreement_sensor.state"
-      - room_fault_sensor.state | regex_findall('not is_number') | length == 2
-      - room_fault_sensor.state | regex_findall('primary \\| float < 1') | length == 1
-      - room_fault_sensor.state | regex_findall('primary \\| float > 99') | length == 1
-      - room_fault_sensor.state | regex_findall('secondary \\| float < 1') | length == 1
-      - room_fault_sensor.state | regex_findall('secondary \\| float > 99') | length == 1
-      - room_fault_sensor.state | regex_findall('>= 7200') | length == 2
+      - homeassistant_test_room_disagreement_sensor.delay_on.hours == 2
+      - homeassistant_test_room_fault_sensor.delay_off.hours == 1
+      - "'> 10' in homeassistant_test_room_disagreement_sensor.state"
+      - homeassistant_test_room_fault_sensor.state | regex_findall('not is_number') | length == 2
+      - homeassistant_test_room_fault_sensor.state | regex_findall('primary \\| float < 1') | length == 1
+      - homeassistant_test_room_fault_sensor.state | regex_findall('primary \\| float > 99') | length == 1
+      - homeassistant_test_room_fault_sensor.state | regex_findall('secondary \\| float < 1') | length == 1
+      - homeassistant_test_room_fault_sensor.state | regex_findall('secondary \\| float > 99') | length == 1
+      - homeassistant_test_room_fault_sensor.state | regex_findall('>= 7200') | length == 2
       - >-
         ("is_state('binary_sensor." ~ room_contract.prefix ~
-         "_humidity_disagreement', 'on')") in room_fault_sensor.state
+         "_humidity_disagreement', 'on')") in homeassistant_test_room_fault_sensor.state
 
-- name: "hygrometer-fault-test : Verify {{ room_contract.prefix }} source freshness"
+- name: tests | hygrometer_fault_detection_room | Verify source freshness for {{ room_contract.prefix }}
   ansible.builtin.assert:
     that:
-      - "('states.' ~ item ~ '.last_reported') in room_fault_sensor.state"
+      - "('states.' ~ item ~ '.last_reported') in homeassistant_test_room_fault_sensor.state"
   loop: "{{ room_contract.source_entity_ids }}"
 
-- name: "hygrometer-fault-test : Verify {{ room_contract.prefix }} secondary availability delay"
+- name: tests | hygrometer_fault_detection_room | Verify secondary availability delay for {{ room_contract.prefix }}
   ansible.builtin.assert:
     that:
       - >-
@@ -92,33 +92,33 @@
           room_contract.secondary_entity_id ~
           ".last_changed).total_seconds() >= " ~
           room_contract.secondary_unavailable_seconds
-        ) in (room_fault_sensor.state | regex_replace('\\s+', ' '))
+        ) in (homeassistant_test_room_fault_sensor.state | regex_replace('\\s+', ' '))
       - >-
         (
           "is_number(secondary) and (now() - states." ~
           room_contract.secondary_entity_id ~
           ".last_reported).total_seconds() >= 7200"
-        ) in (room_fault_sensor.state | regex_replace('\\s+', ' '))
+        ) in (homeassistant_test_room_fault_sensor.state | regex_replace('\\s+', ' '))
   when: room_contract.secondary_unavailable_seconds is defined
 
-- name: "hygrometer-fault-test : Verify {{ room_contract.prefix }} has no secondary availability delay"
+- name: tests | hygrometer_fault_detection_room | Verify has no secondary availability delay for {{ room_contract.prefix }}
   ansible.builtin.assert:
     that:
-      - "'.last_changed' not in room_fault_sensor.state"
-      - "'86400' not in room_fault_sensor.state"
+      - "'.last_changed' not in homeassistant_test_room_fault_sensor.state"
+      - "'86400' not in homeassistant_test_room_fault_sensor.state"
   when: room_contract.secondary_unavailable_seconds is not defined
 
-- name: "hygrometer-fault-test : Verify {{ room_contract.prefix }} alarm"
+- name: tests | hygrometer_fault_detection_room | Verify alarm for {{ room_contract.prefix }}
   ansible.builtin.assert:
     that:
-      - room_alarm_automation_value.triggers | length == 1
-      - room_alarm_automation_value.triggers[0].entity_id == room_contract.fault_entity_id
-      - room_alarm_automation_value.triggers[0].to == 'on'
-      - room_alarm_automation_value.actions | selectattr('action', 'equalto', 'automation.turn_off') | list | length == 0
-      - "'is_number' in room_alarm_automation_value.actions[0].data.message"
-      - "'unavailable' in room_alarm_automation_value.actions[0].data.message"
+      - homeassistant_test_room_alarm_automation_value.triggers | length == 1
+      - homeassistant_test_room_alarm_automation_value.triggers[0].entity_id == room_contract.fault_entity_id
+      - homeassistant_test_room_alarm_automation_value.triggers[0].to == 'on'
+      - homeassistant_test_room_alarm_automation_value.actions | selectattr('action', 'equalto', 'automation.turn_off') | list | length == 0
+      - "'is_number' in homeassistant_test_room_alarm_automation_value.actions[0].data.message"
+      - "'unavailable' in homeassistant_test_room_alarm_automation_value.actions[0].data.message"
 
-- name: "hygrometer-fault-test : Verify {{ room_contract.prefix }} control guards"
+- name: tests | hygrometer_fault_detection_room | Verify control guards for {{ room_contract.prefix }}
   ansible.builtin.assert:
     that:
       - >-
@@ -128,6 +128,6 @@
         | selectattr('state', 'equalto', 'off')
         | list
         | length == 1
-  loop: "{{ room_control_automations }}"
+  loop: "{{ homeassistant_test_room_control_automations }}"
   loop_control:
     label: "{{ item.id }}"

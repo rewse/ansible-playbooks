@@ -4,29 +4,29 @@
   connection: local
   gather_facts: false
   tasks:
-    - name: "floor-heater-sync-test : Parse automations"
+    - name: Parse automations
       ansible.builtin.set_fact:
         homeassistant_living_room_climate_automations: >-
           {{ lookup('file', '../files/automations-living-room-climates.yaml') | from_yaml }}
 
-    - name: "floor-heater-sync-test : Select automation"
+    - name: Select automation
       ansible.builtin.set_fact:
         homeassistant_floor_heater_sync_automations: >-
           {{ homeassistant_living_room_climate_automations
              | selectattr('id', 'equalto', 'automation.sync_living_area_floor_heater_operation_status')
              | list }}
 
-    - name: "floor-heater-sync-test : Verify automation exists"
+    - name: Verify automation exists
       ansible.builtin.assert:
         that:
           - homeassistant_floor_heater_sync_automations | length == 1
 
-    - name: "floor-heater-sync-test : Store automation"
+    - name: Store automation
       ansible.builtin.set_fact:
         homeassistant_floor_heater_sync_automation: >-
           {{ homeassistant_floor_heater_sync_automations[0] }}
 
-    - name: "floor-heater-sync-test : Verify sync contract"
+    - name: Verify sync contract
       ansible.builtin.assert:
         that:
           - homeassistant_floor_heater_sync_automation.triggers | length == 4

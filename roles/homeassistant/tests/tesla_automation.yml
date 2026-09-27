@@ -7,19 +7,19 @@
     homeassistant_tesla_active_states_template: !unsafe >-
       {{ states('sensor.model_y_state') in ['Online', 'Driving', 'Charging'] }}
   tasks:
-    - name: "tesla-test : Parse automation"
+    - name: Parse automation
       ansible.builtin.set_fact:
         homeassistant_tesla_automations: >-
           {{ lookup('file', '../files/automations-tesla.yaml') | from_yaml }}
 
-    - name: "tesla-test : Find refresh automation"
+    - name: Find refresh automation
       ansible.builtin.set_fact:
         homeassistant_refresh_automations: >-
           {{ homeassistant_tesla_automations
              | selectattr('id', 'equalto', 'automation.refresh_tesla_fleet_data')
              | list }}
 
-    - name: "tesla-test : Verify refresh contract"
+    - name: Verify refresh contract
       ansible.builtin.assert:
         that:
           - homeassistant_tesla_automations | length == 2
@@ -55,14 +55,14 @@
           - homeassistant_refresh_automations[0].mode == 'single'
 
 
-    - name: "tesla-test : Find TNS sentry automation"
+    - name: Find TNS sentry automation
       ansible.builtin.set_fact:
         homeassistant_tns_sentry_automations: >-
           {{ homeassistant_tesla_automations
              | selectattr('id', 'equalto', 'automation.enable_tesla_sentry_at_tns_azabudai_3_chome')
              | list }}
 
-    - name: "tesla-test : Verify TNS sentry contract"
+    - name: Verify TNS sentry contract
       ansible.builtin.assert:
         that:
           - homeassistant_tns_sentry_automations | length == 1

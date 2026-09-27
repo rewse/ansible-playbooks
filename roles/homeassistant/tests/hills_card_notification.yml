@@ -11,14 +11,14 @@
       ●利用先：Mastercard加盟店
       ●利用金額：７，９００円
   tasks:
-    - name: "hills-card-test : Parse configuration"
+    - name: Parse configuration
       ansible.builtin.set_fact:
         homeassistant_info_automations: >-
           {{ lookup('file', '../files/automations-info.yaml') | from_yaml }}
         homeassistant_template_groups: >-
           {{ lookup('file', '../files/templates.yaml') | from_yaml }}
 
-    - name: "hills-card-test : Parse sample email body"
+    - name: Parse sample email body
       ansible.builtin.set_fact:
         homeassistant_hills_card_sample_amount: >-
           {{
@@ -43,14 +43,14 @@
             first
           }}
 
-    - name: "hills-card-test : Find notification automation"
+    - name: Find notification automation
       ansible.builtin.set_fact:
         homeassistant_hills_card_automations: >-
           {{ homeassistant_info_automations
              | selectattr('id', 'equalto', 'automation.info_hills_card')
              | list }}
 
-    - name: "hills-card-test : Find email template group"
+    - name: Find email template group
       ansible.builtin.set_fact:
         homeassistant_hills_card_template_groups: >-
           {{ homeassistant_template_groups
@@ -59,7 +59,7 @@
              | selectattr('triggers.0.event_data.sender', 'equalto', 'e-ask@orico.co.jp')
              | list }}
 
-    - name: "hills-card-test : Verify notification contract"
+    - name: Verify notification contract
       ansible.builtin.assert:
         that:
           - homeassistant_hills_card_automations | length == 1
@@ -81,12 +81,12 @@
             == homeassistant_hills_card_message
           - homeassistant_hills_card_automations[0].actions[1].data.data.push['interruption-level'] == 'time-sensitive'
 
-    - name: "hills-card-test : Store email template group"
+    - name: Store email template group
       ansible.builtin.set_fact:
         homeassistant_hills_card_template: >-
           {{ homeassistant_hills_card_template_groups[0] }}
 
-    - name: "hills-card-test : Verify email parsing contract"
+    - name: Verify email parsing contract
       ansible.builtin.assert:
         that:
           - homeassistant_hills_card_template.triggers[0].trigger == 'event'

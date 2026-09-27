@@ -77,12 +77,12 @@
           - sensor.moms_room_humidity
           - sensor.moms_room_switchbot_meter_humidity
   tasks:
-    - name: "hygrometer-fault-test : Parse shared configuration"
+    - name: Parse shared configuration
       ansible.builtin.set_fact:
         homeassistant_sensors: "{{ lookup('file', '../files/sensors.yaml') | from_yaml }}"
         homeassistant_templates: "{{ lookup('file', '../files/templates.yaml') | from_yaml }}"
 
-    - name: "hygrometer-fault-test : Collect template entities"
+    - name: Collect template entities
       ansible.builtin.set_fact:
         homeassistant_template_binary_sensors: >-
           {{ homeassistant_templates
@@ -95,13 +95,13 @@
              | map(attribute='sensor')
              | flatten }}
 
-    - name: "hygrometer-fault-test : Verify each room contract"
+    - name: Verify each room contract
       ansible.builtin.include_tasks: hygrometer_fault_detection_room.yml
       loop: "{{ room_contracts }}"
       loop_control:
         loop_var: room_contract
 
-    - name: "hygrometer-fault-test : Verify retired sensors are absent"
+    - name: Verify retired sensors are absent
       ansible.builtin.assert:
         that:
           - item not in (homeassistant_sensors | map(attribute='unique_id') | list)
