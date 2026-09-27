@@ -1,0 +1,62 @@
+---
+- name: config | Set Server
+  ansible.builtin.lineinfile:
+    dest: /etc/zabbix/zabbix_agentd.conf
+    regexp: Server=
+    line: Server={{ zabbix_agent_server }}
+  notify: Restart zabbix-agent
+
+- name: config | Set ServerActive
+  ansible.builtin.lineinfile:
+    dest: /etc/zabbix/zabbix_agentd.conf
+    regexp: ServerActive=
+    line: ServerActive={{ zabbix_agent_server }}
+  notify: Restart zabbix-agent
+
+- name: config | Set Hostname
+  ansible.builtin.lineinfile:
+    dest: /etc/zabbix/zabbix_agentd.conf
+    regexp: Hostname=
+    line: Hostname={{ ansible_facts['nodename'] }}
+  notify: Restart zabbix-agent
+
+- name: config | Set Timeout
+  ansible.builtin.lineinfile:
+    dest: /etc/zabbix/zabbix_agentd.conf
+    insertafter: "^# Timeout="
+    regexp: "^Timeout="
+    line: Timeout=30
+  notify: Restart zabbix-agent
+
+- name: config | Set Include path
+  ansible.builtin.lineinfile:
+    dest: /etc/zabbix/zabbix_agentd.conf
+    insertafter: "^# Include="
+    regexp: "^Include="
+    line: Include=/etc/zabbix/zabbix_agentd.d/*.conf
+  notify: Restart zabbix-agent
+
+- name: config | Create config directory
+  ansible.builtin.file:
+    path: /etc/zabbix/zabbix_agentd.d
+    state: directory
+    mode: "0755"
+
+- name: config | Copy Ubuntu config
+  ansible.builtin.copy:
+    src: ubuntu.conf
+    dest: /etc/zabbix/zabbix_agentd.d
+    mode: "0644"
+  notify: Restart zabbix-agent
+
+- name: config | Create agentscripts directory
+  ansible.builtin.file:
+    path: /usr/lib/zabbix/agentscripts
+    state: directory
+    mode: "0755"
+
+- name: config | Copy sudo config
+  ansible.builtin.copy:
+    src: zabbix.sudo
+    dest: /etc/sudoers.d/zabbix
+    mode: "0440"

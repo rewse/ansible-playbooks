@@ -1,5 +1,0 @@
----
-dependencies:
-  - role: zabbix/agent/ubuntu
-    tags:
-      - zabbix_agent

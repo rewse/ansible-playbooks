@@ -1,3 +1,5 @@
 ---
 dependencies:
-  - {role: zabbix/agent}
+  - role: zabbix_agent
+    tags:
+      - zabbix_agent

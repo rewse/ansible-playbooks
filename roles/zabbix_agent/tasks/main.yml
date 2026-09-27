@@ -1,0 +1,21 @@
+---
+- name: Import package tasks
+  ansible.builtin.import_tasks: package.yml
+  tags:
+    - zabbix_agent_package
+
+- name: Import config tasks
+  ansible.builtin.import_tasks: config.yml
+  tags:
+    - zabbix_agent_config
+
+- name: Include platform tasks
+  ansible.builtin.include_tasks:
+    file: "{{ zabbix_agent_platform }}.yml"
+    apply:
+      tags:
+        - zabbix_agent
+        - zabbix_agent_platform
+  when: zabbix_agent_platform != "ubuntu"
+  tags:
+    - zabbix_agent_platform

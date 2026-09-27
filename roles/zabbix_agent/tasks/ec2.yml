@@ -1,0 +1,13 @@
+---
+- name: ec2 | Copy monitoring script
+  ansible.builtin.copy:
+    src: ec2.sh
+    dest: /usr/lib/zabbix/agentscripts
+    mode: "0755"
+
+- name: ec2 | Copy config
+  ansible.builtin.copy:
+    src: ec2.conf
+    dest: /etc/zabbix/zabbix_agentd.d
+    mode: "0644"
+  notify: Restart zabbix-agent

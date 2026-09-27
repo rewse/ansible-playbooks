@@ -1,4 +1,0 @@
----
-zabbix_agent:
-  server: zabbix.rewse.jp
-  version: 7.4

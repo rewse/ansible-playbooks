@@ -1,0 +1,5 @@
+---
+zabbix_agent_server: zabbix.rewse.jp
+# The release series of the Zabbix apt repository. Pinned because the agent must
+# not run ahead of zabbix_server, which moves to a new series by hand.
+zabbix_agent_version: "7.4"

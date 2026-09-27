@@ -1,0 +1,17 @@
+---
+- name: package | Install zabbix-release package
+  ansible.builtin.apt:
+    deb: https://repo.zabbix.com/zabbix/{{ zabbix_agent_version }}/release/ubuntu/pool/main/z/zabbix-release/zabbix-release_latest_{{ zabbix_agent_version }}+ubuntu{{ ansible_facts['distribution_version'] }}_all.deb
+
+- name: package | Install packages
+  ansible.builtin.apt:
+    name:
+      - zabbix-agent
+      - zabbix-sender
+    update_cache: true
+
+- name: package | Add zabbix user to adm group
+  ansible.builtin.user:
+    name: zabbix
+    groups: zabbix,adm
+  notify: Restart zabbix-agent

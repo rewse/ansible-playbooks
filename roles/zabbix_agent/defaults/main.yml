@@ -1,0 +1,4 @@
+---
+# Hardware or cloud the host runs on; selects tasks/<platform>.yml.
+# ubuntu adds nothing to the common tasks.
+zabbix_agent_platform: ubuntu

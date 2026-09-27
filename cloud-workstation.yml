@@ -16,10 +16,7 @@
     - role: postfix/client
       tags:
         - postfix_client
-    - role: zabbix/agent/ubuntu
-      tags:
-        - zabbix_agent
-    - role: zabbix/agent/ec2
+    - role: zabbix_agent
       tags:
         - zabbix_agent
     - role: desktop
