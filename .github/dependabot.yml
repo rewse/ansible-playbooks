@@ -8,6 +8,9 @@ updates:
     # Matches the runtime supply-chain cooldown used by the playbooks.
     cooldown:
       default-days: 4  # zizmor: ignore[dependabot-cooldown] matches the 96-hour minimum package age
+      # Own actions are exempt from the cooldown.
+      exclude:
+        - "rewse/*"
     groups:
       github-actions:
         patterns: ["*"]
