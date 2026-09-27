@@ -150,4 +150,4 @@ Secrets live in the 1Password `ansible` vault. Commit only Secret References tha
 3. **Use 1Password**: Store sensitive information in 1Password and commit only Secret References
 4. **Gradual application**: Test large changes on specific hosts first
 5. **Check results**: Judge a run by its exit code, and confirm a second run reports `changed=0`
-6. **Lint**: Run `uvx pre-commit run --all-files` before committing
+6. **Lint**: Run `uvx --with pre-commit-uv==4.3.0 pre-commit@4.6.2 run --all-files` before committing

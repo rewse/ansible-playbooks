@@ -122,7 +122,7 @@ Use only these tags, written as an indented YAML list:
 
 ### Lint
 
-- Lint through pre-commit (`uvx --with pre-commit-uv==4.3.0 pre-commit@4.6.2 run --all-files --show-diff-on-failure`) locally and in CI. It runs ansible-lint for Ansible content, shellcheck for shell scripts, and ruff and basedpyright for Python. `.yamllint` configures ansible-lint's `yaml` rule; do not run yamllint separately.
+- Lint through pre-commit (`uvx --with pre-commit-uv==4.3.0 pre-commit@4.6.2 run --all-files --show-diff-on-failure`) locally and in CI. It runs actionlint for GitHub Actions workflows, ansible-lint for Ansible content, basedpyright and ruff for Python, check-jsonschema for the Dependabot config, shellcheck for shell scripts, and zizmor for GitHub Actions workflows. `.yamllint` configures ansible-lint's `yaml` rule; do not run yamllint separately.
 - `roles/homeassistant/files/` is excluded from lint.
 - Do not add entries to `.ansible-lint-ignore` for new code.
 
