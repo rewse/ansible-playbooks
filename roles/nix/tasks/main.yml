@@ -1,0 +1,6 @@
+---
+- name: Import nix tasks
+  ansible.builtin.import_tasks: nix.yml
+  tags:
+    - nix_nix
+    - update
