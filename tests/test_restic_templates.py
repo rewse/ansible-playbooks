@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-"""Regression tests for the restic-darwin templates."""
+"""Regression tests for the restic role on macOS."""
 
 import os
 import pathlib
@@ -10,9 +10,9 @@ import textwrap
 import unittest
 
 REPO_ROOT = pathlib.Path(__file__).resolve().parents[1]
-ROLE = REPO_ROOT / "roles" / "restic-darwin"
+ROLE = REPO_ROOT / "roles" / "restic"
 FILES = ROLE / "files"
-TASKS = ROLE / "tasks" / "main.yml"
+TASKS = ROLE / "tasks" / "darwin.yml"
 TEMPLATES = ROLE / "templates"
 
 
@@ -21,14 +21,14 @@ class ResticDarwinTemplateTest(unittest.TestCase):
         template = (TEMPLATES / "restic-s3-backup.j2").read_text()
         replacements = {
             "{{ home }}": str(home),
-            "{{ restic_darwin.keep_daily }}": "30",
-            "{{ restic_darwin.keep_monthly }}": "12",
-            "{{ restic_darwin.keep_weekly }}": "8",
-            "{{ restic_darwin.materialise_timeout_seconds }}": "1",
-            "{{ restic_darwin.min_interval_hours }}": "20",
-            "{{ restic_darwin.repo_name }}": "test-host",
-            "{{ restic_darwin.s3_bucket }}": "example-bucket",
-            "{{ restic_darwin.s3_region }}": "ap-northeast-1",
+            "{{ restic_keep_daily }}": "30",
+            "{{ restic_keep_monthly }}": "12",
+            "{{ restic_keep_weekly }}": "8",
+            "{{ restic_materialise_timeout_seconds }}": "1",
+            "{{ restic_min_interval_hours }}": "20",
+            "{{ restic_repo_name }}": "test-host",
+            "{{ restic_s3_bucket }}": "example-bucket",
+            "{{ restic_s3_region }}": "ap-northeast-1",
             'export PATH="/opt/homebrew/bin:/usr/bin:/bin:/usr/sbin:/sbin"': (
                 f'export PATH="{bin_dir}:/usr/bin:/bin:/usr/sbin:/sbin"'
             ),
@@ -270,9 +270,9 @@ class ResticDarwinTemplateTest(unittest.TestCase):
         self.assertIn("restic-icloud-download.checksum", tasks)
         self.assertIn("restic-icloud-download.new", tasks)
         self.assertIn(
-            "restic_icloud_download_compiled_binary.stat.checksum is defined", tasks
+            "__restic_icloud_download_compiled_binary.stat.checksum is defined", tasks
         )
-        self.assertIn("mode: '0755'", tasks)
+        self.assertIn("mode: \"0755\"", tasks)
         self.assertIn("restic-icloud-download", tasks)
 
     def test_excludes_unreadable_and_disposable_paths(self) -> None:
@@ -303,16 +303,16 @@ class ResticDarwinTemplateTest(unittest.TestCase):
         tasks = TASKS.read_text()
 
         self.assertIn(
-            "- path: \"{{ ansible_facts['env']['HOME'] }}/.local/bin\"\n      mode: '0755'",
+            "- path: \"{{ ansible_facts['env']['HOME'] }}/.local/bin\"\n      mode: \"0755\"",
             tasks,
         )
 
     def test_repository_initialization_sources_shared_cache_environment(self) -> None:
         tasks = TASKS.read_text()
         initialize_task = tasks.split(
-            '- name: "restic : Initialise the repository"', 1
+            "- name: darwin | Initialise the repository", 1
         )[1]
-        initialize_task = initialize_task.split('- name: "restic : Copy iCloud', 1)[0]
+        initialize_task = initialize_task.split("- name: darwin | Copy iCloud", 1)[0]
 
         self.assertIn('. "${HOME}/.config/environment/cache.sh"', initialize_task)
         self.assertLess(

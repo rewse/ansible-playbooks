@@ -16,10 +16,10 @@ LOG_FILE="{{ home }}/Library/Logs/restic-s3-backup.log"
 LOG_TAG="restic-s3-backup"
 MARKER_SUCCESS="{{ home }}/.local/state/restic-s3-backup.success"
 MARKER_RETENTION="{{ home }}/.local/state/restic-s3-backup.retention"
-MATERIALISE_TIMEOUT={{ restic_darwin.materialise_timeout_seconds }}
-MIN_INTERVAL=$(( {{ restic_darwin.min_interval_hours }} * 3600 ))
+MATERIALISE_TIMEOUT={{ restic_materialise_timeout_seconds }}
+MIN_INTERVAL=$(( {{ restic_min_interval_hours }} * 3600 ))
 
-export RESTIC_REPOSITORY="s3:s3.{{ restic_darwin.s3_region }}.amazonaws.com/{{ restic_darwin.s3_bucket }}/{{ restic_darwin.repo_name }}"
+export RESTIC_REPOSITORY="s3:s3.{{ restic_s3_region }}.amazonaws.com/{{ restic_s3_bucket }}/{{ restic_repo_name }}"
 export RESTIC_PASSWORD_FILE="${CONFIG_DIR}/password"
 export RESTIC_PROGRESS_FPS=0.0166
 export PATH="/opt/homebrew/bin:/usr/bin:/bin:/usr/sbin:/sbin"
@@ -149,9 +149,9 @@ log "Backup completed"
 # Apply retention
 # -----------------------------------------------------------------------------
 nice -n 10 restic forget \
-  --keep-daily {{ restic_darwin.keep_daily }} \
-  --keep-weekly {{ restic_darwin.keep_weekly }} \
-  --keep-monthly {{ restic_darwin.keep_monthly }} \
+  --keep-daily {{ restic_keep_daily }} \
+  --keep-weekly {{ restic_keep_weekly }} \
+  --keep-monthly {{ restic_keep_monthly }} \
   --prune \
   --retry-lock=2h
 

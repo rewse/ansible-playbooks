@@ -4,7 +4,7 @@
   The repository lives on Bay 2 of the enclosure attached to the NAS host. That
   host reaches it as a local directory, every other host mounts it over NFS.
 #}
-{% set backup_is_nas = ansible_facts['hostname'] == raspberrypi_backup.nas_host %}
+{% set backup_is_nas = ansible_facts['hostname'] == restic_nas_host %}
 set -euo pipefail
 
 # The instance name of the calling unit, which is also the name of the repository
@@ -12,14 +12,14 @@ set -euo pipefail
 readonly NAME="${1:?usage: restic-local-check <repository>}"
 
 {% if backup_is_nas %}
-readonly REPO="{{ raspberrypi_backup.repo_root }}/${NAME}"
+readonly REPO="{{ restic_repo_root }}/${NAME}"
 
 # Nothing to mount: the repository is a directory on this host. The unit carries
 # RequiresMountsFor so systemd holds it back until the volume is mounted, which
 # a boot can otherwise complete without because crypttab uses nofail.
 {% else %}
 readonly REPO="/mnt/bak"
-readonly REMOTE="{{ raspberrypi_backup.nas_host }}:{{ raspberrypi_backup.repo_root }}/${NAME}"
+readonly REMOTE="{{ restic_nas_host }}:{{ restic_repo_root }}/${NAME}"
 
 # Cleanup function
 cleanup() {

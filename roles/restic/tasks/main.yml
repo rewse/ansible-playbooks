@@ -1,0 +1,19 @@
+---
+- name: Import set_vars tasks
+  ansible.builtin.import_tasks: set_vars.yml
+  tags:
+    - always
+
+- name: Import linux tasks
+  ansible.builtin.import_tasks: linux.yml
+  when: ansible_facts['system'] == "Linux"
+  tags:
+    - restic_linux
+    - update
+
+- name: Import darwin tasks
+  ansible.builtin.import_tasks: darwin.yml
+  when: ansible_facts['system'] == "Darwin"
+  tags:
+    - restic_darwin
+    - update

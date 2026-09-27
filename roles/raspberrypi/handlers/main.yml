@@ -24,30 +24,6 @@
   ansible.builtin.systemd:
     daemon_reload: true
 
-- name: "raspberrypi : Restart local backup timer"
-  ansible.builtin.systemd:
-    name: "restic-local-backup@{{ ansible_facts['hostname'] }}.timer"
-    state: restarted
-    daemon_reload: true
-
-- name: "raspberrypi : Restart local check timer"
-  ansible.builtin.systemd:
-    name: "restic-local-check@{{ ansible_facts['hostname'] }}.timer"
-    state: restarted
-    daemon_reload: true
-
-- name: "raspberrypi : Restart S3 backup timer"
-  ansible.builtin.systemd:
-    name: "restic-s3-backup@{{ ansible_facts['hostname'] }}.timer"
-    state: restarted
-    daemon_reload: true
-
-- name: "raspberrypi : Restart S3 check timer"
-  ansible.builtin.systemd:
-    name: "restic-s3-check@{{ ansible_facts['hostname'] }}.timer"
-    state: restarted
-    daemon_reload: true
-
 - name: "sysctl: Reload"
   ansible.builtin.command: sysctl --system
   changed_when: false

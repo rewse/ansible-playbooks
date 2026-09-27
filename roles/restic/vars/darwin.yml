@@ -1,0 +1,21 @@
+---
+# The repository is named after the host so that a second Mac lands beside this
+# one in the same bucket, next to the volume repositories the NAS writes.
+restic_repo_name: "{{ inventory_hostname_short }}"
+# Retention matches the volumes in the same bucket.
+restic_keep_daily: 30
+restic_keep_weekly: 8
+restic_keep_monthly: 12
+# Stop waiting for iCloud downloads eventually; any remaining placeholders are
+# reported by restic as an incomplete snapshot rather than blocking forever.
+restic_materialise_timeout_seconds: 600
+# A run is skipped when the last one succeeded this recently, so loading the
+# agent at every login costs nothing while a day missed to sleep is picked up.
+restic_min_interval_hours: 20
+restic_hour: 3
+restic_minute: 7
+# Sunday, after the volume and host checks on the NAS at nine and ten.
+restic_check_min_interval_days: 6
+restic_check_weekday: 0
+restic_check_hour: 11
+restic_check_minute: 13

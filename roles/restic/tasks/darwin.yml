@@ -1,0 +1,159 @@
+---
+- name: darwin | Install restic
+  community.general.homebrew:
+    name: restic
+    state: present
+
+- name: darwin | Create directories
+  ansible.builtin.file:
+    path: "{{ item.path }}"
+    state: directory
+    mode: "{{ item.mode }}"
+  loop:
+    - path: "{{ ansible_facts['env']['HOME'] }}/.config/restic"
+      mode: "0700"
+    - path: "{{ ansible_facts['env']['HOME'] }}/.local/bin"
+      mode: "0755"
+    - path: "{{ ansible_facts['env']['HOME'] }}/.local/libexec"
+      mode: "0700"
+    - path: "{{ ansible_facts['env']['HOME'] }}/.local/state"
+      mode: "0700"
+  loop_control:
+    label: "{{ item.path }}"
+
+- name: darwin | Install repository password
+  ansible.builtin.copy:
+    content: "{{ restic_password }}"
+    dest: "{{ ansible_facts['env']['HOME'] }}/.config/restic/password"
+    mode: "0600"
+  no_log: true
+
+- name: darwin | Install S3 credentials
+  ansible.builtin.copy:
+    content: |
+      AWS_ACCESS_KEY_ID={{ restic_aws_key }}
+      AWS_SECRET_ACCESS_KEY={{ restic_aws_secret }}
+    dest: "{{ ansible_facts['env']['HOME'] }}/.config/restic/s3.env"
+    mode: "0600"
+  no_log: true
+
+- name: darwin | Copy exclude patterns
+  ansible.builtin.template:
+    src: exclude.j2
+    dest: "{{ ansible_facts['env']['HOME'] }}/.config/restic/exclude"
+    mode: "0644"
+  vars:
+    home: "{{ ansible_facts['env']['HOME'] }}"
+
+- name: darwin | Initialise the repository
+  # restic has no module; cat config probes for an existing repository.
+  ansible.builtin.shell: |
+    if [ -r "${HOME}/.config/environment/cache.sh" ]; then
+      . "${HOME}/.config/environment/cache.sh"
+    fi
+    set -a
+    . "${HOME}/.config/restic/s3.env"
+    set +a
+    export RESTIC_REPOSITORY="s3:s3.{{ restic_s3_region }}.amazonaws.com/{{ restic_s3_bucket }}/{{ restic_repo_name }}"
+    export RESTIC_PASSWORD_FILE="${HOME}/.config/restic/password"
+    export PATH="/opt/homebrew/bin:${PATH}"
+    restic cat config >/dev/null 2>&1 && exit 0
+    restic init
+  register: __restic_init
+  changed_when: "'created restic repository' in __restic_init.stdout"
+
+- name: darwin | Copy iCloud download helper source
+  ansible.builtin.copy:
+    src: restic-icloud-download.swift
+    dest: "{{ ansible_facts['env']['HOME'] }}/.local/libexec/restic-icloud-download.swift"
+    mode: "0644"
+  register: __restic_icloud_download_source
+
+- name: darwin | Check iCloud download helper
+  ansible.builtin.stat:
+    path: "{{ ansible_facts['env']['HOME'] }}/.local/bin/restic-icloud-download"
+    checksum_algorithm: sha256
+  register: __restic_icloud_download_binary
+
+- name: darwin | Check iCloud download helper checksum
+  ansible.builtin.stat:
+    path: "{{ ansible_facts['env']['HOME'] }}/.local/libexec/restic-icloud-download.checksum"
+  register: __restic_icloud_download_marker
+
+- name: darwin | Read iCloud download helper checksum
+  ansible.builtin.slurp:
+    src: "{{ ansible_facts['env']['HOME'] }}/.local/libexec/restic-icloud-download.checksum"
+  when: __restic_icloud_download_marker.stat.exists
+  register: __restic_icloud_download_marker_content
+
+- name: darwin | Compile iCloud download helper
+  # No module compiles Swift.
+  ansible.builtin.shell: |
+    set -e
+    output="{{ ansible_facts['env']['HOME'] }}/.local/bin/restic-icloud-download.new"
+    trap 'rm -f "${output}"' EXIT
+    xcrun swiftc -O \
+      "{{ ansible_facts['env']['HOME'] }}/.local/libexec/restic-icloud-download.swift" \
+      -o "${output}"
+    chmod 0755 "${output}"
+    mv "${output}" "{{ ansible_facts['env']['HOME'] }}/.local/bin/restic-icloud-download"
+  when: >-
+    not __restic_icloud_download_binary.stat.exists or
+    not __restic_icloud_download_marker.stat.exists or
+    (__restic_icloud_download_marker_content.content | default('') | b64decode | trim) !=
+    (__restic_icloud_download_source.checksum ~ ' ' ~ (__restic_icloud_download_binary.stat.checksum | default('')))
+  register: __restic_icloud_download_compile
+  changed_when: true
+
+- name: darwin | Check compiled iCloud download helper
+  ansible.builtin.stat:
+    path: "{{ ansible_facts['env']['HOME'] }}/.local/bin/restic-icloud-download"
+    checksum_algorithm: sha256
+  register: __restic_icloud_download_compiled_binary
+
+- name: darwin | Record iCloud download helper checksum
+  ansible.builtin.copy:
+    content: "{{ __restic_icloud_download_source.checksum }} {{ __restic_icloud_download_compiled_binary.stat.checksum }}\n"
+    dest: "{{ ansible_facts['env']['HOME'] }}/.local/libexec/restic-icloud-download.checksum"
+    mode: "0600"
+  when: __restic_icloud_download_compiled_binary.stat.checksum is defined
+
+- name: darwin | Set iCloud download helper permissions
+  ansible.builtin.file:
+    path: "{{ ansible_facts['env']['HOME'] }}/.local/bin/restic-icloud-download"
+    state: file
+    mode: "0755"
+  when: __restic_icloud_download_compiled_binary.stat.exists
+
+- name: darwin | Copy scripts
+  ansible.builtin.template:
+    src: "{{ item }}.j2"
+    dest: "{{ ansible_facts['env']['HOME'] }}/.local/bin/{{ item }}"
+    mode: "0755"
+  loop:
+    - restic-s3-backup
+    - restic-s3-check
+  vars:
+    home: "{{ ansible_facts['env']['HOME'] }}"
+
+- name: darwin | Copy launchd agents
+  ansible.builtin.template:
+    src: "jp.rewse.{{ item }}.plist.j2"
+    dest: "{{ ansible_facts['env']['HOME'] }}/Library/LaunchAgents/jp.rewse.{{ item }}.plist"
+    mode: "0644"
+  loop:
+    - restic-s3-backup
+    - restic-s3-check
+  vars:
+    home: "{{ ansible_facts['env']['HOME'] }}"
+  register: __restic_agents
+
+- name: darwin | Reload launchd agents
+  # No module manages per-user launchd agents.
+  ansible.builtin.shell: |
+    launchctl bootout gui/$(id -u)/jp.rewse.{{ item.item }} 2>/dev/null || true
+    launchctl bootstrap gui/$(id -u) "{{ ansible_facts['env']['HOME'] }}/Library/LaunchAgents/jp.rewse.{{ item.item }}.plist"
+  changed_when: true
+  loop: "{{ __restic_agents.results | selectattr('changed') | list }}"
+  loop_control:
+    label: "{{ item.item }}"

@@ -8,7 +8,7 @@ OnFailure=failure-notify@%n.service
 Type=oneshot
 # The instance name is the repository name. A check needs nothing else, so unlike
 # the backup this template covers a host and a volume without a drop-in.
-Environment=RESTIC_REPOSITORY=s3:s3.{{ raspberrypi_backup.s3_region }}.amazonaws.com/{{ raspberrypi_backup.s3_bucket }}/%i
+Environment=RESTIC_REPOSITORY=s3:s3.{{ restic_s3_region }}.amazonaws.com/{{ restic_s3_bucket }}/%i
 Environment=RESTIC_PASSWORD_FILE=/etc/restic/password
 Environment=RESTIC_PROGRESS_FPS=0.0166
 Environment=XDG_CACHE_HOME=/var/cache/restic

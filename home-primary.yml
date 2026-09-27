@@ -28,6 +28,9 @@
     - role: php_miio
       tags:
         - php_miio
+    - role: restic
+      tags:
+        - restic
     - role: mhz19
       tags:
         - mhz19

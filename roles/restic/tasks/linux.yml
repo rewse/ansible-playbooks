@@ -1,0 +1,214 @@
+---
+- name: linux | Create mount point
+  ansible.builtin.file:
+    path: /mnt/bak
+    state: directory
+    mode: "0755"
+
+- name: linux | Check installed restic version
+  # restic has no module; its own version output is the only record.
+  ansible.builtin.command: restic version
+  register: __restic_installed
+  changed_when: false
+  failed_when: false
+  check_mode: false
+
+- name: linux | Resolve aged release
+  ansible.builtin.set_fact:
+    __restic_release: >-
+      {{ lookup('aged_release', 'github-release:restic/restic', asset='restic_{version}_linux_' ~ (ansible_facts['architecture'] | replace('x86_64', 'amd64') | replace('aarch64', 'arm64')) ~ '.bz2') }}
+
+- name: linux | Download restic binary archive
+  ansible.builtin.get_url:
+    url: "{{ __restic_release.url }}"
+    checksum: "{{ __restic_release.checksum | default(omit, true) }}"
+    dest: "/usr/local/src/restic_{{ (__restic_release.version | regex_replace('^v', '')) }}_linux_{{ restic_arch }}.bz2"
+    mode: "0644"
+  vars:
+    restic_arch: "{{ ansible_facts['architecture'] | replace('x86_64', 'amd64') | replace('aarch64', 'arm64') }}"
+  when: (__restic_release.version | regex_replace('^v', '')) not in (__restic_installed.stdout | default(''))
+
+- name: linux | Extract restic binary
+  # unarchive does not handle a bare .bz2 file.
+  ansible.builtin.shell: |
+    bunzip2 -kc /usr/local/src/restic_{{ (__restic_release.version | regex_replace('^v', '')) }}_linux_{{ restic_arch }}.bz2 > /usr/local/bin/restic
+    chmod 755 /usr/local/bin/restic
+  vars:
+    restic_arch: "{{ ansible_facts['architecture'] | replace('x86_64', 'amd64') | replace('aarch64', 'arm64') }}"
+  when: (__restic_release.version | regex_replace('^v', '')) not in (__restic_installed.stdout | default(''))
+  changed_when: true
+
+- name: linux | Create password directory
+  ansible.builtin.file:
+    path: /etc/restic
+    state: directory
+    mode: "0700"
+
+- name: linux | Install repository password
+  ansible.builtin.copy:
+    content: "{{ restic_password }}"
+    dest: /etc/restic/password
+    mode: "0600"
+  no_log: true
+
+- name: linux | Copy exclusion list
+  ansible.builtin.copy:
+    src: restic.exclude
+    dest: /etc
+    mode: "0644"
+
+- name: linux | Copy local backup script
+  ansible.builtin.template:
+    src: restic-local-backup.j2
+    dest: /usr/local/sbin/restic-local-backup
+    mode: "0755"
+
+- name: linux | Copy local backup service
+  ansible.builtin.template:
+    src: restic-local-backup@.service.j2
+    dest: /etc/systemd/system/restic-local-backup@.service
+    mode: "0644"
+  notify: Reload systemd
+
+- name: linux | Copy local backup timer
+  ansible.builtin.copy:
+    src: restic-local-backup@.timer
+    dest: /etc/systemd/system/restic-local-backup@.timer
+    mode: "0644"
+  notify: Restart local backup timer
+
+- name: linux | Enable and start local backup timer
+  # One instance per host, named after the repository it writes, which is named
+  # after the host.
+  ansible.builtin.systemd:
+    name: "restic-local-backup@{{ ansible_facts['hostname'] }}.timer"
+    enabled: true
+    state: started
+    daemon_reload: true
+
+- name: linux | Copy local check script
+  ansible.builtin.template:
+    src: restic-local-check.j2
+    dest: /usr/local/sbin/restic-local-check
+    mode: "0755"
+
+- name: linux | Copy local check service
+  ansible.builtin.template:
+    src: restic-local-check@.service.j2
+    dest: /etc/systemd/system/restic-local-check@.service
+    mode: "0644"
+  notify: Reload systemd
+
+- name: linux | Copy local check timer
+  ansible.builtin.copy:
+    src: restic-local-check@.timer
+    dest: /etc/systemd/system/restic-local-check@.timer
+    mode: "0644"
+  notify: Restart local check timer
+
+- name: linux | Enable and start local check timer
+  ansible.builtin.systemd:
+    name: "restic-local-check@{{ ansible_facts['hostname'] }}.timer"
+    enabled: true
+    state: started
+    daemon_reload: true
+
+- name: linux | Install S3 credentials
+  # Owned here rather than in the nas role because every host that backs up needs
+  # it, not only the one holding the disks.
+  ansible.builtin.copy:
+    content: |
+      AWS_ACCESS_KEY_ID={{ restic_aws_key }}
+      AWS_SECRET_ACCESS_KEY={{ restic_aws_secret }}
+    dest: /etc/restic/s3.env
+    mode: "0600"
+  no_log: true
+
+- name: linux | Copy S3 backup script
+  ansible.builtin.copy:
+    src: restic-s3-backup
+    dest: /usr/local/sbin/restic-s3-backup
+    mode: "0755"
+
+- name: linux | Copy S3 backup service
+  ansible.builtin.template:
+    src: restic-s3-backup@.service.j2
+    dest: /etc/systemd/system/restic-s3-backup@.service
+    mode: "0644"
+  notify: Reload systemd
+
+- name: linux | Copy S3 backup timer
+  ansible.builtin.copy:
+    src: restic-s3-backup@.timer
+    dest: /etc/systemd/system/restic-s3-backup@.timer
+    mode: "0644"
+
+- name: linux | Create S3 drop-in directories
+  # Drop-ins rather than unit files per instance: enabling a template instance
+  # links to the template, and a concrete file of the same name would leave that
+  # link pointing at the wrong place. The nas role adds its own for the volume
+  # repositories it owns.
+  ansible.builtin.file:
+    path: "/etc/systemd/system/{{ item }}"
+    state: directory
+    owner: root
+    group: root
+    mode: "0755"
+  loop:
+    - "restic-s3-backup@{{ ansible_facts['hostname'] }}.service.d"
+    - "restic-s3-backup@{{ ansible_facts['hostname'] }}.timer.d"
+    - "restic-s3-check@{{ ansible_facts['hostname'] }}.timer.d"
+
+- name: linux | Configure S3 backup source
+  ansible.builtin.copy:
+    src: restic-s3-backup-host.conf
+    dest: "/etc/systemd/system/restic-s3-backup@{{ ansible_facts['hostname'] }}.service.d/source.conf"
+    mode: "0644"
+  notify: Reload systemd
+
+- name: linux | Configure S3 backup schedule
+  ansible.builtin.template:
+    src: restic-timer-schedule.conf.j2
+    dest: "/etc/systemd/system/restic-s3-backup@{{ ansible_facts['hostname'] }}.timer.d/schedule.conf"
+    mode: "0644"
+  vars:
+    restic_timer_oncalendar: "{{ restic_s3_backup_schedule }}"
+    restic_timer_delay: 30m
+  notify: Restart S3 backup timer
+
+- name: linux | Enable and start S3 backup timer
+  ansible.builtin.systemd:
+    name: "restic-s3-backup@{{ ansible_facts['hostname'] }}.timer"
+    enabled: true
+    state: started
+    daemon_reload: true
+
+- name: linux | Copy S3 check service
+  ansible.builtin.template:
+    src: restic-s3-check@.service.j2
+    dest: /etc/systemd/system/restic-s3-check@.service
+    mode: "0644"
+  notify: Reload systemd
+
+- name: linux | Copy S3 check timer
+  ansible.builtin.copy:
+    src: restic-s3-check@.timer
+    dest: /etc/systemd/system/restic-s3-check@.timer
+    mode: "0644"
+
+- name: linux | Configure S3 check schedule
+  ansible.builtin.template:
+    src: restic-timer-schedule.conf.j2
+    dest: "/etc/systemd/system/restic-s3-check@{{ ansible_facts['hostname'] }}.timer.d/schedule.conf"
+    mode: "0644"
+  vars:
+    restic_timer_oncalendar: "{{ restic_s3_check_schedule }}"
+    restic_timer_delay: 30m
+  notify: Restart S3 check timer
+
+- name: linux | Enable and start S3 check timer
+  ansible.builtin.systemd:
+    name: "restic-s3-check@{{ ansible_facts['hostname'] }}.timer"
+    enabled: true
+    state: started
+    daemon_reload: true

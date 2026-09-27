@@ -1,4 +1,4 @@
-{% set backup_is_nas = ansible_facts['hostname'] == raspberrypi_backup.nas_host %}
+{% set backup_is_nas = ansible_facts['hostname'] == restic_nas_host %}
 [Unit]
 Description=Monthly integrity check of the local repository %i
 After=network-online.target
@@ -7,13 +7,13 @@ OnFailure=failure-notify@%n.service
 {% if backup_is_nas %}
 # See restic-local-backup@.service: the volume can be absent after a boot because
 # crypttab uses nofail, and a check against a missing repository fails anyway.
-RequiresMountsFor={{ raspberrypi_backup.repo_root }}
+RequiresMountsFor={{ restic_repo_root }}
 {% endif %}
 
 [Service]
 Type=oneshot
 {% if backup_is_nas %}
-Environment=RESTIC_REPOSITORY={{ raspberrypi_backup.repo_root }}/%i
+Environment=RESTIC_REPOSITORY={{ restic_repo_root }}/%i
 {% else %}
 Environment=RESTIC_REPOSITORY=/mnt/bak
 {% endif %}

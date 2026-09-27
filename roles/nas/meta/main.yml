@@ -1,0 +1,6 @@
+---
+# The nas role adds drop-ins to the restic S3 units and checks they exist.
+dependencies:
+  - role: restic
+    tags:
+      - restic
