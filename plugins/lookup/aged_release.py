@@ -81,7 +81,9 @@ def _parse_time(value: str) -> datetime:
     cut to microseconds. A timestamp without an offset is taken as UTC.
     """
     text = value.strip().replace("Z", "+00:00")
-    match = re.fullmatch(r"([^.+]+)(?:\.(\d+))?([+-]\d{2}:\d{2})?", text)
+    match = re.fullmatch(
+        r"(\d{4}-\d{2}-\d{2}T\d{2}:\d{2}:\d{2})(?:\.(\d+))?([+-]\d{2}:\d{2})?", text
+    )
     if not match:
         raise ValueError(f"unrecognised timestamp {value!r}")
     base, fraction, offset = match.groups()

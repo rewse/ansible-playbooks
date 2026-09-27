@@ -386,3 +386,9 @@ def test_image_created_before_2000_is_rejected():
     )
     with pytest.raises(AnsibleLookupError, match="before 2000"):
         resolve("oci:ghcr.io/o/img", run)
+
+
+def test_parse_time_honours_negative_offset():
+    assert aged_release._parse_time("2026-09-20T09:00:00-05:00") == datetime(
+        2026, 9, 20, 14, 0, tzinfo=timezone.utc
+    )
