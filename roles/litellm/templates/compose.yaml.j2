@@ -6,7 +6,8 @@ services:
     container_name: litellm
     image: {{ __litellm_image.ref }}
     ports:
-      - "4000:4000"
+      # Reached only through the Apache vhost, which terminates TLS.
+      - "127.0.0.1:4000:4000"
     volumes:
       - /srv/litellm/config.yml:/app/config.yml:ro
     environment:

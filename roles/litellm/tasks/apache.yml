@@ -1,0 +1,14 @@
+---
+- name: apache | Copy vhost config
+  ansible.builtin.copy:
+    src: litellm.rewse.jp.conf
+    dest: /etc/apache2/sites-available
+    mode: "0644"
+  notify: Reload Apache
+
+- name: apache | Enable site
+  # No module enables an Apache site; a2ensite reports whether it changed.
+  ansible.builtin.command: a2ensite litellm.rewse.jp
+  register: __litellm_a2ensite
+  changed_when: "'already enabled' not in __litellm_a2ensite.stdout"
+  notify: Reload Apache

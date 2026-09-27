@@ -1,4 +1,9 @@
 ---
+- name: Import apache tasks
+  ansible.builtin.import_tasks: apache.yml
+  tags:
+    - litellm_apache
+
 - name: Import config tasks
   ansible.builtin.import_tasks: config.yml
   tags:
