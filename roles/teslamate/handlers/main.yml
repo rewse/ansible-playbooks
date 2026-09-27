@@ -4,7 +4,11 @@
     project_src: /etc/compose/teslamate
     services:
       - teslamate
-    state: restarted
+    # A restart keeps the environment the container was created with, so
+    # recreate it to apply a changed env_file.
+    pull: never
+    recreate: always
+    state: present
   when: not ansible_check_mode
 
 - name: Restart teslamate-grafana
@@ -12,7 +16,11 @@
     project_src: /etc/compose/teslamate
     services:
       - teslamate-grafana
-    state: restarted
+    # A restart keeps the environment the container was created with, so
+    # recreate it to apply a changed env_file.
+    pull: never
+    recreate: always
+    state: present
   when: not ansible_check_mode
 
 - name: Validate Apache configuration

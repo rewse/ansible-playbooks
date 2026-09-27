@@ -59,7 +59,9 @@
           - "'DATABASE_HOST=\\\"database.cluster.example.test\\\"' in teslamate_test_grafana_env_output"
           - "'GF_AUTH_ANONYMOUS_ENABLED=false' in teslamate_test_grafana_env_output"
           - "'GF_SERVER_ROOT_URL=https://grafana.rewse.jp' in teslamate_test_grafana_env_output"
-          - (teslamate_database_password | replace('$', '$$')) in teslamate_test_grafana_env_output
+          - "'DATABASE_USER=\\\"grafana_ro\\\"' in teslamate_test_grafana_env_output"
+          - (teslamate_grafana_database_password | replace('$', '$$')) in teslamate_test_grafana_env_output
+          - (teslamate_database_password | replace('$', '$$')) not in teslamate_test_grafana_env_output
           - (teslamate_grafana_admin_password | replace('$', '$$')) in teslamate_test_grafana_env_output
 
     - name: Verify TeslaMate vhost contract

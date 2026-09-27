@@ -37,6 +37,8 @@ LiteLLMがホストの4000番ポートを使用しているため、TeslaMateは
 
 Aurora 16.11には、Ansible管理外の一回限りの初期化として`teslamate` DBとログインロールを作成済みである。ロールは`SUPERUSER`、`CREATEDB`、`CREATEROLE`を持たない。`rds_extension`を付与し、管理可能な拡張を`cube`と`earthdistance`に限定した。TeslaMateのmigrationに必要な`DROP EXTENSION ... CASCADE`は`teslamate` DBでのみ許可した。Aurora delegated extensionが拡張関数を`rdsadmin`所有で作成するため、初回migrationが`ALTER FUNCTION`する`ll_to_earth(double precision, double precision)`と`earth_box(earth, double precision)`だけは所有者を`teslamate`へ移した。
 
+Grafana datasourceは所有者ロールではなく、同じく一回限りの初期化で作成した`grafana_ro`で接続する。`grafana_ro`はログインロールで、`default_transaction_read_only = on`を持ち、`teslamate` DBへの`CONNECT`、`public`スキーマの`USAGE`、全テーブルとシーケンスの`SELECT`だけを与えた。TeslaMateのmigrationで増えるテーブルにも読めるよう、`ALTER DEFAULT PRIVILEGES FOR ROLE teslamate IN SCHEMA public`で`SELECT`を既定付与した。認証情報は1Passwordの`PostgreSQL - grafana_ro`に置く。Grafanaは起動時のprovisioningで既存datasourceの接続ユーザーを書き換えないため、`DATABASE_USER`や`DATABASE_PASS`を変えたときはGrafana APIでdatasourceも更新する。
+
 ### Mosquitto
 
 TeslaMateはDocker host gateway経由でfox上のMosquitto 2.0.18へ接続する。ユーザー名は`pub_client`、パスワードは`op://ansible/utsespwfv247vhgklpbbpbtboe/credential`を使う。Mosquittoは匿名接続を許可しない。接続はホスト内に閉じるためMQTT TLSは使わない。

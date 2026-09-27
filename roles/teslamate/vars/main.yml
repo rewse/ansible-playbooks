@@ -12,6 +12,10 @@ teslamate_database_username: "{{ lookup('pipe', 'op read \"op://ansible/f6jqsrpz
 teslamate_encryption_key: "{{ lookup('pipe', 'op read \"op://ansible/vt2ez35yutq5ikwrbp46q56oke/encryption key\"') }}"
 teslamate_grafana_admin_password: "{{ lookup('pipe', 'op read \"op://ansible/oy677zzpeppxyn3b4xfdfapqvy/password\"') }}"
 teslamate_grafana_admin_username: "{{ lookup('pipe', 'op read \"op://ansible/oy677zzpeppxyn3b4xfdfapqvy/username\"') }}"
+# Grafana only reads TeslaMate data, so its datasource logs in as a SELECT-only
+# role instead of the owner role TeslaMate uses.
+teslamate_grafana_database_password: "{{ lookup('pipe', 'op read \"op://ansible/vscvaupdtxuwrbomqa3u3syq3e/password\"') }}"
+teslamate_grafana_database_username: "{{ lookup('pipe', 'op read \"op://ansible/vscvaupdtxuwrbomqa3u3syq3e/username\"') }}"
 teslamate_grafana_hostname: grafana.rewse.jp
 teslamate_grafana_port: 3000
 teslamate_hostname: teslamate.rewse.jp

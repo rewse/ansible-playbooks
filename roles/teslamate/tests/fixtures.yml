@@ -10,6 +10,8 @@ teslamate_database_username: teslamate
 teslamate_encryption_key: DUMMY_ENCRYPTION_KEY
 teslamate_grafana_admin_password: DUMMY_GRAFANA_PASSWORD_$VALUE#=
 teslamate_grafana_admin_username: test-admin
+teslamate_grafana_database_password: DUMMY_GRAFANA_DB_PASSWORD_$VALUE#=
+teslamate_grafana_database_username: grafana_ro
 teslamate_grafana_hostname: grafana.rewse.jp
 __teslamate_grafana_image:
   ref: ghcr.io/rewse/teslamate/grafana:main@sha256:bbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbb
