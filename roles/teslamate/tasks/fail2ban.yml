@@ -1,4 +1,16 @@
 ---
+- name: fail2ban | Create Grafana basic-auth log
+  # Apache creates it only when it next reloads, and fail2ban will not start a
+  # jail whose log file is missing.
+  ansible.builtin.file:
+    path: /var/log/apache2/grafana_basic_auth.log
+    state: touch
+    owner: root
+    group: adm
+    mode: "0640"
+    modification_time: preserve
+    access_time: preserve
+
 - name: fail2ban | Copy filter
   ansible.builtin.copy:
     src: fail2ban-filter.conf

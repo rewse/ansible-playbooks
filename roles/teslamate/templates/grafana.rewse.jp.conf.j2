@@ -14,6 +14,15 @@
     ProxyPass / http://127.0.0.1:{{ teslamate_grafana_port }}/
     ProxyPassReverse / http://127.0.0.1:{{ teslamate_grafana_port }}/
 
+    # Grafana answers an expired session with 401 as well, so a failed basic-auth
+    # request is recognised by a separate log of the requests that carry one; the
+    # fail2ban jail reads it. Only the request line is logged, not the header.
+    # A CustomLog here stops the vhost inheriting the server's, so the shared
+    # access log is named again.
+    SetEnvIf Authorization "^Basic " grafana_basic_auth
+    CustomLog ${APACHE_LOG_DIR}/other_vhosts_access.log vhost_combined
+    CustomLog ${APACHE_LOG_DIR}/grafana_basic_auth.log "%v:%p %h basic %t \"%r\" %>s %O" env=grafana_basic_auth
+
     SSLCertificateFile /etc/letsencrypt/live/rewse.jp/fullchain.pem
     SSLCertificateKeyFile /etc/letsencrypt/live/rewse.jp/privkey.pem
     Include /etc/letsencrypt/options-ssl-apache.conf
