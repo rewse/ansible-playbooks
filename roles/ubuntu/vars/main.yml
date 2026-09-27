@@ -3,5 +3,3 @@
 # the shortest timer here, five minutes, so an outage lasting a working day
 # reaches the inbox a handful of times rather than a hundred.
 ubuntu_failure_notify_repeat_after: 3600
-
-ubuntu_lightpanda_version: 0.3.4
