@@ -1,0 +1,5 @@
+---
+dependencies:
+  - role: fail2ban
+    tags:
+      - fail2ban
