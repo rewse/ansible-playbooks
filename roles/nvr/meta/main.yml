@@ -1,11 +1,14 @@
 ---
 dependencies:
-  - role: fail2ban
-    tags:
-      - fail2ban
   - role: docker
     tags:
       - docker
   - role: httpd
     tags:
       - httpd
+  - role: nas
+    tags:
+      - nas
+  - role: zabbix_agent
+    tags:
+      - zabbix_agent

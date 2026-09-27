@@ -3,3 +3,9 @@ dependencies:
   - role: fail2ban
     tags:
       - fail2ban
+  - role: docker
+    tags:
+      - docker
+  - role: httpd
+    tags:
+      - httpd

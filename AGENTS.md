@@ -35,6 +35,7 @@
 
 - When only values differ (package names, paths, service names), load `vars/<distribution>.yml` from `tasks/set_vars.yml`.
 - When steps differ slightly, include `tasks/<variant>.yml` selected by a fact or an inventory variable such as `zabbix_agent_platform`. Never select by inventory group name.
+- When one product needs unrelated steps per OS but shares its purpose and values, import `tasks/linux.yml` and `tasks/darwin.yml` conditioned on `ansible_facts['system']`, as `roles/restic` does.
 - When the implementations are unrelated, write separate roles.
 - Name an OS by its lowercase Ansible fact: `distribution` for Linux (`ubuntu`) and `system` for macOS (`darwin`, never `macos`). Name hardware and clouds (`raspberrypi`, `ec2`) as platforms, distinct from OS names.
 
@@ -81,6 +82,7 @@ Use only these tags, written as an indented YAML list:
 - In `tasks/main.yml`, import `set_vars.yml` and fact setup first, then components in dependency order and otherwise alphabetically; an OS role ends with `upgrade.yml`.
 - In a component file, order tasks as prerequisites, version resolution, installation, configuration, service enablement, and removal of legacy state.
 - Restart services through handlers. Add `meta: flush_handlers` only when a later component needs the restarted service.
+- Give a handler the same name and body in every role that defines it, such as `Reload Apache`. Ansible runs only the last one loaded, so when the order of two handlers matters, notify them as `<role> : <handler>`.
 - Delete a legacy-removal task (`state: absent`) once every host has converged.
 
 ### Variables

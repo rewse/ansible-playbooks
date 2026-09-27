@@ -17,6 +17,7 @@ This repository contains Ansible playbooks and roles for managing infrastructure
 ├── inventory/
 │   ├── hosts                # Hosts and groups only
 │   ├── group_vars/all/      # Site-wide shared values
+│   ├── group_vars/<group>/  # Per host type values, one file per role
 │   └── host_vars/<host>/    # Per-host values, one file per role
 ├── site.yml                 # All Ubuntu host types
 ├── home-primary.yml         # Home primary (fox)

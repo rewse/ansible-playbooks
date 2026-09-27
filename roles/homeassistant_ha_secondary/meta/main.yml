@@ -9,3 +9,6 @@ dependencies:
   - role: httpd
     tags:
       - httpd
+  - role: zabbix_agent
+    tags:
+      - zabbix_agent

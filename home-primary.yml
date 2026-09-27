@@ -16,24 +16,12 @@
     - role: postfix_client
       tags:
         - postfix_client
-    - role: zabbix_agent
-      tags:
-        - zabbix_agent
-    - role: fail2ban
-      tags:
-        - fail2ban
-    - role: network_failover
-      tags:
-        - network_failover
-    - role: php_miio
-      tags:
-        - php_miio
     - role: restic
       tags:
         - restic
-    - role: mhz19
+    - role: zabbix_agent
       tags:
-        - mhz19
+        - zabbix_agent
     - role: autodiscover
       tags:
         - autodiscover
@@ -46,6 +34,9 @@
     - role: enecoq_data_fetcher
       tags:
         - enecoq_data_fetcher
+    - role: fail2ban
+      tags:
+        - fail2ban
     - role: filebrowser
       tags:
         - filebrowser
@@ -67,27 +58,36 @@
     - role: matter_server
       tags:
         - matter_server
+    - role: mhz19
+      tags:
+        - mhz19
     - role: mosquitto
       tags:
         - mosquitto
     - role: nas
       tags:
         - nas
+    - role: network_failover
+      tags:
+        - network_failover
     - role: nvr
       tags:
         - nvr
+    - role: php_miio
+      tags:
+        - php_miio
     - role: syslogd
       tags:
         - syslogd
     - role: teslamate
       tags:
         - teslamate
-    - role: zabbix_server
-      tags:
-        - zabbix_server
     - role: zabbix_mcp
       tags:
         - zabbix_mcp
     - role: zabbix_money_market
       tags:
         - zabbix_money_market
+    - role: zabbix_server
+      tags:
+        - zabbix_server

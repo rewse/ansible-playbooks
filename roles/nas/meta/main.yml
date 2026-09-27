@@ -4,3 +4,6 @@ dependencies:
   - role: restic
     tags:
       - restic
+  - role: zabbix_agent
+    tags:
+      - zabbix_agent

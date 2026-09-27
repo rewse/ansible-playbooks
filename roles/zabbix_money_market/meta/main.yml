@@ -1,0 +1,5 @@
+---
+dependencies:
+  - role: zabbix_server
+    tags:
+      - zabbix_server

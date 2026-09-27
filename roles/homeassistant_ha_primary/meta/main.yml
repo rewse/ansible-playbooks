@@ -1,0 +1,5 @@
+---
+dependencies:
+  - role: zabbix_agent
+    tags:
+      - zabbix_agent
