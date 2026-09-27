@@ -74,7 +74,9 @@ def _now() -> datetime:
 
 def _parse_time(value: str) -> datetime:
     """Parse an RFC 3339 timestamp; skopeo reports nanoseconds, so keep seconds."""
-    return datetime.strptime(value[:19], "%Y-%m-%dT%H:%M:%S").replace(tzinfo=timezone.utc)
+    return datetime.strptime(value[:19], "%Y-%m-%dT%H:%M:%S").replace(
+        tzinfo=timezone.utc
+    )
 
 
 def _iso(value: datetime) -> str:
@@ -89,7 +91,9 @@ def version_key(tag: str) -> list[int]:
 def ordered(versions: list[str], pattern: str) -> list[str]:
     """Keep versions matching the pattern, newest first."""
     regex = re.compile(pattern)
-    return sorted((v for v in versions if regex.search(v)), key=version_key, reverse=True)
+    return sorted(
+        (v for v in versions if regex.search(v)), key=version_key, reverse=True
+    )
 
 
 def select(candidates: list[dict], pattern: str, days: int, now: datetime) -> dict:
@@ -98,7 +102,9 @@ def select(candidates: list[dict], pattern: str, days: int, now: datetime) -> di
     for version in ordered(list(by_version), pattern):
         if now - by_version[version]["published"] >= timedelta(days=days):
             return by_version[version]
-    raise AnsibleLookupError(f"no version matching {pattern} is at least {days} day(s) old")
+    raise AnsibleLookupError(
+        f"no version matching {pattern} is at least {days} day(s) old"
+    )
 
 
 def _json(run: Callable[[list[str]], str], cmd: list[str]):
@@ -110,17 +116,33 @@ def _oci(repo, pattern, days, platform, run, now):
     tags = _json(run, ["skopeo", "list-tags", f"docker://{repo}"])["Tags"]
     for tag in ordered(tags, pattern):
         # Inspecting is one request per tag, so stop at the first aged tag.
-        meta = _json(run, ["skopeo", "--override-os", os_name, "--override-arch", arch,
-                           "inspect", f"docker://{repo}:{tag}"])
+        meta = _json(
+            run,
+            [
+                "skopeo",
+                "--override-os",
+                os_name,
+                "--override-arch",
+                arch,
+                "inspect",
+                f"docker://{repo}:{tag}",
+            ],
+        )
         if now - _parse_time(meta["Created"]) >= timedelta(days=days):
             return {"version": tag, "ref": f"{repo}:{tag}@{meta['Digest']}"}
-    raise AnsibleLookupError(f"no tag of {repo} matching {pattern} is at least {days} day(s) old")
+    raise AnsibleLookupError(
+        f"no tag of {repo} matching {pattern} is at least {days} day(s) old"
+    )
 
 
 def _release(repo, pattern, days, asset, run, now):
     releases = _json(run, ["gh", "api", f"repos/{repo}/releases?per_page=100"])
     candidates = [
-        {"version": r["tag_name"], "published": _parse_time(r["published_at"]), "assets": r["assets"]}
+        {
+            "version": r["tag_name"],
+            "published": _parse_time(r["published_at"]),
+            "assets": r["assets"],
+        }
         for r in releases
         if not r["draft"] and not r["prerelease"] and r.get("published_at")
     ]
@@ -132,8 +154,14 @@ def _release(repo, pattern, days, asset, run, now):
         if item["name"] in (name, asset.replace("{version}", chosen["version"])):
             checksum = item.get("digest") or ""
             if not checksum:
-                _display.vvv(f"aged_release: {repo} {chosen['version']} {item['name']} has no digest")
-            return {"version": chosen["version"], "url": item["browser_download_url"], "checksum": checksum}
+                _display.vvv(
+                    f"aged_release: {repo} {chosen['version']} {item['name']} has no digest"
+                )
+            return {
+                "version": chosen["version"],
+                "url": item["browser_download_url"],
+                "checksum": checksum,
+            }
     raise AnsibleLookupError(f"{repo} {chosen['version']} has no asset named {name}")
 
 
@@ -142,22 +170,39 @@ def _tag(repo, pattern, days, run, now):
     shas = {t["name"]: t["commit"]["sha"] for t in tags}
     for name in ordered(list(shas), pattern):
         commit = _json(run, ["gh", "api", f"repos/{repo}/commits/{shas[name]}"])
-        if now - _parse_time(commit["commit"]["committer"]["date"]) >= timedelta(days=days):
+        if now - _parse_time(commit["commit"]["committer"]["date"]) >= timedelta(
+            days=days
+        ):
             return {"version": name, "commit": shas[name]}
-    raise AnsibleLookupError(f"no tag of {repo} matching {pattern} is at least {days} day(s) old")
+    raise AnsibleLookupError(
+        f"no tag of {repo} matching {pattern} is at least {days} day(s) old"
+    )
 
 
 def _commit(repo, days, run, now):
     branch = _json(run, ["gh", "api", f"repos/{repo}"])["default_branch"]
     until = _iso(now - timedelta(days=days))
-    commits = _json(run, ["gh", "api", f"repos/{repo}/commits?sha={branch}&until={until}&per_page=1"])
+    commits = _json(
+        run,
+        ["gh", "api", f"repos/{repo}/commits?sha={branch}&until={until}&per_page=1"],
+    )
     if not commits:
-        raise AnsibleLookupError(f"{repo} has no commit on {branch} at least {days} day(s) old")
+        raise AnsibleLookupError(
+            f"{repo} has no commit on {branch} at least {days} day(s) old"
+        )
     return {"commit": commits[0]["sha"]}
 
 
-def resolve(term: str, *, pattern: str, days: int, platform: str | None, asset: str | None,
-            run: Callable[[list[str]], str], now: datetime) -> dict:
+def resolve(
+    term: str,
+    *,
+    pattern: str,
+    days: int,
+    platform: str | None,
+    asset: str | None,
+    run: Callable[[list[str]], str],
+    now: datetime,
+) -> dict:
     kind, sep, source = term.partition(":")
     if not sep or not source:
         raise AnsibleLookupError(f"aged_release: malformed term {term!r}")
@@ -184,7 +229,9 @@ def _cache_path() -> Path:
     cache dies with the worker. The workers share the playbook's process group,
     which keys a file every host and task of the run can read.
     """
-    return Path(tempfile.gettempdir()) / f"aged_release-{os.getuid()}-{os.getpgrp()}.json"
+    return (
+        Path(tempfile.gettempdir()) / f"aged_release-{os.getuid()}-{os.getpgrp()}.json"
+    )
 
 
 def _cached(key: tuple, compute: Callable[[], dict]) -> dict:
@@ -221,14 +268,27 @@ class LookupModule(LookupBase):
         if days is None:
             days = variables.get("supply_chain_cooldown_days")
         if days is None:
-            raise AnsibleLookupError("aged_release: days is not set and supply_chain_cooldown_days is undefined")
+            raise AnsibleLookupError(
+                "aged_release: days is not set and supply_chain_cooldown_days is undefined"
+            )
         days = int(days)
         platform = kwargs.get("platform")
         asset = kwargs.get("asset")
         results = []
         for term in terms:
             key = (term, pattern, days, platform, asset)
-            results.append(_cached(key, lambda term=term: resolve(
-                term, pattern=pattern, days=days, platform=platform,
-                asset=asset, run=_run, now=_now())))
+            results.append(
+                _cached(
+                    key,
+                    lambda term=term: resolve(
+                        term,
+                        pattern=pattern,
+                        days=days,
+                        platform=platform,
+                        asset=asset,
+                        run=_run,
+                        now=_now(),
+                    ),
+                )
+            )
         return results
