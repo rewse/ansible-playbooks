@@ -1,0 +1,12 @@
+---
+- name: apache | Set SSL certificate path
+  ansible.builtin.lineinfile:
+    path: /etc/apache2/sites-available/000-default-ssl.conf
+    regexp: '^\s+SSLCertificateFile'
+    line: "        SSLCertificateFile /etc/letsencrypt/live/rewse.jp/fullchain.pem"
+
+- name: apache | Set SSL private key path
+  ansible.builtin.lineinfile:
+    path: /etc/apache2/sites-available/000-default-ssl.conf
+    regexp: '^\s+SSLCertificateKeyFile'
+    line: "        SSLCertificateKeyFile /etc/letsencrypt/live/rewse.jp/privkey.pem"

@@ -1,0 +1,21 @@
+---
+- name: timer | Install systemd service
+  ansible.builtin.copy:
+    src: certbot.service
+    dest: /etc/systemd/system/certbot.service
+    mode: "0644"
+  notify: Reload systemd
+
+- name: timer | Install systemd timer
+  ansible.builtin.copy:
+    src: certbot.timer
+    dest: /etc/systemd/system/certbot.timer
+    mode: "0644"
+  notify: Restart certbot timer
+
+- name: timer | Enable and start timer
+  ansible.builtin.systemd:
+    name: certbot.timer
+    enabled: true
+    state: started
+    daemon_reload: true

@@ -1,0 +1,42 @@
+---
+- name: certbot | Install prerequisite packages
+  ansible.builtin.apt:
+    name:
+      - libaugeas0
+      - python3
+
+- name: certbot | Create installation directory
+  ansible.builtin.file:
+    path: /opt/certbot
+    state: directory
+    mode: "0755"
+
+- name: certbot | Create virtual environment
+  # uv has no Ansible module.
+  ansible.builtin.command: uv venv /opt/certbot
+  args:
+    creates: /opt/certbot/bin/activate
+
+- name: certbot | Install packages
+  # uv has no Ansible module.
+  ansible.builtin.command: >
+    uv pip install --upgrade
+    certbot
+    certbot-apache
+    certbot-dns-route53
+  environment: "{{ supply_chain_cooldown_environment | combine({'VIRTUAL_ENV': '/opt/certbot'}) }}"
+  register: __sslcert_pip
+  changed_when: "'Installed' in __sslcert_pip.stderr"
+
+- name: certbot | Install renew script
+  ansible.builtin.copy:
+    src: certbot-renew
+    dest: /usr/local/sbin/certbot-renew
+    mode: "0755"
+
+# Issue the first certificate by hand. A task would request one on every run.
+#
+#   sudo certbot certonly --dns-route53 -d rewse.jp -d '*.rewse.jp' \
+#     -m hostmaster@rewse.jp -i apache --post-hook 'systemctl reload apache2' \
+#     --preferred-challenges dns-01 \
+#     --server https://acme-v02.api.letsencrypt.org/directory --agree-tos
