@@ -53,8 +53,8 @@
     line: "allow-interfaces={{ nas_mdns_interface }}"
     insertafter: '^\[server\]'
   notify:
-    - Restart avahi-daemon
-    - Restart smbd
+    - "nas : Restart avahi-daemon"
+    - "nas : Restart smbd"
 
 - name: samba | Configure Samba
   ansible.builtin.template:
