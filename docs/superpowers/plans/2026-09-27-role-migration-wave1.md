@@ -167,7 +167,7 @@ Expected: exit 0。docker の `group` 以外は `changed=0`
   - `/srv/matter-server` を `stat` し、あれば `docker_compose_v2` で `state: stopped` にしてから `command: mv /srv/matter-server /srv/matter_server`（`creates: /srv/matter_server`、`removes: /srv/matter-server`。モジュールがないため `command` にする）
   - `/srv/matter_server/data` を作り、compose のマウントを `/srv/matter_server/data:/data` にする。compose の変更で `Start containers` がコンテナを作り直す
   - 空の `/etc/matter-server` を消す
-  - 移動の前に `/srv/matter-server/data` を `/srv/nas` 以外の場所に退避しない。2.9M の JSON 2 つで、`mv` は同じファイルシステム内の rename なので途中で壊れない
+  - 事前のバックアップは取らない。データは 2.9M の JSON 2 つで、`mv` は同じファイルシステム内の rename なので途中で壊れない
 - filebrowser、litellm、couchdb の restart handler に、nvr と同じ `when: not ansible_check_mode` を付ける
 
 - [ ] **Step 1: 分割して lint を通す**
