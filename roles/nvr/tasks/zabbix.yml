@@ -1,0 +1,13 @@
+---
+- name: zabbix | Copy recording age script
+  ansible.builtin.template:
+    src: nvr-recording-age.j2
+    dest: /usr/local/sbin/nvr-recording-age
+    mode: "0755"
+
+- name: zabbix | Copy agent config
+  ansible.builtin.copy:
+    src: nvr.conf
+    dest: /etc/zabbix/zabbix_agentd.d
+    mode: "0644"
+  notify: Restart zabbix-agent

@@ -1,17 +1,17 @@
 ---
-- name: "apache: Reload"
+- name: Reload Apache
   ansible.builtin.systemd:
     name: apache2
     state: reloaded
 
-- name: "nvr: Restart"
+- name: Restart nvr
   community.docker.docker_compose_v2:
     project_src: /etc/compose/nvr
     state: restarted
   # The project directory may not exist yet in check mode.
   when: not ansible_check_mode
 
-- name: "nvr : Restart zabbix-agent"
+- name: Restart zabbix-agent
   ansible.builtin.systemd:
     name: zabbix-agent
     state: restarted

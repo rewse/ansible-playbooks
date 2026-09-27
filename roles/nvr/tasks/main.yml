@@ -1,159 +1,21 @@
 ---
-- name: "nvr : Fail when the recording volume is not mounted"
-  # Frigate would otherwise write recordings onto the root filesystem under an
-  # empty mount point, filling the NVMe and losing them once Bay 1 is mounted.
-  ansible.builtin.command:
-    cmd: mountpoint -q {{ nvr_media_parent }}
-  changed_when: false
+- name: Import storage tasks
+  ansible.builtin.import_tasks: storage.yml
   tags:
-    - nvr
-    - config
-    - nvr_nvr
-    - nvr_nvr_init
+    - nvr_storage
 
-- name: "nvr : Create configuration directory"
-  ansible.builtin.file:
-    path: /srv/nvr
-    state: directory
-    owner: root
-    group: root
-    mode: '0755'
+- name: Import container tasks
+  ansible.builtin.import_tasks: container.yml
   tags:
-    - nvr
-    - config
-    - nvr_nvr
-    - nvr_nvr_init
-
-- name: "nvr : Create recording directory"
-  ansible.builtin.file:
-    path: "{{ nvr_media_dir }}"
-    state: directory
-    owner: root
-    group: root
-    mode: '0755'
-  tags:
-    - nvr
-    - config
-    - nvr_nvr
-    - nvr_nvr_init
-
-- name: "docker : Resolve aged image"
-  ansible.builtin.set_fact:
-    __nvr_image: >-
-      {{ lookup('aged_release', 'oci:ghcr.io/blakeblackshear/frigate', pattern='^\d+\.\d+\.\d+$',
-                platform='linux/' ~ ('arm64' if ansible_facts['architecture'] == 'aarch64' else 'amd64')) }}
-  tags:
-    - nvr
+    - nvr_container
     - update
-    - docker
-    - nvr_docker
 
-- name: "nvr : Deploy configuration file"
-  ansible.builtin.template:
-    src: config.yml.j2
-    dest: /srv/nvr/config.yml
-    mode: '0644'
-    backup: true
-  notify: "nvr: Restart"
+- name: Import zabbix tasks
+  ansible.builtin.import_tasks: zabbix.yml
   tags:
-    - nvr
-    - config
-    - nvr_nvr
-    - nvr_nvr_config
+    - nvr_zabbix
 
-- name: "docker : Create compose directory"
-  ansible.builtin.file:
-    path: /etc/compose/nvr
-    state: directory
-    mode: "0755"
+- name: Import apache tasks
+  ansible.builtin.import_tasks: apache.yml
   tags:
-    - nvr
-    - update
-    - docker
-    - nvr_docker
-
-- name: "docker : Deploy compose file"
-  ansible.builtin.template:
-    src: compose.yaml.j2
-    dest: /etc/compose/nvr/compose.yaml
-    mode: "0640"
-  # Carries credentials in the environment, so no diff.
-  diff: false
-  register: __nvr_compose
-  tags:
-    - nvr
-    - update
-    - docker
-    - nvr_docker
-
-- name: "docker : Report skipped start in check mode"
-  ansible.builtin.debug:
-    msg: Start skipped because the compose file is not written in check mode
-    verbosity: 0
-  when: ansible_check_mode and __nvr_compose is changed
-  tags:
-    - nvr
-    - update
-    - docker
-    - nvr_docker
-
-- name: "docker : Start containers"
-  community.docker.docker_compose_v2:
-    project_src: /etc/compose/nvr
-    state: present
-    pull: missing
-  when: not (ansible_check_mode and __nvr_compose is changed)
-  tags:
-    - nvr
-    - update
-    - docker
-    - nvr_docker
-- name: "nvr : Copy recording age script"
-  ansible.builtin.template:
-    src: nvr-recording-age.j2
-    dest: /usr/local/sbin/nvr-recording-age
-    mode: '0755'
-  tags:
-    - nvr
-    - config
-    - monitor
-    - nvr_monitor
-    - nvr_monitor_config
-
-- name: "nvr : Copy Zabbix agent config"
-  ansible.builtin.copy:
-    src: nvr.conf
-    dest: /etc/zabbix/zabbix_agentd.d
-    mode: '0644'
-  notify: "nvr : Restart zabbix-agent"
-  tags:
-    - nvr
-    - config
-    - monitor
-    - nvr_monitor
-    - nvr_monitor_config
-
-- name: "nvr : Copy Apache vhost config"
-  ansible.builtin.copy:
-    src: nvr.rewse.jp.conf
-    dest: /etc/apache2/sites-available
-    mode: '0644'
-  notify: "apache: Reload"
-  tags:
-    - nvr
-    - config
-    - apache
     - nvr_apache
-    - nvr_apache_config
-
-- name: "nvr : Enable Apache site"
-  ansible.builtin.command: a2ensite nvr.rewse.jp
-  register: nvr_a2ensite
-  changed_when: "'already enabled' not in nvr_a2ensite.stdout"
-  notify: "apache: Reload"
-  tags:
-    - nvr
-    - config
-    - apache
-    - nvr_apache
-    - nvr_apache_config
