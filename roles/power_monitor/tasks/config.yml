@@ -1,0 +1,52 @@
+---
+- name: config | Create directories
+  ansible.builtin.file:
+    path: "{{ item }}"
+    state: directory
+    mode: "0755"
+  loop:
+    - "{{ ansible_facts['env']['HOME'] }}/.local/bin"
+    - "{{ ansible_facts['env']['HOME'] }}/.config/power-monitor-mqtt"
+
+# Fetched with uri and written with copy/template rather than get_url, which in
+# check mode reports a forced download as changed without comparing content.
+- name: config | Fetch MQTT script
+  ansible.builtin.uri:
+    url: "{{ power_monitor_mqtt_script_url }}"
+    return_content: true
+  register: __power_monitor_script
+  check_mode: false
+
+- name: config | Install MQTT script
+  ansible.builtin.copy:
+    content: "{{ __power_monitor_script.content }}"
+    dest: "{{ ansible_facts['env']['HOME'] }}/.local/bin/power-monitor-mqtt"
+    mode: "0755"
+
+- name: config | Fetch example configuration
+  ansible.builtin.uri:
+    url: "{{ power_monitor_mqtt_config_url }}"
+    return_content: true
+  register: __power_monitor_config_example
+  check_mode: false
+
+- name: config | Deploy configuration
+  # Built from the example so upstream additions arrive, with this site's values set.
+  ansible.builtin.template:
+    src: config.j2
+    dest: "{{ ansible_facts['env']['HOME'] }}/.config/power-monitor-mqtt/config"
+    mode: "0600"
+  no_log: true
+
+- name: config | Test MQTT script
+  # The script's own self-test; no module can exercise it.
+  ansible.builtin.command:
+    cmd: "{{ ansible_facts['env']['HOME'] }}/.local/bin/power-monitor-mqtt --test"
+  register: __power_monitor_test
+  changed_when: false
+  failed_when: __power_monitor_test.rc != 0
+
+- name: config | Display test results
+  ansible.builtin.debug:
+    var: __power_monitor_test.stdout
+    verbosity: 1

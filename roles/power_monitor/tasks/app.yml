@@ -1,0 +1,61 @@
+---
+- name: app | Resolve aged release
+  ansible.builtin.set_fact:
+    __power_monitor_package: >-
+      {{ lookup('aged_release', 'github-release:SAP/power-monitoring-tool-for-macos', asset='PowerMonitor_{version}.pkg') }}
+
+- name: app | Read installed version
+  # PlistBuddy is the only reader for an app bundle's plist on macOS.
+  ansible.builtin.command:
+    argv:
+      - /usr/libexec/PlistBuddy
+      - -c
+      - "Print :CFBundleShortVersionString"
+      - "/Applications/Power Monitor.app/Contents/Info.plist"
+  check_mode: false
+  changed_when: false
+  failed_when: false
+  register: __power_monitor_current_version
+
+- name: app | Decide whether to install
+  ansible.builtin.set_fact:
+    __power_monitor_install_required: >-
+      {{
+        __power_monitor_current_version.rc != 0 or
+        __power_monitor_package.version is version(
+          __power_monitor_current_version.stdout | trim, '>'
+        )
+      }}
+
+- name: app | Download package
+  ansible.builtin.get_url:
+    url: "{{ __power_monitor_package.url }}"
+    dest: "/tmp/PowerMonitor_{{ __power_monitor_package.version }}.pkg"
+    checksum: "{{ __power_monitor_package.checksum | default(omit, true) }}"
+    mode: "0644"
+  when: __power_monitor_install_required
+
+- name: app | Install package
+  # No module installs a macOS .pkg.
+  ansible.builtin.command:
+    argv:
+      - /usr/sbin/installer
+      - -pkg
+      - "/tmp/PowerMonitor_{{ __power_monitor_package.version }}.pkg"
+      - -target
+      - /
+  become: true
+  changed_when: true
+  when:
+    - __power_monitor_install_required
+    - not ansible_check_mode
+
+- name: app | Report deferred install in check mode
+  ansible.builtin.debug:
+    msg: >-
+      Power Monitor {{ __power_monitor_package.version }} installation is deferred in
+      check mode because installing the package would modify the system.
+    verbosity: 0
+  when:
+    - __power_monitor_install_required
+    - ansible_check_mode

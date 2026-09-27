@@ -1,0 +1,10 @@
+{{ ansible_managed | comment }}
+{% for line in __power_monitor_config_example.content.splitlines() %}
+{% if line.startswith('MQTT_HOST=') %}
+MQTT_HOST="{{ power_monitor_mosquitto_host }}"
+{% elif line.startswith('MQTT_PASSWORD=') %}
+MQTT_PASSWORD="{{ power_monitor_mosquitto_password }}"
+{% else %}
+{{ line }}
+{% endif %}
+{% endfor %}

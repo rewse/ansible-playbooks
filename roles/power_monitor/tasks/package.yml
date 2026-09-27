@@ -1,0 +1,7 @@
+---
+- name: package | Install required packages
+  community.general.homebrew:
+    name:
+      - jq
+      - mosquitto
+    state: present
