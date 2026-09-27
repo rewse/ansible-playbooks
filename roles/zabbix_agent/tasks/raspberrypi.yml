@@ -33,15 +33,19 @@
     src: root.conf.j2
     dest: /etc/systemd/system/zabbix-agent.service.d/root.conf
     mode: "0644"
+  # Qualified names: other roles define handlers of the same names, and the last
+  # one loaded would otherwise run, possibly restarting before the reload.
   notify:
-    - Reload systemd
-    - Restart zabbix-agent
+    - "zabbix_agent : Reload systemd"
+    - "zabbix_agent : Restart zabbix-agent"
 
 - name: raspberrypi | Remove copied unit file
   # A full copy hid package updates to the unit; the drop-in replaces it.
   ansible.builtin.file:
     path: /etc/systemd/system/zabbix-agent.service
     state: absent
+  # Qualified names: other roles define handlers of the same names, and the last
+  # one loaded would otherwise run, possibly restarting before the reload.
   notify:
-    - Reload systemd
-    - Restart zabbix-agent
+    - "zabbix_agent : Reload systemd"
+    - "zabbix_agent : Restart zabbix-agent"
