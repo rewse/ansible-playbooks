@@ -9,6 +9,8 @@
   ansible.builtin.command: e2label /dev/{{ ec2_secondary_disk }}
   register: __ec2_label
   changed_when: false
+  # In check mode an unformatted disk has no filesystem to read yet.
+  failed_when: false
   check_mode: false
 
 - name: storage | Label secondary disk as srv
