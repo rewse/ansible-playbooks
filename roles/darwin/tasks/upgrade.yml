@@ -1,4 +1,6 @@
 ---
+# Some casks need sudo to upgrade; when this fails asking for a terminal, run
+# brew upgrade by hand.
 - name: upgrade | Upgrade all Homebrew packages
   community.general.homebrew:
     upgrade_all: true

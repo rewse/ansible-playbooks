@@ -95,6 +95,8 @@
     dest: /etc/apt/keyrings/nodesource.asc
     mode: "0644"
 
+# Removed before the new definition: both would offer nodejs from different
+# major lines, and apt would keep whichever resolves first.
 - name: apt | Remove legacy NodeSource list
   ansible.builtin.file:
     path: /etc/apt/sources.list.d/nodesource.list

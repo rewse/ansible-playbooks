@@ -1,4 +1,6 @@
 ---
+# A loop rather than a list: with a list the module stops at the first failing
+# cask, which is common when an app already exists at the target path.
 - name: cask | Install casks
   community.general.homebrew_cask:
     name: "{{ item }}"

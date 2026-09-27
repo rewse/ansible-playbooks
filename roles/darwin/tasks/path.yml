@@ -17,4 +17,4 @@
   loop: "{{ __darwin_paths.results }}"
   loop_control:
     label: "{{ item.item }}"
-  when: item.stat.checksum | default('') != (lookup('ansible.builtin.file', item.item) ~ '\n') | hash('sha1')
+  when: item.stat.checksum | default('') != (lookup('ansible.builtin.file', item.item, rstrip=false)) | hash('sha1')

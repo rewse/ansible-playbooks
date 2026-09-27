@@ -3,6 +3,8 @@
   community.general.homebrew:
     update_homebrew: true
 
+# A loop rather than a list: with a list the module stops at the first failing
+# item, leaving the rest uninstalled.
 - name: package | Install formulae
   community.general.homebrew:
     name: "{{ item }}"
