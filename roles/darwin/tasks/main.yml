@@ -332,10 +332,44 @@
     - darwin_font
     - darwin_font_init
 
+- name: "font : Resolve aged release source-han-mono"
+  ansible.builtin.set_fact:
+    __darwin_source_han_mono: "{{ lookup('aged_release', 'github-release:adobe-fonts/source-han-mono', pattern='^\\d+\\.\\d+$', asset='SourceHanMono.ttc') }}"
+  tags:
+    - darwin
+    - install
+    - font
+    - darwin_font
+    - darwin_font_install
+    - darwin_font_download
+
+- name: "font : Resolve aged release source-han-sans"
+  ansible.builtin.set_fact:
+    __darwin_source_han_sans: "{{ lookup('aged_release', 'github-release:adobe-fonts/source-han-sans', pattern='^\\d+\\.\\d+R$', asset='01_SourceHanSans.ttc.zip') }}"
+  tags:
+    - darwin
+    - install
+    - font
+    - darwin_font
+    - darwin_font_install
+    - darwin_font_download
+
+- name: "font : Resolve aged release source-han-serif"
+  ansible.builtin.set_fact:
+    __darwin_source_han_serif: "{{ lookup('aged_release', 'github-release:adobe-fonts/source-han-serif', pattern='^\\d+\\.\\d+R$', asset='01_SourceHanSerif.ttc.zip') }}"
+  tags:
+    - darwin
+    - install
+    - font
+    - darwin_font
+    - darwin_font_install
+    - darwin_font_download
+
 - name: "font : Download source-han-mono"
   ansible.builtin.get_url:
-    url: https://github.com/adobe-fonts/source-han-mono/releases/download/{{ darwin_source_han_mono_version }}/SourceHanMono.ttc
-    dest: /Library/Fonts/Adobe
+    url: "{{ __darwin_source_han_mono.url }}"
+    dest: /Library/Fonts/Adobe/SourceHanMono.ttc
+    checksum: "{{ __darwin_source_han_mono.checksum | default(omit, true) }}"
     mode: '0644'
   tags:
     - darwin
@@ -347,9 +381,12 @@
 
 - name: "font : Download source-han-sans"
   ansible.builtin.unarchive:
-    src: https://github.com/adobe-fonts/source-han-sans/releases/download/{{ darwin_source_han_sans_version }}/SourceHanSans.ttc.zip
+    src: "{{ __darwin_source_han_sans.url }}"
     dest: /Library/Fonts/Adobe
     remote_src: true
+    # Files created in this directory inherit its admin group; stating it
+    # stops unarchive from reporting a group change on every run.
+    group: admin
   tags:
     - darwin
     - install
@@ -360,9 +397,12 @@
 
 - name: "font : Download source-han-serif"
   ansible.builtin.unarchive:
-    src: https://github.com/adobe-fonts/source-han-serif/releases/download/{{ darwin_source_han_serif_version }}/01_SourceHanSerif.ttc.zip
+    src: "{{ __darwin_source_han_serif.url }}"
     dest: /Library/Fonts/Adobe
     remote_src: true
+    # Files created in this directory inherit its admin group; stating it
+    # stops unarchive from reporting a group change on every run.
+    group: admin
   tags:
     - darwin
     - install
