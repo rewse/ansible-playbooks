@@ -1,6 +1,9 @@
 ---
-- hosts: udm
+- name: Configure UniFi Dream Machine
+  hosts: udm
   become: true
   remote_user: root
   roles:
-    - udm
+    - role: udm
+      tags:
+        - udm

@@ -1,4 +1,5 @@
-- name: "udm-rp-filter: Restart"
+---
+- name: Restart udm-rp-filter
   ansible.builtin.systemd:
     name: udm-rp-filter
     state: restarted

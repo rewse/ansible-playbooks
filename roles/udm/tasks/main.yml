@@ -1,22 +1,5 @@
-- name: "udm : Deploy udm-rp-filter.service"
-  ansible.builtin.copy:
-    src: udm-rp-filter.service
-    dest: /etc/systemd/system/udm-rp-filter.service
-    owner: root
-    group: root
-    mode: "0644"
-  notify: "udm-rp-filter: Restart"
+---
+- name: Import rp_filter tasks
+  ansible.builtin.import_tasks: rp_filter.yml
   tags:
-    - udm
-    - config
-    - udm_config
-
-- name: "udm : Enable udm-rp-filter.service"
-  ansible.builtin.systemd:
-    name: udm-rp-filter
-    enabled: true
-    daemon_reload: true
-  tags:
-    - udm
-    - config
-    - udm_config
+    - udm_rp_filter

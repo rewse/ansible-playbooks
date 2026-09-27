@@ -1,0 +1,15 @@
+---
+- name: rp_filter | Deploy service unit
+  ansible.builtin.copy:
+    src: udm-rp-filter.service
+    dest: /etc/systemd/system/udm-rp-filter.service
+    owner: root
+    group: root
+    mode: "0644"
+  notify: Restart udm-rp-filter
+
+- name: rp_filter | Enable service
+  ansible.builtin.systemd:
+    name: udm-rp-filter
+    enabled: true
+    daemon_reload: true
