@@ -1,0 +1,102 @@
+---
+- name: oracle | Find instantclient directories
+  ansible.builtin.find:
+    paths: /srv
+    patterns: instantclient_*
+    file_type: directory
+  register: __database_client_instantclient_dirs
+
+# Oracle serves the newest release under an unversioned name. Its ETag tells
+# whether it changed, so the 300 MB of archives download only on a new release.
+- name: oracle | Read archive ETags
+  ansible.builtin.uri:
+    url: "{{ database_client_instantclient_url }}"
+    method: HEAD
+  loop: "{{ database_client_instantclient_packages }}"
+  register: __database_client_instantclient_head
+  check_mode: false
+
+- name: oracle | Read recorded ETags
+  ansible.builtin.slurp:
+    src: "/usr/local/src/instantclient-{{ item }}.etag"
+  loop: "{{ database_client_instantclient_packages }}"
+  register: __database_client_instantclient_recorded
+  failed_when: false
+
+- name: oracle | Download changed archives
+  ansible.builtin.get_url:
+    url: "{{ database_client_instantclient_url }}"
+    dest: "/usr/local/src/instantclient-{{ item }}.zip"
+    mode: "0644"
+    force: true
+  loop: "{{ database_client_instantclient_packages }}"
+  loop_control:
+    index_var: __database_client_index
+  register: __database_client_instantclient_download
+  when: >-
+    __database_client_instantclient_dirs.matched == 0 or
+    __database_client_instantclient_head.results[__database_client_index].etag !=
+    (__database_client_instantclient_recorded.results[__database_client_index].content | default('') | b64decode | trim)
+
+- name: oracle | Extract archives
+  ansible.builtin.unarchive:
+    src: "{{ item.dest }}"
+    dest: /srv
+    remote_src: true
+  loop: "{{ __database_client_instantclient_download.results }}"
+  loop_control:
+    label: "{{ item.item }}"
+  # A dry run does not download the archive to extract.
+  when: item is changed and not ansible_check_mode
+
+- name: oracle | Record ETags
+  ansible.builtin.copy:
+    content: "{{ item.etag }}\n"
+    dest: "/usr/local/src/instantclient-{{ item.item }}.etag"
+    mode: "0644"
+  loop: "{{ __database_client_instantclient_head.results }}"
+  loop_control:
+    label: "{{ item.item }}"
+
+- name: oracle | Find extracted directories
+  ansible.builtin.find:
+    paths: /srv
+    patterns: instantclient_*
+    file_type: directory
+  register: __database_client_instantclient_dirs
+
+- name: oracle | Select newest directory
+  ansible.builtin.set_fact:
+    __database_client_instantclient_dir: >-
+      {{ __database_client_instantclient_dirs.files | map(attribute='path')
+         | community.general.version_sort | last }}
+  # A dry run on a new host has nothing extracted yet.
+  when: __database_client_instantclient_dirs.matched > 0
+
+- name: oracle | Add instantclient to PATH
+  ansible.builtin.template:
+    src: oracle-instantclient.sh.j2
+    dest: /etc/profile.d/oracle-instantclient.sh
+    mode: "0644"
+  when: __database_client_instantclient_dir is defined
+
+- name: oracle | Add instantclient to ld.so.conf
+  ansible.builtin.template:
+    src: oracle-instantclient.conf.j2
+    dest: /etc/ld.so.conf.d/oracle-instantclient.conf
+    mode: "0644"
+  when: __database_client_instantclient_dir is defined
+
+- name: oracle | Link ojdbc.jar
+  ansible.builtin.file:
+    src: "{{ __database_client_instantclient_dir }}/ojdbc8.jar"
+    dest: /usr/share/java/ojdbc11.jar
+    state: link
+  when: __database_client_instantclient_dir is defined
+
+- name: oracle | Remove older directories
+  ansible.builtin.file:
+    path: "{{ item }}"
+    state: absent
+  loop: "{{ __database_client_instantclient_dirs.files | map(attribute='path') | reject('equalto', __database_client_instantclient_dir) }}"
+  when: __database_client_instantclient_dir is defined

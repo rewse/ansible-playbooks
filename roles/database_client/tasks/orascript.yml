@@ -1,0 +1,46 @@
+---
+- name: orascript | Create directory
+  ansible.builtin.file:
+    path: /opt/orascript
+    state: directory
+    owner: "{{ admin }}"
+    group: "{{ admin }}"
+    mode: "0755"
+
+- name: orascript | Check out repository
+  # This account's own repository follows master without a cooldown. Checked out
+  # as the admin user, who owns it and runs the scripts.
+  ansible.builtin.git:
+    repo: git@github.com:rewse/orascript.git
+    dest: /opt/orascript
+    accept_hostkey: true
+    key_file: /home/{{ admin }}/.ssh/id_rsa
+    version: master
+  become: true
+  become_user: "{{ admin }}"
+  register: __database_client_orascript
+
+- name: orascript | Copy orarc to admin home
+  ansible.builtin.copy:
+    src: /opt/orascript/orarc
+    dest: /home/{{ admin }}/.orarc
+    remote_src: true
+    mode: "0644"
+  become: true
+  become_user: "{{ admin }}"
+  # A dry run does not create a first checkout.
+  when: not ansible_check_mode or __database_client_orascript.before is not none
+
+- name: orascript | Link the SQL scripts into the admin home
+  ansible.builtin.file:
+    src: /opt/orascript/common
+    dest: /home/{{ admin }}/oracle
+    state: link
+    force: true
+  become: true
+  become_user: "{{ admin }}"
+
+- name: orascript | Remove legacy checkout
+  ansible.builtin.file:
+    path: /srv/git/orascript
+    state: absent

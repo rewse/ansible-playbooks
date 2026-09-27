@@ -1,0 +1,23 @@
+---
+- name: Import mysql tasks
+  ansible.builtin.import_tasks: mysql.yml
+  tags:
+    - database_client_mysql
+
+- name: Import oracle tasks
+  ansible.builtin.import_tasks: oracle.yml
+  tags:
+    - database_client_oracle
+    - update
+
+- name: Import orascript tasks
+  ansible.builtin.import_tasks: orascript.yml
+  tags:
+    - database_client_orascript
+    - update
+
+- name: Import redshift tasks
+  ansible.builtin.import_tasks: redshift.yml
+  tags:
+    - database_client_redshift
+    - update

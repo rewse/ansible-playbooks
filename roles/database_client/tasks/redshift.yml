@@ -1,0 +1,40 @@
+---
+- name: redshift | Resolve aged release
+  ansible.builtin.set_fact:
+    # Releases on GitHub carry no jar; the jar lives on S3 under the same version.
+    __database_client_redshift_version: "{{ lookup('aged_release', 'github-release:aws/amazon-redshift-jdbc-driver').version | regex_replace('^v', '') }}"
+
+- name: redshift | Download JDBC driver
+  ansible.builtin.get_url:
+    url: https://s3.amazonaws.com/redshift-downloads/drivers/jdbc/{{ __database_client_redshift_version }}/redshift-jdbc42-{{ __database_client_redshift_version }}.jar
+    dest: /usr/share/java/redshift-jdbc42-{{ __database_client_redshift_version }}.jar
+    mode: "0644"
+  register: __database_client_redshift_download
+
+- name: redshift | Link JDBC driver
+  ansible.builtin.file:
+    src: redshift-jdbc42-{{ __database_client_redshift_version }}.jar
+    dest: /usr/share/java/{{ item }}
+    state: link
+  loop:
+    - redshift-jdbc42.jar
+    - redshift-jdbc.jar
+  # A dry run does not download a new version for the links to point at.
+  when: not (ansible_check_mode and __database_client_redshift_download is changed)
+
+- name: redshift | Find older drivers
+  ansible.builtin.find:
+    paths: /usr/share/java
+    patterns: redshift-jdbc42-*.jar
+    excludes: redshift-jdbc42-{{ __database_client_redshift_version }}.jar
+  register: __database_client_redshift_old
+
+- name: redshift | Remove older drivers
+  ansible.builtin.file:
+    path: "{{ item.path }}"
+    state: absent
+  loop: "{{ __database_client_redshift_old.files }}"
+  loop_control:
+    label: "{{ item.path }}"
+  # A dry run keeps the current driver as the link target.
+  when: not (ansible_check_mode and __database_client_redshift_download is changed)

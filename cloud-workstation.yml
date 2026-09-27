@@ -22,10 +22,10 @@
     - role: desktop
       tags:
         - desktop
-    - role: database/client
+    - role: database_client
       tags:
         - database_client
-    - role: database/client/gui
+    - role: database_client_gui
       tags:
         - database_client_gui
     - role: zabbix_aws

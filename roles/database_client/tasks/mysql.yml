@@ -1,0 +1,20 @@
+---
+- name: mysql | Add apt repository
+  ansible.builtin.apt:
+    # The unversioned name always serves the newest release; apt then keeps the
+    # repository's packages current.
+    deb: https://repo.mysql.com/mysql-apt-config.deb
+
+- name: mysql | Install client packages
+  ansible.builtin.apt:
+    name:
+      - alien
+      - libpostgresql-jdbc-java
+      - mysql-client
+      - postgresql-client
+      - rlwrap
+
+- name: mysql | Install Connector/J
+  ansible.builtin.apt:
+    name: mysql-connector-j
+    state: present
