@@ -1,0 +1,10 @@
+{{ ansible_managed | comment }}
+#
+# backend is stated because jail.d/defaults-debian.conf from the package sets
+# systemd for every jail and jail.d is read after jail.local.
+[litellm]
+enabled = true
+backend = auto
+port = http,https
+filter = litellm
+logpath = /var/log/apache2/other_vhosts_access.log
