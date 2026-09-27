@@ -38,6 +38,21 @@
   when: (__restic_release.version | regex_replace('^v', '')) not in (__restic_installed.stdout | default(''))
   changed_when: true
 
+- name: linux | Find older binary archives
+  ansible.builtin.find:
+    paths: /usr/local/src
+    patterns: restic_*_linux_*.bz2
+    excludes: restic_{{ __restic_release.version | regex_replace('^v', '') }}_linux_*.bz2
+  register: __restic_old_archives
+
+- name: linux | Remove older binary archives
+  ansible.builtin.file:
+    path: "{{ item.path }}"
+    state: absent
+  loop: "{{ __restic_old_archives.files }}"
+  loop_control:
+    label: "{{ item.path }}"
+
 - name: linux | Create password directory
   ansible.builtin.file:
     path: /etc/restic
