@@ -1,0 +1,27 @@
+---
+- name: publisher | Create installation directory
+  ansible.builtin.file:
+    path: /opt/mhz19
+    state: directory
+    mode: "0755"
+
+- name: publisher | Create virtual environment
+  # uv has no Ansible module.
+  ansible.builtin.command: uv venv /opt/mhz19
+  args:
+    creates: /opt/mhz19/bin/activate
+
+- name: publisher | Install mh_z19
+  # uv has no Ansible module.
+  ansible.builtin.command: uv pip install --upgrade mh_z19
+  environment: "{{ supply_chain_cooldown_environment | combine({'VIRTUAL_ENV': '/opt/mhz19'}) }}"
+  register: __mhz19_pip
+  changed_when: "'Installed' in __mhz19_pip.stderr"
+
+- name: publisher | Copy MQTT publisher script
+  ansible.builtin.template:
+    src: mhz192mqtt.j2
+    dest: /usr/local/sbin/mhz192mqtt
+    mode: "0700"
+    variable_start_string: "[%"
+    variable_end_string: "%]"

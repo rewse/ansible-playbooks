@@ -1,80 +1,11 @@
 ---
-- name: "mhz19 : Create installation directory"
-  ansible.builtin.file:
-    path: /opt/mhz19
-    state: directory
-    mode: '0755'
+- name: Import publisher tasks
+  ansible.builtin.import_tasks: publisher.yml
   tags:
-    - mhz19
-    - init
-    - mhz19_mhz19
-    - mhz19_mhz19_init
+    - mhz19_publisher
+    - update
 
-- name: "mhz19 : Create Python virtual environment with uv"
-  ansible.builtin.command: uv venv /opt/mhz19
-  args:
-    creates: /opt/mhz19/bin/activate
+- name: Import timer tasks
+  ansible.builtin.import_tasks: timer.yml
   tags:
-    - mhz19
-    - init
-    - mhz19_mhz19
-    - mhz19_mhz19_init
-
-- name: "mhz19 : Install mh_z19 package with uv"
-  ansible.builtin.command: uv pip install --upgrade mh_z19
-  environment: "{{ supply_chain_cooldown_environment | combine({'VIRTUAL_ENV': '/opt/mhz19'}) }}"
-  changed_when: false
-  tags:
-    - mhz19
-    - install
-    - mhz19_mhz19
-    - mhz19_mhz19_install
-
-- name: "mhz19 : Copy MQTT publisher script"
-  ansible.builtin.template:
-    src: mhz192mqtt.j2
-    dest: /usr/local/sbin/mhz192mqtt
-    mode: '0700'
-    variable_start_string: "[%"
-    variable_end_string: "%]"
-  tags:
-    - mhz19
-    - config
-    - mhz19_mhz19
-    - mhz19_mhz19_config
-
-- name: "mhz19 : Install systemd service"
-  ansible.builtin.copy:
-    src: mhz192mqtt.service
-    dest: /etc/systemd/system/mhz192mqtt.service
-    mode: '0644'
-  notify: "Reload systemd"
-  tags:
-    - mhz19
-    - config
-    - mhz19_mhz19
-    - mhz19_mhz19_config
-
-- name: "mhz19 : Install systemd timer"
-  ansible.builtin.copy:
-    src: mhz192mqtt.timer
-    dest: /etc/systemd/system/mhz192mqtt.timer
-    mode: '0644'
-  notify: "mhz19 : Restart timer"
-  tags:
-    - mhz19
-    - config
-    - mhz19_mhz19
-    - mhz19_mhz19_config
-
-- name: "mhz19 : Enable and start timer"
-  ansible.builtin.systemd:
-    name: mhz192mqtt.timer
-    enabled: true
-    state: started
-    daemon_reload: true
-  tags:
-    - mhz19
-    - config
-    - mhz19_mhz19
-    - mhz19_mhz19_config
+    - mhz19_timer

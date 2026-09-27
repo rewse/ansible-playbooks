@@ -1,0 +1,21 @@
+---
+- name: timer | Install systemd service
+  ansible.builtin.copy:
+    src: mhz192mqtt.service
+    dest: /etc/systemd/system/mhz192mqtt.service
+    mode: "0644"
+  notify: Reload systemd
+
+- name: timer | Install systemd timer
+  ansible.builtin.copy:
+    src: mhz192mqtt.timer
+    dest: /etc/systemd/system/mhz192mqtt.timer
+    mode: "0644"
+  notify: Restart mhz192mqtt timer
+
+- name: timer | Enable and start timer
+  ansible.builtin.systemd:
+    name: mhz192mqtt.timer
+    enabled: true
+    state: started
+    daemon_reload: true
