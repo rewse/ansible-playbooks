@@ -23,20 +23,25 @@
   register: __database_client_instantclient_recorded
   failed_when: false
 
-- name: oracle | Download changed archives
+- name: oracle | Decide whether to download
+  ansible.builtin.set_fact:
+    # All three archives extract into one versioned directory, so a release that
+    # changes any of them needs all of them.
+    __database_client_instantclient_stale: >-
+      {{ __database_client_instantclient_dirs.matched == 0 or
+         (__database_client_instantclient_head.results | map(attribute='etag') | list) !=
+         (__database_client_instantclient_recorded.results
+          | map(attribute='content', default='') | map('b64decode') | map('trim') | list) }}
+
+- name: oracle | Download archives
   ansible.builtin.get_url:
     url: "{{ database_client_instantclient_url }}"
     dest: "/usr/local/src/instantclient-{{ item }}.zip"
     mode: "0644"
     force: true
   loop: "{{ database_client_instantclient_packages }}"
-  loop_control:
-    index_var: __database_client_index
   register: __database_client_instantclient_download
-  when: >-
-    __database_client_instantclient_dirs.matched == 0 or
-    __database_client_instantclient_head.results[__database_client_index].etag !=
-    (__database_client_instantclient_recorded.results[__database_client_index].content | default('') | b64decode | trim)
+  when: __database_client_instantclient_stale | bool
 
 - name: oracle | Extract archives
   ansible.builtin.unarchive:
