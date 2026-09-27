@@ -122,7 +122,7 @@ Use only these tags, written as an indented YAML list:
 
 ### Lint
 
-- Lint with ansible-lint only, through pre-commit (`uvx pre-commit run --all-files`) locally and in CI. `.yamllint` configures ansible-lint's `yaml` rule; do not run yamllint separately.
+- Lint through pre-commit (`uvx --with pre-commit-uv==4.3.0 pre-commit@4.6.2 run --all-files --show-diff-on-failure`) locally and in CI. It runs ansible-lint for Ansible content, shellcheck for shell scripts, and ruff and basedpyright for Python. `.yamllint` configures ansible-lint's `yaml` rule; do not run yamllint separately.
 - `roles/homeassistant/files/` is excluded from lint.
 - Do not add entries to `.ansible-lint-ignore` for new code.
 
