@@ -921,9 +921,11 @@
   ansible.builtin.file:
     path: /usr/lib/node_modules/agent-browser/bin/agent-browser-linux-{{ 'arm64' if ansible_facts['architecture'] == 'aarch64' else 'x64' }}
     mode: "0755"
+  # A dry run on a new host installs nothing to mark.
+  when: not ansible_check_mode
   tags:
     - ubuntu
-    - install
-    - agent-browser
-    - ubuntu_agent-browser
-    - ubuntu_agent-browser_install
+    - upgrade
+    - package
+    - ubuntu_package
+    - ubuntu_package_upgrade
