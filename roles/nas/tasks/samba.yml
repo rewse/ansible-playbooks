@@ -1,0 +1,91 @@
+---
+- name: samba | Install Samba
+  ansible.builtin.apt:
+    name: samba
+    state: present
+
+- name: samba | Create service users
+  ansible.builtin.user:
+    name: "{{ item.name }}"
+    uid: "{{ item.uid }}"
+    shell: /usr/sbin/nologin
+    password: '!'
+    create_home: false
+  loop: "{{ nas_service_users }}"
+  loop_control:
+    label: "{{ item.name }}"
+
+- name: samba | Create home directories
+  ansible.builtin.file:
+    path: "{{ nas_data_path }}/homes/{{ item }}"
+    state: directory
+    owner: "{{ item }}"
+    group: "{{ item }}"
+    mode: "0700"
+  loop: "{{ nas_samba_users }}"
+
+- name: samba | Create Time Machine parent directory
+  # Created explicitly so it does not inherit the owner of whichever share came
+  # first in the loop below. Both users have to traverse it to reach their own
+  # directory, so it stays root owned and traversable.
+  ansible.builtin.file:
+    path: "{{ nas_backup_path }}/timemachine"
+    state: directory
+    owner: root
+    group: root
+    mode: "0755"
+
+- name: samba | Create Time Machine directories
+  ansible.builtin.file:
+    path: "{{ nas_backup_path }}/timemachine/{{ item.name | replace('timemachine-', '') }}"
+    state: directory
+    owner: "{{ item.user }}"
+    group: "{{ item.user }}"
+    mode: "0700"
+  loop: "{{ nas_timemachine_shares }}"
+  loop_control:
+    label: "{{ item.name }}"
+
+- name: samba | Confine Avahi to one interface
+  ansible.builtin.lineinfile:
+    path: /etc/avahi/avahi-daemon.conf
+    regexp: '^#?allow-interfaces='
+    line: "allow-interfaces={{ nas_mdns_interface }}"
+    insertafter: '^\[server\]'
+  notify:
+    - Restart avahi-daemon
+    - Restart smbd
+
+- name: samba | Configure Samba
+  ansible.builtin.template:
+    src: smb.conf.j2
+    dest: /etc/samba/smb.conf
+    mode: "0644"
+    validate: testparm -s %s
+  notify: Restart smbd
+
+- name: samba | Read Samba database
+  # No module reads the Samba password database.
+  ansible.builtin.command: pdbedit --list
+  register: __nas_pdbedit
+  changed_when: false
+
+- name: samba | Create Samba users
+  # No module manages the Samba password database.
+  ansible.builtin.command:
+    cmd: "smbpasswd -a -s {{ item }}"
+    # Passed on stdin rather than the command line so it stays out of the
+    # process list.
+    stdin: "{{ nas_samba_password }}\n{{ nas_samba_password }}\n"
+  vars:
+    nas_samba_password: "{{ lookup('pipe', 'op read \"op://ansible/' ~ nas_samba_item_ids[item] ~ '/password\"') }}"
+  loop: "{{ nas_samba_users }}"
+  when: item not in __nas_pdbedit.stdout
+  changed_when: true
+  no_log: true
+
+- name: samba | Enable and start Samba
+  ansible.builtin.systemd:
+    name: smbd
+    enabled: true
+    state: started

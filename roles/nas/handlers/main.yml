@@ -1,29 +1,31 @@
 ---
-- name: "nas : Reload exports"
+- name: Reload exports
+  # No module re-exports NFS shares.
   ansible.builtin.command: exportfs -ra
   changed_when: true
 
-- name: "nas : Reload systemd"
+- name: Reload systemd
   ansible.builtin.systemd:
     daemon_reload: true
 
-- name: "nas : Reload udev rules"
+- name: Reload udev rules
+  # No module reloads udev rules.
   ansible.builtin.command: udevadm control --reload-rules
   changed_when: false
 
-- name: "nas : Restart zabbix-agent"
+- name: Restart zabbix-agent
   ansible.builtin.systemd:
     name: zabbix-agent
     state: restarted
 
-- name: "nas : Restart avahi-daemon"
+- name: Restart avahi-daemon
   # Ahead of smbd on purpose: smbd registers its mDNS service through Avahi, so
   # the name has to be settled before it does.
   ansible.builtin.systemd:
     name: avahi-daemon
     state: restarted
 
-- name: "nas : Restart smbd"
+- name: Restart smbd
   ansible.builtin.systemd:
     name: smbd
     state: restarted

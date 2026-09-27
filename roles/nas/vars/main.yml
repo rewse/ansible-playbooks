@@ -26,7 +26,7 @@ nas_data_path: /srv/nas/data
 # The archive is the reason step 23 waits: its staging copy on Bay 1 cannot go
 # until a complete snapshot exists here.
 #
-# The unit templates and the script belong to the raspberrypi role, which every
+# The unit templates and the script belong to the restic role, which every
 # host that backs up gets: a repository name is a unit instance, so a host's root
 # filesystem and a volume here run through the same pair of units, and the bucket
 # is named there. Only the instances are configured below.

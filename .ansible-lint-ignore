@@ -17,6 +17,3 @@ roles/homeassistant/tests/thermometer_fault_detection_room.yml name[prefix]
 roles/homeassistant/tests/thermometer_fault_detection_room.yml var-naming[no-role-prefix]
 roles/homeassistant/tests/utility_meter_cost_charts.yml name[casing]
 roles/homeassistant/tests/zones.yml name[casing]
-roles/nas/handlers/main.yml name[casing]
-roles/nas/tasks/main.yml name[casing]
-roles/nas/tasks/main.yml no-changed-when

@@ -1,4 +1,5 @@
 #!/usr/bin/bash
+[% ansible_managed | comment %]
 #
 # Releases the ORICO enclosure so it can be powered off or unplugged: stops
 # whatever holds the volumes, unmounts them and closes the LUKS mappings.

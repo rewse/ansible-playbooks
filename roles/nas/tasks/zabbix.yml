@@ -1,0 +1,7 @@
+---
+- name: zabbix | Copy Zabbix agent config
+  ansible.builtin.copy:
+    src: nas.conf
+    dest: /etc/zabbix/zabbix_agentd.d
+    mode: "0644"
+  notify: Restart zabbix-agent

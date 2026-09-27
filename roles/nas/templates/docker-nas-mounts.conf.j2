@@ -1,3 +1,4 @@
+{{ ansible_managed | comment }}
 [Unit]
 # Docker starts its containers itself through their restart policy, so any that
 # bind a directory on these volumes race the mount. cryptsetup spends several

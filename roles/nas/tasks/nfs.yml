@@ -1,0 +1,29 @@
+---
+- name: nfs | Install NFS server
+  ansible.builtin.apt:
+    name: nfs-kernel-server
+    state: present
+
+- name: nfs | Create export directories
+  ansible.builtin.file:
+    path: "{{ nas_backup_path }}/{{ item.name }}"
+    state: directory
+    owner: root
+    group: root
+    mode: "0700"
+  loop: "{{ nas_nfs_clients }}"
+  loop_control:
+    label: "{{ item.name }}"
+
+- name: nfs | Configure exports
+  ansible.builtin.template:
+    src: exports.j2
+    dest: /etc/exports
+    mode: "0644"
+  notify: Reload exports
+
+- name: nfs | Enable and start NFS server
+  ansible.builtin.systemd:
+    name: nfs-server
+    enabled: true
+    state: started

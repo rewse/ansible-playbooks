@@ -1,0 +1,79 @@
+---
+- name: s3 | Check the restic S3 units are installed
+  # The templates and the script belong to the restic role, which every host
+  # that backs up gets and which this role depends on. Only the instances for the
+  # volumes are configured here, so an absent template would otherwise surface as
+  # a timer that enables and never runs anything.
+  ansible.builtin.stat:
+    path: /etc/systemd/system/restic-s3-backup@.service
+  register: __nas_s3_template
+
+- name: s3 | Fail when the restic S3 units are missing
+  ansible.builtin.assert:
+    that: __nas_s3_template.stat.exists
+    fail_msg: >-
+      restic-s3-backup@.service is missing. Apply the restic role first;
+      it owns the unit templates the volume repositories instantiate.
+
+- name: s3 | Create S3 drop-in directories
+  # Drop-ins rather than unit files per instance: enabling a template instance
+  # links to the template, and a concrete file of the same name would leave that
+  # link pointing at the wrong place.
+  ansible.builtin.file:
+    path: "/etc/systemd/system/{{ item.1.unit }}@{{ item.0.name }}.{{ item.1.type }}.d"
+    state: directory
+    owner: root
+    group: root
+    mode: "0755"
+  vars:
+    nas_s3_dropins:
+      - {unit: restic-s3-backup, type: service}
+      - {unit: restic-s3-backup, type: timer}
+      - {unit: restic-s3-check, type: timer}
+  loop: "{{ nas_s3_repositories | product(nas_s3_dropins) | list }}"
+  loop_control:
+    label: "{{ item.1.unit }}@{{ item.0.name }}.{{ item.1.type }}"
+
+- name: s3 | Configure S3 backup sources
+  ansible.builtin.template:
+    src: restic-s3-source.conf.j2
+    dest: "/etc/systemd/system/restic-s3-backup@{{ item.name }}.service.d/source.conf"
+    mode: "0644"
+  loop: "{{ nas_s3_repositories }}"
+  loop_control:
+    label: "{{ item.name }}"
+  notify: "nas : Reload systemd"
+
+- name: s3 | Configure S3 backup schedules
+  ansible.builtin.template:
+    src: restic-timer-schedule.conf.j2
+    dest: "/etc/systemd/system/restic-s3-backup@{{ item.name }}.timer.d/schedule.conf"
+    mode: "0644"
+  vars:
+    restic_timer_oncalendar: "{{ item.backup_schedule }}"
+    restic_timer_delay: 15m
+  loop: "{{ nas_s3_repositories }}"
+  loop_control:
+    label: "{{ item.name }}"
+
+- name: s3 | Configure S3 check schedules
+  ansible.builtin.template:
+    src: restic-timer-schedule.conf.j2
+    dest: "/etc/systemd/system/restic-s3-check@{{ item.name }}.timer.d/schedule.conf"
+    mode: "0644"
+  vars:
+    restic_timer_oncalendar: "{{ nas_s3_check_schedule }}"
+    restic_timer_delay: 30m
+  loop: "{{ nas_s3_repositories }}"
+  loop_control:
+    label: "{{ item.name }}"
+
+- name: s3 | Enable and start S3 timers
+  ansible.builtin.systemd:
+    name: "{{ item.0 }}@{{ item.1.name }}.timer"
+    enabled: true
+    state: started
+    daemon_reload: true
+  loop: "{{ ['restic-s3-backup', 'restic-s3-check'] | product(nas_s3_repositories) | list }}"
+  loop_control:
+    label: "{{ item.0 }}@{{ item.1.name }}"
