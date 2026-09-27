@@ -1,0 +1,26 @@
+---
+- name: Import package tasks
+  ansible.builtin.import_tasks: package.yml
+  tags:
+    - zabbix_server_package
+
+- name: Import server tasks
+  ansible.builtin.import_tasks: server.yml
+  tags:
+    - zabbix_server_server
+
+- name: Import frontend tasks
+  ansible.builtin.import_tasks: frontend.yml
+  tags:
+    - zabbix_server_frontend
+
+- name: Import ssl_cert_check tasks
+  ansible.builtin.import_tasks: ssl_cert_check.yml
+  tags:
+    - zabbix_server_ssl_cert_check
+    - update
+
+- name: Import scripts tasks
+  ansible.builtin.import_tasks: scripts.yml
+  tags:
+    - zabbix_server_scripts

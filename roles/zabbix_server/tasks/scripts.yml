@@ -1,0 +1,9 @@
+---
+- name: scripts | Copy external scripts
+  ansible.builtin.copy:
+    src: "{{ item }}"
+    dest: /usr/lib/zabbix/externalscripts
+    mode: "0755"
+  loop:
+    - cloudwatch.sh
+    - ssl-cert-check.sh

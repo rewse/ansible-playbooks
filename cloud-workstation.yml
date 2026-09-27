@@ -28,6 +28,6 @@
     - role: database/client/gui
       tags:
         - database_client_gui
-    - role: zabbix/aws
+    - role: zabbix_aws
       tags:
         - zabbix_aws

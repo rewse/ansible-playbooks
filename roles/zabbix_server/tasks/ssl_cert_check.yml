@@ -1,0 +1,20 @@
+---
+- name: ssl_cert_check | Resolve aged commit
+  ansible.builtin.set_fact:
+    __zabbix_server_ssl_cert_check: "{{ lookup('aged_release', 'github-commit:Matty9191/ssl-cert-check') }}"
+
+- name: ssl_cert_check | Check out repository
+  ansible.builtin.git:
+    repo: https://github.com/Matty9191/ssl-cert-check.git
+    dest: /usr/local/src/ssl-cert-check
+    version: "{{ __zabbix_server_ssl_cert_check.commit }}"
+  register: __zabbix_server_ssl_cert_check_git
+
+- name: ssl_cert_check | Install script
+  ansible.builtin.copy:
+    src: /usr/local/src/ssl-cert-check/ssl-cert-check
+    dest: /usr/local/bin
+    mode: "0755"
+    remote_src: true
+  # A dry run does not create a first checkout.
+  when: not ansible_check_mode or __zabbix_server_ssl_cert_check_git.before is not none

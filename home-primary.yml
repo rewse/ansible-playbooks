@@ -70,12 +70,12 @@
     - role: teslamate
       tags:
         - teslamate
-    - role: zabbix/server
+    - role: zabbix_server
       tags:
         - zabbix_server
-    - role: zabbix/mcp
+    - role: zabbix_mcp
       tags:
         - zabbix_mcp
-    - role: zabbix/money/market
+    - role: zabbix_money_market
       tags:
         - zabbix_money_market

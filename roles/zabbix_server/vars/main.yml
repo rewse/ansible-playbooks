@@ -1,0 +1,6 @@
+---
+zabbix_server_db_host: "{{ lookup('pipe', 'op read \"op://ansible/hrmsun2hbhhvrr6ou6yungdfwi/server\"') }}"
+zabbix_server_db_password: "{{ lookup('pipe', 'op read \"op://ansible/hrmsun2hbhhvrr6ou6yungdfwi/password\"') }}"
+# The release series of the Zabbix apt repository. Moved to a new series by hand
+# after reading its upgrade notes, since the database schema migrates with it.
+zabbix_server_version: "7.4"

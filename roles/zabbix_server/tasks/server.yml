@@ -1,0 +1,84 @@
+---
+- name: server | Create systemd override directory
+  ansible.builtin.file:
+    path: /etc/systemd/system/zabbix-server.service.d
+    state: directory
+    mode: "0755"
+
+- name: server | Copy systemd override config
+  ansible.builtin.copy:
+    src: override.conf
+    dest: /etc/systemd/system/zabbix-server.service.d
+    mode: "0644"
+  notify: Restart zabbix-server
+
+- name: server | Set config file permissions
+  ansible.builtin.file:
+    path: /etc/zabbix/zabbix_server.conf
+    owner: root
+    group: zabbix
+    mode: "0640"
+
+- name: server | Set DBHost
+  ansible.builtin.lineinfile:
+    dest: /etc/zabbix/zabbix_server.conf
+    insertafter: "^# DBHost="
+    regexp: "^DBHost="
+    line: "DBHost={{ zabbix_server_db_host }}"
+  notify: Restart zabbix-server
+
+- name: server | Set DBPassword
+  ansible.builtin.lineinfile:
+    dest: /etc/zabbix/zabbix_server.conf
+    insertafter: "^# DBPassword="
+    regexp: "^DBPassword="
+    line: "DBPassword={{ zabbix_server_db_password }}"
+  notify: Restart zabbix-server
+
+- name: server | Set Timeout
+  ansible.builtin.lineinfile:
+    dest: /etc/zabbix/zabbix_server.conf
+    insertafter: "^# Timeout="
+    regexp: "^Timeout="
+    line: "Timeout=30"
+  notify: Restart zabbix-server
+
+- name: server | Set MaxHousekeeperDelete
+  ansible.builtin.lineinfile:
+    dest: /etc/zabbix/zabbix_server.conf
+    insertafter: "^# MaxHousekeeperDelete="
+    regexp: "^MaxHousekeeperDelete="
+    line: "MaxHousekeeperDelete=20000"
+  notify: Restart zabbix-server
+
+- name: server | Set AllowUnsupportedDBVersions
+  ansible.builtin.lineinfile:
+    dest: /etc/zabbix/zabbix_server.conf
+    insertafter: "^# AllowUnsupportedDBVersions="
+    regexp: "^AllowUnsupportedDBVersions="
+    line: "AllowUnsupportedDBVersions=1"
+  notify: Restart zabbix-server
+
+- name: server | Set HistoryCacheSize
+  ansible.builtin.lineinfile:
+    dest: /etc/zabbix/zabbix_server.conf
+    insertafter: "^# HistoryCacheSize="
+    regexp: "^HistoryCacheSize="
+    line: "HistoryCacheSize=64M"
+  notify: Restart zabbix-server
+
+- name: server | Set FpingLocation
+  ansible.builtin.lineinfile:
+    dest: /etc/zabbix/zabbix_server.conf
+    insertafter: "^# FpingLocation="
+    regexp: "^FpingLocation="
+    line: "FpingLocation=/usr/bin/fping"
+  notify: Restart zabbix-server
+
+- name: server | Set Fping6Location
+  ansible.builtin.lineinfile:
+    dest: /etc/zabbix/zabbix_server.conf
+    insertafter: "^# Fping6Location="
+    regexp: "^Fping6Location="
+    line: "Fping6Location=/usr/bin/fping6"
+  notify: Restart zabbix-server
