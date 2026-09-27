@@ -53,8 +53,3 @@
   ansible.builtin.import_tasks: qwen_code.yml
   tags:
     - raspberrypi_qwen_code
-
-- name: Import claude_code tasks
-  ansible.builtin.import_tasks: claude_code.yml
-  tags:
-    - raspberrypi_claude_code
