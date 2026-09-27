@@ -1,36 +1,5 @@
 ---
-- name: "lmstudio : Enable Apache proxy modules"
-  community.general.apache2_module:
-    name: "{{ item }}"
-  loop:
-    - proxy
-    - proxy_http
-  notify: "apache: Restart"
+- name: Import apache tasks
+  ansible.builtin.import_tasks: apache.yml
   tags:
-    - lmstudio
-    - config
-    - apache
-    - lmstudio_config
-
-- name: "lmstudio : Copy Apache vhost config"
-  ansible.builtin.copy:
-    src: lmstudio.rewse.jp.conf
-    dest: /etc/apache2/sites-available
-    mode: '0644'
-  notify: "apache: Reload"
-  tags:
-    - lmstudio
-    - config
-    - apache
-    - lmstudio_config
-
-- name: "lmstudio : Enable Apache site"
-  ansible.builtin.command: a2ensite lmstudio.rewse.jp
-  register: lmstudio_a2ensite
-  changed_when: "'already enabled' not in lmstudio_a2ensite.stdout"
-  notify: "apache: Reload"
-  tags:
-    - lmstudio
-    - config
-    - apache
-    - lmstudio_config
+    - lmstudio_apache
