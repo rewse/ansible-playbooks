@@ -36,5 +36,5 @@
   changed_when: true
   notify: Restart zabbix-mcp-server
   when: >-
-    ('Version: ' ~ (__zabbix_mcp_source.version | regex_replace('^v', '')))
-    not in __zabbix_mcp_installed.stdout
+    __zabbix_mcp_installed.stdout is not regex('(?m)^Version: ' ~
+    (__zabbix_mcp_source.version | regex_replace('^v', '') | regex_escape) ~ '$')
