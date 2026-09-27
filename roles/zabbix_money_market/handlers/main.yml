@@ -1,6 +1,6 @@
 ---
 - name: Hand the stock-price-fetcher checkout to zabbix
-  # git runs as root; only a new checkout needs its working tree handed over.
+  # git runs as root, so the files it writes on each update need handing over.
   ansible.builtin.file:
     path: /opt/stock-price-fetcher
     owner: zabbix
