@@ -1,0 +1,7 @@
+---
+- name: logrotate | Copy remote log rotation config
+  ansible.builtin.copy:
+    src: remote
+    dest: /etc/logrotate.d
+    mode: "0644"
+  notify: Restart logrotate

@@ -1,10 +1,10 @@
 ---
-- name: "logrotate: Restart"
+- name: Restart logrotate
   ansible.builtin.systemd:
     name: logrotate
     state: restarted
 
-- name: "rsyslog: Restart"
+- name: Restart rsyslog
   ansible.builtin.systemd:
     name: rsyslog
     state: restarted

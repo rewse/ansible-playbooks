@@ -1,0 +1,7 @@
+---
+- name: rsyslog | Copy remote logging config
+  ansible.builtin.copy:
+    src: 10-remote.conf
+    dest: /etc/rsyslog.d
+    mode: "0644"
+  notify: Restart rsyslog

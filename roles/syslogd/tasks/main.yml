@@ -1,25 +1,10 @@
 ---
-- name: "rsyslog : Copy remote logging config"
-  ansible.builtin.copy:
-    src: 10-remote.conf
-    dest: /etc/rsyslog.d
-    mode: '0644'
-  notify: "rsyslog: Restart"
+- name: Import rsyslog tasks
+  ansible.builtin.import_tasks: rsyslog.yml
   tags:
-    - syslogd
-    - config
     - syslogd_rsyslog
-    - syslogd_rsyslog_config
 
-- name: "logrotate : Copy remote log rotation config"
-  ansible.builtin.copy:
-    src: remote
-    dest: /etc/logrotate.d
-    mode: '0644'
-  notify: "logrotate: Restart"
+- name: Import logrotate tasks
+  ansible.builtin.import_tasks: logrotate.yml
   tags:
-    - syslogd
-    - config
-    - logrotate
     - syslogd_logrotate
-    - syslogd_logrotate_config
