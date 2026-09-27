@@ -32,3 +32,4 @@ repos:
     rev: 706e6acebe9e88c2c28d1527d3085a14b11794c4  # frozen: 1.40.1
     hooks:
       - id: basedpyright
+        additional_dependencies: [ansible-core, pytest]

@@ -1,1 +1,1 @@
-{"typeCheckingMode": "standard"}
+{"typeCheckingMode": "standard", "extraPaths": ["plugins/lookup"]}

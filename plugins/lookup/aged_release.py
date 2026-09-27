@@ -9,9 +9,11 @@ import re
 import shutil
 import subprocess
 import tempfile
-from datetime import datetime, timedelta, timezone
+from collections.abc import Callable
+from datetime import datetime
+from datetime import timedelta
+from datetime import timezone
 from pathlib import Path
-from typing import Callable
 
 from ansible.errors import AnsibleLookupError
 from ansible.plugins.lookup import LookupBase
@@ -261,7 +263,7 @@ def _cached(key: tuple, compute: Callable[[], dict]) -> dict:
 
 
 class LookupModule(LookupBase):
-    def run(self, terms, variables=None, **kwargs):
+    def run(self, terms, variables=None, **kwargs):  # pyright: ignore[reportIncompatibleMethodOverride]  ansible-core leaves LookupBase.run unannotated, so its return type is inferred as None
         variables = variables or {}
         pattern = kwargs.get("pattern", DEFAULT_PATTERN)
         days = kwargs.get("days")

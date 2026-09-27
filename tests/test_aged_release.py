@@ -3,7 +3,9 @@
 import json
 import pathlib
 import sys
-from datetime import datetime, timedelta, timezone
+from datetime import datetime
+from datetime import timedelta
+from datetime import timezone
 
 import pytest
 from ansible.errors import AnsibleLookupError
@@ -12,7 +14,7 @@ sys.path.insert(
     0, str(pathlib.Path(__file__).resolve().parents[1] / "plugins" / "lookup")
 )
 
-import aged_release  # noqa: E402
+import aged_release
 
 NOW = datetime(2026, 9, 27, tzinfo=timezone.utc)
 

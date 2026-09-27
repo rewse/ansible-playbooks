@@ -3,7 +3,7 @@
 import unittest
 from pathlib import Path
 
-import yaml  # pyright: ignore[reportMissingModuleSource]  PyYAML ships with Ansible on the control node, outside the hook environment
+import yaml
 
 TASKS_PATH = Path(__file__).parents[1] / "tasks" / "main.yml"
 
