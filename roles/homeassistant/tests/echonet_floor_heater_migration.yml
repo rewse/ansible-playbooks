@@ -23,8 +23,10 @@
           {{ lookup('file', '../files/customize.yaml') }}
         homeassistant_living_room_climate_automations: >-
           {{ lookup('file', '../files/automations-living-room-climates.yaml') | from_yaml }}
-        homeassistant_role_tasks_raw: >-
-          {{ lookup('file', '../tasks/main.yml') }}
+        homeassistant_configuration_raw: >-
+          {{ lookup('file', '../templates/configuration.yaml.j2') }}
+        homeassistant_role_vars_raw: >-
+          {{ lookup('file', '../vars/main.yml') }}
         homeassistant_scripts: >-
           {{ lookup('file', '../files/scripts.yaml') | from_yaml }}
         homeassistant_templates_raw: >-
@@ -70,17 +72,10 @@
           - "'switch.living_area_floor_heatings' not in homeassistant_alexa_raw"
           - "'switch.study_floor_heater_operation_status' not in homeassistant_alexa_raw"
           - "'switch.living_room_floor_heater_operation_status' in homeassistant_alexa_raw"
-          - "'line: \"switch: !include switches.yaml\"' not in homeassistant_role_tasks_raw"
-          - "'src: switches.yaml' not in homeassistant_role_tasks_raw"
-          - "'path: /srv/homeassistant/config/switches.yaml' not in homeassistant_role_tasks_raw"
-          - >-
-            "regexp: '^switch:'" not in homeassistant_role_tasks_raw
-          - >-
-            "regexp: '^template:'" in homeassistant_role_tasks_raw
-          - >-
-            'line: "template: !include templates.yaml"' in homeassistant_role_tasks_raw
-          - >-
-            "insertafter: '^shell_command:'" in homeassistant_role_tasks_raw
+          - "'switch: !include switches.yaml' not in homeassistant_configuration_raw"
+          - "'switches.yaml' not in homeassistant_role_vars_raw"
+          - "'template: !include templates.yaml' in homeassistant_configuration_raw"
+          - "'templates.yaml' in homeassistant_role_vars_raw"
 
     - name: Verify floor heating automation
       ansible.builtin.assert:
