@@ -14,3 +14,8 @@
   ansible.builtin.import_tasks: apache.yml
   tags:
     - teslamate_apache
+
+- name: Import fail2ban tasks
+  ansible.builtin.import_tasks: fail2ban.yml
+  tags:
+    - teslamate_fail2ban

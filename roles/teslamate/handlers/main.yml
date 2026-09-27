@@ -26,3 +26,8 @@
   ansible.builtin.systemd:
     name: apache2
     state: reloaded
+
+- name: Restart fail2ban
+  ansible.builtin.systemd:
+    name: fail2ban
+    state: restarted
