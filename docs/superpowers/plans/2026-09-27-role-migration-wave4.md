@@ -14,7 +14,7 @@
 
 - ブランチは `refactor/role-migration-wave4`。ロールごとにコミットする
 - 波 1〜3 の Global Constraints（コンポーネントの形、タグ、handler の名前と本体、role-qualified notify）をそのまま守る
-- `roles/homeassistant/files/` には触らない。HA の「Copy default file」と、それが `configuration.yaml` を戻すことで毎回 changed になる include の lineinfile は、HA YAML セッションで直すので残す
+- `roles/homeassistant/files/` には触らない。例外は、テンプレートに置き換える `files/configuration.yaml` の削除だけにする
 - `roles/homeassistant/tests/` は `.ansible-lint-ignore` にあるファイルの lint だけを直す。`model_y_full_charge_due.yml` には触らない。テストは `../vars/main.yml`、`../templates/secrets.yaml.j2`、`../files/` を読むので、`vars/main.yml` の変数名と `secrets.yaml.j2` の名前は変えない
 - check と反映は、変えたロールのタグで絞る。playbook 全体を流すのは Task 6 だけにする
 - 反映の前に `--check --diff` の要約を見せて承認をもらう
@@ -64,12 +64,14 @@
 | `certs` | certs ディレクトリ、ルート証明書 |
 | `container` | イメージの解決、compose ディレクトリ、compose ファイル、check mode の報告、起動（`update` タグ） |
 | `apparmor` | docker-default のダウンロード、無効化サービス |
-| `configuration` | Copy default file、secrets、全部の include と設定ファイルのコピー（今の順番のまま）、customize、main settings |
+| `configuration` | `configuration.yaml` のテンプレート、secrets、ドメインごとの設定ファイルのコピー、customize |
 | `automation` | automations と blueprints のディレクトリ、automation ファイルのコピー。include の行は `configuration` に残す（ほかの include の足場なので） |
 | `tesla_fleet` | 秘密鍵、公開鍵のディレクトリと公開鍵 |
 | `apache` | proxy モジュール、vhost、a2ensite |
 
-- `configuration` のタスク名は `configuration | Copy default file`、`configuration | Configure <domain> include`、`configuration | Copy <domain> configuration` にする。notify の有無は今のタスクのとおりにする（input_* と scene と script は notify しない）
+- `templates/configuration.yaml.j2` を作り、Copy default file、21 の include の lineinfile、main settings の blockinfile を置き換える。中身は `files/configuration.yaml` の `default_config:` と `frontend:`、main settings のブロック、include の行（アルファベット順）。`automation:` は `!include_dir_merge_list automations/` にする。`files/configuration.yaml` は消す
+- 設定ファイルのコピーは 2 つのループにする。`homeassistant_config_files`（コピーしたら再起動する）と `homeassistant_reloadable_config_files`（input_boolean、input_datetime、input_number、input_select、scene、script の 6 つ。今と同じく再起動しない）。どちらも `vars/main.yml` にアルファベット順で置く
+- 新しいドメインを足すときは、テンプレートに include の 1 行、一覧に 1 行、`files/` にファイルを 1 つ置く。この手順を AGENTS.md の Home Assistant の節に書く
 - handler は次のとおりに改名し、notify もそろえる
   - `homeassistant: Restart` → `Restart Home Assistant`
   - `aa-disable-homeassistant: Restart` → `Restart aa-disable-homeassistant`
@@ -79,7 +81,7 @@
 - `homeassistant_ha_secondary/tasks/apache.yml` の `{{ playbook_dir }}/roles/homeassistant/` を `{{ role_path }}/../homeassistant/` にする
 - [ ] **Step 1:** 移す前に `--list-tasks --tags homeassistant` を fox で記録し、移したあとと比べる。Expected: `configuration` の lineinfile の順番が同じ
 - [ ] **Step 2:** notify の文字列の一覧と handler 名の一覧を全ロールから取り出して比べる。Expected: 見つからない notify がない
-- [ ] **Step 3:** fox で `--check --diff --tags homeassistant`、hotel で `--tags homeassistant_ha_secondary`。Expected: exit 0。changed は Copy default file と include、2 つのヘッダーと再起動の handler だけ
+- [ ] **Step 3:** fox で `--check --diff --tags homeassistant`、hotel で `--tags homeassistant_ha_secondary`。Expected: exit 0。changed は `configuration.yaml`（並びとコメントだけ。設定の中身が同じことを YAML として読んで比べる）、2 つのヘッダーと再起動の handler だけ。つづけて同じ check をもう一度。Expected: `configuration` に changed がない（反映後）
 - [ ] **Step 4:** コミットする
 
 ### Task 3: homeassistant のカスタムコンポーネントと Lovelace の分割
@@ -122,5 +124,5 @@
 
 - [ ] **Step 1:** fox、hotel、alfa、youth、sierra で、各 playbook 全体を `--check --diff` で流す（タグで絞らない）。Expected: どれも exit 0
 - [ ] **Step 2:** 差分の要約をユーザーに見せて、承認をもらってから playbook 全体を反映する
-- [ ] **Step 3:** 同じく 2 回目を流す。Expected: `changed=0`。例外は homeassistant の Copy default file と、それに続く include の lineinfile だけ
+- [ ] **Step 3:** 同じく 2 回目を流す。Expected: `changed=0`（例外なし）
 - [ ] **Step 4:** 最後のレビューを受け、Critical と Important を直す。main に fast-forward でマージして、CI が通るのを確かめる。spec の完了条件 5 つを 1 つずつ根拠付きで報告する

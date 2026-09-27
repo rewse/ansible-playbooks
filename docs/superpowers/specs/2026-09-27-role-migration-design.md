@@ -14,7 +14,7 @@
 
 次の 3 つは例外として扱う。
 
-- homeassistant は tasks、handlers、templates、vars、`tests/` を移行する。HA の YAML（`files/`）は別の HA YAML セッションが直しているため触らず、コミットされていない `tests/model_y_full_charge_due.yml` にも触らない。毎回 changed になる「Copy default file」も HA YAML セッションで直す
+- homeassistant は tasks、handlers、templates、vars、`tests/` を移行する。HA の YAML（`files/`）は別の HA YAML セッションが直しているため触らず、コミットされていない `tests/model_y_full_charge_due.yml` にも触らない。ただし `configuration.yaml` はロールのテンプレートにし、HA 標準のコピー（`files/configuration.yaml`）を消す。コピーした標準ファイルを lineinfile と blockinfile で書き換える今の形は、行の挿入位置を考える手間がかかるうえ、毎回 changed になるため
 - darwin_business のホスト（`7cf34ded5d65.local`）は `connection: local` で、そのマシンでしか流せない。このため darwin_business 向けの変更は置き場所の移動と命名の整理に限り、動作を変えない。例外は Claude Code を toolbox の一覧に足す 1 行だけである。検証は syntax-check と lint までとし、実機での確認手順を完了報告に書く
 - litellm と couchdb のポートを全インターフェースで公開している件は、動作が変わるため範囲外とし、別に相談する
 
@@ -100,12 +100,12 @@ restic と zabbix_agent は、systemd と launchd のユニット名、設定フ
 
 1. `.ansible-lint-ignore` がなくなり、CI の lint が通る。`roles/` にネストしたロールのディレクトリが残らない
 2. fox、hotel、alfa、youth、sierra で、各 playbook 全体の `--check` がタスクを除外せずに exit 0 で終わる
-3. 各 playbook 全体を 2 回流し、2 回目が `changed=0` になる。例外は homeassistant の「Copy default file」だけである
+3. 各 playbook 全体を 2 回流し、2 回目が `changed=0` になる
 4. `darwin-business.yml` の syntax-check と lint が通り、実機での確認手順が完了報告にある
 5. 規約を変えた箇所が AGENTS.md と README に反映されている
 
 ## 範囲外
 
-- HA の YAML（`roles/homeassistant/files/`）と「Copy default file」（HA YAML セッション）
+- HA の YAML（`roles/homeassistant/files/`、HA YAML セッション）。`configuration.yaml` は除く
 - litellm と couchdb のポートの公開範囲
 - darwin_business の動作の変更（Claude Code の追加を除く）
