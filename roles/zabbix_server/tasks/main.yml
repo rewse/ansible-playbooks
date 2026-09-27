@@ -24,3 +24,8 @@
   ansible.builtin.import_tasks: scripts.yml
   tags:
     - zabbix_server_scripts
+
+- name: Import fail2ban tasks
+  ansible.builtin.import_tasks: fail2ban.yml
+  tags:
+    - zabbix_server_fail2ban

@@ -13,3 +13,8 @@
   ansible.builtin.systemd:
     name: zabbix-server
     state: restarted
+
+- name: Restart fail2ban
+  ansible.builtin.systemd:
+    name: fail2ban
+    state: restarted
