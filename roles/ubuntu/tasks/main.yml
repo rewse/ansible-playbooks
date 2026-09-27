@@ -912,3 +912,18 @@
     - package
     - ubuntu_package
     - ubuntu_package_upgrade
+
+- name: "agent-browser : Make the binary executable"
+  # The root npmrc sets ignore-scripts, which skips the postinstall that marks the
+  # platform binary executable. Run as root the CLI fixes this itself, but users
+  # such as zabbix cannot and fail with EPERM. It follows the npm update, which
+  # reinstalls the binary without the bit.
+  ansible.builtin.file:
+    path: /usr/lib/node_modules/agent-browser/bin/agent-browser-linux-{{ 'arm64' if ansible_facts['architecture'] == 'aarch64' else 'x64' }}
+    mode: "0755"
+  tags:
+    - ubuntu
+    - install
+    - agent-browser
+    - ubuntu_agent-browser
+    - ubuntu_agent-browser_install
