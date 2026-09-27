@@ -1,0 +1,35 @@
+---
+- name: container | Resolve aged image
+  ansible.builtin.set_fact:
+    # Upstream publishes no -stable tags; rc, dev and nightly must stay out.
+    __litellm_image: >-
+      {{ lookup('aged_release', 'oci:ghcr.io/berriai/litellm', pattern='^v\d+\.\d+\.\d+$',
+                platform='linux/' ~ ('arm64' if ansible_facts['architecture'] == 'aarch64' else 'amd64')) }}
+
+- name: container | Create compose directory
+  ansible.builtin.file:
+    path: /etc/compose/litellm
+    state: directory
+    mode: "0755"
+
+- name: container | Deploy compose file
+  ansible.builtin.template:
+    src: compose.yaml.j2
+    dest: /etc/compose/litellm/compose.yaml
+    mode: "0640"
+  # Carries credentials in the environment, so no diff.
+  diff: false
+  register: __litellm_compose
+
+- name: container | Report skipped start in check mode
+  ansible.builtin.debug:
+    msg: Start skipped because the compose file is not written in check mode
+    verbosity: 0
+  when: ansible_check_mode and __litellm_compose is changed
+
+- name: container | Start containers
+  community.docker.docker_compose_v2:
+    project_src: /etc/compose/litellm
+    state: present
+    pull: missing
+  when: not (ansible_check_mode and __litellm_compose is changed)

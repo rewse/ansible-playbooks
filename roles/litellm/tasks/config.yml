@@ -1,0 +1,15 @@
+---
+- name: config | Create configuration directory
+  ansible.builtin.file:
+    path: /srv/litellm
+    state: directory
+    owner: root
+    group: root
+    mode: "0755"
+
+- name: config | Copy configuration file
+  ansible.builtin.copy:
+    src: config.yml
+    dest: /srv/litellm
+    mode: "0644"
+  notify: Restart litellm
