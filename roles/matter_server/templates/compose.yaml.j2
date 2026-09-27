@@ -7,7 +7,7 @@ services:
     image: {{ __matter_server_image.ref }}
     volumes:
       - /run/dbus:/run/dbus:ro
-      - /srv/matter-server/data:/data
+      - /srv/matter_server/data:/data
     security_opt:
       - apparmor:unconfined
     network_mode: host
