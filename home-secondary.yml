@@ -13,7 +13,7 @@
     - role: chezmoi
       tags:
         - chezmoi
-    - role: postfix/client
+    - role: postfix_client
       tags:
         - postfix_client
     - role: zabbix_agent

@@ -1,0 +1,20 @@
+---
+- name: Import main_cf tasks
+  ansible.builtin.import_tasks: main_cf.yml
+  tags:
+    - postfix_client_main_cf
+
+- name: Import sasl tasks
+  ansible.builtin.import_tasks: sasl.yml
+  tags:
+    - postfix_client_sasl
+
+- name: Import sender_canonical tasks
+  ansible.builtin.import_tasks: sender_canonical.yml
+  tags:
+    - postfix_client_sender_canonical
+
+- name: Import aliases tasks
+  ansible.builtin.import_tasks: aliases.yml
+  tags:
+    - postfix_client_aliases

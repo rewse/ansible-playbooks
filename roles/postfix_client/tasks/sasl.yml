@@ -1,0 +1,40 @@
+---
+- name: sasl | Enable SASL authentication
+  ansible.builtin.lineinfile:
+    dest: /etc/postfix/main.cf
+    regexp: "^smtp_sasl_auth_enable "
+    line: "smtp_sasl_auth_enable = yes"
+  notify: Reload postfix
+
+- name: sasl | Set SASL mechanism filter
+  ansible.builtin.lineinfile:
+    dest: /etc/postfix/main.cf
+    regexp: "^smtp_sasl_mechanism_filter"
+    line: "smtp_sasl_mechanism_filter = plain, login"
+  notify: Reload postfix
+
+- name: sasl | Set SASL password maps
+  ansible.builtin.lineinfile:
+    dest: /etc/postfix/main.cf
+    regexp: "smtp_sasl_password_maps "
+    line: "smtp_sasl_password_maps = hash:/etc/postfix/sasl_passwd"
+  notify: Reload postfix
+
+- name: sasl | Set SASL security options
+  ansible.builtin.lineinfile:
+    dest: /etc/postfix/main.cf
+    regexp: "smtp_sasl_security_options "
+    line: "smtp_sasl_security_options = noanonymous"
+  notify: Reload postfix
+
+- name: sasl | Create password file
+  no_log: true
+  ansible.builtin.lineinfile:
+    dest: /etc/postfix/sasl_passwd
+    regexp: '^\[{{ postfix_client_relayhost.name }}\]:{{ postfix_client_relayhost.port }}'
+    line: "[{{ postfix_client_relayhost.name }}]:{{ postfix_client_relayhost.port }} {{ postfix_client_sakura.username }}:{{ postfix_client_sakura.password }}"
+    create: true
+    mode: "0600"
+  notify:
+    - Hash SASL password file
+    - Reload postfix

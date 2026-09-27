@@ -1,0 +1,53 @@
+---
+- name: main_cf | Set myhostname
+  ansible.builtin.lineinfile:
+    dest: /etc/postfix/main.cf
+    insertafter: "^myhostname "
+    regexp: "^myhostname "
+    line: "myhostname = {{ ansible_facts['nodename'] }}"
+  notify: Reload postfix
+
+- name: main_cf | Set mydomain
+  ansible.builtin.lineinfile:
+    dest: /etc/postfix/main.cf
+    insertafter: "^myhostname "
+    regexp: "^mydomain "
+    line: "mydomain = rewse.jp"
+  notify: Reload postfix
+
+- name: main_cf | Set myorigin
+  ansible.builtin.lineinfile:
+    dest: /etc/postfix/main.cf
+    insertafter: "^#myorigin "
+    regexp: "^myorigin "
+    line: "myorigin = $mydomain"
+  notify: Reload postfix
+
+- name: main_cf | Set relayhost
+  ansible.builtin.lineinfile:
+    dest: /etc/postfix/main.cf
+    insertafter: "^#relayhost "
+    regexp: "^relayhost "
+    line: "relayhost = [{{ postfix_client_relayhost.name }}]:{{ postfix_client_relayhost.port }}"
+  notify: Reload postfix
+
+- name: main_cf | Set smtp_address_preference
+  ansible.builtin.lineinfile:
+    dest: /etc/postfix/main.cf
+    regexp: "^smtp_address_preference"
+    line: "smtp_address_preference = ipv4"
+  notify: Reload postfix
+
+- name: main_cf | Set smtp_tls_security_level
+  ansible.builtin.lineinfile:
+    dest: /etc/postfix/main.cf
+    regexp: "^smtp_tls_security_level"
+    line: "smtp_tls_security_level = encrypt"
+  notify: Reload postfix
+
+- name: main_cf | Set smtp_tls_wrappermode
+  ansible.builtin.lineinfile:
+    dest: /etc/postfix/main.cf
+    regexp: "^smtp_tls_wrappermode"
+    line: "smtp_tls_wrappermode = yes"
+  notify: Reload postfix

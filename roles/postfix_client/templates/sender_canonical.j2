@@ -1,0 +1,3 @@
+{{ ansible_managed | comment }}
+root@{{ ansible_facts['fqdn'] }} {{ postfix_client_sakura.username }}
+{{ admin }}@{{ ansible_facts['fqdn'] }} {{ postfix_client_sakura.username }}

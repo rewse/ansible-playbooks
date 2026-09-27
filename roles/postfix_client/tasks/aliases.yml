@@ -1,0 +1,8 @@
+---
+- name: aliases | Set root mail alias
+  ansible.builtin.lineinfile:
+    dest: /etc/aliases
+    insertafter: "^postmaster:"
+    regexp: "^root: "
+    line: "root: {{ email.primary }}"
+  notify: Rebuild aliases

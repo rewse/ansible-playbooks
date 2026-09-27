@@ -39,9 +39,6 @@ roles/homeassistant/tests/zones.yml name[casing]
 roles/nas/handlers/main.yml name[casing]
 roles/nas/tasks/main.yml name[casing]
 roles/nas/tasks/main.yml no-changed-when
-roles/postfix/client/handlers/main.yml name[casing]
-roles/postfix/client/tasks/main.yml name[casing]
-roles/postfix/client/vars/main.yml var-naming[no-role-prefix]
 roles/raspberrypi/handlers/main.yml name[casing]
 roles/raspberrypi/tasks/main.yml name[casing]
 roles/restic-darwin role-name

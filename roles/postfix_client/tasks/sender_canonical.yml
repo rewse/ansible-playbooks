@@ -1,0 +1,16 @@
+---
+- name: sender_canonical | Set sender_canonical_maps
+  ansible.builtin.lineinfile:
+    dest: /etc/postfix/main.cf
+    regexp: "^sender_canonical_maps "
+    line: "sender_canonical_maps = hash:/etc/postfix/sender_canonical"
+  notify: Reload postfix
+
+- name: sender_canonical | Copy map file
+  ansible.builtin.template:
+    src: sender_canonical.j2
+    dest: /etc/postfix/sender_canonical
+    mode: "0600"
+  notify:
+    - Hash sender_canonical
+    - Reload postfix
