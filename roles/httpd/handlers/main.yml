@@ -1,6 +1,6 @@
 ---
-# listen keeps the old names working for roles not yet migrated, which notify
-# them without defining their own.
+# listen keeps the old Apache names working for roles not yet migrated, which
+# notify them without defining their own.
 - name: Reload Apache
   ansible.builtin.systemd:
     name: apache2
@@ -17,4 +17,3 @@
   ansible.builtin.systemd:
     name: zabbix-agent
     state: restarted
-  listen: "zabbix-agent: Restart"
