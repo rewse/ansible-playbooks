@@ -8,7 +8,7 @@
   # its binaries; the one on the default branch installs whatever is newest.
   ansible.builtin.get_url:
     url: "{{ __darwin_safe_chain.url }}"
-    dest: /tmp/install-safe-chain-{{ __darwin_safe_chain.version }}.sh
+    dest: "{{ ansible_facts['env']['HOME'] }}/Library/Caches/install-safe-chain-{{ __darwin_safe_chain.version }}.sh"
     mode: "0755"
     checksum: "{{ __darwin_safe_chain.checksum | default(omit, true) }}"
 
@@ -16,10 +16,16 @@
   # The vendor's install method. It skips a version already installed, but finds
   # the installed one only through PATH, and each reinstall also appends to the
   # shell startup files.
-  ansible.builtin.command: sh /tmp/install-safe-chain-{{ __darwin_safe_chain.version }}.sh --include-python
+  ansible.builtin.command: sh {{ ansible_facts['env']['HOME'] }}/Library/Caches/install-safe-chain-{{ __darwin_safe_chain.version }}.sh
   register: __darwin_safe_chain_install
   environment:
     PATH: "{{ ansible_facts['env']['HOME'] }}/.safe-chain/bin:{{ ansible_facts['env']['PATH'] }}"
   changed_when: "'is already installed' not in __darwin_safe_chain_install.stdout"
   # A dry run does not download the installer.
   when: not ansible_check_mode
+
+- name: security | Report installation deferred in check mode
+  ansible.builtin.debug:
+    msg: The installer is not downloaded in check mode, so it is not run.
+    verbosity: 0
+  when: ansible_check_mode
