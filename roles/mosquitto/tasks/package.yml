@@ -1,0 +1,6 @@
+---
+- name: package | Install packages
+  ansible.builtin.apt:
+    name:
+      - mosquitto
+      - mosquitto-clients

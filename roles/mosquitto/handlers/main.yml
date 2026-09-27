@@ -1,9 +1,20 @@
 ---
-- name: "mosquitto: Hash password file"
+# Handlers run in the order defined here, not the order notified.
+- name: Write mosquitto password file
+  ansible.builtin.template:
+    src: pwfile.j2
+    dest: /etc/mosquitto/pwfile
+    owner: mosquitto
+    group: mosquitto
+    mode: "0600"
+  no_log: true
+
+- name: Hash mosquitto password file
+  # mosquitto_passwd is the only tool that writes its hash format.
   ansible.builtin.command: mosquitto_passwd -U /etc/mosquitto/pwfile
   changed_when: true
 
-- name: "mosquitto: Restart"
+- name: Restart mosquitto
   ansible.builtin.systemd:
     name: mosquitto
     state: restarted

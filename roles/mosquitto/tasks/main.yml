@@ -1,39 +1,10 @@
 ---
-- name: "mosquitto : Install packages"
-  ansible.builtin.apt:
-    name:
-      - mosquitto
-      - mosquitto-clients
+- name: Import package tasks
+  ansible.builtin.import_tasks: package.yml
   tags:
-    - mosquitto
-    - install
-    - mosquitto_mosquitto
-    - mosquitto_mosquitto_install
+    - mosquitto_package
 
-- name: "mosquitto : Create password file"
-  ansible.builtin.template:
-    src: pwfile.j2
-    dest: /etc/mosquitto/pwfile
-    owner: mosquitto
-    group: mosquitto
-    mode: '0600'
-  notify:
-    - "mosquitto: Hash password file"
-    - "mosquitto: Restart"
+- name: Import auth tasks
+  ansible.builtin.import_tasks: auth.yml
   tags:
-    - mosquitto
-    - config
-    - mosquitto_mosquitto
-    - mosquitto_mosquitto_config
-
-- name: "mosquitto : Copy authentication config"
-  ansible.builtin.copy:
-    src: password.conf
-    dest: /etc/mosquitto/conf.d
-    mode: '0644'
-  notify: "mosquitto: Restart"
-  tags:
-    - mosquitto
-    - config
-    - mosquitto_mosquitto
-    - mosquitto_mosquitto_config
+    - mosquitto_auth

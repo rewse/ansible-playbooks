@@ -1,0 +1,23 @@
+---
+# mosquitto_passwd hashes the file in place with a random salt, so the file never
+# matches its template again. A digest of the rendered template stands in for it:
+# the file is rewritten and hashed only when the digest changes, and the plain
+# text exists on disk only between those two handlers.
+- name: auth | Record password file digest
+  ansible.builtin.copy:
+    content: "{{ lookup('ansible.builtin.template', 'pwfile.j2') | hash('sha256') }}\n"
+    dest: /etc/mosquitto/pwfile.sha256
+    owner: root
+    group: root
+    mode: "0600"
+  notify:
+    - Write mosquitto password file
+    - Hash mosquitto password file
+    - Restart mosquitto
+
+- name: auth | Copy authentication config
+  ansible.builtin.copy:
+    src: password.conf
+    dest: /etc/mosquitto/conf.d
+    mode: "0644"
+  notify: Restart mosquitto
