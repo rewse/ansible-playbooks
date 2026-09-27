@@ -272,7 +272,7 @@ class ResticDarwinTemplateTest(unittest.TestCase):
         self.assertIn(
             "__restic_icloud_download_compiled_binary.stat.checksum is defined", tasks
         )
-        self.assertIn("mode: \"0755\"", tasks)
+        self.assertIn('mode: "0755"', tasks)
         self.assertIn("restic-icloud-download", tasks)
 
     def test_excludes_unreadable_and_disposable_paths(self) -> None:
@@ -309,9 +309,9 @@ class ResticDarwinTemplateTest(unittest.TestCase):
 
     def test_repository_initialization_sources_shared_cache_environment(self) -> None:
         tasks = TASKS.read_text()
-        initialize_task = tasks.split(
-            "- name: darwin | Initialise the repository", 1
-        )[1]
+        initialize_task = tasks.split("- name: darwin | Initialise the repository", 1)[
+            1
+        ]
         initialize_task = initialize_task.split("- name: darwin | Copy iCloud", 1)[0]
 
         self.assertIn('. "${HOME}/.config/environment/cache.sh"', initialize_task)
