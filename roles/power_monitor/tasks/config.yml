@@ -30,6 +30,14 @@
   register: __power_monitor_config_example
   check_mode: false
 
+- name: config | Check example configuration keys
+  ansible.builtin.assert:
+    that:
+      - "'MQTT_HOST=' in __power_monitor_config_example.content"
+      - "'MQTT_PASSWORD=' in __power_monitor_config_example.content"
+    fail_msg: The upstream example no longer defines MQTT_HOST or MQTT_PASSWORD.
+    quiet: true
+
 - name: config | Deploy configuration
   # Built from the example so upstream additions arrive, with this site's values set.
   ansible.builtin.template:
