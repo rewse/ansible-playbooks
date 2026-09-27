@@ -1,0 +1,25 @@
+---
+- name: corretto | Add apt repository
+  ansible.builtin.deb822_repository:
+    name: corretto
+    types: deb
+    uris: https://apt.corretto.aws
+    suites: stable
+    components: main
+    # The module downloads the key and rewrites it only when it changes.
+    signed_by: https://apt.corretto.aws/corretto.key
+  register: __database_client_gui_corretto_repo
+
+- name: corretto | Install JDK
+  ansible.builtin.apt:
+    name: java-{{ database_client_gui_corretto_version }}-amazon-corretto-jdk
+    update_cache: "{{ __database_client_gui_corretto_repo is changed }}"
+
+- name: corretto | Remove legacy key files
+  ansible.builtin.file:
+    path: "{{ item }}"
+    state: absent
+  loop:
+    - /etc/apt/keyrings/corretto.gpg
+    - /etc/apt/keyrings/corretto.key
+    - /etc/apt/sources.list.d/corretto.list

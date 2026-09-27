@@ -1,0 +1,18 @@
+---
+- name: sct | Download and extract
+  ansible.builtin.unarchive:
+    src: https://s3.amazonaws.com/publicsctdownload/Ubuntu/aws-schema-conversion-tool-1.0.latest.zip
+    dest: /usr/local/src
+    remote_src: true
+
+- name: sct | Find package
+  ansible.builtin.find:
+    paths: /usr/local/src
+    patterns: "aws-schema-conversion-tool-*.deb"
+  register: __database_client_gui_sct_debs
+
+- name: sct | Install package
+  ansible.builtin.apt:
+    deb: "{{ __database_client_gui_sct_debs.files | map(attribute='path') | community.general.version_sort | last }}"
+  # A dry run does not extract a first archive.
+  when: __database_client_gui_sct_debs.matched > 0

@@ -1,0 +1,18 @@
+---
+- name: Import corretto tasks
+  ansible.builtin.import_tasks: corretto.yml
+  tags:
+    - database_client_gui_corretto
+    - update
+
+- name: Import sct tasks
+  ansible.builtin.import_tasks: sct.yml
+  tags:
+    - database_client_gui_sct
+    - update
+
+- name: Import dbeaver tasks
+  ansible.builtin.import_tasks: dbeaver.yml
+  tags:
+    - database_client_gui_dbeaver
+    - update
