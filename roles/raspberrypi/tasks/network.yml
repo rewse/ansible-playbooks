@@ -31,3 +31,8 @@
     dest: /etc/sysctl.d
     mode: "0644"
   notify: Reload sysctl
+
+- name: network | Apply a changed configuration now
+  # Later roles must not delay netplan apply, nor a failure in them skip it and
+  # leave the new configuration waiting for a reboot.
+  ansible.builtin.meta: flush_handlers
