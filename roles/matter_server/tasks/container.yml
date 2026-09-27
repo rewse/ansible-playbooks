@@ -1,8 +1,24 @@
 ---
+- name: container | Resolve aged image
+  ansible.builtin.set_fact:
+    __matter_server_image: >-
+      {{ lookup('aged_release', 'oci:ghcr.io/home-assistant-libs/python-matter-server', pattern='^\d+\.\d+\.\d+$',
+                platform='linux/' ~ ('arm64' if ansible_facts['architecture'] == 'aarch64' else 'amd64')) }}
+
 - name: container | Check legacy data directory
   ansible.builtin.stat:
     path: /srv/matter-server
   register: __matter_server_legacy
+
+- name: container | Check data directory
+  ansible.builtin.stat:
+    path: /srv/matter_server
+  register: __matter_server_current
+
+- name: container | Fail when both data directories exist
+  ansible.builtin.fail:
+    msg: /srv/matter-server and /srv/matter_server both exist; keep one by hand.
+  when: __matter_server_legacy.stat.exists and __matter_server_current.stat.exists
 
 - name: container | Stop containers before moving data
   community.docker.docker_compose_v2:
@@ -22,12 +38,6 @@
     path: /srv/matter_server/data
     state: directory
     mode: "0755"
-
-- name: container | Resolve aged image
-  ansible.builtin.set_fact:
-    __matter_server_image: >-
-      {{ lookup('aged_release', 'oci:ghcr.io/home-assistant-libs/python-matter-server', pattern='^\d+\.\d+\.\d+$',
-                platform='linux/' ~ ('arm64' if ansible_facts['architecture'] == 'aarch64' else 'amd64')) }}
 
 - name: container | Create compose directory
   ansible.builtin.file:
