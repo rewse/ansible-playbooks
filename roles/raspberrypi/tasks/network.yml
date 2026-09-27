@@ -1,0 +1,33 @@
+---
+- name: network | Configure netplan
+  ansible.builtin.template:
+    src: 99-config.yaml.j2
+    dest: /etc/netplan/99-config.yaml
+    mode: "0600"
+  notify: Apply netplan configuration
+
+- name: network | Remove cloud-init netplan config
+  ansible.builtin.file:
+    path: /etc/netplan/50-cloud-init.yaml
+    state: absent
+  notify: Apply netplan configuration
+
+- name: network | Stop cloud-init writing network config
+  ansible.builtin.copy:
+    src: 99-disable-network-config.cfg
+    dest: /etc/cloud/cloud.cfg.d
+    mode: "0644"
+
+- name: network | Configure sysctl for VPN
+  ansible.builtin.copy:
+    src: 90-vpn.conf
+    dest: /etc/sysctl.d
+    mode: "0644"
+  notify: Reload sysctl
+
+- name: network | Configure sysctl for multiple NICs
+  ansible.builtin.copy:
+    src: 99-arp-multinic.conf
+    dest: /etc/sysctl.d
+    mode: "0644"
+  notify: Reload sysctl

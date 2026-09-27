@@ -1,0 +1,21 @@
+---
+- name: swap | Set swap factor to RAM size
+  ansible.builtin.lineinfile:
+    path: /etc/dphys-swapfile
+    regexp: "^#?CONF_SWAPFACTOR="
+    line: "CONF_SWAPFACTOR=1"
+  notify: Restart dphys-swapfile
+
+- name: swap | Set swap max size to 16GB
+  ansible.builtin.lineinfile:
+    path: /etc/dphys-swapfile
+    regexp: "^#?CONF_MAXSWAP="
+    line: "CONF_MAXSWAP=16384"
+  notify: Restart dphys-swapfile
+
+- name: swap | Disable the fixed swap size
+  ansible.builtin.lineinfile:
+    path: /etc/dphys-swapfile
+    regexp: "^CONF_SWAPSIZE="
+    line: "#CONF_SWAPSIZE="
+  notify: Restart dphys-swapfile

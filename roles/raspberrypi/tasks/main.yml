@@ -1,350 +1,60 @@
 ---
-- name: "package : Install packages"
-  ansible.builtin.apt:
-    name:
-      - bluez
-      - fuse3
-      - ifmetric
-      - mosquitto-clients
-      - nfs-common
-      - pi-bluetooth
-      - snmp
-      - snmp-mibs-downloader
+- name: Import package tasks
+  ansible.builtin.import_tasks: package.yml
   tags:
-    - raspberrypi
-    - install
     - raspberrypi_package
-    - raspberrypi_package_install
 
-- name: "package : Install packages for NVMe"
-  # The tooling has to be present before it is needed: once the controller drops
-  # off the PCIe link, / turns read-only and apt can no longer install anything.
-  # smartctl reaches the health summary over the SATA translation layer, while
-  # the NVMe error log and the vendor log pages need nvme-cli.
-  ansible.builtin.apt:
-    name:
-      - nvme-cli
-  when: ansible_facts['devices']['nvme0n1'] is defined
+- name: Import swap tasks
+  ansible.builtin.import_tasks: swap.yml
   tags:
-    - raspberrypi
-    - install
-    - raspberrypi_package
-    - raspberrypi_package_install
-
-- name: "claude: Download Claude Code installer"
-  ansible.builtin.get_url:
-    url: https://claude.ai/install.sh
-    dest: /tmp/claude-install.sh
-    mode: '0755'
-  tags:
-    - raspberrypi
-    - install
-    - claude
-
-- name: "claude: Install Claude Code"
-  ansible.builtin.command: bash /tmp/claude-install.sh
-  args:
-    creates: ~/.local/bin/claude
-  tags:
-    - raspberrypi
-    - install
-    - claude
-    - raspberrypi_claude
-    - raspberrypi_claude_install
-
-- name: "claude: Create symlink to /usr/local/bin"
-  ansible.builtin.file:
-    src: ~/.local/bin/claude
-    dest: /usr/local/bin/claude
-    state: link
-  become: true
-  tags:
-    - raspberrypi
-    - install
-    - claude
-    - raspberrypi_claude
-    - raspberrypi_claude_install
-
-- name: "claude: Update Claude Code"
-  # The native installer has no module; claude update fetches the newest release.
-  ansible.builtin.command: "{{ ansible_facts['env']['HOME'] }}/.local/bin/claude update"
-  register: __raspberrypi_claude_update
-  changed_when: "'Successfully updated' in __raspberrypi_claude_update.stdout"
-  tags:
-    - raspberrypi
-    - update
-    - claude
-    - raspberrypi_claude
-    - raspberrypi_claude_install
-
-
-- name: "swap : Set swap factor to RAM size"
-  ansible.builtin.lineinfile:
-    path: /etc/dphys-swapfile
-    regexp: '^#?CONF_SWAPFACTOR='
-    line: 'CONF_SWAPFACTOR=1'
-    backup: true
-  notify: "dphys-swapfile: Restart"
-  tags:
-    - raspberrypi
-    - config
-    - swap
     - raspberrypi_swap
-    - raspberrypi_swap_config
 
-- name: "swap : Set swap max size to 16GB"
-  ansible.builtin.lineinfile:
-    path: /etc/dphys-swapfile
-    regexp: '^#?CONF_MAXSWAP='
-    line: 'CONF_MAXSWAP=16384'
-    backup: true
-  notify: "dphys-swapfile: Restart"
+- name: Import ntp tasks
+  ansible.builtin.import_tasks: ntp.yml
   tags:
-    - raspberrypi
-    - config
-    - swap
-    - raspberrypi_swap
-    - raspberrypi_swap_config
-
-- name: "swap : Disable fixed swap size for dynamic calculation"
-  ansible.builtin.lineinfile:
-    path: /etc/dphys-swapfile
-    regexp: '^CONF_SWAPSIZE='
-    line: '#CONF_SWAPSIZE='
-    backup: true
-  notify: "dphys-swapfile: Restart"
-  tags:
-    - raspberrypi
-    - config
-    - swap
-    - raspberrypi_swap
-    - raspberrypi_swap_config
-
-- name: "ntp : Configure NTP servers"
-  ansible.builtin.lineinfile:
-    dest: /etc/systemd/timesyncd.conf
-    insertafter: '^#NTP='
-    regexp: '^NTP='
-    line: 'NTP=ntp.nict.jp ntp.jst.mfeed.ad.jp'
-  notify: "systemd-timesyncd: Restart"
-  tags:
-    - raspberrypi
-    - config
-    - time
     - raspberrypi_ntp
-    - raspberrypi_ntp_config
 
-- name: "journald : Limit journal disk usage"
-  ansible.builtin.lineinfile:
-    dest: /etc/systemd/journald.conf
-    insertafter: '^#SystemMaxUse='
-    regexp: '^SystemMaxUse='
-    line: 'SystemMaxUse=200M'
-  notify: "systemd-journald: Restart"
+- name: Import journald tasks
+  ansible.builtin.import_tasks: journald.yml
   tags:
-    - raspberrypi
-    - config
-    - journald
     - raspberrypi_journald
-    - raspberrypi_journald_config
 
-- name: "bluetooth : Enable service"
-  ansible.builtin.systemd:
-    name: "{{ item }}"
-    state: started
-    enabled: true
-  loop:
-    - bluetooth
+- name: Import bluetooth tasks
+  ansible.builtin.import_tasks: bluetooth.yml
   tags:
-    - raspberrypi
-    - config
     - raspberrypi_bluetooth
-    - raspberrypi_bluetooth_config
 
-- name: "snmp : Enable MIBs"
-  ansible.builtin.lineinfile:
-    dest: /etc/snmp/snmp.conf
-    regexp: "mibs "
-    line: "mibs all"
+- name: Import snmp tasks
+  ansible.builtin.import_tasks: snmp.yml
   tags:
-    - raspberrypi
-    - config
     - raspberrypi_snmp
-    - raspberrypi_snmp_config
 
-- name: "environment : Copy file"
-  ansible.builtin.copy:
-    src: environment
-    dest: /etc
-    mode: '0644'
+- name: Import environment tasks
+  ansible.builtin.import_tasks: environment.yml
   tags:
-    - raspberrypi
-    - config
     - raspberrypi_environment
-    - raspberrypi_environment_config
 
-- name: "nvme : Disable runtime power management via udev"
-  ansible.builtin.copy:
-    src: 99-nvme-power.rules
-    dest: /etc/udev/rules.d
-    mode: "0644"
-  when: ansible_facts['devices']['nvme0n1'] is defined
-  notify: "udev: Reload rules"
+- name: Import nvme tasks
+  ansible.builtin.import_tasks: nvme.yml
   tags:
-    - raspberrypi
-    - config
     - raspberrypi_nvme
-    - raspberrypi_nvme_config
 
-- name: "boot : Configure NVMe power management workaround"
-  # The negative lookahead skips a line that already carries the parameters, and
-  # backrefs makes a non-match a no-op, so the existing cmdline is never replaced.
-  # backup is unusable here: its timestamped name holds a colon, which vfat rejects.
-  ansible.builtin.lineinfile:
-    path: /boot/firmware/cmdline.txt
-    regexp: '^((?!.*nvme_core\.default_ps_max_latency_us).+)$'
-    line: '\1 nvme_core.default_ps_max_latency_us=0 pcie_aspm=off pcie_port_pm=off'
-    backrefs: true
-  when: ansible_facts['devices']['nvme0n1'] is defined
+- name: Import network tasks
+  ansible.builtin.import_tasks: network.yml
   tags:
-    - raspberrypi
-    - config
-    - boot
-    - raspberrypi_boot
-    - raspberrypi_boot_config
+    - raspberrypi_network
 
-- name: "netplan : Configure network"
-  ansible.builtin.template:
-    src: 99-config.yaml.j2
-    dest: /etc/netplan/99-config.yaml
-    mode: '0600'
+- name: Import ssh tasks
+  ansible.builtin.import_tasks: ssh.yml
   tags:
-    - raspberrypi
-    - config
-    - raspberrypi_netplan
-    - raspberrypi_netplan_config
-
-- name: "netplan : Remove cloud-init config"
-  ansible.builtin.file:
-    path: /etc/netplan/50-cloud-init.yaml
-    state: absent
-    mode: '0644'
-  tags:
-    - raspberrypi
-    - config
-    - raspberrypi_netplan
-    - raspberrypi_netplan_config
-
-- name: "cloud-init : Disable network config"
-  ansible.builtin.copy:
-    src: 99-disable-network-config.cfg
-    dest: /etc/cloud/cloud.cfg.d
-    mode: '0644'
-  tags:
-    - raspberrypi
-    - config
-    - raspberrypi_cloud-init
-    - raspberrypi_cloud-init_config
-
-- name: "sysctl : Configure for VPN"
-  ansible.builtin.copy:
-    src: 90-vpn.conf
-    dest: /etc/sysctl.d
-    mode: '0644'
-  notify: "sysctl: Reload"
-  tags:
-    - raspberrypi
-    - config
-    - raspberrypi_sysctl
-    - raspberrypi_sysctl_config
-
-- name: "sysctl : Configure for multi NIC"
-  ansible.builtin.copy:
-    src: 99-arp-multinic.conf
-    dest: /etc/sysctl.d
-    mode: '0644'
-  notify: "sysctl: Reload"
-  tags:
-    - raspberrypi
-    - config
-    - raspberrypi_sysctl
-    - raspberrypi_sysctl_config
-
-# routable covers eth0 regaining the segment and wlan0 having come up, no-carrier
-# the cable going away. networkd-dispatcher refuses a hook that anyone but root
-# can write, which the target already satisfies.
-- name: "netplan : Apply configuration"
-  ansible.builtin.command: netplan apply
-  changed_when: false
-  tags:
-    - raspberrypi
-    - config
-    - raspberrypi_netplan
-    - raspberrypi_netplan_config
-
-- name: "netplan : Wait for network to be reachable"
-  ansible.builtin.wait_for:
-    host: 1.1.1.1
-    port: 53
-    timeout: 30
-  tags:
-    - raspberrypi
-    - config
-    - raspberrypi_netplan
-    - raspberrypi_netplan_config
-
-# ssh stuck at expecting SSH2_MSG_KEX_ECDH_REPLY - Unix & Linux Stack Exchange
-# https://unix.stackexchange.com/questions/722954/ssh-stuck-at-expecting-ssh2-msg-kex-ecdh-reply
-- name: "ssh : Configure KEX algorithms"
-  ansible.builtin.copy:
-    src: kex_algorithms.conf
-    dest: /etc/ssh/ssh_config.d
-    mode: '0644'
-  tags:
-    - raspberrypi
-    - config
-    - ssh
     - raspberrypi_ssh
-    - raspberrypi_ssh_config
 
-- name: "ssh : Create socket override directory"
-  ansible.builtin.file:
-    path: /etc/systemd/system/ssh.socket.d
-    state: directory
-    mode: '0755'
+- name: Import qwen_code tasks
+  ansible.builtin.import_tasks: qwen_code.yml
   tags:
-    - raspberrypi
-    - config
-    - ssh
-    - raspberrypi_ssh
-    - raspberrypi_ssh_init
+    - raspberrypi_qwen_code
 
-- name: "ssh : Configure socket override"
-  ansible.builtin.template:
-    src: override.conf.j2
-    dest: /etc/systemd/system/ssh.socket.d/override.conf
-    mode: '0644'
-  notify:
-    - "Reload systemd"
-    - "ssh: Restart socket"
+- name: Import claude_code tasks
+  ansible.builtin.import_tasks: claude_code.yml
   tags:
-    - raspberrypi
-    - config
-    - ssh
-    - raspberrypi_ssh
-    - raspberrypi_ssh_config
-
-- name: "qwen-code : Install"
-  community.general.npm:
-    # Without @latest: a version spec makes the module reinstall on every run.
-    # The ubuntu role's npm update -g keeps it current.
-    name: "@qwen-code/qwen-code"
-    global: true
-    state: present
-  environment: "{{ supply_chain_cooldown_environment }}"
-  tags:
-    - raspberrypi
-    - install
-    - qwen-code
-    - raspberrypi_qwen-code
-    - raspberrypi_qwen-code_install
+    - raspberrypi_claude_code

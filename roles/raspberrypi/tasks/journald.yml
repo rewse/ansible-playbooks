@@ -1,0 +1,8 @@
+---
+- name: journald | Limit journal disk usage
+  ansible.builtin.lineinfile:
+    dest: /etc/systemd/journald.conf
+    insertafter: "^#SystemMaxUse="
+    regexp: "^SystemMaxUse="
+    line: "SystemMaxUse=200M"
+  notify: Restart systemd-journald

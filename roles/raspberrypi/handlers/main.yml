@@ -1,33 +1,47 @@
 ---
-- name: "systemd-journald: Restart"
+# Handlers run in the order defined here.
+- name: Reload systemd
   ansible.builtin.systemd:
-    name: systemd-journald
-    state: restarted
+    daemon_reload: true
 
-- name: "systemd-timesyncd: Restart"
-  ansible.builtin.systemd:
-    name: systemd-timesyncd
-    state: restarted
+- name: Reload sysctl
+  # sysctl --system rereads every drop-in; no module does that.
+  ansible.builtin.command: sysctl --system
+  changed_when: false
 
-- name: "dphys-swapfile: Restart"
+- name: Reload udev rules
+  # No module reloads udev rules.
+  ansible.builtin.command: udevadm control --reload-rules
+  changed_when: false
+
+- name: Apply netplan configuration
+  # No module applies netplan. Runs only when its configuration changes.
+  ansible.builtin.command: netplan apply
+  changed_when: true
+  notify: Wait for the network
+
+- name: Wait for the network
+  ansible.builtin.wait_for:
+    host: 1.1.1.1
+    port: 53
+    timeout: 30
+
+- name: Restart dphys-swapfile
   ansible.builtin.systemd:
     name: dphys-swapfile
     state: restarted
 
-- name: "ssh: Restart socket"
+- name: Restart ssh socket
   ansible.builtin.systemd:
-    daemon_reload: true
     name: ssh.socket
     state: restarted
 
-- name: "Reload systemd"
+- name: Restart systemd-journald
   ansible.builtin.systemd:
-    daemon_reload: true
+    name: systemd-journald
+    state: restarted
 
-- name: "sysctl: Reload"
-  ansible.builtin.command: sysctl --system
-  changed_when: false
-
-- name: "udev: Reload rules"
-  ansible.builtin.command: udevadm control --reload-rules
-  changed_when: false
+- name: Restart systemd-timesyncd
+  ansible.builtin.systemd:
+    name: systemd-timesyncd
+    state: restarted

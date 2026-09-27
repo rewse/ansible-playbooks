@@ -1,0 +1,9 @@
+---
+- name: qwen_code | Install
+  community.general.npm:
+    # Without @latest: a version spec makes the module reinstall on every run.
+    # The ubuntu role's npm component keeps it current.
+    name: "@qwen-code/qwen-code"
+    global: true
+    state: present
+  environment: "{{ supply_chain_cooldown_environment }}"

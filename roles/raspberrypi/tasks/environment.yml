@@ -1,0 +1,6 @@
+---
+- name: environment | Copy /etc/environment
+  ansible.builtin.copy:
+    src: environment
+    dest: /etc
+    mode: "0644"

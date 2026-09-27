@@ -1,0 +1,22 @@
+---
+- name: package | Install packages
+  ansible.builtin.apt:
+    name:
+      - bluez
+      - fuse3
+      - ifmetric
+      - mosquitto-clients
+      - nfs-common
+      - pi-bluetooth
+      - snmp
+      - snmp-mibs-downloader
+
+- name: package | Install packages for NVMe
+  # The tooling has to be present before it is needed: once the controller drops
+  # off the PCIe link, / turns read-only and apt can no longer install anything.
+  # smartctl reaches the health summary over the SATA translation layer, while
+  # the NVMe error log and the vendor log pages need nvme-cli.
+  ansible.builtin.apt:
+    name:
+      - nvme-cli
+  when: ansible_facts['devices']['nvme0n1'] is defined

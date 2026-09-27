@@ -1,0 +1,21 @@
+---
+- name: ssh | Configure KEX algorithms
+  ansible.builtin.copy:
+    src: kex_algorithms.conf
+    dest: /etc/ssh/ssh_config.d
+    mode: "0644"
+
+- name: ssh | Create socket override directory
+  ansible.builtin.file:
+    path: /etc/systemd/system/ssh.socket.d
+    state: directory
+    mode: "0755"
+
+- name: ssh | Configure socket override
+  ansible.builtin.template:
+    src: override.conf.j2
+    dest: /etc/systemd/system/ssh.socket.d/override.conf
+    mode: "0644"
+  notify:
+    - "raspberrypi : Reload systemd"
+    - "raspberrypi : Restart ssh socket"

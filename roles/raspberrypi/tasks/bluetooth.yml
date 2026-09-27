@@ -1,0 +1,8 @@
+---
+- name: bluetooth | Enable services
+  ansible.builtin.systemd:
+    name: "{{ item }}"
+    state: started
+    enabled: true
+  loop:
+    - bluetooth

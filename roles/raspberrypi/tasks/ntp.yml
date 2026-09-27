@@ -1,0 +1,8 @@
+---
+- name: ntp | Configure NTP servers
+  ansible.builtin.lineinfile:
+    dest: /etc/systemd/timesyncd.conf
+    insertafter: "^#NTP="
+    regexp: "^NTP="
+    line: "NTP=ntp.nict.jp ntp.jst.mfeed.ad.jp"
+  notify: Restart systemd-timesyncd

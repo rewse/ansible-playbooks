@@ -1,0 +1,6 @@
+---
+- name: snmp | Enable MIBs
+  ansible.builtin.lineinfile:
+    dest: /etc/snmp/snmp.conf
+    regexp: "mibs "
+    line: "mibs all"
