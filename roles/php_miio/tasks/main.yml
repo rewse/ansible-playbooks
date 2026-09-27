@@ -1,0 +1,6 @@
+---
+- name: Import checkout tasks
+  ansible.builtin.import_tasks: checkout.yml
+  tags:
+    - php_miio_checkout
+    - update

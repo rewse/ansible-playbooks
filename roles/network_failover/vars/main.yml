@@ -1,0 +1,3 @@
+---
+# The router both interfaces reach; the script probes it to pick an interface.
+network_failover_gateway: 192.168.0.1

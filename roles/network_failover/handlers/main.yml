@@ -1,0 +1,10 @@
+---
+- name: Reload systemd
+  ansible.builtin.systemd:
+    daemon_reload: true
+
+- name: Restart network-failover timer
+  ansible.builtin.systemd:
+    name: network-failover.timer
+    state: restarted
+    daemon_reload: true

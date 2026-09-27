@@ -1,0 +1,5 @@
+---
+- name: Import service tasks
+  ansible.builtin.import_tasks: service.yml
+  tags:
+    - network_failover_service

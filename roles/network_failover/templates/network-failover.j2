@@ -1,4 +1,5 @@
 #!/bin/bash
+{{ ansible_managed | comment }}
 
 # wlan0 holds a second static address on the same segment as eth0 as a path of
 # last resort, and only one of the two may carry that segment at a time: Avahi
@@ -12,7 +13,7 @@
 
 set -u
 
-readonly gateway="{{ raspberrypi_default_gateway }}"
+readonly gateway="{{ network_failover_gateway }}"
 
 # Consecutive probe failures before the fallback takes the segment. A carrier
 # that is gone is acted on at once, being a hardware fact, but a probe that

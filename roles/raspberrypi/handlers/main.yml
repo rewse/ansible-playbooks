@@ -20,12 +20,6 @@
     name: ssh.socket
     state: restarted
 
-- name: "network-failover: Restart timer"
-  ansible.builtin.systemd:
-    name: network-failover.timer
-    state: restarted
-    daemon_reload: true
-
 - name: "Reload systemd"
   ansible.builtin.systemd:
     daemon_reload: true

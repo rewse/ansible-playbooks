@@ -22,6 +22,12 @@
     - role: fail2ban
       tags:
         - fail2ban
+    - role: network_failover
+      tags:
+        - network_failover
+    - role: php_miio
+      tags:
+        - php_miio
     - role: mhz19
       tags:
         - mhz19
