@@ -1,0 +1,3 @@
+---
+- name: set_vars | Load distribution variables
+  ansible.builtin.include_vars: "{{ role_path }}/vars/{{ ansible_facts['distribution'] | lower }}.yml"

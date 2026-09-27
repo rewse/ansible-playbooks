@@ -1,4 +1,9 @@
 ---
+- name: Import distribution variables
+  ansible.builtin.import_tasks: set_vars.yml
+  tags:
+    - always
+
 - name: "httpd : Create /srv/www directory"
   ansible.builtin.file:
     path: /srv/www

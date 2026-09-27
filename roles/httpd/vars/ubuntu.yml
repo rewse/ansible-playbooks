@@ -1,0 +1,4 @@
+---
+# The PHP release Ubuntu ships, which follows the distribution version rather
+# than a pin.
+httpd_php_version: "8.3"
