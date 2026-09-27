@@ -1,0 +1,15 @@
+---
+homeassistant_ha_secondary_token: "{{ lookup('pipe', 'op read \"op://ansible/5xhph5yv3c3vzkubj5v33cgkya/credential\"') }}"
+# 15 minutes filters a primary that is only rebooting, which accounted for one of
+# the two failovers seen so far, while still covering the hour-long outage of the
+# other one.
+homeassistant_ha_secondary_failover_after: 900
+# The name that follows whichever host serves Home Assistant, and the two hosts
+# it moves between.
+homeassistant_ha_secondary_domain: hass.rewse.jp
+homeassistant_ha_secondary_primary_ip: 192.168.0.30
+homeassistant_ha_secondary_standby_ip: 192.168.0.40
+# Reached through the Site Manager Cloud Connector rather than the console's own
+# address, because a key generated at unifi.ui.com is refused locally.
+homeassistant_ha_secondary_unifi_console: sierra
+homeassistant_ha_secondary_unifi_api_key: "{{ lookup('pipe', 'op read \"op://ansible/bvdayezevkxx6kmhjc3kmug7u4/credential\"') }}"

@@ -25,6 +25,6 @@
     - role: docker
       tags:
         - docker
-    - role: homeassistant-ha/secondary
+    - role: homeassistant_ha_secondary
       tags:
         - homeassistant_ha_secondary

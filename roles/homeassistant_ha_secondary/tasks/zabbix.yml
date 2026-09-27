@@ -1,0 +1,7 @@
+---
+- name: zabbix | Copy agent config
+  ansible.builtin.copy:
+    src: homeassistant-ha.conf
+    dest: /etc/zabbix/zabbix_agentd.d/homeassistant-ha.conf
+    mode: "0644"
+  notify: Restart zabbix-agent

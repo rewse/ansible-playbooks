@@ -1,4 +1,5 @@
 #!/bin/bash
+[% ansible_managed | comment %]
 # Move the name Home Assistant is reached by between the primary and this host.
 #
 # Three things decide where a request lands, and all three live in UniFi:
@@ -12,13 +13,13 @@ set -uo pipefail
 
 readonly TARGET="${1:?usage: homeassistant-name-switch <primary|standby>}"
 
-DOMAIN="[% homeassistant_ha_domain %]"
+DOMAIN="[% homeassistant_ha_secondary_domain %]"
 PRIMARY_HOST="fox.rewse.jp"
 STANDBY_HOST="hotel.rewse.jp"
-PRIMARY_IP="[% homeassistant_ha_primary_ip %]"
-STANDBY_IP="[% homeassistant_ha_standby_ip %]"
-CONSOLE_NAME="[% homeassistant_ha_unifi_console %]"
-API_KEY="[% homeassistant_ha_unifi_api_key %]"
+PRIMARY_IP="[% homeassistant_ha_secondary_primary_ip %]"
+STANDBY_IP="[% homeassistant_ha_secondary_standby_ip %]"
+CONSOLE_NAME="[% homeassistant_ha_secondary_unifi_console %]"
+API_KEY="[% homeassistant_ha_secondary_unifi_api_key %]"
 # A key generated at unifi.ui.com authenticates here but not against the
 # console's own address, so every call goes through the connector.
 CLOUD="https://api.ui.com"

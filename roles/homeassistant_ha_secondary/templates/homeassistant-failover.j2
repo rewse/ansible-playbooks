@@ -1,16 +1,17 @@
 #!/bin/bash
+[% ansible_managed | comment %]
 set -uo pipefail
 
 PRIMARY_HOST="fox.rewse.jp"
 PRIMARY_API="http://${PRIMARY_HOST}:8123/api/"
 PRIMARY_SSH_PORT="11022"
 PRIMARY_SSH_USER="[% admin %]"
-HA_TOKEN="[% homeassistant_ha_token %]"
+HA_TOKEN="[% homeassistant_ha_secondary_token %]"
 HEALTHCHECK_TIMEOUT=5
 # How long the primary has to stay unreachable before the standby takes over.
 # The timer fires every 5 minutes, so the clock is kept in a file rather than by
 # retrying within one run: a primary that reboots is back long before this.
-FAILOVER_AFTER=[% homeassistant_ha_failover_after %]
+FAILOVER_AFTER=[% homeassistant_ha_secondary_failover_after %]
 STATE_DIR="/var/lib/homeassistant-ha"
 # When the primary was first seen unreachable, absent while it answers.
 DOWN_SINCE_FILE="${STATE_DIR}/down-since"
@@ -21,7 +22,7 @@ LOCK_FILE="/var/run/homeassistant-failover.lock"
 LOG_TAG="homeassistant-failover"
 MAIL_TO="[% email.primary %]"
 COMPOSE_FILE="/etc/compose/homeassistant/compose.yaml"
-DOMAIN="[% homeassistant_ha_domain %]"
+DOMAIN="[% homeassistant_ha_secondary_domain %]"
 NAME_SWITCH="/usr/local/bin/homeassistant-name-switch"
 # Written by the name switch while the name points here.
 NAME_SWITCHED_FILE="${STATE_DIR}/name-switched"

@@ -1,11 +1,12 @@
 #!/bin/bash
+[% ansible_managed | comment %]
 set -uo pipefail
 
 PRIMARY_HOST="fox.rewse.jp"
 PRIMARY_API="http://${PRIMARY_HOST}:8123/api/"
 PRIMARY_SSH_PORT="11022"
 PRIMARY_SSH_USER="[% admin %]"
-HA_TOKEN="[% homeassistant_ha_token %]"
+HA_TOKEN="[% homeassistant_ha_secondary_token %]"
 CONFIG_DIR="/srv/homeassistant/config"
 RSYNC_MODULE="rsync://${PRIMARY_HOST}/homeassistant-config/"
 COMPOSE_FILE="/etc/compose/homeassistant/compose.yaml"

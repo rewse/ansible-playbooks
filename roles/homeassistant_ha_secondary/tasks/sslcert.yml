@@ -1,0 +1,35 @@
+---
+- name: sslcert | Copy script
+  ansible.builtin.copy:
+    src: sslcert-sync
+    dest: /usr/local/bin/sslcert-sync
+    mode: "0755"
+
+- name: sslcert | Copy service unit
+  ansible.builtin.copy:
+    src: sslcert-sync.service
+    dest: /etc/systemd/system/sslcert-sync.service
+    mode: "0644"
+  notify: Reload systemd
+
+- name: sslcert | Copy timer unit
+  ansible.builtin.copy:
+    src: sslcert-sync.timer
+    dest: /etc/systemd/system/sslcert-sync.timer
+    mode: "0644"
+  notify: Reload systemd
+
+- name: sslcert | Enable timer
+  ansible.builtin.systemd:
+    name: sslcert-sync.timer
+    enabled: true
+    state: started
+    daemon_reload: true
+  when: not ansible_check_mode
+
+- name: sslcert | Fetch the certificate now
+  # The script's own copy logic; no module fetches from the primary.
+  ansible.builtin.command: /usr/local/bin/sslcert-sync
+  register: __homeassistant_ha_secondary_sslcert_sync
+  changed_when: "'updated' in __homeassistant_ha_secondary_sslcert_sync.stdout"
+  when: not ansible_check_mode

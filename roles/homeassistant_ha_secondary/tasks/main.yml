@@ -1,0 +1,31 @@
+---
+- name: Import rsync tasks
+  ansible.builtin.import_tasks: rsync.yml
+  tags:
+    - homeassistant_ha_secondary_rsync
+
+- name: Import container tasks
+  ansible.builtin.import_tasks: container.yml
+  tags:
+    - homeassistant_ha_secondary_container
+    - update
+
+- name: Import failover tasks
+  ansible.builtin.import_tasks: failover.yml
+  tags:
+    - homeassistant_ha_secondary_failover
+
+- name: Import sslcert tasks
+  ansible.builtin.import_tasks: sslcert.yml
+  tags:
+    - homeassistant_ha_secondary_sslcert
+
+- name: Import apache tasks
+  ansible.builtin.import_tasks: apache.yml
+  tags:
+    - homeassistant_ha_secondary_apache
+
+- name: Import zabbix tasks
+  ansible.builtin.import_tasks: zabbix.yml
+  tags:
+    - homeassistant_ha_secondary_zabbix

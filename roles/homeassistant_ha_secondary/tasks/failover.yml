@@ -1,0 +1,52 @@
+---
+- name: failover | Create state directory
+  ansible.builtin.file:
+    path: /var/lib/homeassistant-ha
+    state: directory
+    mode: "0755"
+
+- name: failover | Copy script
+  ansible.builtin.template:
+    src: homeassistant-failover.j2
+    dest: /usr/local/bin/homeassistant-failover
+    mode: "0755"
+    variable_start_string: "[%"
+    variable_end_string: "%]"
+
+- name: failover | Copy service unit
+  ansible.builtin.copy:
+    src: homeassistant-failover.service
+    dest: /etc/systemd/system/homeassistant-failover.service
+    mode: "0644"
+  notify: Reload systemd
+
+- name: failover | Copy timer unit
+  ansible.builtin.copy:
+    src: homeassistant-failover.timer
+    dest: /etc/systemd/system/homeassistant-failover.timer
+    mode: "0644"
+  notify: Reload systemd
+
+- name: failover | Enable timer
+  ansible.builtin.systemd:
+    name: homeassistant-failover.timer
+    enabled: true
+    state: started
+    daemon_reload: true
+  when: not ansible_check_mode
+
+- name: failover | Copy failback script
+  ansible.builtin.template:
+    src: homeassistant-failback.j2
+    dest: /usr/local/bin/homeassistant-failback
+    mode: "0755"
+    variable_start_string: "[%"
+    variable_end_string: "%]"
+
+- name: failover | Copy name switch script
+  ansible.builtin.template:
+    src: homeassistant-name-switch.j2
+    dest: /usr/local/bin/homeassistant-name-switch
+    mode: "0700"
+    variable_start_string: "[%"
+    variable_end_string: "%]"
