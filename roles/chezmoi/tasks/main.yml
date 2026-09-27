@@ -1,52 +1,10 @@
 ---
-- name: "chezmoi : Install via Homebrew (macOS)"
-  community.general.homebrew:
-    name: chezmoi
-  when: ansible_facts["system"] == "Darwin"
+- name: Import package tasks
+  ansible.builtin.import_tasks: package.yml
   tags:
-    - chezmoi
-    - install
-    - chezmoi_chezmoi
-    - chezmoi_chezmoi_install
+    - chezmoi_package
 
-- name: "chezmoi : Install via script (Linux)"
-  ansible.builtin.shell: sh -c "$(curl -fsLS get.chezmoi.io)" -- -b /usr/local/bin
-  args:
-    creates: /usr/local/bin/chezmoi
-  when: ansible_facts["system"] == "Linux"
+- name: Import source tasks
+  ansible.builtin.import_tasks: source.yml
   tags:
-    - chezmoi
-    - install
-    - chezmoi_chezmoi
-    - chezmoi_chezmoi_install
-
-- name: "chezmoi : Check initialization status"
-  ansible.builtin.stat:
-    path: "{{ item.home }}/.local/share/chezmoi/.git"
-  become: true
-  become_user: "{{ item.user }}"
-  loop:
-    - { user: "root", home: "/root" }
-    - { user: "{{ admin }}", home: "/home/{{ admin }}" }
-  register: chezmoi_initialized
-  when: ansible_facts["system"] == "Linux"
-  tags:
-    - chezmoi
-    - init
-    - chezmoi_chezmoi
-    - chezmoi_chezmoi_install
-
-- name: "chezmoi : Initialize"
-  ansible.builtin.command: chezmoi init rewse
-  changed_when: false
-  become: true
-  become_user: "{{ item.item.user }}"
-  loop: "{{ chezmoi_initialized.results }}"
-  when:
-    - ansible_facts["system"] == "Linux"
-    - not item.stat.exists
-  tags:
-    - chezmoi
-    - init
-    - chezmoi_chezmoi
-    - chezmoi_chezmoi_init
+    - chezmoi_source

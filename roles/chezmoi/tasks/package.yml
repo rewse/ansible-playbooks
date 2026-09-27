@@ -1,0 +1,12 @@
+---
+- name: package | Install with Homebrew
+  community.general.homebrew:
+    name: chezmoi
+  when: ansible_facts['system'] == "Darwin"
+
+- name: package | Install with the official script
+  # The vendor documents only this installer for Linux; there is no apt package.
+  ansible.builtin.shell: sh -c "$(curl -fsLS get.chezmoi.io)" -- -b /usr/local/bin
+  args:
+    creates: /usr/local/bin/chezmoi
+  when: ansible_facts['system'] == "Linux"

@@ -1,0 +1,24 @@
+---
+- name: source | Check initialization
+  ansible.builtin.stat:
+    path: "{{ item.home }}/.local/share/chezmoi/.git"
+  become: true
+  become_user: "{{ item.user }}"
+  loop:
+    - user: root
+      home: /root
+    - user: "{{ admin }}"
+      home: /home/{{ admin }}
+  register: __chezmoi_initialized
+  when: ansible_facts['system'] == "Linux"
+
+- name: source | Initialize
+  # chezmoi has no module; init clones the source only when it is missing.
+  ansible.builtin.command: chezmoi init rewse
+  changed_when: true
+  become: true
+  become_user: "{{ item.item.user }}"
+  loop: "{{ __chezmoi_initialized.results }}"
+  when:
+    - ansible_facts['system'] == "Linux"
+    - not item.stat.exists
