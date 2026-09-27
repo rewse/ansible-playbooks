@@ -1,6 +1,0 @@
----
-- name: cleanup | Remove legacy paths
-  ansible.builtin.file:
-    path: "{{ item | expanduser }}"
-    state: absent
-  loop: "{{ darwin_legacy_paths }}"

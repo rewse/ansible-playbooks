@@ -38,14 +38,3 @@
   notify:
     - "zabbix_agent : Reload systemd"
     - "zabbix_agent : Restart zabbix-agent"
-
-- name: raspberrypi | Remove copied unit file
-  # A full copy hid package updates to the unit; the drop-in replaces it.
-  ansible.builtin.file:
-    path: /etc/systemd/system/zabbix-agent.service
-    state: absent
-  # Qualified names: other roles define handlers of the same names, and the last
-  # one loaded would otherwise run, possibly restarting before the reload.
-  notify:
-    - "zabbix_agent : Reload systemd"
-    - "zabbix_agent : Restart zabbix-agent"

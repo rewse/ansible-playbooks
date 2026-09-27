@@ -39,15 +39,3 @@
     force: true
   become: true
   become_user: "{{ admin }}"
-
-- name: orascript | Remove legacy safe directory
-  community.general.git_config:
-    name: safe.directory
-    scope: global
-    value: /srv/git/orascript
-    state: absent
-
-- name: orascript | Remove legacy checkout
-  ansible.builtin.file:
-    path: /srv/git/orascript
-    state: absent

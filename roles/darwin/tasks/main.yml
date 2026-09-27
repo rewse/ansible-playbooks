@@ -55,11 +55,6 @@
   tags:
     - darwin_xurl
 
-- name: Import cleanup tasks
-  ansible.builtin.import_tasks: cleanup.yml
-  tags:
-    - darwin_cleanup
-
 - name: Import upgrade tasks
   ansible.builtin.import_tasks: upgrade.yml
   tags:

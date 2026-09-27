@@ -1,4 +1,0 @@
----
-fail2ban_legacy_jails:
-  - couchdb
-  - zabbix-web

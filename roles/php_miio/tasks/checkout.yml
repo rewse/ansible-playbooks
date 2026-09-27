@@ -9,11 +9,3 @@
     # Run in place, so under /opt rather than /srv, which holds service data.
     dest: /opt/php-miio
     version: "{{ __php_miio_source.commit }}"
-
-- name: checkout | Remove legacy checkouts
-  ansible.builtin.file:
-    path: "{{ item }}"
-    state: absent
-  loop:
-    - /srv/php-miio
-    - /srv/php-miio-v.0.2.6

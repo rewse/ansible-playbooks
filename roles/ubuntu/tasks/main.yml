@@ -101,11 +101,6 @@
     - ubuntu_npm
     - update
 
-- name: Import claude_code tasks
-  ansible.builtin.import_tasks: claude_code.yml
-  tags:
-    - ubuntu_claude_code
-
 - name: Import upgrade tasks
   ansible.builtin.import_tasks: upgrade.yml
   tags:

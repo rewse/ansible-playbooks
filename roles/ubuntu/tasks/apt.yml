@@ -21,11 +21,6 @@
     signed_by: /etc/apt/keyrings/githubcli-archive-keyring.gpg
   when: ansible_facts['architecture'] in ['x86_64', 'aarch64']
 
-- name: apt | Remove legacy GitHub CLI list
-  ansible.builtin.file:
-    path: /etc/apt/sources.list.d/github-cli.list
-    state: absent
-
 - name: apt | Download 1Password key
   ansible.builtin.get_url:
     url: https://downloads.1password.com/linux/keys/1password.asc
@@ -47,11 +42,6 @@
     components: main
     architectures: "{{ __ubuntu_deb_arch }}"
     signed_by: /usr/share/keyrings/1password-archive-keyring.gpg
-
-- name: apt | Remove legacy 1Password list
-  ansible.builtin.file:
-    path: /etc/apt/sources.list.d/1password.list
-    state: absent
 
 - name: apt | Create 1Password debsig policies directory
   ansible.builtin.file:
@@ -94,13 +84,6 @@
     url: https://deb.nodesource.com/gpgkey/nodesource-repo.gpg.key
     dest: /etc/apt/keyrings/nodesource.asc
     mode: "0644"
-
-# Removed before the new definition: both would offer nodejs from different
-# major lines, and apt would keep whichever resolves first.
-- name: apt | Remove legacy NodeSource list
-  ansible.builtin.file:
-    path: /etc/apt/sources.list.d/nodesource.list
-    state: absent
 
 - name: apt | Add NodeSource repository
   ansible.builtin.deb822_repository:

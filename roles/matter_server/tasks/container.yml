@@ -64,8 +64,3 @@
     state: present
     pull: missing
   when: not (ansible_check_mode and __matter_server_compose is changed)
-
-- name: container | Remove legacy configuration directory
-  ansible.builtin.file:
-    path: /etc/matter-server
-    state: absent

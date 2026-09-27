@@ -2,7 +2,7 @@
 
 ## Ansible Conventions
 
-`roles/filebrowser` is the reference implementation of these rules. Roles not yet migrated still have entries in `.ansible-lint-ignore`; migrate a role by making it lint-clean and deleting its lines there.
+`roles/filebrowser` is the reference implementation of these rules.
 
 ### Update Policy
 
@@ -126,7 +126,7 @@ Use only these tags, written as an indented YAML list:
 
 - Lint through pre-commit (`uvx --with pre-commit-uv==4.3.0 pre-commit@4.6.2 run --all-files --show-diff-on-failure`) locally and in CI. It runs actionlint for GitHub Actions workflows, ansible-lint for Ansible content, basedpyright and ruff for Python, check-jsonschema for the Dependabot config, shellcheck for shell scripts, and zizmor for GitHub Actions workflows. `.yamllint` configures ansible-lint's `yaml` rule; do not run yamllint separately.
 - `roles/homeassistant/files/` is excluded from lint.
-- Do not add entries to `.ansible-lint-ignore` for new code.
+- Do not create `.ansible-lint-ignore`. Fix a violation, or suppress one task with `# noqa: <rule>` and a comment stating why.
 
 ## Repository Operations
 

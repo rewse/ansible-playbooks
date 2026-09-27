@@ -14,11 +14,3 @@
   ansible.builtin.apt:
     name: java-{{ database_client_gui_corretto_version }}-amazon-corretto-jdk
     update_cache: "{{ __database_client_gui_corretto_repo is changed }}"
-
-- name: corretto | Remove legacy key files
-  ansible.builtin.file:
-    path: "{{ item }}"
-    state: absent
-  loop:
-    - /etc/apt/keyrings/corretto.gpg
-    - /etc/apt/keyrings/corretto.key

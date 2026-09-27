@@ -1,4 +1,0 @@
----
-# Service jails the ubuntu role once wrote to this host although the service does
-# not run here. Remove an entry once the host has converged.
-fail2ban_legacy_jails: []

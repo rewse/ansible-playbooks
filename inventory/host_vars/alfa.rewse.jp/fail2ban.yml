@@ -1,5 +1,0 @@
----
-fail2ban_legacy_jails:
-  - couchdb
-  - homeassistant
-  - zabbix-web
