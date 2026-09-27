@@ -1,8 +1,8 @@
-# {{ ansible_managed }}
+{{ ansible_managed | comment }}
 #
 # Home Assistant writes the failed logins itself, at a path that does not move,
-# so this one reads the application log. enabled follows its presence, since only
-# some of these hosts run Home Assistant.
+# so this one reads the application log. The standby enables it only once the
+# synced log exists there.
 #
 # backend is stated because jail.d/defaults-debian.conf from the package sets
 # systemd for every jail and jail.d is read after jail.local. Without it the jail
@@ -14,7 +14,7 @@
 # Settings > System > Network, and an Apache address missing from them makes this
 # jail ban the proxy itself.
 [homeassistant]
-enabled = {{ 'true' if ubuntu_homeassistant_log.stat.exists else 'false' }}
+enabled = {{ 'true' if homeassistant_fail2ban_enabled | default(true) else 'false' }}
 backend = auto
 port = http,https
 filter = homeassistant

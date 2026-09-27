@@ -1419,3 +1419,8 @@
     - homeassistant_echonet_lite
     - homeassistant_echonet_lite_config
     - homeassistant_echonet_lite_install
+
+- name: Import fail2ban tasks
+  ansible.builtin.import_tasks: fail2ban.yml
+  tags:
+    - homeassistant_fail2ban

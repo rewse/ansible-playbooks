@@ -1,0 +1,14 @@
+---
+- name: fail2ban | Copy filter
+  ansible.builtin.copy:
+    src: fail2ban-filter.conf
+    dest: /etc/fail2ban/filter.d/homeassistant.conf
+    mode: "0644"
+  notify: Restart fail2ban
+
+- name: fail2ban | Deploy jail config
+  ansible.builtin.template:
+    src: fail2ban-jail.conf.j2
+    dest: /etc/fail2ban/jail.d/homeassistant.conf
+    mode: "0644"
+  notify: Restart fail2ban
