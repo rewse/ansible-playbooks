@@ -17,11 +17,24 @@
     cmd: uv venv --python /usr/bin/python3 /opt/zabbix-mcp/venv
     creates: /opt/zabbix-mcp/venv
 
-- name: app | Install package
+- name: app | Read installed version
   # uv has no Ansible module.
+  ansible.builtin.command: uv pip show zabbix-mcp-server
+  environment:
+    VIRTUAL_ENV: /opt/zabbix-mcp/venv
+  register: __zabbix_mcp_installed
+  changed_when: false
+  failed_when: false
+  check_mode: false
+
+- name: app | Install package
+  # uv has no Ansible module. A local path always rebuilds, so install only when
+  # the checked-out tag differs from what the virtual environment holds.
   ansible.builtin.command:
     cmd: uv pip install /opt/zabbix-mcp/src
   environment: "{{ supply_chain_cooldown_environment | combine({'VIRTUAL_ENV': '/opt/zabbix-mcp/venv'}) }}"
-  register: __zabbix_mcp_pip
-  changed_when: "'Installed' in __zabbix_mcp_pip.stderr"
+  changed_when: true
   notify: Restart zabbix-mcp-server
+  when: >-
+    ('Version: ' ~ (__zabbix_mcp_source.version | regex_replace('^v', '')))
+    not in __zabbix_mcp_installed.stdout
