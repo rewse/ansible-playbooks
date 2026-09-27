@@ -1,0 +1,29 @@
+---
+- name: npm | Find outdated global packages
+  # npm update -g reinstalls every global package on each run, so only the
+  # outdated ones are installed. outdated exits 1 when it finds any.
+  ansible.builtin.command: npm outdated -g --json
+  environment: "{{ supply_chain_cooldown_environment }}"
+  register: __ubuntu_npm_outdated
+  changed_when: false
+  failed_when: __ubuntu_npm_outdated.rc > 1
+  check_mode: false
+
+- name: npm | Update outdated global packages
+  # npm has no module that honours the cooldown environment.
+  ansible.builtin.command: >-
+    npm install -g
+    {% for name, info in (__ubuntu_npm_outdated.stdout | default('{}', true) | from_json).items() %}{{ name }}@{{ info.latest }} {% endfor %}
+  environment: "{{ supply_chain_cooldown_environment }}"
+  changed_when: true
+  when: (__ubuntu_npm_outdated.stdout | default('{}', true) | from_json) | length > 0
+
+- name: npm | Keep the agent-browser binary executable
+  # The root npmrc sets ignore-scripts, which skips the postinstall that marks the
+  # platform binary executable. Run as root the CLI fixes this itself, but users
+  # such as zabbix cannot and fail with EPERM.
+  ansible.builtin.file:
+    path: /usr/lib/node_modules/agent-browser/bin/agent-browser-linux-{{ 'arm64' if ansible_facts['architecture'] == 'aarch64' else 'x64' }}
+    mode: "0755"
+  # A dry run on a new host installs nothing to mark.
+  when: not ansible_check_mode

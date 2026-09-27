@@ -29,5 +29,3 @@ roles/nas/tasks/main.yml name[casing]
 roles/nas/tasks/main.yml no-changed-when
 roles/raspberrypi/handlers/main.yml name[casing]
 roles/raspberrypi/tasks/main.yml name[casing]
-roles/ubuntu/handlers/main.yml name[casing]
-roles/ubuntu/tasks/main.yml name[casing]

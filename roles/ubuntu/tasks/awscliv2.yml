@@ -1,0 +1,24 @@
+---
+- name: awscliv2 | Check installation
+  ansible.builtin.stat:
+    path: /usr/local/bin/aws
+  register: __ubuntu_aws
+
+- name: awscliv2 | Download and extract
+  ansible.builtin.unarchive:
+    src: https://awscli.amazonaws.com/awscli-exe-linux-{{ ansible_facts['architecture'] }}.zip
+    dest: /usr/local/src
+    remote_src: true
+  when: not __ubuntu_aws.stat.exists
+
+- name: awscliv2 | Install
+  # The vendor installer has no module.
+  ansible.builtin.command: /usr/local/src/aws/install
+  changed_when: true
+  when: not __ubuntu_aws.stat.exists
+
+- name: awscliv2 | Update
+  # The vendor installer has no module.
+  ansible.builtin.command: /usr/local/src/aws/install --update
+  changed_when: false
+  when: __ubuntu_aws.stat.exists

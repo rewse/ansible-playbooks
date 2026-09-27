@@ -1,0 +1,13 @@
+---
+- name: failure_notify | Copy script
+  ansible.builtin.template:
+    src: failure-notify.j2
+    dest: /usr/local/sbin/failure-notify
+    mode: "0755"
+
+- name: failure_notify | Copy service
+  ansible.builtin.copy:
+    src: failure-notify@.service
+    dest: /etc/systemd/system/failure-notify@.service
+    mode: "0644"
+  notify: Reload systemd

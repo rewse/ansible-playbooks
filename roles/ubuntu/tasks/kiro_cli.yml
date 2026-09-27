@@ -1,0 +1,27 @@
+---
+- name: kiro_cli | Download installer
+  ansible.builtin.get_url:
+    url: https://cli.kiro.dev/install
+    dest: /usr/local/src/kiro-cli-install.sh
+    mode: "0755"
+
+- name: kiro_cli | Install
+  # The vendor installer has no module.
+  ansible.builtin.command: bash /usr/local/src/kiro-cli-install.sh
+  args:
+    creates: /root/.local/bin/kiro-cli
+
+- name: kiro_cli | Link binaries into /usr/local/bin
+  ansible.builtin.file:
+    src: /root/.local/bin/{{ item }}
+    dest: /usr/local/bin/{{ item }}
+    state: link
+  loop:
+    - kiro-cli
+    - kiro-cli-chat
+    - kiro-cli-term
+
+- name: kiro_cli | Update
+  # kiro-cli updates itself; no module manages it.
+  ansible.builtin.command: /usr/local/bin/kiro-cli update
+  changed_when: false

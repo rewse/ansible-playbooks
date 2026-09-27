@@ -1,0 +1,13 @@
+---
+- name: etckeeper | Initialize /etc
+  # etckeeper has no module.
+  ansible.builtin.command: etckeeper init
+  args:
+    creates: /etc/.git
+
+- name: etckeeper | Create initial commit
+  # etckeeper has no module.
+  ansible.builtin.command: etckeeper commit "Initial commit"
+  args:
+    chdir: /etc
+    creates: /etc/.git/logs

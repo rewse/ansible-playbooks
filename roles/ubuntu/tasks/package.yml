@@ -1,0 +1,40 @@
+---
+- name: package | Install packages
+  ansible.builtin.apt:
+    name:
+      - 1password-cli
+      - ansible
+      - ansible-lint
+      - apt-file
+      - at
+      - bat
+      - bc
+      - curl
+      - direnv
+      - dphys-swapfile
+      - dnsutils
+      - etckeeper
+      - gh
+      - git
+      - irqbalance
+      - libsasl2-modules
+      - libwww-perl
+      - locales-all
+      - logwatch
+      - iw
+      - mailutils
+      - ncdu
+      - net-tools
+      - postfix
+      - python3-pip
+      - python3-venv
+      - ripgrep
+      - sysstat
+      - tldr
+      - tree
+      - unattended-upgrades
+      - unzip
+      - update-notifier-common
+      - vim
+      - wireless-tools
+      - zsh

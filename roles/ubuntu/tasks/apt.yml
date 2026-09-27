@@ -1,0 +1,119 @@
+---
+- name: apt | Install repository management dependency
+  ansible.builtin.apt:
+    name: python3-debian
+    update_cache: true
+
+- name: apt | Download GitHub CLI key
+  ansible.builtin.get_url:
+    url: https://cli.github.com/packages/githubcli-archive-keyring.gpg
+    dest: /etc/apt/keyrings/githubcli-archive-keyring.gpg
+    mode: "0644"
+
+- name: apt | Add GitHub CLI repository
+  ansible.builtin.deb822_repository:
+    name: github-cli
+    types: deb
+    uris: https://cli.github.com/packages
+    suites: stable
+    components: main
+    architectures: "{{ __ubuntu_deb_arch }}"
+    signed_by: /etc/apt/keyrings/githubcli-archive-keyring.gpg
+  when: ansible_facts['architecture'] in ['x86_64', 'aarch64']
+
+- name: apt | Remove legacy GitHub CLI list
+  ansible.builtin.file:
+    path: /etc/apt/sources.list.d/github-cli.list
+    state: absent
+
+- name: apt | Download 1Password key
+  ansible.builtin.get_url:
+    url: https://downloads.1password.com/linux/keys/1password.asc
+    dest: /usr/local/src/1password.asc
+    mode: "0644"
+
+- name: apt | Dearmor 1Password key for apt
+  # apt needs the binary keyring; no module converts it.
+  ansible.builtin.shell: gpg --dearmor < /usr/local/src/1password.asc > /usr/share/keyrings/1password-archive-keyring.gpg
+  args:
+    creates: /usr/share/keyrings/1password-archive-keyring.gpg
+
+- name: apt | Add 1Password repository
+  ansible.builtin.deb822_repository:
+    name: 1password
+    types: deb
+    uris: "https://downloads.1password.com/linux/debian/{{ __ubuntu_deb_arch }}"
+    suites: stable
+    components: main
+    architectures: "{{ __ubuntu_deb_arch }}"
+    signed_by: /usr/share/keyrings/1password-archive-keyring.gpg
+
+- name: apt | Remove legacy 1Password list
+  ansible.builtin.file:
+    path: /etc/apt/sources.list.d/1password.list
+    state: absent
+
+- name: apt | Create 1Password debsig policies directory
+  ansible.builtin.file:
+    path: /etc/debsig/policies/AC2D62742012EA22
+    state: directory
+    mode: "0755"
+
+- name: apt | Download 1Password debsig policy
+  ansible.builtin.get_url:
+    url: https://downloads.1password.com/linux/debian/debsig/1password.pol
+    dest: /etc/debsig/policies/AC2D62742012EA22/1password.pol
+    mode: "0644"
+
+- name: apt | Create 1Password debsig keyrings directory
+  ansible.builtin.file:
+    path: /usr/share/debsig/keyrings/AC2D62742012EA22
+    state: directory
+    mode: "0755"
+
+- name: apt | Dearmor 1Password key for debsig
+  # debsig needs the binary keyring; no module converts it.
+  ansible.builtin.shell: gpg --dearmor < /usr/local/src/1password.asc > /usr/share/debsig/keyrings/AC2D62742012EA22/debsig.gpg
+  args:
+    creates: /usr/share/debsig/keyrings/AC2D62742012EA22/debsig.gpg
+
+- name: apt | Read Node.js release index
+  ansible.builtin.uri:
+    url: https://nodejs.org/dist/index.json
+    return_content: true
+  register: __ubuntu_nodejs_index
+  check_mode: false
+
+- name: apt | Select Node.js LTS major
+  ansible.builtin.set_fact:
+    # The index lists releases newest first; lts is false or the LTS codename.
+    __ubuntu_nodejs_major: "{{ (__ubuntu_nodejs_index.json | selectattr('lts') | first).version | regex_replace('^v', '') | split('.') | first }}"
+
+- name: apt | Download NodeSource key
+  ansible.builtin.get_url:
+    url: https://deb.nodesource.com/gpgkey/nodesource-repo.gpg.key
+    dest: /etc/apt/keyrings/nodesource.asc
+    mode: "0644"
+
+- name: apt | Remove legacy NodeSource list
+  ansible.builtin.file:
+    path: /etc/apt/sources.list.d/nodesource.list
+    state: absent
+
+- name: apt | Add NodeSource repository
+  ansible.builtin.deb822_repository:
+    name: nodesource
+    types: deb
+    uris: "https://deb.nodesource.com/node_{{ __ubuntu_nodejs_major }}.x"
+    suites: nodistro
+    components: main
+    architectures: "{{ __ubuntu_deb_arch }}"
+    signed_by: /etc/apt/keyrings/nodesource.asc
+
+- name: apt | Install Node.js
+  # Present only: the dist upgrade in the upgrade component moves nodejs to the
+  # new major.
+  ansible.builtin.apt:
+    name: nodejs
+    state: present
+    update_cache: true

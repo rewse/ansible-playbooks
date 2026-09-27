@@ -1,0 +1,6 @@
+---
+- name: inputrc | Set editing-mode to vi
+  ansible.builtin.lineinfile:
+    dest: /etc/inputrc
+    regexp: "set editing-mode "
+    line: "set editing-mode vi"

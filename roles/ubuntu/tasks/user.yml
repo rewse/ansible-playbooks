@@ -1,0 +1,42 @@
+---
+- name: user | Create admin group
+  ansible.builtin.group:
+    name: "{{ admin }}"
+    gid: 2000
+
+- name: user | Create admin user
+  ansible.builtin.user:
+    name: "{{ admin }}"
+    uid: 2000
+    group: "{{ admin }}"
+    groups: "adm,sudo"
+    # Append so the docker role's docker group survives this task.
+    append: true
+    shell: /usr/bin/zsh
+    skeleton: /etc/skel
+
+- name: user | Allow passwordless sudo for admin
+  ansible.builtin.lineinfile:
+    dest: /etc/sudoers.d/00-{{ admin }}
+    regexp: "^{{ admin }}"
+    line: "{{ admin }} ALL=(ALL) NOPASSWD: ALL"
+    create: true
+    mode: "0440"
+    validate: "visudo -cf %s"
+
+- name: user | Create .ssh directory for admin
+  ansible.builtin.file:
+    path: /home/{{ admin }}/.ssh
+    owner: "{{ admin }}"
+    group: "{{ admin }}"
+    state: directory
+    mode: "0700"
+
+- name: user | Copy authorized_keys for admin
+  ansible.builtin.copy:
+    src: /home/ubuntu/.ssh/authorized_keys
+    dest: /home/{{ admin }}/.ssh/authorized_keys
+    remote_src: true
+    owner: "{{ admin }}"
+    group: "{{ admin }}"
+    mode: "0600"

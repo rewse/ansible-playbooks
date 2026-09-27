@@ -1,0 +1,10 @@
+---
+- name: hostname | Set hostname
+  ansible.builtin.hostname:
+    name: "{{ inventory_hostname }}"
+
+- name: hostname | Keep the hostname across cloud-init runs
+  ansible.builtin.lineinfile:
+    dest: /etc/cloud/cloud.cfg
+    regexp: "^preserve_hostname"
+    line: "preserve_hostname: true"

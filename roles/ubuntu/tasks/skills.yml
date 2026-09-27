@@ -1,0 +1,8 @@
+---
+- name: skills | Install
+  # npm has no module that honours the cooldown environment. Updates come from
+  # the npm component.
+  ansible.builtin.command: npm install -g skills
+  args:
+    creates: /usr/lib/node_modules/skills
+  environment: "{{ supply_chain_cooldown_environment }}"

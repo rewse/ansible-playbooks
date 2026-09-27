@@ -1,0 +1,39 @@
+---
+- name: uv | Download installer
+  ansible.builtin.get_url:
+    url: https://astral.sh/uv/install.sh
+    dest: /usr/local/src/uv-install.sh
+    mode: "0755"
+
+- name: uv | Install
+  # The vendor installer has no module.
+  ansible.builtin.command: sh /usr/local/src/uv-install.sh
+  args:
+    creates: /usr/local/bin/uv
+  environment:
+    UV_INSTALL_DIR: /usr/local/bin
+
+- name: uv | Update
+  # uv updates itself; no module manages it.
+  ansible.builtin.command: /usr/local/bin/uv self update
+  changed_when: false
+
+- name: uv | Install tools
+  # uv has no Ansible module.
+  ansible.builtin.command: uv tool install {{ item }}
+  environment: "{{ supply_chain_cooldown_environment }}"
+  changed_when: false
+  loop:
+    # Web search through a Bedrock AgentCore Gateway, signed with local AWS
+    # credentials. Published only as a sample repository, so it installs from git
+    # rather than PyPI. Needs the gateway from the repo's CloudFormation template
+    # and AGENTCORE_GATEWAY_URL, which .zshenv exports.
+    - git+https://github.com/aws-samples/sample-agentcore-websearch-agent-skill
+    - pdfplumber
+    - tavily-cli
+
+- name: uv | Upgrade tools
+  # uv has no Ansible module.
+  ansible.builtin.command: uv tool upgrade --all
+  environment: "{{ supply_chain_cooldown_environment }}"
+  changed_when: false

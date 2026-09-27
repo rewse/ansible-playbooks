@@ -1,0 +1,4 @@
+---
+- name: facts | Set deb architecture
+  ansible.builtin.set_fact:
+    __ubuntu_deb_arch: "{{ ansible_facts['architecture'] | replace('x86_64', 'amd64') | replace('aarch64', 'arm64') }}"

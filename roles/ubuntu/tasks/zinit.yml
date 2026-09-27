@@ -1,0 +1,19 @@
+---
+- name: zinit | Install
+  # The vendor installer has no module.
+  ansible.builtin.shell: bash -c "$(curl --fail --show-error --silent --location https://raw.githubusercontent.com/zdharma-continuum/zinit/HEAD/scripts/install.sh)"
+  args:
+    creates: /root/.local/share/zinit/zinit.git
+  environment:
+    NO_INPUT: "1"
+
+- name: zinit | Link into /usr/local/share
+  ansible.builtin.file:
+    src: /root/.local/share/zinit
+    dest: /usr/local/share/zinit
+    state: link
+
+- name: zinit | Update
+  # zinit updates itself from zsh; no module manages it.
+  ansible.builtin.command: zsh -ic "zinit self-update"
+  changed_when: false

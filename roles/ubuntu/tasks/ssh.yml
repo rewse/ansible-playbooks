@@ -1,0 +1,7 @@
+---
+- name: ssh | Copy authentication config
+  ansible.builtin.copy:
+    src: authentication.conf
+    dest: /etc/ssh/sshd_config.d
+    mode: "0644"
+  notify: Restart ssh

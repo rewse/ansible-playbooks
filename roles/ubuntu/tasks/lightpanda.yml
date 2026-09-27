@@ -1,0 +1,15 @@
+---
+- name: lightpanda | Resolve aged release
+  ansible.builtin.set_fact:
+    __ubuntu_lightpanda: >-
+      {{ lookup('aged_release', 'github-release:lightpanda-io/browser', asset='lightpanda-' ~ ansible_facts['architecture'] ~ '-linux') }}
+
+- name: lightpanda | Download binary
+  ansible.builtin.get_url:
+    url: "{{ __ubuntu_lightpanda.url }}"
+    dest: /usr/local/bin/lightpanda
+    mode: "0755"
+    checksum: "{{ __ubuntu_lightpanda.checksum | default(omit, true) }}"
+    # The file name carries no version, so without a checksum only a fresh
+    # download reveals a new release.
+    force: "{{ __ubuntu_lightpanda.checksum == '' }}"

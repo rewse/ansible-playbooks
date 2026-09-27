@@ -1,791 +1,108 @@
 ---
-- name: "ubuntu : Set deb architecture fact"
-  ansible.builtin.set_fact:
-    ubuntu_deb_arch: "{{ ansible_facts['architecture'] | replace('x86_64', 'amd64') | replace('aarch64', 'arm64') }}"
+- name: Import facts tasks
+  ansible.builtin.import_tasks: facts.yml
   tags:
-    - ubuntu
     - always
 
-- name: "ubuntu : Set timezone to Asia/Tokyo"
-  community.general.timezone:
-    name: Asia/Tokyo
+- name: Import timezone tasks
+  ansible.builtin.import_tasks: timezone.yml
   tags:
-    - ubuntu
-    - config
-    - timezone
-    - ubuntu_ubuntu
-    - ubuntu_ubuntu_config
+    - ubuntu_timezone
 
-- name: "ubuntu : Install apt repository management dependency"
-  ansible.builtin.apt:
-    name: python3-debian
-    update_cache: true
+- name: Import apt tasks
+  ansible.builtin.import_tasks: apt.yml
   tags:
-    - ubuntu
-    - install
-    - ubuntu_ubuntu
-    - ubuntu_ubuntu_install
-
-- name: "github : Download apt GPG key"
-  ansible.builtin.get_url:
-    url: https://cli.github.com/packages/githubcli-archive-keyring.gpg
-    dest: /etc/apt/keyrings/githubcli-archive-keyring.gpg
-    mode: '0644'
-  tags:
-    - ubuntu
-    - install
-    - github
-    - ubuntu_github
-    - ubuntu_github_install
-    - ubuntu_github_download
-
-- name: "github : Add apt repository"
-  ansible.builtin.deb822_repository:
-    name: github-cli
-    types: deb
-    uris: https://cli.github.com/packages
-    suites: stable
-    components: main
-    architectures: "{{ ubuntu_deb_arch }}"
-    signed_by: /etc/apt/keyrings/githubcli-archive-keyring.gpg
-  when: ansible_facts["architecture"] in ["x86_64", "aarch64"]
-  tags:
-    - ubuntu
-    - install
-    - github
-    - ubuntu_github
-    - ubuntu_github_install
-    - ubuntu_github_config
-
-- name: "github : Remove legacy apt list"
-  ansible.builtin.file:
-    path: /etc/apt/sources.list.d/github-cli.list
-    state: absent
-  tags:
-    - ubuntu
-    - install
-    - github
-    - ubuntu_github
-    - ubuntu_github_install
-    - ubuntu_github_config
-
-- name: "1password : Download GPG key"
-  ansible.builtin.get_url:
-    url: https://downloads.1password.com/linux/keys/1password.asc
-    dest: /tmp/1password.asc
-    mode: '0644'
-  tags:
-    - ubuntu
-    - install
-    - 1password
-    - ubuntu_1password
-    - ubuntu_1password_install
-    - ubuntu_1password_download
-
-- name: "1password : Dearmor GPG key for apt"
-  ansible.builtin.shell: gpg --dearmor < /tmp/1password.asc > /usr/share/keyrings/1password-archive-keyring.gpg
-  args:
-    creates: /usr/share/keyrings/1password-archive-keyring.gpg
-  tags:
-    - ubuntu
-    - install
-    - 1password
-    - ubuntu_1password
-    - ubuntu_1password_install
-    - ubuntu_1password_config
-
-- name: "1password : Add apt repository"
-  ansible.builtin.deb822_repository:
-    name: 1password
-    types: deb
-    uris: "https://downloads.1password.com/linux/debian/{{ ubuntu_deb_arch }}"
-    suites: stable
-    components: main
-    architectures: "{{ ubuntu_deb_arch }}"
-    signed_by: /usr/share/keyrings/1password-archive-keyring.gpg
-  tags:
-    - ubuntu
-    - install
-    - 1password
-    - ubuntu_1password
-    - ubuntu_1password_install
-    - ubuntu_1password_config
-
-- name: "1password : Remove legacy apt list"
-  ansible.builtin.file:
-    path: /etc/apt/sources.list.d/1password.list
-    state: absent
-  tags:
-    - ubuntu
-    - install
-    - 1password
-    - ubuntu_1password
-    - ubuntu_1password_install
-    - ubuntu_1password_config
-
-- name: "1password : Create debsig policies directory"
-  ansible.builtin.file:
-    path: /etc/debsig/policies/AC2D62742012EA22
-    state: directory
-    mode: '0755'
-  tags:
-    - ubuntu
-    - install
-    - 1password
-    - ubuntu_1password
-    - ubuntu_1password_install
-    - ubuntu_1password_init
-
-- name: "1password : Download debsig policy"
-  ansible.builtin.get_url:
-    url: https://downloads.1password.com/linux/debian/debsig/1password.pol
-    dest: /etc/debsig/policies/AC2D62742012EA22/1password.pol
-    mode: '0644'
-  tags:
-    - ubuntu
-    - install
-    - 1password
-    - ubuntu_1password
-    - ubuntu_1password_install
-    - ubuntu_1password_download
-
-- name: "1password : Create debsig keyrings directory"
-  ansible.builtin.file:
-    path: /usr/share/debsig/keyrings/AC2D62742012EA22
-    state: directory
-    mode: '0755'
-  tags:
-    - ubuntu
-    - install
-    - 1password
-    - ubuntu_1password
-    - ubuntu_1password_install
-    - ubuntu_1password_init
-
-- name: "1password : Dearmor GPG key for debsig"
-  ansible.builtin.shell: gpg --dearmor < /tmp/1password.asc > /usr/share/debsig/keyrings/AC2D62742012EA22/debsig.gpg
-  args:
-    creates: /usr/share/debsig/keyrings/AC2D62742012EA22/debsig.gpg
-  tags:
-    - ubuntu
-    - install
-    - 1password
-    - ubuntu_1password
-    - ubuntu_1password_install
-    - ubuntu_1password_config
-
-- name: "nodejs : Read release index"
-  ansible.builtin.uri:
-    url: https://nodejs.org/dist/index.json
-    return_content: true
-  register: __ubuntu_nodejs_index
-  check_mode: false
-  tags:
-    - ubuntu
-    - install
+    - ubuntu_apt
     - update
-    - nodejs
-    - ubuntu_nodejs
-    - ubuntu_nodejs_install
 
-- name: "nodejs : Select LTS major"
-  ansible.builtin.set_fact:
-    # The index lists releases newest first; lts is false or the LTS codename.
-    __ubuntu_nodejs_major: "{{ (__ubuntu_nodejs_index.json | selectattr('lts') | first).version | regex_replace('^v', '') | split('.') | first }}"
+- name: Import package tasks
+  ansible.builtin.import_tasks: package.yml
   tags:
-    - ubuntu
-    - install
-    - update
-    - nodejs
-    - ubuntu_nodejs
-    - ubuntu_nodejs_install
-
-- name: "nodejs : Download apt GPG key"
-  ansible.builtin.get_url:
-    url: https://deb.nodesource.com/gpgkey/nodesource-repo.gpg.key
-    dest: /etc/apt/keyrings/nodesource.asc
-    mode: "0644"
-  tags:
-    - ubuntu
-    - install
-    - update
-    - nodejs
-    - ubuntu_nodejs
-    - ubuntu_nodejs_install
-
-# Removed before the new definition: both would offer nodejs from different
-# major lines, and apt would keep whichever resolves first.
-- name: "nodejs : Remove legacy apt list"
-  ansible.builtin.file:
-    path: /etc/apt/sources.list.d/nodesource.list
-    state: absent
-  tags:
-    - ubuntu
-    - install
-    - update
-    - nodejs
-    - ubuntu_nodejs
-    - ubuntu_nodejs_install
-
-- name: "nodejs : Add apt repository"
-  ansible.builtin.deb822_repository:
-    name: nodesource
-    types: deb
-    uris: "https://deb.nodesource.com/node_{{ __ubuntu_nodejs_major }}.x"
-    suites: nodistro
-    components: main
-    architectures: "{{ ubuntu_deb_arch }}"
-    signed_by: /etc/apt/keyrings/nodesource.asc
-  tags:
-    - ubuntu
-    - install
-    - update
-    - nodejs
-    - ubuntu_nodejs
-    - ubuntu_nodejs_install
-
-- name: "nodejs : Install package"
-  ansible.builtin.apt:
-    name: nodejs
-    state: present
-    update_cache: true
-  # Present only: the dist upgrade that follows moves nodejs to the new major.
-  tags:
-    - ubuntu
-    - install
-    - update
-    - nodejs
-    - ubuntu_nodejs
-    - ubuntu_nodejs_install
-
-- name: "ubuntu : Update all packages"
-  ansible.builtin.apt:
-    upgrade: dist
-    update_cache: true
-  tags:
-    - ubuntu
-    - update
-    - ubuntu_ubuntu
-    - ubuntu_ubuntu_update
-
-- name: "ubuntu : Install packages"
-  ansible.builtin.apt:
-    name:
-      - 1password-cli
-      - ansible
-      - ansible-lint
-      - apt-file
-      - at
-      - bat
-      - bc
-      - curl
-      - direnv
-      - dphys-swapfile
-      - dnsutils
-      - etckeeper
-      - gh
-      - git
-      - irqbalance
-      - libsasl2-modules
-      - libwww-perl
-      - locales-all
-      - logwatch
-      - iw
-      - mailutils
-      - ncdu
-      - net-tools
-      - postfix
-      - python3-pip
-      - python3-venv
-      - ripgrep
-      - sysstat
-      - tldr
-      - tree
-      - unattended-upgrades
-      - unzip
-      - update-notifier-common
-      - vim
-      - wireless-tools
-      - zsh
-  tags:
-    - ubuntu
-    - install
-    - ubuntu_ubuntu
-    - ubuntu_ubuntu_install
-
-- name: "awscliv2 : Check installation status"
-  ansible.builtin.stat:
-    path: /usr/local/bin/aws
-  register: ubuntu_aws
-  tags:
-    - ubuntu
-    - install
-    - awscliv2
-    - ubuntu_awscliv2
-    - ubuntu_awscliv2_install
-
-- name: "awscliv2 : Download and extract"
-  ansible.builtin.unarchive:
-    src: https://awscli.amazonaws.com/awscli-exe-linux-{{ ansible_facts["architecture"] }}.zip
-    dest: /usr/local/src
-    remote_src: true
-  when: not ubuntu_aws.stat.exists
-  tags:
-    - ubuntu
-    - install
-    - awscliv2
-    - ubuntu_awscliv2
-    - ubuntu_awscliv2_install
-    - ubuntu_awscliv2_download
-
-- name: "awscliv2 : Install"
-  ansible.builtin.command: /usr/local/src/aws/install
-  changed_when: true
-  when: not ubuntu_aws.stat.exists
-  tags:
-    - ubuntu
-    - install
-    - awscliv2
-    - ubuntu_awscliv2
-    - ubuntu_awscliv2_install
-
-- name: "awscliv2 : Update"
-  ansible.builtin.command: /usr/local/src/aws/install --update
-  changed_when: false
-  when: ubuntu_aws.stat.exists
-  tags:
-    - ubuntu
-    - update
-    - awscliv2
-    - ubuntu_awscliv2
-    - ubuntu_awscliv2_update
-
-- name: "kiro-cli : Download installer"
-  ansible.builtin.get_url:
-    url: https://cli.kiro.dev/install
-    dest: /tmp/kiro-cli-install.sh
-    mode: '0755'
-  tags:
-    - ubuntu
-    - install
-    - kiro-cli
-    - ubuntu_kiro-cli
-
-- name: "kiro-cli : Install"
-  ansible.builtin.command: bash /tmp/kiro-cli-install.sh
-  args:
-    creates: /root/.local/bin/kiro-cli
-  tags:
-    - ubuntu
-    - install
-    - kiro-cli
-    - ubuntu_kiro-cli
-    - ubuntu_kiro-cli_install
-
-- name: "kiro-cli : Create symlinks in /usr/local/bin"
-  ansible.builtin.file:
-    src: /root/.local/bin/{{ item }}
-    dest: /usr/local/bin/{{ item }}
-    state: link
-  loop:
-    - kiro-cli
-    - kiro-cli-chat
-    - kiro-cli-term
-  tags:
-    - ubuntu
-    - install
-    - kiro-cli
-    - ubuntu_kiro-cli
-    - ubuntu_kiro-cli_install
-    - ubuntu_kiro-cli_init
-
-- name: "kiro-cli : Update"
-  ansible.builtin.command: /usr/local/bin/kiro-cli update
-  changed_when: false
-  tags:
-    - ubuntu
-    - update
-    - kiro-cli
-    - ubuntu_kiro-cli
-    - ubuntu_kiro-cli_update
-
-- name: "uv : Download installer"
-  ansible.builtin.get_url:
-    url: https://astral.sh/uv/install.sh
-    dest: /tmp/uv-install.sh
-    mode: '0755'
-  tags:
-    - ubuntu
-    - install
-
-- name: "uv : Install"
-  ansible.builtin.command: sh /tmp/uv-install.sh
-  args:
-    creates: /usr/local/bin/uv
-  environment:
-    UV_INSTALL_DIR: /usr/local/bin
-  tags:
-    - ubuntu
-    - install
-    - uv
-    - ubuntu_uv
-    - ubuntu_uv_install
-
-- name: "uv : Update"
-  ansible.builtin.command: /usr/local/bin/uv self update
-  changed_when: false
-  tags:
-    - ubuntu
-    - update
-    - uv
-    - ubuntu_uv
-    - ubuntu_uv_update
-
-- name: "uv : Install package by uv"
-  ansible.builtin.command: uv tool install {{ item }}
-  environment: "{{ supply_chain_cooldown_environment }}"
-  changed_when: false
-  loop:
-    # Web search through a Bedrock AgentCore Gateway, signed with local AWS
-    # credentials. Published only as a sample repository, so it installs from git
-    # rather than PyPI. Needs the gateway from the repo's CloudFormation template
-    # and AGENTCORE_GATEWAY_URL, which .zshenv exports.
-    - git+https://github.com/aws-samples/sample-agentcore-websearch-agent-skill
-    - pdfplumber
-    - tavily-cli
-  tags:
-    - ubuntu
-    - install
-    - package
     - ubuntu_package
-    - ubuntu_package_install
 
-- name: "uv : Upgrade all uv tools"
-  ansible.builtin.command: uv tool upgrade --all
-  environment: "{{ supply_chain_cooldown_environment }}"
-  changed_when: false
+- name: Import awscliv2 tasks
+  ansible.builtin.import_tasks: awscliv2.yml
   tags:
-    - ubuntu
-    - upgrade
-    - package
-    - ubuntu_package
-    - ubuntu_package_upgrade
-
-- name: "zinit : Install"
-  ansible.builtin.shell: bash -c "$(curl --fail --show-error --silent --location https://raw.githubusercontent.com/zdharma-continuum/zinit/HEAD/scripts/install.sh)"
-  args:
-    creates: /root/.local/share/zinit/zinit.git
-  environment:
-    NO_INPUT: "1"
-  tags:
-    - ubuntu
-    - install
-    - zinit
-    - ubuntu_zinit
-    - ubuntu_zinit_install
-
-- name: "zinit : Create symlink in /usr/local/share"
-  ansible.builtin.file:
-    src: /root/.local/share/zinit
-    dest: /usr/local/share/zinit
-    state: link
-  tags:
-    - ubuntu
-    - install
-    - zinit
-    - ubuntu_zinit
-    - ubuntu_zinit_install
-    - ubuntu_zinit_init
-
-- name: "zinit : Update"
-  ansible.builtin.command: zsh -ic "zinit self-update"
-  changed_when: false
-  tags:
-    - ubuntu
+    - ubuntu_awscliv2
     - update
-    - zinit
+
+- name: Import kiro_cli tasks
+  ansible.builtin.import_tasks: kiro_cli.yml
+  tags:
+    - ubuntu_kiro_cli
+    - update
+
+- name: Import uv tasks
+  ansible.builtin.import_tasks: uv.yml
+  tags:
+    - ubuntu_uv
+    - update
+
+- name: Import zinit tasks
+  ansible.builtin.import_tasks: zinit.yml
+  tags:
     - ubuntu_zinit
-    - ubuntu_zinit_update
+    - update
 
-- name: "etckeeper : Initialize /etc"
-  ansible.builtin.command: etckeeper init
-  args:
-    creates: /etc/.git
+- name: Import etckeeper tasks
+  ansible.builtin.import_tasks: etckeeper.yml
   tags:
-    - ubuntu
-    - init
-    - etckeeper
     - ubuntu_etckeeper
-    - ubuntu_etckeeper_init
 
-- name: "etckeeper : Create initial commit"
-  ansible.builtin.command: etckeeper commit "Initial commit"
-  args:
-    chdir: /etc
-    creates: /etc/.git/logs
+- name: Import hostname tasks
+  ansible.builtin.import_tasks: hostname.yml
   tags:
-    - ubuntu
-    - init
-    - etckeeper
-    - ubuntu_etckeeper
-    - ubuntu_etckeeper_init
+    - ubuntu_hostname
 
-- name: "ubuntu : Set hostname"
-  ansible.builtin.hostname:
-    name: "{{ inventory_hostname }}"
+- name: Import inputrc tasks
+  ansible.builtin.import_tasks: inputrc.yml
   tags:
-    - ubuntu
-    - config
-    - hostname
-    - ubuntu_ubuntu
-    - ubuntu_ubuntu_config
-
-- name: "cloud-init : Enable preserve_hostname"
-  ansible.builtin.lineinfile:
-    dest: /etc/cloud/cloud.cfg
-    regexp: '^preserve_hostname'
-    line: 'preserve_hostname: true'
-  tags:
-    - ubuntu
-    - config
-    - cloud-init
-    - ubuntu_cloud-init
-    - ubuntu_cloud-init_config
-
-- name: "inputrc : Set editing-mode to vi"
-  ansible.builtin.lineinfile:
-    dest: /etc/inputrc
-    regexp: 'set editing-mode '
-    line: 'set editing-mode vi'
-  tags:
-    - ubuntu
-    - config
-    - inputrc
     - ubuntu_inputrc
-    - ubuntu_inputrc_config
 
-- name: "user : Create admin group"
-  ansible.builtin.group:
-    name: "{{ admin }}"
-    gid: 2000
+- name: Import user tasks
+  ansible.builtin.import_tasks: user.yml
   tags:
-    - ubuntu
-    - config
-    - user
     - ubuntu_user
-    - ubuntu_user_config
-    - ubuntu_user_init
 
-- name: "user : Create admin user"
-  ansible.builtin.user:
-    name: "{{ admin }}"
-    uid: 2000
-    group: "{{ admin }}"
-    groups: "adm,sudo"
-    # Append so the docker role's docker group survives this task.
-    append: true
-    shell: /usr/bin/zsh
-    skeleton: /etc/skel
+- name: Import ssh tasks
+  ansible.builtin.import_tasks: ssh.yml
   tags:
-    - ubuntu
-    - config
-    - user
-    - ubuntu_user
-    - ubuntu_user_config
-    - ubuntu_user_init
-
-- name: "user : Configure passwordless sudo for admin"
-  ansible.builtin.lineinfile:
-    dest: /etc/sudoers.d/00-{{ admin }}
-    regexp: '^{{ admin }}'
-    line: '{{ admin }} ALL=(ALL) NOPASSWD: ALL'
-    create: true
-    mode: '0440'
-    validate: 'visudo -cf %s'
-  tags:
-    - ubuntu
-    - config
-    - user
-    - ubuntu_user
-    - ubuntu_user_config
-
-- name: "user : Create .ssh directory for admin"
-  ansible.builtin.file:
-    path: /home/{{ admin }}/.ssh
-    owner: "{{ admin }}"
-    group: "{{ admin }}"
-    state: directory
-    mode: '0700'
-  tags:
-    - ubuntu
-    - config
-    - user
-    - ubuntu_user
-    - ubuntu_user_config
-    - ubuntu_user_init
-
-- name: "ssh : Copy authentication.conf"
-  ansible.builtin.copy:
-    src: authentication.conf
-    dest: /etc/ssh/sshd_config.d
-    mode: '0644'
-  notify: "ssh: Restart"
-  tags:
-    - ubuntu
-    - config
-    - ssh
     - ubuntu_ssh
-    - ubuntu_ssh_config
 
-- name: "user : Copy authorized_keys for admin"
-  ansible.builtin.copy:
-    src: /home/ubuntu/.ssh/authorized_keys
-    dest: /home/{{ admin }}/.ssh/authorized_keys
-    remote_src: true
-    owner: "{{ admin }}"
-    group: "{{ admin }}"
-    mode: '0600'
+- name: Import failure_notify tasks
+  ansible.builtin.import_tasks: failure_notify.yml
   tags:
-    - ubuntu
-    - config
-    - user
-    - ubuntu_user
-    - ubuntu_user_config
+    - ubuntu_failure_notify
 
-- name: "failure-notify : Copy script"
-  ansible.builtin.template:
-    src: failure-notify.j2
-    dest: /usr/local/sbin/failure-notify
-    mode: '0755'
+- name: Import ghostty tasks
+  ansible.builtin.import_tasks: ghostty.yml
   tags:
-    - ubuntu
-    - config
-    - failure-notify
-    - ubuntu_failure-notify
-    - ubuntu_failure-notify_config
-
-- name: "failure-notify : Copy service"
-  ansible.builtin.copy:
-    src: failure-notify@.service
-    dest: /etc/systemd/system/failure-notify@.service
-    mode: '0644'
-  notify: "Reload systemd"
-  tags:
-    - ubuntu
-    - config
-    - failure-notify
-    - ubuntu_failure-notify
-    - ubuntu_failure-notify_config
-
-# Ref: https://ghostty.org/docs/help/terminfo
-- name: "ghostty : Copy terminfo"
-  ansible.builtin.copy:
-    src: xterm-ghostty
-    dest: /usr/share/terminfo/x/xterm-ghostty
-    mode: '0644'
-  tags:
-    - ubuntu
-    - install
-    - ghostty
     - ubuntu_ghostty
-    - ubuntu_ghostty_install
-    - ubuntu_ghostty_config
 
-- name: "ghostty : Create symlink"
-  ansible.builtin.file:
-    src: ../x/xterm-ghostty
-    dest: /usr/share/terminfo/g/ghostty
-    state: link
+- name: Import skills tasks
+  ansible.builtin.import_tasks: skills.yml
   tags:
-    - ubuntu
-    - install
-    - ghostty
-    - ubuntu_ghostty
-    - ubuntu_ghostty_install
-    - ubuntu_ghostty_init
-
-- name: "skills : Install"
-  ansible.builtin.command: npm install -g skills
-  environment: "{{ supply_chain_cooldown_environment }}"
-  changed_when: false
-  tags:
-    - ubuntu
-    - install
-    - skills
     - ubuntu_skills
-    - ubuntu_skills_install
 
-- name: "agent-browser : Install"
-  ansible.builtin.command: npm install -g agent-browser
-  environment: "{{ supply_chain_cooldown_environment }}"
-  changed_when: false
+- name: Import agent_browser tasks
+  ansible.builtin.import_tasks: agent_browser.yml
   tags:
-    - ubuntu
-    - install
-    - agent-browser
-    - ubuntu_agent-browser
-    - ubuntu_agent-browser_install
+    - ubuntu_agent_browser
 
-- name: "lightpanda : Set download architecture"
-  ansible.builtin.set_fact:
-    ubuntu_lightpanda_arch: "{{ ansible_facts['architecture'] | replace('x86_64', 'x86_64') | replace('aarch64', 'aarch64') }}"
+- name: Import lightpanda tasks
+  ansible.builtin.import_tasks: lightpanda.yml
   tags:
-    - ubuntu
-    - install
-    - lightpanda
-    - always
-
-- name: "lightpanda : Resolve aged release"
-  ansible.builtin.set_fact:
-    __ubuntu_lightpanda: >-
-      {{ lookup('aged_release', 'github-release:lightpanda-io/browser', asset='lightpanda-' ~ ubuntu_lightpanda_arch ~ '-linux') }}
-  tags:
-    - ubuntu
-    - install
-    - lightpanda
     - ubuntu_lightpanda
-    - ubuntu_lightpanda_install
+    - update
 
-- name: "lightpanda : Download binary"
-  ansible.builtin.get_url:
-    url: "{{ __ubuntu_lightpanda.url }}"
-    dest: /usr/local/bin/lightpanda
-    mode: "0755"
-    checksum: "{{ __ubuntu_lightpanda.checksum | default(omit, true) }}"
-    # The file name carries no version, so without a checksum only a fresh
-    # download reveals a new release.
-    force: "{{ __ubuntu_lightpanda.checksum == '' }}"
+- name: Import npm tasks
+  ansible.builtin.import_tasks: npm.yml
   tags:
-    - ubuntu
-    - install
-    - lightpanda
-    - ubuntu_lightpanda
-    - ubuntu_lightpanda_install
+    - ubuntu_npm
+    - update
 
-- name: "package : Update global npm packages"
-  ansible.builtin.command: npm update -g
-  environment: "{{ supply_chain_cooldown_environment }}"
-  changed_when: false
+- name: Import upgrade tasks
+  ansible.builtin.import_tasks: upgrade.yml
   tags:
-    - ubuntu
-    - upgrade
-    - package
-    - ubuntu_package
-    - ubuntu_package_upgrade
-
-- name: "agent-browser : Make the binary executable"
-  # The root npmrc sets ignore-scripts, which skips the postinstall that marks the
-  # platform binary executable. Run as root the CLI fixes this itself, but users
-  # such as zabbix cannot and fail with EPERM. It follows the npm update, which
-  # reinstalls the binary without the bit.
-  ansible.builtin.file:
-    path: /usr/lib/node_modules/agent-browser/bin/agent-browser-linux-{{ 'arm64' if ansible_facts['architecture'] == 'aarch64' else 'x64' }}
-    mode: "0755"
-  # A dry run on a new host installs nothing to mark.
-  when: not ansible_check_mode
-  tags:
-    - ubuntu
-    - upgrade
-    - package
-    - ubuntu_package
-    - ubuntu_package_upgrade
+    - ubuntu_upgrade
+    - update
