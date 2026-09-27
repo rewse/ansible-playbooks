@@ -1,0 +1,18 @@
+---
+- name: automation | Create directories
+  ansible.builtin.file:
+    path: /srv/homeassistant/config/{{ item }}
+    state: directory
+    mode: "0755"
+  loop:
+    - automations
+    - blueprints/automation
+
+- name: automation | Copy files
+  # configuration.yaml merges every file in the directory, so each automations-*
+  # file in the role is deployed without being listed.
+  ansible.builtin.copy:
+    src: "{{ item }}"
+    dest: /srv/homeassistant/config/automations
+    mode: "0644"
+  with_fileglob: automations-*.yaml

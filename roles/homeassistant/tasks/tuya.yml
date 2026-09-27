@@ -1,0 +1,34 @@
+---
+- name: tuya | Create components directory
+  ansible.builtin.file:
+    path: /srv/homeassistant/config/custom_components
+    state: directory
+    mode: "0755"
+
+- name: tuya | Resolve aged tag tuya-local
+  ansible.builtin.set_fact:
+    __homeassistant_tuya_local: "{{ lookup('aged_release', 'github-tag:make-all/tuya-local') }}"
+
+- name: tuya | Clone local integration
+  ansible.builtin.git:
+    repo: https://github.com/make-all/tuya-local.git
+    dest: /usr/local/src/tuya-local
+    version: "{{ __homeassistant_tuya_local.commit }}"
+  register: __homeassistant_tuya_local_git
+
+- name: tuya | Install local integration
+  ansible.builtin.copy:
+    src: /usr/local/src/tuya-local/custom_components/tuya_local
+    dest: /srv/homeassistant/config/custom_components
+    remote_src: true
+    mode: "0644"
+  notify: Restart Home Assistant
+  when: not ansible_check_mode or __homeassistant_tuya_local_git.before is not none
+
+- name: tuya | Report installation deferred in check mode
+  ansible.builtin.debug:
+    msg: >-
+      Tuya Local integration file installation is deferred in check mode because
+      the requested checkout is not created during a dry run.
+    verbosity: 0
+  when: ansible_check_mode and __homeassistant_tuya_local_git.before is none

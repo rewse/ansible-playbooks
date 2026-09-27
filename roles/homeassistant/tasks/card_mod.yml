@@ -1,0 +1,27 @@
+---
+- name: card_mod | Create www directory
+  ansible.builtin.file:
+    path: /srv/homeassistant/config/www
+    state: directory
+    mode: "0755"
+
+- name: card_mod | Resolve aged tag lovelace-card-mod
+  ansible.builtin.set_fact:
+    __homeassistant_card_mod: "{{ lookup('aged_release', 'github-tag:thomasloven/lovelace-card-mod') }}"
+
+- name: card_mod | Clone repository
+  ansible.builtin.git:
+    repo: https://github.com/thomasloven/lovelace-card-mod.git
+    dest: /usr/local/src/lovelace-card-mod
+    version: "{{ __homeassistant_card_mod.commit }}"
+  register: __homeassistant_card_mod_git
+
+- name: card_mod | Install
+  ansible.builtin.copy:
+    src: /usr/local/src/lovelace-card-mod/card-mod.js
+    dest: /srv/homeassistant/config/www
+    remote_src: true
+    mode: "0644"
+  notify: Restart Home Assistant
+  # A dry run does not create a first checkout.
+  when: not ansible_check_mode or __homeassistant_card_mod_git.before is not none

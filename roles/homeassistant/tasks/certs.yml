@@ -1,0 +1,13 @@
+---
+- name: certs | Create directory
+  ansible.builtin.file:
+    path: /srv/homeassistant/config/certs
+    state: directory
+    mode: "0755"
+
+- name: certs | Copy root certificate
+  ansible.builtin.copy:
+    src: /etc/ssl/certs/ISRG_Root_X1.pem
+    dest: /srv/homeassistant/config/certs
+    remote_src: true
+    mode: "0644"

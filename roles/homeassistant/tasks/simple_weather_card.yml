@@ -1,0 +1,21 @@
+---
+- name: simple_weather_card | Create www directory
+  ansible.builtin.file:
+    path: /srv/homeassistant/config/www
+    state: directory
+    mode: "0755"
+
+- name: simple_weather_card | Resolve aged release
+  ansible.builtin.set_fact:
+    __homeassistant_simple_weather_card: "{{ lookup('aged_release', 'github-release:kalkih/simple-weather-card', asset='simple-weather-card-bundle.js') }}"
+
+- name: simple_weather_card | Install
+  ansible.builtin.get_url:
+    url: "{{ __homeassistant_simple_weather_card.url }}"
+    dest: /srv/homeassistant/config/www/simple-weather-card-bundle.js
+    mode: "0644"
+    checksum: "{{ __homeassistant_simple_weather_card.checksum | default(omit, true) }}"
+    # The file name carries no version, so without a checksum only a fresh
+    # download reveals a new release.
+    force: "{{ __homeassistant_simple_weather_card.checksum == '' }}"
+  notify: Restart Home Assistant

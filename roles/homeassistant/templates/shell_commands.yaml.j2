@@ -1,3 +1,4 @@
+[% ansible_managed | comment %]
 control_toggle_regza: >-
     curl -k --digest --user '[% homeassistant_regza.username %]:[% homeassistant_regza.password %]' \
     https://regza.rewse.jp:4430/remote/remote.htm?key=40BF12

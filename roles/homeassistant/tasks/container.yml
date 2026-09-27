@@ -1,0 +1,32 @@
+---
+- name: container | Resolve aged image
+  ansible.builtin.set_fact:
+    __homeassistant_image: >-
+      {{ lookup('aged_release', 'oci:ghcr.io/home-assistant/home-assistant', pattern='^\d{4}\.\d+\.\d+$',
+                platform='linux/' ~ ('arm64' if ansible_facts['architecture'] == 'aarch64' else 'amd64')) }}
+
+- name: container | Create compose directory
+  ansible.builtin.file:
+    path: /etc/compose/homeassistant
+    state: directory
+    mode: "0755"
+
+- name: container | Deploy compose file
+  ansible.builtin.template:
+    src: compose.yaml.j2
+    dest: /etc/compose/homeassistant/compose.yaml
+    mode: "0644"
+  register: __homeassistant_compose
+
+- name: container | Report skipped start in check mode
+  ansible.builtin.debug:
+    msg: Start skipped because the compose file is not written in check mode
+    verbosity: 0
+  when: ansible_check_mode and __homeassistant_compose is changed
+
+- name: container | Start containers
+  community.docker.docker_compose_v2:
+    project_src: /etc/compose/homeassistant
+    state: present
+    pull: missing
+  when: not (ansible_check_mode and __homeassistant_compose is changed)

@@ -1,0 +1,34 @@
+---
+- name: frigate | Create components directory
+  ansible.builtin.file:
+    path: /srv/homeassistant/config/custom_components
+    state: directory
+    mode: "0755"
+
+- name: frigate | Resolve aged tag frigate-hass-integration
+  ansible.builtin.set_fact:
+    __homeassistant_frigate: "{{ lookup('aged_release', 'github-tag:blakeblackshear/frigate-hass-integration') }}"
+
+- name: frigate | Clone integration
+  ansible.builtin.git:
+    repo: https://github.com/blakeblackshear/frigate-hass-integration.git
+    dest: /usr/local/src/frigate-hass-integration
+    version: "{{ __homeassistant_frigate.commit }}"
+  register: __homeassistant_frigate_git
+
+- name: frigate | Install integration
+  ansible.builtin.copy:
+    src: /usr/local/src/frigate-hass-integration/custom_components/frigate
+    dest: /srv/homeassistant/config/custom_components
+    remote_src: true
+    mode: "0644"
+  notify: Restart Home Assistant
+  when: not ansible_check_mode or __homeassistant_frigate_git.before is not none
+
+- name: frigate | Report installation deferred in check mode
+  ansible.builtin.debug:
+    msg: >-
+      Frigate integration file installation is deferred in check mode because
+      the requested checkout is not created during a dry run.
+    verbosity: 0
+  when: ansible_check_mode and __homeassistant_frigate_git.before is none

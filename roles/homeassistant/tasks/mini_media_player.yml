@@ -1,0 +1,21 @@
+---
+- name: mini_media_player | Create www directory
+  ansible.builtin.file:
+    path: /srv/homeassistant/config/www
+    state: directory
+    mode: "0755"
+
+- name: mini_media_player | Resolve aged release
+  ansible.builtin.set_fact:
+    __homeassistant_mini_media_player: "{{ lookup('aged_release', 'github-release:kalkih/mini-media-player', asset='mini-media-player-bundle.js') }}"
+
+- name: mini_media_player | Install
+  ansible.builtin.get_url:
+    url: "{{ __homeassistant_mini_media_player.url }}"
+    dest: /srv/homeassistant/config/www/mini-media-player-bundle.js
+    mode: "0644"
+    checksum: "{{ __homeassistant_mini_media_player.checksum | default(omit, true) }}"
+    # The file name carries no version, so without a checksum only a fresh
+    # download reveals a new release.
+    force: "{{ __homeassistant_mini_media_player.checksum == '' }}"
+  notify: Restart Home Assistant

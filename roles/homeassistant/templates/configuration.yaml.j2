@@ -1,0 +1,65 @@
+{{ ansible_managed | comment }}
+# Loads default set of integrations. Do not remove.
+default_config:
+
+frontend:
+  themes: !include_dir_merge_named themes
+  extra_module_url:
+    - /local/card-mod.js
+
+homeassistant:
+  name: "Home"
+  latitude: !secret latlng_home_lat
+  longitude: !secret latlng_home_lng
+  elevation: 40
+  unit_system: metric
+  temperature_unit: C
+  time_zone: "Asia/Tokyo"
+  country: "JP"
+  currency: "JPY"
+  external_url: "https://hass.rewse.jp/"
+  internal_url: "https://hass.rewse.jp/"
+  customize: !include customize.yaml
+
+logger:
+  default: warning
+  logs:
+    androidtv.adb_manager.adb_manager_async: error
+    homeassistant.components.androidtv.media_player: error
+    homeassistant.components.imap_email_content.sensor: warning
+
+lovelace:
+  mode: storage
+
+recorder:
+  db_url: !secret postgres_connstr
+  purge_keep_days: 450
+
+zha:
+  zigpy_config:
+    ota:
+      ikea_provider: true
+
+# Each included file is copied by the configuration component, from
+# homeassistant_config_files or homeassistant_reloadable_config_files.
+alarm_control_panel: !include alarm_control_panels.yaml
+alexa: !include alexa.yaml
+automation: !include_dir_merge_list automations/
+command_line: !include command_lines.yaml
+homekit: !include homekit.yaml
+input_boolean: !include input_booleans.yaml
+input_datetime: !include input_datetimes.yaml
+input_number: !include input_numbers.yaml
+input_select: !include input_selects.yaml
+light: !include lights.yaml
+media_player: !include media_players.yaml
+mqtt: !include mqtt.yaml
+notify: !include notify.yaml
+rest: !include rests.yaml
+scene: !include scenes.yaml
+script: !include scripts.yaml
+sensor: !include sensors.yaml
+shell_command: !include shell_commands.yaml
+template: !include templates.yaml
+utility_meter: !include utility_meters.yaml
+zone: !include zones.yaml

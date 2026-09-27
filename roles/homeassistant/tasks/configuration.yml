@@ -1,0 +1,46 @@
+---
+- name: configuration | Deploy configuration.yaml
+  # The role owns the whole file: its includes name the files copied below, and
+  # frontend loads card-mod.js from the card_mod component.
+  ansible.builtin.template:
+    src: configuration.yaml.j2
+    dest: /srv/homeassistant/config/configuration.yaml
+    mode: "0644"
+  notify: Restart Home Assistant
+
+- name: configuration | Deploy secrets
+  ansible.builtin.template:
+    src: secrets.yaml.j2
+    dest: /srv/homeassistant/config/secrets.yaml
+    # The file holds Home Assistant templates, which share Jinja's delimiters.
+    variable_start_string: "[%"
+    variable_end_string: "%]"
+    mode: "0644"
+  notify: Restart Home Assistant
+
+- name: configuration | Deploy shell commands
+  ansible.builtin.template:
+    src: shell_commands.yaml.j2
+    dest: /srv/homeassistant/config/shell_commands.yaml
+    # The file holds Home Assistant templates, which share Jinja's delimiters.
+    variable_start_string: "[%"
+    variable_end_string: "%]"
+    mode: "0644"
+  notify: Restart Home Assistant
+
+- name: configuration | Copy included files
+  ansible.builtin.copy:
+    src: "{{ item }}"
+    dest: /srv/homeassistant/config
+    mode: "0644"
+  loop: "{{ homeassistant_config_files }}"
+  notify: Restart Home Assistant
+
+- name: configuration | Copy reloadable included files
+  # Home Assistant reloads these from the UI or an action; a change needs no
+  # restart.
+  ansible.builtin.copy:
+    src: "{{ item }}"
+    dest: /srv/homeassistant/config
+    mode: "0644"
+  loop: "{{ homeassistant_reloadable_config_files }}"

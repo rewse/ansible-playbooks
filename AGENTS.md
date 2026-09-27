@@ -147,6 +147,7 @@ Use only these tags, written as an indented YAML list:
 - Read the `mcporter` skill and use `mcporter call home-assistant.<tool>` for live entity discovery, control, configuration, logs, and troubleshooting. Query actual entity IDs and state instead of guessing them.
 - Follow the Home Assistant YAML Style Guide and use the canonical schema: `triggers`, `conditions`, and `actions`; `trigger` inside trigger entries; `action` for service calls; and `target` for entity, device, or area selection.
 - Sort new peer entities alphabetically when their order has no behavior or priority.
+- To add a configuration domain, add its `!include` line to `roles/homeassistant/templates/configuration.yaml.j2`, add the file to `homeassistant_config_files` (or `homeassistant_reloadable_config_files` when Home Assistant reloads it without a restart) in `roles/homeassistant/vars/main.yml`, and put the file in `roles/homeassistant/files/`. Automation files named `automations-*.yaml` are deployed without being listed.
 - Give every `time_pattern` trigger a chosen `seconds` value from 0 through 59 so periodic automations do not start together.
 
 ### UniFi

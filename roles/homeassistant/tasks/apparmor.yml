@@ -1,0 +1,14 @@
+---
+# Ref: https://github.com/home-assistant/core/issues/117768
+- name: apparmor | Download docker-default
+  ansible.builtin.get_url:
+    url: https://github.com/home-assistant/core/files/9417617/docker-default.txt
+    dest: /etc/apparmor.d/docker-default
+    mode: "0644"
+
+- name: apparmor | Copy disable service
+  ansible.builtin.copy:
+    src: aa-disable-homeassistant.service
+    dest: /etc/systemd/system
+    mode: "0644"
+  notify: Restart aa-disable-homeassistant

@@ -1,0 +1,52 @@
+---
+- name: echonet_lite | Create components directory
+  ansible.builtin.file:
+    path: /srv/homeassistant/config/custom_components
+    state: directory
+    mode: "0755"
+
+- name: echonet_lite | Resolve aged tag hems_echonet_lite
+  ansible.builtin.set_fact:
+    __homeassistant_hems_echonet_lite: "{{ lookup('aged_release', 'github-tag:sayurin/hems_echonet_lite') }}"
+
+- name: echonet_lite | Clone HEMS integration
+  ansible.builtin.git:
+    repo: https://github.com/sayurin/hems_echonet_lite.git
+    dest: /usr/local/src/hems-echonet-lite
+    version: "{{ __homeassistant_hems_echonet_lite.commit }}"
+    force: true
+  register: __homeassistant_echonet_lite_git
+
+- name: echonet_lite | Clean HEMS integration checkout
+  # The git module has no clean.
+  ansible.builtin.command:
+    argv:
+      - git
+      - -C
+      - /usr/local/src/hems-echonet-lite
+      - clean
+      - -ffdx
+  register: __homeassistant_echonet_lite_clean
+  changed_when: >-
+    __homeassistant_echonet_lite_clean.stdout | default('') | length > 0
+
+- name: echonet_lite | Synchronize HEMS integration  # noqa: command-instead-of-module
+  # synchronize runs rsync from the controller; both ends are on the managed
+  # host, and copy cannot delete files the release dropped.
+  ansible.builtin.command:
+    cmd: >-
+      rsync --archive --delete --itemize-changes --omit-dir-times
+      --exclude=__pycache__/
+      /usr/local/src/hems-echonet-lite/custom_components/echonet_lite/
+      /srv/homeassistant/config/custom_components/echonet_lite/
+  register: __homeassistant_echonet_lite_sync
+  changed_when: __homeassistant_echonet_lite_sync.stdout | length > 0
+  notify: Restart Home Assistant
+  when: not ansible_check_mode
+
+- name: echonet_lite | Report synchronization deferred in check mode
+  ansible.builtin.debug:
+    msg: >-
+      HEMS integration file synchronization is deferred in check mode because
+      the pinned checkout is not modified during a dry run.
+  when: ansible_check_mode

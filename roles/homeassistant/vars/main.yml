@@ -25,3 +25,30 @@ homeassistant_regza:
 homeassistant_tesla_fleet:
   private_key: "{{ lookup('pipe', 'op read \"op://ansible/a43jcxbfn53ohsi5hbvw7qozie/private key base64\" | openssl base64 -d -A') }}"
   public_key: "{{ lookup('pipe', 'op read \"op://ansible/a43jcxbfn53ohsi5hbvw7qozie/private key base64\" | openssl base64 -d -A | openssl ec -pubout') }}"
+
+# Files included from configuration.yaml.j2, copied from files/. A change to one
+# of these restarts Home Assistant.
+homeassistant_config_files:
+  - alarm_control_panels.yaml
+  - alexa.yaml
+  - command_lines.yaml
+  - customize.yaml
+  - homekit.yaml
+  - lights.yaml
+  - media_players.yaml
+  - mqtt.yaml
+  - notify.yaml
+  - rests.yaml
+  - sensors.yaml
+  - templates.yaml
+  - utility_meters.yaml
+  - zones.yaml
+
+# Included files Home Assistant reloads without a restart.
+homeassistant_reloadable_config_files:
+  - input_booleans.yaml
+  - input_datetimes.yaml
+  - input_numbers.yaml
+  - input_selects.yaml
+  - scenes.yaml
+  - scripts.yaml

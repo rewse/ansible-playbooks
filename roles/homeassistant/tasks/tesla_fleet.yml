@@ -1,0 +1,22 @@
+---
+- name: tesla_fleet | Copy private key
+  ansible.builtin.copy:
+    content: "{{ homeassistant_tesla_fleet.private_key }}\n"
+    dest: /srv/homeassistant/config/tesla_fleet.key
+    mode: "0600"
+  no_log: true
+  notify: Restart Home Assistant
+
+- name: tesla_fleet | Create public key directory
+  ansible.builtin.file:
+    path: /srv/www/tesla
+    state: directory
+    mode: "0755"
+
+# Tesla pairs a vehicle against the key published under the domain, so this file
+# must stay derived from the private key Home Assistant signs commands with.
+- name: tesla_fleet | Copy public key
+  ansible.builtin.copy:
+    content: "{{ homeassistant_tesla_fleet.public_key }}\n"
+    dest: /srv/www/tesla/com.tesla.3p.public-key.pem
+    mode: "0644"

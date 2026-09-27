@@ -1,0 +1,57 @@
+---
+- name: frosted_glass | Create components directory
+  ansible.builtin.file:
+    path: /srv/homeassistant/config/custom_components
+    state: directory
+    mode: "0755"
+
+- name: frosted_glass | Resolve aged tag frosted-glass-manager
+  ansible.builtin.set_fact:
+    __homeassistant_frosted_glass_manager: "{{ lookup('aged_release', 'github-tag:wessamlauf/frosted-glass-manager') }}"
+
+- name: frosted_glass | Clone manager
+  ansible.builtin.git:
+    repo: https://github.com/wessamlauf/frosted-glass-manager.git
+    dest: /usr/local/src/frosted-glass-manager
+    version: "{{ __homeassistant_frosted_glass_manager.commit }}"
+  register: __homeassistant_frosted_glass_manager_git
+
+- name: frosted_glass | Install manager
+  ansible.builtin.copy:
+    src: /usr/local/src/frosted-glass-manager/custom_components/frosted_glass_manager
+    dest: /srv/homeassistant/config/custom_components
+    remote_src: true
+    mode: "0644"
+  notify: Restart Home Assistant
+  # A dry run does not create a first checkout.
+  when: not ansible_check_mode or __homeassistant_frosted_glass_manager_git.before is not none
+
+- name: frosted_glass | Create themes directory
+  ansible.builtin.file:
+    path: /srv/homeassistant/config/themes
+    state: directory
+    mode: "0755"
+
+- name: frosted_glass | Resolve aged tag homeassistant-frosted-glass-themes
+  ansible.builtin.set_fact:
+    __homeassistant_frosted_glass_themes: "{{ lookup('aged_release', 'github-tag:wessamlauf/homeassistant-frosted-glass-themes') }}"
+
+- name: frosted_glass | Clone themes
+  ansible.builtin.git:
+    repo: https://github.com/wessamlauf/homeassistant-frosted-glass-themes.git
+    dest: /usr/local/src/homeassistant-frosted-glass-themes
+    version: "{{ __homeassistant_frosted_glass_themes.commit }}"
+  register: __homeassistant_frosted_glass_themes_git
+
+- name: frosted_glass | Install themes
+  ansible.builtin.copy:
+    src: /usr/local/src/homeassistant-frosted-glass-themes/themes/{{ item }}
+    dest: /srv/homeassistant/config/themes
+    remote_src: true
+    mode: "0644"
+  loop:
+    - Frosted Glass.yaml
+    - Frosted Glass Dark.yaml
+    - Frosted Glass Light.yaml
+  # A dry run does not create a first checkout.
+  when: not ansible_check_mode or __homeassistant_frosted_glass_themes_git.before is not none
