@@ -29,3 +29,8 @@
   ansible.builtin.import_tasks: zabbix.yml
   tags:
     - homeassistant_ha_secondary_zabbix
+
+- name: Import fail2ban tasks
+  ansible.builtin.import_tasks: fail2ban.yml
+  tags:
+    - homeassistant_ha_secondary_fail2ban

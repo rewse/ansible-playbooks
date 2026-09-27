@@ -1,0 +1,23 @@
+---
+# The primary's filter and jail, so the standby bans the same logins once it
+# serves Home Assistant. The jail stays off until the synced log exists here.
+- name: fail2ban | Check Home Assistant log
+  ansible.builtin.stat:
+    path: /srv/homeassistant/config/home-assistant.log
+  register: __homeassistant_ha_secondary_log
+
+- name: fail2ban | Copy filter
+  ansible.builtin.copy:
+    src: "{{ playbook_dir }}/roles/homeassistant/files/fail2ban-filter.conf"
+    dest: /etc/fail2ban/filter.d/homeassistant.conf
+    mode: "0644"
+  notify: Restart fail2ban
+
+- name: fail2ban | Deploy jail config
+  ansible.builtin.template:
+    src: "{{ playbook_dir }}/roles/homeassistant/templates/fail2ban-jail.conf.j2"
+    dest: /etc/fail2ban/jail.d/homeassistant.conf
+    mode: "0644"
+  vars:
+    homeassistant_fail2ban_enabled: "{{ __homeassistant_ha_secondary_log.stat.exists }}"
+  notify: Restart fail2ban
