@@ -24,11 +24,31 @@
   failed_when: __darwin_npm_outdated.rc > 1
   check_mode: false
 
+- name: npm | Fail on an npm error
+  # outdated also exits 1 on an error, printing an error object instead.
+  ansible.builtin.fail:
+    msg: "npm outdated failed: {{ __darwin_npm_outdated.stdout }}"
+  when: "'error' in (__darwin_npm_outdated.stdout | default('{}', true) | from_json)"
+
+- name: npm | Select packages with a newer release
+  ansible.builtin.set_fact:
+    # outdated reports latest as "git" or "linked" for non-registry installs, and
+    # within the cooldown latest can be older than what is installed, such as the
+    # npm bundled with a newer Node.js. Neither is an update.
+    __darwin_npm_updates: >-
+      {%- set out = [] -%}
+      {%- for name, info in (__darwin_npm_outdated.stdout | default('{}', true) | from_json).items() -%}
+      {%- if info.latest is defined and info.current is defined
+            and info.latest is match('^\\d') and info.current is match('^\\d')
+            and info.latest is version(info.current, '>') -%}
+      {%- set _ = out.append(name ~ '@' ~ info.latest) -%}
+      {%- endif -%}
+      {%- endfor -%}
+      {{ out }}
+
 - name: npm | Update outdated global packages
   # npm has no module that honours the cooldown environment.
-  ansible.builtin.command: >-
-    npm install -g
-    {% for name, info in (__darwin_npm_outdated.stdout | default('{}', true) | from_json).items() %}{{ name }}@{{ info.latest }} {% endfor %}
+  ansible.builtin.command: npm install -g {{ __darwin_npm_updates | join(' ') }}
   environment: "{{ supply_chain_cooldown_environment }}"
   changed_when: true
-  when: (__darwin_npm_outdated.stdout | default('{}', true) | from_json) | length > 0
+  when: __darwin_npm_updates | length > 0
