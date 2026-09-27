@@ -19,18 +19,17 @@
     accept_hostkey: true
     key_file: /home/{{ admin }}/.ssh/id_rsa
     version: main
+  notify: Hand the stock-price-fetcher checkout to zabbix
 
-- name: app | Set ownership
-  ansible.builtin.file:
-    path: /opt/stock-price-fetcher
-    owner: zabbix
-    group: zabbix
-    recurse: true
+- name: app | Hand over a new checkout before syncing as zabbix
+  ansible.builtin.meta: flush_handlers
 
 - name: app | Sync dependencies
   # uv has no Ansible module. The committed lockfile of this account's own
   # repository pins every version, so the cooldown environment does not apply.
-  ansible.builtin.command: uv sync
+  # --frozen installs from the lockfile as committed; without it uv may rewrite
+  # uv.lock, and the next checkout refuses the local modification.
+  ansible.builtin.command: uv sync --frozen
   args:
     chdir: /opt/stock-price-fetcher
   become: true

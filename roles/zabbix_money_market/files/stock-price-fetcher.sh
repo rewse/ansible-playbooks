@@ -16,7 +16,7 @@ exec 9>"$LOCK_FILE"
 flock 9
 
 if [ -n "$provider" ]; then
-    uv run stock-price-fetcher "$code" --source "$provider"
+    uv run --frozen stock-price-fetcher "$code" --source "$provider"
 else
-    uv run stock-price-fetcher "$code"
+    uv run --frozen stock-price-fetcher "$code"
 fi
