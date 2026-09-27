@@ -1,0 +1,25 @@
+---
+- name: storage | Format secondary disk as ext4
+  community.general.filesystem:
+    fstype: ext4
+    dev: /dev/{{ ec2_secondary_disk }}
+
+- name: storage | Read secondary disk label
+  # No module reads or sets an ext4 label.
+  ansible.builtin.command: e2label /dev/{{ ec2_secondary_disk }}
+  register: __ec2_label
+  changed_when: false
+  check_mode: false
+
+- name: storage | Label secondary disk as srv
+  ansible.builtin.command: e2label /dev/{{ ec2_secondary_disk }} srv
+  changed_when: true
+  when: __ec2_label.stdout != "srv"
+
+- name: storage | Mount /srv
+  ansible.posix.mount:
+    src: LABEL=srv
+    path: /srv
+    fstype: ext4
+    opts: defaults,discard
+    state: mounted
