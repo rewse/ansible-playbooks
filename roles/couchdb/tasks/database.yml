@@ -3,10 +3,18 @@
   ansible.builtin.set_fact:
     __couchdb_livesync: "{{ lookup('aged_release', 'github-commit:vrtmrz/obsidian-livesync') }}"
 
-- name: database | Download init script
-  ansible.builtin.get_url:
+# Fetched with uri and written with copy rather than get_url, which in check mode
+# reports a forced download as changed without comparing content.
+- name: database | Fetch init script
+  ansible.builtin.uri:
     url: https://raw.githubusercontent.com/vrtmrz/obsidian-livesync/{{ __couchdb_livesync.commit }}/utils/couchdb/couchdb-init.sh
+    return_content: true
+  register: __couchdb_init_script
+  check_mode: false
+
+- name: database | Install init script
+  ansible.builtin.copy:
+    content: "{{ __couchdb_init_script.content }}"
     dest: /usr/local/src/couchdb-init.sh
     mode: "0755"
-    force: true
   notify: Run couchdb init script
