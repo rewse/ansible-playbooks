@@ -1,15 +1,21 @@
 ---
-- name: "apache: Reload"
+- name: Reload Apache
   ansible.builtin.systemd:
     name: apache2
     state: reloaded
 
-- name: "apache: Restart"
-  ansible.builtin.systemd:
-    name: apache2
-    state: restarted
-
-- name: "couchdb: Restart"
+- name: Restart couchdb
   community.docker.docker_compose_v2:
     project_src: /etc/compose/couchdb
     state: restarted
+  # The project directory may not exist yet in check mode.
+  when: not ansible_check_mode
+
+- name: Run couchdb init script
+  # The script only applies CouchDB settings over HTTP; there is no module for them.
+  ansible.builtin.command: /usr/local/src/couchdb-init.sh
+  changed_when: true
+  environment:
+    hostname: http://localhost:5984
+    username: tats
+    password: "{{ couchdb_password }}"

@@ -1,152 +1,22 @@
 ---
-- name: "couchdb : Create data directories"
-  ansible.builtin.file:
-    path: "{{ item }}"
-    state: directory
-    mode: '0755'
-  loop:
-    - /srv/couchdb/data
-    - /srv/couchdb/etc/local.d
+- name: Import container tasks
+  ansible.builtin.import_tasks: container.yml
   tags:
-    - couchdb
-    - init
-    - couchdb_couchdb
-    - couchdb_couchdb_init
-
-- name: "docker : Resolve aged image"
-  ansible.builtin.set_fact:
-    __couchdb_image: >-
-      {{ lookup('aged_release', 'oci:apache/couchdb', pattern='^\d+\.\d+\.\d+$',
-                platform='linux/' ~ ('arm64' if ansible_facts['architecture'] == 'aarch64' else 'amd64')) }}
-  tags:
-    - couchdb
+    - couchdb_container
     - update
-    - docker
-    - couchdb_docker
 
-- name: "docker : Create compose directory"
-  ansible.builtin.file:
-    path: /etc/compose/couchdb
-    state: directory
-    mode: "0755"
+- name: Import deno tasks
+  ansible.builtin.import_tasks: deno.yml
   tags:
-    - couchdb
-    - update
-    - docker
-    - couchdb_docker
-
-- name: "docker : Deploy compose file"
-  ansible.builtin.template:
-    src: compose.yaml.j2
-    dest: /etc/compose/couchdb/compose.yaml
-    mode: "0640"
-  # Carries credentials in the environment, so no diff.
-  diff: false
-  register: __couchdb_compose
-  tags:
-    - couchdb
-    - update
-    - docker
-    - couchdb_docker
-
-- name: "docker : Report skipped start in check mode"
-  ansible.builtin.debug:
-    msg: Start skipped because the compose file is not written in check mode
-    verbosity: 0
-  when: ansible_check_mode and __couchdb_compose is changed
-  tags:
-    - couchdb
-    - update
-    - docker
-    - couchdb_docker
-
-- name: "docker : Start containers"
-  community.docker.docker_compose_v2:
-    project_src: /etc/compose/couchdb
-    state: present
-    pull: missing
-  when: not (ansible_check_mode and __couchdb_compose is changed)
-  tags:
-    - couchdb
-    - update
-    - docker
-    - couchdb_docker
-# Note: The upstream couchdb-init.sh delegates provisioning to a Deno script, so Deno
-# must be present before it runs. Deno has no apt package, hence the official installer.
-# DENO_INSTALL puts the binary in /usr/local/bin, which is on the PATH the init script
-# runs with; the default would be /root/.deno/bin because this play uses become. The
-# installer skips its interactive shell setup on its own, since Ansible gives it no TTY.
-# The rules below are waived to keep the installer invocation byte-for-byte identical to
-# the one Deno documents. A failed download makes sh exit 0 without pipefail, but the
-# next task then fails because couchdb-init.sh refuses to run without Deno.
-- name: "deno : Run installer"  # noqa: command-instead-of-module risky-shell-pipe
-  ansible.builtin.shell:
-    cmd: curl -fsSL https://deno.land/install.sh | sh
-    creates: /usr/local/bin/deno
-  environment:
-    DENO_INSTALL: /usr/local
-  tags:
-    - couchdb
-    - init
-    - deno
     - couchdb_deno
-    - couchdb_deno_install
-
-- name: "deno : Update"
-  ansible.builtin.command: /usr/local/bin/deno upgrade
-  changed_when: false
-  tags:
-    - couchdb
     - update
-    - deno
-    - couchdb_deno
-    - couchdb_deno_update
 
-- name: "couchdb : Download init script"
-  ansible.builtin.get_url:
-    url: https://raw.githubusercontent.com/vrtmrz/obsidian-livesync/main/utils/couchdb/couchdb-init.sh
-    dest: /tmp
-    mode: '0755'
+- name: Import database tasks
+  ansible.builtin.import_tasks: database.yml
   tags:
-    - couchdb
-    - init
-    - couchdb_couchdb
-    - couchdb_couchdb_download
+    - couchdb_database
 
-- name: "couchdb : Run init script"
-  ansible.builtin.command: /tmp/couchdb-init.sh
-  changed_when: false
-  environment:
-    hostname: http://localhost:5984
-    username: tats
-    password: "{{ couchdb_password }}"
+- name: Import apache tasks
+  ansible.builtin.import_tasks: apache.yml
   tags:
-    - couchdb
-    - init
-    - couchdb_couchdb
-    - couchdb_couchdb_config
-
-- name: "couchdb : Copy Apache vhost config"
-  ansible.builtin.copy:
-    src: couchdb.rewse.jp.conf
-    dest: /etc/apache2/sites-available
-    mode: '0644'
-  notify: "apache: Reload"
-  tags:
-    - couchdb
-    - config
-    - apache
-    - couchdb_couchdb
-    - couchdb_couchdb_config
-
-- name: "couchdb : Enable Apache site"
-  ansible.builtin.command: a2ensite couchdb.rewse.jp
-  register: couchdb_a2ensite
-  changed_when: "'already enabled' not in couchdb_a2ensite.stdout"
-  notify: "apache: Reload"
-  tags:
-    - couchdb
-    - config
-    - apache
-    - couchdb_couchdb
-    - couchdb_couchdb_config
+    - couchdb_apache

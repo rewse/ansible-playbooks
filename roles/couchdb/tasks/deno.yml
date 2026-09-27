@@ -1,0 +1,20 @@
+---
+# The upstream couchdb-init.sh delegates provisioning to a Deno script, so Deno
+# must be present before it runs. Deno has no apt package, hence the official installer.
+# DENO_INSTALL puts the binary in /usr/local/bin, which is on the PATH the init script
+# runs with; the default would be /root/.deno/bin because this play uses become. The
+# installer skips its interactive shell setup on its own, since Ansible gives it no TTY.
+# The rules below are waived to keep the installer invocation byte-for-byte identical to
+# the one Deno documents. A failed download makes sh exit 0 without pipefail, but the
+# init script then fails because it refuses to run without Deno.
+- name: deno | Run installer  # noqa: command-instead-of-module risky-shell-pipe
+  ansible.builtin.shell:
+    cmd: curl -fsSL https://deno.land/install.sh | sh
+    creates: /usr/local/bin/deno
+  environment:
+    DENO_INSTALL: /usr/local
+
+- name: deno | Update
+  # Deno updates itself; no module manages it.
+  ansible.builtin.command: /usr/local/bin/deno upgrade
+  changed_when: false

@@ -1,0 +1,12 @@
+---
+- name: database | Resolve aged commit of the init script
+  ansible.builtin.set_fact:
+    __couchdb_livesync: "{{ lookup('aged_release', 'github-commit:vrtmrz/obsidian-livesync') }}"
+
+- name: database | Download init script
+  ansible.builtin.get_url:
+    url: https://raw.githubusercontent.com/vrtmrz/obsidian-livesync/{{ __couchdb_livesync.commit }}/utils/couchdb/couchdb-init.sh
+    dest: /usr/local/src/couchdb-init.sh
+    mode: "0755"
+    force: true
+  notify: Run couchdb init script
