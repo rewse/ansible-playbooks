@@ -1,4 +1,10 @@
 ---
+- name: configuration | Create configuration directory
+  ansible.builtin.file:
+    path: /srv/homeassistant/config
+    state: directory
+    mode: "0755"
+
 - name: configuration | Deploy configuration.yaml
   # The role owns the whole file: its includes name the files copied below, and
   # frontend loads card-mod.js from the card_mod component.
