@@ -22,4 +22,3 @@
   loop:
     - /etc/apt/keyrings/corretto.gpg
     - /etc/apt/keyrings/corretto.key
-    - /etc/apt/sources.list.d/corretto.list
