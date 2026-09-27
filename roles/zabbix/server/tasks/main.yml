@@ -238,11 +238,34 @@
     - zabbix-server_zabbix-frontend
     - zabbix-server_zabbix-frontend_config
 
+- name: "zabbix-server : Resolve aged commit ssl-cert-check"
+  ansible.builtin.set_fact:
+    __zabbix_server_ssl_cert_check: "{{ lookup('aged_release', 'github-commit:Matty9191/ssl-cert-check') }}"
+  tags:
+    - zabbix-server
+    - install
+    - zabbix-extra
+    - zabbix-server_zabbix-server
+    - zabbix-server_zabbix-server_install
+
 - name: "zabbix-server : Clone ssl-cert-check repository"
   ansible.builtin.git:
     repo: https://github.com/Matty9191/ssl-cert-check.git
-    dest: /srv/git/ssl-cert-check
-    version: master
+    dest: /usr/local/src/ssl-cert-check
+    version: "{{ __zabbix_server_ssl_cert_check.commit }}"
+  register: __zabbix_server_ssl_cert_check_git
+  tags:
+    - zabbix-server
+    - install
+    - zabbix-extra
+    - zabbix-server_zabbix-server
+    - zabbix-server_zabbix-server_install
+
+
+- name: "zabbix-server : Remove legacy checkout"
+  ansible.builtin.file:
+    path: /srv/git/ssl-cert-check
+    state: absent
   tags:
     - zabbix-server
     - install
@@ -252,10 +275,12 @@
 
 - name: "zabbix-server : Copy ssl-cert-check script"
   ansible.builtin.copy:
-    src: /srv/git/ssl-cert-check/ssl-cert-check
+    src: /usr/local/src/ssl-cert-check/ssl-cert-check
     dest: /usr/local/bin
     mode: '0755'
     remote_src: true
+  # A dry run does not create a first checkout.
+  when: not ansible_check_mode or __zabbix_server_ssl_cert_check_git.before is not none
   tags:
     - zabbix-server
     - config
