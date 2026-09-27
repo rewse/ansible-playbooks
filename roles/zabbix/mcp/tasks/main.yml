@@ -29,11 +29,20 @@
     - zabbix-mcp_mcp
     - zabbix-mcp_mcp_init
 
+- name: "mcp : Resolve aged tag"
+  ansible.builtin.set_fact:
+    __zabbix_mcp_source: "{{ lookup('aged_release', 'github-tag:initMAX/zabbix-mcp-server') }}"
+  tags:
+    - zabbix-mcp
+    - install
+    - zabbix-mcp_mcp
+    - zabbix-mcp_mcp_install
+
 - name: "mcp : Clone repository"
   ansible.builtin.git:
     repo: https://github.com/initMAX/zabbix-mcp-server.git
     dest: /opt/zabbix-mcp/src
-    version: "v{{ zabbix_mcp.version }}"
+    version: "{{ __zabbix_mcp_source.commit }}"
     force: true
   register: zabbix_mcp_git
   tags:

@@ -1,6 +1,5 @@
 ---
 zabbix_mcp:
-  version: "1.14"
   url: "{{ lookup('pipe', 'op read \"op://ansible/qbgipeerfcsiwsudnejpmwl2oy/url\"') }}"
   api_token: "{{ lookup('pipe', 'op read \"op://ansible/qbgipeerfcsiwsudnejpmwl2oy/credential\"') }}"
   auth_token: "{{ lookup('pipe', 'op read \"op://ansible/rgvaj2b2gxvfgq7zmhnamqkiom/auth_token\"') }}"
