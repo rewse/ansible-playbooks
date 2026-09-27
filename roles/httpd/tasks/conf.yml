@@ -1,0 +1,65 @@
+---
+- name: conf | Copy force SSL config
+  ansible.builtin.copy:
+    src: 00-forcessl.conf
+    dest: /etc/apache2/conf-available
+    mode: "0644"
+
+- name: conf | Enable force SSL config
+  # No module enables an Apache site or conf; the command reports whether it changed.
+  ansible.builtin.command: a2enconf 00-forcessl
+  register: __httpd_a2enconf_forcessl
+  changed_when: "'already enabled' not in __httpd_a2enconf_forcessl.stdout"
+  notify: Reload Apache
+
+- name: conf | Copy blog redirect config
+  ansible.builtin.copy:
+    src: 01-blog-redirect.conf
+    dest: /etc/apache2/conf-available
+    mode: "0644"
+
+- name: conf | Enable blog redirect config
+  # No module enables an Apache site or conf; the command reports whether it changed.
+  ansible.builtin.command: a2enconf 01-blog-redirect
+  register: __httpd_a2enconf_blog
+  changed_when: "'already enabled' not in __httpd_a2enconf_blog.stdout"
+  notify: Reload Apache
+
+- name: conf | Copy admin config
+  ansible.builtin.template:
+    src: admin.conf.j2
+    dest: /etc/apache2/conf-available/admin.conf
+    mode: "0644"
+
+- name: conf | Enable admin config
+  # No module enables an Apache site or conf; the command reports whether it changed.
+  ansible.builtin.command: a2enconf admin
+  register: __httpd_a2enconf_admin
+  changed_when: "'already enabled' not in __httpd_a2enconf_admin.stdout"
+  notify: Reload Apache
+
+- name: conf | Copy status config
+  ansible.builtin.template:
+    src: status.conf.j2
+    dest: /etc/apache2/conf-available/status.conf
+    mode: "0644"
+  notify: Reload Apache
+
+- name: conf | Enable status config
+  # No module enables an Apache site or conf; the command reports whether it changed.
+  ansible.builtin.command: a2enconf status
+  register: __httpd_a2enconf_status
+  changed_when: "'already enabled' not in __httpd_a2enconf_status.stdout"
+  notify: Reload Apache
+
+- name: conf | Create admin directory
+  ansible.builtin.file:
+    path: /srv/www/html/admin
+    state: directory
+    mode: "0755"
+
+- name: conf | Copy phpinfo.php
+  ansible.builtin.copy:
+    src: phpinfo.php
+    dest: /srv/www/html/admin
+    mode: "0644"

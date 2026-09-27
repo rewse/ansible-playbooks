@@ -1,0 +1,19 @@
+---
+- name: zabbix | Create agentscripts directory
+  ansible.builtin.file:
+    path: /usr/lib/zabbix/agentscripts
+    state: directory
+    mode: "0755"
+
+- name: zabbix | Copy Apache monitoring script
+  ansible.builtin.copy:
+    src: apache.sh
+    dest: /usr/lib/zabbix/agentscripts
+    mode: "0755"
+
+- name: zabbix | Copy agent config
+  ansible.builtin.template:
+    src: apache.conf.j2
+    dest: /etc/zabbix/zabbix_agentd.d/apache.conf
+    mode: "0644"
+  notify: Restart zabbix-agent

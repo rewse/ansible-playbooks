@@ -1,0 +1,86 @@
+---
+- name: default_site | Check default-ssl.conf
+  ansible.builtin.stat:
+    path: /etc/apache2/sites-available/default-ssl.conf
+  register: __httpd_default_ssl_conf
+
+- name: default_site | Link default-ssl.conf as 000-default-ssl.conf
+  ansible.builtin.file:
+    src: /etc/apache2/sites-available/default-ssl.conf
+    dest: /etc/apache2/sites-available/000-default-ssl.conf
+    state: hard
+    mode: "0644"
+  when: __httpd_default_ssl_conf.stat.exists
+  notify: Reload Apache
+
+- name: default_site | Enable 000-default-ssl site
+  # No module enables an Apache site or conf; the command reports whether it changed.
+  ansible.builtin.command: a2ensite 000-default-ssl
+  register: __httpd_a2ensite_default
+  changed_when: "'already enabled' not in __httpd_a2ensite_default.stdout"
+  notify: Reload Apache
+
+- name: default_site | Remove original default-ssl.conf
+  ansible.builtin.file:
+    path: "{{ item }}"
+    state: absent
+  loop:
+    - /etc/apache2/sites-available/default-ssl.conf
+    - /etc/apache2/sites-enabled/default-ssl.conf
+  notify: Reload Apache
+
+- name: default_site | Set ServerName for HTTP
+  ansible.builtin.lineinfile:
+    dest: /etc/apache2/sites-available/000-default.conf
+    insertafter: "^	#ServerName"
+    regexp: "^	ServerName "
+    line: "	ServerName rewse.jp:80"
+  notify: Reload Apache
+
+- name: default_site | Set ServerAdmin for HTTP
+  ansible.builtin.lineinfile:
+    dest: /etc/apache2/sites-available/000-default.conf
+    regexp: "^	ServerAdmin "
+    line: "	ServerAdmin hostmaster@rewse.jp"
+  notify: Reload Apache
+
+- name: default_site | Set ServerAdmin for HTTPS
+  ansible.builtin.lineinfile:
+    dest: /etc/apache2/sites-available/000-default-ssl.conf
+    regexp: "^	ServerAdmin "
+    line: "	ServerAdmin hostmaster@rewse.jp"
+  notify: Reload Apache
+
+- name: default_site | Set ServerName for HTTPS
+  ansible.builtin.lineinfile:
+    dest: /etc/apache2/sites-available/000-default-ssl.conf
+    insertafter: "^	ServerAdmin"
+    regexp: "^	ServerName "
+    line: "	ServerName rewse.jp"
+  notify: Reload Apache
+
+- name: default_site | Set ErrorLog to syslog
+  ansible.builtin.lineinfile:
+    dest: /etc/apache2/apache2.conf
+    regexp: "^ErrorLog "
+    line: "ErrorLog syslog"
+  notify: Reload Apache
+
+- name: default_site | Set LogLevel to notice
+  ansible.builtin.lineinfile:
+    dest: /etc/apache2/apache2.conf
+    regexp: "^LogLevel "
+    line: "LogLevel notice"
+  notify: Reload Apache
+
+- name: default_site | Enable .htaccess for /srv/www
+  ansible.builtin.blockinfile:
+    path: /etc/apache2/apache2.conf
+    insertbefore: "<Directory /srv/>"
+    block: |
+      <Directory /srv/www>
+          Options Indexes FollowSymLinks
+          AllowOverride All
+          Require all granted
+      </Directory>
+  notify: Reload Apache

@@ -1,0 +1,29 @@
+---
+- name: package | Create /srv/www directory
+  ansible.builtin.file:
+    path: /srv/www
+    state: directory
+    mode: "0755"
+
+- name: package | Link /var/www to /srv/www
+  ansible.builtin.file:
+    src: /srv/www
+    dest: /var/www
+    state: link
+
+- name: package | Install packages
+  ansible.builtin.apt:
+    name:
+      - apache2
+      - php
+      - php-mysql
+
+- name: package | Enable Apache modules
+  community.general.apache2_module:
+    name: "{{ item }}"
+  loop:
+    - headers
+    - rewrite
+    - ssl
+    - status
+  notify: Reload Apache

@@ -1,0 +1,12 @@
+---
+- name: php | Copy timezone config
+  ansible.builtin.copy:
+    src: timezone.ini
+    dest: /etc/php/{{ httpd_php_version }}/mods-available
+    mode: "0644"
+
+- name: php | Enable timezone module
+  # No module enables a PHP module; phpenmod is idempotent.
+  ansible.builtin.command: phpenmod -v {{ httpd_php_version }} -s ALL timezone
+  changed_when: false
+  notify: Restart Apache
