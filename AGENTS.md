@@ -98,7 +98,7 @@ Use only these tags, written as an indented YAML list:
 | `inventory/group_vars/all/site.yml` | Site-wide shared values |
 
 - Prefix every variable a role defines with the role name. Prefix `register` and `set_fact` results with `__<role>_`.
-- Only these shared values in `inventory/group_vars/all/site.yml` go without a prefix: `admin`, `email`, `global_ip`, `ipv6`, `supply_chain_cooldown_days`, and `supply_chain_cooldown_environment`. Give a new shared value a specific name (`local_network`, not `local`) and add it here.
+- Only these shared values in `inventory/group_vars/all/site.yml` go without a prefix: `admin_email`, `admin_user`, `networks`, `supply_chain_cooldown_days`, and `supply_chain_cooldown_environment`. Give a new shared value a specific name (`local_network`, not `local`) and add it here.
 - Put a Secret Reference in the role's `vars/main.yml` when it is the same on every host and in the inventory when it differs.
 - Do not use play vars, `include_vars` outside `set_vars.yml`, or extra vars for desired state.
 

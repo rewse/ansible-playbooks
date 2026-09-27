@@ -5,7 +5,7 @@ set -uo pipefail
 PRIMARY_HOST="fox.rewse.jp"
 PRIMARY_API="http://${PRIMARY_HOST}:8123/api/"
 PRIMARY_SSH_PORT="11022"
-PRIMARY_SSH_USER="[% admin %]"
+PRIMARY_SSH_USER="[% admin_user %]"
 HA_TOKEN="[% homeassistant_ha_secondary_token %]"
 HEALTHCHECK_TIMEOUT=5
 # How long the primary has to stay unreachable before the standby takes over.
@@ -20,7 +20,7 @@ DOWN_SINCE_FILE="${STATE_DIR}/down-since"
 HOLD_FILE="${STATE_DIR}/hold"
 LOCK_FILE="/var/run/homeassistant-failover.lock"
 LOG_TAG="homeassistant-failover"
-MAIL_TO="[% email.primary %]"
+MAIL_TO="[% admin_email %]"
 COMPOSE_FILE="/etc/compose/homeassistant/compose.yaml"
 DOMAIN="[% homeassistant_ha_secondary_domain %]"
 NAME_SWITCH="/usr/local/bin/homeassistant-name-switch"

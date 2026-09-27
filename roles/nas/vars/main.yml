@@ -120,8 +120,8 @@ nas_volumes:
   - name: nas-archive
     path: /srv/nas/archive
     luks_uuid: 1f51b48f-5827-4eb3-9146-1e798e89c85b
-    owner: "{{ admin }}"
-    group: "{{ admin }}"
+    owner: "{{ admin_user }}"
+    group: "{{ admin_user }}"
     mode: '0700'
   # Bay 2. Stays traversable: Samba serves a Time Machine share per Mac below
   # it as separate users, while the restic repositories keep their own 0700 root.

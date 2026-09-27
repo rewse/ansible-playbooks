@@ -35,7 +35,7 @@ server:
 {% endfor %}
 
 auth:
-  adminUsername: {{ admin }}
+  adminUsername: {{ admin_user }}
   adminPassword: "{{ filebrowser_admin_password }}"
   key: "{{ filebrowser_jwt_secret }}"
   tokenExpirationHours: {{ filebrowser_token_expiration_hours }}

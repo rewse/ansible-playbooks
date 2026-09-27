@@ -42,7 +42,7 @@ filebrowser_token_expiration_hours: 720
 # scoped to it.
 filebrowser_sources:
   - name: Home
-    path: "/srv/nas/data/homes/{{ admin }}"
+    path: "/srv/nas/data/homes/{{ admin_user }}"
     rules: []
 
 filebrowser_admin_password: "{{ lookup('pipe', 'op read \"op://ansible/mcfawidi6xerblpafiaimpv2de/password\"') }}"

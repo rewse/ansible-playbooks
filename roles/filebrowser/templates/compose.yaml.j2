@@ -10,7 +10,7 @@ services:
     ports:
       - "127.0.0.1:{{ filebrowser_port }}:{{ filebrowser_port }}"
     # The image bakes in uid 1000 and supports no PUID/PGID, so the runtime user is
-    # overridden here. It has to be {{ admin }} to read a 0700 home directory.
+    # overridden here. It has to be {{ admin_user }} to read a 0700 home directory.
     user: "{{ filebrowser_uid }}:{{ filebrowser_gid }}"
     volumes:
       - {{ filebrowser_data_dir }}:/home/filebrowser/data

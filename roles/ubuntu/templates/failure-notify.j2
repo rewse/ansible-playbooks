@@ -39,7 +39,7 @@ touch "${STAMP}"
 
 {
   echo "From: alert@rewse.jp"
-  echo "To: {{ email.primary }}"
+  echo "To: {{ admin_email }}"
   echo "Subject: Problem: ${EVENT_NAME}"
   echo ""
   echo "Problem started at ${NOW_TIME} on ${NOW_DATE}"

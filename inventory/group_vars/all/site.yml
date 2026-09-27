@@ -1,15 +1,15 @@
 ---
-admin: tats
-email:
-  primary: "{{ lookup('pipe', 'op read \"op://ansible/weohbz5qszb2gbs6rz6cbr2wee/email\"') }}"
-global_ip:
-  home: 106.163.184.9/32
-  home_ip: 106.163.184.9
-  office: 27.0.0.0/22
-ipv6:
-  aws: 2406:da14:b2b:e400::/56
-  home: 240f:143:f60c:1::/64
-  home_ula: fd20:2400:ab3d:5b1e::/64
+admin_email: "{{ lookup('pipe', 'op read \"op://ansible/weohbz5qszb2gbs6rz6cbr2wee/email\"') }}"
+admin_user: tats
+# Networks named <place>_<public|private>_<ipv4|ipv6>; each value is a CIDR.
+networks:
+  aws_private_ipv4: 10.0.0.0/16
+  aws_public_ipv6: 2406:da14:b2b:e400::/56
+  home_private_ipv4: 192.168.0.0/24
+  home_private_ipv6: fd20:2400:ab3d:5b1e::/64
+  home_public_ipv4: 106.163.184.9/32
+  home_public_ipv6: 240f:143:f60c:1::/64
+  office_public_ipv4: 27.0.0.0/22
 # Minimum age in days of a third-party release before a run adopts it.
 supply_chain_cooldown_days: 4
 # Environment for npm and uv tasks: both refuse releases newer than the cutoff.

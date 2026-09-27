@@ -17,7 +17,7 @@
     repo: git@github.com:rewse/stock-price-fetcher.git
     dest: /opt/stock-price-fetcher
     accept_hostkey: true
-    key_file: /home/{{ admin }}/.ssh/id_rsa
+    key_file: /home/{{ admin_user }}/.ssh/id_rsa
     version: main
   notify: Hand the stock-price-fetcher checkout to zabbix
 

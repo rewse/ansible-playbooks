@@ -15,7 +15,7 @@ network:
         - to: default
           via: {{ raspberrypi_default_gateway }}
           metric: 100
-        - to: {{ raspberrypi_aws_vpc_cidr }}
+        - to: {{ networks.aws_private_ipv4 }}
           via: {{ raspberrypi_default_gateway }}
       nameservers:
         # IPv4 only. The router announces its own IPv6 address for this through
@@ -54,7 +54,7 @@ network:
         - to: default
           via: {{ raspberrypi_default_gateway }}
           metric: 200
-        - to: {{ raspberrypi_aws_vpc_cidr }}
+        - to: {{ networks.aws_private_ipv4 }}
           via: {{ raspberrypi_default_gateway }}
       nameservers:
         # IPv4 only, for the reason given on eth0.

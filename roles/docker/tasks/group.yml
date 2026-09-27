@@ -1,6 +1,6 @@
 ---
 - name: group | Add admin user to docker group
   ansible.builtin.user:
-    name: "{{ admin }}"
+    name: "{{ admin_user }}"
     groups: docker
     append: true

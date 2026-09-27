@@ -44,7 +44,7 @@
     # reaches, so both are listed. Link-local is not, being absent from what mDNS
     # hands out. The global prefix is delegated by the ISP and changes with it.
     hosts deny = ALL
-    hosts allow = 192.168.0.0/24 {{ ipv6.home }} {{ ipv6.home_ula }}
+    hosts allow = {{ networks.home_private_ipv4 }} {{ networks.home_public_ipv6 }} {{ networks.home_private_ipv6 }}
     load printers = no
     printing = bsd
     printcap name = /dev/null
@@ -83,7 +83,7 @@
 
 [archive]
     path = {{ nas_archive_path }}
-    valid users = {{ admin }}
+    valid users = {{ admin_user }}
     read only = no
     create mask = 0600
     directory mask = 0700

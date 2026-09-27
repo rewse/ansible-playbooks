@@ -1,3 +1,3 @@
 <Directory /srv/www/html/admin>
-    Require ip 192.168.0.0/16 10.0.0.0/16 {{ global_ip.home }} {{ global_ip.office }} {{ ipv6.home }} {{ ipv6.aws }}
+    Require ip {{ networks.home_private_ipv4 }} {{ networks.aws_private_ipv4 }} {{ networks.home_public_ipv4 }} {{ networks.office_public_ipv4 }} {{ networks.home_public_ipv6 }} {{ networks.aws_public_ipv6 }}
 </Directory>

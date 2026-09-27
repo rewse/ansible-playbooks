@@ -14,11 +14,11 @@
   ansible.builtin.command: bash /usr/local/src/one-gnome-terminal/one-dark.sh
   changed_when: false
   become: true
-  become_user: "{{ admin }}"
+  become_user: "{{ admin_user }}"
 
 - name: terminal | Set font to Ricty Diminished
   # community.general.dconf needs a D-Bus session, which a non-interactive login lacks.
   ansible.builtin.command: gsettings set org.gnome.desktop.interface monospace-font-name "Ricty Diminished Regular 12"
   changed_when: false
   become: true
-  become_user: "{{ admin }}"
+  become_user: "{{ admin_user }}"

@@ -4,5 +4,5 @@
     dest: /etc/aliases
     insertafter: "^postmaster:"
     regexp: "^root: "
-    line: "root: {{ email.primary }}"
+    line: "root: {{ admin_email }}"
   notify: Rebuild aliases

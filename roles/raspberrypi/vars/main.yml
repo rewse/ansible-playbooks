@@ -1,5 +1,4 @@
 ---
-raspberrypi_aws_vpc_cidr: 10.0.0.0/16
 raspberrypi_default_gateway: 192.168.0.1
 raspberrypi_default_gateway6: fe80::70a7:41ff:fea6:bd7a
 raspberrypi_resolved1:

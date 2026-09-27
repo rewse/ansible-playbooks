@@ -5,7 +5,7 @@ set -uo pipefail
 PRIMARY_HOST="fox.rewse.jp"
 PRIMARY_API="http://${PRIMARY_HOST}:8123/api/"
 PRIMARY_SSH_PORT="11022"
-PRIMARY_SSH_USER="[% admin %]"
+PRIMARY_SSH_USER="[% admin_user %]"
 HA_TOKEN="[% homeassistant_ha_secondary_token %]"
 CONFIG_DIR="/srv/homeassistant/config"
 RSYNC_MODULE="rsync://${PRIMARY_HOST}/homeassistant-config/"
@@ -14,7 +14,7 @@ FAILOVER_TIMER="homeassistant-failover.timer"
 API_WAIT_TIMEOUT=120
 API_WAIT_INTERVAL=5
 LOG_TAG="homeassistant-failback"
-MAIL_TO="[% email.primary %]"
+MAIL_TO="[% admin_email %]"
 NAME_SWITCH="/usr/local/bin/homeassistant-name-switch"
 
 # -----------------------------------------------------------------------------

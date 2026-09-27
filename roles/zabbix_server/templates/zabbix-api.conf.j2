@@ -18,7 +18,7 @@
 <Location "/zabbix/api_jsonrpc.php">
     Require ip 127.0.0.1
     Require ip ::1
-    Require ip 192.168.0.0/24
-    Require ip {{ ipv6.home }}
-    Require ip {{ ipv6.home_ula }}
+    Require ip {{ networks.home_private_ipv4 }}
+    Require ip {{ networks.home_public_ipv6 }}
+    Require ip {{ networks.home_private_ipv6 }}
 </Location>
