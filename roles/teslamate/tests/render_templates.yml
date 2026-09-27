@@ -6,7 +6,7 @@
   vars_files:
     - fixtures.yml
   tasks:
-    - name: "teslamate-test : Render templates"
+    - name: Render templates
       ansible.builtin.set_fact:
         teslamate_test_compose_output: "{{ lookup('template', '../templates/compose.yaml.j2') }}"
         teslamate_test_env_output: "{{ lookup('template', '../templates/teslamate.env.j2') }}"
@@ -14,12 +14,12 @@
         teslamate_test_grafana_vhost_output: "{{ lookup('template', '../templates/grafana.rewse.jp.conf.j2') }}"
         teslamate_test_vhost_output: "{{ lookup('template', '../templates/teslamate.rewse.jp.conf.j2') }}"
 
-    - name: "teslamate-test : Parse compose template"
+    - name: Parse compose template
       ansible.builtin.set_fact:
         teslamate_test_compose: >-
           {{ teslamate_test_compose_output | from_yaml }}
 
-    - name: "teslamate-test : Verify compose contract"
+    - name: Verify compose contract
       ansible.builtin.assert:
         that:
           - teslamate_test_compose.services.teslamate.image == __teslamate_image.ref
@@ -38,7 +38,7 @@
           - teslamate_grafana_admin_password not in teslamate_test_compose_output
           - teslamate_mqtt_password not in teslamate_test_compose_output
 
-    - name: "teslamate-test : Verify TeslaMate environment contract"
+    - name: Verify TeslaMate environment contract
       ansible.builtin.assert:
         that:
           - "'DATABASE_SSL=true' in teslamate_test_env_output"
@@ -52,7 +52,7 @@
           - teslamate_encryption_key in teslamate_test_env_output
           - (teslamate_mqtt_password | replace('$', '$$')) in teslamate_test_env_output
 
-    - name: "teslamate-test : Verify Grafana environment contract"
+    - name: Verify Grafana environment contract
       ansible.builtin.assert:
         that:
           - "'DATABASE_SSL_MODE=require' in teslamate_test_grafana_env_output"
@@ -62,7 +62,7 @@
           - (teslamate_database_password | replace('$', '$$')) in teslamate_test_grafana_env_output
           - (teslamate_grafana_admin_password | replace('$', '$$')) in teslamate_test_grafana_env_output
 
-    - name: "teslamate-test : Verify TeslaMate vhost contract"
+    - name: Verify TeslaMate vhost contract
       ansible.builtin.assert:
         that:
           - "'ServerName teslamate.rewse.jp' in teslamate_test_vhost_output"
@@ -72,7 +72,7 @@
           - "'RequestHeader set X-Forwarded-Proto \"https\"' in teslamate_test_vhost_output"
           - "'SSLCertificateFile /etc/letsencrypt/live/rewse.jp/fullchain.pem' in teslamate_test_vhost_output"
 
-    - name: "teslamate-test : Verify Grafana vhost contract"
+    - name: Verify Grafana vhost contract
       ansible.builtin.assert:
         that:
           - "'ServerName grafana.rewse.jp' in teslamate_test_grafana_vhost_output"

@@ -1,5 +1,5 @@
 ---
-- name: "teslamate: Restart"
+- name: Restart teslamate
   community.docker.docker_compose_v2:
     project_src: /etc/compose/teslamate
     services:
@@ -7,7 +7,7 @@
     state: restarted
   when: not ansible_check_mode
 
-- name: "teslamate-grafana: Restart"
+- name: Restart teslamate-grafana
   community.docker.docker_compose_v2:
     project_src: /etc/compose/teslamate
     services:
@@ -15,14 +15,14 @@
     state: restarted
   when: not ansible_check_mode
 
-- name: "teslamate: Validate Apache configuration"
+- name: Validate Apache configuration
   ansible.builtin.command: apache2ctl configtest
   # A successful validation marks this handler changed so it can notify the
   # reload handler; a failed validation stops before Apache is reloaded.
   changed_when: true
-  notify: "teslamate: Reload Apache"
+  notify: Reload Apache
 
-- name: "teslamate: Reload Apache"
+- name: Reload Apache
   ansible.builtin.systemd:
     name: apache2
     state: reloaded

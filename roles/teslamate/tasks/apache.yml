@@ -1,0 +1,103 @@
+---
+- name: apache | Install authentication utility
+  ansible.builtin.apt:
+    name: apache2-utils
+
+- name: apache | Enable modules
+  community.general.apache2_module:
+    name: "{{ item }}"
+  loop:
+    - auth_basic
+    - headers
+    - proxy
+    - proxy_http
+    - proxy_wstunnel
+    - rewrite
+    - ssl
+  notify: Validate Apache configuration
+
+- name: apache | Check password file
+  ansible.builtin.stat:
+    path: /etc/apache2/.teslamate.htpasswd
+  register: __teslamate_htpasswd_status
+
+- name: apache | Verify password
+  ansible.builtin.command:
+    argv:
+      - htpasswd
+      - -v
+      - -i
+      - /etc/apache2/.teslamate.htpasswd
+      - "{{ teslamate_basic_auth_username }}"
+    stdin: "{{ teslamate_basic_auth_password }}"
+  check_mode: false
+  changed_when: false
+  failed_when: false
+  no_log: true
+  register: __teslamate_htpasswd_verify
+  when: __teslamate_htpasswd_status.stat.exists
+
+- name: apache | Create password file
+  ansible.builtin.command:
+    argv:
+      - htpasswd
+      - -c
+      - -B
+      - -i
+      - /etc/apache2/.teslamate.htpasswd
+      - "{{ teslamate_basic_auth_username }}"
+    stdin: "{{ teslamate_basic_auth_password }}"
+  changed_when: true
+  no_log: true
+  notify: Validate Apache configuration
+  when:
+    - not __teslamate_htpasswd_status.stat.exists
+    - not ansible_check_mode
+
+- name: apache | Update password
+  ansible.builtin.command:
+    argv:
+      - htpasswd
+      - -B
+      - -i
+      - /etc/apache2/.teslamate.htpasswd
+      - "{{ teslamate_basic_auth_username }}"
+    stdin: "{{ teslamate_basic_auth_password }}"
+  changed_when: true
+  no_log: true
+  notify: Validate Apache configuration
+  when:
+    - __teslamate_htpasswd_status.stat.exists
+    - __teslamate_htpasswd_verify.rc != 0
+    - not ansible_check_mode
+
+- name: apache | Set password file permissions
+  ansible.builtin.file:
+    path: /etc/apache2/.teslamate.htpasswd
+    state: file
+    owner: root
+    group: www-data
+    mode: "0640"
+  when: __teslamate_htpasswd_status.stat.exists or not ansible_check_mode
+
+- name: apache | Deploy sites
+  ansible.builtin.template:
+    src: "{{ item }}.conf.j2"
+    dest: "/etc/apache2/sites-available/{{ item }}.conf"
+    mode: "0644"
+  loop:
+    - "{{ teslamate_grafana_hostname }}"
+    - "{{ teslamate_hostname }}"
+  notify: Validate Apache configuration
+
+- name: apache | Enable sites
+  ansible.builtin.command:
+    argv:
+      - a2ensite
+      - "{{ item }}"
+  loop:
+    - "{{ teslamate_grafana_hostname }}"
+    - "{{ teslamate_hostname }}"
+  register: __teslamate_a2ensite
+  changed_when: "'already enabled' not in __teslamate_a2ensite.stdout"
+  notify: Validate Apache configuration

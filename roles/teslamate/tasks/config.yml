@@ -1,0 +1,82 @@
+---
+- name: config | Check data directory
+  ansible.builtin.stat:
+    path: "{{ teslamate_data_dir }}"
+  register: __teslamate_data_dir_status
+
+- name: config | Create data directories
+  ansible.builtin.file:
+    path: "{{ item.path }}"
+    state: directory
+    owner: "{{ item.owner }}"
+    group: "{{ item.group }}"
+    mode: "{{ item.mode }}"
+  loop:
+    - path: "{{ teslamate_data_dir }}"
+      owner: root
+      group: root
+      mode: "0755"
+    - path: "{{ teslamate_data_dir }}/grafana"
+      owner: "472"
+      group: "0"
+      mode: "0750"
+    - path: "{{ teslamate_data_dir }}/import"
+      owner: root
+      group: root
+      mode: "0755"
+
+- name: config | Download Amazon RDS CA bundle
+  ansible.builtin.get_url:
+    url: "{{ teslamate_database_ca_url }}"
+    dest: "{{ teslamate_data_dir }}/global-bundle.pem"
+    checksum: "{{ teslamate_database_ca_checksum }}"
+    owner: root
+    group: root
+    mode: "0644"
+  notify: Restart teslamate
+  when:
+    # Check mode does not create the parent directory on a first run.
+    - not ansible_check_mode or __teslamate_data_dir_status.stat.exists
+
+- name: config | Deploy environment file
+  ansible.builtin.template:
+    src: teslamate.env.j2
+    dest: "{{ teslamate_data_dir }}/teslamate.env"
+    owner: root
+    group: root
+    mode: "0600"
+  no_log: true
+  notify: Restart teslamate
+  when:
+    # Check mode does not create the parent directory, so a first run cannot
+    # stage this file. The local template contract test still renders it.
+    - not ansible_check_mode or __teslamate_data_dir_status.stat.exists
+
+- name: config | Deploy Grafana environment file
+  ansible.builtin.template:
+    src: grafana.env.j2
+    dest: "{{ teslamate_data_dir }}/grafana.env"
+    owner: root
+    group: root
+    mode: "0600"
+  no_log: true
+  notify: Restart teslamate-grafana
+  when:
+    # Check mode does not create the parent directory, so a first run cannot
+    # stage this file. The local template contract test still renders it.
+    - not ansible_check_mode or __teslamate_data_dir_status.stat.exists
+
+- name: config | Find backups of environment files
+  ansible.builtin.find:
+    paths: "{{ teslamate_data_dir }}"
+    patterns: "*.env.*~"
+  register: __teslamate_env_backups
+
+- name: config | Remove backups of environment files
+  # They hold credentials and are no longer written.
+  ansible.builtin.file:
+    path: "{{ item.path }}"
+    state: absent
+  loop: "{{ __teslamate_env_backups.files }}"
+  loop_control:
+    label: "{{ item.path }}"

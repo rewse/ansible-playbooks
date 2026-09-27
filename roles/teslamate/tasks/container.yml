@@ -1,0 +1,40 @@
+---
+- name: container | Resolve fork images
+  ansible.builtin.set_fact:
+    # The fork is this account's own build, so it follows main without a cooldown.
+    __teslamate_image: >-
+      {{ lookup('aged_release', 'oci:ghcr.io/rewse/teslamate', pattern='^main$', days=0, platform='linux/' ~ ('arm64' if ansible_facts['architecture'] == 'aarch64' else 'amd64')) }}
+    __teslamate_grafana_image: >-
+      {{ lookup('aged_release', 'oci:ghcr.io/rewse/teslamate/grafana', pattern='^main$', days=0, platform='linux/' ~ ('arm64' if ansible_facts['architecture'] == 'aarch64' else 'amd64')) }}
+
+- name: container | Pre-pull deployment images
+  community.docker.docker_image:
+    name: "{{ item }}"
+    source: pull
+  # By digest alone: docker_image cannot match a local image to a tag@digest
+  # name, so that form pulls again on every run.
+  loop:
+    - "{{ __teslamate_image.ref | regex_replace(':[^:@/]+@', '@') }}"
+    - "{{ __teslamate_grafana_image.ref | regex_replace(':[^:@/]+@', '@') }}"
+  when:
+    - not ansible_check_mode
+
+- name: container | Create compose directory
+  ansible.builtin.file:
+    path: /etc/compose/teslamate
+    state: directory
+    mode: "0755"
+
+- name: container | Deploy compose file
+  ansible.builtin.template:
+    src: compose.yaml.j2
+    dest: /etc/compose/teslamate/compose.yaml
+    mode: "0644"
+  register: __teslamate_compose
+
+- name: container | Pull and update containers
+  community.docker.docker_compose_v2:
+    project_src: /etc/compose/teslamate
+    pull: never
+    state: present
+  when: not ansible_check_mode

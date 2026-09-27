@@ -5,7 +5,7 @@ from pathlib import Path
 
 import yaml
 
-TASKS_PATH = Path(__file__).parents[1] / "tasks" / "main.yml"
+TASKS_PATH = Path(__file__).parents[1] / "tasks" / "container.yml"
 
 
 class DeploymentOrderTest(unittest.TestCase):
@@ -19,10 +19,9 @@ class DeploymentOrderTest(unittest.TestCase):
         cls.task_names = [task["name"] for task in cls.tasks]
 
     def test_deployment_images_are_staged_before_compose_changes(self):
-        pre_pull_name = "teslamate : Pre-pull deployment images"
-        compose_name = "teslamate : Deploy compose file"
-        update_name = "teslamate : Pull and update containers"
-        cleanup_name = "teslamate : Remove legacy dashboard patch assets"
+        pre_pull_name = "container | Pre-pull deployment images"
+        compose_name = "container | Deploy compose file"
+        update_name = "container | Pull and update containers"
 
         self.assertIn(pre_pull_name, self.tasks_by_name)
         pre_pull = self.tasks_by_name[pre_pull_name]
@@ -50,9 +49,6 @@ class DeploymentOrderTest(unittest.TestCase):
                 "pull"
             ],
             "never",
-        )
-        self.assertLess(
-            self.task_names.index(update_name), self.task_names.index(cleanup_name)
         )
 
 
