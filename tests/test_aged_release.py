@@ -122,34 +122,36 @@ def test_oci_returns_tag_at_digest():
 def test_release_skips_draft_and_prerelease():
     run = FakeRun(
         {
-            "gh api repos/o/r/releases?per_page=100": [
-                {
-                    "tag_name": "v3.0.0",
-                    "draft": True,
-                    "prerelease": False,
-                    "published_at": iso(10),
-                    "assets": [],
-                },
-                {
-                    "tag_name": "v2.0.0",
-                    "draft": False,
-                    "prerelease": True,
-                    "published_at": iso(10),
-                    "assets": [],
-                },
-                {
-                    "tag_name": "v1.0.0",
-                    "draft": False,
-                    "prerelease": False,
-                    "published_at": iso(10),
-                    "assets": [
-                        {
-                            "name": "a.js",
-                            "browser_download_url": "https://x/a.js",
-                            "digest": "sha256:aa",
-                        }
-                    ],
-                },
+            "gh api --paginate --slurp repos/o/r/releases?per_page=100": [
+                [
+                    {
+                        "tag_name": "v3.0.0",
+                        "draft": True,
+                        "prerelease": False,
+                        "published_at": iso(10),
+                        "assets": [],
+                    },
+                    {
+                        "tag_name": "v2.0.0",
+                        "draft": False,
+                        "prerelease": True,
+                        "published_at": iso(10),
+                        "assets": [],
+                    },
+                    {
+                        "tag_name": "v1.0.0",
+                        "draft": False,
+                        "prerelease": False,
+                        "published_at": iso(10),
+                        "assets": [
+                            {
+                                "name": "a.js",
+                                "browser_download_url": "https://x/a.js",
+                                "digest": "sha256:aa",
+                            }
+                        ],
+                    },
+                ]
             ]
         }
     )
@@ -159,25 +161,27 @@ def test_release_skips_draft_and_prerelease():
 def test_release_asset_checksum():
     run = FakeRun(
         {
-            "gh api repos/o/r/releases?per_page=100": [
-                {
-                    "tag_name": "v0.2.0",
-                    "draft": False,
-                    "prerelease": False,
-                    "published_at": iso(10),
-                    "assets": [
-                        {
-                            "name": "tool_0.2.0_linux_arm64.bz2",
-                            "browser_download_url": "https://x/t.bz2",
-                            "digest": "sha256:bb",
-                        },
-                        {
-                            "name": "tool_0.2.0_linux_amd64.bz2",
-                            "browser_download_url": "https://x/u.bz2",
-                            "digest": "sha256:cc",
-                        },
-                    ],
-                },
+            "gh api --paginate --slurp repos/o/r/releases?per_page=100": [
+                [
+                    {
+                        "tag_name": "v0.2.0",
+                        "draft": False,
+                        "prerelease": False,
+                        "published_at": iso(10),
+                        "assets": [
+                            {
+                                "name": "tool_0.2.0_linux_arm64.bz2",
+                                "browser_download_url": "https://x/t.bz2",
+                                "digest": "sha256:bb",
+                            },
+                            {
+                                "name": "tool_0.2.0_linux_amd64.bz2",
+                                "browser_download_url": "https://x/u.bz2",
+                                "digest": "sha256:cc",
+                            },
+                        ],
+                    },
+                ]
             ]
         }
     )
@@ -192,20 +196,22 @@ def test_release_asset_checksum():
 def test_release_without_digest_has_empty_checksum():
     run = FakeRun(
         {
-            "gh api repos/o/r/releases?per_page=100": [
-                {
-                    "tag_name": "1.0.0",
-                    "draft": False,
-                    "prerelease": False,
-                    "published_at": iso(10),
-                    "assets": [
-                        {
-                            "name": "a.js",
-                            "browser_download_url": "https://x/a.js",
-                            "digest": None,
-                        }
-                    ],
-                },
+            "gh api --paginate --slurp repos/o/r/releases?per_page=100": [
+                [
+                    {
+                        "tag_name": "1.0.0",
+                        "draft": False,
+                        "prerelease": False,
+                        "published_at": iso(10),
+                        "assets": [
+                            {
+                                "name": "a.js",
+                                "browser_download_url": "https://x/a.js",
+                                "digest": None,
+                            }
+                        ],
+                    },
+                ]
             ]
         }
     )
@@ -215,9 +221,11 @@ def test_release_without_digest_has_empty_checksum():
 def test_tag_returns_commit_sha():
     run = FakeRun(
         {
-            "gh api repos/o/r/tags?per_page=100": [
-                {"name": "v1.1.0", "commit": {"sha": "s11"}},
-                {"name": "v1.0.0", "commit": {"sha": "s10"}},
+            "gh api --paginate --slurp repos/o/r/tags?per_page=100": [
+                [
+                    {"name": "v1.1.0", "commit": {"sha": "s11"}},
+                    {"name": "v1.0.0", "commit": {"sha": "s10"}},
+                ]
             ],
             "gh api repos/o/r/commits/s11": {"commit": {"committer": {"date": iso(1)}}},
             "gh api repos/o/r/commits/s10": {
@@ -244,7 +252,7 @@ def test_commit_returns_newest_aged():
 def test_gh_failure_raises():
     run = FakeRun(
         {
-            "gh api repos/o/r/tags?per_page=100": RuntimeError(
+            "gh api --paginate --slurp repos/o/r/tags?per_page=100": RuntimeError(
                 "HTTP 403: API rate limit exceeded"
             )
         }
@@ -279,9 +287,11 @@ def test_lookup_caches_identical_calls(monkeypatch, tmp_path):
 def test_default_pattern_ignores_single_number_tags():
     run = FakeRun(
         {
-            "gh api repos/o/r/tags?per_page=100": [
-                {"name": "14", "commit": {"sha": "old"}},
-                {"name": "v4.2.1", "commit": {"sha": "new"}},
+            "gh api --paginate --slurp repos/o/r/tags?per_page=100": [
+                [
+                    {"name": "14", "commit": {"sha": "old"}},
+                    {"name": "v4.2.1", "commit": {"sha": "new"}},
+                ]
             ],
             "gh api repos/o/r/commits/new": {
                 "commit": {"committer": {"date": iso(10)}}
@@ -313,3 +323,66 @@ def test_cache_is_shared_across_worker_processes(monkeypatch, tmp_path):
         {"commit": "abc"}
     ]
     assert len(run.calls) == 2
+
+
+def test_release_error_names_repository():
+    # The only release is one day old, so nothing is aged enough.
+    run = FakeRun(
+        {
+            "gh api --paginate --slurp repos/o/r/releases?per_page=100": [
+                [
+                    {
+                        "tag_name": "v1.0",
+                        "published_at": iso(1),
+                        "draft": False,
+                        "prerelease": False,
+                        "assets": [],
+                    },
+                ]
+            ]
+        }
+    )
+    with pytest.raises(AnsibleLookupError, match="o/r: no version"):
+        resolve("github-release:o/r", run)
+
+
+def test_tags_are_read_across_pages():
+    # Page 1 holds only a too-new tag; the aged one is on page 2.
+    run = FakeRun(
+        {
+            "gh api --paginate --slurp repos/o/r/tags?per_page=100": [
+                [{"name": "v2.0", "commit": {"sha": "new"}}],
+                [{"name": "v1.0", "commit": {"sha": "old"}}],
+            ],
+            "gh api repos/o/r/commits/new": {"commit": {"committer": {"date": iso(1)}}},
+            "gh api repos/o/r/commits/old": {"commit": {"committer": {"date": iso(5)}}},
+        }
+    )
+    assert resolve("github-tag:o/r", run) == {"version": "v1.0", "commit": "old"}
+
+
+def test_parse_time_honours_offset():
+    assert aged_release._parse_time("2026-09-20T09:00:00+09:00") == datetime(
+        2026, 9, 20, tzinfo=timezone.utc
+    )
+
+
+def test_parse_time_accepts_nanoseconds_and_z():
+    assert aged_release._parse_time("2026-09-20T00:00:00.123456789Z") == datetime(
+        2026, 9, 20, 0, 0, 0, 123456, tzinfo=timezone.utc
+    )
+
+
+def test_image_created_before_2000_is_rejected():
+    # Reproducible builds set Created to the epoch, which would skip the cooldown.
+    run = FakeRun(
+        {
+            "skopeo list-tags docker://ghcr.io/o/img": {"Tags": ["1.0.0"]},
+            "skopeo --override-os linux --override-arch amd64 inspect docker://ghcr.io/o/img:1.0.0": {
+                "Created": "1970-01-01T00:00:00Z",
+                "Digest": "sha256:x",
+            },
+        }
+    )
+    with pytest.raises(AnsibleLookupError, match="before 2000"):
+        resolve("oci:ghcr.io/o/img", run)

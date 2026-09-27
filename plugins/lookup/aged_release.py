@@ -75,10 +75,22 @@ def _now() -> datetime:
 
 
 def _parse_time(value: str) -> datetime:
-    """Parse an RFC 3339 timestamp; skopeo reports nanoseconds, so keep seconds."""
-    return datetime.strptime(value[:19], "%Y-%m-%dT%H:%M:%S").replace(
-        tzinfo=timezone.utc
+    """Parse an RFC 3339 timestamp into UTC.
+
+    skopeo reports nanoseconds, which fromisoformat rejects, so the fraction is
+    cut to microseconds. A timestamp without an offset is taken as UTC.
+    """
+    text = value.strip().replace("Z", "+00:00")
+    match = re.fullmatch(r"([^.+]+)(?:\.(\d+))?([+-]\d{2}:\d{2})?", text)
+    if not match:
+        raise ValueError(f"unrecognised timestamp {value!r}")
+    base, fraction, offset = match.groups()
+    iso = (
+        base
+        + (f".{fraction[:6].ljust(6, '0')}" if fraction else "")
+        + (offset or "+00:00")
     )
+    return datetime.fromisoformat(iso).astimezone(timezone.utc)
 
 
 def _iso(value: datetime) -> str:
@@ -113,6 +125,20 @@ def _json(run: Callable[[list[str]], str], cmd: list[str]):
     return json.loads(run(cmd))
 
 
+def _pages(run: Callable[[list[str]], str], path: str) -> list:
+    """Read every page of a GitHub list endpoint as one flat list."""
+    return [
+        item
+        for page in _json(run, ["gh", "api", "--paginate", "--slurp", path])
+        for item in page
+    ]
+
+
+# A reproducible build sets Created to the epoch or year 1, which would make
+# every tag look old enough and silently skip the cooldown.
+_EARLIEST_CREATED = datetime(2000, 1, 1, tzinfo=timezone.utc)
+
+
 def _oci(repo, pattern, days, platform, run, now):
     os_name, _, arch = (platform or "linux/amd64").partition("/")
     tags = _json(run, ["skopeo", "list-tags", f"docker://{repo}"])["Tags"]
@@ -130,7 +156,12 @@ def _oci(repo, pattern, days, platform, run, now):
                 f"docker://{repo}:{tag}",
             ],
         )
-        if now - _parse_time(meta["Created"]) >= timedelta(days=days):
+        created = _parse_time(meta["Created"])
+        if created < _EARLIEST_CREATED:
+            raise AnsibleLookupError(
+                f"{repo}:{tag} Created {meta['Created']} is before 2000"
+            )
+        if now - created >= timedelta(days=days):
             return {"version": tag, "ref": f"{repo}:{tag}@{meta['Digest']}"}
     raise AnsibleLookupError(
         f"no tag of {repo} matching {pattern} is at least {days} day(s) old"
@@ -138,7 +169,7 @@ def _oci(repo, pattern, days, platform, run, now):
 
 
 def _release(repo, pattern, days, asset, run, now):
-    releases = _json(run, ["gh", "api", f"repos/{repo}/releases?per_page=100"])
+    releases = _pages(run, f"repos/{repo}/releases?per_page=100")
     candidates = [
         {
             "version": r["tag_name"],
@@ -148,7 +179,10 @@ def _release(repo, pattern, days, asset, run, now):
         for r in releases
         if not r["draft"] and not r["prerelease"] and r.get("published_at")
     ]
-    chosen = select(candidates, pattern, days, now)
+    try:
+        chosen = select(candidates, pattern, days, now)
+    except AnsibleLookupError as exc:
+        raise AnsibleLookupError(f"{repo}: {exc}") from exc
     if asset is None:
         return {"version": chosen["version"], "url": "", "checksum": ""}
     name = asset.replace("{version}", chosen["version"].lstrip("v"))
@@ -168,7 +202,7 @@ def _release(repo, pattern, days, asset, run, now):
 
 
 def _tag(repo, pattern, days, run, now):
-    tags = _json(run, ["gh", "api", f"repos/{repo}/tags?per_page=100"])
+    tags = _pages(run, f"repos/{repo}/tags?per_page=100")
     shas = {t["name"]: t["commit"]["sha"] for t in tags}
     for name in ordered(list(shas), pattern):
         commit = _json(run, ["gh", "api", f"repos/{repo}/commits/{shas[name]}"])
