@@ -1,0 +1,28 @@
+---
+darwin_extra_packages:
+  - treefmt
+  - vips
+
+darwin_extra_casks:
+  - charles
+  - deepl
+  - ea
+  - fantastical
+  - epic-games
+  - gog-galaxy
+  - google-cloud-sdk
+  - kiro
+  - kiro-cli
+  - microsoft-office
+  - raspberry-pi-imager
+  - sony-ps-remote-play
+  - steam
+  - steelseries-gg
+  - ticktick
+
+# Claude Code runs only on the business Mac.
+darwin_legacy_paths:
+  - ~/.claude
+  - ~/.claude.json
+  - ~/.local/bin/claude
+  - ~/.local/share/claude

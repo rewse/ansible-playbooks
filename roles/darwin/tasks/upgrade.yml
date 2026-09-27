@@ -1,0 +1,9 @@
+---
+- name: upgrade | Upgrade all Homebrew packages
+  community.general.homebrew:
+    upgrade_all: true
+
+- name: upgrade | Update npm
+  ansible.builtin.command: npm install -g npm@latest
+  environment: "{{ supply_chain_cooldown_environment }}"
+  changed_when: false

@@ -1,0 +1,34 @@
+---
+- name: npm | Install global packages
+  # npm has no module that honours the cooldown environment.
+  ansible.builtin.command: npm install -g {{ item }}
+  environment: "{{ supply_chain_cooldown_environment }}"
+  args:
+    creates: /opt/homebrew/lib/node_modules/{{ item | regex_replace('@latest$', '') }}
+  loop: "{{ darwin_npm_packages }}"
+
+- name: npm | Remove invalid global package-lock file
+  ansible.builtin.file:
+    path: /opt/homebrew/lib/node_modules/.package-lock.json
+    state: absent
+    mode: "0644"
+  failed_when: false
+
+- name: npm | Find outdated global packages
+  # npm update -g reinstalls every global package on each run, so only the
+  # outdated ones are installed. outdated exits 1 when it finds any.
+  ansible.builtin.command: npm outdated -g --json
+  environment: "{{ supply_chain_cooldown_environment }}"
+  register: __darwin_npm_outdated
+  changed_when: false
+  failed_when: __darwin_npm_outdated.rc > 1
+  check_mode: false
+
+- name: npm | Update outdated global packages
+  # npm has no module that honours the cooldown environment.
+  ansible.builtin.command: >-
+    npm install -g
+    {% for name, info in (__darwin_npm_outdated.stdout | default('{}', true) | from_json).items() %}{{ name }}@{{ info.latest }} {% endfor %}
+  environment: "{{ supply_chain_cooldown_environment }}"
+  changed_when: true
+  when: (__darwin_npm_outdated.stdout | default('{}', true) | from_json) | length > 0

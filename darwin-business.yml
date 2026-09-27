@@ -1,7 +1,14 @@
 ---
-- hosts: darwin_business
+- name: Configure business Mac
+  hosts: darwin_business
   connection: local
   roles:
-    - chezmoi
-    - darwin
-    - darwin/business
+    - role: darwin
+      tags:
+        - darwin
+    - role: chezmoi
+      tags:
+        - chezmoi
+    - role: builder_toolbox
+      tags:
+        - builder_toolbox

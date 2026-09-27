@@ -1,1 +1,157 @@
 ---
+darwin_taps:
+  - k1low/tap
+  - lightpanda-io/browser
+  - steipete/tap
+  - xdevplatform/tap
+
+darwin_trusted_formulae:
+  - k1low/tap/mo
+  - lightpanda-io/browser/lightpanda
+  - steipete/tap/agent-browser
+  - steipete/tap/mcporter
+
+darwin_trusted_casks:
+  - xdevplatform/tap/xurl
+
+darwin_packages:
+  - agent-browser
+  - ansible
+  - ansible-lint
+  - awscli
+  - basedpyright
+  - bat
+  - chezmoi
+  - container
+  - coreutils
+  - direnv
+  - dotnet
+  - fping
+  - gh
+  - gitleaks
+  - gnu-sed
+  - git-cliff
+  - jq
+  - lightpanda
+  - mas
+  - mcporter
+  - mo
+  - node
+  - officecli
+  - osv-scanner
+  - pandoc
+  - php
+  - pipx
+  - pnpm
+  - poppler
+  - pv
+  - pwgen
+  - python3
+  - ripgrep
+  - rsync
+  - shellcheck
+  - skopeo
+  - switchaudio-osx
+  - svn
+  - telnet
+  - tree
+  - typescript-language-server
+  - uv
+  - watch
+  - xdg-ninja
+  - yt-dlp
+  - zsh-vi-mode
+
+darwin_casks:
+  - 1password
+  - 1password-cli
+  - adobe-creative-cloud
+  - amazon-chime
+  - appcleaner
+  - arc
+  - atok
+  - betterdisplay
+  - calibre
+  - calibrite-profiler
+  - chatbox
+  - cmux
+  - corretto
+  - cyberduck
+  - dotnet-sdk
+  - easydict
+  - firefox
+  - font-hackgen
+  - font-new-york
+  - font-sf-compact
+  - font-sf-mono
+  - font-sf-mono-for-powerline
+  - font-sf-pro
+  - font-source-sans-3
+  - font-source-serif-4
+  - geekbench
+  - ghostty
+  - gnucash
+  - google-chrome
+  - grandperspective
+  - handbrake
+  - istat-menus
+  - karabiner-elements
+  - keka
+  - kekaexternalhelper
+  - keyboard-maestro
+  - keycastr
+  - libreoffice
+  - lm-studio
+  - obsidian
+  - otty
+  - popclip
+  - prowritingaid
+  - qlmarkdown
+  - rectangle-pro
+  - slack
+  - snapzy
+  - spokenly
+  - steermouse
+  - sf-symbols
+  - thaw
+  - vlc
+  - xurl
+  - zed
+  - zoom
+
+darwin_npm_packages:
+  - "@aikidosec/safe-chain"
+  - ctx7
+  - "@playwright/mcp@latest"
+  - skills
+
+darwin_uv_tools:
+  # Web search through a Bedrock AgentCore Gateway, signed with local AWS
+  # credentials. Published only as a sample repository, so it installs from git
+  # rather than PyPI. Needs the gateway from the repo's CloudFormation template
+  # and AGENTCORE_GATEWAY_URL, which .zshenv exports.
+  - git+https://github.com/aws-samples/sample-agentcore-websearch-agent-skill
+  - jupyterlab
+  - pdfplumber
+  - tavily-cli
+
+darwin_mas_apps:
+  - 302584613   # Amazon Kindle
+  - 545519333   # Amazon Prime Video
+  - 1168254295  # AmorphousDiskMark
+  - 425264550   # Blackmagic Disk Speed Test
+  - 1044629456  # GFXBench Metal
+  - 1099568401  # Home Assistant
+  - 539883307   # LINE
+  - 1436994560  # Portal
+  - 1187772509  # stts
+  - 899247664   # TestFlight
+  - 494803304   # WiFi Explorer
+  - 1295203466  # Windows App
+  - 1451685025  # WireGuard
+  - 497799835   # Xcode
+  - 1380563956  # 辞書 by 物書堂
+
+darwin_path_files:
+  - homebrew
+  - local

@@ -1,0 +1,9 @@
+---
+# Homebrew formulae, casks and Mac App Store app IDs a host type adds to the
+# common lists.
+darwin_extra_packages: []
+darwin_extra_casks: []
+darwin_extra_mas_apps: []
+# Paths left by software this host no longer runs. Remove an entry once the host
+# has converged.
+darwin_legacy_paths: []

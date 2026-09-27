@@ -1,0 +1,17 @@
+---
+- name: tap | Add taps
+  community.general.homebrew_tap:
+    name: "{{ item }}"
+  loop: "{{ darwin_taps }}"
+
+- name: tap | Trust tap formulae
+  # No module sets Homebrew's trust flag.
+  ansible.builtin.command: brew trust --formula {{ item }}
+  changed_when: false
+  loop: "{{ darwin_trusted_formulae }}"
+
+- name: tap | Trust tap casks
+  # No module sets Homebrew's trust flag.
+  ansible.builtin.command: brew trust --cask {{ item }}
+  changed_when: false
+  loop: "{{ darwin_trusted_casks }}"

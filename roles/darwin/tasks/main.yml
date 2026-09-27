@@ -1,486 +1,67 @@
 ---
-- name: "package : Add homebrew taps"
-  community.general.homebrew_tap:
-    name: "{{ item }}"
-  loop:
-    - k1low/tap
-    - lightpanda-io/browser
-    - steipete/tap
-    - xdevplatform/tap
+- name: Import tap tasks
+  ansible.builtin.import_tasks: tap.yml
   tags:
-    - darwin
-    - install
-    - package
+    - darwin_tap
+
+- name: Import package tasks
+  ansible.builtin.import_tasks: package.yml
+  tags:
     - darwin_package
-    - darwin_package_install
+    - update
 
-- name: "package : Trust homebrew tap formulae"
-  ansible.builtin.command: brew trust --formula {{ item }}
-  changed_when: false
-  loop:
-    - k1low/tap/mo
-    - lightpanda-io/browser/lightpanda
-    - steipete/tap/agent-browser
-    - steipete/tap/mcporter
+- name: Import cask tasks
+  ansible.builtin.import_tasks: cask.yml
   tags:
-    - darwin
-    - install
-    - package
-    - darwin_package
-    - darwin_package_install
+    - darwin_cask
+    - update
 
-- name: "package : Trust homebrew tap casks"
-  ansible.builtin.command: brew trust --cask {{ item }}
-  changed_when: false
-  loop:
-    - xdevplatform/tap/xurl
+- name: Import mas tasks
+  ansible.builtin.import_tasks: mas.yml
   tags:
-    - darwin
-    - install
-    - package
-    - darwin_package
-    - darwin_package_install
+    - darwin_mas
 
-# Update Homebrew once here rather than per item in the install loops below,
-# where update_homebrew per iteration would re-run brew update many times.
-- name: "package : Update homebrew"
-  community.general.homebrew:
-    update_homebrew: true
+- name: Import npm tasks
+  ansible.builtin.import_tasks: npm.yml
   tags:
-    - darwin
-    - install
-    - package
-    - darwin_package
-    - darwin_package_install
+    - darwin_npm
+    - update
 
-# Use loop instead of passing a list to name: so that a failure on one package
-# does not abort the others. With a list, the module processes packages in order
-# and stops at the first failure, leaving the rest uninstalled.
-- name: "package : Install packages by homebrew"
-  community.general.homebrew:
-    name: "{{ item }}"
-    update_homebrew: false
-  loop:
-    - agent-browser
-    - ansible
-    - ansible-lint
-    - awscli
-    - basedpyright
-    - bat
-    - chezmoi
-    - container
-    - coreutils
-    - direnv
-    - dotnet
-    - fping
-    - gh
-    - gitleaks
-    - gnu-sed
-    - git-cliff
-    - jq
-    - lightpanda
-    - mas
-    - mcporter
-    - mo
-    - node
-    - officecli
-    - osv-scanner
-    - pandoc
-    - php
-    - pipx
-    - pnpm
-    - poppler
-    - pv
-    - pwgen
-    - python3
-    - ripgrep
-    - rsync
-    - shellcheck
-    - skopeo
-    - switchaudio-osx
-    - svn
-    - telnet
-    - tree
-    - typescript-language-server
-    - uv
-    - watch
-    - xdg-ninja
-    - yt-dlp
-    - zsh-vi-mode
+- name: Import uv tasks
+  ansible.builtin.import_tasks: uv.yml
   tags:
-    - darwin
-    - install
-    - package
-    - darwin_package
-    - darwin_package_install
+    - darwin_uv
+    - update
 
-- name: "package: Install Chrome for agent-browser"
-  ansible.builtin.command: agent-browser install
-  changed_when: false
+- name: Import font tasks
+  ansible.builtin.import_tasks: font.yml
   tags:
-    - darwin
-    - install
-    - package
-    - darwin_package
-    - darwin_package_install
-
-# Use loop for the same reason as the homebrew task above: a list aborts at the
-# first failing cask, which is common when an app already exists at the target
-# path, leaving the rest uninstalled.
-- name: "package : Install packages by homebrew_cask"
-  community.general.homebrew_cask:
-    name: "{{ item }}"
-    update_homebrew: false
-  loop:
-    - 1password
-    - 1password-cli
-    - adobe-creative-cloud
-    - amazon-chime
-    - appcleaner
-    - arc
-    - atok
-    - betterdisplay
-    - calibre
-    - calibrite-profiler
-    - chatbox
-    - cmux
-    - corretto
-    - cyberduck
-    - dotnet-sdk
-    - easydict
-    - firefox
-    - font-hackgen
-    - font-new-york
-    - font-sf-compact
-    - font-sf-mono
-    - font-sf-mono-for-powerline
-    - font-sf-pro
-    - font-source-sans-3
-    - font-source-serif-4
-    - geekbench
-    - ghostty
-    - gnucash
-    - google-chrome
-    - grandperspective
-    - handbrake
-    - istat-menus
-    - karabiner-elements
-    - keka
-    - kekaexternalhelper
-    - keyboard-maestro
-    - keycastr
-    - libreoffice
-    - lm-studio
-    - obsidian
-    - otty
-    - popclip
-    - prowritingaid
-    - qlmarkdown
-    - rectangle-pro
-    - slack
-    - snapzy
-    - spokenly
-    - steermouse
-    - sf-symbols
-    - thaw
-    - vlc
-    - xurl
-    - zed
-    - zoom
-  failed_when: false
-  tags:
-    - darwin
-    - install
-    - package
-    - darwin_package
-    - darwin_package_install
-
-- name: "package: Install global npm packages"
-  ansible.builtin.command: npm install -g {{ item }}
-  environment: "{{ supply_chain_cooldown_environment }}"
-  changed_when: false
-  loop:
-    - "@aikidosec/safe-chain"
-    - ctx7
-    - "@playwright/mcp@latest"
-    - skills
-  tags:
-    - darwin
-    - install
-    - package
-    - darwin_package
-    - darwin_package_install
-
-- name: "package : Install package by uv"
-  ansible.builtin.command: uv tool install {{ item }}
-  environment: "{{ supply_chain_cooldown_environment }}"
-  changed_when: false
-  loop:
-    # Web search through a Bedrock AgentCore Gateway, signed with local AWS
-    # credentials. Published only as a sample repository, so it installs from git
-    # rather than PyPI. Needs the gateway from the repo's CloudFormation template
-    # and AGENTCORE_GATEWAY_URL, which .zshenv exports.
-    - git+https://github.com/aws-samples/sample-agentcore-websearch-agent-skill
-    - jupyterlab
-    - pdfplumber
-    - tavily-cli
-  tags:
-    - darwin
-    - install
-    - package
-    - darwin_package
-    - darwin_package_install
-
-# Note: If this task fails with "sudo: a terminal is required to read the password" error,
-# some casks require sudo password for upgrade. In such cases, run `brew upgrade` manually
-# in the terminal.
-- name: "package : Upgrade all homebrew packages"
-  community.general.homebrew:
-    upgrade_all: true
-  tags:
-    - darwin
-    - upgrade
-    - package
-    - darwin_package
-    - darwin_package_upgrade
-
-- name: "package : Remove invalid npm global package-lock file"
-  ansible.builtin.file:
-    path: /opt/homebrew/lib/node_modules/.package-lock.json
-    state: absent
-    mode: '0644'
-  failed_when: false
-  tags:
-    - darwin
-    - upgrade
-    - package
-    - darwin_package
-    - darwin_package_upgrade
-
-- name: "package : Update npm"
-  ansible.builtin.command: npm install -g npm@latest
-  environment: "{{ supply_chain_cooldown_environment }}"
-  changed_when: false
-  tags:
-    - ubuntu
-    - upgrade
-    - package
-    - ubuntu_package
-    - ubuntu_package_upgrade
-
-- name: "package : Update global npm packages"
-  ansible.builtin.command: npm update -g
-  environment: "{{ supply_chain_cooldown_environment }}"
-  changed_when: false
-  tags:
-    - darwin
-    - upgrade
-    - package
-    - darwin_package
-    - darwin_package_upgrade
-
-- name: "package : Upgrade all uv tools"
-  ansible.builtin.command: uv tool upgrade --all
-  environment: "{{ supply_chain_cooldown_environment }}"
-  changed_when: false
-  tags:
-    - darwin
-    - upgrade
-    - package
-    - darwin_package
-    - darwin_package_upgrade
-
-# Note: mas 6+ requires root privileges to install App Store apps, so this task
-# needs become. Run the playbook with -K or --ask-become-pass.
-- name: "package : Install packages by mas"
-  ansible.builtin.command: mas install {{ item }}
-  become: true
-  changed_when: false
-  loop:
-    - 302584613   # Amazon Kindle
-    - 545519333   # Amazon Prime Video
-    - 1168254295  # AmorphousDiskMark
-    - 425264550   # Blackmagic Disk Speed Test
-    - 1044629456  # GFXBench Metal
-    - 1099568401  # Home Assistant
-    - 539883307   # LINE
-    - 1436994560  # Portal
-    - 1187772509  # stts
-    - 899247664   # TestFlight
-    - 494803304   # WiFi Explorer
-    - 1295203466  # Windows App
-    - 1451685025  # WireGuard
-    - 497799835   # Xcode
-    - 1380563956  # 辞書 by 物書堂
-  failed_when: false
-  tags:
-    - darwin
-    - install
-    - package
-    - darwin_package
-    - darwin_package_install
-
-- name: "font : Create directory"
-  ansible.builtin.file:
-    path: /Library/Fonts/Adobe
-    state: directory
-    mode: '0755'
-  tags:
-    - darwin
-    - init
-    - font
     - darwin_font
-    - darwin_font_init
+    - update
 
-- name: "font : Resolve aged release source-han-mono"
-  ansible.builtin.set_fact:
-    __darwin_source_han_mono: "{{ lookup('aged_release', 'github-release:adobe-fonts/source-han-mono', pattern='^\\d+\\.\\d+$', asset='SourceHanMono.ttc') }}"
+- name: Import security tasks
+  ansible.builtin.import_tasks: security.yml
   tags:
-    - darwin
-    - install
-    - font
-    - darwin_font
-    - darwin_font_install
-    - darwin_font_download
-
-- name: "font : Resolve aged release source-han-sans"
-  ansible.builtin.set_fact:
-    __darwin_source_han_sans: "{{ lookup('aged_release', 'github-release:adobe-fonts/source-han-sans', pattern='^\\d+\\.\\d+R$', asset='01_SourceHanSans.ttc.zip') }}"
-  tags:
-    - darwin
-    - install
-    - font
-    - darwin_font
-    - darwin_font_install
-    - darwin_font_download
-
-- name: "font : Resolve aged release source-han-serif"
-  ansible.builtin.set_fact:
-    __darwin_source_han_serif: "{{ lookup('aged_release', 'github-release:adobe-fonts/source-han-serif', pattern='^\\d+\\.\\d+R$', asset='01_SourceHanSerif.ttc.zip') }}"
-  tags:
-    - darwin
-    - install
-    - font
-    - darwin_font
-    - darwin_font_install
-    - darwin_font_download
-
-- name: "font : Download source-han-mono"
-  ansible.builtin.get_url:
-    url: "{{ __darwin_source_han_mono.url }}"
-    dest: /Library/Fonts/Adobe/SourceHanMono.ttc
-    checksum: "{{ __darwin_source_han_mono.checksum | default(omit, true) }}"
-    mode: '0644'
-  tags:
-    - darwin
-    - install
-    - font
-    - darwin_font
-    - darwin_font_install
-    - darwin_font_download
-
-- name: "font : Download source-han-sans"
-  ansible.builtin.unarchive:
-    src: "{{ __darwin_source_han_sans.url }}"
-    dest: /Library/Fonts/Adobe
-    remote_src: true
-    # Files created in this directory inherit its admin group; stating it
-    # stops unarchive from reporting a group change on every run.
-    group: admin
-  tags:
-    - darwin
-    - install
-    - font
-    - darwin_font
-    - darwin_font_install
-    - darwin_font_download
-
-- name: "font : Download source-han-serif"
-  ansible.builtin.unarchive:
-    src: "{{ __darwin_source_han_serif.url }}"
-    dest: /Library/Fonts/Adobe
-    remote_src: true
-    # Files created in this directory inherit its admin group; stating it
-    # stops unarchive from reporting a group change on every run.
-    group: admin
-  tags:
-    - darwin
-    - install
-    - font
-    - darwin_font
-    - darwin_font_install
-    - darwin_font_download
-
-- name: "security : Download Aikido Safe Chain installer"
-  ansible.builtin.get_url:
-    url: https://raw.githubusercontent.com/AikidoSec/safe-chain/main/install-scripts/install-safe-chain.sh
-    dest: /tmp/install-safe-chain.sh
-    mode: '0755'
-  tags:
-    - darwin
-    - install
-    - security
     - darwin_security
-    - darwin_security_install
+    - update
 
-- name: "security : Install Aikido Safe Chain"
-  ansible.builtin.command: sh /tmp/install-safe-chain.sh --include-python
-  changed_when: false
+- name: Import path tasks
+  ansible.builtin.import_tasks: path.yml
   tags:
-    - darwin
-    - install
-    - security
-    - darwin_security
-    - darwin_security_install
-
-- name: "package : Install PowerShell by dotnet"
-  ansible.builtin.command: dotnet tool install --global PowerShell
-  changed_when: false
-  tags:
-    - darwin
-    - install
-    - package
-    - darwin_package
-    - darwin_package_install
-
-# Note: This task requires sudo password. Run the playbook with -K or --ask-become-pass option.
-# Example: ansible-playbook darwin-personal.yml --ask-become-pass
-- name: "path : Copy path configurations"
-  ansible.builtin.copy:
-    src: "{{ item }}"
-    dest: /etc/paths.d/{{ item }}
-    mode: '0644'
-  become: true
-  loop:
-    - homebrew
-    - local
-  failed_when: false
-  tags:
-    - darwin
-    - config
-    - path
     - darwin_path
-    - darwin_path_config
 
-- name: "xurl : Configure X API authentication"
-  ansible.builtin.command:
-    cmd: >
-      xurl auth apps add kiro-rewse
-      --client-id "{{ lookup('pipe', 'op read op://ansible/3mpawbf6a3ipmepznocniqqes4/username') }}"
-      --client-secret "{{ lookup('pipe', 'op read op://ansible/3mpawbf6a3ipmepznocniqqes4/credential') }}"
-    creates: ~/.xurl
+- name: Import xurl tasks
+  ansible.builtin.import_tasks: xurl.yml
   tags:
-    - darwin
-    - config
-    - xurl
     - darwin_xurl
-    - darwin_xurl_config
-# - name: "package : Install rest of the apps"
-#   install_yourself:
-#     - https://www.blackmagicdesign.com/jp/products/davinciresolve/  # DaVinci Resolve
-#     - https://www.insta360.com/download/insta360-link2c             # Insta360 Link Controller
-#     - https://www.ireasoning.com/mibbrowser.shtml                   # MIB Browser
-#     - https://prowritingaid.com/everywhere-download-mac             # ProWritingAid Everywhere
-#     - https://github.com/SAP/power-monitoring-tool-for-macos        # SAP Power Monitor
-#     - https://cornixhub.com/vialwindow                              # VialWindow
-#     - https://www.xencelabs.com/support/download-drivers/           # Xencelabs Driver
+
+- name: Import cleanup tasks
+  ansible.builtin.import_tasks: cleanup.yml
+  tags:
+    - darwin_cleanup
+
+- name: Import upgrade tasks
+  ansible.builtin.import_tasks: upgrade.yml
+  tags:
+    - darwin_upgrade
+    - update

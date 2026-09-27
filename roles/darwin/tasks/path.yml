@@ -1,0 +1,20 @@
+---
+# /etc/paths.d needs root. Comparing first keeps a run that changes nothing from
+# asking for the become password; run the playbook with -K when a file differs.
+- name: path | Check path configurations
+  ansible.builtin.stat:
+    path: /etc/paths.d/{{ item }}
+    checksum_algorithm: sha1
+  loop: "{{ darwin_path_files }}"
+  register: __darwin_paths
+
+- name: path | Copy path configurations
+  ansible.builtin.copy:
+    src: "{{ item.item }}"
+    dest: /etc/paths.d/{{ item.item }}
+    mode: "0644"
+  become: true
+  loop: "{{ __darwin_paths.results }}"
+  loop_control:
+    label: "{{ item.item }}"
+  when: item.stat.checksum | default('') != (lookup('ansible.builtin.file', item.item) ~ '\n') | hash('sha1')

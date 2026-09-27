@@ -1,0 +1,12 @@
+---
+- name: uv | Install tools
+  # uv has no Ansible module.
+  ansible.builtin.command: uv tool install {{ item }}
+  environment: "{{ supply_chain_cooldown_environment }}"
+  changed_when: false
+  loop: "{{ darwin_uv_tools }}"
+
+- name: uv | Upgrade tools
+  ansible.builtin.command: uv tool upgrade --all
+  environment: "{{ supply_chain_cooldown_environment }}"
+  changed_when: false

@@ -1,9 +1,20 @@
 ---
-- hosts: darwin_personal
+- name: Configure personal Mac
+  hosts: darwin_personal
   connection: local
   roles:
-    - chezmoi
-    - darwin
-    - darwin/personal
-    - power_monitor
-    - restic
+    - role: darwin
+      tags:
+        - darwin
+    - role: chezmoi
+      tags:
+        - chezmoi
+    - role: nix
+      tags:
+        - nix
+    - role: power_monitor
+      tags:
+        - power_monitor
+    - role: restic
+      tags:
+        - restic

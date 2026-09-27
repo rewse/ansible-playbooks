@@ -1,0 +1,18 @@
+---
+- name: mas | List installed apps
+  # Listing first keeps become to apps actually missing; mas 6 installs only as
+  # root, and the mas module offers no way to ask as the user and install as root.
+  ansible.builtin.command: mas list
+  register: __darwin_mas_list
+  changed_when: false
+  check_mode: false
+
+- name: mas | Install missing apps
+  # Run the playbook with -K when an app is missing; a host with every app
+  # installed asks for nothing.
+  ansible.builtin.command: mas install {{ item }}
+  become: true
+  changed_when: true
+  loop: "{{ darwin_mas_apps + darwin_extra_mas_apps }}"
+  when: (item | string) not in (__darwin_mas_list.stdout_lines | map('trim') | map('split', ' ') | map('first') | list)
+  failed_when: false

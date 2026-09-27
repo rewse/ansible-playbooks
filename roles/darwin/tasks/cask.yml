@@ -1,0 +1,7 @@
+---
+- name: cask | Install casks
+  community.general.homebrew_cask:
+    name: "{{ item }}"
+    update_homebrew: false
+  loop: "{{ darwin_casks + darwin_extra_casks }}"
+  failed_when: false

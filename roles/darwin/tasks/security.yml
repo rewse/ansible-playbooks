@@ -1,0 +1,10 @@
+---
+- name: security | Download Aikido Safe Chain installer
+  ansible.builtin.get_url:
+    url: https://raw.githubusercontent.com/AikidoSec/safe-chain/main/install-scripts/install-safe-chain.sh
+    dest: /tmp/install-safe-chain.sh
+    mode: "0755"
+
+- name: security | Install Aikido Safe Chain
+  ansible.builtin.command: sh /tmp/install-safe-chain.sh --include-python
+  changed_when: false

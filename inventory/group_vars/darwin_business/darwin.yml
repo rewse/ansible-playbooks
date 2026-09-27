@@ -1,0 +1,17 @@
+---
+darwin_extra_casks:
+  - asana
+  - box-drive
+  - claude
+  - displaylink
+  - font-noto-sans-cjk
+  - gotomeeting
+  - microsoft-teams
+  - quip
+  - tripmode
+  - webex-meetings
+
+# mas 6 installs only as root, so a missing app needs the playbook run with -K.
+darwin_extra_mas_apps:
+  - 1274495053  # Microsoft To Do
+  - 1639692859  # WattsConnected

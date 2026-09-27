@@ -1,0 +1,43 @@
+---
+- name: font | Create directory
+  ansible.builtin.file:
+    path: /Library/Fonts/Adobe
+    state: directory
+    mode: "0755"
+
+- name: font | Resolve aged release source-han-mono
+  ansible.builtin.set_fact:
+    __darwin_source_han_mono: "{{ lookup('aged_release', 'github-release:adobe-fonts/source-han-mono', pattern='^\\d+\\.\\d+$', asset='SourceHanMono.ttc') }}"
+
+- name: font | Resolve aged release source-han-sans
+  ansible.builtin.set_fact:
+    __darwin_source_han_sans: "{{ lookup('aged_release', 'github-release:adobe-fonts/source-han-sans', pattern='^\\d+\\.\\d+R$', asset='01_SourceHanSans.ttc.zip') }}"
+
+- name: font | Resolve aged release source-han-serif
+  ansible.builtin.set_fact:
+    __darwin_source_han_serif: "{{ lookup('aged_release', 'github-release:adobe-fonts/source-han-serif', pattern='^\\d+\\.\\d+R$', asset='01_SourceHanSerif.ttc.zip') }}"
+
+- name: font | Install source-han-mono
+  ansible.builtin.get_url:
+    url: "{{ __darwin_source_han_mono.url }}"
+    dest: /Library/Fonts/Adobe/SourceHanMono.ttc
+    checksum: "{{ __darwin_source_han_mono.checksum | default(omit, true) }}"
+    mode: "0644"
+
+- name: font | Install source-han-sans
+  ansible.builtin.unarchive:
+    src: "{{ __darwin_source_han_sans.url }}"
+    dest: /Library/Fonts/Adobe
+    remote_src: true
+    # Files created in this directory inherit its admin group; stating it
+    # stops unarchive from reporting a group change on every run.
+    group: admin
+
+- name: font | Install source-han-serif
+  ansible.builtin.unarchive:
+    src: "{{ __darwin_source_han_serif.url }}"
+    dest: /Library/Fonts/Adobe
+    remote_src: true
+    # Files created in this directory inherit its admin group; stating it
+    # stops unarchive from reporting a group change on every run.
+    group: admin
