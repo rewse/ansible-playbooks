@@ -1,0 +1,23 @@
+---
+- name: config | Copy jail.local
+  ansible.builtin.copy:
+    src: jail.local
+    dest: /etc/fail2ban/jail.local
+    mode: "0644"
+  notify: Restart fail2ban
+
+- name: config | Deploy sshd jail config
+  ansible.builtin.template:
+    src: sshd.conf.j2
+    dest: /etc/fail2ban/jail.d/sshd.conf
+    mode: "0644"
+  notify: Restart fail2ban
+
+- name: config | Remove jails for services this host does not run
+  # Jails once written to every host by the ubuntu role; each service role now
+  # writes its own.
+  ansible.builtin.file:
+    path: /etc/fail2ban/{{ item[0] }}/{{ item[1] }}.conf
+    state: absent
+  loop: "{{ ['filter.d', 'jail.d'] | product(fail2ban_legacy_jails) | list }}"
+  notify: Restart fail2ban

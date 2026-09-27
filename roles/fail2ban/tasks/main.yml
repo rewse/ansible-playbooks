@@ -1,0 +1,10 @@
+---
+- name: Import package tasks
+  ansible.builtin.import_tasks: package.yml
+  tags:
+    - fail2ban_package
+
+- name: Import config tasks
+  ansible.builtin.import_tasks: config.yml
+  tags:
+    - fail2ban_config

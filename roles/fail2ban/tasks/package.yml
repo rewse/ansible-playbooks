@@ -1,0 +1,4 @@
+---
+- name: package | Install package
+  ansible.builtin.apt:
+    name: fail2ban

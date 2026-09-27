@@ -19,6 +19,9 @@
     - role: zabbix_agent
       tags:
         - zabbix_agent
+    - role: fail2ban
+      tags:
+        - fail2ban
     - role: desktop
       tags:
         - desktop
