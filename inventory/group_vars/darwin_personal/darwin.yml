@@ -19,3 +19,9 @@ darwin_extra_casks:
   - steam
   - steelseries-gg
   - ticktick
+
+# Install by hand; these have no Homebrew cask or App Store entry:
+#   adbLink                    https://adblink.me/download/
+#   HoudahGPS                  https://www.houdah.com/houdahGPS/download.html
+#   Palette Master Element     https://www.benq.com/ja-jp/support/downloads-faq/products/monitor/sw271/software-driver.html
+#   PhishWall                  http://www2.securebrain.co.jp/products/phishwall/smbc_direct.html

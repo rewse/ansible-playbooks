@@ -11,6 +11,9 @@ darwin_extra_casks:
   - tripmode
   - webex-meetings
 
+# Install by hand; these have no Homebrew cask or App Store entry:
+#   MeetNote                   https://gitlab.aws.dev/kaizawap/MeetNote
+
 # mas 6 installs only as root, so a missing app needs the playbook run with -K.
 darwin_extra_mas_apps:
   - 1274495053  # Microsoft To Do

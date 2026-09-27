@@ -119,6 +119,15 @@ darwin_casks:
   - zed
   - zoom
 
+# Install by hand on every Mac; these have no Homebrew cask or App Store entry:
+#   DaVinci Resolve            https://www.blackmagicdesign.com/jp/products/davinciresolve/
+#   Insta360 Link Controller   https://www.insta360.com/download/insta360-link2c
+#   MIB Browser                https://www.ireasoning.com/mibbrowser.shtml
+#   ProWritingAid Everywhere   https://prowritingaid.com/everywhere-download-mac
+#   SAP Power Monitor          https://github.com/SAP/power-monitoring-tool-for-macos
+#   VialWindow                 https://cornixhub.com/vialwindow
+#   Xencelabs Driver           https://www.xencelabs.com/support/download-drivers/
+
 # Aikido Safe Chain is not listed: its official installer in the security
 # component removes the npm copy in favour of its own binary.
 darwin_npm_packages:
