@@ -1,0 +1,6 @@
+---
+- name: Import tools tasks
+  ansible.builtin.import_tasks: tools.yml
+  tags:
+    - builder_toolbox_tools
+    - update

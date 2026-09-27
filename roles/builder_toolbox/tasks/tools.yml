@@ -1,0 +1,63 @@
+---
+# Builder Toolbox and the tools it installs. Run `mwinit -s` before the playbook.
+# Ref: https://docs.hub.amazon.dev/builder-toolbox/user-guide/getting-started/
+# The toolbox, enfable, axe and aim CLIs have no Ansible modules.
+- name: tools | Register repositories
+  ansible.builtin.command: toolbox registry add {{ item }}
+  changed_when: false
+  loop:
+    - s3://buildertoolbox-registry-aisec-enfable-us-west-2/tools.json
+    - s3://buildertoolbox-registry-isengard-cli-us-west-2/tools.json
+
+- name: tools | Install with toolbox
+  ansible.builtin.command: toolbox install {{ item }}
+  changed_when: false
+  loop:
+    - aim
+    - axe
+    - brazilcli
+    - claude-code
+    - enfable
+    - isengard-cli
+    - kiro-cli
+
+- name: tools | Update toolbox
+  ansible.builtin.command: toolbox update
+  changed_when: false
+
+- name: tools | Enable enfable
+  ansible.builtin.command: enfable enable
+  changed_when: false
+
+- name: tools | Install Kiro IDE
+  ansible.builtin.command: axe init kiro
+  args:
+    creates: /Applications/Kiro.app
+
+- name: tools | Install MCP servers
+  # --clients selects which client configs to edit. Naming an unregistered
+  # client leaves all of them alone, keeping aim away from the codex and kiro
+  # configs that chezmoi owns. Do not reach for --print-client-config instead:
+  # it also skips the ~/.aim/mcp-servers wrapper, so the server never lands on
+  # PATH and the install reports success while leaving nothing runnable.
+  ansible.builtin.command: aim mcp install --clients=none {{ item }}
+  changed_when: false
+  loop:
+    - amazon-quick-mcp
+    - amazon-sharepoint-mcp
+    - atoz-mcp
+    - aws-agent-registry-gateway-mcp
+    - aws-insights-mcp
+    - aws-outlook-mcp
+    - builder-mcp
+    - chorus-mcp
+    - emburse-mcp
+    - pippin-mcp
+    - slack-mcp
+    - spec-req-mcp
+    - specialist-super-agent-mcp
+    - wis-web-search-mcp
+
+- name: tools | Update MCP servers
+  ansible.builtin.command: aim mcp update
+  changed_when: false
