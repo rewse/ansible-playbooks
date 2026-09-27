@@ -174,6 +174,90 @@
     - ubuntu_1password_install
     - ubuntu_1password_config
 
+- name: "nodejs : Read release index"
+  ansible.builtin.uri:
+    url: https://nodejs.org/dist/index.json
+    return_content: true
+  register: __ubuntu_nodejs_index
+  check_mode: false
+  tags:
+    - ubuntu
+    - install
+    - update
+    - nodejs
+    - ubuntu_nodejs
+    - ubuntu_nodejs_install
+
+- name: "nodejs : Select LTS major"
+  ansible.builtin.set_fact:
+    # The index lists releases newest first; lts is false or the LTS codename.
+    __ubuntu_nodejs_major: "{{ (__ubuntu_nodejs_index.json | selectattr('lts') | first).version | regex_replace('^v', '') | split('.') | first }}"
+  tags:
+    - ubuntu
+    - install
+    - update
+    - nodejs
+    - ubuntu_nodejs
+    - ubuntu_nodejs_install
+
+- name: "nodejs : Download apt GPG key"
+  ansible.builtin.get_url:
+    url: https://deb.nodesource.com/gpgkey/nodesource-repo.gpg.key
+    dest: /etc/apt/keyrings/nodesource.asc
+    mode: "0644"
+  tags:
+    - ubuntu
+    - install
+    - update
+    - nodejs
+    - ubuntu_nodejs
+    - ubuntu_nodejs_install
+
+# Removed before the new definition: both would offer nodejs from different
+# major lines, and apt would keep whichever resolves first.
+- name: "nodejs : Remove legacy apt list"
+  ansible.builtin.file:
+    path: /etc/apt/sources.list.d/nodesource.list
+    state: absent
+  tags:
+    - ubuntu
+    - install
+    - update
+    - nodejs
+    - ubuntu_nodejs
+    - ubuntu_nodejs_install
+
+- name: "nodejs : Add apt repository"
+  ansible.builtin.deb822_repository:
+    name: nodesource
+    types: deb
+    uris: "https://deb.nodesource.com/node_{{ __ubuntu_nodejs_major }}.x"
+    suites: nodistro
+    components: main
+    architectures: "{{ ubuntu_deb_arch }}"
+    signed_by: /etc/apt/keyrings/nodesource.asc
+  tags:
+    - ubuntu
+    - install
+    - update
+    - nodejs
+    - ubuntu_nodejs
+    - ubuntu_nodejs_install
+
+- name: "nodejs : Install package"
+  ansible.builtin.apt:
+    name: nodejs
+    state: present
+    update_cache: true
+  # Present only: the dist upgrade that follows moves nodejs to the new major.
+  tags:
+    - ubuntu
+    - install
+    - update
+    - nodejs
+    - ubuntu_nodejs
+    - ubuntu_nodejs_install
+
 - name: "ubuntu : Update all packages"
   ansible.builtin.apt:
     upgrade: dist
@@ -499,6 +583,8 @@
     uid: 2000
     group: "{{ admin }}"
     groups: "adm,sudo"
+    # Append so the docker role's docker group survives this task.
+    append: true
     shell: /usr/bin/zsh
     skeleton: /etc/skel
   tags:
