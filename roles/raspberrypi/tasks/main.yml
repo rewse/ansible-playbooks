@@ -159,12 +159,33 @@
     - raspberrypi_snmp
     - raspberrypi_snmp_config
 
+- name: "php-miio : Resolve aged tag"
+  ansible.builtin.set_fact:
+    __raspberrypi_php_miio: "{{ lookup('aged_release', 'github-tag:skysilver-lab/php-miio', pattern='^v\\.\\d+(\\.\\d+)+$') }}"
+  tags:
+    - raspberrypi
+    - install
+    - raspberrypi_php-miio
+    - raspberrypi_php-miio_install
+
 - name: "php-miio : Clone repository"
   ansible.builtin.git:
     repo: https://github.com/skysilver-lab/php-miio.git
-    dest: /srv/php-miio
-    version: "v.{{ raspberrypi_php_miio_version }}"
-  register: raspberrypi_php_miio_git
+    # Run in place, so under /opt rather than /srv, which holds service data.
+    dest: /opt/php-miio
+    version: "{{ __raspberrypi_php_miio.commit }}"
+  register: __raspberrypi_php_miio_git
+  tags:
+    - raspberrypi
+    - install
+    - raspberrypi_php-miio
+    - raspberrypi_php-miio_install
+
+
+- name: "php-miio : Remove legacy checkout"
+  ansible.builtin.file:
+    path: /srv/php-miio
+    state: absent
   tags:
     - raspberrypi
     - install
@@ -396,7 +417,9 @@
 
 - name: "qwen-code : Install"
   community.general.npm:
-    name: "@qwen-code/qwen-code@latest"
+    # Without @latest: a version spec makes the module reinstall on every run.
+    # The ubuntu role's npm update -g keeps it current.
+    name: "@qwen-code/qwen-code"
     global: true
     state: present
   environment: "{{ supply_chain_cooldown_environment }}"
@@ -430,14 +453,25 @@
     - raspberrypi_backup
     - raspberrypi_backup_install
 
+- name: "backup : Resolve aged release"
+  ansible.builtin.set_fact:
+    __raspberrypi_restic: >-
+      {{ lookup('aged_release', 'github-release:restic/restic', asset='restic_{version}_linux_' ~ (ansible_facts['architecture'] | replace('x86_64', 'amd64') | replace('aarch64', 'arm64')) ~ '.bz2') }}
+  tags:
+    - raspberrypi
+    - install
+    - raspberrypi_backup
+    - raspberrypi_backup_install
+
 - name: "backup : Download restic binary archive"
   ansible.builtin.get_url:
-    url: "https://github.com/restic/restic/releases/download/v{{ raspberrypi_restic.version }}/restic_{{ raspberrypi_restic.version }}_linux_{{ restic_arch }}.bz2"
-    dest: "/tmp/restic_{{ raspberrypi_restic.version }}_linux_{{ restic_arch }}.bz2"
+    url: "{{ __raspberrypi_restic.url }}"
+    checksum: "{{ __raspberrypi_restic.checksum | default(omit, true) }}"
+    dest: "/tmp/restic_{{ (__raspberrypi_restic.version | regex_replace('^v', '')) }}_linux_{{ restic_arch }}.bz2"
     mode: '0644'
   vars:
     restic_arch: "{{ ansible_facts['architecture'] | replace('x86_64', 'amd64') | replace('aarch64', 'arm64') }}"
-  when: raspberrypi_restic.version not in (raspberrypi_restic_installed.stdout | default(''))
+  when: (__raspberrypi_restic.version | regex_replace('^v', '')) not in (raspberrypi_restic_installed.stdout | default(''))
   tags:
     - raspberrypi
     - install
@@ -446,11 +480,11 @@
 
 - name: "backup : Extract restic binary"
   ansible.builtin.shell: |
-    bunzip2 -kc /tmp/restic_{{ raspberrypi_restic.version }}_linux_{{ restic_arch }}.bz2 > /usr/local/bin/restic
+    bunzip2 -kc /tmp/restic_{{ (__raspberrypi_restic.version | regex_replace('^v', '')) }}_linux_{{ restic_arch }}.bz2 > /usr/local/bin/restic
     chmod 755 /usr/local/bin/restic
   vars:
     restic_arch: "{{ ansible_facts['architecture'] | replace('x86_64', 'amd64') | replace('aarch64', 'arm64') }}"
-  when: raspberrypi_restic.version not in (raspberrypi_restic_installed.stdout | default(''))
+  when: (__raspberrypi_restic.version | regex_replace('^v', '')) not in (raspberrypi_restic_installed.stdout | default(''))
   changed_when: true
   tags:
     - raspberrypi
