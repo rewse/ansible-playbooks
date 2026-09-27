@@ -1,0 +1,35 @@
+---
+- name: service | Deploy config
+  ansible.builtin.template:
+    src: config.toml.j2
+    dest: /etc/zabbix-mcp/config.toml
+    owner: zabbix-mcp
+    group: zabbix-mcp
+    mode: "0600"
+  notify: Restart zabbix-mcp-server
+
+- name: service | Install systemd unit
+  ansible.builtin.copy:
+    src: zabbix-mcp-server.service
+    dest: /etc/systemd/system/zabbix-mcp-server.service
+    owner: root
+    group: root
+    mode: "0644"
+  notify:
+    - Reload systemd
+    - Restart zabbix-mcp-server
+
+- name: service | Install logrotate config
+  ansible.builtin.copy:
+    src: zabbix-mcp-server.logrotate
+    dest: /etc/logrotate.d/zabbix-mcp-server
+    owner: root
+    group: root
+    mode: "0644"
+
+- name: service | Enable and start service
+  ansible.builtin.systemd:
+    name: zabbix-mcp-server
+    enabled: true
+    state: started
+  when: not ansible_check_mode

@@ -1,0 +1,29 @@
+---
+- name: user | Create system user
+  ansible.builtin.user:
+    name: zabbix-mcp
+    system: true
+    shell: /usr/sbin/nologin
+    home: /opt/zabbix-mcp
+    create_home: false
+
+- name: user | Create directories
+  ansible.builtin.file:
+    path: "{{ item.path }}"
+    state: directory
+    owner: "{{ item.owner }}"
+    group: "{{ item.group }}"
+    mode: "{{ item.mode }}"
+  loop:
+    - path: /opt/zabbix-mcp
+      owner: root
+      group: root
+      mode: "0755"
+    - path: /etc/zabbix-mcp
+      owner: zabbix-mcp
+      group: zabbix-mcp
+      mode: "0755"
+    - path: /var/log/zabbix-mcp
+      owner: zabbix-mcp
+      group: zabbix-mcp
+      mode: "0750"

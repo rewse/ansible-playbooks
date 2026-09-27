@@ -4,8 +4,8 @@ host = "0.0.0.0"
 port = 8081
 log_level = "info"
 log_file = "/var/log/zabbix-mcp/server.log"
-{% if zabbix_mcp.auth_token is defined and zabbix_mcp.auth_token %}
-auth_token = "{{ zabbix_mcp.auth_token }}"
+{% if zabbix_mcp_auth_token is defined and zabbix_mcp_auth_token %}
+auth_token = "{{ zabbix_mcp_auth_token }}"
 {% else %}
 {{ 'auth_token is required when host is 0.0.0.0' | mandatory }}
 {% endif %}
@@ -13,7 +13,7 @@ rate_limit = 300
 compact_output = true
 
 [zabbix.production]
-url = "{{ zabbix_mcp.url }}"
-api_token = "{{ zabbix_mcp.api_token }}"
-read_only = {{ zabbix_mcp.read_only | lower }}
+url = "{{ zabbix_mcp_url }}"
+api_token = "{{ zabbix_mcp_api_token }}"
+read_only = {{ zabbix_mcp_read_only | lower }}
 verify_ssl = true

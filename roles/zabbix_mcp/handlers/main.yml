@@ -1,9 +1,9 @@
 ---
-- name: "systemd: Daemon reload"
+- name: Reload systemd
   ansible.builtin.systemd:
     daemon_reload: true
 
-- name: "zabbix-mcp-server: Restart"
+- name: Restart zabbix-mcp-server
   ansible.builtin.systemd:
     name: zabbix-mcp-server
     state: restarted

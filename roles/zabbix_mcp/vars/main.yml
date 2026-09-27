@@ -1,0 +1,5 @@
+---
+zabbix_mcp_url: "{{ lookup('pipe', 'op read \"op://ansible/qbgipeerfcsiwsudnejpmwl2oy/url\"') }}"
+zabbix_mcp_api_token: "{{ lookup('pipe', 'op read \"op://ansible/qbgipeerfcsiwsudnejpmwl2oy/credential\"') }}"
+zabbix_mcp_auth_token: "{{ lookup('pipe', 'op read \"op://ansible/rgvaj2b2gxvfgq7zmhnamqkiom/auth_token\"') }}"
+zabbix_mcp_read_only: false

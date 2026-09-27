@@ -1,0 +1,16 @@
+---
+- name: Import user tasks
+  ansible.builtin.import_tasks: user.yml
+  tags:
+    - zabbix_mcp_user
+
+- name: Import app tasks
+  ansible.builtin.import_tasks: app.yml
+  tags:
+    - zabbix_mcp_app
+    - update
+
+- name: Import service tasks
+  ansible.builtin.import_tasks: service.yml
+  tags:
+    - zabbix_mcp_service

@@ -1,0 +1,27 @@
+---
+- name: app | Resolve aged tag
+  ansible.builtin.set_fact:
+    __zabbix_mcp_source: "{{ lookup('aged_release', 'github-tag:initMAX/zabbix-mcp-server') }}"
+
+- name: app | Check out repository
+  ansible.builtin.git:
+    repo: https://github.com/initMAX/zabbix-mcp-server.git
+    dest: /opt/zabbix-mcp/src
+    version: "{{ __zabbix_mcp_source.commit }}"
+    force: true
+  register: __zabbix_mcp_git
+
+- name: app | Create virtual environment
+  # uv has no Ansible module.
+  ansible.builtin.command:
+    cmd: uv venv --python /usr/bin/python3 /opt/zabbix-mcp/venv
+    creates: /opt/zabbix-mcp/venv
+
+- name: app | Install package
+  # uv has no Ansible module.
+  ansible.builtin.command:
+    cmd: uv pip install /opt/zabbix-mcp/src
+  environment: "{{ supply_chain_cooldown_environment | combine({'VIRTUAL_ENV': '/opt/zabbix-mcp/venv'}) }}"
+  register: __zabbix_mcp_pip
+  changed_when: "'Installed' in __zabbix_mcp_pip.stderr"
+  notify: Restart zabbix-mcp-server
