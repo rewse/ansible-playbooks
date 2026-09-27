@@ -273,6 +273,14 @@
     delay_off:
       hours: 1
     device_class: problem
+  # Model Y
+  # Turns on when the LFP battery has not reached 100% for 30 days, so its charge level
+  # estimate needs recalibration.
+  - unique_id: binary_sensor.model_y_battery_full_charge_due
+    name: "Model Y Battery Full Charge Due"
+    availability: "{{ is_number(states('sensor.model_y_battery_max_30_days')) }}"
+    state: "{{ states('sensor.model_y_battery_max_30_days') | float < 100 }}"
+    icon: "mdi:battery-alert-variant-outline"
   # Mom’s Room
   - unique_id: binary_sensor.moms_room_ac_cooldry
     name: "Mom’s Room AC CoolDry"

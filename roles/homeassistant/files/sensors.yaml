@@ -114,6 +114,20 @@
   max_age:
     minutes: 60
 
+# Model Y
+
+# Provides the highest charge level of the last 30 days for the full charge reminder.
+# The sampling size covers every level change in that window; the default of 20 does not.
+- platform: statistics
+  unique_id: sensor.model_y_battery_max_30_days
+  name: "Model Y Battery Max 30 Days"
+  entity_id: sensor.model_y_battery
+  state_characteristic: value_max
+  max_age:
+    days: 30
+  sampling_size: 10000
+  keep_last_sample: true
+
 # Mom’s Room
 
 # Provides a stable value for comparison with the paired sensor.

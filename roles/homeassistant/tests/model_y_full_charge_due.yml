@@ -1,0 +1,37 @@
+---
+- name: Test Model Y full charge reminder
+  hosts: localhost
+  connection: local
+  gather_facts: false
+  tasks:
+    - name: Parse configuration
+      ansible.builtin.set_fact:
+        homeassistant_sensors: "{{ lookup('file', '../files/sensors.yaml') | from_yaml }}"
+        homeassistant_template_groups: "{{ lookup('file', '../files/templates.yaml') | from_yaml }}"
+
+    - name: Find entities
+      ansible.builtin.set_fact:
+        homeassistant_max_sensors: >-
+          {{ homeassistant_sensors
+             | selectattr('unique_id', 'equalto', 'sensor.model_y_battery_max_30_days')
+             | list }}
+        homeassistant_due_sensors: >-
+          {{ homeassistant_template_groups
+             | selectattr('binary_sensor', 'defined')
+             | map(attribute='binary_sensor') | flatten
+             | selectattr('unique_id', 'equalto', 'binary_sensor.model_y_battery_full_charge_due')
+             | list }}
+
+    - name: Verify reminder contract
+      ansible.builtin.assert:
+        that:
+          - homeassistant_max_sensors | length == 1
+          - homeassistant_max_sensors[0].platform == 'statistics'
+          - homeassistant_max_sensors[0].entity_id == 'sensor.model_y_battery'
+          - homeassistant_max_sensors[0].state_characteristic == 'value_max'
+          - "homeassistant_max_sensors[0].max_age == {'days': 30}"
+          - homeassistant_max_sensors[0].sampling_size >= 10000
+          - homeassistant_max_sensors[0].keep_last_sample
+          - homeassistant_due_sensors | length == 1
+          - "'sensor.model_y_battery_max_30_days' in homeassistant_due_sensors[0].availability"
+          - "'< 100' in homeassistant_due_sensors[0].state"

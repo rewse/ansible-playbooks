@@ -269,6 +269,21 @@
   mode: parallel
   trace:
     stored_traces: 100
+- id: automation.alarm_model_y_battery_full_charge_due
+  alias: "ALARM: Model Y Battery Full Charge Due"
+  triggers:
+    # Starting from "off" keeps a restart from repeating the notification.
+    - trigger: state
+      entity_id: binary_sensor.model_y_battery_full_charge_due
+      from: "off"
+      to: "on"
+  actions:
+    - action: notify.tats_devices
+      data:
+        title: "⚠️ ALARM"
+        message: "Model Y has not been charged to 100% for 30 days"
+  trace:
+    stored_traces: 100
 - id: automation.alarm_plug_switch_offline
   alias: "ALARM: Plug Switch is Offline"
   triggers:
