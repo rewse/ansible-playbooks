@@ -149,13 +149,14 @@ def test_gh_failure_raises():
         resolve("github-tag:o/r", run)
 
 
-def test_lookup_caches_identical_calls(monkeypatch):
+def test_lookup_caches_identical_calls(monkeypatch, tmp_path):
     run = FakeRun({
         "gh api repos/o/r": {"default_branch": "main"},
         f"gh api repos/o/r/commits?sha=main&until={iso(ago(4))}&per_page=1": [{"sha": "abc"}],
     })
     monkeypatch.setattr(aged_release, "_run", run)
     monkeypatch.setattr(aged_release, "_now", lambda: NOW)
+    monkeypatch.setattr(aged_release, "_cache_path", lambda: pathlib.Path(tmp_path) / "cache.json")
     aged_release._CACHE.clear()
     lookup = aged_release.LookupModule()
     variables = {"supply_chain_cooldown_days": 4}
@@ -174,3 +175,21 @@ def test_default_pattern_ignores_single_number_tags():
         "gh api repos/o/r/commits/new": {"commit": {"committer": {"date": iso(10)}}},
     })
     assert resolve("github-tag:o/r", run) == {"version": "v4.2.1", "commit": "new"}
+
+
+def test_cache_is_shared_across_worker_processes(monkeypatch, tmp_path):
+    run = FakeRun({
+        "gh api repos/o/r": {"default_branch": "main"},
+        f"gh api repos/o/r/commits?sha=main&until={iso(ago(4))}&per_page=1": [{"sha": "abc"}],
+    })
+    monkeypatch.setattr(aged_release, "_run", run)
+    monkeypatch.setattr(aged_release, "_now", lambda: NOW)
+    monkeypatch.setattr(aged_release, "_cache_path", lambda: tmp_path / "cache.json")
+    variables = {"supply_chain_cooldown_days": 4}
+    aged_release._CACHE.clear()
+    aged_release.LookupModule().run(["github-commit:o/r"], variables)
+    # Ansible templates each task in a freshly forked worker, so the in-memory
+    # cache starts empty for the next task or host.
+    aged_release._CACHE.clear()
+    assert aged_release.LookupModule().run(["github-commit:o/r"], variables) == [{"commit": "abc"}]
+    assert len(run.calls) == 2

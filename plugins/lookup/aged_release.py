@@ -2,11 +2,15 @@
 
 from __future__ import annotations
 
+import fcntl
 import json
+import os
 import re
 import shutil
 import subprocess
+import tempfile
 from datetime import datetime, timedelta, timezone
+from pathlib import Path
 from typing import Callable
 
 from ansible.errors import AnsibleLookupError
@@ -48,6 +52,9 @@ _raw:
 DEFAULT_PATTERN = r"^v?\d+(\.\d+)+$"
 
 _CACHE: dict[tuple, dict] = {}
+# Entries older than this are ignored, so a reused process group id cannot
+# serve a result from an earlier run.
+_CACHE_TTL = timedelta(hours=12)
 _display = Display()
 
 
@@ -170,6 +177,42 @@ def resolve(term: str, *, pattern: str, days: int, platform: str | None, asset: 
     raise AnsibleLookupError(f"aged_release: unknown source type {kind!r}")
 
 
+def _cache_path() -> Path:
+    """One file per ansible-playbook run.
+
+    Ansible templates each task in a worker forked per host, so a module-level
+    cache dies with the worker. The workers share the playbook's process group,
+    which keys a file every host and task of the run can read.
+    """
+    return Path(tempfile.gettempdir()) / f"aged_release-{os.getuid()}-{os.getpgrp()}.json"
+
+
+def _cached(key: tuple, compute: Callable[[], dict]) -> dict:
+    if key in _CACHE:
+        return _CACHE[key]
+    path = _cache_path()
+    name = json.dumps(key)
+    with open(path, "a+", encoding="utf-8") as handle:
+        # Held across the resolution so parallel hosts resolve a term once.
+        fcntl.flock(handle, fcntl.LOCK_EX)
+        handle.seek(0)
+        try:
+            data = json.loads(handle.read() or "{}")
+        except json.JSONDecodeError:
+            data = {}
+        entry = data.get(name)
+        if entry and _now() - datetime.fromisoformat(entry["at"]) < _CACHE_TTL:
+            result = entry["value"]
+        else:
+            result = compute()
+            data[name] = {"at": _now().isoformat(), "value": result}
+            handle.seek(0)
+            handle.truncate()
+            handle.write(json.dumps(data))
+    _CACHE[key] = result
+    return result
+
+
 class LookupModule(LookupBase):
     def run(self, terms, variables=None, **kwargs):
         variables = variables or {}
@@ -185,8 +228,7 @@ class LookupModule(LookupBase):
         results = []
         for term in terms:
             key = (term, pattern, days, platform, asset)
-            if key not in _CACHE:
-                _CACHE[key] = resolve(term, pattern=pattern, days=days, platform=platform,
-                                      asset=asset, run=_run, now=_now())
-            results.append(_CACHE[key])
+            results.append(_cached(key, lambda term=term: resolve(
+                term, pattern=pattern, days=days, platform=platform,
+                asset=asset, run=_run, now=_now())))
         return results
