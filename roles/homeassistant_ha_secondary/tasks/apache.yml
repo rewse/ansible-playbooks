@@ -10,7 +10,7 @@
 
 - name: apache | Copy vhost configuration
   ansible.builtin.copy:
-    src: "{{ playbook_dir }}/roles/homeassistant/files/hass.rewse.jp.conf"
+    src: "{{ role_path }}/../homeassistant/files/hass.rewse.jp.conf"
     dest: /etc/apache2/sites-available/hass.rewse.jp.conf
     mode: "0644"
   notify: Reload Apache
