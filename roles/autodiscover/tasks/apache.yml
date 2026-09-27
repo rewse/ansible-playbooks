@@ -1,0 +1,19 @@
+---
+- name: apache | Enable proxy_http module
+  community.general.apache2_module:
+    name: proxy_http
+  notify: Restart Apache
+
+- name: apache | Copy autodiscover configuration
+  ansible.builtin.copy:
+    src: autodiscover.conf
+    dest: /etc/apache2/conf-available
+    mode: "0644"
+  notify: Reload Apache
+
+- name: apache | Enable autodiscover configuration
+  # No module enables an Apache conf; a2enconf reports whether it changed.
+  ansible.builtin.command: a2enconf autodiscover
+  register: __autodiscover_a2enconf
+  changed_when: "'already enabled' not in __autodiscover_a2enconf.stdout"
+  notify: Reload Apache
