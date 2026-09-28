@@ -3,5 +3,5 @@ ExtendedStatus On
 <Location /server-status>
     SetHandler server-status
 
-    Require ip {{ networks.home_private_ipv4 }} {{ networks.aws_private_ipv4 }} {{ networks.home_public_ipv4 }} {{ networks.office_public_ipv4 }} {{ networks.home_public_ipv6 }} {{ networks.aws_public_ipv6 }}
+    Require ip {{ networks.home_private_ipv4 }} {{ networks.aws_private_ipv4 }} {{ networks.home_public_ipv4 }} {{ networks.office_public_ipv4 | join(' ') }} {{ networks.home_public_ipv6 }} {{ networks.aws_public_ipv6 }}
 </Location>

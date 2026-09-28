@@ -1,7 +1,8 @@
 ---
 admin_email: "{{ lookup('pipe', 'op read \"op://ansible/weohbz5qszb2gbs6rz6cbr2wee/email\"') }}"
 admin_user: tats
-# Networks named <place>_<public|private>_<ipv4|ipv6>; each value is a CIDR.
+# Networks named <place>_<public|private>_<ipv4|ipv6>; each value is a CIDR or
+# a list of CIDRs.
 networks:
   aws_private_ipv4: 10.0.0.0/16
   aws_public_ipv6: 2406:da14:b2b:e400::/56
@@ -9,7 +10,22 @@ networks:
   home_private_ipv6: fd20:2400:ab3d:5b1e::/64
   home_public_ipv4: 106.163.184.9/32
   home_public_ipv6: 240f:143:f60c:1::/64
-  office_public_ipv4: 27.0.0.0/22
+  # Amazon egress: HND10/11/17/21 and HND25 A2Z Wi-Fi, and VPN (Narita).
+  # https://w.amazon.com/bin/view/AWS/Teams/Proserve/Japan/OfficeIPAddress/
+  office_public_ipv4:
+    - 13.113.155.103/32
+    - 13.158.88.175/32
+    - 13.158.123.147/32
+    - 15.248.4.68/30
+    - 15.248.4.76/30
+    - 15.248.5.0/30
+    - 15.248.5.4/30
+    - 15.248.5.96/30
+    - 15.248.5.100/30
+    - 18.178.37.249/32
+    - 27.0.3.144/28
+    - 35.76.150.132/32
+    - 57.180.118.44/32
 # Minimum age in days of a third-party release before a run adopts it.
 supply_chain_cooldown_days: 4
 # Environment for npm and uv tasks: both refuse releases newer than the cutoff.
