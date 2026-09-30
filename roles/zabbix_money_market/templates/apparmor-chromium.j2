@@ -1,0 +1,15 @@
+{{ ansible_managed | comment }}
+#
+# Ubuntu restricts unprivileged user namespaces to programs whose AppArmor
+# profile grants userns, and Chromium needs one for its sandbox. This profile
+# mirrors the package's /etc/apparmor.d/chrome for the Playwright build, whose
+# versioned directory the glob follows across updates.
+
+abi <abi/4.0>,
+include <tunables/global>
+
+profile {{ zabbix_money_market_apparmor_profile }} {{ zabbix_money_market_chromium_glob }} flags=(unconfined) {
+  userns,
+
+  include if exists <local/{{ zabbix_money_market_apparmor_profile }}>
+}

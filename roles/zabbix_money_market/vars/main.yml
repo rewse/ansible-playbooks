@@ -1,0 +1,4 @@
+---
+zabbix_money_market_apparmor_profile: stock-price-fetcher-chromium
+# Playwright names the directory after its build number and the platform.
+zabbix_money_market_chromium_glob: /var/lib/zabbix/.cache/ms-playwright/chromium-*/chrome-linux*/chrome

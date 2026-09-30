@@ -1,0 +1,49 @@
+---
+- name: browser | Install Chromium with Playwright
+  # Chrome for Testing, which agent-browser install downloads, has no Linux
+  # ARM64 build, and Ubuntu ships Chromium only as a snap, which refuses a home
+  # outside /home. Playwright publishes ARM64 builds; no module installs them.
+  ansible.builtin.command:
+    cmd: npx -y playwright install chromium
+    chdir: /var/lib/zabbix
+  become: true
+  become_user: zabbix
+  environment: "{{ supply_chain_cooldown_environment }}"
+  register: __zabbix_money_market_chromium
+  changed_when: "'downloaded to' in __zabbix_money_market_chromium.stdout"
+
+- name: browser | Find Chromium builds
+  ansible.builtin.find:
+    paths: /var/lib/zabbix/.cache/ms-playwright
+    patterns: chrome
+    recurse: true
+    file_type: file
+  register: __zabbix_money_market_chromium_builds
+
+- name: browser | Create link directory
+  ansible.builtin.file:
+    path: /var/lib/zabbix/.local/bin
+    state: directory
+    owner: zabbix
+    group: zabbix
+    mode: "0755"
+
+- name: browser | Link chromium to the newest build
+  # agent-browser finds Chrome for Testing only on x86_64 and otherwise looks up
+  # chromium on PATH. Playwright keeps earlier builds, so pick the highest.
+  ansible.builtin.file:
+    src: "{{ __zabbix_money_market_chromium_builds.files | map(attribute='path') | select('search', '/chromium-[0-9]+/') | community.general.version_sort | last }}"
+    dest: /var/lib/zabbix/.local/bin/chromium
+    state: link
+    owner: zabbix
+    group: zabbix
+    force: true
+  # A dry run on a host without Chromium has no build to link yet.
+  when: __zabbix_money_market_chromium_builds.files | map(attribute='path') | select('search', '/chromium-[0-9]+/') | length > 0
+
+- name: browser | Deploy AppArmor profile for Chromium
+  ansible.builtin.template:
+    src: apparmor-chromium.j2
+    dest: /etc/apparmor.d/{{ zabbix_money_market_apparmor_profile }}
+    mode: "0644"
+  notify: Load the Chromium AppArmor profile

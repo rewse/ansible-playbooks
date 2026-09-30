@@ -5,6 +5,12 @@
     - zabbix_money_market_app
     - update
 
+- name: Import browser tasks
+  ansible.builtin.import_tasks: browser.yml
+  tags:
+    - zabbix_money_market_browser
+    - update
+
 - name: Import script tasks
   ansible.builtin.import_tasks: script.yml
   tags:
