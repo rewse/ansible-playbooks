@@ -25,6 +25,20 @@
   changed_when: "'already enabled' not in __httpd_a2enconf_blog.stdout"
   notify: Reload Apache
 
+- name: conf | Copy log format config
+  ansible.builtin.copy:
+    src: log-format.conf
+    dest: /etc/apache2/conf-available
+    mode: "0644"
+  notify: Reload Apache
+
+- name: conf | Enable log format config
+  # No module enables an Apache site or conf; the command reports whether it changed.
+  ansible.builtin.command: a2enconf log-format
+  register: __httpd_a2enconf_log_format
+  changed_when: "'already enabled' not in __httpd_a2enconf_log_format.stdout"
+  notify: Reload Apache
+
 - name: conf | Copy admin config
   ansible.builtin.template:
     src: admin.conf.j2

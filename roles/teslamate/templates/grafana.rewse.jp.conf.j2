@@ -18,10 +18,11 @@
     # request is recognised by a separate log of the requests that carry one; the
     # fail2ban jail reads it. Only the request line is logged, not the header.
     # A CustomLog here stops the vhost inheriting the server's, so the shared
-    # access log is named again.
+    # access log is named again. The entry is stamped with the time the response
+    # finished, as the httpd role does for the shared formats.
     SetEnvIf Authorization "^Basic " grafana_basic_auth
     CustomLog ${APACHE_LOG_DIR}/other_vhosts_access.log vhost_combined
-    CustomLog ${APACHE_LOG_DIR}/grafana_basic_auth.log "%v:%p %h basic %t \"%r\" %>s %O" env=grafana_basic_auth
+    CustomLog ${APACHE_LOG_DIR}/grafana_basic_auth.log "%v:%p %h basic %{end:[%d/%b/%Y:%H:%M:%S %z]}t \"%r\" %>s %O" env=grafana_basic_auth
 
     SSLCertificateFile /etc/letsencrypt/live/rewse.jp/fullchain.pem
     SSLCertificateKeyFile /etc/letsencrypt/live/rewse.jp/privkey.pem
