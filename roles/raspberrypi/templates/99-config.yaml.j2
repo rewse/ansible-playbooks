@@ -46,7 +46,8 @@ network:
       # long as it takes something to notice, and Avahi renames the host inside
       # that window. Configuration still applies the moment the link goes up,
       # and wpa_supplicant waits on the device rather than the link, so the
-      # fallback needs no hand.
+      # fallback needs no hand. netplan apply still brings the link up, which
+      # the handlers that follow it undo.
       activation-mode: manual
       addresses:
          - {{ raspberrypi_secondary_address }}/24

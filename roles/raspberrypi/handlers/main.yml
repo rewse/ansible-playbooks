@@ -18,13 +18,50 @@
   # No module applies netplan. Runs only when its configuration changes.
   ansible.builtin.command: netplan apply
   changed_when: true
-  notify: Wait for the network
+  notify:
+    - Wait for the network
+    - Settle the fallback link
+    - Republish mDNS
 
 - name: Wait for the network
   ansible.builtin.wait_for:
     host: 1.1.1.1
     port: 53
     timeout: 30
+
+- name: Settle the fallback link
+  # netplan apply restarts wpa_supplicant and has networkd reconfigure wlan0,
+  # which brings the link up despite activation-mode: manual. The script takes
+  # it back down when eth0 reaches the gateway; hosts without it have no
+  # fallback link to settle.
+  ansible.builtin.command:
+    cmd: /usr/local/sbin/network-failover
+    removes: /usr/local/sbin/network-failover
+  changed_when: false
+
+# While netplan apply bounces eth0 and wlan0 briefly shares its segment, Avahi
+# can meet its own records, take them for another host, and rename itself, which
+# strands every saved Time Machine destination. Restarting it once the fallback
+# link is down reclaims the hostname. Avahi goes first because smbd registers
+# its service through it. Only running units are restarted, so a host without
+# Samba is left as it is.
+- name: Read services for mDNS
+  ansible.builtin.service_facts:
+  listen: Republish mDNS
+
+- name: Restart avahi-daemon after netplan apply
+  ansible.builtin.systemd:
+    name: avahi-daemon
+    state: restarted
+  when: ansible_facts.services['avahi-daemon.service'].state | default('') == 'running'
+  listen: Republish mDNS
+
+- name: Restart smbd after netplan apply
+  ansible.builtin.systemd:
+    name: smbd
+    state: restarted
+  when: ansible_facts.services['smbd.service'].state | default('') == 'running'
+  listen: Republish mDNS
 
 - name: Restart dphys-swapfile
   ansible.builtin.systemd:
