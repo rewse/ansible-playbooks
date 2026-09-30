@@ -11,8 +11,11 @@ darwin_extra_casks:
   - tripmode
   - webex-meetings
 
-# Install by hand; these have no Homebrew cask or App Store entry:
+# Install by hand; these have no Homebrew cask or App Store entry mas can
+# install. WiFiman is the iPad app: WiFiman Desktop times out connecting
+# Teleport under this host's network filters, and mas cannot see iPad apps.
 #   MeetNote                   https://gitlab.aws.dev/kaizawap/MeetNote
+#   Ubiquiti WiFiman           https://apps.apple.com/jp/app/ubiquiti-wifiman/id1385561119
 
 # mas 6 installs only as root, so a missing app needs the playbook run with -K.
 darwin_extra_mas_apps:
