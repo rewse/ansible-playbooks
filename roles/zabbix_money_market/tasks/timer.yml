@@ -1,0 +1,40 @@
+---
+- name: timer | Install send script
+  ansible.builtin.template:
+    src: stock-price-fetcher-send.j2
+    dest: /usr/local/bin/stock-price-fetcher-send
+    mode: "0755"
+
+- name: timer | Install service
+  ansible.builtin.copy:
+    src: stock-price-fetcher@.service
+    dest: /etc/systemd/system/stock-price-fetcher@.service
+    mode: "0644"
+  notify: Reload systemd
+
+- name: timer | Install timers
+  ansible.builtin.template:
+    src: stock-price-fetcher.timer.j2
+    dest: /etc/systemd/system/stock-price-fetcher@{{ item.key }}.timer
+    mode: "0644"
+  loop: "{{ zabbix_money_market_schedules | dict2items }}"
+  loop_control:
+    label: "{{ item.key }}"
+  register: __zabbix_money_market_timers
+  notify: Restart stock-price-fetcher timers
+
+- name: timer | Enable and start timers
+  ansible.builtin.systemd:
+    name: stock-price-fetcher@{{ item }}.timer
+    enabled: true
+    state: started
+    daemon_reload: true
+  loop: "{{ zabbix_money_market_schedules | list }}"
+  # A dry run does not install new timers, so systemd cannot find them.
+  when: not ansible_check_mode or not __zabbix_money_market_timers.changed
+
+- name: timer | Remove external check script
+  # Zabbix no longer runs the fetcher; the timers send to trapper items.
+  ansible.builtin.file:
+    path: /usr/lib/zabbix/externalscripts/stock-price-fetcher.sh
+    state: absent

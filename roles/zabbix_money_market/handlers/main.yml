@@ -11,3 +11,16 @@
   # No module loads a profile file; apparmor_parser -r adds or replaces it.
   ansible.builtin.command: apparmor_parser -r /etc/apparmor.d/{{ zabbix_money_market_apparmor_profile }}
   changed_when: true
+
+- name: Reload systemd
+  ansible.builtin.systemd:
+    daemon_reload: true
+
+- name: Restart stock-price-fetcher timers
+  ansible.builtin.systemd:
+    name: stock-price-fetcher@{{ item }}.timer
+    state: restarted
+    daemon_reload: true
+  loop: "{{ zabbix_money_market_schedules | list }}"
+  # A dry run does not install new timers, so systemd cannot find them.
+  when: not ansible_check_mode

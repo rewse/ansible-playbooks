@@ -11,7 +11,7 @@
     - zabbix_money_market_browser
     - update
 
-- name: Import script tasks
-  ansible.builtin.import_tasks: script.yml
+- name: Import timer tasks
+  ansible.builtin.import_tasks: timer.yml
   tags:
-    - zabbix_money_market_script
+    - zabbix_money_market_timer

@@ -2,3 +2,50 @@
 zabbix_money_market_apparmor_profile: stock-price-fetcher-chromium
 # Playwright names the directory after its build number and the platform.
 zabbix_money_market_chromium_glob: /var/lib/zabbix/.cache/ms-playwright/chromium-*/chrome-linux*/chrome
+
+# The host whose stock-price-fetcher.sh[<symbol>] trapper items receive prices.
+# The items come from the MyTemplate Market template; a symbol listed here
+# needs an item there, and the key keeps the name the external check had so
+# calculated items that read it keep working.
+zabbix_money_market_zabbix_host: Money
+
+# Each schedule becomes a timer that fetches its symbols in turn. Times are the
+# host's local time (JST); the sessions add five-minute samples while the
+# Tokyo and US markets trade.
+zabbix_money_market_schedules:
+  hourly:
+    on_calendar:
+      - "*:09"
+    symbols:
+      - "0231102C"
+      - "0331418A"
+      - "03316183"
+      - "03317172"
+      - "0331A211"
+      - "4731102B"
+      - "998407.O"
+      - "9C311125"
+      - AMZN
+      - EURJPY=X
+      - QQQ
+      - USDJPY=X
+      - VGT
+      - "^DJI"
+      - "^FTSE"
+      - "^GSPC"
+      - "^IXIC"
+  tokyo-session:
+    on_calendar:
+      - "Mon..Fri 09..14:00/5"
+      - "Mon..Fri 15:00,05,10,15,20"
+    symbols:
+      - "998407.O"
+  us-session:
+    on_calendar:
+      - "Mon..Fri 22:30/5"
+      - "Mon..Fri 23:00/5"
+      - "Tue..Sat 00..05:00/5"
+    symbols:
+      - AMZN
+      - QQQ
+      - VGT

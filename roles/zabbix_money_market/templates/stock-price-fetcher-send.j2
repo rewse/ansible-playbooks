@@ -1,0 +1,42 @@
+#!/usr/bin/env bash
+{{ ansible_managed | comment }}
+#
+# Fetches the prices of one schedule's symbols in turn and sends each to its
+# Zabbix trapper item. A symbol that fails sends nothing, so the item keeps its
+# last value and ages instead of recording a false one.
+
+set -uo pipefail
+
+case "${1:-}" in
+{% for name, schedule in zabbix_money_market_schedules | dictsort %}
+  {{ name }}) symbols=({% for symbol in schedule.symbols %}'{{ symbol }}'{{ ' ' if not loop.last }}{% endfor %}) ;;
+{% endfor %}
+  *) echo "Usage: $0 {{ zabbix_money_market_schedules | dictsort | map('first') | join('|') }}" >&2; exit 2 ;;
+esac
+
+export STOCK_FETCHER_DEBUG=1
+# agent-browser looks up chromium on PATH; the browser component links it to
+# the newest Playwright build. AGENT_BROWSER_EXECUTABLE_PATH would also replace
+# the Lightpanda binary that the Yahoo source uses.
+export PATH="/var/lib/zabbix/.local/bin:$PATH"
+
+cd /opt/stock-price-fetcher || exit 1
+
+# The schedules overlap, and agent-browser sessions conflict when two run at once.
+exec 9>/var/lib/zabbix/stock-price-fetcher.lock
+flock 9
+
+failed=0
+for symbol in "${symbols[@]}"; do
+    if ! value=$(timeout 120 uv run --frozen stock-price-fetcher "$symbol"); then
+        echo "$symbol: fetch failed: $value" >&2
+        failed=1
+        continue
+    fi
+    if ! zabbix_sender -z 127.0.0.1 -s '{{ zabbix_money_market_zabbix_host }}' \
+            -k "stock-price-fetcher.sh[$symbol]" -o "$value" >/dev/null; then
+        echo "$symbol: Zabbix rejected $value" >&2
+        failed=1
+    fi
+done
+exit "$failed"

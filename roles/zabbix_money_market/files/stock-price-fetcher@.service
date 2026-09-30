@@ -1,0 +1,13 @@
+[Unit]
+Description=Send %i stock prices to Zabbix
+After=network-online.target zabbix-server.service
+Wants=network-online.target
+
+[Service]
+Type=oneshot
+User=zabbix
+Group=zabbix
+ExecStart=/usr/local/bin/stock-price-fetcher-send %i
+# A oneshot unit stops when the script exits, which also ends any
+# agent-browser daemon or browser a fetch left behind.
+TimeoutStartSec=45min

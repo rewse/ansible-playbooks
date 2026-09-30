@@ -1,0 +1,11 @@
+{{ ansible_managed | comment }}
+[Unit]
+Description=Send {{ item.key }} stock prices to Zabbix
+
+[Timer]
+{% for calendar in item.value.on_calendar %}
+OnCalendar={{ calendar }}
+{% endfor %}
+
+[Install]
+WantedBy=timers.target
