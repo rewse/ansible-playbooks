@@ -2,6 +2,9 @@
 transport = "http"
 host = "0.0.0.0"
 port = 8081
+# The MCP SDK rejects any Host header but localhost unless the server names its
+# public URL, which also enables the Origin check for that host.
+public_url = "{{ zabbix_mcp_public_url }}"
 log_level = "info"
 log_file = "/var/log/zabbix-mcp/server.log"
 {% if zabbix_mcp_auth_token is defined and zabbix_mcp_auth_token %}
