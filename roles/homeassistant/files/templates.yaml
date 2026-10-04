@@ -63,7 +63,7 @@
         (now() - states.sensor.dads_room_humidity.last_reported).total_seconds() >= 7200 or
         (
           is_number(secondary) and
-          (now() - states.sensor.dads_room_switchbot_meter_humidity.last_reported).total_seconds() >= 7200
+          (now() - states.sensor.dads_room_switchbot_meter_humidity.last_reported).total_seconds() >= 86400
         ) or
         is_state('binary_sensor.dads_room_humidity_disagreement', 'on')
       }}
@@ -129,7 +129,7 @@
         (now() - states.sensor.dads_room_temperature.last_reported).total_seconds() >= 7200 or
         (
           is_number(secondary) and
-          (now() - states.sensor.dads_room_switchbot_meter_temperature.last_reported).total_seconds() >= 7200
+          (now() - states.sensor.dads_room_switchbot_meter_temperature.last_reported).total_seconds() >= 86400
         ) or
         is_state('binary_sensor.dads_room_temperature_disagreement', 'on')
       }}
@@ -200,7 +200,7 @@
         (now() - states.sensor.living_room_humidity.last_reported).total_seconds() >= 7200 or
         (
           is_number(secondary) and
-          (now() - states.sensor.living_room_switchbot_hub_2_humidity.last_reported).total_seconds() >= 7200
+          (now() - states.sensor.living_room_switchbot_hub_2_humidity.last_reported).total_seconds() >= 86400
         ) or
         is_state('binary_sensor.living_room_humidity_disagreement', 'on')
       }}
@@ -266,7 +266,7 @@
         (now() - states.sensor.living_room_temperature.last_reported).total_seconds() >= 7200 or
         (
           is_number(secondary) and
-          (now() - states.sensor.living_room_switchbot_hub_2_temperature.last_reported).total_seconds() >= 7200
+          (now() - states.sensor.living_room_switchbot_hub_2_temperature.last_reported).total_seconds() >= 86400
         ) or
         is_state('binary_sensor.living_room_temperature_disagreement', 'on')
       }}
@@ -345,7 +345,7 @@
         (now() - states.sensor.moms_room_humidity.last_reported).total_seconds() >= 7200 or
         (
           is_number(secondary) and
-          (now() - states.sensor.moms_room_switchbot_meter_humidity.last_reported).total_seconds() >= 7200
+          (now() - states.sensor.moms_room_switchbot_meter_humidity.last_reported).total_seconds() >= 86400
         ) or
         is_state('binary_sensor.moms_room_humidity_disagreement', 'on')
       }}
@@ -411,7 +411,7 @@
         (now() - states.sensor.moms_room_temperature.last_reported).total_seconds() >= 7200 or
         (
           is_number(secondary) and
-          (now() - states.sensor.moms_room_switchbot_meter_temperature.last_reported).total_seconds() >= 7200
+          (now() - states.sensor.moms_room_switchbot_meter_temperature.last_reported).total_seconds() >= 86400
         ) or
         is_state('binary_sensor.moms_room_temperature_disagreement', 'on')
       }}

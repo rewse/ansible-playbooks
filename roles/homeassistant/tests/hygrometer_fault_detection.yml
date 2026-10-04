@@ -30,6 +30,7 @@
         fault_entity_id: binary_sensor.dads_room_hygrometer_fault
         prefix: dads_room
         secondary_entity_id: sensor.dads_room_switchbot_meter_humidity
+        secondary_stale_seconds: 86400
         secondary_unavailable_seconds: 86400
         smoothed_entity_ids:
           - sensor.dads_room_humidity_smoothed
@@ -50,6 +51,7 @@
         fault_entity_id: binary_sensor.living_room_hygrometer_fault
         prefix: living_room
         secondary_entity_id: sensor.living_room_switchbot_hub_2_humidity
+        secondary_stale_seconds: 86400
         secondary_unavailable_seconds: 86400
         smoothed_entity_ids:
           - sensor.living_room_humidity_smoothed
@@ -69,6 +71,7 @@
         fault_entity_id: binary_sensor.moms_room_hygrometer_fault
         prefix: moms_room
         secondary_entity_id: sensor.moms_room_switchbot_meter_humidity
+        secondary_stale_seconds: 86400
         secondary_unavailable_seconds: 86400
         smoothed_entity_ids:
           - sensor.moms_room_humidity_smoothed

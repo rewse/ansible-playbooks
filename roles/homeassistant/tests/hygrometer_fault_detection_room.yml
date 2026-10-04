@@ -72,7 +72,7 @@
       - homeassistant_test_room_fault_sensor.state | regex_findall('primary \\| float > 99') | length == 1
       - homeassistant_test_room_fault_sensor.state | regex_findall('secondary \\| float < 1') | length == 1
       - homeassistant_test_room_fault_sensor.state | regex_findall('secondary \\| float > 99') | length == 1
-      - homeassistant_test_room_fault_sensor.state | regex_findall('>= 7200') | length == 2
+      - homeassistant_test_room_fault_sensor.state | regex_findall('>= 7200') | length == 1
       - >-
         ("is_state('binary_sensor." ~ room_contract.prefix ~
          "_humidity_disagreement', 'on')") in homeassistant_test_room_fault_sensor.state
@@ -97,7 +97,8 @@
         (
           "is_number(secondary) and (now() - states." ~
           room_contract.secondary_entity_id ~
-          ".last_reported).total_seconds() >= 7200"
+          ".last_reported).total_seconds() >= " ~
+          room_contract.secondary_stale_seconds
         ) in (homeassistant_test_room_fault_sensor.state | regex_replace('\\s+', ' '))
   when: room_contract.secondary_unavailable_seconds is defined
 
