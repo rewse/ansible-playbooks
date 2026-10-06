@@ -25,3 +25,5 @@
     mode: "0700"
     variable_start_string: "[%"
     variable_end_string: "%]"
+    comment_start_string: "[#"
+    comment_end_string: "#]"

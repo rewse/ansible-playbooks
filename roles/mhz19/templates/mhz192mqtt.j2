@@ -11,6 +11,10 @@ readonly MQTT_PORT="1883"
 readonly MQTT_USER="pub_client"
 readonly MQTT_PASS="[% mhz19_mosquitto_password %]"
 readonly TOPIC_BASE="mhz19/[% mhz19_location %]"
+readonly STATE_FILE="/var/lib/mhz19/state"
+readonly MAX_CO2=4900
+readonly MAX_STEP=200
+readonly STABLE_SPREAD=100
 
 PATH="${VENV_PATH}/bin:${PATH}"
 
@@ -68,6 +72,83 @@ read_co2() {
   return 1
 }
 
+filter_co2() {
+  local co2="$1"
+  local accepted="-"
+  local readings=""
+  local recent=()
+  local diff
+  local max
+  local min
+  local value
+  local valid=false
+
+  # A faulty sensor reports values that wander by thousands of ppm from one
+  # reading to the next for up to an hour, far faster than room air changes. A
+  # reading is accepted when it stays near the last accepted one, or when three
+  # consecutive readings agree, which is how a real change of level looks. Values
+  # near the 5000 ppm top of the range are always rejected because a faulty
+  # sensor can report them several times in a row.
+  # The state file holds the last accepted value, or "-" before the first one,
+  # followed by the most recent raw readings.
+  if [[ -r "${STATE_FILE}" ]]; then
+    read -r accepted readings < "${STATE_FILE}" || true
+  fi
+
+  # A damaged state file is discarded so it cannot reject every later reading.
+  if ! [[ "${accepted}" =~ ^(-|[0-9]+)$ && "${readings}" =~ ^[0-9\ ]*$ ]]; then
+    accepted="-"
+    readings=""
+  fi
+
+  read -ra recent <<< "${readings}"
+  recent+=("${co2}")
+  if [[ "${#recent[@]}" -gt 3 ]]; then
+    recent=("${recent[@]: -3}")
+  fi
+
+  if [[ "${co2}" -lt "${MAX_CO2}" ]]; then
+    if [[ "${accepted}" == "-" ]]; then
+      valid=true
+    else
+      diff=$(( co2 - accepted ))
+      if [[ "${diff#-}" -le "${MAX_STEP}" ]]; then
+        valid=true
+      fi
+    fi
+
+    if [[ "${#recent[@]}" -eq 3 ]]; then
+      max="${co2}"
+      min="${co2}"
+      for value in "${recent[@]}"; do
+        if [[ "${value}" -gt "${max}" ]]; then
+          max="${value}"
+        fi
+        if [[ "${value}" -lt "${min}" ]]; then
+          min="${value}"
+        fi
+      done
+      if [[ $(( max - min )) -le "${STABLE_SPREAD}" ]]; then
+        valid=true
+      fi
+    fi
+  fi
+
+  if [[ "${valid}" == true ]]; then
+    accepted="${co2}"
+  fi
+
+  mkdir -p "${STATE_FILE%/*}"
+  echo "${accepted} ${recent[*]}" > "${STATE_FILE}"
+
+  if [[ "${valid}" != true ]]; then
+    echo "rejected: ${co2} ppm, last accepted: ${accepted}" >&2
+    return 1
+  fi
+
+  echo "${co2}"
+}
+
 send_co2() {
   local co2
   local datetime
@@ -80,6 +161,12 @@ send_co2() {
   fi
 
   publish_mqtt "${TOPIC_BASE}/state" "online"
+
+  # A rejected reading keeps the previous value in Home Assistant and is not a
+  # failure, so it raises no notification.
+  if ! co2=$(filter_co2 "${co2}"); then
+    return 0
+  fi
 
   datetime=$(date --iso-8601=seconds)
 
