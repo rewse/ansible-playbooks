@@ -183,3 +183,7 @@ Use only these tags, written as an indented YAML list:
 6. Stop when the entity recovers. Do not follow recovery with unrelated options changes because another reload can return the entry to the `has already been setup` state.
 
 `tuya_local` discovery overwrites `host` with the discovered IP, so configuring a hostname does not persist. Use `tuya_local` rather than LocalTuya for devices that LocalTuya does not support, such as the Fancy Sync Box.
+
+## Validation
+
+Before pushing, run `uvx pre-commit run --all-files` and `uv run --with pytest --with ansible-core pytest tests`, and commit any files the hooks reformat. Stage new files first, because `--all-files` skips untracked files. CI runs the same hooks, and `core.hooksPath` points at git-defender, so `pre-commit install` cannot run them at commit time. CI does not run the tests.
