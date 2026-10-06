@@ -64,6 +64,40 @@
             - action: alarm_control_panel.alarm_arm_away
               target:
                 entity_id: alarm_control_panel.home
+# Frigate restarts ffmpeg every second for a camera without power, and its main
+# process grows until the container memory limit kills it. Cameras follow their
+# plugs, and are synced again when Frigate starts because a restart can bring a
+# disabled camera back.
+# Kept apart from Toggle Camera Plugs, which runs only when the alarm mode and the
+# plugs disagree and notifies every run. A Frigate restart or a plug switched by
+# hand changes neither the alarm mode nor the need for a notification.
+- id: automation.sync_frigate_cameras
+  alias: "Sync Frigate Cameras"
+  triggers:
+    - trigger: state
+      entity_id:
+        - switch.dads_room_camera_plug
+        - switch.living_room_camera_plug
+        - switch.moms_room_camera_plug
+      to: ~
+    - trigger: mqtt
+      topic: "frigate/available"
+      payload: "online"
+  actions:
+    - repeat:
+        for_each:
+          - camera: "eufy-dad"
+            plug: "switch.dads_room_camera_plug"
+          - camera: "eufy-liv"
+            plug: "switch.living_room_camera_plug"
+          - camera: "eufy-mom"
+            plug: "switch.moms_room_camera_plug"
+        sequence:
+          - action: mqtt.publish
+            data:
+              topic: "frigate/{{ repeat.item.camera }}/enabled/set"
+              payload: "{{ 'ON' if is_state(repeat.item.plug, 'on') else 'OFF' }}"
+  mode: queued
 - id: automation.toggle_camera_plugs
   alias: "Toggle Camera Plugs"
   triggers:
