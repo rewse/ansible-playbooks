@@ -66,8 +66,9 @@
                 entity_id: alarm_control_panel.home
 # Frigate restarts ffmpeg every second for a camera without power, and its main
 # process grows until the container memory limit kills it. Cameras follow their
-# plugs, and are synced again when Frigate starts because a restart can bring a
-# disabled camera back.
+# plugs. Frigate restores the enabled state across a restart, but a set message
+# published while Frigate is down is not retained and is lost, so the cameras are
+# synced again when Frigate comes online.
 # Kept apart from Toggle Camera Plugs, which runs only when the alarm mode and the
 # plugs disagree and notifies every run. A Frigate restart or a plug switched by
 # hand changes neither the alarm mode nor the need for a notification.
