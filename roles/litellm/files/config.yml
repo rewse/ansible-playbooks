@@ -10,17 +10,22 @@ model_list:
   # cross-region routing of the global. prefix below, and it does not support
   # Guardrails.
   #
-  # Opus 5 and Sonnet 5 reject temperature ("`temperature` is deprecated for
-  # this model"), so it is dropped along with top_p. Clients that always send
-  # temperature, such as EasyDict, get a 400 otherwise.
-  - model_name: claude-opus-5
+  # Claude 5.5 models reject temperature ("`temperature` is deprecated
+  # for this model"), so it is dropped along with top_p. Clients that always
+  # send temperature, such as EasyDict, get a 400 otherwise.
+  - model_name: claude-haiku-5-5
     litellm_params:
-      model: bedrock/global.anthropic.claude-opus-5
+      model: bedrock/global.anthropic.claude-haiku-5-5
       aws_region_name: us-east-1
       additional_drop_params: ["temperature", "top_p"]
-  - model_name: claude-sonnet-5
+  - model_name: claude-opus-5-5
     litellm_params:
-      model: bedrock/global.anthropic.claude-sonnet-5
+      model: bedrock/global.anthropic.claude-opus-5-5
+      aws_region_name: us-east-1
+      additional_drop_params: ["temperature", "top_p"]
+  - model_name: claude-sonnet-5-5
+    litellm_params:
+      model: bedrock/global.anthropic.claude-sonnet-5-5
       aws_region_name: us-east-1
       additional_drop_params: ["temperature", "top_p"]
   # Gemma 4 is served only on the bedrock-mantle endpoint, so it does not get the
@@ -40,18 +45,18 @@ model_list:
   # The numbered GPT models answer only on the Responses API, which LiteLLM
   # reaches from this gateway's /v1/chat/completions since 1.89.0. They reject
   # temperature and top_p.
-  - model_name: gpt-5.6-luna
+  - model_name: gpt-6-astra
     litellm_params:
-      model: bedrock_mantle/openai.gpt-5.6-luna
+      model: bedrock_mantle/openai.gpt-6-astra
       aws_region_name: us-east-1
       additional_drop_params: ["temperature", "top_p"]
-  - model_name: gpt-5.6-sol
+  - model_name: gpt-6-luna
     litellm_params:
-      model: bedrock_mantle/openai.gpt-5.6-sol
+      model: bedrock_mantle/openai.gpt-6-luna
       aws_region_name: us-east-1
       additional_drop_params: ["temperature", "top_p"]
-  - model_name: gpt-5.6-terra
+  - model_name: gpt-6.1-sol
     litellm_params:
-      model: bedrock_mantle/openai.gpt-5.6-terra
+      model: bedrock_mantle/openai.gpt-6.1-sol
       aws_region_name: us-east-1
       additional_drop_params: ["temperature", "top_p"]
