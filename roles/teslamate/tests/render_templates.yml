@@ -58,6 +58,8 @@
           - "'DATABASE_SSL_MODE=require' in teslamate_test_grafana_env_output"
           - "'DATABASE_HOST=\\\"database.cluster.example.test\\\"' in teslamate_test_grafana_env_output"
           - "'GF_AUTH_ANONYMOUS_ENABLED=false' in teslamate_test_grafana_env_output"
+          - "'GF_AUTH_LOGIN_MAXIMUM_INACTIVE_LIFETIME_DURATION=120M' in teslamate_test_grafana_env_output"
+          - "'GF_AUTH_LOGIN_MAXIMUM_LIFETIME_DURATION=120M' in teslamate_test_grafana_env_output"
           - "'GF_SERVER_ROOT_URL=https://grafana.rewse.jp' in teslamate_test_grafana_env_output"
           - "'DATABASE_USER=\\\"grafana_ro\\\"' in teslamate_test_grafana_env_output"
           - (teslamate_grafana_database_password | replace('$', '$$')) in teslamate_test_grafana_env_output
