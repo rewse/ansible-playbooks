@@ -1,6 +1,6 @@
 ---
-teslamate_basic_auth_password: "{{ lookup('pipe', 'op read op://ansible/vt2ez35yutq5ikwrbp46q56oke/password') }}"
-teslamate_basic_auth_username: "{{ lookup('pipe', 'op read op://ansible/vt2ez35yutq5ikwrbp46q56oke/username') }}"
+teslamate_basic_auth_password: "{{ lookup('pipe', 'op read op://ansible/4xdt6pukfrzolxpd44srn2farm/password') }}"
+teslamate_basic_auth_username: "{{ lookup('pipe', 'op read op://ansible/4xdt6pukfrzolxpd44srn2farm/username') }}"
 teslamate_data_dir: /srv/teslamate
 teslamate_database_ca_checksum: sha256:e5bb2084ccf45087bda1c9bffdea0eb15ee67f0b91646106e466714f9de3c7e3
 teslamate_database_ca_url: https://truststore.pki.rds.amazonaws.com/global/global-bundle.pem
@@ -9,7 +9,7 @@ teslamate_database_name: "{{ lookup('pipe', 'op read \"op://ansible/f6jqsrpzvfqj
 teslamate_database_password: "{{ lookup('pipe', 'op read \"op://ansible/f6jqsrpzvfqjxge4ntvalkwbte/password\"') }}"
 teslamate_database_port: 5432
 teslamate_database_username: "{{ lookup('pipe', 'op read \"op://ansible/f6jqsrpzvfqjxge4ntvalkwbte/username\"') }}"
-teslamate_encryption_key: "{{ lookup('pipe', 'op read \"op://ansible/vt2ez35yutq5ikwrbp46q56oke/encryption key\"') }}"
+teslamate_encryption_key: "{{ lookup('pipe', 'op read \"op://ansible/4xdt6pukfrzolxpd44srn2farm/encryption key\"') }}"
 teslamate_grafana_admin_password: "{{ lookup('pipe', 'op read \"op://ansible/yjxf7ko4udy47oyal57x4u5siq/password\"') }}"
 teslamate_grafana_admin_username: "{{ lookup('pipe', 'op read \"op://ansible/yjxf7ko4udy47oyal57x4u5siq/username\"') }}"
 # Grafana only reads TeslaMate data, so its datasource logs in as a SELECT-only
