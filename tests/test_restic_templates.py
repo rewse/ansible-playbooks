@@ -24,7 +24,9 @@ class ResticDarwinTemplateTest(unittest.TestCase):
             "{{ restic_keep_daily }}": "30",
             "{{ restic_keep_monthly }}": "12",
             "{{ restic_keep_weekly }}": "8",
-            "{{ restic_materialise_timeout_seconds }}": "1",
+            # The deadline is compared in whole seconds, so a short timeout can
+            # expire during the first pass and end the loop before a second one.
+            "{{ restic_materialise_timeout_seconds }}": "60",
             "{{ restic_min_interval_hours }}": "20",
             "{{ restic_repo_name }}": "test-host",
             "{{ restic_s3_bucket }}": "example-bucket",
