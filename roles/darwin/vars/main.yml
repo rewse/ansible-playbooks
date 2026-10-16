@@ -21,6 +21,7 @@ darwin_packages:
   - awscli
   - basedpyright
   - bat
+  - bind
   - chezmoi
   - container
   - coreutils
