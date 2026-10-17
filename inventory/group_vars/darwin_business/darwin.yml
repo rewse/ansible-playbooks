@@ -1,4 +1,7 @@
 ---
+darwin_extra_packages:
+  - swiftlint
+
 darwin_extra_casks:
   - asana
   - box-drive
