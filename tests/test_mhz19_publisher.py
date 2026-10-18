@@ -67,7 +67,7 @@ class Mhz19PublisherTest(unittest.TestCase):
         return template
 
     def run_publisher(
-        self, outputs: list[str]
+        self, outputs: list[str], stderr: str = ""
     ) -> tuple[subprocess.CompletedProcess[str], list[str], list[tuple[str, str]]]:
         run_dir = pathlib.Path(tempfile.mkdtemp(dir=self.root))
         bin_dir = run_dir / "bin"
@@ -80,14 +80,20 @@ class Mhz19PublisherTest(unittest.TestCase):
         for index, output in enumerate(outputs):
             (outputs_dir / str(index)).write_text(output + "\n")
         counter.write_text("0")
+        stderr_file = run_dir / "stderr"
+        stderr_file.write_text(stderr)
 
-        # Records its arguments and prints the next prepared sensor output.
+        # Records its arguments, writes the prepared stderr text, and prints the
+        # next prepared sensor output.
         self.write_executable(
             bin_dir / "python3",
             textwrap.dedent(
                 f"""\
                 #!/bin/sh
                 printf '%s\\n' "$*" >> '{calls}'
+                if [ -s '{stderr_file}' ]; then
+                    cat '{stderr_file}' >&2
+                fi
                 n=$(cat '{counter}')
                 echo $((n + 1)) > '{counter}'
                 if [ -f '{outputs_dir}'/"$n" ]; then
@@ -163,6 +169,14 @@ class Mhz19PublisherTest(unittest.TestCase):
         self.assertNotEqual(result.returncode, 0)
         self.assertEqual(len(calls), 3)
         self.assertEqual(published[-1], ("mhz19/test_room/state", "offline"))
+
+    def test_library_errors_reach_the_journal(self) -> None:
+        result, _, _ = self.run_publisher(
+            outputs=["{}", "{}", "{}"], stderr="SerialException: could not open port"
+        )
+
+        self.assertNotEqual(result.returncode, 0)
+        self.assertIn("SerialException: could not open port", result.stderr)
 
     def test_level_change_is_accepted_after_three_agreeing_readings(self) -> None:
         self.write_state("600 600 600 600")

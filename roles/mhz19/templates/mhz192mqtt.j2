@@ -57,10 +57,12 @@ read_co2() {
   # sensor does not answer or a frame fails its checksum, and the next attempt
   # usually succeeds. Retried here because the timer's next run is five minutes
   # out, which is long enough for the reading to be stale, and because a failure
-  # raises a notification through OnFailure. The serial console is disabled by
-  # the serial component, so the library is told to leave the getty alone.
+  # raises a notification through OnFailure. The library reports a port it
+  # cannot open only as a traceback on stderr, so stderr is left to reach the
+  # journal. The serial console is disabled by the serial component, so the
+  # library is told to leave the getty alone.
   for attempt in 1 2 3; do
-    if co2=$(python3 -m mh_z19 --serial_device /dev/ttyAMA0 --serial_console_untouched 2>/dev/null \
+    if co2=$(python3 -m mh_z19 --serial_device /dev/ttyAMA0 --serial_console_untouched \
       | grep -oP '(?<="co2": )\d+') \
       && [[ -n "${co2}" ]]; then
       echo "${co2}"
