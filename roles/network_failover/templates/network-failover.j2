@@ -55,6 +55,19 @@ reset_paths() {
     conntrack -F 2> /dev/null || true
 }
 
+# Avahi does not take back a name it gave up, so a rename made while wlan0
+# shared the segment outlives the link. wlan0 comes up outside this script too:
+# wpa_supplicant raises it at boot and on netplan apply despite
+# activation-mode: manual, while Avahi is probing. Restarting Avahi once the
+# segment has one address again reclaims the hostname. Avahi goes first because
+# smbd registers its service through it. try-restart leaves a unit that is not
+# running alone, so a host without Samba is left as it is.
+republish_mdns() {
+    logger -t network-failover "republishing mDNS"
+    systemctl try-restart avahi-daemon.service
+    systemctl try-restart smbd.service
+}
+
 restore_primary() {
     rm -f "$failure_count"
 
@@ -63,6 +76,7 @@ restore_primary() {
     logger -t network-failover "eth0 reaches $gateway, bringing wlan0 down"
     ip link set wlan0 down
     reset_paths
+    republish_mdns
 }
 
 activate_fallback() {
