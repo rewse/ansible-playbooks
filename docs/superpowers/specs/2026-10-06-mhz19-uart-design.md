@@ -42,7 +42,7 @@ mhz19 ロールに `tasks/serial.yml` を足し、`tasks/main.yml` からタグ 
 `serial.yml` は次の順に処理する。
 
 1. `/boot/firmware/config.txt` に `enable_uart=1` があることを `lineinfile` で保証する
-2. `/boot/firmware/cmdline.txt` から `console=ttyAMA0,115200` を取り除く。`roles/raspberrypi/tasks/nvme.yml` と同じく `lineinfile` の `backrefs` を使い、パラメーターがない行には何もしない。vfat はコロンを含むファイル名を受け付けないので、`backup` は使えない
+2. `/boot/firmware/cmdline.txt` からシリアルコンソールの指定を取り除く。両ホストの `cmdline.txt` には `console=serial0,115200` と書かれていて、ファームウェアが起動時に `console=ttyAMA0,115200` へ書き換えるので、どちらの表記にも一致させる。`roles/raspberrypi/tasks/nvme.yml` と同じく `lineinfile` の `backrefs` を使い、パラメーターがない行には何もしない。vfat はコロンを含むファイル名を受け付けないので、`backup` は使えない
 3. `serial-getty@ttyAMA0.service` を mask する。コンソール指定がなくなれば systemd-getty-generator はこの getty を作らないが、手動で有効にされた場合にも UART を奪われないようにする
 
 1 の `lineinfile` は、行がないときにファイル末尾へ足す。末尾が `[all]` 以外のセクションだとそのモデルにしか効かないため、`insertafter` で `[all]` の直後に足す。両ホストとも今は行があるので、変更は起きない。
@@ -70,7 +70,7 @@ MH-Z19 の UART は 3.3V レベルなので、レベル変換なしで GPIO に�
 
 ### 切り替え手順
 
-hotel で手順を確かめてから fox に進む。ホストごとに次の順で行う。
+fox の PWM 出力は 2026-10-18 01:20 から止まっている（GPIO12 が常に LOW で、電源を入れ直しても戻らない）。そのため fox を先に切り替え、続けて hotel を切り替える。fox では PWM と値を比べられないので、UART が値を返すことだけを確かめ、配線のときに PWM 線も外す。UART でも応答がなければセンサー本体の故障として切り替えを止める。hotel はホストごとに次の順で行う。
 
 ```mermaid
 flowchart TD
@@ -85,7 +85,7 @@ flowchart TD
     H --> I[シャットダウンして PWM 線を外し起動]
 ```
 
-PWM 線を外すまでは、どちらの読み取りでも戻せる。publisher の適用前に問題があれば、配線を戻さなくても今の PWM の読み取りが動き続ける。
+hotel では、PWM 線を外すまではどちらの読み取りでも戻せる。publisher の適用前に問題があれば、配線を戻さなくても今の PWM の読み取りが動き続ける。
 
 ### 切り戻し
 
