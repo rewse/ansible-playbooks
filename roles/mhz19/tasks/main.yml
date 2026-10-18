@@ -1,4 +1,9 @@
 ---
+- name: Import serial tasks
+  ansible.builtin.import_tasks: serial.yml
+  tags:
+    - mhz19_serial
+
 - name: Import publisher tasks
   ansible.builtin.import_tasks: publisher.yml
   tags:

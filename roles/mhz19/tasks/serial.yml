@@ -1,0 +1,28 @@
+---
+- name: serial | Enable the UART
+  # A line added at the end of the file would land in whatever section is last,
+  # which may apply to one board model only, so it goes right after [all].
+  ansible.builtin.lineinfile:
+    path: /boot/firmware/config.txt
+    regexp: '^enable_uart='
+    line: enable_uart=1
+    insertafter: '^\[all\]'
+
+- name: serial | Remove the serial console from the kernel command line
+  # The firmware rewrites serial0 to ttyAMA0, so either name holds the UART.
+  # The space after the parameter is consumed so neighbours stay single-spaced.
+  # backrefs makes a non-match a no-op, so a cmdline without the console is left alone.
+  # backup is unusable here: its timestamped name holds a colon, which vfat rejects.
+  ansible.builtin.lineinfile:
+    path: /boot/firmware/cmdline.txt
+    regexp: '^(.*?)console=(?:serial0|ttyAMA0),115200 ?(.*)$'
+    line: '\1\2'
+    backrefs: true
+  notify: Report a pending reboot for the UART
+
+- name: serial | Mask the serial getty
+  # Keeps the getty off the UART even if someone enables it by hand.
+  ansible.builtin.systemd:
+    name: serial-getty@ttyAMA0.service
+    masked: true
+    state: stopped

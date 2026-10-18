@@ -8,3 +8,8 @@
     name: mhz192mqtt.timer
     state: restarted
     daemon_reload: true
+
+- name: Report a pending reboot for the UART
+  ansible.builtin.debug:
+    msg: "Reboot to release ttyAMA0 from the kernel console"
+    verbosity: 0
