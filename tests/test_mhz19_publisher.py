@@ -145,7 +145,7 @@ class Mhz19PublisherTest(unittest.TestCase):
         return result, call_log, published_log
 
     def test_reads_over_uart(self) -> None:
-        result, calls, published = self.run_publisher(outputs=["{'co2': 650}"])
+        result, calls, published = self.run_publisher(outputs=['{"co2": 650}'])
 
         self.assertEqual(result.returncode, 0, result.stdout + result.stderr)
         self.assertEqual(
@@ -167,7 +167,7 @@ class Mhz19PublisherTest(unittest.TestCase):
     def test_level_change_is_accepted_after_three_agreeing_readings(self) -> None:
         self.write_state("600 600 600 600")
         for expected_published in (False, False, True):
-            result, _, published = self.run_publisher(outputs=["{'co2': 900}"])
+            result, _, published = self.run_publisher(outputs=['{"co2": 900}'])
             self.assertEqual(result.returncode, 0, result.stdout + result.stderr)
             self.assertEqual(
                 any(t.endswith("/co2") for t, _ in published), expected_published
