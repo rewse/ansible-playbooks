@@ -10,9 +10,9 @@ import shutil
 import subprocess
 import tempfile
 from collections.abc import Callable
+from datetime import UTC
 from datetime import datetime
 from datetime import timedelta
-from datetime import timezone
 from pathlib import Path
 
 from ansible.errors import AnsibleLookupError
@@ -71,7 +71,7 @@ def _run(cmd: list[str]) -> str:
 
 
 def _now() -> datetime:
-    return datetime.now(timezone.utc)
+    return datetime.now(UTC)
 
 
 def _parse_time(value: str) -> datetime:
@@ -92,7 +92,7 @@ def _parse_time(value: str) -> datetime:
         + (f".{fraction[:6].ljust(6, '0')}" if fraction else "")
         + (offset or "+00:00")
     )
-    return datetime.fromisoformat(iso).astimezone(timezone.utc)
+    return datetime.fromisoformat(iso).astimezone(UTC)
 
 
 def _iso(value: datetime) -> str:
@@ -138,7 +138,7 @@ def _pages(run: Callable[[list[str]], str], path: str) -> list:
 
 # A reproducible build sets Created to the epoch or year 1, which would make
 # every tag look old enough and silently skip the cooldown.
-_EARLIEST_CREATED = datetime(2000, 1, 1, tzinfo=timezone.utc)
+_EARLIEST_CREATED = datetime(2000, 1, 1, tzinfo=UTC)
 
 
 def _oci(repo, pattern, days, platform, run, now):

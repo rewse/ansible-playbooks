@@ -3,9 +3,9 @@
 import json
 import pathlib
 import sys
+from datetime import UTC
 from datetime import datetime
 from datetime import timedelta
-from datetime import timezone
 
 import pytest
 from ansible.errors import AnsibleLookupError
@@ -16,7 +16,7 @@ sys.path.insert(
 
 import aged_release
 
-NOW = datetime(2026, 9, 27, tzinfo=timezone.utc)
+NOW = datetime(2026, 9, 27, tzinfo=UTC)
 
 
 def ago(days):
@@ -363,13 +363,13 @@ def test_tags_are_read_across_pages():
 
 def test_parse_time_honours_offset():
     assert aged_release._parse_time("2026-09-20T09:00:00+09:00") == datetime(
-        2026, 9, 20, tzinfo=timezone.utc
+        2026, 9, 20, tzinfo=UTC
     )
 
 
 def test_parse_time_accepts_nanoseconds_and_z():
     assert aged_release._parse_time("2026-09-20T00:00:00.123456789Z") == datetime(
-        2026, 9, 20, 0, 0, 0, 123456, tzinfo=timezone.utc
+        2026, 9, 20, 0, 0, 0, 123456, tzinfo=UTC
     )
 
 
@@ -390,5 +390,5 @@ def test_image_created_before_2000_is_rejected():
 
 def test_parse_time_honours_negative_offset():
     assert aged_release._parse_time("2026-09-20T09:00:00-05:00") == datetime(
-        2026, 9, 20, 14, 0, tzinfo=timezone.utc
+        2026, 9, 20, 14, 0, tzinfo=UTC
     )
