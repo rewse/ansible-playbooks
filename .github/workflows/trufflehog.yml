@@ -23,5 +23,5 @@ jobs:
           base: ""
           head: main
           # Keep in step with the action version above; Dependabot does not update this input.
-          version: 3.99.0@sha256:39ee0643ae620664287bcc95f133f3fc8484590d6ca4e7105d96b90dac4b9f6f
+          version: 3.99.2@sha256:47a84bc18a0d04a165498bbbd3bacfd84176661cbc91f8e0f85467f6a771e99a
           extra_args: --results=verified,unknown
