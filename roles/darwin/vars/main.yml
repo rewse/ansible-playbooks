@@ -165,3 +165,5 @@ darwin_mas_apps:
 darwin_path_files:
   - homebrew
   - local
+
+darwin_visual_explainer_prefix: "{{ ansible_facts['env']['HOME'] }}/.agents"

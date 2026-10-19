@@ -1,0 +1,32 @@
+---
+# The visual-explainer skill checks rendered pages with playwright-core and
+# Google Chrome. Its import() never looks in global installs, and every skill
+# update replaces the skill directory, so the package goes in ~/.agents, whose
+# node_modules Node.js reaches from ~/.agents/skills/visual-explainer.
+- name: visual_explainer | Install playwright-core
+  # npm has no module that honours the cooldown environment.
+  ansible.builtin.command: npm install --prefix {{ darwin_visual_explainer_prefix }} playwright-core
+  environment: "{{ supply_chain_cooldown_environment }}"
+  args:
+    creates: "{{ darwin_visual_explainer_prefix }}/node_modules/playwright-core"
+
+- name: visual_explainer | Find outdated playwright-core
+  # outdated exits 1 when it finds any.
+  ansible.builtin.command: npm outdated --prefix {{ darwin_visual_explainer_prefix }} --json
+  environment: "{{ supply_chain_cooldown_environment }}"
+  register: __darwin_visual_explainer_outdated
+  changed_when: false
+  failed_when: __darwin_visual_explainer_outdated.rc > 1
+  check_mode: false
+
+- name: visual_explainer | Update playwright-core
+  # npm has no module that honours the cooldown environment.
+  ansible.builtin.command: npm install --prefix {{ darwin_visual_explainer_prefix }} playwright-core@{{ __darwin_visual_explainer_info.latest }}
+  environment: "{{ supply_chain_cooldown_environment }}"
+  vars:
+    __darwin_visual_explainer_info: "{{ (__darwin_visual_explainer_outdated.stdout | default('{}', true) | from_json).get('playwright-core', {}) }}"
+  changed_when: true
+  when:
+    - __darwin_visual_explainer_info.latest is defined
+    - __darwin_visual_explainer_info.current is defined
+    - __darwin_visual_explainer_info.latest is version(__darwin_visual_explainer_info.current, '>')

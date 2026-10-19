@@ -50,6 +50,12 @@
   tags:
     - darwin_path
 
+- name: Import visual_explainer tasks
+  ansible.builtin.import_tasks: visual_explainer.yml
+  tags:
+    - darwin_visual_explainer
+    - update
+
 - name: Import xurl tasks
   ansible.builtin.import_tasks: xurl.yml
   tags:
