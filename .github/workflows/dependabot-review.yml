@@ -26,7 +26,7 @@ jobs:
       statuses: read
     steps:
       - name: Review the Dependabot PR
-        uses: rewse/actions/dependabot-review@f4009aabb158e08d02f739dce2ebf7aecd0a779f  # v1.1.1
+        uses: rewse/actions/dependabot-review@de7d830f00bb1d7fe242c4f7e4ffb629f062e6b2  # v1.1.3
         with:
           app-client-id: ${{ secrets.DEPENDABOT_APP_CLIENT_ID }}
           app-private-key: ${{ secrets.DEPENDABOT_APP_PRIVATE_KEY }}
