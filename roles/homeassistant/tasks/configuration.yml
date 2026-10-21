@@ -21,7 +21,11 @@
     # The file holds Home Assistant templates, which share Jinja's delimiters.
     variable_start_string: "[%"
     variable_end_string: "%]"
-    mode: "0644"
+    # Carries tokens and passwords. Home Assistant runs as root in its
+    # container, and rsyncd serves the standby as root.
+    owner: root
+    group: root
+    mode: "0600"
   notify: Restart Home Assistant
 
 - name: configuration | Deploy shell commands
@@ -31,7 +35,11 @@
     # The file holds Home Assistant templates, which share Jinja's delimiters.
     variable_start_string: "[%"
     variable_end_string: "%]"
-    mode: "0644"
+    # Carries tokens and passwords. Home Assistant runs as root in its
+    # container, and rsyncd serves the standby as root.
+    owner: root
+    group: root
+    mode: "0600"
   notify: Restart Home Assistant
 
 - name: configuration | Copy included files

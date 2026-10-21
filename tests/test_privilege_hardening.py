@@ -12,6 +12,7 @@ REPO_ROOT = pathlib.Path(__file__).resolve().parents[1]
 RSYNCD_CONF = (
     REPO_ROOT / "roles" / "homeassistant_ha_primary" / "templates" / "rsyncd.conf.j2"
 )
+HOMEASSISTANT = REPO_ROOT / "roles" / "homeassistant"
 PRIMARY = REPO_ROOT / "roles" / "homeassistant_ha_primary"
 SECONDARY = REPO_ROOT / "roles" / "homeassistant_ha_secondary"
 ZABBIX_FILES = REPO_ROOT / "roles" / "zabbix_agent" / "files"
@@ -191,6 +192,40 @@ class StockPriceFetcherCheckoutTest(unittest.TestCase):
         self.assertLess(
             send.index("export UV_PROJECT_ENVIRONMENT"), send.index("uv run")
         )
+
+
+def template_tasks(path: pathlib.Path) -> dict[str, dict]:
+    return {
+        t["ansible.builtin.template"]["dest"]: t["ansible.builtin.template"]
+        for t in yaml.safe_load(path.read_text())
+        if "ansible.builtin.template" in t
+    }
+
+
+class HomeAssistantSecretFilesTest(unittest.TestCase):
+    # Home Assistant runs as root in its container, and rsyncd and the standby's
+    # sync run as root, so root alone needs to read these.
+    def test_secret_config_is_private(self):
+        tasks = template_tasks(HOMEASSISTANT / "tasks" / "configuration.yml")
+        for name in ("secrets.yaml", "shell_commands.yaml"):
+            with self.subTest(name=name):
+                task = tasks[f"/srv/homeassistant/config/{name}"]
+                self.assertEqual(task["mode"], "0600")
+                self.assertEqual(task["owner"], "root")
+                self.assertEqual(task["group"], "root")
+
+    def test_token_bearing_failover_scripts_are_private(self):
+        tasks = template_tasks(SECONDARY / "tasks" / "failover.yml")
+        for name in (
+            "homeassistant-failback",
+            "homeassistant-failover",
+            "homeassistant-name-switch",
+        ):
+            with self.subTest(name=name):
+                task = tasks[f"/usr/local/bin/{name}"]
+                self.assertEqual(task["mode"], "0700")
+                self.assertEqual(task["owner"], "root")
+                self.assertEqual(task["group"], "root")
 
 
 if __name__ == "__main__":

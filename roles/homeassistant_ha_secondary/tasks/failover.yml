@@ -9,7 +9,10 @@
   ansible.builtin.template:
     src: homeassistant-failover.j2
     dest: /usr/local/bin/homeassistant-failover
-    mode: "0755"
+    # Carries the Home Assistant token; the failover timer runs it as root.
+    owner: root
+    group: root
+    mode: "0700"
     variable_start_string: "[%"
     variable_end_string: "%]"
 
@@ -39,7 +42,10 @@
   ansible.builtin.template:
     src: homeassistant-failback.j2
     dest: /usr/local/bin/homeassistant-failback
-    mode: "0755"
+    # Carries the Home Assistant token; it is run with sudo.
+    owner: root
+    group: root
+    mode: "0700"
     variable_start_string: "[%"
     variable_end_string: "%]"
 
@@ -47,6 +53,9 @@
   ansible.builtin.template:
     src: homeassistant-name-switch.j2
     dest: /usr/local/bin/homeassistant-name-switch
+    # Carries the UniFi API key; only the two root scripts above call it.
+    owner: root
+    group: root
     mode: "0700"
     variable_start_string: "[%"
     variable_end_string: "%]"
