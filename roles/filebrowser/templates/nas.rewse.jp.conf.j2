@@ -12,6 +12,12 @@
     # against the https:// entry in rpOrigins, so no passkey can be registered.
     RequestHeader set X-Forwarded-Proto "https"
 
+    # FileBrowser takes the client address from X-Forwarded-For for its login
+    # lockout and audit log, and mod_proxy appends to a header the client sent
+    # instead of replacing it. Dropping the client's copy before mod_proxy runs
+    # leaves only the address Apache saw, so a guesser cannot rotate it.
+    RequestHeader unset X-Forwarded-For early
+
     ProxyPass / http://localhost:{{ filebrowser_port }}/
     ProxyPassReverse / http://localhost:{{ filebrowser_port }}/
 

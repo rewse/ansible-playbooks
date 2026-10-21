@@ -10,6 +10,7 @@ import yaml
 
 REPO_ROOT = pathlib.Path(__file__).resolve().parents[1]
 ROLES = REPO_ROOT / "roles"
+FILEBROWSER = ROLES / "filebrowser"
 HOMEASSISTANT = ROLES / "homeassistant"
 NVR = ROLES / "nvr"
 SECONDARY = ROLES / "homeassistant_ha_secondary"
@@ -119,6 +120,14 @@ class StandbyHomeAssistantFail2banTest(unittest.TestCase):
         self.assertEqual(touch["state"], "touch")
         self.assertEqual(touch["access_time"], "preserve")
         self.assertEqual(touch["modification_time"], "preserve")
+
+
+class FileBrowserForwardedForTest(unittest.TestCase):
+    def test_vhost_drops_client_forwarded_for(self):
+        # FileBrowser trusts X-Forwarded-For for its lockout and audit log, and
+        # mod_proxy appends to a header the client sent rather than replacing it.
+        text = (FILEBROWSER / "templates" / "nas.rewse.jp.conf.j2").read_text()
+        self.assertRegex(text, r"(?m)^\s*RequestHeader unset X-Forwarded-For early$")
 
 
 if __name__ == "__main__":
