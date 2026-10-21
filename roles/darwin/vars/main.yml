@@ -74,8 +74,6 @@ darwin_casks:
   - betterdisplay
   - calibre
   - calibrite-profiler
-  - chatbox
-  - cmux
   - corretto
   - cyberduck
   - dotnet-sdk
