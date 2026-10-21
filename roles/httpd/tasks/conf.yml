@@ -4,6 +4,7 @@
     src: 00-forcessl.conf
     dest: /etc/apache2/conf-available
     mode: "0644"
+  notify: Reload Apache
 
 - name: conf | Enable force SSL config
   # No module enables an Apache site or conf; the command reports whether it changed.
@@ -17,6 +18,7 @@
     src: 01-blog-redirect.conf
     dest: /etc/apache2/conf-available
     mode: "0644"
+  notify: Reload Apache
 
 - name: conf | Enable blog redirect config
   # No module enables an Apache site or conf; the command reports whether it changed.
@@ -44,6 +46,7 @@
     src: admin.conf.j2
     dest: /etc/apache2/conf-available/admin.conf
     mode: "0644"
+  notify: Reload Apache
 
 - name: conf | Enable admin config
   # No module enables an Apache site or conf; the command reports whether it changed.

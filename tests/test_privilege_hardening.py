@@ -15,6 +15,7 @@ RSYNCD_CONF = (
 PRIMARY = REPO_ROOT / "roles" / "homeassistant_ha_primary"
 SECONDARY = REPO_ROOT / "roles" / "homeassistant_ha_secondary"
 ZABBIX_FILES = REPO_ROOT / "roles" / "zabbix_agent" / "files"
+ADMIN_CONF = REPO_ROOT / "roles" / "httpd" / "templates" / "admin.conf.j2"
 ZABBIX_ACCESS_CONF = (
     REPO_ROOT / "roles" / "zabbix_server" / "templates" / "zabbix-api.conf.j2"
 )
@@ -111,6 +112,17 @@ class ZabbixFrontendTest(unittest.TestCase):
         ):
             with self.subTest(network=network):
                 self.assertIn(network, block)
+
+
+class AdminPagesTest(unittest.TestCase):
+    def test_admin_pages_are_limited_by_url_path(self):
+        # Apache serves /var/www/html through the /var/www -> /srv/www symlink
+        # and matches <Directory> against the unresolved path, so a
+        # <Directory /srv/www/...> block never applies to these pages.
+        text = ADMIN_CONF.read_text()
+        self.assertIn('<Location "/admin">', text)
+        self.assertNotRegex(text, r"(?m)^<Directory")
+        self.assertIn("Require ip", text)
 
 
 class HomeAssistantAgentConfigTest(unittest.TestCase):

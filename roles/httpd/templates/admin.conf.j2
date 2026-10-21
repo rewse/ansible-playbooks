@@ -1,3 +1,5 @@
-<Directory /srv/www/html/admin>
+# Match the URL path: /var/www is a symlink to /srv/www, and Apache matches
+# <Directory> against the unresolved /var/www path.
+<Location "/admin">
     Require ip {{ networks.home_private_ipv4 }} {{ networks.aws_private_ipv4 }} {{ networks.home_public_ipv4 }} {{ networks.office_public_ipv4 | join(' ') }} {{ networks.home_public_ipv6 }} {{ networks.aws_public_ipv6 }}
-</Directory>
+</Location>
