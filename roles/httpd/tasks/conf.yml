@@ -69,14 +69,7 @@
   changed_when: "'already enabled' not in __httpd_a2enconf_status.stdout"
   notify: Reload Apache
 
-- name: conf | Create admin directory
+- name: conf | Remove admin directory
   ansible.builtin.file:
     path: /srv/www/html/admin
-    state: directory
-    mode: "0755"
-
-- name: conf | Copy phpinfo.php
-  ansible.builtin.copy:
-    src: phpinfo.php
-    dest: /srv/www/html/admin
-    mode: "0644"
+    state: absent
