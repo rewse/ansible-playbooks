@@ -5,7 +5,6 @@ darwin_extra_packages:
 darwin_extra_casks:
   - asana
   - box-drive
-  - claude
   - displaylink
   - font-noto-sans-cjk
   - gotomeeting
