@@ -52,9 +52,6 @@
     - role: litellm
       tags:
         - litellm
-    - role: lmstudio
-      tags:
-        - lmstudio
     - role: matter_server
       tags:
         - matter_server
