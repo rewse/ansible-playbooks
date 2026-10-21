@@ -4,12 +4,16 @@
     path: /opt/stock-price-fetcher/.git
   register: __zabbix_money_market_checkout
 
-- name: app | Trust the checkout for root
-  # git refuses a repository owned by another user; the checkout is owned by zabbix.
-  community.general.git_config:
-    name: safe.directory
-    scope: global
-    value: /opt/stock-price-fetcher
+- name: app | Keep the checkout owned by root
+  # root runs git here, and git executes .git/config and hooks, so the user that
+  # runs a browser on scraped pages must not be able to write any of it.
+  ansible.builtin.file:
+    path: /opt/stock-price-fetcher
+    state: directory
+    owner: root
+    group: root
+    recurse: true
+  when: __zabbix_money_market_checkout.stat.exists
 
 - name: app | Check out repository
   # This account's own repository follows main without a cooldown.
@@ -19,22 +23,42 @@
     accept_hostkey: true
     key_file: /home/{{ admin_user }}/.ssh/id_rsa
     version: main
-  notify: Hand the stock-price-fetcher checkout to zabbix
 
-- name: app | Hand over a new checkout before syncing as zabbix
-  ansible.builtin.meta: flush_handlers
+- name: app | Create environment directory
+  ansible.builtin.file:
+    path: "{{ zabbix_money_market_venv | dirname }}"
+    state: directory
+    owner: zabbix
+    group: zabbix
+    mode: "0755"
 
 - name: app | Sync dependencies
   # uv has no Ansible module. The committed lockfile of this account's own
   # repository pins every version, so the cooldown environment does not apply.
-  # --frozen installs from the lockfile as committed; without it uv may rewrite
-  # uv.lock, and the next checkout refuses the local modification.
+  # --frozen installs from the lockfile as committed and writes nothing into the
+  # checkout, which zabbix can only read; the environment lives outside it.
   ansible.builtin.command: uv sync --frozen
   args:
     chdir: /opt/stock-price-fetcher
   become: true
   become_user: zabbix
+  environment:
+    UV_PROJECT_ENVIRONMENT: "{{ zabbix_money_market_venv }}"
   register: __zabbix_money_market_sync
   changed_when: "'Installed' in __zabbix_money_market_sync.stderr or 'Uninstalled' in __zabbix_money_market_sync.stderr"
   # A dry run does not create a first checkout.
   when: not ansible_check_mode or __zabbix_money_market_checkout.stat.exists
+
+- name: app | Remove the safe.directory entry for the checkout
+  # git_config can only unset every safe.directory value at once, and root's
+  # global config may hold others; git config takes a value pattern.
+  ansible.builtin.command: git config --global --unset-all safe.directory '^/opt/stock-price-fetcher$'  # noqa: command-instead-of-module the git module manages checkouts, not config
+  register: __zabbix_money_market_safe_directory
+  # Exit status 5 means no such value was set.
+  changed_when: __zabbix_money_market_safe_directory.rc == 0
+  failed_when: __zabbix_money_market_safe_directory.rc not in [0, 5]
+
+- name: app | Remove the environment inside the checkout
+  ansible.builtin.file:
+    path: /opt/stock-price-fetcher/.venv
+    state: absent

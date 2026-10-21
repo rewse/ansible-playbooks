@@ -1,12 +1,4 @@
 ---
-- name: Hand the stock-price-fetcher checkout to zabbix
-  # git runs as root, so the files it writes on each update need handing over.
-  ansible.builtin.file:
-    path: /opt/stock-price-fetcher
-    owner: zabbix
-    group: zabbix
-    recurse: true
-
 - name: Load the Chromium AppArmor profile
   # No module loads a profile file; apparmor_parser -r adds or replaces it.
   ansible.builtin.command: apparmor_parser -r /etc/apparmor.d/{{ zabbix_money_market_apparmor_profile }}

@@ -20,6 +20,9 @@ export STOCK_FETCHER_DEBUG=1
 # the Lightpanda binary that the Yahoo source uses.
 export PATH="/var/lib/zabbix/.local/bin:$PATH"
 
+# The checkout belongs to root, and the environment uv sync built lives here.
+export UV_PROJECT_ENVIRONMENT="{{ zabbix_money_market_venv }}"
+
 cd /opt/stock-price-fetcher || exit 1
 
 # The schedules overlap, and agent-browser sessions conflict when two run at once.

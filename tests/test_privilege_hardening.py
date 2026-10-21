@@ -15,6 +15,7 @@ RSYNCD_CONF = (
 PRIMARY = REPO_ROOT / "roles" / "homeassistant_ha_primary"
 SECONDARY = REPO_ROOT / "roles" / "homeassistant_ha_secondary"
 ZABBIX_FILES = REPO_ROOT / "roles" / "zabbix_agent" / "files"
+MONEY_MARKET = REPO_ROOT / "roles" / "zabbix_money_market"
 ADMIN_CONF = REPO_ROOT / "roles" / "httpd" / "templates" / "admin.conf.j2"
 ZABBIX_ACCESS_CONF = (
     REPO_ROOT / "roles" / "zabbix_server" / "templates" / "zabbix-api.conf.j2"
@@ -138,6 +139,58 @@ class HomeAssistantAgentConfigTest(unittest.TestCase):
         self.assertEqual(task["mode"], "0640")
         self.assertEqual(task["owner"], "root")
         self.assertEqual(task["group"], "zabbix")
+
+
+class StockPriceFetcherCheckoutTest(unittest.TestCase):
+    # root runs git in this checkout, and git executes .git/config and hooks, so
+    # zabbix, which runs a browser on scraped pages, must not be able to write it.
+    CHECKOUT = "/opt/stock-price-fetcher"
+
+    def tasks(self) -> list[dict]:
+        return yaml.safe_load((MONEY_MARKET / "tasks" / "app.yml").read_text())
+
+    def test_checkout_stays_root_owned(self):
+        handlers = (MONEY_MARKET / "handlers" / "main.yml").read_text()
+        self.assertNotIn(self.CHECKOUT, handlers)
+        for task in self.tasks():
+            with self.subTest(task=task["name"]):
+                spec = task.get("ansible.builtin.file", {})
+                if spec.get("path") == self.CHECKOUT:
+                    self.assertEqual(spec.get("owner"), "root")
+                    self.assertEqual(spec.get("group"), "root")
+                git = task.get("ansible.builtin.git")
+                if git:
+                    self.assertNotIn("become_user", task)
+                    self.assertNotIn("notify", task)
+
+    def test_root_does_not_trust_a_foreign_checkout(self):
+        for task in self.tasks():
+            with self.subTest(task=task["name"]):
+                spec = task.get("community.general.git_config", {})
+                self.assertNotEqual(spec.get("name"), "safe.directory")
+
+    def test_environment_lives_outside_the_checkout(self):
+        venv = yaml.safe_load((MONEY_MARKET / "vars" / "main.yml").read_text())[
+            "zabbix_money_market_venv"
+        ]
+        self.assertFalse(venv.startswith(self.CHECKOUT + "/"))
+        sync = next(
+            t
+            for t in self.tasks()
+            if "uv sync" in str(t.get("ansible.builtin.command"))
+        )
+        self.assertEqual(sync["become_user"], "zabbix")
+        self.assertEqual(
+            sync["environment"],
+            {"UV_PROJECT_ENVIRONMENT": "{{ zabbix_money_market_venv }}"},
+        )
+        send = (MONEY_MARKET / "templates" / "stock-price-fetcher-send.j2").read_text()
+        self.assertIn(
+            'export UV_PROJECT_ENVIRONMENT="{{ zabbix_money_market_venv }}"', send
+        )
+        self.assertLess(
+            send.index("export UV_PROJECT_ENVIRONMENT"), send.index("uv run")
+        )
 
 
 if __name__ == "__main__":

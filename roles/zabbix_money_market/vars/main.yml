@@ -1,4 +1,8 @@
 ---
+# uv's project environment, outside the root-owned checkout so that zabbix, which
+# runs uv sync and the fetcher, owns only this and not the code root runs git in.
+zabbix_money_market_venv: /var/lib/stock-price-fetcher/venv
+
 zabbix_money_market_apparmor_profile: stock-price-fetcher-chromium
 # Playwright names the directory after its build number and the platform.
 zabbix_money_market_chromium_glob: /var/lib/zabbix/.cache/ms-playwright/chromium-*/chrome-linux*/chrome
