@@ -158,6 +158,8 @@ class InternetTlsVerificationTest(unittest.TestCase):
     def test_autodiscover_proxy_verifies_workmail(self):
         text = (AUTODISCOVER / "files" / "autodiscover.conf").read_text()
         self.assertRegex(text, r"(?m)^SSLProxyVerify require$")
+        # The default depth of 1 rejects WorkMail's leaf + intermediate chain.
+        self.assertRegex(text, r"(?m)^SSLProxyVerifyDepth [3-9]$")
         self.assertRegex(text, rf"(?m)^SSLProxyCACertificateFile {self.CA_BUNDLE}$")
         self.assertNotRegex(text, r"(?m)^SSLProxyCheckPeer\w+ off$")
 
