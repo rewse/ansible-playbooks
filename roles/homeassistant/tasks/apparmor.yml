@@ -1,14 +1,36 @@
 ---
-# Ref: https://github.com/home-assistant/core/issues/117768
-- name: apparmor | Download docker-default
-  ansible.builtin.get_url:
-    url: https://github.com/home-assistant/core/files/9417617/docker-default.txt
-    dest: /etc/apparmor.d/docker-default
-    mode: "0644"
+# Removal of the docker-default workaround for home-assistant/core#117768.
+# aa-disable unloaded docker-default from every container running at that
+# moment, and the Home Assistant container runs apparmor:unconfined instead.
+# dockerd loads its built-in docker-default again whenever it starts a container
+# and finds the profile missing, so a running container regains the profile on
+# its next start.
+- name: apparmor | Check docker-default disable service
+  ansible.builtin.stat:
+    path: /etc/systemd/system/aa-disable-homeassistant.service
+  register: __homeassistant_aa_disable_unit
 
-- name: apparmor | Copy disable service
-  ansible.builtin.copy:
-    src: aa-disable-homeassistant.service
-    dest: /etc/systemd/system
-    mode: "0644"
-  notify: Restart aa-disable-homeassistant
+- name: apparmor | Stop and disable docker-default disable service
+  ansible.builtin.systemd:
+    name: aa-disable-homeassistant
+    enabled: false
+    state: stopped
+  when: __homeassistant_aa_disable_unit.stat.exists
+
+- name: apparmor | Remove docker-default disable service
+  ansible.builtin.file:
+    path: /etc/systemd/system/aa-disable-homeassistant.service
+    state: absent
+  notify: Reload systemd
+
+- name: apparmor | Remove docker-default disable link
+  ansible.builtin.file:
+    path: /etc/apparmor.d/disable/docker-default
+    state: absent
+
+- name: apparmor | Remove downloaded docker-default profile
+  # Docker keeps its profile in memory and never installs this file; this copy
+  # came from the issue above.
+  ansible.builtin.file:
+    path: /etc/apparmor.d/docker-default
+    state: absent

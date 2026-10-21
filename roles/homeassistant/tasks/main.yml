@@ -1,9 +1,4 @@
 ---
-- name: Import package tasks
-  ansible.builtin.import_tasks: package.yml
-  tags:
-    - homeassistant_package
-
 - name: Import certs tasks
   ansible.builtin.import_tasks: certs.yml
   tags:

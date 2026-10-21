@@ -241,9 +241,7 @@ class SecretOutputTest(unittest.TestCase):
     def test_secret_tasks_set_no_log(self):
         for role, path, name in self.TASKS:
             with self.subTest(role=role, name=name):
-                tasks = yaml.safe_load(
-                    (REPO_ROOT / "roles" / role / path).read_text()
-                )
+                tasks = yaml.safe_load((REPO_ROOT / "roles" / role / path).read_text())
                 task = next(t for t in tasks if t["name"] == name)
                 self.assertIs(task.get("no_log"), True)
 
@@ -256,6 +254,47 @@ class AnsibleConfigTest(unittest.TestCase):
         parser.read(REPO_ROOT / "ansible.cfg")
         self.assertTrue(
             parser.getboolean("defaults", "host_key_checking", fallback=True)
+        )
+
+
+class DockerAppArmorTest(unittest.TestCase):
+    # aa-disable on docker-default unloaded the profile from every container
+    # running at the time. Home Assistant runs apparmor:unconfined, so nothing
+    # needs it, and a run has to undo it on hosts that still carry it.
+    SERVICE = "aa-disable-homeassistant"
+
+    def test_workaround_is_gone(self):
+        self.assertFalse((HOMEASSISTANT / "files" / f"{self.SERVICE}.service").exists())
+        for path in (HOMEASSISTANT / "tasks").glob("*.yml"):
+            with self.subTest(file=path.name):
+                text = path.read_text()
+                self.assertNotIn("files/9417617/docker-default", text)
+        handlers = (HOMEASSISTANT / "handlers" / "main.yml").read_text()
+        self.assertNotIn(self.SERVICE, handlers)
+        compose = (HOMEASSISTANT / "templates" / "compose.yaml.j2").read_text()
+        self.assertIn("apparmor:unconfined", compose)
+
+    def test_run_removes_the_workaround_from_hosts(self):
+        tasks = yaml.safe_load((HOMEASSISTANT / "tasks" / "apparmor.yml").read_text())
+        service = next(
+            t["ansible.builtin.systemd"]
+            for t in tasks
+            if t.get("ansible.builtin.systemd", {}).get("name") == self.SERVICE
+        )
+        self.assertIs(service["enabled"], False)
+        self.assertEqual(service["state"], "stopped")
+        removed = {
+            t["ansible.builtin.file"]["path"]
+            for t in tasks
+            if t.get("ansible.builtin.file", {}).get("state") == "absent"
+        }
+        self.assertEqual(
+            removed,
+            {
+                f"/etc/systemd/system/{self.SERVICE}.service",
+                "/etc/apparmor.d/disable/docker-default",
+                "/etc/apparmor.d/docker-default",
+            },
         )
 
 
