@@ -6,10 +6,13 @@ import pathlib
 import re
 import unittest
 
+import yaml
+
 REPO_ROOT = pathlib.Path(__file__).resolve().parents[1]
 RSYNCD_CONF = (
     REPO_ROOT / "roles" / "homeassistant_ha_primary" / "templates" / "rsyncd.conf.j2"
 )
+PRIMARY = REPO_ROOT / "roles" / "homeassistant_ha_primary"
 SECONDARY = REPO_ROOT / "roles" / "homeassistant_ha_secondary"
 ZABBIX_FILES = REPO_ROOT / "roles" / "zabbix_agent" / "files"
 
@@ -85,6 +88,21 @@ class ZabbixAgentTest(unittest.TestCase):
             "/usr/bin/docker inspect --format {{.Config.Image}} homeassistant",
             commands,
         )
+
+
+class HomeAssistantAgentConfigTest(unittest.TestCase):
+    def test_token_bearing_agent_config_is_not_world_readable(self):
+        # homeassistant-ha.conf carries the Home Assistant API token.
+        tasks = yaml.safe_load((PRIMARY / "tasks" / "zabbix.yml").read_text())
+        task = next(
+            t["ansible.builtin.template"]
+            for t in tasks
+            if t.get("ansible.builtin.template", {}).get("src")
+            == "homeassistant-ha.conf.j2"
+        )
+        self.assertEqual(task["mode"], "0640")
+        self.assertEqual(task["owner"], "root")
+        self.assertEqual(task["group"], "zabbix")
 
 
 if __name__ == "__main__":
