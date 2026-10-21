@@ -1,0 +1,6 @@
+{{ ansible_managed | comment }}
+# Every jail on this host asks whether a failing address belongs to an AWS
+# Security Agent pentest; see security-agent-pentest.conf in Apache. The sshd
+# jail clears this, since the pentest never uses SSH.
+[DEFAULT]
+ignorecommand = /usr/local/sbin/fail2ban-ignore-security-agent <ip> /var/log/apache2/security_agent_pentest.log

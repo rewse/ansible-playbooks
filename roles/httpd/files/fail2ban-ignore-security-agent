@@ -1,0 +1,10 @@
+#!/bin/sh
+# fail2ban ignorecommand: exits 0, so the address is not banned, when the
+# address sent the AWS Security Agent pentest header in the last two hours.
+# Usage: fail2ban-ignore-security-agent <ip> <log>
+# Each log line is "<epoch seconds> <address>", written by Apache.
+log=$2
+[ -r "$log" ] || exit 1
+since=$(($(date +%s) - 7200))
+awk -v ip="$1" -v since="$since" \
+  '$2 == ip && $1 >= since { found = 1 } END { exit !found }' "$log"

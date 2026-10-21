@@ -2,3 +2,5 @@
 [sshd]
 enabled = true
 port = {{ ansible_port }}
+# A [DEFAULT] ignorecommand from another role must not exempt SSH clients.
+ignorecommand =

@@ -24,6 +24,11 @@
   tags:
     - httpd_php
 
+- name: Import security_agent tasks
+  ansible.builtin.import_tasks: security_agent.yml
+  tags:
+    - httpd_security_agent
+
 - name: Import zabbix tasks
   ansible.builtin.import_tasks: zabbix.yml
   tags:

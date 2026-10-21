@@ -4,6 +4,9 @@
 import configparser
 import pathlib
 import re
+import subprocess
+import tempfile
+import time
 import unittest
 
 import yaml
@@ -11,7 +14,9 @@ import yaml
 REPO_ROOT = pathlib.Path(__file__).resolve().parents[1]
 ROLES = REPO_ROOT / "roles"
 AUTODISCOVER = ROLES / "autodiscover"
+FAIL2BAN = ROLES / "fail2ban"
 FILEBROWSER = ROLES / "filebrowser"
+HTTPD = ROLES / "httpd"
 HOMEASSISTANT = ROLES / "homeassistant"
 NVR = ROLES / "nvr"
 POSTFIX_CLIENT = ROLES / "postfix_client"
@@ -162,6 +167,79 @@ class InternetTlsVerificationTest(unittest.TestCase):
         self.assertRegex(text, r"(?m)^SSLProxyVerifyDepth [3-9]$")
         self.assertRegex(text, rf"(?m)^SSLProxyCACertificateFile {self.CA_BUNDLE}$")
         self.assertNotRegex(text, r"(?m)^SSLProxyCheckPeer\w+ off$")
+
+
+class SecurityAgentPentestTest(unittest.TestCase):
+    # AWS Security Agent pentests send a secret header so that fail2ban, which
+    # would otherwise ban them from every service on the host within seconds,
+    # ignores their address. Apache records which addresses sent it.
+    LOG_LINE = (
+        "CustomLog ${APACHE_LOG_DIR}/security_agent_pentest.log "
+        '"%{sec}t %a" env=security_agent_pentest'
+    )
+    SCRIPT = HTTPD / "files" / "fail2ban-ignore-security-agent"
+
+    def ignored(self, log: str | None, ip: str) -> bool:
+        with tempfile.TemporaryDirectory() as tmp:
+            path = pathlib.Path(tmp) / "pentest.log"
+            if log is not None:
+                path.write_text(log)
+            result = subprocess.run(
+                ["sh", str(self.SCRIPT), ip, str(path)], check=False
+            )
+        return result.returncode == 0
+
+    def test_apache_marks_and_strips_the_header(self):
+        text = (HTTPD / "templates" / "security-agent-pentest.conf.j2").read_text()
+        self.assertRegex(
+            text,
+            r'(?m)^SetEnvIf X-Security-Agent-Pentest "\^\{\{ '
+            r'httpd_security_agent_pentest_token \}\}\$" security_agent_pentest$',
+        )
+        # Not "early": that runs before SetEnvIf reads the header.
+        self.assertRegex(text, r"(?m)^RequestHeader unset X-Security-Agent-Pentest$")
+        self.assertIn(self.LOG_LINE, text.splitlines())
+
+    def test_vhosts_with_their_own_logs_also_record_the_header(self):
+        # A CustomLog in a vhost stops it inheriting the server's.
+        for path in ROLES.glob("*/templates/*.rewse.jp.conf.j2"):
+            text = path.read_text()
+            if "CustomLog" in text:
+                lines = [line.strip() for line in text.splitlines()]
+                self.assertIn(self.LOG_LINE, lines, path)
+
+    def test_token_is_a_secret_reference(self):
+        variables = load_yaml(HTTPD / "vars" / "main.yml")
+        self.assertRegex(
+            variables["httpd_security_agent_pentest_token"],
+            r"^\{\{ lookup\('pipe', 'op read op://ansible/\w+/password'\) \}\}$",
+        )
+
+    def test_every_jail_but_sshd_asks_the_script(self):
+        text = (HTTPD / "templates" / "fail2ban-security-agent.conf.j2").read_text()
+        self.assertRegex(
+            text,
+            r"(?m)^ignorecommand = /usr/local/sbin/fail2ban-ignore-security-agent "
+            r"<ip> /var/log/apache2/security_agent_pentest\.log$",
+        )
+        self.assertEqual(
+            jail(FAIL2BAN / "templates" / "sshd.conf.j2", "sshd")["ignorecommand"], ""
+        )
+
+    def test_script_ignores_an_address_seen_recently(self):
+        now = int(time.time())
+        self.assertTrue(self.ignored(f"{now - 60} 192.0.2.1\n", "192.0.2.1"))
+
+    def test_script_bans_an_address_seen_long_ago(self):
+        now = int(time.time())
+        self.assertFalse(self.ignored(f"{now - 3 * 3600} 192.0.2.1\n", "192.0.2.1"))
+
+    def test_script_bans_other_addresses(self):
+        now = int(time.time())
+        self.assertFalse(self.ignored(f"{now} 192.0.2.10\n", "192.0.2.1"))
+
+    def test_script_bans_when_the_log_is_missing(self):
+        self.assertFalse(self.ignored(None, "192.0.2.1"))
 
 
 if __name__ == "__main__":
