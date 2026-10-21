@@ -1,0 +1,12 @@
+{{ ansible_managed | comment }}
+#
+# Frigate answers a wrong username or password with 401 on its login endpoint.
+# Only that endpoint is matched: other API paths also answer 401 once a session
+# expires, and banning a browser for an old cookie stops no guessing.
+#
+# The virtual host is pinned because other_vhosts_access.log carries every name
+# Apache serves, and the vhost_combined format puts %v:%p ahead of the client
+# address, which is why <HOST> is the second field rather than the first.
+[Definition]
+failregex = ^{{ nvr_hostname | regex_escape }}:\d+ <HOST> \S+ \S+ \[\] "POST /api/login\S* HTTP/[\d.]+" 401 \d+
+ignoreregex =

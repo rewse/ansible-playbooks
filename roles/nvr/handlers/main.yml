@@ -4,6 +4,11 @@
     name: apache2
     state: reloaded
 
+- name: Restart fail2ban
+  ansible.builtin.systemd:
+    name: fail2ban
+    state: restarted
+
 - name: Restart nvr
   community.docker.docker_compose_v2:
     project_src: /etc/compose/nvr

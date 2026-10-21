@@ -1,0 +1,19 @@
+{{ ansible_managed | comment }}
+#
+# The internet reaches the Frigate login through nvr.rewse.jp, and Frigate
+# itself only slows guessing down when auth.failed_login_rate_limit is set. This
+# jail stops it at the edge, by the client address Apache logs.
+#
+# bantime, findtime and maxretry are left to jail.local in the fail2ban role,
+# which gives every jail here five attempts in ten minutes and an hour of ban.
+#
+# backend has to be stated. jail.d/defaults-debian.conf from the package sets
+# systemd for every jail, and jail.d is read after jail.local, so a jail that
+# names a logpath without this reads the journal instead and monitors no file at
+# all. fail2ban-client get <jail> logpath is what tells the two apart.
+[nvr]
+enabled = true
+backend = auto
+port = http,https
+filter = nvr
+logpath = /var/log/apache2/other_vhosts_access.log

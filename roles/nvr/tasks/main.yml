@@ -14,3 +14,8 @@
   ansible.builtin.import_tasks: apache.yml
   tags:
     - nvr_apache
+
+- name: Import fail2ban tasks
+  ansible.builtin.import_tasks: fail2ban.yml
+  tags:
+    - nvr_fail2ban

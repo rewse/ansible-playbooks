@@ -1,4 +1,7 @@
 ---
+# The published name, which the fail2ban filter pins in the shared vhost log.
+nvr_hostname: nvr.rewse.jp
+
 # Bay 1 (SSD). Recordings go here rather than to Bay 3 (HDD) to avoid the noise
 # of a spindle writing around the clock.
 nvr_media_parent: /srv/nas/data
