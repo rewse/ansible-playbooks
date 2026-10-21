@@ -10,9 +10,11 @@ import yaml
 
 REPO_ROOT = pathlib.Path(__file__).resolve().parents[1]
 ROLES = REPO_ROOT / "roles"
+AUTODISCOVER = ROLES / "autodiscover"
 FILEBROWSER = ROLES / "filebrowser"
 HOMEASSISTANT = ROLES / "homeassistant"
 NVR = ROLES / "nvr"
+POSTFIX_CLIENT = ROLES / "postfix_client"
 SECONDARY = ROLES / "homeassistant_ha_secondary"
 TESLAMATE = ROLES / "teslamate"
 
@@ -137,6 +139,27 @@ class GrafanaCookieTest(unittest.TestCase):
         # with any plain http:// request to the name, before a redirect.
         text = (TESLAMATE / "templates" / "grafana.env.j2").read_text()
         self.assertRegex(text, r"(?m)^GF_SECURITY_COOKIE_SECURE=true$")
+
+
+class InternetTlsVerificationTest(unittest.TestCase):
+    # Both legs cross the internet carrying credentials, so an unverified peer
+    # lets an on-path attacker collect them.
+    CA_BUNDLE = "/etc/ssl/certs/ca-certificates.crt"
+
+    def test_postfix_verifies_the_relay(self):
+        lines = {
+            task["ansible.builtin.lineinfile"]["line"]
+            for task in load_yaml(POSTFIX_CLIENT / "tasks" / "main_cf.yml")
+        }
+        self.assertIn("smtp_tls_security_level = secure", lines)
+        # Read before the smtp client enters its chroot, unlike smtp_tls_CApath.
+        self.assertIn(f"smtp_tls_CAfile = {self.CA_BUNDLE}", lines)
+
+    def test_autodiscover_proxy_verifies_workmail(self):
+        text = (AUTODISCOVER / "files" / "autodiscover.conf").read_text()
+        self.assertRegex(text, r"(?m)^SSLProxyVerify require$")
+        self.assertRegex(text, rf"(?m)^SSLProxyCACertificateFile {self.CA_BUNDLE}$")
+        self.assertNotRegex(text, r"(?m)^SSLProxyCheckPeer\w+ off$")
 
 
 if __name__ == "__main__":

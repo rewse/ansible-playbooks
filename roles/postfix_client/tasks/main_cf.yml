@@ -38,11 +38,22 @@
     line: "smtp_address_preference = ipv4"
   notify: Reload postfix
 
+- name: main_cf | Set smtp_tls_CAfile
+  # Postfix reads this file before the smtp client enters its chroot, where the
+  # smtp_tls_CApath directory of the stock main.cf may not be reachable.
+  ansible.builtin.lineinfile:
+    dest: /etc/postfix/main.cf
+    regexp: "^smtp_tls_CAfile"
+    line: "smtp_tls_CAfile = /etc/ssl/certs/ca-certificates.crt"
+  notify: Reload postfix
+
 - name: main_cf | Set smtp_tls_security_level
+  # The relay takes the SASL password, so its certificate has to match the relay
+  # name; the Sakura host presents *.sakura.ne.jp from a public CA.
   ansible.builtin.lineinfile:
     dest: /etc/postfix/main.cf
     regexp: "^smtp_tls_security_level"
-    line: "smtp_tls_security_level = encrypt"
+    line: "smtp_tls_security_level = secure"
   notify: Reload postfix
 
 - name: main_cf | Set smtp_tls_wrappermode
