@@ -14,6 +14,7 @@ FILEBROWSER = ROLES / "filebrowser"
 HOMEASSISTANT = ROLES / "homeassistant"
 NVR = ROLES / "nvr"
 SECONDARY = ROLES / "homeassistant_ha_secondary"
+TESLAMATE = ROLES / "teslamate"
 
 
 def load_yaml(path: pathlib.Path):
@@ -128,6 +129,14 @@ class FileBrowserForwardedForTest(unittest.TestCase):
         # mod_proxy appends to a header the client sent rather than replacing it.
         text = (FILEBROWSER / "templates" / "nas.rewse.jp.conf.j2").read_text()
         self.assertRegex(text, r"(?m)^\s*RequestHeader unset X-Forwarded-For early$")
+
+
+class GrafanaCookieTest(unittest.TestCase):
+    def test_session_cookie_is_sent_over_https_only(self):
+        # Sessions last ten years, and a cookie without Secure also goes out
+        # with any plain http:// request to the name, before a redirect.
+        text = (TESLAMATE / "templates" / "grafana.env.j2").read_text()
+        self.assertRegex(text, r"(?m)^GF_SECURITY_COOKIE_SECURE=true$")
 
 
 if __name__ == "__main__":
