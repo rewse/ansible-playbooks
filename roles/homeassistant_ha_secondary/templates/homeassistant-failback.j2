@@ -160,7 +160,8 @@ if ! ssh_primary "true" 2>/dev/null; then
     abort "Cannot reach primary ${PRIMARY_HOST} via SSH on port ${PRIMARY_SSH_PORT}."
 fi
 
-if ! rsync --dry-run "${RSYNC_MODULE}" >/dev/null 2>&1; then
+# --ipv4 as in homeassistant-sync: the module allows only this host's IPv4 address.
+if ! rsync --ipv4 --dry-run "${RSYNC_MODULE}" >/dev/null 2>&1; then
     abort "Cannot reach rsync daemon at ${RSYNC_MODULE}."
 fi
 

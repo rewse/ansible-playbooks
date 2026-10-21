@@ -11,8 +11,11 @@ if docker ps --format '{{.Names}}' | grep -q '^homeassistant$'; then
     exit 0
 fi
 
+# --ipv4 because the module allows only this host's IPv4 address, and the name
+# also resolves to a global IPv6 whose prefix the ISP changes.
 rsync \
     --archive \
+    --ipv4 \
     --delete \
     --exclude='*.log*' \
     --exclude='home-assistant_v2.db*' \

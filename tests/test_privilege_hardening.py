@@ -10,6 +10,7 @@ REPO_ROOT = pathlib.Path(__file__).resolve().parents[1]
 RSYNCD_CONF = (
     REPO_ROOT / "roles" / "homeassistant_ha_primary" / "templates" / "rsyncd.conf.j2"
 )
+SECONDARY = REPO_ROOT / "roles" / "homeassistant_ha_secondary"
 ZABBIX_FILES = REPO_ROOT / "roles" / "zabbix_agent" / "files"
 
 # The Zabbix script "Restart bluetooth" runs this command on the agent.
@@ -34,6 +35,16 @@ class RsyncdTest(unittest.TestCase):
             module["hosts allow"], "{{ homeassistant_ha_primary_standby_ip }}"
         )
         self.assertEqual(module["hosts deny"], "*")
+
+    def test_standby_pulls_homeassistant_config_over_ipv4(self):
+        # The module allows only the standby's IPv4 address, and fox.rewse.jp
+        # also resolves to IPv6, so every client must force IPv4.
+        for script in (
+            SECONDARY / "files" / "homeassistant-sync",
+            SECONDARY / "templates" / "homeassistant-failback.j2",
+        ):
+            with self.subTest(script=script.name):
+                self.assertIn("--ipv4", script.read_text())
 
 
 class ZabbixAgentTest(unittest.TestCase):
