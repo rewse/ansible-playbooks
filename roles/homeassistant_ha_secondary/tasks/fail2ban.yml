@@ -1,10 +1,24 @@
 ---
 # The primary's filter and jail, so the standby bans the same logins once it
-# serves Home Assistant. The jail stays off until the synced log exists here.
-- name: fail2ban | Check Home Assistant log
-  ansible.builtin.stat:
+# serves Home Assistant.
+- name: fail2ban | Create config directory
+  ansible.builtin.file:
+    path: /srv/homeassistant/config
+    state: directory
+    mode: "0755"
+
+- name: fail2ban | Create Home Assistant log
+  # homeassistant-sync excludes *.log*, so nothing else creates the file before a
+  # failover starts Home Assistant here, and fail2ban refuses to start a jail
+  # whose log is missing. rsync --delete leaves excluded files in place.
+  ansible.builtin.file:
     path: /srv/homeassistant/config/home-assistant.log
-  register: __homeassistant_ha_secondary_log
+    state: touch
+    owner: root
+    group: root
+    mode: "0644"
+    access_time: preserve
+    modification_time: preserve
 
 - name: fail2ban | Copy filter
   ansible.builtin.copy:
@@ -18,6 +32,4 @@
     src: "{{ role_path }}/../homeassistant/templates/fail2ban-jail.conf.j2"
     dest: /etc/fail2ban/jail.d/homeassistant.conf
     mode: "0644"
-  vars:
-    homeassistant_fail2ban_enabled: "{{ __homeassistant_ha_secondary_log.stat.exists }}"
   notify: Restart fail2ban

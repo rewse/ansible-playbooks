@@ -10,7 +10,9 @@ import yaml
 
 REPO_ROOT = pathlib.Path(__file__).resolve().parents[1]
 ROLES = REPO_ROOT / "roles"
+HOMEASSISTANT = ROLES / "homeassistant"
 NVR = ROLES / "nvr"
+SECONDARY = ROLES / "homeassistant_ha_secondary"
 
 
 def load_yaml(path: pathlib.Path):
@@ -84,6 +86,39 @@ class NvrFail2banTest(unittest.TestCase):
         ):
             with self.subTest(line=line):
                 self.assertIsNone(regex.search(line))
+
+
+class StandbyHomeAssistantFail2banTest(unittest.TestCase):
+    LOG = "/srv/homeassistant/config/home-assistant.log"
+
+    def test_jail_is_always_enabled(self):
+        # The standby serves hass.rewse.jp during a failover, and the jail has to
+        # be running by then; a run cannot be counted on to happen in between.
+        section = jail(
+            HOMEASSISTANT / "templates" / "fail2ban-jail.conf.j2", "homeassistant"
+        )
+        self.assertEqual(section["enabled"], "true")
+        self.assertEqual(section["logpath"], self.LOG)
+        text = (SECONDARY / "tasks" / "fail2ban.yml").read_text()
+        self.assertNotIn("homeassistant_fail2ban_enabled", text)
+        self.assertNotIn("ansible.builtin.stat", text)
+
+    def test_standby_creates_the_log_the_jail_reads(self):
+        # homeassistant-sync excludes *.log*, so the log exists only if the
+        # standby makes it, and rsync --delete leaves excluded files alone.
+        self.assertIn(
+            "--exclude='*.log*'",
+            (SECONDARY / "files" / "homeassistant-sync").read_text(),
+        )
+        tasks = load_yaml(SECONDARY / "tasks" / "fail2ban.yml")
+        touch = next(
+            t["ansible.builtin.file"]
+            for t in tasks
+            if t.get("ansible.builtin.file", {}).get("path") == self.LOG
+        )
+        self.assertEqual(touch["state"], "touch")
+        self.assertEqual(touch["access_time"], "preserve")
+        self.assertEqual(touch["modification_time"], "preserve")
 
 
 if __name__ == "__main__":
