@@ -5,8 +5,8 @@ smart_home:
   client_secret: !secret alexa_client_secret
   filter:
     include_entities:
-      - alarm_control_panel.entrance_auto_lock
-      - alarm_control_panel.surveillance
+      - alarm_control_panel.entrance
+      - alarm_control_panel.home
       - automation.turn_down_living_area
       - automation.turn_down_living_area_more
       - binary_sensor.bathroom_motion
@@ -41,9 +41,9 @@ smart_home:
       - switch.living_room_humidifier
       - switch.living_room_hvac_cleaner
   entity_config:
-    alarm_control_panel.entrance_auto_lock:
+    alarm_control_panel.entrance:
       name: 玄関のオートロック
-    alarm_control_panel.surveillance:
+    alarm_control_panel.home:
       name: 監視カメラ
     automation.turn_down_living_area:
       name: リビングのターンダウン

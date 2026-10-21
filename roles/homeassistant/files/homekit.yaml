@@ -1,7 +1,7 @@
   - filter:
       include_entities:
-        - alarm_control_panel.entrance_auto_lock
-        - alarm_control_panel.surveillance
+        - alarm_control_panel.entrance
+        - alarm_control_panel.home
         - climate.dads_room_ac
         - climate.living_room_ac
         - climate.moms_room_ac

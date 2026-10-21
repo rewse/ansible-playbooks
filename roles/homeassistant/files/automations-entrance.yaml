@@ -88,7 +88,7 @@
         minutes: "{{ int(states('input_number.entrance_auto_lock_minutes')) + 10 }}"
   conditions:
     - condition: state
-      entity_id: alarm_control_panel.entrance_auto_lock
+      entity_id: alarm_control_panel.entrance
       state:
         - "armed_home"
         - "armed_night"
