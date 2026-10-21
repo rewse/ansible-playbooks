@@ -27,6 +27,7 @@
     owner: www-data
     group: www-data
     mode: "0600"
+  no_log: true
 
 - name: frontend | Set Japanese font for graphs
   ansible.builtin.file:

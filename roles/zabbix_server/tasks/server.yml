@@ -33,6 +33,7 @@
     insertafter: "^# DBPassword="
     regexp: "^DBPassword="
     line: "DBPassword={{ zabbix_server_db_password }}"
+  no_log: true
   notify: Restart zabbix-server
 
 - name: server | Set Timeout

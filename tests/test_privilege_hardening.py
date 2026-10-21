@@ -228,5 +228,25 @@ class HomeAssistantSecretFilesTest(unittest.TestCase):
                 self.assertEqual(task["group"], "root")
 
 
+class SecretOutputTest(unittest.TestCase):
+    # Under --diff or -v these print the secret they write, into the terminal
+    # and into the transcript of an agent that runs the playbook.
+    TASKS = (
+        ("couchdb", "handlers/main.yml", "Run couchdb init script"),
+        ("zabbix_mcp", "tasks/service.yml", "service | Deploy config"),
+        ("zabbix_server", "tasks/frontend.yml", "frontend | Copy PHP config"),
+        ("zabbix_server", "tasks/server.yml", "server | Set DBPassword"),
+    )
+
+    def test_secret_tasks_set_no_log(self):
+        for role, path, name in self.TASKS:
+            with self.subTest(role=role, name=name):
+                tasks = yaml.safe_load(
+                    (REPO_ROOT / "roles" / role / path).read_text()
+                )
+                task = next(t for t in tasks if t["name"] == name)
+                self.assertIs(task.get("no_log"), True)
+
+
 if __name__ == "__main__":
     unittest.main()

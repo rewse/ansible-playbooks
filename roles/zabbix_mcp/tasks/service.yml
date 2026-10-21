@@ -6,6 +6,7 @@
     owner: zabbix-mcp
     group: zabbix-mcp
     mode: "0600"
+  no_log: true
   notify: Restart zabbix-mcp-server
 
 - name: service | Install systemd unit

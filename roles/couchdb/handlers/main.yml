@@ -19,6 +19,7 @@
     hostname: http://127.0.0.1:5984
     username: tats
     password: "{{ couchdb_password }}"
+  no_log: true
 
 - name: Restart fail2ban
   ansible.builtin.systemd:
