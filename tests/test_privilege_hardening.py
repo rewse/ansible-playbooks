@@ -248,5 +248,16 @@ class SecretOutputTest(unittest.TestCase):
                 self.assertIs(task.get("no_log"), True)
 
 
+class AnsibleConfigTest(unittest.TestCase):
+    def test_host_keys_are_checked(self):
+        # The playbooks push secrets, so a host that answers under a wrong or
+        # spoofed name must stop the run instead of receiving them.
+        parser = configparser.ConfigParser(interpolation=None)
+        parser.read(REPO_ROOT / "ansible.cfg")
+        self.assertTrue(
+            parser.getboolean("defaults", "host_key_checking", fallback=True)
+        )
+
+
 if __name__ == "__main__":
     unittest.main()
