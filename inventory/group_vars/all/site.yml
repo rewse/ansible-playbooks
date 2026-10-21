@@ -10,18 +10,34 @@ networks:
   home_private_ipv6: fd20:2400:ab3d:5b1e::/64
   home_public_ipv4: 106.163.184.9/32
   home_public_ipv6: 240f:143:f60c:1::/64
-  # Amazon egress: HND10/11/17/21 and HND25 A2Z Wi-Fi, and VPN (Narita).
+  # Amazon egress: HND10/11/17/21 and HND25 A2Z Wi-Fi, VPN (Narita), and the
+  # Seattle corp POPs (SEA4, SEA19, SEA73).
   # https://w.amazon.com/bin/view/AWS/Teams/Proserve/Japan/OfficeIPAddress/
+  # https://w.amazon.com/bin/view/Corporate_Infrastructure_Services_CIS/Corporate_Network_Engineering_CNE/Products/CPOP/NAT_Ranges/
   office_public_ipv4:
     - 13.113.155.103/32
     - 13.158.88.175/32
     - 13.158.123.147/32
+    - 15.248.0.8/30
+    - 15.248.0.12/30
+    - 15.248.1.136/30
+    - 15.248.1.140/30
     - 15.248.4.68/30
     - 15.248.4.76/30
     - 15.248.5.0/30
     - 15.248.5.4/30
     - 15.248.5.96/30
     - 15.248.5.100/30
+    - 15.248.6.0/28
+    - 15.248.6.16/28
+    - 15.248.7.0/27
+    - 15.248.7.32/28
+    - 15.248.7.48/28
+    - 15.248.7.64/27
+    - 15.248.7.224/30
+    - 15.248.7.228/30
+    - 15.248.7.232/30
+    - 15.248.7.236/30
     - 18.178.37.249/32
     - 27.0.3.144/28
     - 35.76.150.132/32
