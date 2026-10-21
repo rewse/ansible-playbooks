@@ -59,7 +59,8 @@ class ZabbixAgentTest(unittest.TestCase):
         self.assertEqual(
             keys,
             [
-                f"AllowKey=system.run[{RESTART_BLUETOOTH}*]",
+                f"AllowKey=system.run[{RESTART_BLUETOOTH}]",
+                f"AllowKey=system.run[{RESTART_BLUETOOTH},*]",
                 "DenyKey=system.run[*]",
             ],
         )
