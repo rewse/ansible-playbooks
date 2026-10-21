@@ -15,6 +15,20 @@
 # Location rather than Directory, because zabbix.conf from the package grants the
 # frontend through a Directory block and Location is merged after Directory
 # whichever order the files load in.
+#
+# The frontend itself is used from home and the office only, so the login page is
+# not offered to anyone else. Apache applies Location blocks in file order, so the
+# narrower API block has to follow this one to override it.
+<Location "/zabbix">
+    Require ip 127.0.0.1
+    Require ip ::1
+    Require ip {{ networks.home_private_ipv4 }}
+    Require ip {{ networks.home_public_ipv4 }}
+    Require ip {{ networks.home_public_ipv6 }}
+    Require ip {{ networks.home_private_ipv6 }}
+    Require ip {{ networks.office_public_ipv4 | join(' ') }}
+</Location>
+
 <Location "/zabbix/api_jsonrpc.php">
     Require ip 127.0.0.1
     Require ip ::1

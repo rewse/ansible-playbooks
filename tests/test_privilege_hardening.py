@@ -15,6 +15,9 @@ RSYNCD_CONF = (
 PRIMARY = REPO_ROOT / "roles" / "homeassistant_ha_primary"
 SECONDARY = REPO_ROOT / "roles" / "homeassistant_ha_secondary"
 ZABBIX_FILES = REPO_ROOT / "roles" / "zabbix_agent" / "files"
+ZABBIX_ACCESS_CONF = (
+    REPO_ROOT / "roles" / "zabbix_server" / "templates" / "zabbix-api.conf.j2"
+)
 
 # The Zabbix script "Restart bluetooth" runs this command on the agent.
 RESTART_BLUETOOTH = "sudo systemctl daemon-reload; sudo systemctl restart bluetooth"
@@ -88,6 +91,26 @@ class ZabbixAgentTest(unittest.TestCase):
             "/usr/bin/docker inspect --format {{.Config.Image}} homeassistant",
             commands,
         )
+
+
+class ZabbixFrontendTest(unittest.TestCase):
+    def test_frontend_is_limited_to_home_and_office(self):
+        text = ZABBIX_ACCESS_CONF.read_text()
+        frontend = text.index('<Location "/zabbix">')
+        api = text.index('<Location "/zabbix/api_jsonrpc.php">')
+        # Apache applies Location sections in order, so the narrower API block
+        # must come after the frontend block to override it.
+        self.assertLess(frontend, api)
+        block = text[frontend : text.index("</Location>", frontend)]
+        for network in (
+            "networks.home_private_ipv4",
+            "networks.home_public_ipv4",
+            "networks.home_public_ipv6",
+            "networks.home_private_ipv6",
+            "networks.office_public_ipv4 | join(' ')",
+        ):
+            with self.subTest(network=network):
+                self.assertIn(network, block)
 
 
 class HomeAssistantAgentConfigTest(unittest.TestCase):
