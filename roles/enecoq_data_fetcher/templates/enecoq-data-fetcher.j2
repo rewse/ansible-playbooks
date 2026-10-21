@@ -3,8 +3,17 @@ set -euo pipefail
 
 readonly OUTPUT=/srv/homeassistant/config/data/enecoq_data.json
 
+# The cooldown that supply_chain_cooldown_environment gives playbook tasks. This
+# runs from a timer, and @latest resolves again on every run, so the cutoff is
+# computed here each time. It holds back the third-party dependencies, such as
+# playwright; the package itself is this account's own and is adopted on release.
+UV_EXCLUDE_NEWER="$(date -u -d '[% supply_chain_cooldown_days %] days ago' +%Y-%m-%dT%H:%M:%SZ)"
+export UV_EXCLUDE_NEWER
+OWN_PACKAGE="enecoq-data-fetcher=$(date -u +%Y-%m-%dT%H:%M:%SZ)"
+readonly OWN_PACKAGE
+
 fetch() {
-  uvx enecoq-data-fetcher@latest \
+  uvx --exclude-newer-package "$OWN_PACKAGE" enecoq-data-fetcher@latest \
     --email '[% enecoq_data_fetcher_enecoq.email %]' \
     --password '[% enecoq_data_fetcher_enecoq.password %]' \
     --period month \
@@ -35,7 +44,8 @@ if fetch; then
 fi
 
 # A playwright update leaves its browser behind, so reinstall and retry
-uvx --from enecoq-data-fetcher@latest playwright install chromium
+uvx --exclude-newer-package "$OWN_PACKAGE" --from enecoq-data-fetcher@latest \
+  playwright install chromium
 
 if fetch; then
   exit 0
