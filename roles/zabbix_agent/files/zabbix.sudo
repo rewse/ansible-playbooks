@@ -1,1 +1,4 @@
-zabbix ALL=(ALL) NOPASSWD: ALL
+# Commands that Zabbix UserParameters and remote commands run with sudo:
+# the Home Assistant container checks in homeassistant-ha.conf and the
+# "Restart bluetooth" script on Raspberry Pi.
+zabbix ALL=(root) NOPASSWD: /usr/bin/docker inspect --format {{.State.Running}} homeassistant, /usr/bin/docker inspect --format {{.Config.Image}} homeassistant, /usr/bin/systemctl daemon-reload, /usr/bin/systemctl restart bluetooth

@@ -7,17 +7,19 @@ pid file = /var/run/rsyncd.pid
 lock file = /var/run/rsync.lock
 log file = /var/log/rsyncd.log
 
+# Only the standby pulls this module (homeassistant-sync and
+# homeassistant-failback), and it carries secrets.yaml, so no other host may
+# read it.
 [homeassistant-config]
     path = /srv/homeassistant/config
     comment = Home Assistant configuration files
     read only = yes
     list = yes
-    hosts allow = {{ networks.home_private_ipv4 }} {{ networks.home_public_ipv6 }}
+    hosts allow = {{ homeassistant_ha_primary_standby_ip }}
     hosts deny = *
 
 # The standby serves hass.rewse.jp while it stands in for this host, which needs
-# the same certificate. Narrower than the module above because this one carries
-# the private key of a wildcard certificate.
+# the same certificate. It carries the private key of a wildcard certificate.
 [letsencrypt]
     path = /etc/letsencrypt
     comment = Certificates for the host standing in for this one

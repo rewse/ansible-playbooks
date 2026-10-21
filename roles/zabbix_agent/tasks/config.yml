@@ -60,3 +60,4 @@
     src: zabbix.sudo
     dest: /etc/sudoers.d/zabbix
     mode: "0440"
+    validate: "visudo -cf %s"
