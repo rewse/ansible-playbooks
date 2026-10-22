@@ -1,0 +1,6 @@
+{{ ansible_managed | comment }}
+# Deny the addresses that fail2ban jails have banned. The apache-deny action
+# writes one file per jail, holding only deny sections; see
+# /usr/local/sbin/fail2ban-apache-deny. The files are runtime state, and Apache
+# starts without them.
+IncludeOptional {{ httpd_fail2ban_state_dir }}/*.conf

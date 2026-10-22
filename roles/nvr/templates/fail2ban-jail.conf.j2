@@ -15,5 +15,9 @@
 enabled = true
 backend = auto
 port = http,https
+# The firewall stops direct connections, and apache-deny stops requests that
+# arrive through CloudFront, whose edge servers the firewall cannot single out.
+action = %(action_)s
+         apache-deny
 filter = nvr
 logpath = /var/log/apache2/other_vhosts_access.log

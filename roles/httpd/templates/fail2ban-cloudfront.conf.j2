@@ -1,0 +1,12 @@
+{{ ansible_managed | comment }}
+# Never ban a CloudFront origin-facing address. Apache logs the client address
+# that mod_remoteip restores, so one of these appears as the client only when a
+# log line missed the restore, and banning it would deny every visitor that
+# CloudFront routes through that edge server. The list comes from the same
+# ip-ranges.json fetch as remoteip.conf. 127.0.0.1/8 and ::1 are the addresses
+# fail2ban suggests ignoring by default.
+[DEFAULT]
+ignoreip = 127.0.0.1/8 ::1
+{% for prefix in __httpd_remoteip_cloudfront_prefixes %}
+           {{ prefix }}
+{% endfor %}

@@ -1,0 +1,16 @@
+{{ ansible_managed | comment }}
+#
+# Makes Apache deny every address the jail bans, alongside the firewall action
+# the jail also runs. Behind CloudFront a banned client reaches Apache through
+# an edge server, which the firewall cannot tell apart from other clients; see
+# /usr/local/sbin/fail2ban-apache-deny.
+#
+# Starting and stopping the jail empties its list. When fail2ban starts again it
+# restores its bans through actionban, which fills the list back in.
+[Definition]
+actionstart = /usr/local/sbin/fail2ban-apache-deny {{ httpd_fail2ban_state_dir }} flush <name>
+actionstop = /usr/local/sbin/fail2ban-apache-deny {{ httpd_fail2ban_state_dir }} flush <name>
+actionflush = /usr/local/sbin/fail2ban-apache-deny {{ httpd_fail2ban_state_dir }} flush <name>
+actioncheck =
+actionban = /usr/local/sbin/fail2ban-apache-deny {{ httpd_fail2ban_state_dir }} ban <name> <ip>
+actionunban = /usr/local/sbin/fail2ban-apache-deny {{ httpd_fail2ban_state_dir }} unban <name> <ip>

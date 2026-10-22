@@ -39,3 +39,10 @@
   register: __httpd_a2enconf_remoteip
   changed_when: "'already enabled' not in __httpd_a2enconf_remoteip.stdout"
   notify: Reload Apache
+
+- name: remoteip | Deploy fail2ban CloudFront exemption
+  ansible.builtin.template:
+    src: fail2ban-cloudfront.conf.j2
+    dest: /etc/fail2ban/jail.d/00-cloudfront.conf
+    mode: "0644"
+  notify: Restart fail2ban

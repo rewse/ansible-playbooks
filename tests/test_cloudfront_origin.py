@@ -1,6 +1,7 @@
 #!/usr/bin/env python3
 """Regression tests for the CloudFront origin configuration."""
 
+import configparser
 import pathlib
 import re
 import unittest
@@ -54,8 +55,57 @@ class RemoteIpTest(unittest.TestCase):
         self.assertNotIn("RemoteIPInternalProxy", text)
 
     def test_template_starts_with_ansible_managed(self):
-        text = (HTTPD / "templates" / "remoteip.conf.j2").read_text()
-        self.assertTrue(text.startswith("{{ ansible_managed | comment }}"))
+        for name in ("remoteip.conf.j2", "fail2ban-cloudfront.conf.j2"):
+            text = (HTTPD / "templates" / name).read_text()
+            self.assertTrue(text.startswith("{{ ansible_managed | comment }}"), name)
+
+    def test_fail2ban_never_bans_cloudfront(self):
+        # If an edge address ever shows up as the client, banning it would
+        # deny every visitor that CloudFront routes through it.
+        prefixes = ["130.176.0.0/18", "64.252.64.0/18"]
+        text = render(
+            "fail2ban-cloudfront.conf.j2", __httpd_remoteip_cloudfront_prefixes=prefixes
+        )
+        parser = configparser.ConfigParser(interpolation=None)
+        parser.read_string(
+            "\n".join(line for line in text.splitlines() if not line.startswith("#"))
+        )
+        self.assertEqual(parser.sections(), [])
+        self.assertEqual(
+            parser.defaults()["ignoreip"].split(),
+            ["127.0.0.1/8", "::1", *prefixes],
+        )
+
+    def test_fail2ban_exemption_uses_the_same_ranges(self):
+        tasks = yaml.safe_load((HTTPD / "tasks" / "remoteip.yml").read_text())
+        names = [task["name"] for task in tasks]
+        template = next(
+            task
+            for task in tasks
+            if task.get("ansible.builtin.template", {}).get("src")
+            == "fail2ban-cloudfront.conf.j2"
+        )
+        self.assertEqual(
+            template["ansible.builtin.template"]["dest"],
+            "/etc/fail2ban/jail.d/00-cloudfront.conf",
+        )
+        self.assertEqual(template["notify"], "Restart fail2ban")
+        self.assertGreater(
+            names.index(template["name"]),
+            names.index("remoteip | Check CloudFront origin-facing prefixes"),
+        )
+
+    def test_no_jail_replaces_the_exemption(self):
+        # A jail's own ignoreip would replace the [DEFAULT] one, CloudFront
+        # included.
+        found = [
+            str(path.relative_to(REPO_ROOT))
+            for path in sorted(ROLES.rglob("*"))
+            if path.is_file()
+            and path.name != "fail2ban-cloudfront.conf.j2"
+            and re.search(r"(?m)^\s*ignoreip\s*=", path.read_text(errors="ignore"))
+        ]
+        self.assertEqual(found, [])
 
     def test_log_formats_use_the_client_address(self):
         text = (HTTPD / "files" / "log-format.conf").read_text()
@@ -159,16 +209,22 @@ class OriginGateTest(unittest.TestCase):
 
     def test_no_other_if_sections(self):
         # Apache merges If sections last, so another one could override the deny.
-        gate = HTTPD / "templates" / "cloudfront-origin.conf.j2"
+        # The fail2ban ban script writes deny-only sections, which
+        # tests/test_fail2ban_apache.py checks; nothing else may write one.
+        allowed = {
+            HTTPD / "templates" / "cloudfront-origin.conf.j2",
+            HTTPD / "files" / "fail2ban-apache-deny",
+        }
         found = [
             str(path.relative_to(REPO_ROOT))
             for path in sorted(ROLES.rglob("*"))
             if path.is_file()
-            and path.suffix in (".conf", ".j2")
-            and path != gate
-            and re.search(r"<(?:If|ElseIf|Else)\b", path.read_text())
+            and path not in allowed
+            and re.search(r"<(?:If|ElseIf|Else)\b", path.read_text(errors="ignore"))
         ]
         self.assertEqual(found, [])
+        for path in allowed:
+            self.assertRegex(path.read_text(), r"<If\b", path)
 
     def test_hotel_gets_the_same_gate(self):
         dependencies = yaml.safe_load(

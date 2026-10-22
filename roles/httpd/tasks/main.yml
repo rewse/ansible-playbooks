@@ -30,6 +30,11 @@
   tags:
     - httpd_conf
 
+- name: Import fail2ban tasks
+  ansible.builtin.import_tasks: fail2ban.yml
+  tags:
+    - httpd_fail2ban
+
 - name: Import php tasks
   ansible.builtin.import_tasks: php.yml
   tags:
