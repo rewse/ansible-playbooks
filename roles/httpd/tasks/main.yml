@@ -14,6 +14,12 @@
   tags:
     - httpd_default_site
 
+- name: Import remoteip tasks
+  ansible.builtin.import_tasks: remoteip.yml
+  tags:
+    - httpd_remoteip
+    - update
+
 - name: Import conf tasks
   ansible.builtin.import_tasks: conf.yml
   tags:

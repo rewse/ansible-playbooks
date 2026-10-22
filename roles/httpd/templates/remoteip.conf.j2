@@ -1,0 +1,11 @@
+{{ ansible_managed | comment }}
+# Take the client address from X-Forwarded-For when the connection comes from a
+# CloudFront origin-facing address, so access logs, fail2ban, and Require ip see
+# the client instead of the edge server.
+#
+# Only CloudFront is trusted. A client that reaches Apache from anywhere else
+# keeps its connection address, so a forged X-Forwarded-For has no effect.
+RemoteIPHeader X-Forwarded-For
+{% for prefix in __httpd_remoteip_cloudfront_prefixes %}
+RemoteIPTrustedProxy {{ prefix }}
+{% endfor %}

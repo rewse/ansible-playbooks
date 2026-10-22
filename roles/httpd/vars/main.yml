@@ -1,3 +1,4 @@
 ---
 httpd_cloudfront_origin_verify_token: "{{ lookup('pipe', 'op read op://ansible/kgap2pevj7exae5jnvlsewbs7y/password') }}"
+httpd_remoteip_ip_ranges_url: https://ip-ranges.amazonaws.com/ip-ranges.json
 httpd_security_agent_pentest_token: "{{ lookup('pipe', 'op read op://ansible/m6obpvalg7ekdi5nsf4yx6wi3q/password') }}"

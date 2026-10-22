@@ -1,0 +1,41 @@
+---
+- name: remoteip | Get AWS IP ranges
+  ansible.builtin.uri:
+    url: "{{ httpd_remoteip_ip_ranges_url }}"
+    return_content: true
+  register: __httpd_remoteip_ip_ranges
+  # The GET only reads, and the template below needs its result in check mode too.
+  check_mode: false
+
+- name: remoteip | Set CloudFront origin-facing prefixes
+  ansible.builtin.set_fact:
+    __httpd_remoteip_cloudfront_prefixes: >-
+      {{ __httpd_remoteip_ip_ranges.json.prefixes
+      | selectattr('service', 'equalto', 'CLOUDFRONT_ORIGIN_FACING')
+      | map(attribute='ip_prefix') | sort }}
+
+- name: remoteip | Check CloudFront origin-facing prefixes
+  ansible.builtin.assert:
+    that:
+      - __httpd_remoteip_cloudfront_prefixes | length > 0
+    fail_msg: ip-ranges.json lists no CLOUDFRONT_ORIGIN_FACING prefixes.
+    quiet: true
+
+- name: remoteip | Enable remoteip module
+  community.general.apache2_module:
+    name: remoteip
+  notify: Restart Apache
+
+- name: remoteip | Copy remoteip config
+  ansible.builtin.template:
+    src: remoteip.conf.j2
+    dest: /etc/apache2/conf-available/remoteip.conf
+    mode: "0644"
+  notify: Reload Apache
+
+- name: remoteip | Enable remoteip config
+  # No module enables an Apache site or conf; the command reports whether it changed.
+  ansible.builtin.command: a2enconf remoteip
+  register: __httpd_a2enconf_remoteip
+  changed_when: "'already enabled' not in __httpd_a2enconf_remoteip.stdout"
+  notify: Reload Apache

@@ -5,9 +5,11 @@ import pathlib
 import re
 import unittest
 
+import jinja2
 import yaml
 
 REPO_ROOT = pathlib.Path(__file__).resolve().parents[1]
+HTTPD = REPO_ROOT / "roles" / "httpd"
 SITE = REPO_ROOT / "inventory" / "group_vars" / "all" / "site.yml"
 
 OFFICE_EXPRESSION = re.compile(
@@ -24,6 +26,43 @@ class SiteTest(unittest.TestCase):
         value = yaml.safe_load(text)["networks"]["office_public_ipv4"]
         self.assertIsInstance(value, str)
         self.assertRegex(value, OFFICE_EXPRESSION)
+
+
+class RemoteIpTest(unittest.TestCase):
+    def render(self, prefixes: list[str]) -> str:
+        environment = jinja2.Environment(
+            loader=jinja2.FileSystemLoader(HTTPD / "templates"),
+            undefined=jinja2.StrictUndefined,
+        )
+        environment.filters["comment"] = lambda text: f"#\n# {text}\n#"
+        template = environment.get_template("remoteip.conf.j2")
+        return template.render(
+            __httpd_remoteip_cloudfront_prefixes=prefixes,
+            ansible_managed="Ansible managed",
+        )
+
+    def test_remoteip_trusts_only_cloudfront_origin_facing(self):
+        text = self.render(["130.176.0.0/18"])
+        self.assertRegex(text, r"(?m)^RemoteIPHeader X-Forwarded-For$")
+        self.assertEqual(
+            re.findall(r"(?m)^RemoteIPTrustedProxy (.+)$", text), ["130.176.0.0/18"]
+        )
+        self.assertNotIn("RemoteIPInternalProxy", text)
+
+    def test_template_starts_with_ansible_managed(self):
+        text = (HTTPD / "templates" / "remoteip.conf.j2").read_text()
+        self.assertTrue(text.startswith("{{ ansible_managed | comment }}"))
+
+    def test_log_formats_use_the_client_address(self):
+        text = (HTTPD / "files" / "log-format.conf").read_text()
+        formats = {
+            name: spec
+            for spec, name in re.findall(r'(?m)^LogFormat "(.*)" (\S+)$', text)
+        }
+        self.assertEqual(sorted(formats), ["combined", "vhost_combined"])
+        for spec in formats.values():
+            self.assertIn("%a", spec)
+            self.assertNotIn("%h", spec)
 
 
 if __name__ == "__main__":
