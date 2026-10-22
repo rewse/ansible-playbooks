@@ -1,2 +1,2 @@
 ---
-httpd_cloudfront_origin_enforce: false
+httpd_cloudfront_origin_enforce: true
