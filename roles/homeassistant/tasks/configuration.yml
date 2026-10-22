@@ -22,7 +22,7 @@
     variable_start_string: "[%"
     variable_end_string: "%]"
     # Carries tokens and passwords. Home Assistant runs as root in its
-    # container, and rsyncd serves the standby as root.
+    # container, and the standby's sync reads it through sudo.
     owner: root
     group: root
     mode: "0600"
@@ -36,7 +36,7 @@
     variable_start_string: "[%"
     variable_end_string: "%]"
     # Carries tokens and passwords. Home Assistant runs as root in its
-    # container, and rsyncd serves the standby as root.
+    # container, and the standby's sync reads it through sudo.
     owner: root
     group: root
     mode: "0600"

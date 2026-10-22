@@ -1,7 +1,10 @@
 #!/bin/bash
+[% ansible_managed | comment %]
 set -euo pipefail
 
-SOURCE="rsync://fox.rewse.jp/homeassistant-config/"
+# The configuration carries secrets.yaml and is readable only by root on the
+# primary, so the pull logs in over SSH and reads it through sudo.
+SOURCE="[% admin_user %]@fox.rewse.jp:/srv/homeassistant/config/"
 DEST="/srv/homeassistant/config/"
 LOG_TAG="homeassistant-sync"
 
@@ -11,12 +14,11 @@ if docker ps --format '{{.Names}}' | grep -q '^homeassistant$'; then
     exit 0
 fi
 
-# --ipv4 because the module allows only this host's IPv4 address, and the name
-# also resolves to a global IPv6 whose prefix the ISP changes.
 rsync \
     --archive \
-    --ipv4 \
     --delete \
+    --rsync-path="sudo rsync" \
+    -e "ssh -p 11022 -o BatchMode=yes -o ConnectTimeout=10 -o StrictHostKeyChecking=accept-new" \
     --exclude='*.log*' \
     --exclude='home-assistant_v2.db*' \
     --exclude='*.db-shm' \

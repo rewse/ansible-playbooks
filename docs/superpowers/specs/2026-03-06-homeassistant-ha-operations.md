@@ -58,13 +58,11 @@ Zabbix サーバー側の item / trigger 設定は Zabbix Web UI で手動登録
 **監視項目:**
 - `homeassistant.container.running` - fox の HA コンテナ状態（`true` を期待）
 - `homeassistant.api.http_code` - HA API の HTTP ステータスコード
-- `homeassistant.rsync.active` - rsync daemon の状態（`active` を期待）
 - `net.tcp.service[http,fox.rewse.jp,8123]` - APIポートの応答
 
 **アラート条件:**
 - `container.running` が `false`
 - `api.http_code` が 2xx / 3xx / 401 / 403 以外（500 系、`000`、その他）
-- `rsync.active` が `active` 以外
 
 #### 4. 設定ファイルの同期状態（fox/hotel）
 

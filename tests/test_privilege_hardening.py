@@ -29,17 +29,6 @@ ZABBIX_ACCESS_CONF = (
 RESTART_BLUETOOTH = "sudo systemctl daemon-reload; sudo systemctl restart bluetooth"
 
 
-def rsyncd_modules() -> configparser.ConfigParser:
-    parser = configparser.ConfigParser(interpolation=None, strict=False)
-    lines = [
-        line.strip()
-        for line in RSYNCD_CONF.read_text().splitlines()
-        if line.strip() and not line.lstrip().startswith(("#", "{{"))
-    ]
-    parser.read_string("[global]\n" + "\n".join(lines))
-    return parser
-
-
 class CouchDBSecurityAgentTest(unittest.TestCase):
     # The AWS Security Agent pentest signs in to CouchDB as a user that may read
     # one decoy database and write nothing, so a probe cannot alter or read the
@@ -86,23 +75,57 @@ class CouchDBSecurityAgentTest(unittest.TestCase):
         )
 
 
-class RsyncdTest(unittest.TestCase):
-    def test_homeassistant_config_module_allows_only_standby(self):
-        module = rsyncd_modules()["homeassistant-config"]
-        self.assertEqual(
-            module["hosts allow"], "{{ homeassistant_ha_primary_standby_ip }}"
-        )
-        self.assertEqual(module["hosts deny"], "*")
+class StandbySyncTest(unittest.TestCase):
+    # The pulls carry secrets.yaml and the certificate's private key, so they
+    # run over the standby's authenticated, encrypted SSH login to the primary
+    # rather than over an rsync daemon.
+    PULLS = (
+        SECONDARY / "templates" / "homeassistant-sync.j2",
+        SECONDARY / "templates" / "sslcert-sync.j2",
+        SECONDARY / "templates" / "homeassistant-failback.j2",
+    )
 
-    def test_standby_pulls_homeassistant_config_over_ipv4(self):
-        # The module allows only the standby's IPv4 address, and fox.rewse.jp
-        # also resolves to IPv6, so every client must force IPv4.
-        for script in (
-            SECONDARY / "files" / "homeassistant-sync",
-            SECONDARY / "templates" / "homeassistant-failback.j2",
-        ):
+    def test_standby_pulls_over_ssh(self):
+        for script in self.PULLS:
             with self.subTest(script=script.name):
-                self.assertIn("--ipv4", script.read_text())
+                text = script.read_text()
+                self.assertNotIn("rsync://", text)
+                self.assertIn('--rsync-path="sudo rsync"', text)
+                self.assertIn("-o BatchMode=yes", text)
+                self.assertIn("[% admin_user %]", text)
+
+    def test_standby_installs_pull_scripts_from_templates(self):
+        tasks = {
+            **template_tasks(SECONDARY / "tasks" / "rsync.yml"),
+            **template_tasks(SECONDARY / "tasks" / "sslcert.yml"),
+        }
+        for name in ("homeassistant-sync", "sslcert-sync"):
+            with self.subTest(name=name):
+                task = tasks[f"/usr/local/bin/{name}"]
+                self.assertEqual(task["variable_start_string"], "[%")
+                self.assertFalse((SECONDARY / "files" / name).exists())
+
+    def test_primary_runs_no_rsync_daemon(self):
+        self.assertFalse(RSYNCD_CONF.exists())
+        tasks = yaml.safe_load((PRIMARY / "tasks" / "rsync.yml").read_text())
+        service = next(
+            t["ansible.builtin.systemd"]
+            for t in tasks
+            if "ansible.builtin.systemd" in t
+        )
+        self.assertEqual(service["name"], "rsync")
+        self.assertEqual(service["state"], "stopped")
+        self.assertFalse(service["enabled"])
+        removed = {
+            t["ansible.builtin.file"]["path"]
+            for t in tasks
+            if t.get("ansible.builtin.file", {}).get("state") == "absent"
+        }
+        self.assertEqual(removed, {"/etc/logrotate.d/rsyncd", "/etc/rsyncd.conf"})
+        self.assertNotIn(
+            "homeassistant.rsync.active",
+            (PRIMARY / "templates" / "homeassistant-ha.conf.j2").read_text(),
+        )
 
 
 class ZabbixAgentTest(unittest.TestCase):
@@ -252,8 +275,8 @@ def template_tasks(path: pathlib.Path) -> dict[str, dict]:
 
 
 class HomeAssistantSecretFilesTest(unittest.TestCase):
-    # Home Assistant runs as root in its container, and rsyncd and the standby's
-    # sync run as root, so root alone needs to read these.
+    # Home Assistant runs as root in its container, and the standby's sync reads
+    # them through sudo on the primary, so root alone needs to read these.
     def test_secret_config_is_private(self):
         tasks = template_tasks(HOMEASSISTANT / "tasks" / "configuration.yml")
         for name in ("secrets.yaml", "shell_commands.yaml"):

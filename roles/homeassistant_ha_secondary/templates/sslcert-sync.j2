@@ -1,10 +1,13 @@
 #!/bin/bash
+[% ansible_managed | comment %]
 # Keep a copy of the primary's certificate so this host can serve the name it
 # takes over. Pulling means a primary that is down costs nothing but a retry
 # tomorrow, and the primary does not need to know this host exists.
 set -uo pipefail
 
-SOURCE="rsync://fox.rewse.jp/letsencrypt/"
+# The private key is readable only by root on the primary, so the pull logs in
+# over SSH and reads it through sudo.
+SOURCE="[% admin_user %]@fox.rewse.jp:/etc/letsencrypt/"
 DEST="/etc/letsencrypt/"
 LOG_TAG="sslcert-sync"
 
@@ -17,15 +20,13 @@ log() {
 # here rather than carried over as links pointing at paths that are not synced.
 # options-ssl-apache.conf comes along because the vhost includes it and no
 # certbot runs here to write it.
-# --ipv4 because the module is restricted to this host's address, and the name
-# resolves to a global IPv6 whose prefix the ISP changes. rsyncd reports a host it
-# refuses as an unknown module, so a mismatch here looks like a missing module.
 out=$(rsync \
         --archive \
         --copy-links \
         --delete \
         --itemize-changes \
-        --ipv4 \
+        --rsync-path="sudo rsync" \
+        -e "ssh -p 11022 -o BatchMode=yes -o ConnectTimeout=10 -o StrictHostKeyChecking=accept-new" \
         --include='live/' \
         --include='live/**' \
         --include='options-ssl-apache.conf' \

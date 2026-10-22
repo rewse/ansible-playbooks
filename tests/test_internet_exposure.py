@@ -120,7 +120,7 @@ class StandbyHomeAssistantFail2banTest(unittest.TestCase):
         # standby makes it, and rsync --delete leaves excluded files alone.
         self.assertIn(
             "--exclude='*.log*'",
-            (SECONDARY / "files" / "homeassistant-sync").read_text(),
+            (SECONDARY / "templates" / "homeassistant-sync.j2").read_text(),
         )
         tasks = load_yaml(SECONDARY / "tasks" / "fail2ban.yml")
         touch = next(

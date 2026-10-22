@@ -1,9 +1,12 @@
 ---
 - name: sslcert | Copy script
-  ansible.builtin.copy:
-    src: sslcert-sync
+  ansible.builtin.template:
+    src: sslcert-sync.j2
     dest: /usr/local/bin/sslcert-sync
     mode: "0755"
+    # The script uses Docker and shell syntax that clashes with Jinja's.
+    variable_start_string: "[%"
+    variable_end_string: "%]"
 
 - name: sslcert | Copy service unit
   ansible.builtin.copy:

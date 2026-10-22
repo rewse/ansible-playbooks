@@ -8,7 +8,6 @@ PRIMARY_SSH_PORT="11022"
 PRIMARY_SSH_USER="[% admin_user %]"
 HA_TOKEN="[% homeassistant_ha_secondary_token %]"
 CONFIG_DIR="/srv/homeassistant/config"
-RSYNC_MODULE="rsync://${PRIMARY_HOST}/homeassistant-config/"
 COMPOSE_FILE="/etc/compose/homeassistant/compose.yaml"
 FAILOVER_TIMER="homeassistant-failover.timer"
 API_WAIT_TIMEOUT=120
@@ -160,9 +159,8 @@ if ! ssh_primary "true" 2>/dev/null; then
     abort "Cannot reach primary ${PRIMARY_HOST} via SSH on port ${PRIMARY_SSH_PORT}."
 fi
 
-# --ipv4 as in homeassistant-sync: the module allows only this host's IPv4 address.
-if ! rsync --ipv4 --dry-run "${RSYNC_MODULE}" >/dev/null 2>&1; then
-    abort "Cannot reach rsync daemon at ${RSYNC_MODULE}."
+if ! ssh_primary "sudo -n rsync --version" >/dev/null 2>&1; then
+    abort "Cannot run rsync through sudo on ${PRIMARY_HOST}."
 fi
 
 log "Preflight checks passed."

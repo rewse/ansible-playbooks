@@ -1,5 +1,4 @@
 [% ansible_managed | comment %]
-UserParameter=homeassistant.rsync.active,systemctl is-active rsync
 UserParameter=homeassistant.container.running,sudo docker inspect --format '{{.State.Running}}' homeassistant 2>/dev/null || echo false
 # The tag of the image the container would run, which is what has to match the
 # other host: a standby whose image is older than the version that wrote the
