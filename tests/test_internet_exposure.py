@@ -142,6 +142,14 @@ class HomeAssistantNameSwitchTest(unittest.TestCase):
         self.assertNotIn("forward of 80", text)
         self.assertNotIn("FORWARDED_PORTS=(443 80)", text)
 
+    def test_name_switch_reads_every_dns_policy(self):
+        # The integration API pages its lists, and the console holds more DNS
+        # policies than one default page, so the CNAME can sit past the first.
+        text = (SECONDARY / "templates" / "homeassistant-name-switch.j2").read_text()
+        self.assertIn("/dns/policies?limit=${PAGE_LIMIT}", text)
+        self.assertRegex(text, r"(?m)^readonly PAGE_LIMIT=200$")
+        self.assertIn("totalCount", text)
+
 
 class FileBrowserForwardedForTest(unittest.TestCase):
     def test_vhost_drops_client_forwarded_for(self):

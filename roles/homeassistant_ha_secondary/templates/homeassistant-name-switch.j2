@@ -25,6 +25,9 @@ CLOUD="https://api.ui.com"
 FORWARDED_PORTS=(443)
 # Long enough to be cached usefully, short enough that a switch is not waited on.
 TTL_SECONDS=30
+# The integration API returns 25 items a page by default and the console holds
+# more DNS policies than that, so lists are read at the largest page it allows.
+readonly PAGE_LIMIT=200
 STATE_DIR="/var/lib/homeassistant-ha"
 # Present while the name points at this host, so a failed switch back can be
 # retried on a later run instead of leaving the name here.
@@ -98,7 +101,13 @@ failed=0
 # -----------------------------------------------------------------------------
 # The internal name
 # -----------------------------------------------------------------------------
-policies=$(api GET "${NET_PATH}/integration/v1/sites/${site_id}/dns/policies")
+policies=$(api GET "${NET_PATH}/integration/v1/sites/${site_id}/dns/policies?limit=${PAGE_LIMIT}")
+# A list longer than one page would hide the CNAME, so it counts as unreadable.
+complete=$(printf '%s' "${policies}" | pluck "
+import json,sys
+d=json.load(sys.stdin)
+print('yes' if d.get('totalCount', 0) <= len(d.get('data', [])) else 'no')
+")
 read -r dns_id dns_target <<< "$(printf '%s' "${policies}" | pluck "
 import json,sys
 for p in json.load(sys.stdin).get('data',[]):
@@ -106,7 +115,10 @@ for p in json.load(sys.stdin).get('data',[]):
         print(p['id'], p.get('targetDomain','')); break
 ")"
 
-if [ -z "${dns_id:-}" ]; then
+if [ "${complete}" != "yes" ]; then
+    log "Cannot read every DNS policy on ${CONSOLE_NAME}"
+    failed=1
+elif [ -z "${dns_id:-}" ]; then
     log "No CNAME for ${DOMAIN} on ${CONSOLE_NAME}"
     failed=1
 elif [ "${dns_target}" = "${want_host}" ]; then
