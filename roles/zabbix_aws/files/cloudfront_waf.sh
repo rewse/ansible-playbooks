@@ -10,9 +10,10 @@
 
 trap 'my_exit 1' 1 2 3 15
 
-queryfile=$(mktemp --tmpdir cloudfront_waf.XXXXXXXXXX)
-resultfile=$(mktemp --tmpdir cloudfront_waf.XXXXXXXXXX)
-readonly queryfile resultfile
+# Created only once there is a distribution to read, so an early exit leaves no
+# files behind.
+queryfile=
+resultfile=
 readonly region=us-east-1
 readonly stack=cloudfront-waf
 
@@ -99,6 +100,8 @@ plan() {
     add_query cloudfront.error_rate.4xx   AWS/CloudFront 4xxErrorRate    Average "$cf"
     add_query cloudfront.error_rate.5xx   AWS/CloudFront 5xxErrorRate    Average "$cf"
     add_query cloudfront.origin_latency   AWS/CloudFront OriginLatency   Average "$cf"
+    # CloudWatch publishes no datapoint for a zero count, so the WAF keys are sent
+    # only when there is traffic.
     add_query waf.requests.allowed        AWS/WAFV2      AllowedRequests Sum     "$waf"
     add_query waf.requests.blocked        AWS/WAFV2      BlockedRequests Sum     "$waf"
     add_query waf.requests.counted        AWS/WAFV2      CountedRequests Sum     "$waf"
@@ -146,6 +149,9 @@ distribution=$(distribution_id)
 if [ -z "$distribution" ] || [ "$distribution" = "None" ]; then
     exit 0
 fi
+
+queryfile=$(mktemp --tmpdir cloudfront_waf.XXXXXXXXXX)
+resultfile=$(mktemp --tmpdir cloudfront_waf.XXXXXXXXXX)
 
 plan "$distribution"
 
