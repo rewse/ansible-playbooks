@@ -2,8 +2,12 @@
 """Regression tests for the CloudFront origin configuration."""
 
 import configparser
+import json
 import pathlib
 import re
+import subprocess
+import sys
+import tempfile
 import unittest
 
 import jinja2
@@ -135,6 +139,110 @@ class RemoteIpTest(unittest.TestCase):
             lines,
         )
         self.assertEqual([line for line in lines if "%h" in line], [])
+
+
+class RemoteIpDriftTest(unittest.TestCase):
+    SCRIPT = HTTPD / "files" / "remoteip-drift"
+
+    def setUp(self):
+        tmp = tempfile.TemporaryDirectory()
+        self.addCleanup(tmp.cleanup)
+        self.root = pathlib.Path(tmp.name)
+        self.ranges = self.root / "ip-ranges.json"
+        self.conf = self.root / "remoteip.conf"
+
+    def write_ranges(self, prefixes: dict[str, str]) -> None:
+        self.ranges.write_text(
+            json.dumps(
+                {
+                    "prefixes": [
+                        {"ip_prefix": prefix, "service": service}
+                        for prefix, service in prefixes.items()
+                    ]
+                }
+            )
+        )
+
+    def write_conf(self, prefixes: list[str]) -> None:
+        self.conf.write_text(
+            render("remoteip.conf.j2", __httpd_remoteip_cloudfront_prefixes=prefixes)
+        )
+
+    def run_script(self) -> subprocess.CompletedProcess[str]:
+        return subprocess.run(
+            [
+                sys.executable,
+                "-I",
+                str(self.SCRIPT),
+                self.ranges.as_uri(),
+                str(self.conf),
+            ],
+            capture_output=True,
+            text=True,
+            check=False,
+        )
+
+    def test_reports_zero_when_the_trust_list_is_current(self):
+        self.write_ranges(
+            {"130.176.0.0/18": "CLOUDFRONT_ORIGIN_FACING", "3.5.140.0/22": "AMAZON"}
+        )
+        self.write_conf(["130.176.0.0/18"])
+
+        result = self.run_script()
+
+        self.assertEqual(
+            (result.returncode, result.stdout, result.stderr), (0, "0\n", "")
+        )
+
+    def test_counts_published_prefixes_the_trust_list_lacks(self):
+        self.write_ranges(
+            {
+                "130.176.0.0/18": "CLOUDFRONT_ORIGIN_FACING",
+                "64.252.64.0/18": "CLOUDFRONT_ORIGIN_FACING",
+                "15.158.0.0/16": "CLOUDFRONT_ORIGIN_FACING",
+            }
+        )
+        self.write_conf(["130.176.0.0/18"])
+
+        self.assertEqual(self.run_script().stdout, "2\n")
+
+    def test_prints_nothing_when_a_source_cannot_be_read(self):
+        self.write_conf(["130.176.0.0/18"])
+        self.assertEqual(self.run_script().stdout, "")
+        self.ranges.write_text("not json")
+        self.assertEqual(self.run_script().stdout, "")
+        self.write_ranges({"3.5.140.0/22": "AMAZON"})
+        self.assertEqual(self.run_script().stdout, "")
+        self.write_ranges({"130.176.0.0/18": "CLOUDFRONT_ORIGIN_FACING"})
+        self.conf.unlink()
+        result = self.run_script()
+        self.assertEqual((result.stdout, result.stderr), ("", ""))
+
+    def test_agent_runs_the_script_against_the_same_sources(self):
+        text = render(
+            "remoteip-drift.conf.j2",
+            httpd_remoteip_ip_ranges_url="https://ip-ranges.amazonaws.com/ip-ranges.json",
+        )
+        self.assertIn(
+            "UserParameter=apache.remoteip.missing_prefixes,"
+            "/usr/lib/zabbix/agentscripts/remoteip-drift "
+            "https://ip-ranges.amazonaws.com/ip-ranges.json "
+            "/etc/apache2/conf-available/remoteip.conf",
+            text.splitlines(),
+        )
+        imports = yaml.safe_load((HTTPD / "tasks" / "main.yml").read_text())
+        names = [task["ansible.builtin.import_tasks"] for task in imports]
+        self.assertEqual(
+            names.index("remoteip_drift.yml"), names.index("remoteip.yml") + 1
+        )
+        self.assertIn(
+            {
+                "name": "Import remoteip_drift tasks",
+                "ansible.builtin.import_tasks": "remoteip_drift.yml",
+                "tags": ["httpd_remoteip_drift"],
+            },
+            imports,
+        )
 
 
 class OriginGateTest(unittest.TestCase):

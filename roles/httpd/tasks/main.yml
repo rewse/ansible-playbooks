@@ -20,6 +20,11 @@
     - httpd_remoteip
     - update
 
+- name: Import remoteip_drift tasks
+  ansible.builtin.import_tasks: remoteip_drift.yml
+  tags:
+    - httpd_remoteip_drift
+
 - name: Import cloudfront_origin tasks
   ansible.builtin.import_tasks: cloudfront_origin.yml
   tags:

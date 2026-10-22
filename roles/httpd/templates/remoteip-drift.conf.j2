@@ -1,0 +1,4 @@
+{{ ansible_managed | comment }}
+# Number of CloudFront origin-facing prefixes in ip-ranges.json that
+# remoteip.conf does not trust yet. Empty when either cannot be read.
+UserParameter=apache.remoteip.missing_prefixes,/usr/lib/zabbix/agentscripts/remoteip-drift {{ httpd_remoteip_ip_ranges_url }} /etc/apache2/conf-available/remoteip.conf

@@ -1,0 +1,50 @@
+#!/usr/bin/python3 -I
+"""Print how many CloudFront origin-facing prefixes remoteip.conf does not trust.
+
+Usage: remoteip-drift <ip-ranges.json URL> <remoteip.conf>
+
+AWS adds CloudFront origin-facing ranges to ip-ranges.json over time, and
+remoteip.conf only learns them when the httpd remoteip component runs again.
+Until then Apache logs requests from a new edge range under the edge address. A
+non-zero count means the remoteip component (and udm_cloudfront, which limits
+the WAN forward to the same ranges) needs to run. Prints nothing when either
+source cannot be read, so the Zabbix item turns unsupported instead of
+reporting a false count.
+"""
+
+import json
+import re
+import sys
+import urllib.request
+
+SERVICE = "CLOUDFRONT_ORIGIN_FACING"
+USAGE = "usage: remoteip-drift <ip-ranges.json URL> <remoteip.conf>"
+# Below the agent's 30-second Timeout.
+FETCH_TIMEOUT_SECONDS = 20
+
+
+def main(argv: list[str]) -> int:
+    if len(argv) != 2:
+        print(USAGE, file=sys.stderr)
+        return 2
+    url, conf = argv
+    try:
+        with urllib.request.urlopen(url, timeout=FETCH_TIMEOUT_SECONDS) as response:
+            ranges = json.load(response)
+        published = {
+            entry["ip_prefix"]
+            for entry in ranges["prefixes"]
+            if entry.get("service") == SERVICE
+        }
+        with open(conf) as file:
+            trusted = set(re.findall(r"(?m)^RemoteIPTrustedProxy\s+(\S+)", file.read()))
+    except (OSError, ValueError, KeyError, TypeError, AttributeError):
+        return 0
+    if not published:
+        return 0
+    print(len(published - trusted))
+    return 0
+
+
+if __name__ == "__main__":
+    sys.exit(main(sys.argv[1:]))
