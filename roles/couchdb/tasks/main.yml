@@ -17,6 +17,11 @@
     - couchdb_database
     - update
 
+- name: Import security_agent tasks
+  ansible.builtin.import_tasks: security_agent.yml
+  tags:
+    - couchdb_security_agent
+
 - name: Import apache tasks
   ansible.builtin.import_tasks: apache.yml
   tags:

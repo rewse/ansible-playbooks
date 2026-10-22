@@ -1,0 +1,147 @@
+---
+# The AWS Security Agent pentest (rewse/security-agent) signs in as this user.
+# It is a member of one decoy database only, and the design document there
+# rejects every write that is not an admin's, so the pentest can test CouchDB's
+# authorization without reaching the Obsidian LiveSync databases. CouchDB has no
+# module, so each step reads the current state over HTTP and writes only when
+# it differs.
+- name: security_agent | Check pentest user sign-in
+  ansible.builtin.uri:
+    url: "{{ couchdb_url }}/_session"
+    method: POST
+    body_format: json
+    body:
+      name: "{{ couchdb_security_agent_user }}"
+      password: "{{ couchdb_security_agent_password }}"
+    status_code:
+      - 200
+      - 401
+  register: __couchdb_security_agent_session
+  check_mode: false
+  no_log: true
+
+- name: security_agent | Read pentest user
+  ansible.builtin.uri:
+    url: "{{ couchdb_url }}/_users/org.couchdb.user:{{ couchdb_security_agent_user }}"
+    url_username: "{{ admin_user }}"
+    url_password: "{{ couchdb_password }}"
+    force_basic_auth: true
+    status_code:
+      - 200
+      - 404
+  register: __couchdb_security_agent_user_doc
+  check_mode: false
+  no_log: true
+
+- name: security_agent | Set pentest user
+  ansible.builtin.uri:
+    url: "{{ couchdb_url }}/_users/org.couchdb.user:{{ couchdb_security_agent_user }}"
+    method: PUT
+    url_username: "{{ admin_user }}"
+    url_password: "{{ couchdb_password }}"
+    force_basic_auth: true
+    body_format: json
+    body: "{{ {'name': couchdb_security_agent_user, 'password': couchdb_security_agent_password, 'roles': [], 'type': 'user'}
+      | combine({'_rev': __couchdb_security_agent_user_doc.json._rev} if __couchdb_security_agent_user_doc.status == 200 else {}) }}"
+    status_code:
+      - 201
+      - 202
+  changed_when: true
+  when: __couchdb_security_agent_session.status == 401
+  no_log: true
+
+- name: security_agent | Create decoy database
+  ansible.builtin.uri:
+    url: "{{ couchdb_url }}/{{ couchdb_security_agent_database }}"
+    method: PUT
+    url_username: "{{ admin_user }}"
+    url_password: "{{ couchdb_password }}"
+    force_basic_auth: true
+    status_code:
+      - 201
+      - 412
+  register: __couchdb_security_agent_database
+  changed_when: __couchdb_security_agent_database.status == 201
+  when: not ansible_check_mode
+
+- name: security_agent | Read decoy database security
+  ansible.builtin.uri:
+    url: "{{ couchdb_url }}/{{ couchdb_security_agent_database }}/_security"
+    url_username: "{{ admin_user }}"
+    url_password: "{{ couchdb_password }}"
+    force_basic_auth: true
+    status_code:
+      - 200
+      - 404
+  register: __couchdb_security_agent_security
+  check_mode: false
+
+- name: security_agent | Set decoy database security
+  ansible.builtin.uri:
+    url: "{{ couchdb_url }}/{{ couchdb_security_agent_database }}/_security"
+    method: PUT
+    url_username: "{{ admin_user }}"
+    url_password: "{{ couchdb_password }}"
+    force_basic_auth: true
+    body_format: json
+    body: "{{ couchdb_security_agent_security }}"
+  changed_when: true
+  when: __couchdb_security_agent_security.json | default({}) != couchdb_security_agent_security
+
+- name: security_agent | Read read-only design document
+  ansible.builtin.uri:
+    url: "{{ couchdb_url }}/{{ couchdb_security_agent_database }}/_design/readonly"
+    url_username: "{{ admin_user }}"
+    url_password: "{{ couchdb_password }}"
+    force_basic_auth: true
+    status_code:
+      - 200
+      - 404
+  register: __couchdb_security_agent_design
+  check_mode: false
+
+- name: security_agent | Set read-only design document
+  ansible.builtin.uri:
+    url: "{{ couchdb_url }}/{{ couchdb_security_agent_database }}/_design/readonly"
+    method: PUT
+    url_username: "{{ admin_user }}"
+    url_password: "{{ couchdb_password }}"
+    force_basic_auth: true
+    body_format: json
+    body: "{{ __couchdb_security_agent_readonly
+      | combine({'_rev': __couchdb_security_agent_design.json._rev} if __couchdb_security_agent_design.status == 200 else {}) }}"
+    status_code:
+      - 201
+  changed_when: true
+  when: >-
+    __couchdb_security_agent_design.status == 404 or
+    __couchdb_security_agent_design.json.validate_doc_update != __couchdb_security_agent_readonly.validate_doc_update
+  vars:
+    __couchdb_security_agent_readonly: "{{ lookup('ansible.builtin.file', 'security-agent-readonly.json') | from_json }}"
+
+- name: security_agent | Read sample document
+  ansible.builtin.uri:
+    url: "{{ couchdb_url }}/{{ couchdb_security_agent_database }}/sample"
+    url_username: "{{ admin_user }}"
+    url_password: "{{ couchdb_password }}"
+    force_basic_auth: true
+    status_code:
+      - 200
+      - 404
+  register: __couchdb_security_agent_sample
+  check_mode: false
+
+- name: security_agent | Create sample document
+  ansible.builtin.uri:
+    url: "{{ couchdb_url }}/{{ couchdb_security_agent_database }}/sample"
+    method: PUT
+    url_username: "{{ admin_user }}"
+    url_password: "{{ couchdb_password }}"
+    force_basic_auth: true
+    body_format: json
+    body:
+      note: A document the pentest user may read but not change.
+    status_code:
+      - 201
+  changed_when: true
+  when: __couchdb_security_agent_sample.status == 404

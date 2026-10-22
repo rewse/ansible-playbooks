@@ -16,8 +16,8 @@
   ansible.builtin.command: /usr/local/src/couchdb-init.sh
   changed_when: true
   environment:
-    hostname: http://127.0.0.1:5984
-    username: tats
+    hostname: "{{ couchdb_url }}"
+    username: "{{ admin_user }}"
     password: "{{ couchdb_password }}"
   no_log: true
 

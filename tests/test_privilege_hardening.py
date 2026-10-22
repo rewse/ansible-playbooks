@@ -2,8 +2,10 @@
 """Regression tests for services that grant remote access to root or secrets."""
 
 import configparser
+import json
 import pathlib
 import re
+import subprocess
 import unittest
 
 import yaml
@@ -12,6 +14,7 @@ REPO_ROOT = pathlib.Path(__file__).resolve().parents[1]
 RSYNCD_CONF = (
     REPO_ROOT / "roles" / "homeassistant_ha_primary" / "templates" / "rsyncd.conf.j2"
 )
+COUCHDB = REPO_ROOT / "roles" / "couchdb"
 HOMEASSISTANT = REPO_ROOT / "roles" / "homeassistant"
 PRIMARY = REPO_ROOT / "roles" / "homeassistant_ha_primary"
 SECONDARY = REPO_ROOT / "roles" / "homeassistant_ha_secondary"
@@ -35,6 +38,52 @@ def rsyncd_modules() -> configparser.ConfigParser:
     ]
     parser.read_string("[global]\n" + "\n".join(lines))
     return parser
+
+
+class CouchDBSecurityAgentTest(unittest.TestCase):
+    # The AWS Security Agent pentest signs in to CouchDB as a user that may read
+    # one decoy database and write nothing, so a probe cannot alter or read the
+    # Obsidian LiveSync databases.
+    def validate(self, roles: list[str]) -> bool:
+        design = json.loads(
+            (COUCHDB / "files" / "security-agent-readonly.json").read_text()
+        )
+        script = (
+            f"const validate = {design['validate_doc_update']};"
+            "try { validate({}, null, JSON.parse(process.argv[1])); }"
+            " catch (e) { process.exit(e.forbidden ? 3 : 1); }"
+        )
+        result = subprocess.run(
+            ["node", "-e", script, json.dumps({"name": "x", "roles": roles})],
+            check=False,
+        )
+        self.assertIn(result.returncode, (0, 3))
+        return result.returncode == 0
+
+    def test_design_document_rejects_writes_by_members(self):
+        self.assertFalse(self.validate([]))
+
+    def test_design_document_lets_admins_write(self):
+        self.assertTrue(self.validate(["_admin"]))
+
+    def test_only_the_pentest_user_is_a_member(self):
+        variables = yaml.safe_load((COUCHDB / "vars" / "main.yml").read_text())
+        security = variables["couchdb_security_agent_security"]
+        self.assertEqual(
+            security,
+            {
+                "admins": {"names": [], "roles": []},
+                "members": {
+                    "names": ["{{ couchdb_security_agent_user }}"],
+                    "roles": [],
+                },
+            },
+        )
+        self.assertEqual(variables["couchdb_security_agent_user"], "security-agent")
+        self.assertRegex(
+            variables["couchdb_security_agent_password"],
+            r"^\{\{ lookup\('pipe', 'op read op://ansible/\w+/password'\) \}\}$",
+        )
 
 
 class RsyncdTest(unittest.TestCase):

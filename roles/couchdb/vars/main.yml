@@ -1,2 +1,14 @@
 ---
 couchdb_password: "{{ lookup('pipe', 'op read op://ansible/stw5hklwupgn4cjnd4vh3ia5me/credential') }}"
+couchdb_security_agent_database: security-agent-pentest
+couchdb_security_agent_password: "{{ lookup('pipe', 'op read op://ansible/4sxe6btt7pa5jxgp7d4fg6axtu/password') }}"
+couchdb_security_agent_security:
+  admins:
+    names: []
+    roles: []
+  members:
+    names:
+      - "{{ couchdb_security_agent_user }}"
+    roles: []
+couchdb_security_agent_user: security-agent
+couchdb_url: http://127.0.0.1:5984

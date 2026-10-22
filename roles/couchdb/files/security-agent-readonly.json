@@ -1,0 +1,3 @@
+{
+  "validate_doc_update": "function (newDoc, oldDoc, userCtx) { if (userCtx.roles.indexOf('_admin') === -1) { throw({forbidden: 'This database is read-only.'}); } }"
+}

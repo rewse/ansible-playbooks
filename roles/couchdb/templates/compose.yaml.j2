@@ -12,6 +12,6 @@ services:
       - /srv/couchdb/data:/opt/couchdb/data
       - /srv/couchdb/etc/local.d:/opt/couchdb/etc/local.d
     environment:
-      - COUCHDB_USER=tats
+      - COUCHDB_USER={{ admin_user }}
       - COUCHDB_PASSWORD={{ couchdb_password }}
     restart: unless-stopped
