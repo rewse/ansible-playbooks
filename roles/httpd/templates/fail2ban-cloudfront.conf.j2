@@ -5,8 +5,13 @@
 # CloudFront routes through that edge server. The list comes from the same
 # ip-ranges.json fetch as remoteip.conf. 127.0.0.1/8 and ::1 are the addresses
 # fail2ban suggests ignoring by default.
+#
+# Never ban the home WAN address either. A home client that resolves a public
+# name through public DNS reaches this host through CloudFront and is restored
+# as that address, so a ban on it would deny every IPv4 client at home.
 [DEFAULT]
 ignoreip = 127.0.0.1/8 ::1
+           {{ networks.home_public_ipv4 }}
 {% for prefix in __httpd_remoteip_cloudfront_prefixes %}
            {{ prefix }}
 {% endfor %}

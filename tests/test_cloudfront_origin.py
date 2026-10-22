@@ -73,7 +73,9 @@ class RemoteIpTest(unittest.TestCase):
         # deny every visitor that CloudFront routes through it.
         prefixes = ["130.176.0.0/18", "64.252.64.0/18"]
         text = render(
-            "fail2ban-cloudfront.conf.j2", __httpd_remoteip_cloudfront_prefixes=prefixes
+            "fail2ban-cloudfront.conf.j2",
+            __httpd_remoteip_cloudfront_prefixes=prefixes,
+            networks={"home_public_ipv4": "106.163.184.9/32"},
         )
         parser = configparser.ConfigParser(interpolation=None)
         parser.read_string(
@@ -82,7 +84,7 @@ class RemoteIpTest(unittest.TestCase):
         self.assertEqual(parser.sections(), [])
         self.assertEqual(
             parser.defaults()["ignoreip"].split(),
-            ["127.0.0.1/8", "::1", *prefixes],
+            ["127.0.0.1/8", "::1", "106.163.184.9/32", *prefixes],
         )
 
     def test_fail2ban_exemption_uses_the_same_ranges(self):

@@ -170,12 +170,30 @@ class ApacheDenyScriptTest(unittest.TestCase):
         self.assertEqual(sorted(terms), sorted(addresses))
 
     def test_rejects_anything_but_an_address(self):
-        for address in ("203.0.113.7' || true || '", "203.0.113.0/24", "example.com"):
+        for address in (
+            "203.0.113.7' || true || '",
+            "203.0.113.0/24",
+            "example.com",
+            "fe80::1%eth0",
+            'fe80::1%x"y',
+        ):
             with self.subTest(address=address):
                 result = self.run_script("ban", "nvr", address)
                 self.assertNotEqual(result.returncode, 0)
                 self.assertFalse((self.state / "nvr.conf").exists())
         self.assertEqual(self.reloads(), [])
+
+    def test_flush_clears_a_ban_list_with_unreadable_lines(self):
+        (self.state / "nvr.bans").write_text("203.0.113.7\nnot-an-address\n")
+
+        self.assertEqual(self.run_script("flush", "nvr").returncode, 0)
+        self.assertNotIn("<If", self.conf("nvr"))
+
+    def test_ban_skips_unreadable_lines_in_the_ban_list(self):
+        (self.state / "nvr.bans").write_text("not-an-address\nfe80::1%x\n")
+
+        self.assertEqual(self.run_script("ban", "nvr", "203.0.113.7").returncode, 0)
+        self.assertEqual(if_sections(self.conf("nvr"))[0][0], "-R '203.0.113.7'")
 
     def test_rejects_a_jail_name_that_leaves_the_directory(self):
         result = self.run_script("ban", "../nvr", "203.0.113.7")
