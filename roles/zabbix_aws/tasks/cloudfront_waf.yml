@@ -1,0 +1,13 @@
+---
+- name: cloudfront_waf | Copy monitoring script
+  ansible.builtin.copy:
+    src: cloudfront_waf.sh
+    dest: /usr/lib/zabbix/agentscripts
+    mode: "0755"
+
+- name: cloudfront_waf | Copy agent config
+  ansible.builtin.copy:
+    src: cloudfront_waf.conf
+    dest: /etc/zabbix/zabbix_agentd.d
+    mode: "0644"
+  notify: Restart zabbix-agent
