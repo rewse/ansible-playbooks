@@ -1,2 +1,3 @@
 ---
+httpd_cloudfront_origin_verify_token: "{{ lookup('pipe', 'op read op://ansible/kgap2pevj7exae5jnvlsewbs7y/password') }}"
 httpd_security_agent_pentest_token: "{{ lookup('pipe', 'op read op://ansible/m6obpvalg7ekdi5nsf4yx6wi3q/password') }}"
