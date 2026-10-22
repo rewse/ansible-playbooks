@@ -1,0 +1,16 @@
+---
+- name: cloudfront_origin | Copy origin header config
+  ansible.builtin.template:
+    src: cloudfront-origin.conf.j2
+    dest: /etc/apache2/conf-available/cloudfront-origin.conf
+    mode: "0640"
+  # The file holds the header secret, which --diff would print.
+  diff: false
+  notify: Reload Apache
+
+- name: cloudfront_origin | Enable origin header config
+  # No module enables an Apache site or conf; the command reports whether it changed.
+  ansible.builtin.command: a2enconf cloudfront-origin
+  register: __httpd_a2enconf_cloudfront_origin
+  changed_when: "'already enabled' not in __httpd_a2enconf_cloudfront_origin.stdout"
+  notify: Reload Apache

@@ -1,0 +1,19 @@
+{{ ansible_managed | comment }}
+# CloudFront adds this header with a secret value to every request it forwards,
+# so a matching value marks a request that came through CloudFront and AWS WAF.
+# The header is removed before the request reaches a backend, so no backend
+# sees or logs the value.
+SetEnvIf X-Origin-Verify "^{{ httpd_cloudfront_origin_verify_token }}$" cloudfront_origin
+RequestHeader unset X-Origin-Verify
+{% if httpd_cloudfront_origin_enforce %}
+
+# Deny requests that bypass CloudFront unless they come from the internal
+# networks. -R tests the client address that mod_remoteip restores. Apache
+# merges If sections after every other section, and this one only denies, so it
+# cannot replace the authentication or authorization another section requires;
+# every other request keeps the access rules it already has.
+{% set exempt = ['127.0.0.1', '::1', networks.home_private_ipv4, networks.home_private_ipv6, networks.home_public_ipv6, networks.aws_private_ipv4, networks.aws_public_ipv6] %}
+<If "reqenv('cloudfront_origin') != '1'{% for cidr in exempt %} && ! -R '{{ cidr }}'{% endfor %}">
+    Require all denied
+</If>
+{% endif %}

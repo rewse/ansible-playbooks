@@ -1,0 +1,4 @@
+---
+# Deny requests that reach Apache without the CloudFront origin header, except
+# from the internal networks.
+httpd_cloudfront_origin_enforce: false

@@ -20,6 +20,11 @@
     - httpd_remoteip
     - update
 
+- name: Import cloudfront_origin tasks
+  ansible.builtin.import_tasks: cloudfront_origin.yml
+  tags:
+    - httpd_cloudfront_origin
+
 - name: Import conf tasks
   ansible.builtin.import_tasks: conf.yml
   tags:

@@ -1,0 +1,2 @@
+---
+httpd_cloudfront_origin_enforce: false
