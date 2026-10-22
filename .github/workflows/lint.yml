@@ -26,7 +26,7 @@ jobs:
         uses: astral-sh/setup-uv@1c37ad07a6a961277cf70c0d37d6f313000f5884  # v10.3.0
 
       - name: Setup Aikido Safe Chain
-        uses: rewse/actions/setup-safe-chain@de7d830f00bb1d7fe242c4f7e4ffb629f062e6b2  # v1.1.3
+        uses: rewse/actions/setup-safe-chain@0d135e777b83f37d11136115713ee84b9d779b31  # v1.1.5
 
       # uvx runs through the Safe Chain shim, so hook environments are
       # installed through Safe Chain too. pre-commit-uv builds hook environments
