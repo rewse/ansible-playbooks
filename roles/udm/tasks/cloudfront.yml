@@ -122,17 +122,29 @@
             {{ __udm_cloudfront_prefixes
             | map('community.general.dict_kv', 'value')
             | map('combine', {'type': 'SUBNET'}) }}
-        status_code:
-          - 200
-          - 201
+        return_content: true
       register: __udm_cloudfront_group_write
-      changed_when: true
+      changed_when: __udm_cloudfront_group_write.status in [200, 201]
+      failed_when: false
       when:
         - not ansible_check_mode
         - >-
           __udm_cloudfront_group.get('items', []) | map(attribute='value') | sort
           != __udm_cloudfront_prefixes
       no_log: true
+
+    # The request above is no_log because it carries the API key; this shows
+    # only the status and the response body.
+    - name: cloudfront | Check address group write
+      ansible.builtin.assert:
+        that:
+          - __udm_cloudfront_group_write.status in [200, 201]
+        fail_msg: >-
+          Writing {{ udm_cloudfront_group_name }} returned
+          {{ __udm_cloudfront_group_write.status }}:
+          {{ __udm_cloudfront_group_write.json | default(__udm_cloudfront_group_write.content | default('')) }}
+        quiet: true
+      when: __udm_cloudfront_group_write is not skipped
 
     - name: cloudfront | Set address group ID
       ansible.builtin.set_fact:
@@ -215,41 +227,45 @@
         quiet: true
       when: udm_cloudfront_enforce
 
-    # The policies to remove allow IPv6 from the internet to port 443 or 80
-    # alone, whether the ports come from a traffic matching list or are listed
-    # in the policy itself. Policies the console derives from them, such as
-    # return traffic, go with them.
+    # Every enabled ALLOW policy from the internet that admits new IPv6 TCP
+    # connections to port 80 or 443, whether it names IPv6 alone or both IP
+    # versions, and whatever form its port filter takes; see
+    # filter_plugins/udm_firewall.py. Only those that name web ports alone are
+    # removed, because removing one that also names another port would close
+    # that port too. Policies the console derives from them, such as return
+    # traffic, go with them.
     - name: cloudfront | Set IPv6 web allows
       vars:
-        web_port_items:
-          - - type: PORT_NUMBER
-              value: 443
-          - - type: PORT_NUMBER
-              value: 80
-        web_port_lists: >-
-          {{ __udm_cloudfront_lists.json.data
-          | selectattr('type', 'equalto', 'PORTS')
-          | selectattr('items', 'in', web_port_items)
-          | map(attribute='id') }}
         external_zone: >-
           {{ (__udm_cloudfront_zones.json.data
           | selectattr('name', 'equalto', 'External') | first).id }}
-        inbound: >-
+      ansible.builtin.set_fact:
+        __udm_cloudfront_ipv6_web: >-
           {{ __udm_cloudfront_policies.json.data
-          | selectattr('metadata.origin', 'equalto', 'USER_DEFINED')
-          | selectattr('action.type', 'equalto', 'ALLOW')
-          | selectattr('ipProtocolScope.ipVersion', 'equalto', 'IPV6')
-          | selectattr('source.zoneId', 'equalto', external_zone)
-          | selectattr('destination.trafficFilter', 'defined')
-          | selectattr('destination.trafficFilter.portFilter', 'defined') }}
+          | udm_web_allows(__udm_cloudfront_lists.json.data, external_zone) }}
+        __udm_cloudfront_external_zone: "{{ external_zone }}"
+      when: udm_cloudfront_enforce
+
+    - name: cloudfront | Set removable IPv6 web allows
       ansible.builtin.set_fact:
         __udm_cloudfront_ipv6_allows: >-
-          {{ (inbound
-          | selectattr('destination.trafficFilter.portFilter.type', 'equalto', 'TRAFFIC_MATCHING_LIST')
-          | selectattr('destination.trafficFilter.portFilter.trafficMatchingListId', 'in', web_port_lists))
-          + (inbound
-          | selectattr('destination.trafficFilter.portFilter.type', 'equalto', 'PORTS')
-          | selectattr('destination.trafficFilter.portFilter.items', 'in', web_port_items)) }}
+          {{ __udm_cloudfront_ipv6_web | udm_web_only(__udm_cloudfront_lists.json.data) }}
+      when: udm_cloudfront_enforce
+
+    - name: cloudfront | Check IPv6 web allows are removable
+      ansible.builtin.assert:
+        that:
+          - >-
+            __udm_cloudfront_ipv6_web | map(attribute='id')
+            | difference(__udm_cloudfront_ipv6_allows | map(attribute='id'))
+            | length == 0
+        fail_msg: >-
+          These policies let IPv6 reach port 80 or 443 together with other ports
+          or a range, so removing them would close more than the web ports:
+          {{ __udm_cloudfront_ipv6_web | rejectattr('id', 'in', __udm_cloudfront_ipv6_allows
+          | map(attribute='id')) | map(attribute='name') | join(', ') }}.
+          Split them in the UniFi UI and run again.
+        quiet: true
       when: udm_cloudfront_enforce
 
     - name: cloudfront | Set changes
@@ -262,21 +278,29 @@
       ansible.builtin.set_fact:
         __udm_cloudfront_https_forward: "{{ https_forward | combine(https_limit) }}"
         __udm_cloudfront_https_pending: "{{ https_forward | combine(https_limit) != https_forward }}"
+        __udm_cloudfront_https_limit: "{{ https_limit }}"
       when: udm_cloudfront_enforce
 
+    - name: cloudfront | Set pending
+      ansible.builtin.set_fact:
+        __udm_cloudfront_pending: >-
+          {{ __udm_cloudfront_https_pending
+          or __udm_cloudfront_http_forwards | length > 0
+          or __udm_cloudfront_ipv6_allows | length > 0 }}
+        __udm_cloudfront_backup_name: originals-{{ now(utc=true, fmt='%Y%m%dT%H%M%SZ') }}.json
+      when: udm_cloudfront_enforce
+
+    # Rolling back stage 5 in rewse/cloudfront-waf docs/setup.md restores from
+    # the saved objects, so they outlive the run; AGENTS.md has the purge policy.
     - name: cloudfront | Create backup directory
-      ansible.builtin.tempfile:
+      ansible.builtin.file:
+        path: "{{ udm_cloudfront_backup_dir }}"
         state: directory
-        path: /tmp
-        prefix: udm-cloudfront.
-      register: __udm_cloudfront_backup
+        mode: "0700"
       when:
         - udm_cloudfront_enforce
         - not ansible_check_mode
-        - >-
-          __udm_cloudfront_https_pending
-          or __udm_cloudfront_http_forwards | length > 0
-          or __udm_cloudfront_ipv6_allows | length > 0
+        - __udm_cloudfront_pending
 
     # None of these objects holds a secret: forwards and policies carry only
     # addresses, ports, zones and names.
@@ -286,19 +310,21 @@
           {{ {'firewall_policies': __udm_cloudfront_ipv6_allows,
           'port_forwards': __udm_cloudfront_https_forwards + __udm_cloudfront_http_forwards}
           | to_nice_json }}
-        dest: "{{ __udm_cloudfront_backup.path }}/originals.json"
+        dest: "{{ udm_cloudfront_backup_dir }}/{{ __udm_cloudfront_backup_name }}"
         mode: "0600"
       when:
         - udm_cloudfront_enforce
-        - __udm_cloudfront_backup is not skipped
+        - not ansible_check_mode
+        - __udm_cloudfront_pending
 
     - name: cloudfront | Show backup path
       ansible.builtin.debug:
-        msg: Saved the objects before the change to {{ __udm_cloudfront_backup.path }}/originals.json
+        msg: Saved the objects before the change to {{ udm_cloudfront_backup_dir }}/{{ __udm_cloudfront_backup_name }}
         verbosity: 0
       when:
         - udm_cloudfront_enforce
-        - __udm_cloudfront_backup is not skipped
+        - not ansible_check_mode
+        - __udm_cloudfront_pending
 
     # The whole object goes back, the legacy endpoint replacing rather than
     # patching what it is given.
@@ -311,38 +337,151 @@
         headers: "{{ udm_unifi_api_headers }}"
         body_format: json
         body: "{{ __udm_cloudfront_https_forward }}"
-      changed_when: true
+        return_content: true
+      register: __udm_cloudfront_https_write
+      changed_when: __udm_cloudfront_https_write.status == 200
+      failed_when: false
       when:
         - udm_cloudfront_enforce
         - not ansible_check_mode
         - __udm_cloudfront_https_pending
       no_log: true
 
+    - name: cloudfront | Check HTTPS forward write
+      ansible.builtin.assert:
+        that:
+          - __udm_cloudfront_https_write.status == 200
+        fail_msg: >-
+          Limiting the HTTPS forward returned {{ __udm_cloudfront_https_write.status }}:
+          {{ __udm_cloudfront_https_write.json | default(__udm_cloudfront_https_write.content | default('')) }}
+        quiet: true
+      when:
+        - udm_cloudfront_enforce
+        - __udm_cloudfront_https_write is not skipped
+
+    # The console answers 200 to fields it does not know and drops them, so the
+    # forward is read back to see that the source limit stuck.
+    - name: cloudfront | Get port forwards after the change
+      ansible.builtin.uri:
+        url: "{{ __udm_cloudfront_network_url }}/api/s/default/rest/portforward"
+        headers: "{{ udm_unifi_api_headers }}"
+      register: __udm_cloudfront_forwards_after
+      check_mode: false
+      when:
+        - udm_cloudfront_enforce
+        - not ansible_check_mode
+      no_log: true
+
+    - name: cloudfront | Check HTTPS forward limit
+      vars:
+        stored: >-
+          {{ __udm_cloudfront_forwards_after.json.data
+          | selectattr('_id', 'equalto', __udm_cloudfront_https_forward._id)
+          | first | default({}) }}
+      ansible.builtin.assert:
+        that:
+          - stored.src_limiting_enabled | default(false) is true
+          - stored.src_limiting_type | default('') == __udm_cloudfront_https_limit.src_limiting_type
+          - stored.src_firewall_group_id | default('') == __udm_cloudfront_https_limit.src_firewall_group_id
+        fail_msg: >-
+          The HTTPS forward holds src_limiting_enabled={{ stored.src_limiting_enabled | default('missing') }},
+          src_limiting_type={{ stored.src_limiting_type | default('missing') }},
+          src_firewall_group_id={{ stored.src_firewall_group_id | default('missing') }}
+          instead of the CloudFront limit, so WAN 443 is not limited.
+        quiet: true
+      when:
+        - udm_cloudfront_enforce
+        - not ansible_check_mode
+
     - name: cloudfront | Remove HTTP forward
       ansible.builtin.uri:
         url: "{{ __udm_cloudfront_network_url }}/api/s/default/rest/portforward/{{ item._id }}"
         method: DELETE
         headers: "{{ udm_unifi_api_headers }}"
+        return_content: true
       loop: "{{ __udm_cloudfront_http_forwards | default([]) }}"
+      loop_control:
+        label: "{{ item.name }}"
+      register: __udm_cloudfront_http_removal
       changed_when: true
+      failed_when: false
       when:
         - udm_cloudfront_enforce
         - not ansible_check_mode
       no_log: true
+
+    - name: cloudfront | Check HTTP forward removal
+      ansible.builtin.assert:
+        that:
+          - __udm_cloudfront_http_removal.results | rejectattr('status', 'equalto', 200) | list | length == 0
+        fail_msg: >-
+          Removing the HTTP forward failed:
+          {% for result in __udm_cloudfront_http_removal.results | rejectattr('status', 'equalto', 200) %}
+          {{ result.item.name }} returned {{ result.status }}:
+          {{ result.json | default(result.content | default('')) }}.
+          {% endfor %}
+        quiet: true
+      when:
+        - udm_cloudfront_enforce
+        - not ansible_check_mode
 
     - name: cloudfront | Remove IPv6 web allows
       ansible.builtin.uri:
         url: "{{ __udm_cloudfront_site_url }}/firewall/policies/{{ item.id }}"
         method: DELETE
         headers: "{{ udm_unifi_api_headers }}"
-        # A policy can go with an earlier one it was derived alongside.
-        status_code:
-          - 200
-          - 404
+        return_content: true
       loop: "{{ __udm_cloudfront_ipv6_allows | default([]) }}"
+      loop_control:
+        label: "{{ item.name }}"
       register: __udm_cloudfront_ipv6_removal
       changed_when: __udm_cloudfront_ipv6_removal.status == 200
+      failed_when: false
       when:
         - udm_cloudfront_enforce
         - not ansible_check_mode
       no_log: true
+
+    # A policy can go with an earlier one it was derived alongside, so 404
+    # counts as removed.
+    - name: cloudfront | Check IPv6 web allow removal
+      ansible.builtin.assert:
+        that:
+          - __udm_cloudfront_ipv6_removal.results | rejectattr('status', 'in', [200, 404]) | list | length == 0
+        fail_msg: >-
+          Removing IPv6 web allows failed:
+          {% for result in __udm_cloudfront_ipv6_removal.results | rejectattr('status', 'in', [200, 404]) %}
+          {{ result.item.name }} returned {{ result.status }}:
+          {{ result.json | default(result.content | default('')) }}.
+          {% endfor %}
+        quiet: true
+      when:
+        - udm_cloudfront_enforce
+        - not ansible_check_mode
+
+    - name: cloudfront | Get firewall policies after the change
+      ansible.builtin.uri:
+        url: "{{ __udm_cloudfront_site_url }}/firewall/policies?limit=500"
+        headers: "{{ udm_unifi_api_headers }}"
+      register: __udm_cloudfront_policies_after
+      check_mode: false
+      when:
+        - udm_cloudfront_enforce
+        - not ansible_check_mode
+      no_log: true
+
+    - name: cloudfront | Check no IPv6 web allow remains
+      vars:
+        remaining: >-
+          {{ __udm_cloudfront_policies_after.json.data
+          | udm_web_allows(__udm_cloudfront_lists.json.data, __udm_cloudfront_external_zone) }}
+      ansible.builtin.assert:
+        that:
+          - remaining | length == 0
+        fail_msg: >-
+          IPv6 from the internet still reaches port 80 or 443 through:
+          {{ remaining | map(attribute='name') | join(', ') }}.
+        quiet: true
+      when:
+        - udm_cloudfront_enforce
+        - not ansible_check_mode

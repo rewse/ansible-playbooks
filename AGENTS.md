@@ -156,6 +156,7 @@ Use only these tags, written as an indented YAML list:
 - Use proxied legacy endpoints when the documented API lacks an operation. Legacy updates replace whole objects, so read the object and send it back with the intended changes.
 - Match movable objects such as port forwards by stable meaning (name or port), not controller-generated IDs.
 - Set `ttlSeconds` explicitly for records that move; `0` uses the 300-second default cache.
+- `udm_cloudfront` saves the forwards and policies it changes to `~/.local/state/udm-cloudfront/` on the controller, so a rollback can restore them. At the start of a session, delete the files there 30 days after their last access.
 
 ### Zabbix
 

@@ -1,4 +1,7 @@
 ---
+# Where udm_cloudfront saves the objects it changes, on the controller. Kept
+# past the run, because rolling back stage 5 restores from them.
+udm_cloudfront_backup_dir: "{{ (lookup('ansible.builtin.env', 'XDG_STATE_HOME') or lookup('ansible.builtin.env', 'HOME') ~ '/.local/state') ~ '/udm-cloudfront' }}"
 udm_cloudfront_group_name: CloudFront origin-facing
 udm_cloudfront_ip_ranges_url: https://ip-ranges.amazonaws.com/ip-ranges.json
 udm_unifi_api_headers:

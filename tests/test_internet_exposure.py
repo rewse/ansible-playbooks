@@ -2,12 +2,14 @@
 """Regression tests for services the internet reaches through Apache."""
 
 import configparser
+import importlib.util
 import pathlib
 import re
 import subprocess
 import tempfile
 import time
 import unittest
+from typing import ClassVar
 
 import yaml
 
@@ -259,6 +261,321 @@ class UdmCloudfrontTest(unittest.TestCase):
                 "traffic-matching-lists" not in str(module.get("url", ""))
             ):
                 self.assertGreater(i, backup, task["name"])
+
+
+class UdmCloudfrontWriteTest(unittest.TestCase):
+    TASKS = UDM / "tasks" / "cloudfront.yml"
+
+    def tasks(self) -> list[dict]:
+        return flatten_tasks(load_yaml(self.TASKS))
+
+    def index(self, predicate) -> int:
+        return next(i for i, task in enumerate(self.tasks()) if predicate(task))
+
+    def test_failed_writes_report_status_and_body(self):
+        # The request carries the API key, so it stays no_log; a separate
+        # check prints only the status and the response body.
+        tasks = self.tasks()
+        for i, task in enumerate(tasks):
+            uri = task.get("ansible.builtin.uri")
+            if uri is None or uri.get("method", "GET") == "GET":
+                continue
+            with self.subTest(task=task["name"]):
+                self.assertIs(task.get("no_log"), True)
+                self.assertEqual(str(task.get("failed_when")), "False")
+                self.assertIs(uri.get("return_content"), True)
+                register = task["register"]
+                check = next(
+                    later
+                    for later in tasks[i + 1 :]
+                    if "ansible.builtin.assert" in later
+                    and register in str(later["ansible.builtin.assert"]["that"])
+                )
+                message = check["ansible.builtin.assert"]["fail_msg"]
+                self.assertIn("status", message)
+                self.assertIn("json", message)
+                self.assertNotIn("loop", check)
+                self.assertNotIn("headers", message)
+                self.assertNotIn("invocation", message)
+
+    def test_https_limit_is_read_back(self):
+        put = self.index(
+            lambda t: (
+                t.get("ansible.builtin.uri", {}).get("method") == "PUT"
+                and "portforward" in t["ansible.builtin.uri"]["url"]
+            )
+        )
+        tasks = self.tasks()
+        reread = next(
+            i
+            for i, t in enumerate(tasks)
+            if i > put
+            and "ansible.builtin.uri" in t
+            and t["ansible.builtin.uri"].get("method", "GET") == "GET"
+            and "portforward" in t["ansible.builtin.uri"]["url"]
+        )
+        check = next(
+            t
+            for t in tasks[reread + 1 :]
+            if "ansible.builtin.assert" in t and tasks[reread]["register"] in str(t)
+        )
+        that = str(check["ansible.builtin.assert"]["that"])
+        for field in (
+            "src_firewall_group_id",
+            "src_limiting_enabled",
+            "src_limiting_type",
+        ):
+            self.assertIn(field, that)
+
+    def test_no_ipv6_web_allow_may_remain(self):
+        tasks = self.tasks()
+        text = self.TASKS.read_text()
+        self.assertIn("udm_web_allows", text)
+        self.assertIn("udm_web_only", text)
+        deletes = [
+            i
+            for i, t in enumerate(tasks)
+            if t.get("ansible.builtin.uri", {}).get("method") == "DELETE"
+        ]
+        # Before any change: every web allow can be removed without closing
+        # another port.
+        precheck = self.index(
+            lambda t: (
+                "__udm_cloudfront_ipv6_web"
+                in str(t.get("ansible.builtin.assert", {}).get("that", ""))
+            )
+        )
+        first_write = min(
+            i
+            for i, t in enumerate(tasks)
+            if t.get("ansible.builtin.uri", {}).get("method") in ("DELETE", "PUT")
+            and "traffic-matching-lists" not in t["ansible.builtin.uri"]["url"]
+        )
+        self.assertLess(precheck, first_write)
+        # After the deletes: the policies are read again and none remains.
+        reread = next(
+            i
+            for i, t in enumerate(tasks)
+            if i > max(deletes)
+            and "ansible.builtin.uri" in t
+            and t["ansible.builtin.uri"].get("method", "GET") == "GET"
+            and "firewall/policies" in t["ansible.builtin.uri"]["url"]
+        )
+        self.assertTrue(
+            any(
+                "ansible.builtin.assert" in t and "udm_web_allows" in str(t)
+                for t in tasks[reread + 1 :]
+            )
+        )
+
+    def test_originals_are_kept_in_the_state_directory(self):
+        self.assertNotIn("tempfile", self.TASKS.read_text())
+        self.assertNotIn("/tmp", self.TASKS.read_text())
+        variables = load_yaml(UDM / "vars" / "main.yml")
+        self.assertRegex(
+            variables["udm_cloudfront_backup_dir"], r"XDG_STATE_HOME.*/udm-cloudfront"
+        )
+        tasks = self.tasks()
+        directory = next(
+            t["ansible.builtin.file"]
+            for t in tasks
+            if t.get("ansible.builtin.file", {}).get("path")
+            == "{{ udm_cloudfront_backup_dir }}"
+        )
+        self.assertEqual(directory["state"], "directory")
+        self.assertEqual(directory["mode"], "0700")
+        saved = next(
+            t["ansible.builtin.copy"] for t in tasks if "ansible.builtin.copy" in t
+        )
+        self.assertTrue(saved["dest"].startswith("{{ udm_cloudfront_backup_dir }}/"))
+        self.assertEqual(saved["mode"], "0600")
+        agents = (REPO_ROOT / "AGENTS.md").read_text()
+        self.assertIn("~/.local/state/udm-cloudfront/", agents)
+
+
+def load_udm_firewall():
+    path = UDM / "filter_plugins" / "udm_firewall.py"
+    spec = importlib.util.spec_from_file_location("udm_firewall", path)
+    assert spec is not None and spec.loader is not None
+    module = importlib.util.module_from_spec(spec)
+    spec.loader.exec_module(module)
+    return module
+
+
+class UdmFirewallFilterTest(unittest.TestCase):
+    EXTERNAL = "external-zone"
+    LISTS: ClassVar[list[dict]] = [
+        {
+            "id": "https",
+            "type": "PORTS",
+            "items": [{"type": "PORT_NUMBER", "value": 443}],
+        },
+        {
+            "id": "http",
+            "type": "PORTS",
+            "items": [{"type": "PORT_NUMBER", "value": 80}],
+        },
+        {
+            "id": "ssh",
+            "type": "PORTS",
+            "items": [{"type": "PORT_NUMBER", "value": 11022}],
+        },
+    ]
+
+    def setUp(self):
+        self.module = load_udm_firewall()
+
+    @classmethod
+    def policy(cls, name: str, ports=None, **overrides) -> dict:
+        policy = {
+            "name": name,
+            "enabled": True,
+            "action": {"type": "ALLOW"},
+            "source": {"zoneId": cls.EXTERNAL},
+            "destination": {"zoneId": "internal-zone"},
+            "ipProtocolScope": {
+                "ipVersion": "IPV6",
+                "protocolFilter": {
+                    "type": "NAMED_PROTOCOL",
+                    "protocol": {"name": "TCP"},
+                    "matchOpposite": False,
+                },
+            },
+            "metadata": {"origin": "USER_DEFINED"},
+        }
+        if isinstance(ports, str):
+            policy["destination"]["trafficFilter"] = {
+                "type": "IP_ADDRESS",
+                "portFilter": {
+                    "type": "TRAFFIC_MATCHING_LIST",
+                    "matchOpposite": False,
+                    "trafficMatchingListId": ports,
+                },
+            }
+        elif ports is not None:
+            policy["destination"]["trafficFilter"] = {
+                "type": "PORT",
+                "portFilter": {"type": "PORTS", "matchOpposite": False, "items": ports},
+            }
+        for key, value in overrides.items():
+            policy[key] = value
+        return policy
+
+    @staticmethod
+    def port(value: int) -> dict:
+        return {"type": "PORT_NUMBER", "value": value}
+
+    def names(self, policies: list[dict]) -> list[str]:
+        return [policy["name"] for policy in policies]
+
+    def test_selects_every_ipv6_capable_allow_that_reaches_a_web_port(self):
+        tcp_udp = {
+            "ipVersion": "IPV6",
+            "protocolFilter": {"type": "PRESET", "preset": {"name": "TCP_UDP"}},
+        }
+        policies = [
+            self.policy("https list", "https"),
+            self.policy("http inline", [self.port(80)]),
+            self.policy(
+                "dual stack web",
+                [self.port(80), self.port(443)],
+                ipProtocolScope={"ipVersion": "IPV4_AND_IPV6"},
+            ),
+            self.policy("web and ssh", [self.port(443), self.port(11022)]),
+            self.policy(
+                "low range", [{"type": "PORT_NUMBER_RANGE", "start": 1, "stop": 1024}]
+            ),
+            self.policy(
+                "all but ssh",
+                None,
+                destination={
+                    "zoneId": "internal-zone",
+                    "trafficFilter": {
+                        "portFilter": {
+                            "type": "PORTS",
+                            "matchOpposite": True,
+                            "items": [self.port(22)],
+                        }
+                    },
+                },
+            ),
+            self.policy("tcp and udp", [self.port(443)], ipProtocolScope=tcp_udp),
+            self.policy(
+                "any protocol", [self.port(443)], ipProtocolScope={"ipVersion": "IPV6"}
+            ),
+            self.policy("unknown list", "missing"),
+            self.policy("every port", None, ipProtocolScope={"ipVersion": "IPV6"}),
+            # None of these reaches a web port over IPv6 with new TCP connections.
+            self.policy("ssh", "ssh"),
+            self.policy("ipv4 only", "https", ipProtocolScope={"ipVersion": "IPV4"}),
+            self.policy("disabled", "https", enabled=False),
+            self.policy("from internal", "https", source={"zoneId": "internal-zone"}),
+            self.policy("block", "https", action={"type": "BLOCK"}),
+            self.policy(
+                "icmpv6",
+                None,
+                ipProtocolScope={
+                    "ipVersion": "IPV6",
+                    "protocolFilter": {
+                        "type": "NAMED_PROTOCOL",
+                        "protocol": {"name": "ICMPV6"},
+                        "matchOpposite": False,
+                    },
+                },
+            ),
+            self.policy(
+                "udp",
+                [self.port(443)],
+                ipProtocolScope={
+                    "ipVersion": "IPV6",
+                    "protocolFilter": {
+                        "type": "NAMED_PROTOCOL",
+                        "protocol": {"name": "UDP"},
+                        "matchOpposite": False,
+                    },
+                },
+            ),
+            self.policy(
+                "return traffic",
+                None,
+                ipProtocolScope={"ipVersion": "IPV4_AND_IPV6"},
+                connectionStateFilter=["RELATED", "ESTABLISHED"],
+                metadata={"origin": "SYSTEM_DEFINED"},
+            ),
+        ]
+
+        web = self.module.udm_web_allows(policies, self.LISTS, self.EXTERNAL)
+
+        self.assertEqual(
+            self.names(web),
+            [
+                "https list",
+                "http inline",
+                "dual stack web",
+                "web and ssh",
+                "low range",
+                "all but ssh",
+                "tcp and udp",
+                "any protocol",
+                "unknown list",
+                "every port",
+            ],
+        )
+        self.assertEqual(
+            self.names(self.module.udm_web_only(web, self.LISTS)),
+            [
+                "https list",
+                "http inline",
+                "dual stack web",
+                "tcp and udp",
+                "any protocol",
+            ],
+        )
+
+    def test_web_only_leaves_other_origins(self):
+        derived = self.policy("derived", "https", metadata={"origin": "DERIVED"})
+
+        self.assertEqual(self.module.udm_web_only([derived], self.LISTS), [])
 
 
 class InternetTlsVerificationTest(unittest.TestCase):
