@@ -16,3 +16,10 @@ class CloudfrontWafTest(unittest.TestCase):
         text = (FILES / "cloudfront_waf.sh").read_text()
         self.assertIn("readonly region=us-east-1", text)
         self.assertIn("readonly waf_acl=cloudfront-waf", text)
+
+    def test_window_covers_two_periods_only(self):
+        # A datapoint older than two periods is not resent, so a stalled metric
+        # leaves the trapper item without new values instead of repeating one.
+        text = (FILES / "cloudfront_waf.sh").read_text()
+        self.assertIn("readonly period=300", text)
+        self.assertIn("readonly window='10 minutes ago'", text)

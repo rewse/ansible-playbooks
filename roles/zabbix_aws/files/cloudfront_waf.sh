@@ -26,10 +26,11 @@ readonly waf_rule=ALL
 # CloudFront: the distribution metrics carry Region=Global.
 readonly cf_region=Global
 
-# Both services publish every minute or five minutes. The window reaches back an
-# hour and the newest datapoint is taken, so a late arrival is still found.
+# Both services publish every minute or five minutes. The window covers two
+# periods and the newest datapoint is taken, so a late arrival is still found
+# while a value older than that is not sent again as if it were current.
 readonly period=300
-readonly window='1 hour ago'
+readonly window='10 minutes ago'
 
 declare -A query_key
 declare -A raw_value
