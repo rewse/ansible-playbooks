@@ -315,6 +315,19 @@ class OriginGateTest(unittest.TestCase):
         self.assertNotIn("<Location", text)
         self.assertNotIn("RequireAny", text)
 
+    def test_exempt_networks_may_be_lists(self):
+        # site.yml allows each network to be a CIDR or a list of CIDRs.
+        self.networks["aws_public_ipv6"] = ["2001:db8:1::/56", "2001:db8:2::/56"]
+        self.networks["home_private_ipv4"] = ["192.0.2.0/24"]
+        ((condition, _),) = re.findall(
+            r'(?ms)^<If "(.*?)">\n(.*?)^</If>$', self.render(True)
+        )
+        terms = re.findall(r"! -R '([^']+)'", condition)
+        for cidr in ("2001:db8:1::/56", "2001:db8:2::/56", "192.0.2.0/24"):
+            self.assertIn(cidr, terms)
+        self.assertNotIn("[", condition)
+        self.assertEqual(len(terms), 8)
+
     def test_no_other_if_sections(self):
         # Apache merges If sections last, so another one could override the deny.
         # The fail2ban ban script writes deny-only sections, which

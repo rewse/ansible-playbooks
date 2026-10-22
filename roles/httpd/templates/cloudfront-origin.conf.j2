@@ -15,7 +15,8 @@ RequestHeader unset X-Origin-Verify
 # redirect, such as a rewrite to index.php or an ErrorDocument, sees the
 # variable only as REDIRECT_cloudfront_origin, so the condition checks both.
 {% set exempt = ['127.0.0.1', '::1', networks.home_private_ipv4, networks.home_private_ipv6, networks.home_public_ipv6, networks.aws_private_ipv4, networks.aws_public_ipv6] %}
-<If "reqenv('cloudfront_origin') != '1' && reqenv('REDIRECT_cloudfront_origin') != '1'{% for cidr in exempt %} && ! -R '{{ cidr }}'{% endfor %}">
+{# Each network is a CIDR or a list of CIDRs. #}
+<If "reqenv('cloudfront_origin') != '1' && reqenv('REDIRECT_cloudfront_origin') != '1'{% for value in exempt %}{% for cidr in ([value] if value is string else value) %} && ! -R '{{ cidr }}'{% endfor %}{% endfor %}">
     Require all denied
 </If>
 {% endif %}
