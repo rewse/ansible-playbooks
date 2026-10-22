@@ -2,10 +2,9 @@
 [% ansible_managed | comment %]
 # Move the name Home Assistant is reached by between the primary and this host.
 #
-# Three things decide where a request lands, and all three live in UniFi:
+# Two things decide where a request lands, and both live in UniFi:
 #   - the internal CNAME, for clients resolving through the console
 #   - the WAN forward of 443, for requests arriving from the internet
-#   - the WAN forward of 80, which the force-SSL redirect answers
 #
 # Requests from the internet arrive at the same WAN address either way, so the
 # forward is what decides the host, not the public DNS record.
@@ -23,7 +22,7 @@ API_KEY="[% homeassistant_ha_secondary_unifi_api_key %]"
 # A key generated at unifi.ui.com authenticates here but not against the
 # console's own address, so every call goes through the connector.
 CLOUD="https://api.ui.com"
-FORWARDED_PORTS=(443 80)
+FORWARDED_PORTS=(443)
 # Long enough to be cached usefully, short enough that a switch is not waited on.
 TTL_SECONDS=30
 STATE_DIR="/var/lib/homeassistant-ha"

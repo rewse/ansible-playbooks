@@ -130,6 +130,16 @@ class StandbyHomeAssistantFail2banTest(unittest.TestCase):
         self.assertEqual(touch["modification_time"], "preserve")
 
 
+class HomeAssistantNameSwitchTest(unittest.TestCase):
+    def test_name_switch_moves_only_the_https_forward(self):
+        # CloudFront fronts the services and WAN port 80 is closed, so the failover
+        # moves only the 443 forward.
+        text = (SECONDARY / "templates" / "homeassistant-name-switch.j2").read_text()
+        self.assertIn("FORWARDED_PORTS=(443)", text)
+        self.assertNotIn("forward of 80", text)
+        self.assertNotIn("FORWARDED_PORTS=(443 80)", text)
+
+
 class FileBrowserForwardedForTest(unittest.TestCase):
     def test_vhost_drops_client_forwarded_for(self):
         # FileBrowser trusts X-Forwarded-For for its lockout and audit log, and
