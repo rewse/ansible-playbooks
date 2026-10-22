@@ -1,0 +1,6 @@
+---
+# Limit the WAN HTTPS forward to CloudFront and remove the other routes from the
+# internet to the web servers: the HTTP forward and the IPv6 HTTP and HTTPS
+# allows. While false, the component only keeps the CloudFront address group in
+# step with ip-ranges.json, so the group can be checked before it is relied on.
+udm_cloudfront_enforce: false

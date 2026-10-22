@@ -1,4 +1,10 @@
 ---
+- name: Import cloudfront tasks
+  ansible.builtin.import_tasks: cloudfront.yml
+  tags:
+    - udm_cloudfront
+    - update
+
 - name: Import rp_filter tasks
   ansible.builtin.import_tasks: rp_filter.yml
   tags:

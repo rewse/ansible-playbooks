@@ -22,6 +22,7 @@ NVR = ROLES / "nvr"
 POSTFIX_CLIENT = ROLES / "postfix_client"
 SECONDARY = ROLES / "homeassistant_ha_secondary"
 TESLAMATE = ROLES / "teslamate"
+UDM = ROLES / "udm"
 
 
 def load_yaml(path: pathlib.Path):
@@ -157,6 +158,107 @@ class GrafanaCookieTest(unittest.TestCase):
         # with any plain http:// request to the name, before a redirect.
         text = (TESLAMATE / "templates" / "grafana.env.j2").read_text()
         self.assertRegex(text, r"(?m)^GF_SECURITY_COOKIE_SECURE=true$")
+
+
+def flatten_tasks(tasks: list[dict], inherited: dict | None = None) -> list[dict]:
+    # Blocks pass their keywords down, so each task carries what it runs with.
+    inherited = inherited or {}
+    flat = []
+    for task in tasks:
+        merged = {**inherited, **task}
+        if "block" in task:
+            keywords = {k: v for k, v in task.items() if k not in ("block", "name")}
+            flat.extend(flatten_tasks(task["block"], {**inherited, **keywords}))
+        else:
+            flat.append(merged)
+    return flat
+
+
+def conditions(task: dict) -> list[str]:
+    when = task.get("when", [])
+    return [when] if isinstance(when, str) else list(when)
+
+
+class UdmCloudfrontTest(unittest.TestCase):
+    TASKS = UDM / "tasks" / "cloudfront.yml"
+
+    def tasks(self) -> list[dict]:
+        return flatten_tasks(load_yaml(self.TASKS))
+
+    def test_udm_cloudfront_tasks_never_touch_ssh_forwards(self):
+        # The SSH forwards are how the hosts are reached when the web path
+        # breaks, so the component selects the web forwards by port and never
+        # names the SSH ports at all.
+        for path in (
+            self.TASKS,
+            UDM / "defaults" / "main.yml",
+            UDM / "vars" / "main.yml",
+        ):
+            text = path.read_text()
+            for port in ("11022", "21022"):
+                self.assertNotIn(port, text, path)
+        text = self.TASKS.read_text()
+        for port in ("443", "80"):
+            self.assertIn(f"selectattr('dst_port', 'equalto', '{port}')", text)
+
+    def test_component_is_imported_and_off_by_default(self):
+        imports = {
+            task["ansible.builtin.import_tasks"]: task.get("tags")
+            for task in load_yaml(UDM / "tasks" / "main.yml")
+        }
+        self.assertEqual(imports.get("cloudfront.yml"), ["udm_cloudfront", "update"])
+        defaults = load_yaml(UDM / "defaults" / "main.yml")
+        self.assertIs(defaults["udm_cloudfront_enforce"], False)
+
+    def test_api_key_is_the_failover_secret_reference(self):
+        ours = load_yaml(UDM / "vars" / "main.yml")
+        theirs = load_yaml(SECONDARY / "vars" / "main.yml")
+        self.assertEqual(
+            ours["udm_unifi_api_key"],
+            theirs["homeassistant_ha_secondary_unifi_api_key"],
+        )
+        self.assertEqual(
+            ours["udm_unifi_console"],
+            theirs["homeassistant_ha_secondary_unifi_console"],
+        )
+
+    def test_tasks_run_on_the_controller_without_become(self):
+        for task in self.tasks():
+            self.assertEqual(task.get("delegate_to"), "localhost", task["name"])
+            self.assertIs(task.get("become"), False, task["name"])
+
+    def test_reads_run_in_check_mode_and_writes_do_not(self):
+        calls = [task for task in self.tasks() if "ansible.builtin.uri" in task]
+        self.assertTrue(calls)
+        for task in calls:
+            method = task["ansible.builtin.uri"].get("method", "GET")
+            if method == "GET":
+                self.assertIs(task.get("check_mode"), False, task["name"])
+            else:
+                self.assertIn("not ansible_check_mode", conditions(task), task["name"])
+
+    def test_only_the_address_group_changes_without_enforce(self):
+        reads = ("ansible.builtin.assert", "ansible.builtin.set_fact")
+        for task in self.tasks():
+            uri = task.get("ansible.builtin.uri")
+            if any(name in task for name in reads) or (
+                uri is not None and uri.get("method", "GET") == "GET"
+            ):
+                continue
+            if uri is not None and "traffic-matching-lists" in uri["url"]:
+                self.assertNotIn("udm_cloudfront_enforce", conditions(task))
+            else:
+                self.assertIn("udm_cloudfront_enforce", conditions(task), task["name"])
+
+    def test_originals_are_saved_before_anything_is_removed(self):
+        names = [task["name"] for task in self.tasks()]
+        backup = next(i for i, n in enumerate(names) if "Save" in n)
+        for i, task in enumerate(self.tasks()):
+            module = task.get("ansible.builtin.uri", {})
+            if module.get("method") in ("DELETE", "PUT") and (
+                "traffic-matching-lists" not in str(module.get("url", ""))
+            ):
+                self.assertGreater(i, backup, task["name"])
 
 
 class InternetTlsVerificationTest(unittest.TestCase):

@@ -1,0 +1,12 @@
+---
+udm_cloudfront_group_name: CloudFront origin-facing
+udm_cloudfront_ip_ranges_url: https://ip-ranges.amazonaws.com/ip-ranges.json
+udm_unifi_api_headers:
+  Accept: application/json
+  X-API-KEY: "{{ udm_unifi_api_key }}"
+# The Site Manager key the failover script also uses.
+udm_unifi_api_key: "{{ lookup('pipe', 'op read \"op://ansible/bvdayezevkxx6kmhjc3kmug7u4/credential\"') }}"
+# Reached through the Site Manager Cloud Connector rather than the console's own
+# address, because a key generated at unifi.ui.com is refused locally.
+udm_unifi_api_url: https://api.ui.com
+udm_unifi_console: sierra
