@@ -3,7 +3,7 @@
 # so a matching value marks a request that came through CloudFront and AWS WAF.
 # The header is removed before the request reaches a backend, so no backend
 # sees or logs the value.
-SetEnvIf X-Origin-Verify "^{{ httpd_cloudfront_origin_verify_token }}$" cloudfront_origin
+SetEnvIf X-Origin-Verify "^{{ httpd_cloudfront_origin_verify_token | regex_escape }}$" cloudfront_origin
 RequestHeader unset X-Origin-Verify
 {% if httpd_cloudfront_origin_enforce %}
 
@@ -11,9 +11,11 @@ RequestHeader unset X-Origin-Verify
 # networks. -R tests the client address that mod_remoteip restores. Apache
 # merges If sections after every other section, and this one only denies, so it
 # cannot replace the authentication or authorization another section requires;
-# every other request keeps the access rules it already has.
+# every other request keeps the access rules it already has. An internal
+# redirect, such as a rewrite to index.php or an ErrorDocument, sees the
+# variable only as REDIRECT_cloudfront_origin, so the condition checks both.
 {% set exempt = ['127.0.0.1', '::1', networks.home_private_ipv4, networks.home_private_ipv6, networks.home_public_ipv6, networks.aws_private_ipv4, networks.aws_public_ipv6] %}
-<If "reqenv('cloudfront_origin') != '1'{% for cidr in exempt %} && ! -R '{{ cidr }}'{% endfor %}">
+<If "reqenv('cloudfront_origin') != '1' && reqenv('REDIRECT_cloudfront_origin') != '1'{% for cidr in exempt %} && ! -R '{{ cidr }}'{% endfor %}">
     Require all denied
 </If>
 {% endif %}

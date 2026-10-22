@@ -36,6 +36,7 @@ def render(name: str, **variables) -> str:
         undefined=jinja2.StrictUndefined,
     )
     environment.filters["comment"] = lambda text: f"#\n# {text}\n#"
+    environment.filters["regex_escape"] = re.escape
     template = environment.get_template(name)
     return template.render(ansible_managed="Ansible managed", **variables)
 
@@ -87,7 +88,8 @@ class RemoteIpTest(unittest.TestCase):
 
 
 class OriginGateTest(unittest.TestCase):
-    TOKEN = "fake-origin-token"
+    # Regex metacharacters check that the value is matched literally.
+    TOKEN = "fake.origin+token"
     OFFICE = ("198.51.100.0/24", "203.0.113.0/24")
     EXEMPT_NETWORKS = (
         "aws_private_ipv4",
@@ -121,7 +123,8 @@ class OriginGateTest(unittest.TestCase):
         for enforce in (False, True):
             lines = self.directives(self.render(enforce))
             self.assertIn(
-                f'SetEnvIf X-Origin-Verify "^{self.TOKEN}$" cloudfront_origin', lines
+                f'SetEnvIf X-Origin-Verify "^{re.escape(self.TOKEN)}$" cloudfront_origin',
+                lines,
             )
             self.assertIn("RequestHeader unset X-Origin-Verify", lines)
 
@@ -138,6 +141,8 @@ class OriginGateTest(unittest.TestCase):
         condition, body = sections[0]
         self.assertEqual(self.directives(body), ["Require all denied"])
         self.assertIn("reqenv('cloudfront_origin') != '1'", condition)
+        # An internal redirect renames the variable with a REDIRECT_ prefix.
+        self.assertIn("reqenv('REDIRECT_cloudfront_origin') != '1'", condition)
         exempt = ["127.0.0.1", "::1"] + [
             self.networks[name] for name in self.EXEMPT_NETWORKS
         ]
@@ -146,16 +151,11 @@ class OriginGateTest(unittest.TestCase):
         self.assertNotIn(self.networks["home_public_ipv4"], condition)
         for cidr in self.OFFICE:
             self.assertNotIn(cidr, text)
+        self.assertEqual(
+            re.findall(r"(?m)^\s*(Require\b.*?)\s*$", text), ["Require all denied"]
+        )
         self.assertNotIn("<Location", text)
         self.assertNotIn("RequireAny", text)
-
-    def test_gate_cannot_grant_access(self):
-        for enforce in (False, True):
-            requires = re.findall(r"(?m)^\s*(Require\b.*)$", self.render(enforce))
-            self.assertEqual(
-                [line for line in requires if line.strip() != "Require all denied"],
-                [],
-            )
 
     def test_no_other_if_sections(self):
         # Apache merges If sections last, so another one could override the deny.
