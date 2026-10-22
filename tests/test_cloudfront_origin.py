@@ -64,6 +64,24 @@ class RemoteIpTest(unittest.TestCase):
             self.assertIn("%a", spec)
             self.assertNotIn("%h", spec)
 
+    def test_no_role_logs_the_connection_address(self):
+        # Behind CloudFront %h is the edge server, so a log fail2ban reads must
+        # use %a, the client address mod_remoteip restores.
+        directive = re.compile(r"(?m)^\s*(?:CustomLog|LogFormat)\b.*$")
+        lines = [
+            f"{path.relative_to(REPO_ROOT)}: {line.strip()}"
+            for path in sorted((REPO_ROOT / "roles").rglob("*"))
+            if path.is_file() and path.suffix in (".conf", ".j2")
+            for line in directive.findall(path.read_text())
+        ]
+        self.assertIn(
+            "roles/teslamate/templates/grafana.rewse.jp.conf.j2: "
+            'CustomLog ${APACHE_LOG_DIR}/grafana_basic_auth.log "%v:%p %a basic '
+            '%{end:[%d/%b/%Y:%H:%M:%S %z]}t \\"%r\\" %>s %O" env=grafana_basic_auth',
+            lines,
+        )
+        self.assertEqual([line for line in lines if "%h" in line], [])
+
 
 if __name__ == "__main__":
     unittest.main()

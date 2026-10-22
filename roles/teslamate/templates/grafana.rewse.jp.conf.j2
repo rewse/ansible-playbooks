@@ -23,7 +23,7 @@
     # the httpd role is named again for the same reason.
     SetEnvIf Authorization "^Basic " grafana_basic_auth
     CustomLog ${APACHE_LOG_DIR}/other_vhosts_access.log vhost_combined
-    CustomLog ${APACHE_LOG_DIR}/grafana_basic_auth.log "%v:%p %h basic %{end:[%d/%b/%Y:%H:%M:%S %z]}t \"%r\" %>s %O" env=grafana_basic_auth
+    CustomLog ${APACHE_LOG_DIR}/grafana_basic_auth.log "%v:%p %a basic %{end:[%d/%b/%Y:%H:%M:%S %z]}t \"%r\" %>s %O" env=grafana_basic_auth
     CustomLog ${APACHE_LOG_DIR}/security_agent_pentest.log "%{sec}t %a" env=security_agent_pentest
 
     SSLCertificateFile /etc/letsencrypt/live/rewse.jp/fullchain.pem

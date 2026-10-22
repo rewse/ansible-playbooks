@@ -134,8 +134,11 @@ class FileBrowserForwardedForTest(unittest.TestCase):
     def test_vhost_drops_client_forwarded_for(self):
         # FileBrowser trusts X-Forwarded-For for its lockout and audit log, and
         # mod_proxy appends to a header the client sent rather than replacing it.
+        # The unset runs in fixups, after mod_remoteip restores the client
+        # address; an early unset races mod_remoteip in post_read_request.
         text = (FILEBROWSER / "templates" / "nas.rewse.jp.conf.j2").read_text()
-        self.assertRegex(text, r"(?m)^\s*RequestHeader unset X-Forwarded-For early$")
+        self.assertRegex(text, r"(?m)^\s*RequestHeader unset X-Forwarded-For$")
+        self.assertNotRegex(text, r"(?m)^\s*RequestHeader unset X-Forwarded-For early")
 
 
 class GrafanaCookieTest(unittest.TestCase):

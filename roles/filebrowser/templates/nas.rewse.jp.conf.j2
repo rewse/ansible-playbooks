@@ -14,9 +14,12 @@
 
     # FileBrowser takes the client address from X-Forwarded-For for its login
     # lockout and audit log, and mod_proxy appends to a header the client sent
-    # instead of replacing it. Dropping the client's copy before mod_proxy runs
-    # leaves only the address Apache saw, so a guesser cannot rotate it.
-    RequestHeader unset X-Forwarded-For early
+    # instead of replacing it. The unset runs in the fixups phase, after
+    # mod_remoteip has restored the client address from CloudFront's header and
+    # before mod_proxy appends that address, so FileBrowser receives only the
+    # restored address and a guesser cannot rotate it. An early unset would race
+    # mod_remoteip for the same hook and could leave the edge address instead.
+    RequestHeader unset X-Forwarded-For
 
     ProxyPass / http://localhost:{{ filebrowser_port }}/
     ProxyPassReverse / http://localhost:{{ filebrowser_port }}/
