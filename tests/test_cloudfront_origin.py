@@ -26,10 +26,15 @@ OFFICE_EXPRESSION = re.compile(
 
 
 class SiteTest(unittest.TestCase):
+    # The only IPv4 literals site.yml may hold; the office egress ranges live
+    # in 1Password.
+    IPV4_ALLOWLIST = ("10.0.0.0/16", "106.163.184.9/32", "192.168.0.0/24")
+
     def test_site_holds_no_office_cidr_literals(self):
         text = SITE.read_text()
-        for literal in ("13.113.", "15.248.", "w.amazon.com"):
-            self.assertNotIn(literal, text)
+        literals = re.findall(r"(?<![\d.])\d{1,3}(?:\.\d{1,3}){3}(?:/\d{1,2})?", text)
+        self.assertEqual(sorted(set(literals)), sorted(self.IPV4_ALLOWLIST))
+        self.assertNotIn("w.amazon.com", text)
         value = yaml.safe_load(text)["networks"]["office_public_ipv4"]
         self.assertIsInstance(value, str)
         self.assertRegex(value, OFFICE_EXPRESSION)
