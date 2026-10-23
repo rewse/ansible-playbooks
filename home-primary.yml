@@ -22,9 +22,6 @@
     - role: zabbix_agent
       tags:
         - zabbix_agent
-    - role: autodiscover
-      tags:
-        - autodiscover
     - role: couchdb
       tags:
         - couchdb

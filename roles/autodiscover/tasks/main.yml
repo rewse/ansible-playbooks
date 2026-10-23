@@ -1,5 +1,0 @@
----
-- name: Import apache tasks
-  ansible.builtin.import_tasks: apache.yml
-  tags:
-    - autodiscover_apache
