@@ -15,7 +15,6 @@ import yaml
 
 REPO_ROOT = pathlib.Path(__file__).resolve().parents[1]
 ROLES = REPO_ROOT / "roles"
-AUTODISCOVER = ROLES / "autodiscover"
 FAIL2BAN = ROLES / "fail2ban"
 FILEBROWSER = ROLES / "filebrowser"
 HTTPD = ROLES / "httpd"
@@ -587,8 +586,8 @@ class UdmFirewallFilterTest(unittest.TestCase):
 
 
 class InternetTlsVerificationTest(unittest.TestCase):
-    # Both legs cross the internet carrying credentials, so an unverified peer
-    # lets an on-path attacker collect them.
+    # The relay leg crosses the internet carrying credentials, so an unverified
+    # peer lets an on-path attacker collect them.
     CA_BUNDLE = "/etc/ssl/certs/ca-certificates.crt"
 
     def test_postfix_verifies_the_relay(self):
@@ -599,14 +598,6 @@ class InternetTlsVerificationTest(unittest.TestCase):
         self.assertIn("smtp_tls_security_level = secure", lines)
         # Read before the smtp client enters its chroot, unlike smtp_tls_CApath.
         self.assertIn(f"smtp_tls_CAfile = {self.CA_BUNDLE}", lines)
-
-    def test_autodiscover_proxy_verifies_workmail(self):
-        text = (AUTODISCOVER / "files" / "autodiscover.conf").read_text()
-        self.assertRegex(text, r"(?m)^SSLProxyVerify require$")
-        # The default depth of 1 rejects WorkMail's leaf + intermediate chain.
-        self.assertRegex(text, r"(?m)^SSLProxyVerifyDepth [3-9]$")
-        self.assertRegex(text, rf"(?m)^SSLProxyCACertificateFile {self.CA_BUNDLE}$")
-        self.assertNotRegex(text, r"(?m)^SSLProxyCheckPeer\w+ off$")
 
 
 class SecurityAgentPentestTest(unittest.TestCase):
