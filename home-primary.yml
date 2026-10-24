@@ -67,9 +67,6 @@
     - role: nvr
       tags:
         - nvr
-    - role: php_miio
-      tags:
-        - php_miio
     - role: syslogd
       tags:
         - syslogd
