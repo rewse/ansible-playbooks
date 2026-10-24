@@ -129,6 +129,15 @@ class RemoteIpTest(unittest.TestCase):
             self.assertIn("%a", spec)
             self.assertNotIn("%h", spec)
 
+    def test_log_formats_end_with_the_received_bytes(self):
+        # The fail2ban filters leave the tail of a line unanchored, so %I goes
+        # last where it cannot shift the fields they match.
+        text = (HTTPD / "files" / "log-format.conf").read_text()
+        specs = re.findall(r'(?m)^LogFormat "(.*)" \S+$', text)
+        self.assertEqual(len(specs), 2)
+        for spec in specs:
+            self.assertTrue(spec.endswith(" %I"), spec)
+
     def test_no_role_logs_the_connection_address(self):
         # Behind CloudFront %h is the edge server, so a log fail2ban reads must
         # use %a, the client address mod_remoteip restores.

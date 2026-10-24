@@ -54,7 +54,7 @@ def filter_regex(path: pathlib.Path, variable: str, hostname: str) -> re.Pattern
 
 def access_line(vhost: str, request: str, status: int) -> str:
     # A vhost_combined line as fail2ban sees it, with the timestamp removed.
-    return f'{vhost}:443 203.0.113.7 - - [] "{request} HTTP/1.1" {status} 28 "-" "curl"'
+    return f'{vhost}:443 203.0.113.7 - - [] "{request} HTTP/1.1" {status} 28 "-" "curl" 512'
 
 
 class NvrFail2banTest(unittest.TestCase):
