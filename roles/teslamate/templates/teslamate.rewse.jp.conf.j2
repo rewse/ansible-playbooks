@@ -18,6 +18,9 @@
         AuthType Basic
         AuthName "TeslaMate"
         AuthUserFile /etc/apache2/.teslamate.htpasswd
+        # The LiveView socket is left outside basic auth. Joining it needs a
+        # session token signed into a page that basic auth protects, so the
+        # socket alone exposes no data.
         <RequireAny>
             <RequireAll>
                 Require expr %{REQUEST_URI} =~ m#^/live/websocket#
