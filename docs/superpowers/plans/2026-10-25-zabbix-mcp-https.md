@@ -253,16 +253,16 @@ git commit -m "feat: serve zabbix-mcp.rewse.jp through CloudFront"
 
 ### Task 6: 切り替える
 
-各ステップの書き込みの前にユーザーの確認を取る。このワークステーションと alfa には `admin` の AWS プロファイルがないので、AWS の操作はユーザーに認証情報を用意してもらってから行う。
+各ステップの書き込みの前にユーザーの確認を取る。`AWS_PROFILE=admin` を使う操作はこのワークステーションから実行できず、ユーザーが会社の Mac から実行する。そのステップに来たら、ユーザーに実行するコマンドと期待する結果を伝え、結果を受け取ってから次に進む。
 
-- [ ] **Step 1: cloudfront-waf を push してデプロイする**
+- [ ] **Step 1: cloudfront-waf を push し、デプロイを頼む**
 
-Run: `~/git/cloudfront-waf` で `git push`、`AWS_PROFILE=admin scripts/deploy.sh`
-Expected: スタックの更新が完了し、ディストリビューションの `Aliases` に `zabbix-mcp.rewse.jp` がある
+Run: `~/git/cloudfront-waf` で `git push` する。ユーザーには、会社の Mac で `git pull` してから `AWS_PROFILE=admin scripts/deploy.sh` を実行するよう頼む
+Expected: ユーザーからスタックの更新が完了した報告を受ける。`curl -sS -o /dev/null -w '%{http_code}\n' --resolve zabbix-mcp.rewse.jp:443:<hass.rewse.jp の CloudFront のアドレス> https://zabbix-mcp.rewse.jp/` が TLS のエラーにならない（別名が CloudFront に登録された）
 
-- [ ] **Step 2: 公開 DNS を作る**
+- [ ] **Step 2: 公開 DNS の作成を頼む**
 
-Run: `scripts/switch-dns.sh cloudfront --dry-run` に `zabbix-mcp.rewse.jp.` の CNAME があることを見てから、`AWS_PROFILE=admin scripts/switch-dns.sh cloudfront`
+ユーザーに、会社の Mac で `scripts/switch-dns.sh cloudfront --dry-run` の出力に `zabbix-mcp.rewse.jp.` の CNAME があることを見てから、`AWS_PROFILE=admin scripts/switch-dns.sh cloudfront` を実行するよう頼む
 Expected: `curl -s 'https://dns.google/resolve?name=zabbix-mcp.rewse.jp&type=CNAME'` が CloudFront のドメイン名を返す
 
 - [ ] **Step 3: UniFi の内部 DNS を足す**
