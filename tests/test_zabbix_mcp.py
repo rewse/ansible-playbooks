@@ -80,6 +80,8 @@ class ZabbixMcpServerTest(unittest.TestCase):
     def test_empty_auth_token_fails_closed(self):
         with self.assertRaises(tomllib.TOMLDecodeError):
             tomllib.loads(render("config.toml.j2", zabbix_mcp_auth_token=""))
+
+
 class ZabbixMcpApacheTest(unittest.TestCase):
     def test_apache_component_is_imported(self):
         imports = [
@@ -126,6 +128,8 @@ class ZabbixMcpApacheTest(unittest.TestCase):
             expected.update([value] if isinstance(value, str) else value)
         self.assertEqual(allowed, expected)
         self.assertNotIn("Require all granted", text)
+
+
 class ZabbixMcpFail2banTest(unittest.TestCase):
     def test_fail2ban_component_is_imported(self):
         imports = {
