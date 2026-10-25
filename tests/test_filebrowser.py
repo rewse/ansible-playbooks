@@ -133,6 +133,19 @@ class FileBrowserMigrationTest(unittest.TestCase):
         for name in ("database | Stop container", "database | Back up v1 database"):
             self.assertIn("__filebrowser_boltdb.stat.exists", database[name]["when"])
 
+    def test_check_mode_skips_backup_into_a_directory_not_yet_created(self):
+        # copy fails in check mode when its destination directory does not
+        # exist, which it does not until the real run creates it.
+        database = tasks("database.yml")
+        self.assertEqual(
+            database["database | Create backup directory"]["register"],
+            "__filebrowser_backup_dir",
+        )
+        self.assertIn(
+            "not (ansible_check_mode and __filebrowser_backup_dir is changed)",
+            database["database | Back up v1 database"]["when"],
+        )
+
     def test_container_refuses_an_unmigrated_database_outside_check_mode(self):
         container = tasks("container.yml")
         names = list(container)

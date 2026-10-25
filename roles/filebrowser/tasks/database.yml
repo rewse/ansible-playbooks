@@ -19,6 +19,7 @@
     owner: root
     group: root
     mode: "0700"
+  register: __filebrowser_backup_dir
   when: __filebrowser_boltdb.stat.exists
 
 - name: database | Stop container
@@ -34,7 +35,9 @@
 
 - name: database | Back up v1 database
   # Outside the data directory, so a rollback has a copy v2 never opened. On the
-  # root filesystem, which the host backup covers.
+  # root filesystem, which the host backup covers. Skipped in check mode while
+  # the directory does not exist yet, because copy fails on a missing
+  # destination directory.
   ansible.builtin.copy:
     src: "{{ filebrowser_data_dir }}/database.db"
     dest: /var/backups/filebrowser/database.db
@@ -42,7 +45,9 @@
     owner: "{{ filebrowser_uid }}"
     group: "{{ filebrowser_gid }}"
     mode: "0600"
-  when: __filebrowser_boltdb.stat.exists
+  when:
+    - __filebrowser_boltdb.stat.exists
+    - not (ansible_check_mode and __filebrowser_backup_dir is changed)
 
 - name: database | Rename v1 database for migration
   # No module renames a file. creates and removes make check mode predict the
