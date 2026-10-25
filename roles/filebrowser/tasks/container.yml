@@ -35,7 +35,8 @@
     pull: missing
     # v2 initializes its database before it starts the HTTP server, so waiting
     # for healthy keeps a restart from a handler later in the play from
-    # interrupting that.
+    # interrupting that. Every run waits, so a failure here means the service
+    # is unhealthy, not that the wait is in the way.
     wait: true
     wait_timeout: 300
   when: not (ansible_check_mode and __filebrowser_compose is changed)

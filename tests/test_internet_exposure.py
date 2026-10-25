@@ -161,12 +161,18 @@ class FileBrowserForwardedForTest(unittest.TestCase):
         self.assertNotRegex(text, r"(?m)^\s*RequestHeader unset X-Forwarded-For early")
 
     def test_vhost_drops_client_forwarded_host(self):
-        # FileBrowser builds the session cookie domain, the WebAuthn origin and
-        # share URLs from the first X-Forwarded-Host value, and mod_proxy
-        # appends the real host to a value the client sent.
+        # FileBrowser builds the session cookie domain and the WebAuthn origin
+        # from the first X-Forwarded-Host value, and mod_proxy appends the real
+        # host to a value the client sent.
         text = (FILEBROWSER / "templates" / "nas.rewse.jp.conf.j2").read_text()
         self.assertRegex(text, r"(?m)^\s*RequestHeader unset X-Forwarded-Host$")
         self.assertNotRegex(text, r"(?m)^\s*RequestHeader unset X-Forwarded-Host early")
+
+    def test_vhost_drops_client_real_ip(self):
+        # FileBrowser falls back to X-Real-IP for the client address when
+        # X-Forwarded-For is empty, and mod_proxy passes it through untouched.
+        text = (FILEBROWSER / "templates" / "nas.rewse.jp.conf.j2").read_text()
+        self.assertRegex(text, r"(?m)^\s*RequestHeader unset X-Real-IP$")
 
 
 class GrafanaCookieTest(unittest.TestCase):

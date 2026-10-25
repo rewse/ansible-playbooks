@@ -69,7 +69,7 @@ class FileBrowserConfigTest(unittest.TestCase):
             {"account": {"permissions": {"admin": False, "api": False, "share": True}}},
         )
 
-    def test_source_and_auth_are_unchanged(self):
+    def test_source_and_passkey_settings_are_kept(self):
         config = render_config()
         (source,) = config["server"]["sources"]
         self.assertEqual(source["config"]["readOnly"], True)

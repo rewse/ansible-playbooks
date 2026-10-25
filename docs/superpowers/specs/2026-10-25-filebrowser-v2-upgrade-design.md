@@ -107,7 +107,7 @@ check mode ではどれも行わず、移行が走ることを debug で報告�
 
 ### apache コンポーネント
 
-`trustProxyHeaders` を有効にすると、v2 は `X-Forwarded-Host` の先頭の値を、セッション cookie の domain、WebAuthn の origin、共有 URL の組み立てに使う。mod_proxy はクライアントが送った `X-Forwarded-Host` に本来のホストを追記するので、クライアントは先頭の値を自由に決められる。`X-Forwarded-For` と同じく、`RequestHeader unset X-Forwarded-Host` を fixups で行い、mod_proxy が付ける `nas.rewse.jp` だけを渡す。
+`trustProxyHeaders` を有効にすると、v2 は `X-Forwarded-Host` の先頭の値を、セッション cookie の domain と WebAuthn の origin に使う（共有 URL は `externalUrl` を設定していればそちらから作る）。mod_proxy はクライアントが送った `X-Forwarded-Host` に本来のホストを追記するので、クライアントは先頭の値を自由に決められる。`X-Forwarded-For` と同じく、`RequestHeader unset X-Forwarded-Host` を fixups で行い、mod_proxy が付ける `nas.rewse.jp` だけを渡す。クライアントの `X-Real-IP` も消す。v2 は `X-Forwarded-For` が空のときだけ読み、mod_proxy は必ず `X-Forwarded-For` を付けるが、その既定に頼らないため。
 
 ### fail2ban コンポーネント
 

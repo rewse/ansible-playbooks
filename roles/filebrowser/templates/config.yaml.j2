@@ -12,8 +12,8 @@ http:
   # against Apache's address instead of the client's, which switches both off in
   # practice. The audit log addresses, the WebAuthn origin and the session cookie
   # domain read the same headers. Trusting them is safe because the vhost drops
-  # the X-Forwarded-For and X-Forwarded-Host a client sends, so only the values
-  # Apache adds arrive here.
+  # the X-Forwarded-For, X-Forwarded-Host and X-Real-IP a client sends, so only
+  # the values Apache adds arrive here.
   trustProxyHeaders: true
 
 server:
