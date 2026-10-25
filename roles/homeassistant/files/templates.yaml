@@ -103,14 +103,9 @@
     delay_on:
       hours: 2
     device_class: problem
-  - unique_id: binary_sensor.dads_room_thermometer_connectivity
-    name: "Dad's Room Thermometer Connectivity"
-    state: >-
-      {{ (now() - states.sensor.dads_room_temperature.last_reported).total_seconds() < 3600 }}
-    device_class: connectivity
-  # Provides the fault state used by alarms and climate controls.
-  - unique_id: binary_sensor.dads_room_thermometer_fault
-    name: "Dad’s Room Thermometer Fault"
+  # Detects abnormal readings; clears after one hour of normal readings.
+  - unique_id: binary_sensor.dads_room_thermometer_anomaly
+    name: "Dad’s Room Thermometer Anomaly"
     state: >-
       {% set primary = states('sensor.dads_room_temperature') %}
       {% set secondary = states('sensor.dads_room_switchbot_meter_temperature') %}
@@ -119,22 +114,36 @@
         primary | float < 5 or
         primary | float > 40 or
         (
+          is_number(secondary) and
+          (secondary | float < 5 or secondary | float > 40)
+        ) or
+        (now() - states.sensor.dads_room_temperature.last_reported).total_seconds() >= 7200 or
+        is_state('binary_sensor.dads_room_temperature_disagreement', 'on')
+      }}
+    delay_off:
+      hours: 1
+    device_class: problem
+  - unique_id: binary_sensor.dads_room_thermometer_connectivity
+    name: "Dad's Room Thermometer Connectivity"
+    state: >-
+      {{ (now() - states.sensor.dads_room_temperature.last_reported).total_seconds() < 3600 }}
+    device_class: connectivity
+  # Combines reading anomalies with secondary sensor outages, which clear immediately.
+  - unique_id: binary_sensor.dads_room_thermometer_fault
+    name: "Dad’s Room Thermometer Fault"
+    state: >-
+      {% set secondary = states('sensor.dads_room_switchbot_meter_temperature') %}
+      {{
+        is_state('binary_sensor.dads_room_thermometer_anomaly', 'on') or
+        (
           not is_number(secondary) and
           (now() - states.sensor.dads_room_switchbot_meter_temperature.last_changed).total_seconds() >= 86400
         ) or
         (
           is_number(secondary) and
-          (secondary | float < 5 or secondary | float > 40)
-        ) or
-        (now() - states.sensor.dads_room_temperature.last_reported).total_seconds() >= 7200 or
-        (
-          is_number(secondary) and
           (now() - states.sensor.dads_room_switchbot_meter_temperature.last_reported).total_seconds() >= 86400
-        ) or
-        is_state('binary_sensor.dads_room_temperature_disagreement', 'on')
+        )
       }}
-    delay_off:
-      hours: 1
     device_class: problem
   # Living Room
   - unique_id: binary_sensor.living_room_ac_cooldry
@@ -240,14 +249,9 @@
     delay_on:
       hours: 2
     device_class: problem
-  - unique_id: binary_sensor.living_room_thermometer_connectivity
-    name: "Living Room Thermometer Connectivity"
-    state: >-
-      {{ (now() - states.sensor.living_room_temperature.last_reported).total_seconds() < 3600 }}
-    device_class: connectivity
-  # Provides the fault state used by alarms and climate controls.
-  - unique_id: binary_sensor.living_room_thermometer_fault
-    name: "Living Room Thermometer Fault"
+  # Detects abnormal readings; clears after one hour of normal readings.
+  - unique_id: binary_sensor.living_room_thermometer_anomaly
+    name: "Living Room Thermometer Anomaly"
     state: >-
       {% set primary = states('sensor.living_room_temperature') %}
       {% set secondary = states('sensor.living_room_switchbot_hub_2_temperature') %}
@@ -256,22 +260,36 @@
         primary | float < 5 or
         primary | float > 40 or
         (
+          is_number(secondary) and
+          (secondary | float < 5 or secondary | float > 40)
+        ) or
+        (now() - states.sensor.living_room_temperature.last_reported).total_seconds() >= 7200 or
+        is_state('binary_sensor.living_room_temperature_disagreement', 'on')
+      }}
+    delay_off:
+      hours: 1
+    device_class: problem
+  - unique_id: binary_sensor.living_room_thermometer_connectivity
+    name: "Living Room Thermometer Connectivity"
+    state: >-
+      {{ (now() - states.sensor.living_room_temperature.last_reported).total_seconds() < 3600 }}
+    device_class: connectivity
+  # Combines reading anomalies with secondary sensor outages, which clear immediately.
+  - unique_id: binary_sensor.living_room_thermometer_fault
+    name: "Living Room Thermometer Fault"
+    state: >-
+      {% set secondary = states('sensor.living_room_switchbot_hub_2_temperature') %}
+      {{
+        is_state('binary_sensor.living_room_thermometer_anomaly', 'on') or
+        (
           not is_number(secondary) and
           (now() - states.sensor.living_room_switchbot_hub_2_temperature.last_changed).total_seconds() >= 86400
         ) or
         (
           is_number(secondary) and
-          (secondary | float < 5 or secondary | float > 40)
-        ) or
-        (now() - states.sensor.living_room_temperature.last_reported).total_seconds() >= 7200 or
-        (
-          is_number(secondary) and
           (now() - states.sensor.living_room_switchbot_hub_2_temperature.last_reported).total_seconds() >= 86400
-        ) or
-        is_state('binary_sensor.living_room_temperature_disagreement', 'on')
+        )
       }}
-    delay_off:
-      hours: 1
     device_class: problem
   # Model Y
   # Turns on when the LFP battery has not reached 100% for 30 days, so its charge level
@@ -385,14 +403,9 @@
     delay_on:
       hours: 2
     device_class: problem
-  - unique_id: binary_sensor.moms_room_thermometer_connectivity
-    name: "Mom's Room Thermometer Connectivity"
-    state: >-
-      {{ (now() - states.sensor.moms_room_temperature.last_reported).total_seconds() < 3600 }}
-    device_class: connectivity
-  # Provides the fault state used by alarms and climate controls.
-  - unique_id: binary_sensor.moms_room_thermometer_fault
-    name: "Mom’s Room Thermometer Fault"
+  # Detects abnormal readings; clears after one hour of normal readings.
+  - unique_id: binary_sensor.moms_room_thermometer_anomaly
+    name: "Mom’s Room Thermometer Anomaly"
     state: >-
       {% set primary = states('sensor.moms_room_temperature') %}
       {% set secondary = states('sensor.moms_room_switchbot_meter_temperature') %}
@@ -401,22 +414,36 @@
         primary | float < 5 or
         primary | float > 40 or
         (
+          is_number(secondary) and
+          (secondary | float < 5 or secondary | float > 40)
+        ) or
+        (now() - states.sensor.moms_room_temperature.last_reported).total_seconds() >= 7200 or
+        is_state('binary_sensor.moms_room_temperature_disagreement', 'on')
+      }}
+    delay_off:
+      hours: 1
+    device_class: problem
+  - unique_id: binary_sensor.moms_room_thermometer_connectivity
+    name: "Mom's Room Thermometer Connectivity"
+    state: >-
+      {{ (now() - states.sensor.moms_room_temperature.last_reported).total_seconds() < 3600 }}
+    device_class: connectivity
+  # Combines reading anomalies with secondary sensor outages, which clear immediately.
+  - unique_id: binary_sensor.moms_room_thermometer_fault
+    name: "Mom’s Room Thermometer Fault"
+    state: >-
+      {% set secondary = states('sensor.moms_room_switchbot_meter_temperature') %}
+      {{
+        is_state('binary_sensor.moms_room_thermometer_anomaly', 'on') or
+        (
           not is_number(secondary) and
           (now() - states.sensor.moms_room_switchbot_meter_temperature.last_changed).total_seconds() >= 86400
         ) or
         (
           is_number(secondary) and
-          (secondary | float < 5 or secondary | float > 40)
-        ) or
-        (now() - states.sensor.moms_room_temperature.last_reported).total_seconds() >= 7200 or
-        (
-          is_number(secondary) and
           (now() - states.sensor.moms_room_switchbot_meter_temperature.last_reported).total_seconds() >= 86400
-        ) or
-        is_state('binary_sensor.moms_room_temperature_disagreement', 'on')
+        )
       }}
-    delay_off:
-      hours: 1
     device_class: problem
 - fan:
   - unique_id: fan.living_room_fan

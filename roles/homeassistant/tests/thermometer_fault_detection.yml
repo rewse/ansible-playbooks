@@ -7,6 +7,7 @@
     room_contracts:
       - alarm_file: automations-dads-room.yaml
         alarm_id: automation.alarm_dads_room_temp_difference
+        anomaly_entity_id: binary_sensor.dads_room_thermometer_anomaly
         climate_file: automations-dads-room-climates.yaml
         control_automation_ids:
           - automation.adjust_dads_room_ac_temp
@@ -16,6 +17,7 @@
           - automation.toggle_dads_room_ac_heat
         fault_entity_id: binary_sensor.dads_room_thermometer_fault
         prefix: dads_room
+        primary_entity_id: sensor.dads_room_temperature
         secondary_entity_id: sensor.dads_room_switchbot_meter_temperature
         secondary_stale_seconds: 86400
         secondary_unavailable_seconds: 86400
@@ -27,6 +29,7 @@
           - sensor.dads_room_temperature
       - alarm_file: automations-living-room.yaml
         alarm_id: automation.alarm_living_room_temperature_difference
+        anomaly_entity_id: binary_sensor.living_room_thermometer_anomaly
         climate_file: automations-living-room-climates.yaml
         control_automation_ids:
           - automation.adjust_living_room_ac_temp
@@ -37,6 +40,7 @@
           - automation.toggle_living_room_ac_heat
         fault_entity_id: binary_sensor.living_room_thermometer_fault
         prefix: living_room
+        primary_entity_id: sensor.living_room_temperature
         secondary_entity_id: sensor.living_room_switchbot_hub_2_temperature
         secondary_stale_seconds: 86400
         secondary_unavailable_seconds: 86400
@@ -48,6 +52,7 @@
           - sensor.living_room_temperature
       - alarm_file: automations-moms-room.yaml
         alarm_id: automation.alarm_moms_room_temp_difference
+        anomaly_entity_id: binary_sensor.moms_room_thermometer_anomaly
         climate_file: automations-moms-room-climates.yaml
         control_automation_ids:
           - automation.adjust_moms_room_ac_temp
@@ -57,6 +62,7 @@
           - automation.toggle_moms_room_ac_heat
         fault_entity_id: binary_sensor.moms_room_thermometer_fault
         prefix: moms_room
+        primary_entity_id: sensor.moms_room_temperature
         secondary_entity_id: sensor.moms_room_switchbot_meter_temperature
         secondary_stale_seconds: 86400
         secondary_unavailable_seconds: 86400
