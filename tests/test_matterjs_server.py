@@ -160,6 +160,14 @@ class MatterjsServerContainerTest(unittest.TestCase):
         )
         self.assertEqual(down["project_src"], "/etc/compose/matter_server")
 
+    def test_legacy_server_stops_before_the_new_one_starts(self):
+        # Both servers would act as the same controller on the same fabric.
+        names = [t["name"] for t in load_tasks("container.yml")]
+        self.assertLess(
+            names.index("container | Remove legacy compose project"),
+            names.index("container | Start containers"),
+        )
+
     def test_container_is_an_update_component(self):
         imports = {
             t["ansible.builtin.import_tasks"]: t["tags"] for t in load_tasks("main.yml")

@@ -53,6 +53,25 @@
     - not __matterjs_server_storage.stat.exists
     - not __matterjs_server_chip.stat.exists
 
+# The legacy project goes before the new one starts, against the usual
+# removal-last order: both servers would otherwise act as the same controller
+# on the same fabric. The failure above keeps it running when there is no data.
+- name: container | Check legacy compose project
+  ansible.builtin.stat:
+    path: /etc/compose/matter_server/compose.yaml
+  register: __matterjs_server_legacy
+
+- name: container | Remove legacy compose project
+  community.docker.docker_compose_v2:
+    project_src: /etc/compose/matter_server
+    state: absent
+  when: __matterjs_server_legacy.stat.exists
+
+- name: container | Remove legacy compose directory
+  ansible.builtin.file:
+    path: /etc/compose/matter_server
+    state: absent
+
 - name: container | Create compose directory
   ansible.builtin.file:
     path: /etc/compose/matterjs_server
@@ -80,19 +99,3 @@
   when:
     - not (ansible_check_mode and __matterjs_server_compose is changed)
     - __matterjs_server_chip.stat.exists or __matterjs_server_storage.stat.exists
-
-- name: container | Check legacy compose project
-  ansible.builtin.stat:
-    path: /etc/compose/matter_server/compose.yaml
-  register: __matterjs_server_legacy
-
-- name: container | Remove legacy compose project
-  community.docker.docker_compose_v2:
-    project_src: /etc/compose/matter_server
-    state: absent
-  when: __matterjs_server_legacy.stat.exists
-
-- name: container | Remove legacy compose directory
-  ansible.builtin.file:
-    path: /etc/compose/matter_server
-    state: absent
