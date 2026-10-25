@@ -82,9 +82,7 @@ class FileBrowserConfigTest(unittest.TestCase):
         self.assertEqual(source["config"]["defaultEnabled"], True)
         self.assertEqual(source["config"]["rules"], [{"ignoreHidden": True}])
         self.assertEqual(config["server"]["cacheDir"], "/home/filebrowser/data/cache")
-        self.assertEqual(
-            config["auth"]["methods"]["passkey"]["rpId"], "nas.rewse.jp"
-        )
+        self.assertEqual(config["auth"]["methods"]["passkey"]["rpId"], "nas.rewse.jp")
         self.assertEqual(
             config["auth"]["methods"]["passkey"]["rpOrigins"],
             ["https://nas.rewse.jp"],
