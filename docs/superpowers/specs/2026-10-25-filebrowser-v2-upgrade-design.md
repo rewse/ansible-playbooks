@@ -31,7 +31,7 @@ fail2ban は Apache の `other_vhosts_access.log` から `POST /api/auth/login` 
 
 - 権限の強制、次回ログイン時のパスワード変更要求、ディスク使用量表示の切り替えは使わない。
 - WebDAV は今どおり無効にする。
-- ソースの追加、書き込み権限の付与、Apache vhost の変更はしない。
+- ソースの追加と書き込み権限の付与はしない。Apache vhost は、後述の `X-Forwarded-Host` の扱い以外は変えない。
 - データディレクトリに残っている `config.yaml.*~`（2026-08 に作られたもので、秘密情報を含む）の整理は扱わない。
 
 ## 失敗とみなすこと
@@ -45,7 +45,7 @@ fail2ban は Apache の `other_vhosts_access.log` から `POST /api/auth/login` 
 
 - AGENTS.md の規約に従う。コンポーネントごとのタスクファイルとタグ、check mode は非破壊で失敗しない、2 回目の実行は changed=0、一時的な移行用タスクは全ホストが収束したら消す。
 - イメージは 4 日の cooldown に従う。今回入るのは 2.0.1-stable で、2.0.2-stable は 2026-10-28 から選ばれる。
-- 2.0.1 には GHSA-wjp8-g49g-xrhx（Low）が残る。`trustProxyHeaders` が有効なとき、ログインのロックアウトと回数制限が `X-Forwarded-For` の左端の値を使うので、クライアントが偽の値を付けて回避できる。fail2ban は Apache が記録するクライアント IP で判定するので影響を受けない。2.0.2 で直るので、10-28 以降の通常の update で解消する。
+- 2.0.1 には GHSA-wjp8-g49g-xrhx（Low）が残る。`trustProxyHeaders` が有効なとき、ログインのロックアウトと回数制限が `X-Forwarded-For` の左端の値を使う。nas.rewse.jp の vhost はクライアントが送った `X-Forwarded-For` を fixups で消し、mod_proxy に mod_remoteip が復元したクライアント IP だけを付けさせているので、左端は常に本当のクライアント IP になり、この構成は影響を受けない。`X-Real-IP` は `X-Forwarded-For` が空のときだけ読まれ、mod_proxy が必ず `X-Forwarded-For` を付けるので使われない。
 - 公式の移行手順は 4 段階ある。旧 DB をデータディレクトリの外にバックアップして `database.db.old` に改名し、`migrateFrom` 付きで初回起動して SQLite に取り込み、確認後に `migrateFrom` を外し、再起動して確かめる。`database.db` が残っていると v2 は起動しない。SQLite が既にあって空でなければ、`migrateFrom` は無視される。
 - analytics には config の項目がない。SQLite の設定（`analytics.enabled`）として管理画面から切り替える。オンにすると 24 時間後に初回、その後は毎月 `api.filebrowserquantum.com` に送り、送る内容は管理画面でプレビューできる。
 - パスキーでのログインはスマホの Face ID を使うので、その確認は利用者が行う。
@@ -70,7 +70,7 @@ flowchart TD
   hasV1 -->|いいえ| config[config.yaml を配置]
   config --> start[2.x を起動]
   start --> verify[利用者と一緒に確認]
-  verify -->|問題なし| moveOld[database.db.old をデータディレクトリの外へ移す]
+  verify -->|問題なし| moveOld[database.db.old をバックアップと照合して消す]
   moveOld --> rerun[ロールを再実行して migrateFrom を外す]
   rerun --> cleanup[一時タスクを消す]
   verify -->|問題あり| rollback[1.5.8 へ切り戻す]
@@ -103,7 +103,11 @@ check mode ではどれも行わず、移行が走ることを debug で報告�
 - イメージの選び方（stable のパターンと 4 日の cooldown）は変えない。v2 がまだ preview だという趣旨のコメントは事実でなくなったので直す。
 - 起動の前に、データディレクトリに `database.db` が残っていないことを確かめ、残っていれば失敗させる。container のタグだけを回したときに、v1 の DB と v2 のイメージが組み合わさるのを防ぐ。check mode では改名が行われず `database.db` が残るので、失敗させずに報告だけにする。
 - compose の中身（ループバックのポート、uid 2000、読み取り専用のバインドマウント、メモリ制限、`/health` のヘルスチェック）は変えない。
-- 初回起動で行われる移行が、再起動で中断されないようにする。config の変更は `Restart filebrowser` ハンドラを通知するので、起動直後に再起動が重ならないか、重なっても安全かを確かめ、必要なら手当てする。方法は担当者に任せる。
+- 初回起動で行われる移行が、再起動で中断されないようにする。config の変更は `Restart filebrowser` ハンドラを通知するので、起動のタスクに `wait: true` を付けて healthy になるまで待つ。v2 は BoltDB からの移行を HTTP サーバーの起動前に行う（`backend/cmd/root.go`）ので、healthy は移行の完了を意味し、その後にハンドラが再起動しても移行は中断されない。
+
+### apache コンポーネント
+
+`trustProxyHeaders` を有効にすると、v2 は `X-Forwarded-Host` の先頭の値を、セッション cookie の domain、WebAuthn の origin、共有 URL の組み立てに使う。mod_proxy はクライアントが送った `X-Forwarded-Host` に本来のホストを追記するので、クライアントは先頭の値を自由に決められる。`X-Forwarded-For` と同じく、`RequestHeader unset X-Forwarded-Host` を fixups で行い、mod_proxy が付ける `nas.rewse.jp` だけを渡す。
 
 ### fail2ban コンポーネント
 
@@ -115,7 +119,7 @@ check mode ではどれも行わず、移行が走ることを debug で報告�
 
 ### 後片付け
 
-確認が済んだら `database.db.old` を `/var/backups/filebrowser/` に移し、ロールを再実行して `migrateFrom` を外す。同じ作業の中で、database コンポーネント、container の `database.db` の確認、テンプレートの `migrateFrom` の条件を消す。filebrowser を動かすホストは fox だけなので、この時点で全ホストが収束している。`/var/backups/filebrowser/` のバックアップは、2.0.2 への update を適用して確認した後に消す（担当者判断）。
+確認が済んだら、`database.db.old` が `/var/backups/filebrowser/` のバックアップと同じ内容であることを確かめてデータディレクトリから消し、ロールを再実行して `migrateFrom` を外す。同じ作業の中で、database コンポーネント、container の `database.db` の確認、テンプレートの `migrateFrom` の条件を消す。filebrowser を動かすホストは fox だけなので、この時点で全ホストが収束している。`/var/backups/filebrowser/` のバックアップは、2.0.2 への update を適用して確認した後に消す（担当者判断）。
 
 ## 確認
 
@@ -135,6 +139,5 @@ check mode ではどれも行わず、移行が走ることを debug で報告�
 
 - database コンポーネントのタスクの細部（ファイルの確認、複製、改名、check mode の扱い）とタスク名。
 - バックアップのファイル名と、`/etc/restic.exclude` に掛からないことの確認。
-- ハンドラと初回起動の順序の手当て。
 - 公式の設定移行ツールの出力との突き合わせ。
 - 切り戻し手順の具体化。
