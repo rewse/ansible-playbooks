@@ -3,7 +3,7 @@
 # The second layer in front of a service the internet can reach: Quantum's own
 # rate limiting slows a password guess down, and this stops it.
 #
-# bantime, findtime and maxretry are left to jail.local in the ubuntu role, which
+# bantime, findtime and maxretry are left to jail.local in the fail2ban role, which
 # gives every jail here five attempts in ten minutes and an hour of ban.
 #
 # No ignoreip of its own, matching the other jails; the httpd role exempts only
