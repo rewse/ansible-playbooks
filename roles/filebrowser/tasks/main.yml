@@ -1,4 +1,9 @@
 ---
+- name: Import database tasks
+  ansible.builtin.import_tasks: database.yml
+  tags:
+    - filebrowser_database
+
 - name: Import config tasks
   ansible.builtin.import_tasks: config.yml
   tags:

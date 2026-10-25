@@ -1,0 +1,62 @@
+---
+# The one-time move from the v1 BoltDB database to v2's SQLite one. v2 refuses
+# to start beside a file named database.db and imports the renamed file named in
+# migrateFrom on its first start. Delete this component once fox has converged.
+- name: database | Check v1 database
+  ansible.builtin.stat:
+    path: "{{ filebrowser_data_dir }}/database.db"
+  register: __filebrowser_boltdb
+
+- name: database | Check compose file
+  ansible.builtin.stat:
+    path: /etc/compose/filebrowser/compose.yaml
+  register: __filebrowser_compose_file
+
+- name: database | Create backup directory
+  ansible.builtin.file:
+    path: /var/backups/filebrowser
+    state: directory
+    owner: root
+    group: root
+    mode: "0700"
+  when: __filebrowser_boltdb.stat.exists
+
+- name: database | Stop container
+  # The running v1 server holds a lock on the BoltDB file, so a copy taken while
+  # it runs can be inconsistent. A host without a compose file has nothing
+  # running.
+  community.docker.docker_compose_v2:
+    project_src: /etc/compose/filebrowser
+    state: stopped
+  when:
+    - __filebrowser_boltdb.stat.exists
+    - __filebrowser_compose_file.stat.exists
+
+- name: database | Back up v1 database
+  # Outside the data directory, so a rollback has a copy v2 never opened. On the
+  # root filesystem, which the host backup covers.
+  ansible.builtin.copy:
+    src: "{{ filebrowser_data_dir }}/database.db"
+    dest: /var/backups/filebrowser/database.db
+    remote_src: true
+    owner: "{{ filebrowser_uid }}"
+    group: "{{ filebrowser_gid }}"
+    mode: "0600"
+  when: __filebrowser_boltdb.stat.exists
+
+- name: database | Rename v1 database for migration
+  # No module renames a file. creates and removes make check mode predict the
+  # change without running it, and skip the rename rather than overwrite when
+  # both files exist.
+  ansible.builtin.command: mv {{ filebrowser_data_dir }}/database.db {{ filebrowser_data_dir }}/database.db.old
+  args:
+    creates: "{{ filebrowser_data_dir }}/database.db.old"
+    removes: "{{ filebrowser_data_dir }}/database.db"
+  changed_when: true
+  when: __filebrowser_boltdb.stat.exists
+
+- name: database | Report migration in check mode
+  ansible.builtin.debug:
+    msg: The v1 database would be stopped, backed up and renamed for migration
+    verbosity: 0
+  when: ansible_check_mode and __filebrowser_boltdb.stat.exists

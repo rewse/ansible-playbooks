@@ -105,5 +105,54 @@ class FileBrowserConfigTest(unittest.TestCase):
         )
 
 
+class FileBrowserMigrationTest(unittest.TestCase):
+    def test_database_component_runs_before_config(self):
+        imports = yaml.safe_load((ROLE / "tasks" / "main.yml").read_text())
+        files = [task["ansible.builtin.import_tasks"] for task in imports]
+        self.assertLess(files.index("database.yml"), files.index("config.yml"))
+        (database,) = [
+            t for t in imports if t["ansible.builtin.import_tasks"] == "database.yml"
+        ]
+        self.assertEqual(database["tags"], ["filebrowser_database"])
+
+    def test_v1_database_is_stopped_backed_up_and_renamed_only_when_present(self):
+        database = tasks("database.yml")
+        stop = database["database | Stop container"]
+        self.assertEqual(stop["community.docker.docker_compose_v2"]["state"], "stopped")
+        self.assertIn("__filebrowser_compose_file.stat.exists", stop["when"])
+        backup = database["database | Back up v1 database"]["ansible.builtin.copy"]
+        self.assertTrue(backup["remote_src"])
+        self.assertEqual(backup["dest"], "/var/backups/filebrowser/database.db")
+        self.assertEqual(backup["mode"], "0600")
+        rename = database["database | Rename v1 database for migration"]
+        self.assertEqual(
+            rename["args"]["removes"], "{{ filebrowser_data_dir }}/database.db"
+        )
+        self.assertEqual(
+            rename["args"]["creates"], "{{ filebrowser_data_dir }}/database.db.old"
+        )
+        self.assertIn("changed_when", rename)
+        for name in ("database | Stop container", "database | Back up v1 database"):
+            self.assertIn("__filebrowser_boltdb.stat.exists", database[name]["when"])
+
+    def test_container_refuses_an_unmigrated_database_outside_check_mode(self):
+        container = tasks("container.yml")
+        names = list(container)
+        guard = container["container | Fail when v1 database is not migrated"]
+        self.assertIn("__filebrowser_boltdb_left.stat.exists", guard["when"])
+        self.assertIn("not ansible_check_mode", guard["when"])
+        self.assertLess(
+            names.index("container | Fail when v1 database is not migrated"),
+            names.index("container | Start container"),
+        )
+
+    def test_start_waits_until_healthy(self):
+        start = tasks("container.yml")["container | Start container"][
+            "community.docker.docker_compose_v2"
+        ]
+        self.assertTrue(start["wait"])
+        self.assertEqual(start["wait_timeout"], 300)
+
+
 if __name__ == "__main__":
     unittest.main()
