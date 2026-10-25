@@ -42,9 +42,9 @@
         float(states('input_number.dads_room_humidity_min_diff'))
       }}
     icon: "mdi:water-percent-alert"
-  # Provides the fault state used by alarms and climate controls.
-  - unique_id: binary_sensor.dads_room_hygrometer_fault
-    name: "Dad’s Room Hygrometer Fault"
+  # Detects abnormal readings; clears after one hour of normal readings.
+  - unique_id: binary_sensor.dads_room_hygrometer_anomaly
+    name: "Dad’s Room Hygrometer Anomaly"
     state: >-
       {% set primary = states('sensor.dads_room_humidity') %}
       {% set secondary = states('sensor.dads_room_switchbot_meter_humidity') %}
@@ -53,22 +53,31 @@
         primary | float < 1 or
         primary | float > 99 or
         (
+          is_number(secondary) and
+          (secondary | float < 1 or secondary | float > 99)
+        ) or
+        (now() - states.sensor.dads_room_humidity.last_reported).total_seconds() >= 7200 or
+        is_state('binary_sensor.dads_room_humidity_disagreement', 'on')
+      }}
+    delay_off:
+      hours: 1
+    device_class: problem
+  # Combines reading anomalies with secondary sensor outages, which clear immediately.
+  - unique_id: binary_sensor.dads_room_hygrometer_fault
+    name: "Dad’s Room Hygrometer Fault"
+    state: >-
+      {% set secondary = states('sensor.dads_room_switchbot_meter_humidity') %}
+      {{
+        is_state('binary_sensor.dads_room_hygrometer_anomaly', 'on') or
+        (
           not is_number(secondary) and
           (now() - states.sensor.dads_room_switchbot_meter_humidity.last_changed).total_seconds() >= 86400
         ) or
         (
           is_number(secondary) and
-          (secondary | float < 1 or secondary | float > 99)
-        ) or
-        (now() - states.sensor.dads_room_humidity.last_reported).total_seconds() >= 7200 or
-        (
-          is_number(secondary) and
           (now() - states.sensor.dads_room_switchbot_meter_humidity.last_reported).total_seconds() >= 86400
-        ) or
-        is_state('binary_sensor.dads_room_humidity_disagreement', 'on')
+        )
       }}
-    delay_off:
-      hours: 1
     device_class: problem
   - unique_id: binary_sensor.dads_room_temp_high
     name: "Dad's Room Temperature High"
@@ -188,9 +197,9 @@
         float(states('input_number.living_room_humidity_min_diff'))
       }}
     icon: "mdi:water-percent-alert"
-  # Provides the fault state used by alarms and climate controls.
-  - unique_id: binary_sensor.living_room_hygrometer_fault
-    name: "Living Room Hygrometer Fault"
+  # Detects abnormal readings; clears after one hour of normal readings.
+  - unique_id: binary_sensor.living_room_hygrometer_anomaly
+    name: "Living Room Hygrometer Anomaly"
     state: >-
       {% set primary = states('sensor.living_room_humidity') %}
       {% set secondary = states('sensor.living_room_switchbot_hub_2_humidity') %}
@@ -199,22 +208,31 @@
         primary | float < 1 or
         primary | float > 99 or
         (
+          is_number(secondary) and
+          (secondary | float < 1 or secondary | float > 99)
+        ) or
+        (now() - states.sensor.living_room_humidity.last_reported).total_seconds() >= 7200 or
+        is_state('binary_sensor.living_room_humidity_disagreement', 'on')
+      }}
+    delay_off:
+      hours: 1
+    device_class: problem
+  # Combines reading anomalies with secondary sensor outages, which clear immediately.
+  - unique_id: binary_sensor.living_room_hygrometer_fault
+    name: "Living Room Hygrometer Fault"
+    state: >-
+      {% set secondary = states('sensor.living_room_switchbot_hub_2_humidity') %}
+      {{
+        is_state('binary_sensor.living_room_hygrometer_anomaly', 'on') or
+        (
           not is_number(secondary) and
           (now() - states.sensor.living_room_switchbot_hub_2_humidity.last_changed).total_seconds() >= 86400
         ) or
         (
           is_number(secondary) and
-          (secondary | float < 1 or secondary | float > 99)
-        ) or
-        (now() - states.sensor.living_room_humidity.last_reported).total_seconds() >= 7200 or
-        (
-          is_number(secondary) and
           (now() - states.sensor.living_room_switchbot_hub_2_humidity.last_reported).total_seconds() >= 86400
-        ) or
-        is_state('binary_sensor.living_room_humidity_disagreement', 'on')
+        )
       }}
-    delay_off:
-      hours: 1
     device_class: problem
   - unique_id: binary_sensor.living_room_temp_high
     name: "Living Room Temperature High"
@@ -342,9 +360,9 @@
         float(states('input_number.moms_room_humidity_min_diff'))
       }}
     icon: "mdi:water-percent-alert"
-  # Provides the fault state used by alarms and climate controls.
-  - unique_id: binary_sensor.moms_room_hygrometer_fault
-    name: "Mom’s Room Hygrometer Fault"
+  # Detects abnormal readings; clears after one hour of normal readings.
+  - unique_id: binary_sensor.moms_room_hygrometer_anomaly
+    name: "Mom’s Room Hygrometer Anomaly"
     state: >-
       {% set primary = states('sensor.moms_room_humidity') %}
       {% set secondary = states('sensor.moms_room_switchbot_meter_humidity') %}
@@ -353,22 +371,31 @@
         primary | float < 1 or
         primary | float > 99 or
         (
+          is_number(secondary) and
+          (secondary | float < 1 or secondary | float > 99)
+        ) or
+        (now() - states.sensor.moms_room_humidity.last_reported).total_seconds() >= 7200 or
+        is_state('binary_sensor.moms_room_humidity_disagreement', 'on')
+      }}
+    delay_off:
+      hours: 1
+    device_class: problem
+  # Combines reading anomalies with secondary sensor outages, which clear immediately.
+  - unique_id: binary_sensor.moms_room_hygrometer_fault
+    name: "Mom’s Room Hygrometer Fault"
+    state: >-
+      {% set secondary = states('sensor.moms_room_switchbot_meter_humidity') %}
+      {{
+        is_state('binary_sensor.moms_room_hygrometer_anomaly', 'on') or
+        (
           not is_number(secondary) and
           (now() - states.sensor.moms_room_switchbot_meter_humidity.last_changed).total_seconds() >= 86400
         ) or
         (
           is_number(secondary) and
-          (secondary | float < 1 or secondary | float > 99)
-        ) or
-        (now() - states.sensor.moms_room_humidity.last_reported).total_seconds() >= 7200 or
-        (
-          is_number(secondary) and
           (now() - states.sensor.moms_room_switchbot_meter_humidity.last_reported).total_seconds() >= 86400
-        ) or
-        is_state('binary_sensor.moms_room_humidity_disagreement', 'on')
+        )
       }}
-    delay_off:
-      hours: 1
     device_class: problem
   - unique_id: binary_sensor.moms_room_temp_high
     name: "Mom's Room Temperature High"
