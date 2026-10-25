@@ -329,6 +329,7 @@ class JailActionTest(unittest.TestCase):
                 "litellm",
                 "nvr",
                 "teslamate",
+                "zabbix_mcp",
                 "zabbix_server",
             ],
         )

@@ -13,3 +13,8 @@
     name: zabbix-mcp-server
     state: restarted
   when: not ansible_check_mode
+
+- name: Restart fail2ban
+  ansible.builtin.systemd:
+    name: fail2ban
+    state: restarted

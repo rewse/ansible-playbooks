@@ -1,6 +1,7 @@
 #!/usr/bin/env python3
 """Contract tests for the zabbix_mcp role."""
 
+import configparser
 import pathlib
 import re
 import tomllib
@@ -11,6 +12,7 @@ import yaml
 
 REPO_ROOT = pathlib.Path(__file__).resolve().parents[1]
 ROLE = REPO_ROOT / "roles" / "zabbix_mcp"
+HOSTNAME = "zabbix-mcp.rewse.jp"
 
 NETWORKS = {
     "aws_private_ipv4": "10.0.0.0/16",
@@ -51,6 +53,11 @@ def render(name: str, **overrides) -> str:
     }
     context.update(overrides)
     return environment.get_template(name).render(**context)
+
+
+def access_line(vhost: str, request: str, status: int) -> str:
+    # A vhost_combined line as fail2ban sees it, with the timestamp removed.
+    return f'{vhost}:443 203.0.113.7 - - [] "{request} HTTP/1.1" {status} 28 "-" "curl" 512'
 
 
 class ZabbixMcpServerTest(unittest.TestCase):
@@ -119,6 +126,63 @@ class ZabbixMcpApacheTest(unittest.TestCase):
             expected.update([value] if isinstance(value, str) else value)
         self.assertEqual(allowed, expected)
         self.assertNotIn("Require all granted", text)
+class ZabbixMcpFail2banTest(unittest.TestCase):
+    def test_fail2ban_component_is_imported(self):
+        imports = {
+            task["ansible.builtin.import_tasks"]: task["tags"]
+            for task in yaml.safe_load((ROLE / "tasks" / "main.yml").read_text())
+        }
+        self.assertEqual(imports.get("fail2ban.yml"), ["zabbix_mcp_fail2ban"])
+        self.assertEqual(list(imports)[-2:], ["apache.yml", "fail2ban.yml"])
+        roles = [
+            dep["role"]
+            for dep in yaml.safe_load((ROLE / "meta" / "main.yml").read_text())[
+                "dependencies"
+            ]
+        ]
+        self.assertEqual(roles, ["fail2ban", "httpd"])
+
+    def test_jail_reads_the_apache_log(self):
+        parser = configparser.ConfigParser(interpolation=None)
+        lines = [
+            line
+            for line in render("fail2ban-jail.conf.j2").splitlines()
+            if not line.lstrip().startswith("#")
+        ]
+        parser.read_string("\n".join(lines))
+        section = parser["zabbix-mcp"]
+        self.assertEqual(section["enabled"], "true")
+        self.assertEqual(section["backend"], "auto")
+        self.assertEqual(section["filter"], "zabbix-mcp")
+        self.assertEqual(section["logpath"], "/var/log/apache2/other_vhosts_access.log")
+
+    def test_filter_matches_rejected_tokens_only(self):
+        line = next(
+            line
+            for line in render("fail2ban-filter.conf.j2").splitlines()
+            if line.startswith("failregex = ")
+        )
+        regex = re.compile(
+            line.removeprefix("failregex = ").replace("<HOST>", r"(?P<host>\S+)")
+        )
+        for request in ("POST /mcp", "GET /mcp", "DELETE /mcp"):
+            with self.subTest(request=request):
+                match = regex.search(access_line(HOSTNAME, request, 401))
+                self.assertIsNotNone(match)
+                assert match is not None
+                self.assertEqual(match["host"], "203.0.113.7")
+        for unmatched in (
+            # A call with a valid token.
+            access_line(HOSTNAME, "POST /mcp", 200),
+            # A rejected call on another virtual host.
+            access_line("litellm.rewse.jp", "POST /mcp", 401),
+            # OAuth discovery, which a client reads before it sends a token.
+            access_line(HOSTNAME, "GET /.well-known/oauth-protected-resource", 401),
+            # A path that only starts like the endpoint.
+            access_line(HOSTNAME, "GET /mcpx", 401),
+        ):
+            with self.subTest(line=unmatched):
+                self.assertIsNone(regex.search(unmatched))
 
 
 if __name__ == "__main__":
