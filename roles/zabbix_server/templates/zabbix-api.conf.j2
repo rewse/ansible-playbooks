@@ -9,8 +9,8 @@
 # also swept for SugarCRM, iLO and Oracle IDM URLs.
 #
 # Nothing beyond the LAN needs it: the MCP server that consumes the API runs on
-# this host and reaches it from here, and its own port is not forwarded, so a
-# client away from home has no route to it either way.
+# this host and calls it from here. Clients away from home, such as the office,
+# reach the MCP server through its own vhost, never this API.
 #
 # Location rather than Directory, because zabbix.conf from the package grants the
 # frontend through a Directory block and Location is merged after Directory
