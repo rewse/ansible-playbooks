@@ -1,0 +1,36 @@
+{{ ansible_managed | comment }}
+# Home Assistant talks to matterjs-server on localhost and never passes through
+# this vhost; it exists only to open the dashboard from other machines. The
+# dashboard has no login and can remove nodes and rewrite their ACLs, so only
+# home and the VPN may reach it.
+<VirtualHost *:443>
+    ServerAdmin hostmaster@rewse.jp
+    ServerName {{ matterjs_server_hostname }}
+
+    ProxyRequests off
+
+    # The dashboard and Home Assistant share this WebSocket API. It has to be
+    # matched before / so the upgrade reaches mod_proxy_wstunnel.
+    ProxyPass /ws ws://127.0.0.1:{{ matterjs_server_port }}/ws
+    ProxyPassReverse /ws ws://127.0.0.1:{{ matterjs_server_port }}/ws
+    ProxyPass / http://127.0.0.1:{{ matterjs_server_port }}/
+    ProxyPassReverse / http://127.0.0.1:{{ matterjs_server_port }}/
+
+    # Home clients arrive from the home prefixes, over IPv6 usually from the
+    # public one, since fox.rewse.jp has a global AAAA record. VPN clients
+    # arrive through alfa.
+    <Location />
+        Require ip 127.0.0.1
+        Require ip ::1
+        Require ip {{ networks.home_private_ipv4 }}
+        Require ip {{ networks.home_private_ipv6 }}
+        Require ip {{ networks.home_public_ipv4 }}
+        Require ip {{ networks.home_public_ipv6 }}
+        Require ip {{ networks.aws_private_ipv4 }}
+        Require ip {{ networks.aws_public_ipv6 }}
+    </Location>
+
+    SSLCertificateFile /etc/letsencrypt/live/rewse.jp/fullchain.pem
+    SSLCertificateKeyFile /etc/letsencrypt/live/rewse.jp/privkey.pem
+    Include /etc/letsencrypt/options-ssl-apache.conf
+</VirtualHost>

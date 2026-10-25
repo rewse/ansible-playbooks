@@ -2,6 +2,7 @@
 """Contract tests for the matterjs_server role."""
 
 import pathlib
+import re
 import unittest
 
 import jinja2
@@ -152,6 +153,53 @@ class MatterjsServerContainerTest(unittest.TestCase):
     def test_container_is_an_update_component(self):
         imports = {t["ansible.builtin.import_tasks"]: t["tags"] for t in load_tasks("main.yml")}
         self.assertEqual(imports["container.yml"], ["matterjs_server_container", "update"])
+
+
+class MatterjsServerApacheTest(unittest.TestCase):
+    def test_websocket_is_proxied_before_the_dashboard(self):
+        vhost = render("matter.rewse.jp.conf.j2")
+        self.assertIn("ServerName matter.rewse.jp", vhost)
+        self.assertLess(
+            vhost.index("ProxyPass /ws ws://127.0.0.1:5580/ws"),
+            vhost.index("ProxyPass / http://127.0.0.1:5580/"),
+        )
+
+    def test_only_home_and_vpn_may_connect(self):
+        vhost = render("matter.rewse.jp.conf.j2")
+        allowed = re.findall(r"(?m)^\s*Require ip (\S+)$", vhost)
+        self.assertEqual(
+            sorted(allowed),
+            sorted(
+                [
+                    "127.0.0.1",
+                    "::1",
+                    NETWORKS["home_private_ipv4"],
+                    NETWORKS["home_private_ipv6"],
+                    NETWORKS["home_public_ipv4"],
+                    NETWORKS["home_public_ipv6"],
+                    NETWORKS["aws_private_ipv4"],
+                    NETWORKS["aws_public_ipv6"],
+                ]
+            ),
+        )
+        self.assertNotIn("Require all granted", vhost)
+        for office in NETWORKS["office_public_ipv4"]:
+            self.assertNotIn(office, vhost)
+
+    def test_vhost_uses_the_wildcard_certificate(self):
+        vhost = render("matter.rewse.jp.conf.j2")
+        self.assertIn("SSLCertificateFile /etc/letsencrypt/live/rewse.jp/fullchain.pem", vhost)
+        self.assertIn("SSLCertificateKeyFile /etc/letsencrypt/live/rewse.jp/privkey.pem", vhost)
+
+    def test_apache_reload_matches_the_httpd_role(self):
+        theirs = handlers(REPO_ROOT / "roles" / "httpd")
+        self.assertEqual(handlers(ROLE)["Reload Apache"], theirs["Reload Apache"])
+
+    def test_components_and_dependencies(self):
+        imports = [t["ansible.builtin.import_tasks"] for t in load_tasks("main.yml")]
+        self.assertEqual(imports, ["sysctl.yml", "container.yml", "apache.yml"])
+        meta = yaml.safe_load((ROLE / "meta" / "main.yml").read_text())
+        self.assertEqual([d["role"] for d in meta["dependencies"]], ["docker", "httpd"])
 
 
 if __name__ == "__main__":

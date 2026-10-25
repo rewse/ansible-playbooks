@@ -1,5 +1,15 @@
 ---
+- name: Reload Apache
+  ansible.builtin.systemd:
+    name: apache2
+    state: reloaded
+
 - name: Reload sysctl
   # sysctl --system rereads every drop-in; no module does that.
   ansible.builtin.command: sysctl --system
   changed_when: false
+
+- name: Restart Apache
+  ansible.builtin.systemd:
+    name: apache2
+    state: restarted
