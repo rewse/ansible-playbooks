@@ -1,12 +1,31 @@
 ---
 {{ ansible_managed | comment }}
-server:
+http:
   port: {{ filebrowser_port }}
   baseURL: "/"
   # Share links are built from this. Without it they would carry the address the
   # container sees, which is the loopback interface.
   externalUrl: https://{{ filebrowser_hostname }}
-  database: /home/filebrowser/data/database.db
+  # Not used, and one less way in.
+  disableWebDAV: true
+  # Without this the built-in rate limiting and the failed-login lockout count
+  # against Apache's address instead of the client's, which switches both off in
+  # practice. The audit log addresses, the WebAuthn origin and the session cookie
+  # domain read the same headers. Trusting them is safe because the vhost drops
+  # the X-Forwarded-For and X-Forwarded-Host a client sends, so only the values
+  # Apache adds arrive here.
+  trustProxyHeaders: true
+
+server:
+  database:
+    # Any name but database.db, which v2 refuses to start beside.
+    path: /home/filebrowser/data/filebrowser.sqlite
+{% if __filebrowser_boltdb_files.matched > 0 %}
+    # Present only while the v1 BoltDB file remains in the data directory. v2
+    # imports it on a start that finds the SQLite database missing or empty and
+    # ignores it otherwise.
+    migrateFrom: /home/filebrowser/data/database.db.old
+{% endif %}
   # Thumbnails live beside the database on the NVMe and are pruned automatically,
   # because a phone browsing the picture folders will generate a lot of them.
   cacheDir: /home/filebrowser/data/cache
@@ -14,8 +33,6 @@ server:
   # Left on. This project published ten advisories in the first half of 2026,
   # three of them critical, so being told about a release is worth a banner.
   disableUpdateCheck: false
-  # Not used, and one less way in.
-  disableWebDAV: true
   sources:
 {% for source in filebrowser_sources %}
     - path: {{ source.path }}
@@ -53,27 +70,13 @@ auth:
       rpOrigins:
         - https://{{ filebrowser_hostname }}
 
-http:
-  # Without this the built-in rate limiting and the failed-login lockout count
-  # against Apache's address instead of the client's, which switches both off in
-  # practice. The session cookie domain, the WebAuthn origin and the audit log
-  # addresses read the same setting.
-  trustedHeaders:
-    - X-Forwarded-For
-    # TLS ends at Apache, so this is how the external scheme is known. It decides
-    # the origin the WebAuthn check compares against rpOrigins.
-    - X-Forwarded-Proto
-
+# File operations are granted per source. The built-in defaults allow viewing
+# and downloading only, and the source is read-only besides.
 userDefaults:
   account:
     permissions:
       admin: false
       api: false
-      create: false
-      delete: false
-      modify: false
-      # Share links are used. Every advisory published against the public share
-      # paths in 2026 is patched by 1.4.3-beta at the latest, well behind the
-      # stable line this runs, but they are also where this project's bugs
-      # cluster, so the version is worth following closely.
+      # Share links are used. The public share paths are where this project's
+      # advisories cluster, so the version is worth following closely.
       share: true
