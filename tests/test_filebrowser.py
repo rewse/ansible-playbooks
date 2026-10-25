@@ -26,7 +26,6 @@ def render_config(matched: int) -> dict:
         ],
         admin_user="tats",
         filebrowser_admin_password="pw",
-        filebrowser_jwt_secret="key",
         filebrowser_token_expiration_hours=720,
         __filebrowser_boltdb_files={"matched": matched},
     )
@@ -87,6 +86,13 @@ class FileBrowserConfigTest(unittest.TestCase):
             config["auth"]["methods"]["passkey"]["rpOrigins"],
             ["https://nas.rewse.jp"],
         )
+
+    def test_signing_key_is_left_to_the_database(self):
+        # v2 persists the JWT signing key in SQLite, copies the v1 one in on
+        # migration, and refuses to start when a configured key differs.
+        self.assertNotIn("key", render_config(0)["auth"])
+        role_vars = yaml.safe_load((ROLE / "vars" / "main.yml").read_text())
+        self.assertNotIn("filebrowser_jwt_secret", role_vars)
 
     def test_config_task_finds_v1_database_before_rendering(self):
         config = tasks("config.yml")

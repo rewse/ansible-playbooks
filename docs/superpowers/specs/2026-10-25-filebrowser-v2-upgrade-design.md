@@ -95,7 +95,7 @@ check mode ではどれも行わず、移行が走ることを debug で報告�
 - `server.database.migrateFrom` は `/home/filebrowser/data/database.db.old` とし、データディレクトリに `database.db.old` か `database.db` がある間だけ入れる。`database.db` も条件に含めるのは、改名前の check mode でも本番と同じ内容を描画するため。
 - `server.database.activity` は書かない。
 - `userDefaults` は config で管理し続ける。`account.permissions` は `admin: false`、`api: false`、`share: true` を残し、`create`、`delete`、`modify` は消す。ファイル操作の権限は追加で設定しない（担当者判断: v2 の組み込みの既定値は閲覧とダウンロードが可、変更、作成、削除が不可で今の意図と同じであり、ソース自体も読み取り専用のため）。
-- `cacheDir`、`cacheDirCleanup`、`disableUpdateCheck`、`sources`、`auth` は意味を変えずに残す。置き場所や値の形が v2 で変わっているものがあれば v2 に合わせる。公式の設定移行ツールの出力との突き合わせは担当者に任せる。
+- `cacheDir`、`cacheDirCleanup`、`disableUpdateCheck`、`sources` は意味を変えずに残す。`auth` は `key` だけを外し、他は残す。v2 は JWT の署名鍵を SQLite に保存し、移行で v1 の DB にあった鍵を写し、設定の `key` がそれと違うと起動しない。fox の v1 の DB には 1Password の鍵と違う鍵が残っていたので、DB の鍵を使う（2026-10-25 の移行で判明し、利用者が選んだ）。DB を失えばユーザーとパスキーも失うので、鍵だけを DB の外に置く意味はもうない。置き場所や値の形が v2 で変わっているものがあれば v2 に合わせる。
 - v1 を前提にした既存のコメント（`trustedHeaders` の説明、share 権限の説明にある 1.x の版番号）は、v2 の事実に合わせて書き直す。
 
 ### container コンポーネント

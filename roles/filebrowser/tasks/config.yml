@@ -36,7 +36,7 @@
     dest: "{{ filebrowser_data_dir }}/config.yaml"
     owner: "{{ filebrowser_uid }}"
     group: "{{ filebrowser_gid }}"
-    # Carries the admin password and the token signing key.
+    # Carries the admin password.
     mode: "0640"
   no_log: true
   notify: Restart filebrowser

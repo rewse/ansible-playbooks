@@ -54,7 +54,10 @@ server:
 auth:
   adminUsername: {{ admin_user }}
   adminPassword: "{{ filebrowser_admin_password }}"
-  key: "{{ filebrowser_jwt_secret }}"
+  # No key. The JWT signing key lives in the SQLite database, which took over
+  # the v1 one on migration, and v2 refuses to start when a configured key
+  # differs from it. Losing the database loses the users and passkeys as well,
+  # so a key kept outside it would not keep sessions alive anyway.
   tokenExpirationHours: {{ filebrowser_token_expiration_hours }}
   methods:
     password:

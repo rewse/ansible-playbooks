@@ -46,7 +46,3 @@ filebrowser_sources:
     rules: []
 
 filebrowser_admin_password: "{{ lookup('pipe', 'op read \"op://ansible/mcfawidi6xerblpafiaimpv2de/password\"') }}"
-# Supplied rather than generated so that rebuilding the container or losing the
-# database leaves sessions and share signatures valid. Without it the key is
-# random at first start and only the database remembers it.
-filebrowser_jwt_secret: "{{ lookup('pipe', 'op read \"op://ansible/mcfawidi6xerblpafiaimpv2de/jwt token secret\"') }}"
