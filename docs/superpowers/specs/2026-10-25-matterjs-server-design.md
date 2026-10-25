@@ -50,6 +50,8 @@ flowchart LR
   mjs -->|"eth0、mDNS、IPv6"| nodes["Matter ノード 4 台"]
 ```
 
+Matter を使うだけなら Apache は要らない。HA は fox の中から `localhost:5580` に直接つなぐ。Apache を経由するのはダッシュボードを家と VPN の端末から開くためで、TLS と `Require ip` をそこで受け持つ。
+
 ### matterjs_server ロール
 
 - `tasks/main.yml` は sysctl、container、apache の順に import する。container は `update` タグも持つ
