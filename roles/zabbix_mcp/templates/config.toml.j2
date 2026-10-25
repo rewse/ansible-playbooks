@@ -1,7 +1,9 @@
 [server]
 transport = "http"
-host = "0.0.0.0"
-port = 8081
+# Apache terminates TLS on the public name and proxies to this loopback
+# listener, so nothing else on the network reaches the server directly.
+host = "127.0.0.1"
+port = {{ zabbix_mcp_port }}
 # The MCP SDK rejects any Host header but localhost unless the server names its
 # public URL, which also enables the Origin check for that host.
 public_url = "{{ zabbix_mcp_public_url }}"
@@ -10,7 +12,7 @@ log_file = "/var/log/zabbix-mcp/server.log"
 {% if zabbix_mcp_auth_token is defined and zabbix_mcp_auth_token %}
 auth_token = "{{ zabbix_mcp_auth_token }}"
 {% else %}
-{{ 'auth_token is required when host is 0.0.0.0' | mandatory }}
+{{ 'auth_token is required because Apache publishes the server to the LAN and the office' | mandatory }}
 {% endif %}
 rate_limit = 300
 compact_output = true
@@ -20,3 +22,8 @@ url = "{{ zabbix_mcp_url }}"
 api_token = "{{ zabbix_mcp_api_token }}"
 read_only = {{ zabbix_mcp_read_only | lower }}
 verify_ssl = true
+
+[reporting]
+# The download route serves report PDFs without the bearer token, so keep
+# reports to MCP resource links.
+download_urls = false
