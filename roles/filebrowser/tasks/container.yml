@@ -22,26 +22,6 @@
     mode: "0644"
   register: __filebrowser_compose
 
-- name: container | Check v1 database
-  ansible.builtin.stat:
-    path: "{{ filebrowser_data_dir }}/database.db"
-  register: __filebrowser_boltdb_left
-
-- name: container | Fail when v1 database is not migrated
-  # v2 refuses to start beside database.db. Running this component without the
-  # database one would otherwise leave the service down rather than migrated.
-  ansible.builtin.fail:
-    msg: "{{ filebrowser_data_dir }}/database.db is the v1 database. Run with the filebrowser_database tag to migrate it first."
-  when:
-    - __filebrowser_boltdb_left.stat.exists
-    - not ansible_check_mode
-
-- name: container | Report unmigrated database in check mode
-  ansible.builtin.debug:
-    msg: "{{ filebrowser_data_dir }}/database.db would have to be migrated before the container starts"
-    verbosity: 0
-  when: ansible_check_mode and __filebrowser_boltdb_left.stat.exists
-
 - name: container | Report skipped start in check mode
   ansible.builtin.debug:
     msg: Start skipped because the compose file is not written in check mode
@@ -53,9 +33,9 @@
     project_src: /etc/compose/filebrowser
     state: present
     pull: missing
-    # v2 migrates a v1 database before it starts the HTTP server, so healthy
-    # means the migration has finished and a restart from a handler later in
-    # the play cannot interrupt it.
+    # v2 initializes its database before it starts the HTTP server, so waiting
+    # for healthy keeps a restart from a handler later in the play from
+    # interrupting that.
     wait: true
     wait_timeout: 300
   when: not (ansible_check_mode and __filebrowser_compose is changed)

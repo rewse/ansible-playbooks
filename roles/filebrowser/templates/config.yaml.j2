@@ -18,14 +18,7 @@ http:
 
 server:
   database:
-    # Any name but database.db, which v2 refuses to start beside.
     path: /home/filebrowser/data/filebrowser.sqlite
-{% if __filebrowser_boltdb_files.matched > 0 %}
-    # Present only while the v1 BoltDB file remains in the data directory. v2
-    # imports it on a start that finds the SQLite database missing or empty and
-    # ignores it otherwise.
-    migrateFrom: /home/filebrowser/data/database.db.old
-{% endif %}
   # Thumbnails live beside the database on the NVMe and are pruned automatically,
   # because a phone browsing the picture folders will generate a lot of them.
   cacheDir: /home/filebrowser/data/cache
@@ -54,10 +47,10 @@ server:
 auth:
   adminUsername: {{ admin_user }}
   adminPassword: "{{ filebrowser_admin_password }}"
-  # No key. The JWT signing key lives in the SQLite database, which took over
-  # the v1 one on migration, and v2 refuses to start when a configured key
-  # differs from it. Losing the database loses the users and passkeys as well,
-  # so a key kept outside it would not keep sessions alive anyway.
+  # No key. The JWT signing key lives in the SQLite database, and v2 refuses to
+  # start when a configured key differs from it. Losing the database loses the
+  # users and passkeys as well, so a key kept outside it would not keep sessions
+  # alive anyway.
   tokenExpirationHours: {{ filebrowser_token_expiration_hours }}
   methods:
     password:

@@ -18,18 +18,6 @@
     group: "{{ filebrowser_gid }}"
     mode: "0750"
 
-- name: config | Find v1 database
-  # The v1 BoltDB file, before or after the database component renames it.
-  # While either is present the configuration names it as the migration
-  # source; matching the unrenamed name too keeps check mode rendering what
-  # the real run writes.
-  ansible.builtin.find:
-    paths: "{{ filebrowser_data_dir }}"
-    patterns:
-      - database.db
-      - database.db.old
-  register: __filebrowser_boltdb_files
-
 - name: config | Deploy configuration file
   ansible.builtin.template:
     src: config.yaml.j2

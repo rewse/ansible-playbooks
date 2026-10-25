@@ -11,7 +11,7 @@ REPO_ROOT = pathlib.Path(__file__).resolve().parents[1]
 ROLE = REPO_ROOT / "roles" / "filebrowser"
 
 
-def render_config(matched: int) -> dict:
+def render_config() -> dict:
     environment = jinja2.Environment(
         loader=jinja2.FileSystemLoader(ROLE / "templates"),
         undefined=jinja2.StrictUndefined,
@@ -27,7 +27,6 @@ def render_config(matched: int) -> dict:
         admin_user="tats",
         filebrowser_admin_password="pw",
         filebrowser_token_expiration_hours=720,
-        __filebrowser_boltdb_files={"matched": matched},
     )
     return yaml.safe_load(text)
 
@@ -39,7 +38,7 @@ def tasks(name: str) -> dict[str, dict]:
 
 class FileBrowserConfigTest(unittest.TestCase):
     def test_http_settings_live_under_http(self):
-        config = render_config(0)
+        config = render_config()
         self.assertEqual(
             config["http"],
             {
@@ -53,29 +52,25 @@ class FileBrowserConfigTest(unittest.TestCase):
         for key in ("port", "baseURL", "externalUrl", "disableWebDAV"):
             self.assertNotIn(key, config["server"])
 
-    def test_database_has_no_migration_source_without_v1_database(self):
+    def test_database_is_the_sqlite_file(self):
         self.assertEqual(
-            render_config(0)["server"]["database"],
+            render_config()["server"]["database"],
             {"path": "/home/filebrowser/data/filebrowser.sqlite"},
         )
 
-    def test_database_migrates_while_v1_database_remains(self):
-        self.assertEqual(
-            render_config(1)["server"]["database"],
-            {
-                "path": "/home/filebrowser/data/filebrowser.sqlite",
-                "migrateFrom": "/home/filebrowser/data/database.db.old",
-            },
+    def test_template_has_no_migration_source(self):
+        self.assertNotIn(
+            "migrateFrom", (ROLE / "templates" / "config.yaml.j2").read_text()
         )
 
     def test_user_defaults_keep_only_account_permissions(self):
         self.assertEqual(
-            render_config(0)["userDefaults"],
+            render_config()["userDefaults"],
             {"account": {"permissions": {"admin": False, "api": False, "share": True}}},
         )
 
     def test_source_and_auth_are_unchanged(self):
-        config = render_config(0)
+        config = render_config()
         (source,) = config["server"]["sources"]
         self.assertEqual(source["config"]["readOnly"], True)
         self.assertEqual(source["config"]["defaultEnabled"], True)
@@ -88,79 +83,24 @@ class FileBrowserConfigTest(unittest.TestCase):
         )
 
     def test_signing_key_is_left_to_the_database(self):
-        # v2 persists the JWT signing key in SQLite, copies the v1 one in on
-        # migration, and refuses to start when a configured key differs.
-        self.assertNotIn("key", render_config(0)["auth"])
+        # v2 persists the JWT signing key in SQLite and refuses to start when a
+        # configured key differs from it.
+        self.assertNotIn("key", render_config()["auth"])
         role_vars = yaml.safe_load((ROLE / "vars" / "main.yml").read_text())
         self.assertNotIn("filebrowser_jwt_secret", role_vars)
 
-    def test_config_task_finds_v1_database_before_rendering(self):
-        config = tasks("config.yml")
-        names = list(config)
-        find = config["config | Find v1 database"]["ansible.builtin.find"]
-        self.assertEqual(find["patterns"], ["database.db", "database.db.old"])
-        self.assertEqual(
-            config["config | Find v1 database"]["register"],
-            "__filebrowser_boltdb_files",
-        )
-        self.assertLess(
-            names.index("config | Find v1 database"),
-            names.index("config | Deploy configuration file"),
-        )
 
-
-class FileBrowserMigrationTest(unittest.TestCase):
-    def test_database_component_runs_before_config(self):
+class FileBrowserContainerTest(unittest.TestCase):
+    def test_v1_migration_is_gone(self):
         imports = yaml.safe_load((ROLE / "tasks" / "main.yml").read_text())
-        files = [task["ansible.builtin.import_tasks"] for task in imports]
-        self.assertLess(files.index("database.yml"), files.index("config.yml"))
-        (database,) = [
-            t for t in imports if t["ansible.builtin.import_tasks"] == "database.yml"
-        ]
-        self.assertEqual(database["tags"], ["filebrowser_database"])
-
-    def test_v1_database_is_stopped_backed_up_and_renamed_only_when_present(self):
-        database = tasks("database.yml")
-        stop = database["database | Stop container"]
-        self.assertEqual(stop["community.docker.docker_compose_v2"]["state"], "stopped")
-        self.assertIn("__filebrowser_compose_file.stat.exists", stop["when"])
-        backup = database["database | Back up v1 database"]["ansible.builtin.copy"]
-        self.assertTrue(backup["remote_src"])
-        self.assertEqual(backup["dest"], "/var/backups/filebrowser/database.db")
-        self.assertEqual(backup["mode"], "0600")
-        rename = database["database | Rename v1 database for migration"]
-        self.assertEqual(
-            rename["args"]["removes"], "{{ filebrowser_data_dir }}/database.db"
+        self.assertNotIn(
+            "database.yml", [t["ansible.builtin.import_tasks"] for t in imports]
         )
-        self.assertEqual(
-            rename["args"]["creates"], "{{ filebrowser_data_dir }}/database.db.old"
-        )
-        self.assertIn("changed_when", rename)
-        for name in ("database | Stop container", "database | Back up v1 database"):
-            self.assertIn("__filebrowser_boltdb.stat.exists", database[name]["when"])
-
-    def test_check_mode_skips_backup_into_a_directory_not_yet_created(self):
-        # copy fails in check mode when its destination directory does not
-        # exist, which it does not until the real run creates it.
-        database = tasks("database.yml")
-        self.assertEqual(
-            database["database | Create backup directory"]["register"],
-            "__filebrowser_backup_dir",
-        )
-        self.assertIn(
-            "not (ansible_check_mode and __filebrowser_backup_dir is changed)",
-            database["database | Back up v1 database"]["when"],
-        )
-
-    def test_container_refuses_an_unmigrated_database_outside_check_mode(self):
-        container = tasks("container.yml")
-        names = list(container)
-        guard = container["container | Fail when v1 database is not migrated"]
-        self.assertIn("__filebrowser_boltdb_left.stat.exists", guard["when"])
-        self.assertIn("not ansible_check_mode", guard["when"])
-        self.assertLess(
-            names.index("container | Fail when v1 database is not migrated"),
-            names.index("container | Start container"),
+        self.assertFalse((ROLE / "tasks" / "database.yml").exists())
+        self.assertNotIn("config | Find v1 database", tasks("config.yml"))
+        self.assertNotIn(
+            "container | Fail when v1 database is not migrated",
+            tasks("container.yml"),
         )
 
     def test_start_waits_until_healthy(self):
