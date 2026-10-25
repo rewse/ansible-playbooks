@@ -1,12 +1,11 @@
 ---
 # Builder Toolbox and the tools it installs. Run `mwinit -s` before the playbook.
 # Ref: https://docs.hub.amazon.dev/builder-toolbox/user-guide/getting-started/
-# The toolbox, enfable, axe and aim CLIs have no Ansible modules.
+# The toolbox, axe and aim CLIs have no Ansible modules.
 - name: tools | Register repositories
   ansible.builtin.command: toolbox registry add {{ item }}
   changed_when: false
   loop:
-    - s3://buildertoolbox-registry-aisec-enfable-us-west-2/tools.json
     - s3://buildertoolbox-registry-isengard-cli-us-west-2/tools.json
 
 - name: tools | Install with toolbox
@@ -17,16 +16,11 @@
     - axe
     - brazilcli
     - claude-code
-    - enfable
     - isengard-cli
     - kiro-cli
 
 - name: tools | Update toolbox
   ansible.builtin.command: toolbox update
-  changed_when: false
-
-- name: tools | Enable enfable
-  ansible.builtin.command: enfable enable
   changed_when: false
 
 - name: tools | Install Kiro IDE
