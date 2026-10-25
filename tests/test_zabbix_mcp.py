@@ -73,6 +73,52 @@ class ZabbixMcpServerTest(unittest.TestCase):
     def test_empty_auth_token_fails_closed(self):
         with self.assertRaises(tomllib.TOMLDecodeError):
             tomllib.loads(render("config.toml.j2", zabbix_mcp_auth_token=""))
+class ZabbixMcpApacheTest(unittest.TestCase):
+    def test_apache_component_is_imported(self):
+        imports = [
+            (task["ansible.builtin.import_tasks"], task["tags"])
+            for task in yaml.safe_load((ROLE / "tasks" / "main.yml").read_text())
+        ]
+        self.assertEqual(
+            [name for name, _ in imports[:4]],
+            ["user.yml", "app.yml", "service.yml", "apache.yml"],
+        )
+        self.assertEqual(imports[3][1], ["zabbix_mcp_apache"])
+        roles = [
+            dep["role"]
+            for dep in yaml.safe_load((ROLE / "meta" / "main.yml").read_text())[
+                "dependencies"
+            ]
+        ]
+        self.assertIn("httpd", roles)
+
+    def test_vhost_proxies_to_the_loopback_listener(self):
+        lines = [
+            line.strip() for line in render("zabbix-mcp.rewse.jp.conf.j2").splitlines()
+        ]
+        for expected in (
+            "ServerName zabbix-mcp.rewse.jp",
+            "ProxyPreserveHost on",
+            "ProxyPass / http://127.0.0.1:8081/ flushpackets=on",
+            "ProxyPassReverse / http://127.0.0.1:8081/",
+            "SSLCertificateFile /etc/letsencrypt/live/rewse.jp/fullchain.pem",
+        ):
+            with self.subTest(line=expected):
+                self.assertIn(expected, lines)
+
+    def test_vhost_allows_only_listed_networks(self):
+        text = render("zabbix-mcp.rewse.jp.conf.j2")
+        allowed = {
+            value
+            for line in text.splitlines()
+            if line.strip().startswith("Require ip ")
+            for value in line.split()[2:]
+        }
+        expected = {"127.0.0.1", "::1"}
+        for value in NETWORKS.values():
+            expected.update([value] if isinstance(value, str) else value)
+        self.assertEqual(allowed, expected)
+        self.assertNotIn("Require all granted", text)
 
 
 if __name__ == "__main__":

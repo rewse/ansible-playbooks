@@ -14,3 +14,8 @@
   ansible.builtin.import_tasks: service.yml
   tags:
     - zabbix_mcp_service
+
+- name: Import apache tasks
+  ansible.builtin.import_tasks: apache.yml
+  tags:
+    - zabbix_mcp_apache

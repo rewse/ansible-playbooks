@@ -1,0 +1,35 @@
+{{ ansible_managed | comment }}
+<VirtualHost *:443>
+    ServerAdmin hostmaster@rewse.jp
+    ServerName {{ zabbix_mcp_hostname }}
+
+    # The server rejects a Host header other than the one its public_url names,
+    # so the original header has to reach it.
+    ProxyPreserveHost on
+    ProxyRequests off
+
+    # Streamable HTTP can answer a call as server-sent events, which reach the
+    # client only as Apache flushes them. 127.0.0.1 rather than localhost, which
+    # resolves to ::1 first while the server listens on IPv4 loopback only.
+    ProxyPass / http://127.0.0.1:{{ zabbix_mcp_port }}/ flushpackets=on
+    ProxyPassReverse / http://127.0.0.1:{{ zabbix_mcp_port }}/
+
+    # The bearer token can write to Zabbix, so even a valid token works only
+    # from home, the VPN, and the office. Behind CloudFront, mod_remoteip has
+    # already restored the client address that Require ip tests.
+    <Location />
+        Require ip 127.0.0.1
+        Require ip ::1
+        Require ip {{ networks.home_private_ipv4 }}
+        Require ip {{ networks.home_private_ipv6 }}
+        Require ip {{ networks.home_public_ipv4 }}
+        Require ip {{ networks.home_public_ipv6 }}
+        Require ip {{ networks.aws_private_ipv4 }}
+        Require ip {{ networks.aws_public_ipv6 }}
+        Require ip {{ networks.office_public_ipv4 | join(' ') }}
+    </Location>
+
+    SSLCertificateFile /etc/letsencrypt/live/rewse.jp/fullchain.pem
+    SSLCertificateKeyFile /etc/letsencrypt/live/rewse.jp/privkey.pem
+    Include /etc/letsencrypt/options-ssl-apache.conf
+</VirtualHost>

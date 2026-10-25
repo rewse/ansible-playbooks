@@ -1,4 +1,9 @@
 ---
+- name: Reload Apache
+  ansible.builtin.systemd:
+    name: apache2
+    state: reloaded
+
 - name: Reload systemd
   ansible.builtin.systemd:
     daemon_reload: true
