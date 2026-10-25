@@ -9,9 +9,9 @@ dependencies:
   - role: docker
     tags:
       - docker
-  - role: matter_server
+  - role: matterjs_server
     tags:
-      - matter_server
+      - matterjs_server
   - role: sslcert
     tags:
       - sslcert

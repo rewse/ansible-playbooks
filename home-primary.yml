@@ -49,9 +49,9 @@
     - role: litellm
       tags:
         - litellm
-    - role: matter_server
+    - role: matterjs_server
       tags:
-        - matter_server
+        - matterjs_server
     - role: mhz19
       tags:
         - mhz19

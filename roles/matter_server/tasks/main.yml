@@ -1,6 +1,0 @@
----
-- name: Import container tasks
-  ansible.builtin.import_tasks: container.yml
-  tags:
-    - matter_server_container
-    - update

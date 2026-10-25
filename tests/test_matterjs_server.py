@@ -49,7 +49,10 @@ def render(name: str, **overrides) -> str:
 
 
 def handlers(role: pathlib.Path) -> dict:
-    return {h["name"]: h for h in yaml.safe_load((role / "handlers" / "main.yml").read_text())}
+    return {
+        h["name"]: h
+        for h in yaml.safe_load((role / "handlers" / "main.yml").read_text())
+    }
 
 
 class MatterjsServerRoleTest(unittest.TestCase):
@@ -85,7 +88,9 @@ class MatterjsServerContainerTest(unittest.TestCase):
         self.assertEqual(service["network_mode"], "host")
         self.assertEqual(service["restart"], "unless-stopped")
         self.assertEqual(service["volumes"], ["/srv/matterjs_server/data:/data"])
-        self.assertTrue(service["image"].startswith("ghcr.io/matter-js/matterjs-server:"))
+        self.assertTrue(
+            service["image"].startswith("ghcr.io/matter-js/matterjs-server:")
+        )
 
     def test_environment_is_exactly_the_three_settings(self):
         self.assertEqual(
@@ -129,13 +134,18 @@ class MatterjsServerContainerTest(unittest.TestCase):
         task = next(
             t["ansible.builtin.file"]
             for t in load_tasks("container.yml")
-            if t.get("ansible.builtin.file", {}).get("path") == "{{ matterjs_server_data_dir }}"
+            if t.get("ansible.builtin.file", {}).get("path")
+            == "{{ matterjs_server_data_dir }}"
         )
-        self.assertEqual((task["owner"], task["group"], task["mode"]), (1000, 1000, "0700"))
+        self.assertEqual(
+            (task["owner"], task["group"], task["mode"]), (1000, 1000, "0700")
+        )
         self.assertNotIn("recurse", task)
 
     def test_legacy_removal_keeps_python_data(self):
-        self.assertNotIn("/srv/matter_server", (ROLE / "tasks" / "container.yml").read_text())
+        self.assertNotIn(
+            "/srv/matter_server", (ROLE / "tasks" / "container.yml").read_text()
+        )
         tasks = load_tasks("container.yml")
         removed = [
             t["ansible.builtin.file"]["path"]
@@ -151,8 +161,12 @@ class MatterjsServerContainerTest(unittest.TestCase):
         self.assertEqual(down["project_src"], "/etc/compose/matter_server")
 
     def test_container_is_an_update_component(self):
-        imports = {t["ansible.builtin.import_tasks"]: t["tags"] for t in load_tasks("main.yml")}
-        self.assertEqual(imports["container.yml"], ["matterjs_server_container", "update"])
+        imports = {
+            t["ansible.builtin.import_tasks"]: t["tags"] for t in load_tasks("main.yml")
+        }
+        self.assertEqual(
+            imports["container.yml"], ["matterjs_server_container", "update"]
+        )
 
 
 class MatterjsServerApacheTest(unittest.TestCase):
@@ -188,8 +202,12 @@ class MatterjsServerApacheTest(unittest.TestCase):
 
     def test_vhost_uses_the_wildcard_certificate(self):
         vhost = render("matter.rewse.jp.conf.j2")
-        self.assertIn("SSLCertificateFile /etc/letsencrypt/live/rewse.jp/fullchain.pem", vhost)
-        self.assertIn("SSLCertificateKeyFile /etc/letsencrypt/live/rewse.jp/privkey.pem", vhost)
+        self.assertIn(
+            "SSLCertificateFile /etc/letsencrypt/live/rewse.jp/fullchain.pem", vhost
+        )
+        self.assertIn(
+            "SSLCertificateKeyFile /etc/letsencrypt/live/rewse.jp/privkey.pem", vhost
+        )
 
     def test_apache_reload_matches_the_httpd_role(self):
         theirs = handlers(REPO_ROOT / "roles" / "httpd")
@@ -200,6 +218,25 @@ class MatterjsServerApacheTest(unittest.TestCase):
         self.assertEqual(imports, ["sysctl.yml", "container.yml", "apache.yml"])
         meta = yaml.safe_load((ROLE / "meta" / "main.yml").read_text())
         self.assertEqual([d["role"] for d in meta["dependencies"]], ["docker", "httpd"])
+
+
+class MatterjsServerWiringTest(unittest.TestCase):
+    def test_home_primary_runs_matterjs_server(self):
+        play = yaml.safe_load((REPO_ROOT / "home-primary.yml").read_text())[0]
+        roles = [r["role"] for r in play["roles"]]
+        self.assertIn("matterjs_server", roles)
+        self.assertNotIn("matter_server", roles)
+
+    def test_homeassistant_depends_on_matterjs_server(self):
+        meta = yaml.safe_load(
+            (REPO_ROOT / "roles" / "homeassistant" / "meta" / "main.yml").read_text()
+        )
+        deps = [d["role"] for d in meta["dependencies"]]
+        self.assertIn("matterjs_server", deps)
+        self.assertNotIn("matter_server", deps)
+
+    def test_python_matter_server_role_is_gone(self):
+        self.assertFalse((REPO_ROOT / "roles" / "matter_server").exists())
 
 
 if __name__ == "__main__":
