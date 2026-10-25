@@ -1,0 +1,5 @@
+---
+- name: Reload sysctl
+  # sysctl --system rereads every drop-in; no module does that.
+  ansible.builtin.command: sysctl --system
+  changed_when: false

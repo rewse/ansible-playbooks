@@ -1,0 +1,7 @@
+---
+- name: sysctl | Allow unprivileged ping
+  ansible.builtin.copy:
+    src: 60-matterjs-server-ping.conf
+    dest: /etc/sysctl.d
+    mode: "0644"
+  notify: Reload sysctl

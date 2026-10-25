@@ -1,0 +1,10 @@
+---
+matterjs_server_data_dir: /srv/matterjs_server/data
+matterjs_server_hostname: matter.rewse.jp
+# Home Assistant resolves localhost to either loopback address, so the server
+# listens on both. The container health check probes the first entry.
+matterjs_server_listen_address: "127.0.0.1,::1"
+matterjs_server_port: 5580
+# fox has several docker bridges besides its LAN link; mDNS and Matter traffic
+# belong on the LAN link only.
+matterjs_server_primary_interface: eth0
