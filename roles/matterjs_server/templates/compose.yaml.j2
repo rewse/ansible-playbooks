@@ -1,0 +1,17 @@
+---
+{{ ansible_managed | comment }}
+name: matterjs_server
+
+services:
+  matterjs-server:
+    container_name: matterjs-server
+    image: {{ __matterjs_server_image.ref }}
+    environment:
+      LISTEN_ADDRESS: "{{ matterjs_server_listen_address }}"
+      PRIMARY_INTERFACE: {{ matterjs_server_primary_interface }}
+      # The dashboard needs its production mode behind Apache's reverse proxy.
+      PRODUCTION_MODE: "true"
+    volumes:
+      - {{ matterjs_server_data_dir }}:/data
+    network_mode: host
+    restart: unless-stopped

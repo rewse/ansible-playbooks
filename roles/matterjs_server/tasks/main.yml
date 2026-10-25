@@ -3,3 +3,9 @@
   ansible.builtin.import_tasks: sysctl.yml
   tags:
     - matterjs_server_sysctl
+
+- name: Import container tasks
+  ansible.builtin.import_tasks: container.yml
+  tags:
+    - matterjs_server_container
+    - update

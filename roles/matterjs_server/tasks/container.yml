@@ -1,0 +1,98 @@
+---
+- name: container | Resolve aged image
+  ansible.builtin.set_fact:
+    __matterjs_server_image: >-
+      {{ lookup('aged_release', 'oci:ghcr.io/matter-js/matterjs-server', pattern='^\d+\.\d+\.\d+$',
+                platform='linux/' ~ ('arm64' if ansible_facts['architecture'] == 'aarch64' else 'amd64')) }}
+
+- name: container | Create role directory
+  ansible.builtin.file:
+    path: /srv/matterjs_server
+    state: directory
+    mode: "0755"
+
+- name: container | Create data directory
+  # The container runs as UID 1000. The files inside belong to that user once
+  # they are copied in, so ownership is not applied recursively.
+  ansible.builtin.file:
+    path: "{{ matterjs_server_data_dir }}"
+    state: directory
+    owner: 1000
+    group: 1000
+    mode: "0700"
+
+- name: container | Check migrated data
+  ansible.builtin.stat:
+    path: "{{ matterjs_server_data_dir }}/server"
+  register: __matterjs_server_storage
+
+- name: container | Check Python data
+  ansible.builtin.stat:
+    path: "{{ matterjs_server_data_dir }}/chip.json"
+  register: __matterjs_server_chip
+
+# A first start on an empty directory creates a new fabric, after which the
+# server never imports Python Matter Server data placed there. Starting only
+# with data in place keeps a mistaken run from creating that state.
+- name: container | Fail without data to migrate
+  ansible.builtin.fail:
+    msg: >-
+      {{ matterjs_server_data_dir }} holds neither matter.js storage nor chip.json.
+      Copy chip.json and <fabric>.json from the Python Matter Server first.
+  when:
+    - not ansible_check_mode
+    - not __matterjs_server_storage.stat.exists
+    - not __matterjs_server_chip.stat.exists
+
+- name: container | Report skipped start without data
+  ansible.builtin.debug:
+    msg: Start skipped because {{ matterjs_server_data_dir }} holds no data to migrate
+    verbosity: 0
+  when:
+    - ansible_check_mode
+    - not __matterjs_server_storage.stat.exists
+    - not __matterjs_server_chip.stat.exists
+
+- name: container | Create compose directory
+  ansible.builtin.file:
+    path: /etc/compose/matterjs_server
+    state: directory
+    mode: "0755"
+
+- name: container | Deploy compose file
+  ansible.builtin.template:
+    src: compose.yaml.j2
+    dest: /etc/compose/matterjs_server/compose.yaml
+    mode: "0644"
+  register: __matterjs_server_compose
+
+- name: container | Report skipped start in check mode
+  ansible.builtin.debug:
+    msg: Start skipped because the compose file is not written in check mode
+    verbosity: 0
+  when: ansible_check_mode and __matterjs_server_compose is changed
+
+- name: container | Start containers
+  community.docker.docker_compose_v2:
+    project_src: /etc/compose/matterjs_server
+    state: present
+    pull: missing
+  when:
+    - not (ansible_check_mode and __matterjs_server_compose is changed)
+    - __matterjs_server_chip.stat.exists or __matterjs_server_storage.stat.exists
+
+- name: container | Check legacy compose project
+  ansible.builtin.stat:
+    path: /etc/compose/matter_server/compose.yaml
+  register: __matterjs_server_legacy
+
+- name: container | Remove legacy compose project
+  community.docker.docker_compose_v2:
+    project_src: /etc/compose/matter_server
+    state: absent
+  when: __matterjs_server_legacy.stat.exists
+
+- name: container | Remove legacy compose directory
+  ansible.builtin.file:
+    path: /etc/compose/matter_server
+    state: absent
