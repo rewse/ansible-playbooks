@@ -21,6 +21,13 @@
     # mod_remoteip for the same hook and could leave the edge address instead.
     RequestHeader unset X-Forwarded-For
 
+    # FileBrowser builds the session cookie domain, the WebAuthn origin and
+    # share URLs from the first X-Forwarded-Host value, and mod_proxy appends
+    # the real host to a value the client sent, so a client could otherwise
+    # choose that first value. Unset in fixups for the same reason as
+    # X-Forwarded-For, leaving only the host mod_proxy adds.
+    RequestHeader unset X-Forwarded-Host
+
     ProxyPass / http://localhost:{{ filebrowser_port }}/
     ProxyPassReverse / http://localhost:{{ filebrowser_port }}/
 
