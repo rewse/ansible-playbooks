@@ -27,11 +27,20 @@ HA の再起動や Matter サーバーの数分の停止で、各部屋の `*_th
 
 | 方式 | 内容 | 判断 |
 |---|---|---|
-| A | anomaly から `delay_off` を外して `delay_on: 10 minutes` を付ける | 採用 |
-| B | anomaly の非数値条件を「非数値かつ `last_changed` から 10 分以上」に書き換え、遅延は付けない | 不採用。A と同じ結果になるが、6 個のテンプレートに時刻計算が増える |
+| A | anomaly から `delay_off` を外して `delay_on: 10 minutes` を付ける | 不採用。もともと時間で判定している 2 時間未報告と disagreement まで 10 分遅れる |
+| B | anomaly の非数値条件を「非数値で、`last_changed` から 10 分以上」に書き換え、anomaly には遅延を付けない | 採用 |
 | C | 主センサーの非数値条件を削除し、長い欠測は 2 時間未報告の条件に任せる | 不採用。欠測中に連携が `unavailable` を書き直すと `last_reported` が更新され、未報告の条件が働かない。働いても検知は 2 時間後になる |
 
-A では 2 時間未報告と disagreement の検知が 10 分ずつ遅れる（実質 2 時間 10 分と 1 時間 10 分）。どちらも時間単位の判定なので影響はない。HA の起動時は anomaly の前回の状態が復元され、主センサーが 10 分以内に数値に戻れば off のまま変わらない。
+B では、各条件の遅れはその条件の判定だけで決まる。
+
+| 場面 | on までの遅れ | off までの遅れ |
+|---|---|---|
+| 主センサーが数値でない | 10 分（テンプレート内の `last_changed` 判定） | なし |
+| 主センサーが 2 時間報告していない | なし（判定そのものが 2 時間） | なし |
+| 2 台の温湿度差（disagreement） | 1 時間（disagreement の `delay_on`） | なし |
+| 副センサーの 24 時間欠測（fault） | なし（判定そのものが 24 時間） | なし |
+
+テンプレートは `now()` を参照するので毎分再評価され、10 分の経過で真になる。HA の起動時は主センサーの `last_changed` が起動時刻になるので、10 分以内に数値に戻れば anomaly は off のまま変わらない。
 
 `thermometer-fault-detection` の要件のうち、「温度差（湿度差）がしきい値を超えた状態が 2 時間継続した場合に故障と判定する」は 1 時間に、「すべての異常条件が解消した状態が 1 時間継続した場合に自動復旧する」は「解消したらすぐ復旧する」に改める。
 
@@ -39,11 +48,11 @@ A では 2 時間未報告と disagreement の検知が 10 分ずつ遅れる（
 
 `roles/homeassistant/files/templates.yaml` の 3 部屋分を変える。
 
-- anomaly（`binary_sensor.<room>_thermometer_anomaly`、`binary_sensor.<room>_hygrometer_anomaly`）: state を主センサーの非数値、2 時間未報告、対応する disagreement の 3 条件の OR にする。範囲外の条件と、それだけに使う `secondary` 変数を消す。`delay_off` を外し、`delay_on: minutes: 10` を付ける。コメントを新しい挙動に合わせる
+- anomaly（`binary_sensor.<room>_thermometer_anomaly`、`binary_sensor.<room>_hygrometer_anomaly`）: state を主センサーの非数値、2 時間未報告、対応する disagreement の 3 条件の OR にする。範囲外の条件と、それだけに使う `secondary` 変数を消す。非数値条件は `not is_number(primary) and (now() - states.<primary>.last_changed).total_seconds() >= 600` とする。`delay_off` を外し、`delay_on` も付けない。コメントを新しい挙動に合わせる
 - disagreement（`binary_sensor.<room>_temperature_disagreement`、`binary_sensor.<room>_humidity_disagreement`）: `delay_on` を `hours: 1` にする。`delay_off` は付けない
 - fault: 変えない
 
-`roles/homeassistant/tests/thermometer_fault_detection_room.yml` と `hygrometer_fault_detection_room.yml` の契約を合わせる。anomaly は `delay_on.minutes == 10` で `delay_off` を持たず、範囲外の比較を含まず、非数値、未報告、disagreement の各条件を含むこと。disagreement は `delay_on.hours == 1` を持ち、`delay_off` を持たないこと。
+`roles/homeassistant/tests/thermometer_fault_detection_room.yml` と `hygrometer_fault_detection_room.yml` の契約を合わせる。anomaly は `delay_on` も `delay_off` も持たず、非数値条件が `last_changed` と `600` を含み、範囲外の比較を含まず、非数値、未報告、disagreement の各条件を含むこと。disagreement は `delay_on.hours == 1` を持ち、`delay_off` を持たないこと。
 
 ## 反映と検証
 
@@ -54,4 +63,4 @@ A では 2 時間未報告と disagreement の検知が 10 分ずつ遅れる（
 ## 設計時に決めたこと
 
 - 欠測を許す時間を 10 分にした。HA の再起動と Matter サーバーの再起動はどちらも数分で終わる
-- 方式 A を選んだ
+- 方式 B を選んだ
