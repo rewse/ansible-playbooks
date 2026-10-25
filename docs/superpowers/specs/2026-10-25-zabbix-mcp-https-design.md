@@ -11,7 +11,7 @@ fox の zabbix-mcp-server を `https://zabbix-mcp.rewse.jp/mcp` で使えるよ�
 - 利用者は mcporter だけで、chezmoi の `dot_config/mcporter/private_mcporter.json.tmpl` が `http://fox.rewse.jp:8081/mcp` を指す。この設定は会社の端末（ホスト `7cf34ded5d65`）にも配られる
 - `[reporting] download_urls = false` は fox に反映済みである
 - 公開しているホスト名（`rewse.jp` と 9 個のサブドメイン）は `~/git/cloudfront-waf` の CloudFront と WAF を通る。家の中と VPN からは UniFi の DNS ポリシーで fox の内部アドレスに直接届く。Apache は CloudFront の秘密のヘッダーがないリクエストを、ループバック、家、VPN 以外から来たものは 403 にする（`roles/httpd/templates/cloudfront-origin.conf.j2`）。`mod_remoteip` が CloudFront 経由の接続元を復元するので、`Require ip` と fail2ban は本当の接続元を見る
-- 会社の出口アドレスは `networks.office_public_ipv4` にあり、`/zabbix` と `/admin` はこれを許可している。Zabbix の画面は会社から使えており、`access.log` に 10/19 と 10/21 の会社のアドレスからの 200 が残っている
+- 会社の出口アドレスは `networks.office_public_ipv4` にあり、`/zabbix` と `/admin` はこれを許可している。fox の `access.log` には 10/21 までの会社のアドレスからの 200 が残っている。10/22 の CloudFront への切り替え後は会社からのリクエストがまだなく、CloudFront 経由で会社から使えるかは確かめていない
 
 ## ゴール
 
@@ -23,7 +23,7 @@ fox の zabbix-mcp-server を `https://zabbix-mcp.rewse.jp/mcp` で使えるよ�
 
 ## 範囲外
 
-- Zabbix の画面と API の公開範囲。画面は会社から使えており、API は fox の中の zabbix-mcp-server からしか使わない
+- Zabbix の画面と API の公開範囲。画面はすでに会社からのアクセスを許可しており、API は fox の中の zabbix-mcp-server からしか使わない
 - OAuth への切り替えとトークンの更新
 - WAF の `BlockManagedRules` の有効化
 - matter.rewse.jp（別の spec で扱う）
@@ -116,7 +116,7 @@ AWS、UniFi、chezmoi への書き込みは、それぞれ実施の前にユー�
 - CloudFront 経由（CloudFront のアドレスに `curl --resolve` する）で、家の公開アドレスからは `/health` が 200、alfa の公開 IPv4 のように許可していないアドレスからは 403 を返す
 - LAN から `fox.rewse.jp:8081` に接続できない
 - `fail2ban-client get zabbix-mcp logpath` が Apache のログを指し、`fail2ban-regex` が 401 の行だけに一致する
-- 会社からの接続は、次に出社したときにユーザーが確かめる
+- 会社からの接続は、次に出社したときにユーザーが確かめる。同じ CloudFront の経路を通る Zabbix の画面（`https://zabbix.rewse.jp/zabbix/`）も開けることを合わせて確かめる
 
 ## 戻し方
 
