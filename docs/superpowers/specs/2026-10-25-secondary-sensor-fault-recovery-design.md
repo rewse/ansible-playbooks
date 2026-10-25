@@ -17,16 +17,16 @@
 
 ## 検討した方式
 
-1. 採用: 遅延付きの判定と遅延なしの判定に分ける。主センサー、副センサーの範囲外、disagreement の条件を新しい `binary_sensor.<room>_thermometer_reading_fault` と `binary_sensor.<room>_hygrometer_reading_fault` へ移し、`delay_off: 1 hour` を付ける。既存の `*_thermometer_fault` と `*_hygrometer_fault` は、reading fault が on か副センサー欠測条件が真かの OR とし、遅延を外す。entity ID は変わらないので、automation、アラーム、ダッシュボードは影響を受けない。
+1. 採用: 遅延付きの判定と遅延なしの判定に分ける。主センサー、副センサーの範囲外、disagreement の条件を新しい `binary_sensor.<room>_thermometer_anomaly` と `binary_sensor.<room>_hygrometer_anomaly` へ移し、`delay_off: 1 hour` を付ける。anomaly は値の異常、fault は制御を止める総合判定を表す。既存の `*_thermometer_fault` と `*_hygrometer_fault` は、anomaly が on か副センサー欠測条件が真かの OR とし、遅延を外す。entity ID は変わらないので、automation、アラーム、ダッシュボードは影響を受けない。
 2. 不採用: `delay_off` 全体を 10 分程度へ短縮する。変更は小さいが、disagreement のばたつき抑制も弱まり、元の要件の意図から外れる。
 3. 不採用: `delay_off` をテンプレートにして原因に応じて変える。off へ遷移する時点ではすべての条件が偽なので、原因を判別できない。
 
 ## 対象
 
-Dad’s Room、Living Room、Mom’s Room の 3 部屋に適用する（担当者判断）。3 部屋とも同じ構造で副センサーの 24 時間条件を持ち、テストも 3 部屋共通の契約で検証しているため、Dad’s Room だけ変えると構造が分かれる。追加 entity は 1 部屋 2 個、計 6 個。reading fault の名前は既存 fault の名前に `Reading` を挟んだもの（例: `Dad’s Room Thermometer Reading Fault`）とし、`device_class: problem` を付ける（担当者判断）。アラームは既存 fault を引き続き参照し、reading fault 単独では通知しない。
+Dad’s Room、Living Room、Mom’s Room の 3 部屋に適用する（担当者判断）。3 部屋とも同じ構造で副センサーの 24 時間条件を持ち、テストも 3 部屋共通の契約で検証しているため、Dad’s Room だけ変えると構造が分かれる。追加 entity は 1 部屋 2 個、計 6 個。anomaly の名前は既存 fault の `Fault` を `Anomaly` に置き換えたもの（例: `Dad’s Room Thermometer Anomaly`）とし、`device_class: problem` を付ける（担当者判断）。アラームは既存 fault を引き続き参照し、anomaly 単独では通知しない。
 
 ## 検証
 
-- `roles/homeassistant/tests/thermometer_fault_detection*.yml` と `hygrometer_fault_detection*.yml` を新構造に合わせて更新する。reading fault が主センサー、範囲外、disagreement の条件と `delay_off.hours == 1` を持つこと、fault が reading fault と副センサー欠測条件を参照し `delay_off` を持たないことを確認する。
+- `roles/homeassistant/tests/thermometer_fault_detection*.yml` と `hygrometer_fault_detection*.yml` を新構造に合わせて更新する。anomaly が主センサー、範囲外、disagreement の条件と `delay_off.hours == 1` を持つこと、fault が anomaly と副センサー欠測条件を参照し `delay_off` を持たないことを確認する。
 - pre-commit と pytest を実行する。
-- `--tags` を絞って homeassistant の該当コンポーネントを check と apply で適用し、実機で 6 個の reading fault の状態と、既存 fault が off のままであることを確認する。
+- `--tags` を絞って homeassistant の該当コンポーネントを check と apply で適用し、実機で 6 個の anomaly の状態と、既存 fault が off のままであることを確認する。
