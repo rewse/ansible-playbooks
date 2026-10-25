@@ -22,7 +22,7 @@
         ) | abs > 10
       }}
     delay_on:
-      hours: 2
+      hours: 1
     device_class: problem
   - unique_id: binary_sensor.dads_room_humidity_high
     name: "Dad's Room Humidity High"
@@ -42,25 +42,17 @@
         float(states('input_number.dads_room_humidity_min_diff'))
       }}
     icon: "mdi:water-percent-alert"
-  # Detects abnormal readings; clears after one hour of normal readings.
+  # Reports a reading missing for 10 minutes, unreported for 2 hours, or in
+  # persistent disagreement; clears as soon as none holds.
   - unique_id: binary_sensor.dads_room_hygrometer_anomaly
     name: "Dad’s Room Hygrometer Anomaly"
     state: >-
       {% set primary = states('sensor.dads_room_humidity') %}
-      {% set secondary = states('sensor.dads_room_switchbot_meter_humidity') %}
       {{
-        not is_number(primary) or
-        primary | float < 1 or
-        primary | float > 99 or
-        (
-          is_number(secondary) and
-          (secondary | float < 1 or secondary | float > 99)
-        ) or
+        (not is_number(primary) and (now() - states.sensor.dads_room_humidity.last_changed).total_seconds() >= 600) or
         (now() - states.sensor.dads_room_humidity.last_reported).total_seconds() >= 7200 or
         is_state('binary_sensor.dads_room_humidity_disagreement', 'on')
       }}
-    delay_off:
-      hours: 1
     device_class: problem
   # Combines reading anomalies with secondary sensor outages, which clear immediately.
   - unique_id: binary_sensor.dads_room_hygrometer_fault
@@ -110,27 +102,19 @@
         ) | abs > 1.5
       }}
     delay_on:
-      hours: 2
+      hours: 1
     device_class: problem
-  # Detects abnormal readings; clears after one hour of normal readings.
+  # Reports a reading missing for 10 minutes, unreported for 2 hours, or in
+  # persistent disagreement; clears as soon as none holds.
   - unique_id: binary_sensor.dads_room_thermometer_anomaly
     name: "Dad’s Room Thermometer Anomaly"
     state: >-
       {% set primary = states('sensor.dads_room_temperature') %}
-      {% set secondary = states('sensor.dads_room_switchbot_meter_temperature') %}
       {{
-        not is_number(primary) or
-        primary | float < 5 or
-        primary | float > 40 or
-        (
-          is_number(secondary) and
-          (secondary | float < 5 or secondary | float > 40)
-        ) or
+        (not is_number(primary) and (now() - states.sensor.dads_room_temperature.last_changed).total_seconds() >= 600) or
         (now() - states.sensor.dads_room_temperature.last_reported).total_seconds() >= 7200 or
         is_state('binary_sensor.dads_room_temperature_disagreement', 'on')
       }}
-    delay_off:
-      hours: 1
     device_class: problem
   - unique_id: binary_sensor.dads_room_thermometer_connectivity
     name: "Dad's Room Thermometer Connectivity"
@@ -177,7 +161,7 @@
         ) | abs > 10
       }}
     delay_on:
-      hours: 2
+      hours: 1
     device_class: problem
   - unique_id: binary_sensor.living_room_humidity_high
     name: "Living Room Humidity High"
@@ -197,25 +181,17 @@
         float(states('input_number.living_room_humidity_min_diff'))
       }}
     icon: "mdi:water-percent-alert"
-  # Detects abnormal readings; clears after one hour of normal readings.
+  # Reports a reading missing for 10 minutes, unreported for 2 hours, or in
+  # persistent disagreement; clears as soon as none holds.
   - unique_id: binary_sensor.living_room_hygrometer_anomaly
     name: "Living Room Hygrometer Anomaly"
     state: >-
       {% set primary = states('sensor.living_room_humidity') %}
-      {% set secondary = states('sensor.living_room_switchbot_hub_2_humidity') %}
       {{
-        not is_number(primary) or
-        primary | float < 1 or
-        primary | float > 99 or
-        (
-          is_number(secondary) and
-          (secondary | float < 1 or secondary | float > 99)
-        ) or
+        (not is_number(primary) and (now() - states.sensor.living_room_humidity.last_changed).total_seconds() >= 600) or
         (now() - states.sensor.living_room_humidity.last_reported).total_seconds() >= 7200 or
         is_state('binary_sensor.living_room_humidity_disagreement', 'on')
       }}
-    delay_off:
-      hours: 1
     device_class: problem
   # Combines reading anomalies with secondary sensor outages, which clear immediately.
   - unique_id: binary_sensor.living_room_hygrometer_fault
@@ -265,27 +241,19 @@
         ) | abs > 1.5
       }}
     delay_on:
-      hours: 2
+      hours: 1
     device_class: problem
-  # Detects abnormal readings; clears after one hour of normal readings.
+  # Reports a reading missing for 10 minutes, unreported for 2 hours, or in
+  # persistent disagreement; clears as soon as none holds.
   - unique_id: binary_sensor.living_room_thermometer_anomaly
     name: "Living Room Thermometer Anomaly"
     state: >-
       {% set primary = states('sensor.living_room_temperature') %}
-      {% set secondary = states('sensor.living_room_switchbot_hub_2_temperature') %}
       {{
-        not is_number(primary) or
-        primary | float < 5 or
-        primary | float > 40 or
-        (
-          is_number(secondary) and
-          (secondary | float < 5 or secondary | float > 40)
-        ) or
+        (not is_number(primary) and (now() - states.sensor.living_room_temperature.last_changed).total_seconds() >= 600) or
         (now() - states.sensor.living_room_temperature.last_reported).total_seconds() >= 7200 or
         is_state('binary_sensor.living_room_temperature_disagreement', 'on')
       }}
-    delay_off:
-      hours: 1
     device_class: problem
   - unique_id: binary_sensor.living_room_thermometer_connectivity
     name: "Living Room Thermometer Connectivity"
@@ -340,7 +308,7 @@
         ) | abs > 10
       }}
     delay_on:
-      hours: 2
+      hours: 1
     device_class: problem
   - unique_id: binary_sensor.moms_room_humidity_high
     name: "Mom's Room Humidity High"
@@ -360,25 +328,17 @@
         float(states('input_number.moms_room_humidity_min_diff'))
       }}
     icon: "mdi:water-percent-alert"
-  # Detects abnormal readings; clears after one hour of normal readings.
+  # Reports a reading missing for 10 minutes, unreported for 2 hours, or in
+  # persistent disagreement; clears as soon as none holds.
   - unique_id: binary_sensor.moms_room_hygrometer_anomaly
     name: "Mom’s Room Hygrometer Anomaly"
     state: >-
       {% set primary = states('sensor.moms_room_humidity') %}
-      {% set secondary = states('sensor.moms_room_switchbot_meter_humidity') %}
       {{
-        not is_number(primary) or
-        primary | float < 1 or
-        primary | float > 99 or
-        (
-          is_number(secondary) and
-          (secondary | float < 1 or secondary | float > 99)
-        ) or
+        (not is_number(primary) and (now() - states.sensor.moms_room_humidity.last_changed).total_seconds() >= 600) or
         (now() - states.sensor.moms_room_humidity.last_reported).total_seconds() >= 7200 or
         is_state('binary_sensor.moms_room_humidity_disagreement', 'on')
       }}
-    delay_off:
-      hours: 1
     device_class: problem
   # Combines reading anomalies with secondary sensor outages, which clear immediately.
   - unique_id: binary_sensor.moms_room_hygrometer_fault
@@ -428,27 +388,19 @@
         ) | abs > 1.5
       }}
     delay_on:
-      hours: 2
+      hours: 1
     device_class: problem
-  # Detects abnormal readings; clears after one hour of normal readings.
+  # Reports a reading missing for 10 minutes, unreported for 2 hours, or in
+  # persistent disagreement; clears as soon as none holds.
   - unique_id: binary_sensor.moms_room_thermometer_anomaly
     name: "Mom’s Room Thermometer Anomaly"
     state: >-
       {% set primary = states('sensor.moms_room_temperature') %}
-      {% set secondary = states('sensor.moms_room_switchbot_meter_temperature') %}
       {{
-        not is_number(primary) or
-        primary | float < 5 or
-        primary | float > 40 or
-        (
-          is_number(secondary) and
-          (secondary | float < 5 or secondary | float > 40)
-        ) or
+        (not is_number(primary) and (now() - states.sensor.moms_room_temperature.last_changed).total_seconds() >= 600) or
         (now() - states.sensor.moms_room_temperature.last_reported).total_seconds() >= 7200 or
         is_state('binary_sensor.moms_room_temperature_disagreement', 'on')
       }}
-    delay_off:
-      hours: 1
     device_class: problem
   - unique_id: binary_sensor.moms_room_thermometer_connectivity
     name: "Mom's Room Thermometer Connectivity"
