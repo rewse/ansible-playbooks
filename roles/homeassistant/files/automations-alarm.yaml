@@ -98,6 +98,7 @@
     - trigger: state
       entity_id:
         - binary_sensor.aqarahub
+        - binary_sensor.atomlite_dad
         - binary_sensor.aventage
         - binary_sensor.brother
         - binary_sensor.catloghome_dad
