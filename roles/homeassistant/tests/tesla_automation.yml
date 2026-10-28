@@ -6,6 +6,8 @@
   vars:
     homeassistant_tesla_active_states_template: !unsafe >-
       {{ states('sensor.model_y_state') in ['Online', 'Driving', 'Charging'] }}
+    homeassistant_tesla_tns_geofence_template: !unsafe >-
+      {{ states('sensor.model_y_geofence') | lower == 'tns azabudai 3-chome' }}
   tasks:
     - name: Parse automation
       ansible.builtin.set_fact:
@@ -22,10 +24,14 @@
     - name: Verify refresh contract
       ansible.builtin.assert:
         that:
-          - homeassistant_tesla_automations | length == 2
+          - homeassistant_tesla_automations | length == 3
           - >-
             (homeassistant_tesla_automations | map(attribute='alias') | list)
-            == ['Enable Tesla Sentry at TNS Azabudai 3-chome', 'Refresh Tesla Fleet Data']
+            == [
+              'Disable Tesla Sentry',
+              'Enable Tesla Sentry at TNS Azabudai 3-chome',
+              'Refresh Tesla Fleet Data'
+            ]
           - homeassistant_refresh_automations | length == 1
           - homeassistant_refresh_automations[0].id == 'automation.refresh_tesla_fleet_data'
           - homeassistant_refresh_automations[0].triggers | length == 2
@@ -78,9 +84,8 @@
           - homeassistant_tns_sentry_automations[0].conditions | length == 2
           - >-
             {
-              'condition': 'state',
-              'entity_id': 'sensor.model_y_geofence',
-              'state': 'TNS Azabudai 3-chome'
+              'condition': 'template',
+              'value_template': homeassistant_tesla_tns_geofence_template
             } in homeassistant_tns_sentry_automations[0].conditions
           - >-
             {

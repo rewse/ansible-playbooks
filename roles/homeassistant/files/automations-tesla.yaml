@@ -25,9 +25,10 @@
       for:
         minutes: 3
   conditions:
-    - condition: state
-      entity_id: sensor.model_y_geofence
-      state: "TNS Azabudai 3-chome"
+    # TeslaMate geofence names are edited by hand, so compare case-insensitively.
+    - condition: template
+      value_template: >-
+        {{ states('sensor.model_y_geofence') | lower == 'tns azabudai 3-chome' }}
     - condition: not
       conditions:
         - condition: state
