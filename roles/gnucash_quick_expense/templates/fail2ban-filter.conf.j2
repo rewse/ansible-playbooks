@@ -1,0 +1,11 @@
+{{ ansible_managed | comment }}
+#
+# The form sends the PostgreSQL username and password with every API request,
+# and the server answers a rejected login with 401 on any of them.
+#
+# The virtual host is pinned because other_vhosts_access.log carries every name
+# Apache serves, and the vhost_combined format puts %v:%p ahead of the client
+# address, which is why <HOST> is the second field rather than the first.
+[Definition]
+failregex = ^{{ gnucash_quick_expense_hostname | regex_escape }}:\d+ <HOST> \S+ \S+ \[\] "POST /api/(?:accounts|expenses|rate) HTTP/[\d.]+" 401 \d+
+ignoreregex =

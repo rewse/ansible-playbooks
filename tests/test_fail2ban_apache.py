@@ -325,6 +325,7 @@ class JailActionTest(unittest.TestCase):
             [
                 "couchdb",
                 "filebrowser",
+                "gnucash_quick_expense",
                 "homeassistant",
                 "litellm",
                 "nvr",

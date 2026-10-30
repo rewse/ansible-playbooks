@@ -1,0 +1,53 @@
+---
+- name: app | Check existing checkout
+  ansible.builtin.stat:
+    path: /opt/gnucash-quick-expense/.git
+  register: __gnucash_quick_expense_checkout
+
+- name: app | Keep the checkout owned by root
+  # root runs git here, and git executes .git/config and hooks, so the user that
+  # serves requests from the internet must not be able to write any of it.
+  ansible.builtin.file:
+    path: /opt/gnucash-quick-expense
+    state: directory
+    owner: root
+    group: root
+    recurse: true
+  when: __gnucash_quick_expense_checkout.stat.exists
+
+- name: app | Check out repository
+  # This account's own repository follows main without a cooldown.
+  ansible.builtin.git:
+    repo: https://github.com/rewse/gnucash-quick-expense.git
+    dest: /opt/gnucash-quick-expense
+    version: main
+  register: __gnucash_quick_expense_git
+  notify: Restart gnucash-quick-expense
+
+- name: app | Sync dependencies
+  # uv has no Ansible module. The committed lockfile of this account's own
+  # repository pins every version, so the cooldown environment does not apply.
+  # --frozen installs from the lockfile as committed and writes nothing into the
+  # checkout, which the service user can only read; the environment lives
+  # outside it.
+  ansible.builtin.command: uv sync --frozen
+  args:
+    chdir: /opt/gnucash-quick-expense
+  become: true
+  become_user: gnucash-quick-expense
+  environment:
+    UV_PROJECT_ENVIRONMENT: "{{ gnucash_quick_expense_venv }}"
+  register: __gnucash_quick_expense_sync
+  changed_when: "'Installed' in __gnucash_quick_expense_sync.stderr or 'Uninstalled' in __gnucash_quick_expense_sync.stderr"
+  notify: Restart gnucash-quick-expense
+  # A dry run does not create a first checkout.
+  when: not ansible_check_mode or __gnucash_quick_expense_checkout.stat.exists
+
+- name: app | Remove the safe.directory entry for the checkout
+  # git_config can only unset every safe.directory value at once, and root's
+  # global config may hold others; git config takes a value pattern.
+  ansible.builtin.command: git config --global --unset-all safe.directory '^/opt/gnucash-quick-expense$'  # noqa: command-instead-of-module the git module manages checkouts, not config
+  register: __gnucash_quick_expense_safe_directory
+  # Exit status 5 means no such value was set.
+  changed_when: __gnucash_quick_expense_safe_directory.rc == 0
+  failed_when: __gnucash_quick_expense_safe_directory.rc not in [0, 5]

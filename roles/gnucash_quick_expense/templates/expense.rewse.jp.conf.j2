@@ -1,0 +1,31 @@
+{{ ansible_managed | comment }}
+<VirtualHost *:443>
+    ServerAdmin hostmaster@rewse.jp
+    ServerName {{ gnucash_quick_expense_hostname }}
+
+    ProxyPreserveHost on
+    ProxyRequests off
+
+    # The form is used from a phone on mobile data, so no address list limits it.
+    # The database password is the login, and fail2ban counts the 401s the
+    # server answers a wrong one with.
+
+    # Apache logs the client address that mod_remoteip restores from
+    # CloudFront's header, and fail2ban bans by it. The server logs no
+    # addresses itself, but these headers are cleared as on the other vhosts,
+    # so a client cannot pass forged ones through to the backend. The unsets run
+    # in the fixups phase, after mod_remoteip, and before mod_proxy adds its own
+    # X-Forwarded-For and X-Forwarded-Host.
+    RequestHeader unset X-Forwarded-For
+    RequestHeader unset X-Forwarded-Host
+    RequestHeader unset X-Real-IP
+
+    # 127.0.0.1 rather than localhost, which resolves to ::1 first while the
+    # server listens on IPv4 loopback only.
+    ProxyPass / http://127.0.0.1:{{ gnucash_quick_expense_port }}/
+    ProxyPassReverse / http://127.0.0.1:{{ gnucash_quick_expense_port }}/
+
+    SSLCertificateFile /etc/letsencrypt/live/rewse.jp/fullchain.pem
+    SSLCertificateKeyFile /etc/letsencrypt/live/rewse.jp/privkey.pem
+    Include /etc/letsencrypt/options-ssl-apache.conf
+</VirtualHost>

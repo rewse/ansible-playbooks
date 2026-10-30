@@ -1,0 +1,22 @@
+---
+- name: Reload Apache
+  ansible.builtin.systemd:
+    name: apache2
+    state: reloaded
+
+- name: Reload systemd
+  ansible.builtin.systemd:
+    daemon_reload: true
+
+- name: Restart fail2ban
+  ansible.builtin.systemd:
+    name: fail2ban
+    state: restarted
+
+- name: Restart gnucash-quick-expense
+  ansible.builtin.systemd:
+    name: gnucash-quick-expense
+    state: restarted
+    daemon_reload: true
+  # A dry run does not install the unit, so systemd cannot find it.
+  when: not ansible_check_mode

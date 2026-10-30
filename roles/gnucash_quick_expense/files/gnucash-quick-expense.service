@@ -1,0 +1,30 @@
+[Unit]
+Description=GnuCash quick expense form
+Documentation=https://github.com/rewse/gnucash-quick-expense
+After=network-online.target
+Wants=network-online.target
+OnFailure=failure-notify@%n.service
+
+[Service]
+Type=simple
+User=gnucash-quick-expense
+Group=gnucash-quick-expense
+EnvironmentFile=/etc/gnucash-quick-expense/env
+ExecStart=/var/lib/gnucash-quick-expense/venv/bin/gnucash-quick-expense \
+    --host 127.0.0.1 --port 8082 \
+    --config /etc/gnucash-quick-expense/config.yaml
+Restart=on-failure
+RestartSec=5
+NoNewPrivileges=yes
+ProtectSystem=strict
+ProtectHome=yes
+PrivateTmp=yes
+PrivateDevices=yes
+ProtectKernelTunables=yes
+ProtectKernelModules=yes
+ProtectControlGroups=yes
+RestrictSUIDSGID=yes
+RestrictNamespaces=yes
+
+[Install]
+WantedBy=multi-user.target

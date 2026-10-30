@@ -1,0 +1,14 @@
+---
+- name: apache | Deploy vhost config
+  ansible.builtin.template:
+    src: expense.rewse.jp.conf.j2
+    dest: /etc/apache2/sites-available/{{ gnucash_quick_expense_hostname }}.conf
+    mode: "0644"
+  notify: Reload Apache
+
+- name: apache | Enable site
+  # No module manages Apache site symlinks the way a2ensite does.
+  ansible.builtin.command: a2ensite {{ gnucash_quick_expense_hostname }}
+  register: __gnucash_quick_expense_a2ensite
+  changed_when: "'already enabled' not in __gnucash_quick_expense_a2ensite.stdout"
+  notify: Reload Apache

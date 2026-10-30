@@ -1,0 +1,32 @@
+---
+- name: service | Deploy account config
+  ansible.builtin.template:
+    src: config.yaml.j2
+    dest: /etc/gnucash-quick-expense/config.yaml
+    mode: "0644"
+  notify: Restart gnucash-quick-expense
+
+- name: service | Deploy environment file
+  ansible.builtin.template:
+    src: gnucash-quick-expense.env.j2
+    dest: /etc/gnucash-quick-expense/env
+    mode: "0644"
+  notify: Restart gnucash-quick-expense
+
+- name: service | Install systemd unit
+  ansible.builtin.copy:
+    src: gnucash-quick-expense.service
+    dest: /etc/systemd/system/gnucash-quick-expense.service
+    mode: "0644"
+  notify:
+    - Reload systemd
+    - Restart gnucash-quick-expense
+
+- name: service | Enable and start service
+  ansible.builtin.systemd:
+    name: gnucash-quick-expense
+    enabled: true
+    state: started
+    daemon_reload: true
+  # A dry run does not install the unit, so systemd cannot find it.
+  when: not ansible_check_mode

@@ -1,0 +1,10 @@
+---
+{{ ansible_managed | comment }}
+{% for name, choice in [('from_accounts', gnucash_quick_expense_from_accounts), ('to_accounts', gnucash_quick_expense_to_accounts)] %}
+{{ name }}:
+  patterns:
+{% for pattern in choice.patterns %}
+    - {{ pattern | to_json }}
+{% endfor %}
+  default: {{ choice.default | to_json }}
+{% endfor %}

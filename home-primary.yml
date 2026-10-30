@@ -37,6 +37,9 @@
     - role: filebrowser
       tags:
         - filebrowser
+    - role: gnucash_quick_expense
+      tags:
+        - gnucash_quick_expense
     - role: homeassistant
       tags:
         - homeassistant

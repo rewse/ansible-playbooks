@@ -1,0 +1,29 @@
+---
+gnucash_quick_expense_hostname: expense.rewse.jp
+
+# Published on the loopback address only, so nothing off the host reaches it
+# except through the Apache vhost, which terminates TLS and logs the requests.
+gnucash_quick_expense_port: 8082
+
+# uv's project environment, outside the root-owned checkout so that the service
+# user, which runs uv sync and the server, owns only this and not the code root
+# runs git in.
+gnucash_quick_expense_venv: /var/lib/gnucash-quick-expense/venv
+
+# Where the GnuCash database is. The username and password are not here: the
+# form asks for them on every entry and the server keeps neither.
+gnucash_quick_expense_db_host: "{{ lookup('pipe', 'op read \"op://ansible/wypbfjrqxkssvefhycefqcfn5y/server\"') }}"
+gnucash_quick_expense_db_port: "{{ lookup('pipe', 'op read \"op://ansible/wypbfjrqxkssvefhycefqcfn5y/port\"') }}"
+gnucash_quick_expense_db_name: "{{ lookup('pipe', 'op read \"op://ansible/wypbfjrqxkssvefhycefqcfn5y/database\"') }}"
+
+# The accounts the form offers. "**" matches one or more account names.
+gnucash_quick_expense_from_accounts:
+  patterns:
+    - "Assets:**:Car Wallet"
+    - "Assets:**:Cash"
+    - "Assets:**:Suica iPhone"
+  default: "Assets:JPY - Current Assets:Cash"
+gnucash_quick_expense_to_accounts:
+  patterns:
+    - "Expenses:**"
+  default: "Expenses:Foods:Dining"

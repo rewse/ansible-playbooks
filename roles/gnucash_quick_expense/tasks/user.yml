@@ -1,0 +1,24 @@
+---
+- name: user | Create system user
+  ansible.builtin.user:
+    name: gnucash-quick-expense
+    system: true
+    shell: /usr/sbin/nologin
+    # uv keeps its cache and the Python it downloads under the home directory.
+    home: /var/lib/gnucash-quick-expense
+    create_home: false
+
+- name: user | Create directories
+  ansible.builtin.file:
+    path: "{{ item.path }}"
+    state: directory
+    owner: "{{ item.owner }}"
+    group: "{{ item.group }}"
+    mode: "0755"
+  loop:
+    - path: /etc/gnucash-quick-expense
+      owner: root
+      group: root
+    - path: /var/lib/gnucash-quick-expense
+      owner: gnucash-quick-expense
+      group: gnucash-quick-expense
