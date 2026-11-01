@@ -18,6 +18,7 @@ REPO_ROOT = pathlib.Path(__file__).resolve().parents[1]
 ROLES = REPO_ROOT / "roles"
 COUCHDB = ROLES / "couchdb"
 FAIL2BAN = ROLES / "fail2ban"
+LITELLM = ROLES / "litellm"
 FILEBROWSER = ROLES / "filebrowser"
 HTTPD = ROLES / "httpd"
 HOMEASSISTANT = ROLES / "homeassistant"
@@ -165,6 +166,24 @@ class CouchDBAdminPathTest(unittest.TestCase):
         ):
             with self.subTest(path=path):
                 self.assertFalse(pattern.search(path))
+
+
+class LiteLLMNetworkTest(unittest.TestCase):
+    # The master key reaches every model, so the gateway answers only home, the
+    # VPN, and the office.
+    HOSTNAME = "litellm.rewse.jp"
+
+    def test_vhost_is_deployed_from_the_template(self):
+        task = vhost_deploy_task(LITELLM, self.HOSTNAME)
+        self.assertEqual(
+            task["dest"], f"/etc/apache2/sites-available/{self.HOSTNAME}.conf"
+        )
+        self.assertFalse((LITELLM / "files" / f"{self.HOSTNAME}.conf").exists())
+
+    def test_vhost_allows_only_trusted_networks(self):
+        text = render_vhost(LITELLM, f"{self.HOSTNAME}.conf.j2")
+        self.assertEqual(require_ip_blocks(text), {"/": TRUSTED_SOURCES})
+        self.assertNotIn("Require all granted", text)
 
 
 class NvrFail2banTest(unittest.TestCase):

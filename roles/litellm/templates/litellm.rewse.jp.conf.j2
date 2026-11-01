@@ -1,3 +1,4 @@
+{{ ansible_managed | comment }}
 <VirtualHost *:443>
     ServerAdmin hostmaster@rewse.jp
     ServerName litellm.rewse.jp
@@ -14,6 +15,21 @@
 
     RequestHeader set X-Forwarded-Proto "https"
     RequestHeader set X-Forwarded-Port "443"
+
+    # The master key reaches every model, so even a valid key works only from
+    # home, the VPN, and the office. Behind CloudFront, mod_remoteip has already
+    # restored the client address that Require ip tests.
+    <Location />
+        Require ip 127.0.0.1
+        Require ip ::1
+        Require ip {{ networks.home_private_ipv4 }}
+        Require ip {{ networks.home_private_ipv6 }}
+        Require ip {{ networks.home_public_ipv4 }}
+        Require ip {{ networks.home_public_ipv6 }}
+        Require ip {{ networks.aws_private_ipv4 }}
+        Require ip {{ networks.aws_public_ipv6 }}
+        Require ip {{ networks.office_public_ipv4 | join(' ') }}
+    </Location>
 
     SSLCertificateFile /etc/letsencrypt/live/rewse.jp/fullchain.pem
     SSLCertificateKeyFile /etc/letsencrypt/live/rewse.jp/privkey.pem
