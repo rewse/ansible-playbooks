@@ -61,5 +61,36 @@ class TimerCooldownTest(unittest.TestCase):
                     self.assertIn('--exclude-newer-package "$OWN_PACKAGE"', line)
 
 
+class GitToolPinTest(unittest.TestCase):
+    TASKS = ROLES / "ubuntu" / "tasks" / "uv.yml"
+    REPO = "aws-samples/sample-agentcore-websearch-agent-skill"
+
+    def test_git_tool_installs_an_aged_commit(self):
+        tasks = yaml.safe_load(self.TASKS.read_text())
+        commands = [
+            task["ansible.builtin.command"]
+            for task in tasks
+            if "ansible.builtin.command" in task
+        ]
+        items = [item for task in tasks for item in task.get("loop", [])]
+        self.assertEqual(
+            [c for c in commands + items if "git+" in c],
+            [
+                (
+                    f"uv tool install git+https://github.com/{self.REPO}"
+                    "@{{ __ubuntu_agentcore_websearch.commit }}"
+                )
+            ],
+        )
+        lookups = [
+            value
+            for task in tasks
+            for value in task.get("ansible.builtin.set_fact", {}).values()
+        ]
+        self.assertIn(
+            f"{{{{ lookup('aged_release', 'github-commit:{self.REPO}') }}}}", lookups
+        )
+
+
 if __name__ == "__main__":
     unittest.main()
