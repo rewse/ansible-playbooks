@@ -1,0 +1,200 @@
+AWSTemplateFormatVersion: "2010-09-09"
+Description: >-
+  IAM roles for the AWS CLI profiles that chezmoi renders on the managed hosts,
+  and scoped-down policies for the IAM users that services on those hosts
+  hold keys for. Deploy as stack "ansible-playbooks-iam" in ap-northeast-1
+  with admin credentials.
+
+# Long-form intrinsic functions keep the file loadable by ansible-lint, which
+# rejects the short-form YAML tags.
+
+Parameters:
+  HomePublicIpv4:
+    Type: String
+    Description: networks.home_public_ipv4 in inventory/group_vars/all/site.yml.
+    Default: 106.163.184.9/32
+  HomePublicIpv6:
+    Type: String
+    Description: networks.home_public_ipv6 in inventory/group_vars/all/site.yml.
+    Default: 240f:143:f60c:1::/64
+
+Resources:
+  # Each role is assumed from the default profile: the IAM user tats on fox,
+  # hotel, and youth, and the Isengard Admin role on 7cf34ded5d65. Permissions
+  # are granted per service at full-access granularity.
+  BedrockRole:
+    Type: AWS::IAM::Role
+    Properties:
+      RoleName: bedrock
+      Description: Invokes Bedrock models from Zed through the bedrock profile.
+      MaxSessionDuration: 3600
+      AssumeRolePolicyDocument:
+        Version: "2012-10-17"
+        Statement:
+          - Effect: Allow
+            Principal:
+              AWS:
+                - Fn::Sub: arn:${AWS::Partition}:iam::${AWS::AccountId}:role/Admin
+                - Fn::Sub: arn:${AWS::Partition}:iam::${AWS::AccountId}:user/tats
+            Action: sts:AssumeRole
+      ManagedPolicyArns:
+        - Fn::Sub: arn:${AWS::Partition}:iam::aws:policy/AmazonBedrockFullAccess
+
+  # Cyberduck reads role_arn and source_profile but not credential_process, so
+  # only hosts whose default profile holds static keys can use this role.
+  CyberduckRole:
+    Type: AWS::IAM::Role
+    Properties:
+      RoleName: cyberduck
+      Description: Browses S3 from Cyberduck through the cyberduck profile.
+      MaxSessionDuration: 3600
+      AssumeRolePolicyDocument:
+        Version: "2012-10-17"
+        Statement:
+          - Effect: Allow
+            Principal:
+              AWS:
+                - Fn::Sub: arn:${AWS::Partition}:iam::${AWS::AccountId}:role/Admin
+                - Fn::Sub: arn:${AWS::Partition}:iam::${AWS::AccountId}:user/tats
+            Action: sts:AssumeRole
+      ManagedPolicyArns:
+        - Fn::Sub: arn:${AWS::Partition}:iam::aws:policy/AmazonS3FullAccess
+
+  SslcertRole:
+    Type: AWS::IAM::Role
+    Properties:
+      RoleName: sslcert
+      Description: Answers DNS-01 challenges for certbot on fox through the sslcert profile.
+      MaxSessionDuration: 3600
+      AssumeRolePolicyDocument:
+        Version: "2012-10-17"
+        Statement:
+          - Effect: Allow
+            Principal:
+              AWS:
+                - Fn::Sub: arn:${AWS::Partition}:iam::${AWS::AccountId}:role/Admin
+                - Fn::Sub: arn:${AWS::Partition}:iam::${AWS::AccountId}:user/tats
+            Action: sts:AssumeRole
+      ManagedPolicyArns:
+        - Fn::Sub: arn:${AWS::Partition}:iam::aws:policy/AmazonRoute53FullAccess
+
+  # The users were imported into this stack and are retained if it is deleted
+  # or a change requires replacement: a recreated user gets a new principal ID,
+  # which breaks every trust policy that names it. Access keys stay outside the
+  # stack so their secrets never pass through CloudFormation.
+  #
+  # tats is the source profile on fox, hotel, and youth. Route 53 is the one
+  # write exception, because DNS records are edited routinely from those hosts.
+  TatsUser:
+    Type: AWS::IAM::User
+    DeletionPolicy: Retain
+    UpdateReplacePolicy: Retain
+    Properties:
+      UserName: tats
+      Path: /
+      ManagedPolicyArns:
+        - Fn::Sub: arn:${AWS::Partition}:iam::aws:policy/AmazonRoute53FullAccess
+        - Fn::Sub: arn:${AWS::Partition}:iam::aws:policy/ReadOnlyAccess
+
+  # A service that holds a key in a container or a root-owned file keeps its
+  # own user instead of the tats key, so a leak reaches only what that service
+  # needs.
+  LitellmUser:
+    Type: AWS::IAM::User
+    DeletionPolicy: Retain
+    UpdateReplacePolicy: Retain
+    Properties:
+      UserName: LiteLLM
+      Path: /
+
+  ResticUser:
+    Type: AWS::IAM::User
+    DeletionPolicy: Retain
+    UpdateReplacePolicy: Retain
+    Properties:
+      UserName: restic
+      Path: /
+
+  # The policies name their users literally: switching UserName to a Ref
+  # replaces the policy, and the cleanup of a replaced policy with the same
+  # name deletes the new one too.
+  LitellmUserPolicy:
+    Type: AWS::IAM::UserPolicy
+    DependsOn: LitellmUser
+    Properties:
+      UserName: LiteLLM
+      PolicyName: bedrock-invoke
+      PolicyDocument:
+        Version: "2012-10-17"
+        Statement:
+          # Converse and ConverseStream are authorized as InvokeModel and
+          # InvokeModelWithResponseStream. Global inference profiles route to
+          # any Region, so the resources are not limited by Region.
+          - Sid: BedrockRuntime
+            Effect: Allow
+            Action:
+              - bedrock:InvokeModel
+              - bedrock:InvokeModelWithResponseStream
+            Resource: "*"
+            Condition:
+              IpAddress:
+                aws:SourceIp:
+                  - Ref: HomePublicIpv4
+                  - Ref: HomePublicIpv6
+          # The Gemma models are served on the bedrock-mantle endpoint.
+          - Sid: BedrockMantle
+            Effect: Allow
+            Action:
+              - bedrock-mantle:CreateInference
+              - bedrock-mantle:Get*
+              - bedrock-mantle:List*
+            Resource:
+              Fn::Sub: arn:${AWS::Partition}:bedrock-mantle:*:${AWS::AccountId}:project/*
+            Condition:
+              IpAddress:
+                aws:SourceIp:
+                  - Ref: HomePublicIpv4
+                  - Ref: HomePublicIpv6
+
+  # youth is a laptop, so the policy has no source address condition. Bucket
+  # versioning keeps overwritten and deleted objects, and the user cannot
+  # delete versions or change the bucket configuration.
+  ResticUserPolicy:
+    Type: AWS::IAM::UserPolicy
+    DependsOn: ResticUser
+    Properties:
+      UserName: restic
+      PolicyName: rewse-nas-bak
+      PolicyDocument:
+        Version: "2012-10-17"
+        Statement:
+          - Sid: Bucket
+            Effect: Allow
+            Action:
+              - s3:GetBucketLocation
+              - s3:ListBucket
+            Resource:
+              Fn::Sub: arn:${AWS::Partition}:s3:::rewse-nas-bak
+          - Sid: Objects
+            Effect: Allow
+            Action:
+              - s3:AbortMultipartUpload
+              - s3:DeleteObject
+              - s3:GetObject
+              - s3:PutObject
+            Resource:
+              Fn::Sub: arn:${AWS::Partition}:s3:::rewse-nas-bak/*
+
+Outputs:
+  BedrockRoleArn:
+    Description: Role ARN for the bedrock AWS CLI profile.
+    Value:
+      Fn::GetAtt: [BedrockRole, Arn]
+  CyberduckRoleArn:
+    Description: Role ARN for the cyberduck AWS CLI profile.
+    Value:
+      Fn::GetAtt: [CyberduckRole, Arn]
+  SslcertRoleArn:
+    Description: Role ARN for the sslcert AWS CLI profile.
+    Value:
+      Fn::GetAtt: [SslcertRole, Arn]
