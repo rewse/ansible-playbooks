@@ -123,5 +123,35 @@ class CouchDBFilterTest(unittest.TestCase):
                 self.assertIsNone(banned_host(self.FILTER, line))
 
 
+class TeslaMateFilterTest(unittest.TestCase):
+    FILTER = ROLES / "teslamate" / "files" / "fail2ban-filter.conf"
+    VHOST = ROLES / "teslamate" / "templates" / "grafana.rewse.jp.conf.j2"
+
+    def test_counts_a_failed_grafana_login(self):
+        for request in ("POST /login", "POST /login?x=1", "POST /login?"):
+            with self.subTest(request=request):
+                line = access_line("grafana.rewse.jp", request, 401)
+                self.assertEqual(banned_host(self.FILTER, line), "203.0.113.7")
+
+    def test_ignores_other_grafana_401s(self):
+        for request in ("GET /api/user", "POST /loginx", "POST /login/x"):
+            with self.subTest(request=request):
+                line = access_line("grafana.rewse.jp", request, 401)
+                self.assertIsNone(banned_host(self.FILTER, line))
+
+    def test_counts_a_teslamate_401_naming_a_user(self):
+        named = access_line("teslamate.rewse.jp", "GET /", 401, user="tats")
+        anonymous = access_line("teslamate.rewse.jp", "GET /", 401)
+        self.assertEqual(banned_host(self.FILTER, named), "203.0.113.7")
+        self.assertIsNone(banned_host(self.FILTER, anonymous))
+
+    def test_basic_auth_is_recognised_in_any_case(self):
+        # The auth scheme is case-insensitive, and Grafana accepts any case.
+        self.assertRegex(
+            self.VHOST.read_text(),
+            r'(?m)^\s*SetEnvIfNoCase Authorization "\^Basic " grafana_basic_auth$',
+        )
+
+
 if __name__ == "__main__":
     unittest.main()
