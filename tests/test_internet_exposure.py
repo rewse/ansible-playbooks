@@ -638,8 +638,11 @@ class SecurityAgentPentestTest(unittest.TestCase):
         text = (HTTPD / "templates" / "security-agent-pentest.conf.j2").read_text()
         self.assertRegex(
             text,
+            # The token is a regular expression here, so it is escaped to be
+            # matched literally.
             r'(?m)^SetEnvIf X-Security-Agent-Pentest "\^\{\{ '
-            r'httpd_security_agent_pentest_token \}\}\$" security_agent_pentest$',
+            r"httpd_security_agent_pentest_token \| regex_escape \}\}\$\" "
+            r"security_agent_pentest$",
         )
         # Not "early": that runs before SetEnvIf reads the header.
         self.assertRegex(text, r"(?m)^RequestHeader unset X-Security-Agent-Pentest$")
