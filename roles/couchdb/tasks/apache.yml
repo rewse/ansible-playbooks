@@ -1,8 +1,8 @@
 ---
-- name: apache | Copy vhost config
-  ansible.builtin.copy:
-    src: couchdb.rewse.jp.conf
-    dest: /etc/apache2/sites-available
+- name: apache | Deploy vhost config
+  ansible.builtin.template:
+    src: couchdb.rewse.jp.conf.j2
+    dest: /etc/apache2/sites-available/couchdb.rewse.jp.conf
     mode: "0644"
   notify: Reload Apache
 

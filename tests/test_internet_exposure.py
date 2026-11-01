@@ -11,10 +11,12 @@ import time
 import unittest
 from typing import ClassVar
 
+import jinja2
 import yaml
 
 REPO_ROOT = pathlib.Path(__file__).resolve().parents[1]
 ROLES = REPO_ROOT / "roles"
+COUCHDB = ROLES / "couchdb"
 FAIL2BAN = ROLES / "fail2ban"
 FILEBROWSER = ROLES / "filebrowser"
 HTTPD = ROLES / "httpd"
@@ -55,6 +57,114 @@ def filter_regex(path: pathlib.Path, variable: str, hostname: str) -> re.Pattern
 def access_line(vhost: str, request: str, status: int) -> str:
     # A vhost_combined line as fail2ban sees it, with the timestamp removed.
     return f'{vhost}:443 203.0.113.7 - - [] "{request} HTTP/1.1" {status} 28 "-" "curl" 512'
+
+
+NETWORKS = {
+    "aws_private_ipv4": "10.0.0.0/16",
+    "aws_public_ipv6": "2001:db8:aa::/56",
+    "home_private_ipv4": "192.168.0.0/24",
+    "home_private_ipv6": "fd00:db8::/64",
+    "home_public_ipv4": "192.0.2.9/32",
+    "home_public_ipv6": "2001:db8:bb::/64",
+    "office_public_ipv4": ["198.51.100.0/24", "203.0.113.0/24"],
+}
+
+# Loopback plus home, the VPN, and the office, as zabbix-mcp.rewse.jp allows.
+TRUSTED_SOURCES = {"127.0.0.1", "::1"}
+for _value in NETWORKS.values():
+    TRUSTED_SOURCES.update([_value] if isinstance(_value, str) else _value)
+
+
+def render_vhost(role: pathlib.Path, name: str) -> str:
+    environment = jinja2.Environment(
+        loader=jinja2.FileSystemLoader(role / "templates"),
+        undefined=jinja2.StrictUndefined,
+    )
+    environment.filters["comment"] = lambda text: f"#\n# {text}\n#"
+    return environment.get_template(name).render(
+        ansible_managed="Ansible managed", networks=NETWORKS
+    )
+
+
+def require_ip_blocks(text: str) -> dict[str, set[str]]:
+    # Maps each <Location> or <LocationMatch> argument to its Require ip sources.
+    blocks: dict[str, set[str]] = {}
+    current = None
+    for line in (line.strip() for line in text.splitlines()):
+        opened = re.match(r'^<Location(?:Match)? "?([^">]+)"?>$', line)
+        if opened:
+            current = opened.group(1)
+            blocks[current] = set()
+        elif line.startswith("</Location"):
+            current = None
+        elif current is not None and line.startswith("Require ip "):
+            blocks[current].update(line.split()[2:])
+    return blocks
+
+
+def vhost_deploy_task(role: pathlib.Path, hostname: str) -> dict:
+    tasks = load_yaml(role / "tasks" / "apache.yml")
+    return next(
+        task["ansible.builtin.template"]
+        for task in tasks
+        if "ansible.builtin.template" in task
+        and task["ansible.builtin.template"]["src"] == f"{hostname}.conf.j2"
+    )
+
+
+class CouchDBAdminPathTest(unittest.TestCase):
+    # Obsidian LiveSync replicates through the database paths from anywhere.
+    # The server-level paths, all of which begin with an underscore, administer
+    # CouchDB and are needed only from home, the VPN, and the office.
+    HOSTNAME = "couchdb.rewse.jp"
+
+    def admin_pattern(self) -> re.Pattern:
+        blocks = require_ip_blocks(render_vhost(COUCHDB, f"{self.HOSTNAME}.conf.j2"))
+        self.assertEqual(len(blocks), 1)
+        ((pattern, sources),) = blocks.items()
+        self.assertEqual(sources, TRUSTED_SOURCES)
+        return re.compile(pattern)
+
+    def test_vhost_is_deployed_from_the_template(self):
+        task = vhost_deploy_task(COUCHDB, self.HOSTNAME)
+        self.assertEqual(
+            task["dest"], f"/etc/apache2/sites-available/{self.HOSTNAME}.conf"
+        )
+        self.assertFalse((COUCHDB / "files" / f"{self.HOSTNAME}.conf").exists())
+
+    def test_admin_paths_are_limited_to_trusted_networks(self):
+        pattern = self.admin_pattern()
+        for path in (
+            "/_active_tasks",
+            "/_all_dbs",
+            "/_cluster_setup",
+            "/_config",
+            "/_dbs_info",
+            "/_membership",
+            "/_node/_local/_config",
+            "/_replicate",
+            "/_replicator/x",
+            "/_scheduler/jobs",
+            "/_users/org.couchdb.user:x",
+            "/_utils/",
+        ):
+            with self.subTest(path=path):
+                self.assertTrue(pattern.search(path))
+
+    def test_database_and_session_paths_stay_open(self):
+        # LiveSync signs in through /_session; database names cannot begin
+        # with an underscore, so their paths never match.
+        pattern = self.admin_pattern()
+        for path in (
+            "/",
+            "/_session",
+            "/obsidian",
+            "/obsidian/_changes",
+            "/obsidian/_local/checkpoint",
+            "/obsidian/_bulk_docs",
+        ):
+            with self.subTest(path=path):
+                self.assertFalse(pattern.search(path))
 
 
 class NvrFail2banTest(unittest.TestCase):
