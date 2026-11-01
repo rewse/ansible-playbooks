@@ -48,3 +48,13 @@
   ansible.builtin.command: uv tool upgrade --all
   environment: "{{ supply_chain_cooldown_environment }}"
   changed_when: false
+
+- name: uv | Remove user-local uv binaries
+  # A uv in ~/.local/bin from the standalone installer precedes /usr/local/bin
+  # on PATH and is never updated, so an old one fails on newer uv.toml settings.
+  ansible.builtin.file:
+    path: /home/{{ admin_user }}/.local/bin/{{ item }}
+    state: absent
+  loop:
+    - uv
+    - uvx
