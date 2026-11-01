@@ -200,18 +200,31 @@ class AdminPagesTest(unittest.TestCase):
 
 
 class HomeAssistantAgentConfigTest(unittest.TestCase):
-    def test_token_bearing_agent_config_is_not_world_readable(self):
-        # homeassistant-ha.conf carries the Home Assistant API token.
-        tasks = yaml.safe_load((PRIMARY / "tasks" / "zabbix.yml").read_text())
-        task = next(
-            t["ansible.builtin.template"]
-            for t in tasks
-            if t.get("ansible.builtin.template", {}).get("src")
-            == "homeassistant-ha.conf.j2"
+    # The agent runs as root on the primary, so root alone needs to read the
+    # Home Assistant API token, and it stays off curl's command line.
+    CURLRC = "/etc/zabbix/homeassistant-ha.curlrc"
+
+    def test_agent_config_holds_no_token(self):
+        text = (PRIMARY / "templates" / "homeassistant-ha.conf.j2").read_text()
+        self.assertNotIn("homeassistant_ha_primary_token", text)
+        self.assertNotIn("Authorization", text)
+        self.assertRegex(
+            text,
+            r"(?m)^UserParameter=homeassistant\.api\.http_code,curl -s "
+            rf"-K {re.escape(self.CURLRC)} ",
         )
-        self.assertEqual(task["mode"], "0640")
+
+    def test_token_file_is_private(self):
+        task = template_tasks(PRIMARY / "tasks" / "zabbix.yml")[self.CURLRC]
+        self.assertEqual(task["src"], "homeassistant-ha.curlrc.j2")
+        self.assertEqual(task["mode"], "0600")
         self.assertEqual(task["owner"], "root")
-        self.assertEqual(task["group"], "zabbix")
+        self.assertEqual(task["group"], "root")
+        text = (PRIMARY / "templates" / task["src"]).read_text()
+        self.assertIn(
+            'header = "Authorization: Bearer {{ homeassistant_ha_primary_token }}"',
+            text.splitlines(),
+        )
 
 
 class StockPriceFetcherCheckoutTest(unittest.TestCase):
@@ -305,6 +318,7 @@ class SecretOutputTest(unittest.TestCase):
     # and into the transcript of an agent that runs the playbook.
     TASKS = (
         ("couchdb", "handlers/main.yml", "Run couchdb init script"),
+        ("homeassistant_ha_primary", "tasks/zabbix.yml", "zabbix | Copy curl config"),
         ("zabbix_mcp", "tasks/service.yml", "service | Deploy config"),
         ("zabbix_server", "tasks/frontend.yml", "frontend | Copy PHP config"),
         ("zabbix_server", "tasks/server.yml", "server | Set DBPassword"),

@@ -9,4 +9,6 @@ UserParameter=homeassistant.container.running,sudo docker inspect --format '{{.S
 # Nothing is printed when the container or Docker is missing, leaving the item
 # unsupported rather than naming a version that was not read.
 UserParameter=homeassistant.version,sudo docker inspect --format '{{.Config.Image}}' homeassistant 2>/dev/null | sed -E 's|@[^@]*$||; s|^.*:||'
-UserParameter=homeassistant.api.http_code,curl -s -o /dev/null -w '%{http_code}' --max-time 5 -H 'Authorization: Bearer [% homeassistant_ha_primary_token %]' http://localhost:8123/api/ || echo 000
+# The API token comes from a root-only curl config, keeping it out of this file
+# and off the command line.
+UserParameter=homeassistant.api.http_code,curl -s -K /etc/zabbix/homeassistant-ha.curlrc -o /dev/null -w '%{http_code}' --max-time 5 http://localhost:8123/api/ || echo 000

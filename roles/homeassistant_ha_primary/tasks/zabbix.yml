@@ -1,12 +1,21 @@
 ---
+- name: zabbix | Copy curl config
+  ansible.builtin.template:
+    src: homeassistant-ha.curlrc.j2
+    dest: /etc/zabbix/homeassistant-ha.curlrc
+    # The file carries the Home Assistant API token, and the agent runs as root.
+    owner: root
+    group: root
+    mode: "0600"
+  no_log: true
+
 - name: zabbix | Copy agent config
   ansible.builtin.template:
     src: homeassistant-ha.conf.j2
     dest: /etc/zabbix/zabbix_agentd.d/homeassistant-ha.conf
-    # The file carries the Home Assistant API token.
     owner: root
-    group: zabbix
-    mode: "0640"
+    group: root
+    mode: "0644"
     variable_start_string: "[%"
     variable_end_string: "%]"
   notify: Restart zabbix-agent
