@@ -96,5 +96,32 @@ class HomeAssistantFilterTest(unittest.TestCase):
         self.assertEqual(fail2ban_regex(self.FILTER, log + "\n"), "203.0.113.7\n")
 
 
+def access_line(vhost: str, request: str, status: int, user: str = "-") -> str:
+    # A vhost_combined line as fail2ban sees it, with the timestamp removed.
+    return (
+        f'{vhost}:443 203.0.113.7 - {user} [] "{request} HTTP/1.1" {status} 28 '
+        '"-" "curl" 512'
+    )
+
+
+class CouchDBFilterTest(unittest.TestCase):
+    FILTER = ROLES / "couchdb" / "files" / "fail2ban-filter.conf"
+
+    def test_counts_a_401_for_any_method(self):
+        for method in ("GET", "OPTIONS", "PATCH", "POST", "PROPFIND", "PUT"):
+            with self.subTest(method=method):
+                line = access_line("couchdb.rewse.jp", f"{method} /_session", 401)
+                self.assertEqual(banned_host(self.FILTER, line), "203.0.113.7")
+
+    def test_ignores_other_statuses_and_hosts(self):
+        for line in (
+            access_line("couchdb.rewse.jp", "PATCH /_session", 405),
+            access_line("couchdb.rewse.jp", "GET /db", 200),
+            access_line("grafana.rewse.jp", "GET /_session", 401),
+        ):
+            with self.subTest(line=line):
+                self.assertIsNone(banned_host(self.FILTER, line))
+
+
 if __name__ == "__main__":
     unittest.main()
