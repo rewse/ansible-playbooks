@@ -343,6 +343,36 @@ class AnsibleConfigTest(unittest.TestCase):
         )
 
 
+def home_assistant_service(role: pathlib.Path) -> dict:
+    lines = [
+        line
+        for line in (role / "templates" / "compose.yaml.j2").read_text().splitlines()
+        if not line.startswith("{{")
+    ]
+    text = re.sub(r"\{\{.*?\}\}", "image-ref", "\n".join(lines))
+    return yaml.safe_load(text)["services"]["homeassistant"]
+
+
+class HomeAssistantContainerTest(unittest.TestCase):
+    # Home Assistant gets the host's network, D-Bus, and the Zigbee dongle, and
+    # only the capabilities Bluetooth management needs beyond Docker's default
+    # set, rather than every device and capability the host has.
+    def test_container_is_not_privileged(self):
+        for role in (HOMEASSISTANT, SECONDARY):
+            with self.subTest(role=role.name):
+                service = home_assistant_service(role)
+                self.assertNotIn("privileged", service)
+                self.assertEqual(service["cap_add"], ["NET_ADMIN", "NET_RAW"])
+                self.assertEqual(service["network_mode"], "host")
+                self.assertEqual(service["security_opt"], ["apparmor:unconfined"])
+                self.assertIn("/run/dbus:/run/dbus:ro", service["volumes"])
+
+    def test_primary_keeps_the_zigbee_dongle(self):
+        service = home_assistant_service(HOMEASSISTANT)
+        self.assertEqual(service["devices"], ["/dev/ttyUSB0:/dev/ttyUSB0"])
+        self.assertIn("/dev/serial/by-id:/dev/serial/by-id", service["volumes"])
+
+
 class DockerAppArmorTest(unittest.TestCase):
     # aa-disable on docker-default unloaded the profile from every container
     # running at the time. Home Assistant runs apparmor:unconfined, so nothing
