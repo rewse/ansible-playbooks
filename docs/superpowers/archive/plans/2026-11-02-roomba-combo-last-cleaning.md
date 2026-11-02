@@ -8,7 +8,7 @@
 
 **Tech Stack:** Home Assistant YAML、Ansible(`home-primary.yml`)、ha-mcp(mcporter 経由)
 
-**Spec:** `docs/superpowers/specs/2026-11-02-roomba-combo-last-cleaning-design.md`
+**Spec:** `docs/superpowers/archive/specs/2026-11-02-roomba-combo-last-cleaning-design.md`
 
 ## Global Constraints
 

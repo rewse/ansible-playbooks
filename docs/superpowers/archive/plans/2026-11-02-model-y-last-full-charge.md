@@ -8,7 +8,7 @@
 
 **Tech Stack:** Home Assistant YAML、Ansible(`home-primary.yml`)、ha-mcp(mcporter 経由)、TeslaMate(初期値の調査)
 
-**Spec:** `docs/superpowers/specs/2026-11-02-model-y-last-full-charge-design.md`
+**Spec:** `docs/superpowers/archive/specs/2026-11-02-model-y-last-full-charge-design.md`
 
 ## Global Constraints
 
