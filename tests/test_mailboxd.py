@@ -141,5 +141,66 @@ class MailboxdConfigTest(unittest.TestCase):
         self.assertEqual(compose["recreate"], "always")
 
 
+IMAGE = {"ref": "psyb0t/mailbox:v0.8.0@sha256:0"}
+
+
+def compose() -> dict:
+    return yaml.safe_load(render("compose.yaml.j2", __mailboxd_image=IMAGE))
+
+
+def main_imports() -> dict:
+    return {
+        task["ansible.builtin.import_tasks"]: task["tags"]
+        for task in yaml.safe_load((ROLE / "tasks" / "main.yml").read_text())
+    }
+
+
+class MailboxdContainerTest(unittest.TestCase):
+    def test_container_listens_on_loopback_only(self):
+        self.assertEqual(
+            compose()["services"]["mailboxd"]["ports"], ["127.0.0.1:8083:8000"]
+        )
+
+    def test_container_runs_the_pinned_image(self):
+        self.assertEqual(compose()["services"]["mailboxd"]["image"], IMAGE["ref"])
+        self.assertEqual(compose()["name"], "mailboxd")
+
+    def test_container_keeps_the_upstream_hardening(self):
+        service = compose()["services"]["mailboxd"]
+        self.assertIs(service["read_only"], True)
+        self.assertEqual(service["cap_drop"], ["ALL"])
+        self.assertIn("no-new-privileges:true", service["security_opt"])
+        self.assertIn("healthcheck", service)
+
+    def test_container_reads_secrets_from_the_env_file_only(self):
+        service = compose()["services"]["mailboxd"]
+        # Raw, so a password with $ or quotes reaches the container unchanged
+        # rather than being interpolated by Compose.
+        self.assertEqual(service["env_file"], [{"path": ".env", "format": "raw"}])
+        self.assertIn(
+            "/etc/compose/mailboxd/config.yaml:/etc/mailboxd/config.yaml:ro",
+            service["volumes"],
+        )
+        self.assertIn("/srv/mailboxd:/var/lib/mailboxd", service["volumes"])
+
+    def test_no_watcher_is_deployed(self):
+        self.assertEqual(list(compose()["services"]), ["mailboxd"])
+
+    def test_image_is_an_aged_release_tag(self):
+        task = task_named("container.yml", "container | Resolve aged image")
+        expression = task["ansible.builtin.set_fact"]["__mailboxd_image"]
+        self.assertIn("oci:psyb0t/mailbox", expression)
+        self.assertIn(r"^v\d+\.\d+\.\d+$", expression)
+
+    def test_compose_change_recreates_the_container(self):
+        task = task_named("container.yml", "container | Deploy compose file")
+        self.assertEqual(task["notify"], "Recreate mailboxd")
+
+    def test_container_component_is_an_update(self):
+        imports = main_imports()
+        self.assertEqual(list(imports)[:2], ["config.yml", "container.yml"])
+        self.assertEqual(imports["container.yml"], ["mailboxd_container", "update"])
+
+
 if __name__ == "__main__":
     unittest.main()

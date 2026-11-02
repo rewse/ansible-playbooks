@@ -3,3 +3,9 @@
   ansible.builtin.import_tasks: config.yml
   tags:
     - mailboxd_config
+
+- name: Import container tasks
+  ansible.builtin.import_tasks: container.yml
+  tags:
+    - mailboxd_container
+    - update
