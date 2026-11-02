@@ -89,7 +89,7 @@ flowchart LR
 
 AGENTS.md の「Subdomains」の手順に従う。
 
-- `~/git/cloudfront-waf`: `mail-mcp.rewse.jp` を CloudFront の別名と `SUBDOMAINS` に加え、テストと文書の名前の一覧と数を直してデプロイする。`AWS_PROFILE=cloudfront-waf-deploy` の作業は、利用者に会社の Mac で実行してもらう
+- `~/git/cloudfront-waf`: `mail-mcp.rewse.jp` を CloudFront の別名と `SUBDOMAINS` に加え、テストと文書の名前の一覧と数を直してデプロイする。デプロイと DNS の切り替えは、自宅の Mac から `AWS_PROFILE=cloudfront-waf-deploy` で行う
 - UniFi: `mail-mcp.rewse.jp` を `fox.rewse.jp` に向ける CNAME の DNS ポリシーを加える
 - `~/git/security-agent`: インターネットから誰でも届く名前なので、毎月のペネトレーションテストに加え、対象ドメインを検証する
 - `~/git/chezmoi`: クライアント設定に URL を書く場所はないので変更しない

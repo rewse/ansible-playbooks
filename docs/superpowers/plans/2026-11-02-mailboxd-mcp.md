@@ -342,9 +342,9 @@ Expected: 何も出ない
 
 `git pull` のあと、`72b9c81 feat: serve expense.rewse.jp through CloudFront` と同じ箇所に `mail-mcp` を足す（公開名は 13 個、サブドメインは 12 個になる）。README の `BlockManagedRules` の段落に、`mail-mcp.rewse.jp` への Muse の MCP 呼び出しも誤検知を確かめる対象に含める旨を足す。テストと pre-commit を通してコミットし、push する。
 
-- [ ] **Step 2: 利用者に会社の Mac でデプロイしてもらう**
+- [ ] **Step 2: スタックをデプロイし、公開 DNS を切り替える**
 
-利用者に、`git pull` のあと `AWS_PROFILE=cloudfront-waf-deploy scripts/deploy.sh` と `AWS_PROFILE=cloudfront-waf-deploy scripts/switch-dns.sh cloudfront` を実行してもらい、結果を待つ。
+Run: cloudfront-waf で `AWS_PROFILE=cloudfront-waf-deploy scripts/deploy.sh` のあと `AWS_PROFILE=cloudfront-waf-deploy scripts/switch-dns.sh cloudfront`。`cloudfront-waf-deploy` は `tats` が引き受けるロールなので、自宅の Mac から実行できる
 Expected: スタックの更新が完了し、`curl 'https://dns.google/resolve?name=mail-mcp.rewse.jp&type=CNAME'` が CloudFront の名前を返す
 
 - [ ] **Step 3: UniFi に DNS ポリシーを足す**
@@ -358,7 +358,7 @@ Expected: 家から `dig mail-mcp.rewse.jp` が fox の内部アドレスに解�
 
 - [ ] **Step 5: security-agent に毎月のペネトレーションテストを足す**
 
-`git pull` のあと、`1b0a9c2 feat: add a monthly pentest for expense.rewse.jp` と同じ箇所に `mail-mcp.rewse.jp` を足す。開始日は使われていない 13 日、時刻は 21:15 UTC。サインインはせず、匿名で試す。テストを通してコミットし、push する。デプロイと対象ドメインの検証は security-agent の AGENTS.md に従い、`admin` の権限が要る手順は利用者に会社の Mac で実行してもらう。
+`git pull` のあと、`1b0a9c2 feat: add a monthly pentest for expense.rewse.jp` と同じ箇所に `mail-mcp.rewse.jp` を足す。開始日は使われていない 13 日、時刻は 21:15 UTC。サインインはせず、匿名で試す。テストを通してコミットし、push する。デプロイと対象ドメインの検証は `AWS_PROFILE=security-agent-deploy` で行い、手順は security-agent の `docs/setup.md` に従う。IAM のリソースを変えないので、このロールで足りる。
 
 ### Task 8: 家族のコネクタと後片付け（段階 4）
 
