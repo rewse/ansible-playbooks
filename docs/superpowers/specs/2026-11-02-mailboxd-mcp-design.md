@@ -64,7 +64,9 @@ flowchart LR
   - 状態の SQLite（監査ログ、チェックポイント）は `/srv/mailboxd` をバインドマウントして残す
 - config コンポーネント
   - `config.yaml` に、メールボックスとトークンの定義を描画する。パスワードとトークンは `${VAR}` で参照し、値は `.env`（`env_file`）に描画する。`.env` は root だけが読める権限にし、Docker が root で読んでコンテナに渡す
-  - メールボックスは家族一人に一つ。`imap` だけを定義し、`smtp` は定義しない。IMAP は `rewse.sakura.ne.jp:993`、`tls: ssl`
+  - メールボックスは家族一人に一つ。IMAP は `rewse.sakura.ne.jp:993`、`tls: ssl`
+  - 下書きを作るには `smtp` の設定が要る。docker-mailbox は下書きの差出人を `smtp.from_address` から決め、`smtp` のないメールボックスでは下書きの作成を拒否する。そこで `smtp` は差出人のためだけに置き、送れない値にする。`host` は名前解決できない `smtp.invalid`（RFC 2606）、`password` は本物ではない固定の文字列とし、Sakura の SMTP の資格情報はサーバーに置かない
+  - `send_guard.dry_run: true` にする。送信をトークンの権限、届かない SMTP の設定、dry run の三つで止める
   - トークンは家族一人に一つ。`scopes: [read, draft, organize]`、`mailboxes` は本人のメールボックスだけにする。`send`、`delete`、`admin` は付けず、`"*"` も使わない。ゴミ箱への移動は `organize` に含まれ、`delete` はゴミ箱からの完全削除の権限である。`draft` は IMAP の下書きフォルダーに書くだけで、`send` と `smtp` がないので送信には使えない
   - トークンの文字列形式（すべての権限とすべてのメールボックスを許す）は使わない
   - `auth.trusted_authserv_id` は、Sakura が受信メールに付ける `Authentication-Results` の値にする。Muse が SPF、DKIM、DMARC の結果を迷惑メールの判定に使えるようにするため
@@ -72,15 +74,16 @@ flowchart LR
   - `templates/mail-mcp.rewse.jp.conf.j2` を置き、zabbix-mcp の vhost と同じく `ProxyPreserveHost on` と `ProxyPass ... flushpackets=on` で `127.0.0.1` に流す。`Require ip` は付けない
   - 証明書は既存の `*.rewse.jp` を使う
 - fail2ban コンポーネント
-  - フィルタは `mail-mcp.rewse.jp` の vhost で `/mcp` に 401 が返った行に一致させる。`/health` と、もしあれば `/.well-known/` は対象外とする
+  - フィルタは `mail-mcp.rewse.jp` の vhost で `/mcp` に 401 が返った行に一致させる。docker-mailbox は `/health` 以外のすべてのパスでトークンを求め、`/.well-known/` にも 401 を返すが、MCP クライアントがトークンを送る前に読むことがあるので対象外とする
   - ジェイルの形は filebrowser と zabbix-mcp に合わせ、`tests/test_fail2ban_apache.py` の一覧に加える
   - Muse の接続元は家族で共有している可能性がある。誤ったトークンで BAN されると家族全員が一時間使えなくなるが、許容する
 - 1Password
   - 3 アカウントの Sakura のパスワードはすでに 1Password にある。Ansible のサービスアカウントは `ansible` vault しか読めないので、その外にあれば `ansible` vault に移すか複製する（どちらにするかは利用者に確かめる）
   - 家族それぞれの MCP トークンは `ansible` vault に新しく作る。コミットするのは Secret Reference だけにする。項目名は `System - Consumer` の規則に従う
+  - このリポジトリは公開しているので、家族のメールアドレスと名前はコミットしない。アドレスは Sakura の項目の `username` から実行時に読み、メールボックス名はアドレスのローカル部から作る
   - トークンは `openssl rand -hex 32` で作る。トークンの値は、本人が Muse の入力欄に入れるために 1Password から渡す
 - テスト
-  - `tests/test_mailboxd.py` で、テンプレートを描画して確かめる。待ち受けがループバックだけであること、どのトークンも `send`、`delete`、`admin` を持たず、`mailboxes` が一つだけであること、`smtp` がないこと、`.env` の権限、vhost のプロキシ先、ジェイルの設定、フィルタが一致する行と一致しない行を対象にする
+  - `tests/test_mailboxd.py` で、テンプレートを描画して確かめる。待ち受けがループバックだけであること、どのトークンも `send`、`delete`、`admin` を持たず、`mailboxes` が一つだけであること、`smtp.host` が `smtp.invalid` であること、`send_guard.dry_run` が true であること、`.env` の権限、vhost のプロキシ先、ジェイルの設定、フィルタが一致する行と一致しない行を対象にする
 
 ### 他のリポジトリと DNS
 
