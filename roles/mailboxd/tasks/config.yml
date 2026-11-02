@@ -1,0 +1,56 @@
+---
+- name: config | Reset mailboxes
+  # The next task appends to the fact, so a second run of the component in one
+  # play would otherwise list every mailbox twice.
+  ansible.builtin.set_fact:
+    __mailboxd_mailboxes: []
+
+- name: config | Resolve mailboxes
+  ansible.builtin.set_fact:
+    # The mailbox name is the local part of the address, reduced to the
+    # characters the API accepts in a handle.
+    __mailboxd_mailboxes: >-
+      {{ __mailboxd_mailboxes + [{
+           'name': __mailboxd_address.split('@')[0] | lower | regex_replace('[^a-z0-9_-]', '-'),
+           'address': __mailboxd_address,
+           'password': lookup('pipe', 'op read "op://ansible/' ~ item.password_item ~ '/password"'),
+           'token': lookup('pipe', 'op read "op://ansible/' ~ item.token_item ~ '/credential"'),
+         }] }}
+  vars:
+    __mailboxd_address: "{{ lookup('pipe', 'op read \"op://ansible/' ~ item.password_item ~ '/username\"') }}"
+  loop: "{{ mailboxd_accounts }}"
+  no_log: true
+
+- name: config | Create compose directory
+  ansible.builtin.file:
+    path: /etc/compose/mailboxd
+    state: directory
+    mode: "0755"
+
+- name: config | Create data directory
+  ansible.builtin.file:
+    path: "{{ mailboxd_data_dir }}"
+    state: directory
+    owner: "{{ mailboxd_uid }}"
+    group: "{{ mailboxd_uid }}"
+    mode: "0750"
+
+- name: config | Deploy configuration file
+  ansible.builtin.template:
+    src: config.yaml.j2
+    dest: /etc/compose/mailboxd/config.yaml
+    # Holds addresses but no secret; the container user has to read it.
+    mode: "0644"
+  notify: Recreate mailboxd
+
+- name: config | Deploy environment file
+  ansible.builtin.template:
+    src: env.j2
+    dest: /etc/compose/mailboxd/.env
+    owner: root
+    group: root
+    # Carries the IMAP passwords and bearer tokens. Docker reads it as root and
+    # hands the values to the container.
+    mode: "0600"
+  no_log: true
+  notify: Recreate mailboxd
