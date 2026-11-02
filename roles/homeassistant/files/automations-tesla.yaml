@@ -42,6 +42,24 @@
   trace:
     stored_traces: 100
 
+# Records when the LFP battery last reached 100%, which the full charge reminder
+# uses to tell when its charge level estimate needs recalibration.
+- id: automation.record_model_y_last_full_charge
+  alias: "Record Model Y Last Full Charge"
+  triggers:
+    - trigger: numeric_state
+      entity_id: sensor.model_y_battery
+      above: 99
+  actions:
+    - action: input_datetime.set_datetime
+      target:
+        entity_id: input_datetime.model_y_battery_last_full_charge
+      data:
+        timestamp: "{{ now().timestamp() }}"
+  mode: single
+  trace:
+    stored_traces: 100
+
 - id: automation.refresh_tesla_fleet_data
   alias: "Refresh Tesla Fleet Data"
   triggers:

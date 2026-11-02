@@ -14,6 +14,14 @@ living_room_ac_manual_internal_clean:
   has_time: true
   icon: "mdi:broom"
 
+# Model Y
+
+model_y_battery_last_full_charge:
+  name: "Model Y Battery Last Full Charge"
+  has_date: true
+  has_time: true
+  icon: "mdi:battery-charging-100"
+
 # Mom’s Room
 
 moms_room_ac_manual_internal_clean:

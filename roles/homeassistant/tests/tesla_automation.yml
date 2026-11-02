@@ -24,12 +24,13 @@
     - name: Verify refresh contract
       ansible.builtin.assert:
         that:
-          - homeassistant_tesla_automations | length == 3
+          - homeassistant_tesla_automations | length == 4
           - >-
             (homeassistant_tesla_automations | map(attribute='alias') | list)
             == [
               'Disable Tesla Sentry',
               'Enable Tesla Sentry at TNS Azabudai 3-chome',
+              'Record Model Y Last Full Charge',
               'Refresh Tesla Fleet Data'
             ]
           - homeassistant_refresh_automations | length == 1

@@ -8,6 +8,8 @@
       ansible.builtin.set_fact:
         homeassistant_sensors: "{{ lookup('file', '../files/sensors.yaml') | from_yaml }}"
         homeassistant_template_groups: "{{ lookup('file', '../files/templates.yaml') | from_yaml }}"
+        homeassistant_input_datetimes: "{{ lookup('file', '../files/input_datetimes.yaml') | from_yaml }}"
+        homeassistant_tesla_automations: "{{ lookup('file', '../files/automations-tesla.yaml') | from_yaml }}"
 
     - name: Find entities
       ansible.builtin.set_fact:
@@ -21,6 +23,27 @@
              | map(attribute='binary_sensor') | flatten
              | selectattr('unique_id', 'equalto', 'binary_sensor.model_y_battery_full_charge_due')
              | list }}
+        homeassistant_record_automations: >-
+          {{ homeassistant_tesla_automations
+             | selectattr('id', 'equalto', 'automation.record_model_y_last_full_charge')
+             | list }}
+
+    - name: Verify last full charge record contract
+      ansible.builtin.assert:
+        that:
+          - homeassistant_input_datetimes.model_y_battery_last_full_charge.has_date
+          - homeassistant_input_datetimes.model_y_battery_last_full_charge.has_time
+          - homeassistant_record_automations | length == 1
+          - >-
+            homeassistant_record_automations[0].triggers
+            == [{'trigger': 'numeric_state', 'entity_id': 'sensor.model_y_battery', 'above': 99}]
+          - homeassistant_record_automations[0].actions | length == 1
+          - homeassistant_record_automations[0].actions[0].action == 'input_datetime.set_datetime'
+          - >-
+            homeassistant_record_automations[0].actions[0].target
+            == {'entity_id': 'input_datetime.model_y_battery_last_full_charge'}
+          - homeassistant_record_automations[0].mode == 'single'
+          - homeassistant_record_automations[0].trace.stored_traces == 100
 
     - name: Verify reminder contract
       ansible.builtin.assert:
