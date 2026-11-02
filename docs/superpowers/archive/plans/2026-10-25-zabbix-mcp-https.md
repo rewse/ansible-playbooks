@@ -8,7 +8,7 @@
 
 **Tech Stack:** Ansible、Apache（mod_proxy_http）、fail2ban、pytest（unittest、jinja2、PyYAML、tomllib）、CloudFormation（cloudfront-waf）、Route 53、UniFi、chezmoi
 
-**Spec:** `docs/superpowers/specs/2026-10-25-zabbix-mcp-https-design.md`
+**Spec:** `docs/superpowers/archive/specs/2026-10-25-zabbix-mcp-https-design.md`
 
 ## Global Constraints
 

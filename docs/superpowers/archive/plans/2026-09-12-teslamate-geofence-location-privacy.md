@@ -8,7 +8,7 @@
 
 **Tech Stack:** Elixir 1.20.2-otp-29、Ecto、Phoenix LiveView 1.2.8、Gettext/Expo、PostgreSQL 18、`cube`/`earthdistance`、Grafana 13.2.1、GitHub Actions、GHCR、Ansible、Docker Compose、agent-browser
 
-**Spec:** `docs/superpowers/specs/2026-09-12-teslamate-geofence-location-privacy-design.md`
+**Spec:** `docs/superpowers/archive/specs/2026-09-12-teslamate-geofence-location-privacy-design.md`
 
 ## Global Constraints
 

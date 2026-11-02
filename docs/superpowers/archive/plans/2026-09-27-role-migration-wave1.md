@@ -8,7 +8,7 @@
 
 **Tech Stack:** ansible-core、ansible-lint（pre-commit 経由）、pytest（`uv run --with pytest --with ansible-core`）
 
-**Spec:** `docs/superpowers/specs/2026-09-27-role-migration-design.md`
+**Spec:** `docs/superpowers/archive/specs/2026-09-27-role-migration-design.md`
 
 ## Global Constraints
 

@@ -8,7 +8,7 @@
 
 **Tech Stack:** Ansible（community.docker.docker_compose_v2）、Apache mod_headers、FileBrowser Quantum 2.0.1、pytest（unittest、jinja2、PyYAML）
 
-**Spec:** `docs/superpowers/specs/2026-10-25-filebrowser-v2-upgrade-design.md`
+**Spec:** `docs/superpowers/archive/specs/2026-10-25-filebrowser-v2-upgrade-design.md`
 
 ## Global Constraints
 

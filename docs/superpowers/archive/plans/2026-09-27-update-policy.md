@@ -8,7 +8,7 @@
 
 **Tech Stack:** ansible-core 2.21.3、Python 3（lookup）、pytest（`uv run --with pytest`）、skopeo、gh、community.docker
 
-**Spec:** `docs/superpowers/specs/2026-09-27-update-policy-design.md`
+**Spec:** `docs/superpowers/archive/specs/2026-09-27-update-policy-design.md`
 
 ## Global Constraints
 

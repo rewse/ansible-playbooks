@@ -8,7 +8,7 @@
 
 **Tech Stack:** Home Assistant template binary_sensor、Ansible のテスト playbook（`roles/homeassistant/tests/*_fault_detection*.yml`）
 
-**Spec:** `docs/superpowers/specs/2026-10-25-sensor-anomaly-transient-tolerance-design.md`
+**Spec:** `docs/superpowers/archive/specs/2026-10-25-sensor-anomaly-transient-tolerance-design.md`
 
 ## Global Constraints
 

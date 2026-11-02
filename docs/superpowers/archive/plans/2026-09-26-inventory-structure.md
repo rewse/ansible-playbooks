@@ -8,7 +8,7 @@
 
 **Tech Stack:** ansible-core 2.21.3、ansible-lint 26.8.0、jq、pre-commit（`uvx --with pre-commit-uv==4.3.0 pre-commit@4.6.2`）
 
-**Spec:** `docs/superpowers/specs/2026-09-26-inventory-structure-design.md`
+**Spec:** `docs/superpowers/archive/specs/2026-09-26-inventory-structure-design.md`
 
 ## Global Constraints
 

@@ -8,7 +8,7 @@
 
 **Tech Stack:** ansible-core 2.21.3、ansible-lint 26.8.0、pre-commit（`uvx` 経由）、GitHub Actions、Dependabot
 
-**Spec:** `docs/superpowers/specs/2026-09-26-ansible-conventions-design.md`
+**Spec:** `docs/superpowers/archive/specs/2026-09-26-ansible-conventions-design.md`
 
 ## Global Constraints
 

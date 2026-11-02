@@ -8,7 +8,7 @@
 
 **Tech Stack:** Home Assistant template binary sensor、Ansible（localhost の構造テスト playbook）
 
-**Spec:** `docs/superpowers/specs/2026-10-25-secondary-sensor-fault-recovery-design.md`
+**Spec:** `docs/superpowers/archive/specs/2026-10-25-secondary-sensor-fault-recovery-design.md`
 
 ## Global Constraints
 

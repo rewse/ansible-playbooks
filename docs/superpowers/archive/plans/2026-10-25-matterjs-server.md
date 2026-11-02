@@ -8,7 +8,7 @@
 
 **Tech Stack:** Ansible（community.docker.docker_compose_v2、aged_release）、Docker Compose、Apache（mod_proxy_http、mod_proxy_wstunnel）、sysctl、pytest（unittest、jinja2、PyYAML）、UniFi
 
-**Spec:** `docs/superpowers/specs/2026-10-25-matterjs-server-design.md`
+**Spec:** `docs/superpowers/archive/specs/2026-10-25-matterjs-server-design.md`
 
 ## Global Constraints
 
