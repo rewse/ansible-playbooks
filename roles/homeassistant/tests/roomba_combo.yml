@@ -1,0 +1,48 @@
+---
+- name: Test Roomba Combo last cleaning record
+  hosts: localhost
+  connection: local
+  gather_facts: false
+  tasks:
+    - name: Parse configuration
+      ansible.builtin.set_fact:
+        homeassistant_input_datetimes: "{{ lookup('file', '../files/input_datetimes.yaml') | from_yaml }}"
+        homeassistant_other_automations: "{{ lookup('file', '../files/automations-others.yaml') | from_yaml }}"
+
+    - name: Find automations
+      ansible.builtin.set_fact:
+        homeassistant_record_automations: >-
+          {{ homeassistant_other_automations
+             | selectattr('id', 'equalto', 'automation.record_roomba_combo_last_cleaning')
+             | list }}
+        homeassistant_start_automations: >-
+          {{ homeassistant_other_automations
+             | selectattr('id', 'equalto', 'automation.start_roomba_combo')
+             | list }}
+
+    - name: Verify last cleaning record contract
+      ansible.builtin.assert:
+        that:
+          - "'roomba_combo_next' not in homeassistant_input_datetimes"
+          - homeassistant_input_datetimes.roomba_combo_last_cleaning.has_date
+          - homeassistant_input_datetimes.roomba_combo_last_cleaning.has_time
+          - "'roomba_combo_next' not in (homeassistant_other_automations | to_json)"
+          - homeassistant_record_automations | length == 1
+          - >-
+            homeassistant_record_automations[0].triggers
+            == [{'trigger': 'state', 'entity_id': 'vacuum.roomba_combo', 'to': 'cleaning', 'for': {'minutes': 30}}]
+          - homeassistant_record_automations[0].actions | length == 1
+          - homeassistant_record_automations[0].actions[0].action == 'input_datetime.set_datetime'
+          - >-
+            homeassistant_record_automations[0].actions[0].target
+            == {'entity_id': 'input_datetime.roomba_combo_last_cleaning'}
+          - "'trigger.to_state.last_changed' in homeassistant_record_automations[0].actions[0].data.timestamp"
+          - homeassistant_record_automations[0].mode == 'single'
+          - homeassistant_record_automations[0].trace.stored_traces == 100
+
+    - name: Verify start condition contract
+      ansible.builtin.assert:
+        that:
+          - homeassistant_start_automations | length == 1
+          - "'input_datetime.roomba_combo_last_cleaning' in (homeassistant_start_automations[0].conditions | to_json)"
+          - "'2 * 86400' in (homeassistant_start_automations[0].conditions | to_json)"

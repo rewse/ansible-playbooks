@@ -1,5 +1,7 @@
-- id: automation.update_roomba_combo_next_date
-  alias: "Update Roomba Combo Next Date"
+# Records when the last cleaning started. Waiting 30 minutes skips runs that stop
+# early, which do not count as a cleaning.
+- id: automation.record_roomba_combo_last_cleaning
+  alias: "Record Roomba Combo Last Cleaning"
   triggers:
     - trigger: state
       entity_id: vacuum.roomba_combo
@@ -9,9 +11,10 @@
   actions:
     - action: input_datetime.set_datetime
       target:
-        entity_id: input_datetime.roomba_combo_next
+        entity_id: input_datetime.roomba_combo_last_cleaning
       data:
-        datetime: "{{ now() + timedelta(days = 2) }}"
+        timestamp: "{{ trigger.to_state.last_changed.timestamp() }}"
+  mode: single
   trace:
     stored_traces: 100
 - id: automation.start_roomba_combo
@@ -33,7 +36,12 @@
       entity_id: vacuum.roomba_combo
       state: docked
     - "{{ states('sensor.roomba_combo_battery') | int(0) >= 50 }}"
-    - "{{ now().timestamp() > state_attr('input_datetime.roomba_combo_next', 'timestamp') }}"
+    - >-
+      {{
+        now().timestamp() -
+        state_attr('input_datetime.roomba_combo_last_cleaning', 'timestamp')
+        >= 2 * 86400
+      }}
   actions:
     - action: vacuum.start
       target:
