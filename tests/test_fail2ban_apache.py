@@ -328,6 +328,7 @@ class JailActionTest(unittest.TestCase):
                 "gnucash_quick_expense",
                 "homeassistant",
                 "litellm",
+                "mailboxd",
                 "nvr",
                 "teslamate",
                 "zabbix_mcp",

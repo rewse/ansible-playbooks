@@ -1,6 +1,7 @@
 #!/usr/bin/env python3
 """Contract tests for the mailboxd role."""
 
+import configparser
 import pathlib
 import re
 import unittest
@@ -200,6 +201,106 @@ class MailboxdContainerTest(unittest.TestCase):
         imports = main_imports()
         self.assertEqual(list(imports)[:2], ["config.yml", "container.yml"])
         self.assertEqual(imports["container.yml"], ["mailboxd_container", "update"])
+
+
+HOSTNAME = "mail-mcp.rewse.jp"
+
+
+def access_line(vhost: str, request: str, status: int) -> str:
+    # A vhost_combined line as fail2ban sees it, with the timestamp removed.
+    return f'{vhost}:443 203.0.113.7 - - [] "{request} HTTP/1.1" {status} 28 "-" "curl" 512'
+
+
+def matches(line: str) -> bool:
+    failregex = next(
+        entry
+        for entry in render("fail2ban-filter.conf.j2").splitlines()
+        if entry.startswith("failregex = ")
+    )
+    regex = re.compile(
+        failregex.removeprefix("failregex = ").replace("<HOST>", r"(?P<host>\S+)")
+    )
+    match = regex.search(line)
+    return match is not None and match["host"] == "203.0.113.7"
+
+
+def jail_section() -> configparser.SectionProxy:
+    parser = configparser.ConfigParser(interpolation=None)
+    lines = [
+        line
+        for line in render("fail2ban-jail.conf.j2").splitlines()
+        if not line.lstrip().startswith("#")
+    ]
+    parser.read_string("\n".join(lines))
+    return parser["mailboxd"]
+
+
+class MailboxdApacheTest(unittest.TestCase):
+    def test_vhost_proxies_to_loopback_and_streams(self):
+        lines = [
+            line.strip() for line in render("mail-mcp.rewse.jp.conf.j2").splitlines()
+        ]
+        for expected in (
+            "ServerName mail-mcp.rewse.jp",
+            "ProxyPreserveHost on",
+            "ProxyPass / http://127.0.0.1:8083/ flushpackets=on",
+            "ProxyPassReverse / http://127.0.0.1:8083/",
+            "SSLCertificateFile /etc/letsencrypt/live/rewse.jp/fullchain.pem",
+        ):
+            with self.subTest(line=expected):
+                self.assertIn(expected, lines)
+
+    def test_vhost_is_open_to_any_address(self):
+        self.assertNotIn("Require ip", render("mail-mcp.rewse.jp.conf.j2"))
+
+    def test_role_depends_on_fail2ban_and_httpd(self):
+        meta = yaml.safe_load((ROLE / "meta" / "main.yml").read_text())
+        self.assertEqual(
+            [d["role"] for d in meta["dependencies"]], ["fail2ban", "httpd"]
+        )
+
+    def test_components_are_imported_in_order(self):
+        imports = main_imports()
+        self.assertEqual(
+            list(imports), ["config.yml", "container.yml", "apache.yml", "fail2ban.yml"]
+        )
+        self.assertEqual(imports["apache.yml"], ["mailboxd_apache"])
+        self.assertEqual(imports["fail2ban.yml"], ["mailboxd_fail2ban"])
+
+
+class MailboxdFail2banTest(unittest.TestCase):
+    def test_filter_matches_rejected_mcp_calls(self):
+        for request in ("POST /mcp", "POST /mcp/", "GET /mcp", "DELETE /mcp"):
+            with self.subTest(request=request):
+                self.assertTrue(matches(access_line(HOSTNAME, request, 401)))
+
+    def test_filter_ignores_metadata_success_and_other_vhosts(self):
+        for line in (
+            # OAuth discovery, which a client may read before it sends a token.
+            access_line(HOSTNAME, "GET /.well-known/oauth-protected-resource", 401),
+            access_line(HOSTNAME, "POST /mcp", 200),
+            access_line(HOSTNAME, "GET /health", 200),
+            access_line(HOSTNAME, "GET /mcpx", 401),
+            access_line("zabbix-mcp.rewse.jp", "POST /mcp", 401),
+        ):
+            with self.subTest(line=line):
+                self.assertFalse(matches(line))
+
+    def test_jail_reads_the_vhost_log(self):
+        jail = jail_section()
+        self.assertEqual(jail["enabled"], "true")
+        self.assertEqual(jail["backend"], "auto")
+        self.assertEqual(jail["filter"], "mailboxd")
+        self.assertEqual(jail["logpath"], "/var/log/apache2/other_vhosts_access.log")
+
+
+class MailboxdPlaybookTest(unittest.TestCase):
+    def test_role_runs_on_the_home_primary(self):
+        plays = yaml.safe_load((REPO_ROOT / "home-primary.yml").read_text())
+        roles = [entry["role"] for play in plays for entry in play.get("roles", [])]
+        self.assertIn("mailboxd", roles)
+        self.assertLess(roles.index("litellm"), roles.index("mailboxd"))
+        self.assertLess(roles.index("mailboxd"), roles.index("matterjs_server"))
 
 
 if __name__ == "__main__":
