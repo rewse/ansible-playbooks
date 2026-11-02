@@ -28,6 +28,8 @@
 - `sensors.yaml` の `sensor.model_y_battery_max_30_days` は不要になるので削除する
 - `roles/homeassistant/tests/model_y_full_charge_due.yml` を新しい構成に合わせて書き換える
 - デプロイ時に、TeslaMate で調べた最終フルチャージ日時を初期値として入れる
+- ダッシュボード `dashboard-tesla`(ビュー `model-y`)の `sensor.model_y_battery_max_30_days` のタイル(名前 "Max in 30 Days")を、`input_datetime.model_y_battery_last_full_charge` のタイル(名前 "Last Full Charge")に置き換える(利用者の依頼)。ダッシュボードは storage モードでこのリポジトリの管理外なので、ha-mcp の `ha_config_set_dashboard` で書き換える。エンティティが存在してからでないとタイルが壊れて見えるため、デプロイ後に行う
+- `binary_sensor.model_y_battery_full_charge_due` のタイル(on のときだけ表示)はそのまま残す
 
 ## 実装者の判断に任せること(Kiro の判断)
 
@@ -36,3 +38,4 @@
 - 再起動のたびに通知が繰り返されないよう、アラームの `from: "off"` は維持する
 - デプロイは `input_datetime` を先に反映して初期値を入れ、そのあと binary_sensor の変更を反映する。未設定のまま binary_sensor が off から on に変わると誤通知が出るため
 - 100 のまま数日置いても、記録されるのは最初に 100 になった日時になる。「100 になった瞬間」という定義どおりとする
+- "Last Full Charge" のタイルは、既存タイルと同じく `features_position: bottom`、`vertical: false` とし、グリッドの幅も元のタイルに合わせる。`state_content` は `state` だけにする。`last_changed` は書き込んだ日時と重なるため
