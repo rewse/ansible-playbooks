@@ -2,14 +2,16 @@
 
 ## 目的
 
-Zabbix を `https://zabbix.rewse.jp/zabbix/` で、家、会社、VPN 以外からも使えるようにする。主な利用者は iPhone の IntelliTrend Mobile で、5G 回線から Zabbix API を呼んで監視状況を見る。接続元の IP で絞る代わりに、`nas.rewse.jp` と同じく、ログイン、fail2ban、WAF のレート制限、月次 pentest で守る。API はこれに加えて、読み取りしかできないユーザーで使う。
+Zabbix を `https://zabbix.rewse.jp/zabbix/` で、家、会社、VPN 以外からも使えるようにする。主な利用者は iPhone の IntelliTrend Mobile で、5G 回線から Zabbix API を呼んで監視状況を見る。接続元の IP で絞る代わりに、`nas.rewse.jp` と同じく、ログイン、fail2ban、WAF のレート制限、月次 pentest で守る。API はこれに加えて Zabbix の権限で分ける。アプリは読み取りしかできないユーザーのトークンで使い、`Admin` からは API を取り上げる。
 
 ## 現状
 
 - Zabbix 7.4 の画面は、公式パッケージ `zabbix-apache-conf` が置く `/etc/apache2/conf-available/zabbix.conf` の `Alias /zabbix /usr/share/zabbix/ui` で配信している。`frontend.yml` は `a2enconf zabbix` で有効にするだけで、このファイルは Ansible の管理外である。Alias はサーバー全体に効くため、`zabbix.rewse.jp` 専用の vhost はなく、`zabbix.rewse.jp`、`rewse.jp`、`www.rewse.jp` はどれもデフォルト vhost の `/zabbix` に届く
 - `roles/zabbix_server/templates/zabbix-api.conf.j2` が、サーバー全体の `<Location "/zabbix">` を loopback、家、会社に絞り、続く `<Location "/zabbix/api_jsonrpc.php">` を loopback と家だけに絞っている
-- IntelliTrend Mobile は画面ではなく `/zabbix/api_jsonrpc.php` を呼ぶ。fox の `access.log` では、家の IPv6 からの `POST` は 200、5G の IPv6 からの `OPTIONS` は 403 になっている。アプリは `Admin` でログインしている。ログにあるアプリの呼び出しは、多いときで 10 分に 15 回である
-- fox 上の zabbix-mcp-server は API を `https://rewse.jp/zabbix/` で呼ぶ。この URL は 1Password の項目に入っている
+- IntelliTrend Mobile は画面ではなく `/zabbix/api_jsonrpc.php` を呼ぶ。fox の `access.log` では、家の IPv6 からの `POST` は 200、5G の IPv6 からの `OPTIONS` は 403 になっている。ログにあるアプリの呼び出しは、多いときで 10 分に 15 回である
+- API トークンは 2 つあり、どちらも `Admin`（userid 1）のもので、期限がない。`IntelliTrend Mobile` はアプリが、`zabbix-mcp` は zabbix-mcp-server が使っている
+- fox 上の zabbix-mcp-server は API を `https://rewse.jp/zabbix/` で呼ぶ。この URL とトークンは 1Password の項目に入っている。fox は `rewse.jp` を自分の IPv6 に名前解決するので、この呼び出しは CloudFront と WAF を通らない。`read_only = false` で、Zabbix に書き込める
+- Zabbix 7.4 の文書の `user.login` の例では、MFA が有効なユーザーでもパスワードだけでセッションが返る。API には MFA がかからない
 - fail2ban の `zabbix-web` jail は、`access.log`（combined 形式）の `POST /zabbix/index.php` と `POST /zabbix/index_mfa.php` への 200 を失敗として数える。パスワードと MFA の確認コードの両方を対象にしている。API はログインに失敗しても 200 を返し、エラーは本文に入るので、fail2ban はステータスから API の失敗を見分けられない
 - Zabbix はアカウントごとに、5 回失敗すると 30 秒ロックする
 - `zabbix.rewse.jp` はすでに CloudFront の `Aliases` にあり、WAF の `AWSManagedRulesPHPRuleSet` を通る。`RateLimitLogin` の対象は `/auth/`、`/login`、`/api/login` だけで、Zabbix のログインも API も入っていない
@@ -21,7 +23,9 @@ Zabbix を `https://zabbix.rewse.jp/zabbix/` で、家、会社、VPN 以外か�
 
 - 5G 回線の IntelliTrend Mobile から `https://zabbix.rewse.jp/zabbix/` の API を使って監視状況を見られる
 - `https://zabbix.rewse.jp/zabbix/` の画面に、どこからでも MFA 付きでログインできる
-- アプリは読み取りしかできないユーザーで API を使い、`Admin` は画面からだけ使う
+- アプリは読み取りしかできないユーザーのトークンで API を使う
+- `Admin` は画面から MFA 付きでだけ使え、API はパスワードでもトークンでも使えない
+- zabbix-mcp-server は専用ユーザーのトークンで、今と同じく書き込みもできる
 - `rewse.jp/zabbix` など、ほかのホスト名の `/zabbix` は、画面も API も今の IP 制限のまま残る
 - 画面のログインと API への総当たりを、fail2ban、WAF のレート制限、Zabbix のアカウントロックが止める
 - `zabbix.rewse.jp` に月次 pentest がかかる
@@ -41,7 +45,8 @@ Zabbix を `https://zabbix.rewse.jp/zabbix/` で、家、会社、VPN 以外か�
 - Apache は `<VirtualHost>` の中の `<Location>` を、サーバー全体の `<Location>` より後にマージする。同じ種類のセクションはファイルに書いた順に適用される
 - 新しい vhost のログは `other_vhosts_access.log` に vhost_combined 形式で書かれ、クライアントのアドレスは 2 番目のフィールドになる
 - `cloudfront-origin.conf.j2` は、CloudFront の秘密のヘッダーがないリクエストのうち、loopback、家、VPN 以外から来たものを 403 にする。`mod_remoteip` が CloudFront 経由の接続元を復元するため、fail2ban と `Require ip` は本当の接続元を見る
-- API の `user.login` には MFA がかからないとみている。計画の段階で Zabbix 7.4 の文書で確かめる。かからないなら、API はパスワードだけで入れる
+- 組み込みの Super admin ロールは編集できない。`Admin` から API を取り上げるには、API を無効にした Super admin 型のカスタムロールに移す
+- トークンは持ち主のユーザーのロールで動く。`Admin` のロールから API を外すと、`Admin` のトークンはどちらも使えなくなる
 
 ## 方式
 
@@ -55,6 +60,13 @@ Zabbix を `https://zabbix.rewse.jp/zabbix/` で、家、会社、VPN 以外か�
 
 最初は画面だけを開き、API は家だけに残す案だった。アプリが API を使っているとわかったので、`zabbix.rewse.jp` では API も開き、読み取りユーザーとレート制限で補う形にした。
 
+API を開くと、`Admin` がパスワードだけで外から使え、わざとログインに失敗させて締め出すこともできる。これを閉じる方法を 2 つ比べた。
+
+| 方式 | 内容 | 判断 |
+|---|---|---|
+| A | WAF で、`api_jsonrpc.php` への本文に `user.login` を含むリクエストをブロックし、外からはトークンだけで使えるようにする | 不採用。JSON のエスケープ（`\u0075ser.login` など）で文字列一致をすり抜けられないか確かめきれない。WAF が破られると `Admin` の API が外から使える |
+| B | `Admin` を API を使えないカスタムロールに移し、MCP 用の専用ユーザーとアプリ用の読み取りユーザーを作って、それぞれのトークンに切り替える | 採用。守りが WAF に頼らず、Zabbix の権限で決まる |
+
 ## 設計
 
 ### ansible-playbooks
@@ -67,7 +79,7 @@ Zabbix を `https://zabbix.rewse.jp/zabbix/` で、家、会社、VPN 以外か�
   - `<Location "/zabbix">` を `Require all granted` にする。サーバー全体の `<Location "/zabbix/api_jsonrpc.php">` はこれより前にマージされるので、この vhost では API も開く
   - 証明書の 3 行は `nas.rewse.jp.conf.j2` と同じにする
 - `tasks/apache.yml` を追加する。`roles/filebrowser/tasks/apache.yml` と同じく、テンプレートを `/etc/apache2/sites-available/{{ zabbix_server_hostname }}.conf` に置き、`a2ensite` で有効にする。`tasks/main.yml` で `zabbix_server_apache` タグを付けて読み込む
-- `zabbix-api.conf.j2` の `Require ip` はそのまま残し、コメントを直す。この制限は `zabbix.rewse.jp` 以外のホスト名の `/zabbix` に効く。`zabbix.rewse.jp` は専用 vhost で画面も API も開いており、API は読み取りユーザーと WAF のレート制限で守る、と書く。「API は LAN の外に要らない」という今の説明は消す
+- `zabbix-api.conf.j2` の `Require ip` はそのまま残し、コメントを直す。この制限は `zabbix.rewse.jp` 以外のホスト名の `/zabbix` に効く。`zabbix.rewse.jp` は専用 vhost で画面も API も開いており、API は Zabbix の権限（`Admin` は API なし、アプリは読み取りだけ）と WAF のレート制限で守る、と書く。「API は LAN の外に要らない」という今の説明は消す
 - fail2ban の `zabbix-web` を、新しい vhost のログも読めるように直す
   - フィルタを `files/fail2ban-filter.conf` から `templates/fail2ban-filter.conf.j2` に移し、`failregex` に `^{{ zabbix_server_hostname | regex_escape }}:\d+ <HOST> ...` の行を足す。デフォルト vhost の行は残す。家と会社からは今も `rewse.jp/zabbix` に届くためである
   - jail の `logpath` に `/var/log/apache2/other_vhosts_access.log` を足す
@@ -77,15 +89,35 @@ Zabbix を `https://zabbix.rewse.jp/zabbix/` で、家、会社、VPN 以外か�
   - 新しい vhost のログ行を fail2ban のフィルタが拾い、デフォルト vhost のログ行も引き続き拾うことを確かめる
 - AGENTS.md の Zabbix 節にある「`zabbix_get` は `zabbix.rewse.jp` から」という記述は、エージェントの `Server=` の話なので変えない
 
-### Zabbix の読み取りユーザー
+### Zabbix のユーザーとトークン
 
-API で作る。Ansible では管理しないので、作る手順は実装計画に書く。
+API で作る。Ansible では管理しないので、作る手順は実装計画に書く。作業には今の `zabbix-mcp` トークン（`Admin` の権限）を使う。`Admin` のロールを替えるとこのトークンは使えなくなるので、ロールの付け替えは最後に行う。
 
-- ユーザーロール: 種類は User とする。API のアクセスを有効にし、API メソッドは許可リストで `*.get`、`user.login`、`user.logout` だけを許す。アプリが画面を開くことはないので、UI 要素とアクションはできるだけ閉じる
-- ユーザーグループ: 全ホストグループへの読み取り権限だけを与える。画面へのログインを無効にしても API のログインが通るなら無効にする。通るかどうかは実装時に確かめる
-- ユーザー: パスワードを生成して 1Password に新しい項目として置く。項目名は Common Standards の命名に従う
-- IntelliTrend Mobile の接続先を `https://zabbix.rewse.jp/zabbix/`、ユーザーをこの読み取りユーザーに切り替える。アプリの設定はユーザーが手で行う
-- 切り替えたあと、アプリから監視状況が見られること、`Admin` での API ログインがアプリに残っていないことを確かめる
+アプリ用の読み取りユーザー:
+
+- ユーザーロール: 種類は User とする。API のアクセスを有効にし、API メソッドは許可リストで `*.get`、`user.logout` だけを許す。アプリはトークンで使うので `user.login` は要らない。アプリが画面を開くことはないので、UI 要素とアクションはできるだけ閉じる
+- ユーザーグループ: 全ホストグループへの読み取り権限だけを与え、画面へのログインは無効にする。画面へのログインを無効にしてもトークンでの API が通ることを確かめる。通らないなら、画面へのログインは有効のままにする
+- ユーザー: 長いランダムなパスワードを付ける。使い道はないが、1Password の項目に置いておく
+- トークン: このユーザーに期限なしのトークンを発行し、1Password の同じ項目に置く。IntelliTrend Mobile の接続先を `https://zabbix.rewse.jp/zabbix/`、トークンをこれに切り替える。アプリの設定はユーザーが手で行う
+
+MCP 用のユーザー:
+
+- ユーザーロール: Super admin 型のカスタムロールで、API のアクセスを有効にする。MCP は書き込みもするので、API メソッドは絞らない
+- ユーザーグループ: 画面へのログインを無効にしたグループに入れる。トークンでの API が通ることは読み取りユーザーと同じく確かめる
+- ユーザー: 長いランダムなパスワードを付けて 1Password に置く
+- トークン: このユーザーに期限なしのトークンを発行し、1Password の MCP 用の項目（今 `zabbix_mcp_api_token` が読む項目）の `credential` を書き換える。`ansible-playbook` で `zabbix_mcp` を反映し、MCP が新しいトークンで動くことを確かめる
+
+`Admin`:
+
+- API を無効にした Super admin 型のカスタムロールを作り、`Admin` をそこに移す。画面の権限は今と同じにする
+- Zabbix が、組み込みの Super admin ロールを持つユーザーを 1 人以上残すよう求めるかどうかを確かめる。求めるなら、計画の段階で扱いを決め直す
+- 古いトークン `IntelliTrend Mobile` と `zabbix-mcp` を削除する
+
+切り替えたあと、次を確かめる。
+
+- アプリと MCP が新しいトークンで動く
+- `Admin` のパスワードで `user.login` を呼ぶと、API が使えないとして拒否される
+- 読み取りユーザーのトークンで書き込み系の API（たとえば `host.update`）を呼ぶと拒否される
 
 ### cloudfront-waf
 
@@ -111,21 +143,23 @@ API で作る。Ansible では管理しないので、作る手順は実装計�
 - Guest ユーザーが無効で、Guests グループの画面アクセスも無効である
 - 画面にログインできるユーザーは全員 MFA が必須である
 - `Admin` のパスワードが初期値ではない
-- 読み取りユーザーで書き込み系の API（たとえば `host.update`）を呼ぶと拒否される
+- 「Zabbix のユーザーとトークン」の切り替え後の確認がすべて通っている
+- API トークンが、読み取りユーザーと MCP 用ユーザーの 2 つだけである
 
 ## 反映の順番
 
 1. cloudfront-waf の `RateLimitLogin` と `RateLimitZabbixApi` を反映する。開く前にレート制限を効かせるためである
-2. Zabbix に読み取りユーザーを作り、公開前の確認をする
-3. ansible-playbooks で `zabbix_server` を fox に反映する（`zabbix_server_apache` と `zabbix_server_fail2ban`）
-4. 5G 回線から次を確かめる。`https://zabbix.rewse.jp/zabbix/` の画面と API が使えること、`https://rewse.jp/zabbix/` が 403 になること。fail2ban の `zabbix-web` が両方のログを読んでいることを `fail2ban-client get zabbix-web logpath` で確かめる
-5. IntelliTrend Mobile を読み取りユーザーに切り替える
-6. security-agent のドメインを検証し、pentest とスケジュールを反映する
+2. Zabbix に読み取りユーザーと MCP 用ユーザーを作り、トークンを発行する。MCP を新しいトークンに切り替えて動くことを確かめる
+3. `Admin` を API なしのロールに移し、古いトークンを削除する。公開前の確認をする。アプリはこの時点から、家の中で読み取りユーザーのトークンに切り替えるまで使えない
+4. ansible-playbooks で `zabbix_server` を fox に反映する（`zabbix_server_apache` と `zabbix_server_fail2ban`）
+5. IntelliTrend Mobile を `https://zabbix.rewse.jp/zabbix/` と読み取りユーザーのトークンに切り替える
+6. 5G 回線から次を確かめる。アプリと `https://zabbix.rewse.jp/zabbix/` の画面が使えること、`https://rewse.jp/zabbix/` が 403 になること。fail2ban の `zabbix-web` が両方のログを読んでいることを `fail2ban-client get zabbix-web logpath` で確かめる
+7. security-agent のドメインを検証し、pentest とスケジュールを反映する
 
 ## 実装者に任せること
 
 - テストを既存のどのファイルに足すか、新しいファイルにするか
 - vhost とフィルタのコメントの文面
 - `RedirectMatch` か `RewriteRule` か
-- 読み取りユーザー、グループ、ロールの名前
+- 読み取りユーザー、MCP 用ユーザー、それぞれのグループとロールの名前、1Password の新しい項目の名前（Common Standards の命名に従う）
 - WAF のルールの優先度の番号
