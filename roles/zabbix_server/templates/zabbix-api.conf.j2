@@ -8,17 +8,21 @@
 # Scanners find this path. The access log holds probes from three addresses that
 # also swept for SugarCRM, iLO and Oracle IDM URLs.
 #
-# Nothing beyond the LAN needs it: the MCP server that consumes the API runs on
-# this host and calls it from here. Clients away from home, such as the office,
-# reach the MCP server through its own vhost, never this API.
+# These limits apply to every name that reaches the default virtual host, such
+# as rewse.jp, which the MCP server on this host calls the API through.
+# zabbix.rewse.jp has its own virtual host that opens the frontend and the API
+# to the internet, because IntelliTrend Mobile calls the API from cellular
+# networks. There the API is protected by Zabbix roles, which leave Admin
+# without API access and let the app's account call only get methods, and by
+# the WAF's rate limit in front of CloudFront.
 #
 # Location rather than Directory, because zabbix.conf from the package grants the
 # frontend through a Directory block and Location is merged after Directory
 # whichever order the files load in.
 #
-# The frontend itself is used from home and the office only, so the login page is
-# not offered to anyone else. Apache applies Location blocks in file order, so the
-# narrower API block has to follow this one to override it.
+# On these names the frontend is used from home and the office only, so the
+# login page is not offered to anyone else. Apache applies Location blocks in
+# file order, so the narrower API block has to follow this one to override it.
 <Location "/zabbix">
     Require ip 127.0.0.1
     Require ip ::1

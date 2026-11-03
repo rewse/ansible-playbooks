@@ -27,6 +27,7 @@ POSTFIX_CLIENT = ROLES / "postfix_client"
 SECONDARY = ROLES / "homeassistant_ha_secondary"
 TESLAMATE = ROLES / "teslamate"
 UDM = ROLES / "udm"
+ZABBIX_SERVER = ROLES / "zabbix_server"
 
 
 def load_yaml(path: pathlib.Path):
@@ -55,6 +56,32 @@ def filter_regex(path: pathlib.Path, variable: str, hostname: str) -> re.Pattern
     return re.compile(pattern)
 
 
+def filter_regexes(
+    path: pathlib.Path, variable: str, hostname: str
+) -> list[re.Pattern]:
+    # Every failregex pattern, including the indented continuation lines that
+    # fail2ban reads as further patterns.
+    patterns: list[str] = []
+    reading = False
+    for line in path.read_text().splitlines():
+        if line.startswith("failregex = "):
+            reading = True
+            patterns.append(line.removeprefix("failregex = "))
+        elif reading and line[:1].isspace() and line.strip():
+            patterns.append(line.strip())
+        else:
+            reading = False
+    escaped = "{{ " + variable + " | regex_escape }}"
+    return [
+        re.compile(
+            pattern.replace(escaped, re.escape(hostname)).replace(
+                "<HOST>", r"(?P<host>\S+)"
+            )
+        )
+        for pattern in patterns
+    ]
+
+
 def access_line(vhost: str, request: str, status: int) -> str:
     # A vhost_combined line as fail2ban sees it, with the timestamp removed.
     return f'{vhost}:443 203.0.113.7 - - [] "{request} HTTP/1.1" {status} 28 "-" "curl" 512'
@@ -76,14 +103,14 @@ for _value in NETWORKS.values():
     TRUSTED_SOURCES.update([_value] if isinstance(_value, str) else _value)
 
 
-def render_vhost(role: pathlib.Path, name: str) -> str:
+def render_vhost(role: pathlib.Path, name: str, **variables) -> str:
     environment = jinja2.Environment(
         loader=jinja2.FileSystemLoader(role / "templates"),
         undefined=jinja2.StrictUndefined,
     )
     environment.filters["comment"] = lambda text: f"#\n# {text}\n#"
     return environment.get_template(name).render(
-        ansible_managed="Ansible managed", networks=NETWORKS
+        ansible_managed="Ansible managed", networks=NETWORKS, **variables
     )
 
 
@@ -226,6 +253,86 @@ class NvrFail2banTest(unittest.TestCase):
         ):
             with self.subTest(line=line):
                 self.assertIsNone(regex.search(line))
+
+
+class ZabbixPublicVhostTest(unittest.TestCase):
+    # zabbix.rewse.jp opens the frontend and the API to the internet; the
+    # default virtual host keeps /zabbix limited to trusted networks.
+    HOSTNAME = "zabbix.rewse.jp"
+    COMBINED = (
+        '203.0.113.7 - - [] "POST /zabbix/index.php HTTP/1.1" 200 28 "-" "curl" 512'
+    )
+
+    def test_vhost_is_deployed_from_the_template(self):
+        task = vhost_deploy_task(ZABBIX_SERVER, self.HOSTNAME)
+        self.assertEqual(
+            task["dest"],
+            "/etc/apache2/sites-available/{{ zabbix_server_hostname }}.conf",
+        )
+        imports = {
+            task["ansible.builtin.import_tasks"]: task["tags"]
+            for task in load_yaml(ZABBIX_SERVER / "tasks" / "main.yml")
+        }
+        self.assertEqual(imports.get("apache.yml"), ["zabbix_server_apache"])
+        hostname = load_yaml(ZABBIX_SERVER / "vars" / "main.yml")[
+            "zabbix_server_hostname"
+        ]
+        self.assertEqual(hostname, self.HOSTNAME)
+
+    def test_vhost_opens_zabbix_to_everyone(self):
+        text = render_vhost(
+            ZABBIX_SERVER,
+            f"{self.HOSTNAME}.conf.j2",
+            zabbix_server_hostname=self.HOSTNAME,
+        )
+        self.assertIn(f"ServerName {self.HOSTNAME}", text)
+        self.assertIn("RedirectMatch ^/$ /zabbix/", text)
+        block = re.search(r'(?ms)^\s*<Location "/zabbix">\n(.*?)^\s*</Location>', text)
+        self.assertIsNotNone(block)
+        assert block is not None
+        self.assertIn("Require all granted", block.group(1))
+        self.assertEqual(require_ip_blocks(text), {"/zabbix": set()})
+
+    def test_filter_matches_failed_logins_on_both_vhosts(self):
+        regexes = filter_regexes(
+            ZABBIX_SERVER / "templates" / "fail2ban-filter.conf.j2",
+            "zabbix_server_hostname",
+            self.HOSTNAME,
+        )
+        for line in (
+            # A wrong password re-renders the login form.
+            access_line(self.HOSTNAME, "POST /zabbix/index.php", 200),
+            # A wrong verification code re-renders the MFA form.
+            access_line(self.HOSTNAME, "POST /zabbix/index_mfa.php", 200),
+            # The same failure on the default virtual host.
+            self.COMBINED,
+        ):
+            with self.subTest(line=line):
+                matches = [m for m in (r.search(line) for r in regexes) if m]
+                self.assertTrue(matches)
+                self.assertEqual(matches[0]["host"], "203.0.113.7")
+        for line in (
+            # A successful login redirects.
+            access_line(self.HOSTNAME, "POST /zabbix/index.php", 302),
+            # The API answers every call with 200, failed or not.
+            access_line(self.HOSTNAME, "POST /zabbix/api_jsonrpc.php", 200),
+            # Another virtual host.
+            access_line("nas.rewse.jp", "POST /zabbix/index.php", 200),
+        ):
+            with self.subTest(line=line):
+                self.assertFalse([r for r in regexes if r.search(line)])
+
+    def test_jail_reads_both_logs(self):
+        section = jail(
+            ZABBIX_SERVER / "templates" / "fail2ban-jail.conf.j2", "zabbix-web"
+        )
+        self.assertEqual(
+            section["logpath"].split(),
+            [
+                "/var/log/apache2/access.log",
+                "/var/log/apache2/other_vhosts_access.log",
+            ],
+        )
 
 
 class StandbyHomeAssistantFail2banTest(unittest.TestCase):
