@@ -13,20 +13,6 @@
   environment:
     UV_INSTALL_DIR: /usr/local/bin
 
-- name: uv | Remove root-local uv binaries
-  # The standalone installer left an old uv in /root/.local/bin, and a symlink
-  # to it in /usr/local/sbin precedes /usr/local/bin on systemd's PATH. That uv
-  # cannot parse the relative exclude-newer in uv.toml, so root services that
-  # run bare uv, such as certbot-renew, exit before doing anything.
-  ansible.builtin.file:
-    path: "{{ item }}"
-    state: absent
-  loop:
-    - /root/.local/bin/uv
-    - /root/.local/bin/uvx
-    - /usr/local/sbin/uv
-    - /usr/local/sbin/uvx
-
 - name: uv | Update
   # uv updates itself; no module manages it.
   ansible.builtin.command: /usr/local/bin/uv self update
