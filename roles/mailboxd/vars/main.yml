@@ -12,8 +12,11 @@ mailboxd_data_dir: /srv/mailboxd
 mailboxd_uid: 10001
 
 # The authserv-id that Sakura writes in Authentication-Results. Only headers
-# stamped with it are reported as trusted SPF, DKIM and DMARC verdicts. Empty
-# leaves every verdict untrusted.
+# stamped with it are reported as trusted SPF, DKIM and DMARC verdicts.
+#
+# Empty, because Sakura writes its verdicts only to ARC-Authentication-Results
+# (authserv-id rewse.jp), which mailboxd does not parse. A client that needs the
+# verdicts reads that header with get_message and headers=true.
 mailboxd_trusted_authserv_id: ""
 
 # One entry per mailbox. The address and the IMAP password come from the Sakura

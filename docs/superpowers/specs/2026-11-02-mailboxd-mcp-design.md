@@ -71,7 +71,7 @@ flowchart LR
   - `send_guard.dry_run: true` にする。送信をトークンの権限、届かない SMTP の設定、dry run の三つで止める
   - トークンは家族一人に一つ。`scopes: [read, draft, organize]`、`mailboxes` は本人のメールボックスだけにする。`send`、`delete`、`admin` は付けず、`"*"` も使わない。ゴミ箱への移動は `organize` に含まれ、`delete` はゴミ箱からの完全削除の権限である。`draft` は IMAP の下書きフォルダーに書くだけで、`send` と `smtp` がないので送信には使えない
   - トークンの文字列形式（すべての権限とすべてのメールボックスを許す）は使わない
-  - `auth.trusted_authserv_id` は、Sakura が受信メールに付ける `Authentication-Results` の値にする。Muse が SPF、DKIM、DMARC の結果を迷惑メールの判定に使えるようにするため
+  - `auth.trusted_authserv_id` は空のままにする。Sakura は SPF、DKIM、DMARC の結果を `ARC-Authentication-Results`（authserv-id `rewse.jp`）にだけ書き、`Authentication-Results` を付けない。docker-mailbox は `Authentication-Results` しか解釈しないので、設定しても判定は出ない。Muse は `get_message` の `headers=true` で `ARC-Authentication-Results` を読んで判定に使う
 - apache コンポーネント
   - `templates/mail-mcp.rewse.jp.conf.j2` を置き、zabbix-mcp の vhost と同じく `ProxyPreserveHost on` と `ProxyPass ... flushpackets=on` で `127.0.0.1` に流す。`Require ip` は付けない
   - 証明書は既存の `*.rewse.jp` を使う
@@ -147,7 +147,7 @@ Sakura のメール用のカスタムコネクタを作ってほしい。
 道具の一覧が見えたら、次の順に試して、それぞれの結果を見せて。
 1. INBOX の新しいメール 5 件の差出人、件名、日時
 2. 件名に「mailboxd テスト」を含むメールの検索
-3. そのメールの本文と、SPF、DKIM、DMARC の判定結果
+3. そのメールの本文と、get_message を headers=true で呼んだときの ARC-Authentication-Results ヘッダー（SPF、DKIM、DMARC の結果）
 4. そのメールを迷惑メールのフォルダーに移動し、次に INBOX に戻す
 5. そのメールへの返信を下書きとして保存する（送信はしない）
 6. そのメールをゴミ箱に移動する
