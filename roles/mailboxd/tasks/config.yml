@@ -13,11 +13,11 @@
       {{ __mailboxd_mailboxes + [{
            'name': __mailboxd_address.split('@')[0] | lower | regex_replace('[^a-z0-9_-]', '-'),
            'address': __mailboxd_address,
-           'password': lookup('pipe', 'op read "op://ansible/' ~ item.password_item ~ '/password"'),
-           'token': lookup('pipe', 'op read "op://ansible/' ~ item.token_item ~ '/credential"'),
+           'password': lookup('pipe', 'op read "op://ansible/' ~ item.sakura_item ~ '/password"'),
+           'token': lookup('pipe', 'op read "op://ansible/' ~ item.mailboxd_item ~ '/credential"'),
          }] }}
   vars:
-    __mailboxd_address: "{{ lookup('pipe', 'op read \"op://ansible/' ~ item.password_item ~ '/username\"') }}"
+    __mailboxd_address: "{{ lookup('pipe', 'op read \"op://ansible/' ~ item.sakura_item ~ '/username\"') }}"
   loop: "{{ mailboxd_accounts }}"
   no_log: true
 
