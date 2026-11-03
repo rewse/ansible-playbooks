@@ -2,9 +2,11 @@
 
 ## 目的
 
-Meta Muse から Sakura のメール（rewse.jp、MX `rewse.sakura.ne.jp`）を読み、迷惑メールを判定して移動、削除できるようにする。家族もそれぞれの Muse から自分のメールボックスに同じことができるようにする。
+Meta Muse から Sakura のメール（rewse.jp、MX `rewse.sakura.ne.jp`）を読み、迷惑メールを判定して移動、削除できるようにする。家族もそれぞれの Muse から自分のメールボックスに同じことができるようにする。家族が使えることが一番の目的である。
 
-Muse の Secure Credentials Store は HTTPS のリクエストにしか資格情報を差し込まない。Sentinel が外向きの通信の境界で代わりの値を本物に置き換える仕組みで、IMAP のログインには使えない。そのため今は Mac を経由しており、Mac がスリープしている間は Muse がメールに届かない。常時動いている fox に HTTPS の MCP サーバーを置き、Muse からはベアラートークンだけで使えるようにする。
+今は利用者の Muse だけが、Muse の Mac アプリを通して Mac Studio の Mail.app を読んでいる。この経路には三つの問題がある。家族の Muse は利用者の Mac を経由できない。Mac のスリープ、再起動、アップデートの間は読めない（Mac Studio は今はスリープしない設定だが、スリープさせたい）。Muse にフルディスクアクセスを渡す必要がある。
+
+Muse の Secure Credentials Store は HTTPS のリクエストにしか資格情報を差し込まない。Sentinel が外向きの通信の境界で代わりの値を本物に置き換える仕組みで、IMAP のログインには使えない。そこで、常時動いている fox に HTTPS の MCP サーバーを置き、Muse からはベアラートークンだけで使えるようにする。
 
 ## ゴール
 
