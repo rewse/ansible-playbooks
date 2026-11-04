@@ -30,14 +30,14 @@
   # uv has no Ansible module. uv reinstalls the tool when the commit changes and
   # otherwise reports it as already installed.
   ansible.builtin.command: uv tool install git+https://github.com/aws-samples/sample-agentcore-websearch-agent-skill@{{ __ubuntu_agentcore_websearch.commit }}
-  environment: "{{ supply_chain_cooldown_environment }}"
+  environment: "{{ supply_chain_cooldown_environment | combine(ubuntu_uv_tool_environment) }}"
   register: __ubuntu_agentcore_websearch_install
   changed_when: "'is already installed' not in __ubuntu_agentcore_websearch_install.stderr"
 
 - name: uv | Install tools
   # uv has no Ansible module.
   ansible.builtin.command: uv tool install {{ item }}
-  environment: "{{ supply_chain_cooldown_environment }}"
+  environment: "{{ supply_chain_cooldown_environment | combine(ubuntu_uv_tool_environment) }}"
   changed_when: false
   loop:
     - pdfplumber
@@ -46,5 +46,5 @@
 - name: uv | Upgrade tools
   # uv has no Ansible module.
   ansible.builtin.command: uv tool upgrade --all
-  environment: "{{ supply_chain_cooldown_environment }}"
+  environment: "{{ supply_chain_cooldown_environment | combine(ubuntu_uv_tool_environment) }}"
   changed_when: false
