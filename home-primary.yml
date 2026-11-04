@@ -22,6 +22,9 @@
     - role: zabbix_agent
       tags:
         - zabbix_agent
+    - role: cloudfront_waf_report
+      tags:
+        - cloudfront_waf_report
     - role: couchdb
       tags:
         - couchdb
