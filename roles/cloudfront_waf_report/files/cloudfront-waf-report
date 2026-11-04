@@ -13,8 +13,10 @@ and runs against the WAF log group only.
 """
 
 import argparse
+import collections
 import copy
 import email.message
+import gzip
 import ipaddress
 import json
 import os
@@ -74,6 +76,13 @@ AGENT = {
     "resources": [],
 }
 _JSON_BLOCK = re.compile(r"```json\s*\n(.*?)\n?```", re.DOTALL)
+DEFAULT_APACHE_LOG_DIR = "/var/log/apache2"
+APEX = "rewse.jp"
+# vhost_combined and combined as roles/httpd/files/log-format.conf defines them;
+# %a is the real client because mod_remoteip trusts CloudFront.
+_REQUEST = r'(?P<ip>\S+) \S+ \S+ \[(?P<time>[^\]]+)\] "\S+ (?P<target>\S+)[^"]*" (?P<status>\d{3}) '
+_VHOST_LINE = re.compile(r"^(?P<host>[^\s:]+):\d+ " + _REQUEST)
+_COMBINED_LINE = re.compile(r"^" + _REQUEST)
 DEFAULT_CONFIG = pathlib.Path("/etc/cloudfront-waf-report/config.json")
 SENDMAIL = ["/usr/sbin/sendmail", "-t", "-oi"]
 FALLBACK_ROWS = 10
@@ -96,6 +105,7 @@ _INSTRUCTIONS = """\
 - accepted は利用者が「このままでよい」と判断した項目です。これに当たるものは出さないでください。
 - 各項目の rule、host、country には、その項目の代表的な値を入れてください。
 - title、evidence、next_action は日本語で書いてください。
+- allowed_scans の各行の origin_status は、fox の Apache がそのリクエストに返した応答コードと件数です。「不明」は fox のログに見つからなかったもの（hotel が代わりに応答した期間など）で、中身が返ったかは分かりません。3xx と 4xx だけの行は渡していません。
 
 応答は ```json で始まるコードブロック 1 つだけにしてください。形式は次の 2 つです。
 - 追加で調べたいとき: {{"queries": [{{"purpose": "...", "query": "<Logs Insights のクエリ>", "start": "<ISO 8601>", "end": "<ISO 8601>"}}]}}
@@ -448,6 +458,74 @@ def prepare_rows(
     return prepared
 
 
+def _apache_host(host: str) -> str:
+    return APEX if host in (APEX, f"www.{APEX}") else host
+
+
+def _open_log(path: pathlib.Path):
+    if path.suffix == ".gz":
+        return gzip.open(path, "rt", encoding="utf-8", errors="replace")
+    return path.open(encoding="utf-8", errors="replace")
+
+
+def origin_statuses(
+    log_dir: pathlib.Path, period: tuple[datetime, datetime]
+) -> dict[tuple[str, str, str], collections.Counter[str]]:
+    """Count Apache status codes by host, path, and client within the period."""
+    start, end = period
+    statuses: dict[tuple[str, str, str], collections.Counter[str]] = {}
+    sources = [(path, _VHOST_LINE) for path in log_dir.glob("other_vhosts_access.log*")]
+    sources += [(path, _COMBINED_LINE) for path in log_dir.glob("access.log*")]
+    for path, pattern in sources:
+        try:
+            with _open_log(path) as handle:
+                for line in handle:
+                    match = pattern.match(line)
+                    if match is None:
+                        continue
+                    try:
+                        when = datetime.strptime(match["time"], "%d/%b/%Y:%H:%M:%S %z")
+                    except ValueError:
+                        continue
+                    if not start <= when < end:
+                        continue
+                    host = _apache_host(match.groupdict().get("host") or APEX)
+                    key = (host, match["target"].split("?", 1)[0], match["ip"])
+                    statuses.setdefault(key, collections.Counter())[
+                        match["status"]
+                    ] += 1
+        except (OSError, EOFError):
+            # An unreadable file leaves its requests unknown, which keeps them.
+            continue
+    return statuses
+
+
+def annotate_scans(
+    rows: list[dict[str, str]],
+    statuses: dict[tuple[str, str, str], collections.Counter[str]],
+) -> list[dict[str, str]]:
+    """Add the Apache status to each row and drop rows answered only with 3xx or 4xx."""
+    kept = []
+    for row in rows:
+        key = (
+            _apache_host(row.get("httpRequest.host", "")),
+            row.get("httpRequest.uri", ""),
+            row.get("httpRequest.clientIp", ""),
+        )
+        # Hosts without their own vhost are answered by the default one, which
+        # logs to access.log without a host name.
+        counts = statuses.get(key) or statuses.get((APEX, key[1], key[2]))
+        if counts and all(code[0] in "34" for code in counts):
+            continue
+        status = (
+            ", ".join(f"{code}×{counts[code]}" for code in sorted(counts))
+            if counts
+            else "不明"
+        )
+        kept.append(row | {"origin_status": status})
+    return kept
+
+
 def apply_accepted(findings: list[dict], accepted: list[dict]) -> list[dict]:
     """Drop findings that match every given key of an accepted entry."""
 
@@ -600,6 +678,10 @@ def main(
             name: prepare_rows(aws.query(query, *period), networks)
             for name, query in candidate_queries(cidrs).items()
         }
+        log_dir = pathlib.Path(config.get("apache_log_dir", DEFAULT_APACHE_LOG_DIR))
+        candidates["allowed_scans"] = annotate_scans(
+            candidates["allowed_scans"], origin_statuses(log_dir, period)
+        )
         findings: list[dict] | None = []
         if any(candidates.values()):
             try:

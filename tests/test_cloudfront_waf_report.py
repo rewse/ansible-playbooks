@@ -1,9 +1,11 @@
 #!/usr/bin/env python3
 """Unit tests for the cloudfront-waf-report script."""
 
+import collections
 import contextlib
 import email
 import email.policy
+import gzip
 import importlib.machinery
 import io
 import ipaddress
@@ -725,6 +727,23 @@ class MainTest(unittest.TestCase):
         prompt = next(c["argv"][-1] for c in run.calls if c["argv"][0] == "kiro-cli")
         self.assertNotIn("192.0.2.", prompt)
 
+    def test_main_filters_allowed_scans_by_apache_status(self):
+        logs = pathlib.Path(self.tmp.name) / "apache"
+        logs.mkdir()
+        (logs / "other_vhosts_access.log").write_text(VHOST_LINE)
+        config = json.loads(self.config.read_text()) | {"apache_log_dir": str(logs)}
+        self.config.write_text(json.dumps(config))
+        scan = {
+            "httpRequest.host": "nas.rewse.jp",
+            "httpRequest.uri": "/.env.local",
+            "httpRequest.clientIp": "203.0.113.7",
+            "httpRequest.country": "US",
+        }
+        run = self.answers([[], [], [], [scan]])
+        self.assertEqual(self.main(run), 0)
+        self.assertTrue(self.sent(run)["Subject"].endswith(": 対応不要"))
+        self.assertFalse([c for c in run.calls if c["argv"][0] == "kiro-cli"])
+
     def test_dry_run_prints_instead_of_mailing(self):
         run = FakeRun(self.answers([[], [], [], []]).answers[:-1])
         out = io.StringIO()
@@ -820,6 +839,110 @@ class ReviewFixTest(unittest.TestCase):
         with self.assertRaises(RuntimeError):
             report.Aws(run).office_cidrs()
         self.assertEqual(seen, [report.AWS_TIMEOUT])
+
+
+VHOST_LINE = (
+    'nas.rewse.jp:443 203.0.113.7 - - [01/Nov/2026:10:00:00 +0900] "GET /.env.local?x=1 HTTP/1.1" 404 271'
+    ' "-" "UA" 533\n'
+)
+APEX_LINE = '203.0.113.8 - - [02/Nov/2026:11:00:00 +0900] "GET /index.php HTTP/1.1" 200 5120 "-" "UA" 900\n'
+
+
+class ApacheTest(unittest.TestCase):
+    def setUp(self):
+        self.tmp = tempfile.TemporaryDirectory()
+        self.addCleanup(self.tmp.cleanup)
+        self.dir = pathlib.Path(self.tmp.name)
+
+    def test_origin_statuses_parses_both_formats(self):
+        (self.dir / "other_vhosts_access.log").write_text(VHOST_LINE * 2)
+        (self.dir / "access.log").write_text(APEX_LINE)
+        statuses = report.origin_statuses(self.dir, PERIOD)
+        self.assertEqual(
+            statuses[("nas.rewse.jp", "/.env.local", "203.0.113.7")], {"404": 2}
+        )
+        self.assertEqual(
+            statuses[("rewse.jp", "/index.php", "203.0.113.8")], {"200": 1}
+        )
+
+    def test_origin_statuses_reads_rotated_gzip(self):
+        with gzip.open(self.dir / "other_vhosts_access.log.3.gz", "wt") as handle:
+            handle.write(VHOST_LINE)
+        self.assertIn(
+            ("nas.rewse.jp", "/.env.local", "203.0.113.7"),
+            report.origin_statuses(self.dir, PERIOD),
+        )
+
+    def test_origin_statuses_skips_malformed_lines(self):
+        (self.dir / "access.log").write_bytes(
+            b"garbage\n\xff\xfe\n" + APEX_LINE.encode()
+        )
+        self.assertEqual(len(report.origin_statuses(self.dir, PERIOD)), 1)
+
+    def test_origin_statuses_ignores_lines_outside_period(self):
+        (self.dir / "access.log").write_text(
+            APEX_LINE.replace("02/Nov/2026", "07/Nov/2026")
+        )
+        self.assertEqual(report.origin_statuses(self.dir, PERIOD), {})
+
+    def test_origin_statuses_returns_empty_when_unreadable(self):
+        self.assertEqual(report.origin_statuses(self.dir / "missing", PERIOD), {})
+
+    def test_annotate_scans_drops_only_redirects_and_client_errors(self):
+        statuses = {
+            ("rewse.jp", "/a", "1.1.1.1"): collections.Counter({"404": 2, "301": 1}),
+            ("rewse.jp", "/b", "1.1.1.1"): collections.Counter({"404": 1, "200": 1}),
+            ("rewse.jp", "/c", "1.1.1.1"): collections.Counter({"503": 1}),
+        }
+        rows = [
+            {
+                "httpRequest.host": "rewse.jp",
+                "httpRequest.uri": u,
+                "httpRequest.clientIp": "1.1.1.1",
+            }
+            for u in ("/a", "/b", "/c")
+        ]
+        kept = report.annotate_scans(rows, statuses)
+        self.assertEqual([r["httpRequest.uri"] for r in kept], ["/b", "/c"])
+        self.assertEqual(kept[0]["origin_status"], "200×1, 404×1")
+
+    def test_annotate_scans_marks_unknown(self):
+        rows = [
+            {
+                "httpRequest.host": "nas.rewse.jp",
+                "httpRequest.uri": "/x",
+                "httpRequest.clientIp": "1.1.1.1",
+            }
+        ]
+        self.assertEqual(report.annotate_scans(rows, {})[0]["origin_status"], "不明")
+
+    def test_annotate_scans_treats_www_as_apex(self):
+        statuses = {("rewse.jp", "/a", "1.1.1.1"): collections.Counter({"404": 1})}
+        rows = [
+            {
+                "httpRequest.host": "www.rewse.jp",
+                "httpRequest.uri": "/a",
+                "httpRequest.clientIp": "1.1.1.1",
+            }
+        ]
+        self.assertEqual(report.annotate_scans(rows, statuses), [])
+
+    def test_annotate_scans_falls_back_to_default_vhost(self):
+        # A host without its own vhost, such as zabbix.rewse.jp, logs to access.log.
+        statuses = {("rewse.jp", "/a", "1.1.1.1"): collections.Counter({"404": 1})}
+        rows = [
+            {
+                "httpRequest.host": "zabbix.rewse.jp",
+                "httpRequest.uri": "/a",
+                "httpRequest.clientIp": "1.1.1.1",
+            }
+        ]
+        self.assertEqual(report.annotate_scans(rows, statuses), [])
+
+    def test_prompt_explains_origin_status(self):
+        self.assertIn(
+            "origin_status", report.build_prompt(PERIOD, {}, [], [], [], final=False)
+        )
 
 
 if __name__ == "__main__":

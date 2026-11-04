@@ -80,6 +80,7 @@ class RoleTest(unittest.TestCase):
                 "recipient": "root",
                 "state_dir": "/home/tats/.local/state/cloudfront-waf-report",
                 "kiro_env_file": "/home/tats/.config/environment/kiro.sh",
+                "apache_log_dir": "/var/log/apache2",
                 "accepted": accepted,
             },
         )
