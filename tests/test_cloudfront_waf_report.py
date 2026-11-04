@@ -12,6 +12,7 @@ import ipaddress
 import json
 import os
 import pathlib
+import re
 import subprocess
 import tempfile
 import types
@@ -338,13 +339,17 @@ class KiroTest(unittest.TestCase):
         self.assertNotIn("permissions", agent)
         self.assertFalse(pathlib.Path(seen["home"]).exists())
 
-    def test_read_api_key_parses_export_line(self):
+    def test_read_api_key_strips_whitespace(self):
         with tempfile.TemporaryDirectory() as tmp:
-            path = pathlib.Path(tmp) / "kiro.sh"
-            path.write_text('# comment\nexport KIRO_API_KEY="abc-123"\n')
+            path = pathlib.Path(tmp) / "kiro-api-key"
+            path.write_text("abc-123\n")
             self.assertEqual(report.read_api_key(path), "abc-123")
-            path.write_text("# nothing\n")
-            with self.assertRaises(RuntimeError):
+
+    def test_read_api_key_rejects_empty_file(self):
+        with tempfile.TemporaryDirectory() as tmp:
+            path = pathlib.Path(tmp) / "kiro-api-key"
+            path.write_text(" \n")
+            with self.assertRaisesRegex(RuntimeError, re.escape(str(path))):
                 report.read_api_key(path)
 
     def test_parse_response_takes_last_json_block(self):
@@ -620,15 +625,15 @@ class MainTest(unittest.TestCase):
         self.addCleanup(self.tmp.cleanup)
         root = pathlib.Path(self.tmp.name)
         self.state = root / "state"
-        key = root / "kiro.sh"
-        key.write_text('export KIRO_API_KEY="k"\n')
+        self.key = root / "kiro-api-key"
+        self.key.write_text("k\n")
         self.config = root / "config.json"
         self.config.write_text(
             json.dumps(
                 {
                     "recipient": "root",
                     "state_dir": str(self.state),
-                    "kiro_env_file": str(key),
+                    "kiro_api_key_file": str(self.key),
                     "accepted": [],
                 }
             )
@@ -680,6 +685,13 @@ class MainTest(unittest.TestCase):
         self.assertEqual(self.main(run), 0)
         self.assertTrue(self.sent(run)["Subject"].endswith(": AI 判定なし"))
         self.assertFalse((self.state / "last.json").exists())
+
+    def test_missing_key_file_reports_without_ai(self):
+        self.key.unlink()
+        run = self.answers([[{"httpRequest.uri": "/a"}], [], [], []])
+        self.assertEqual(self.main(run), 0)
+        self.assertTrue(self.sent(run)["Subject"].endswith(": AI 判定なし"))
+        self.assertFalse([c for c in run.calls if c["argv"][0] == "kiro-cli"])
 
     def test_main_falls_back_on_invalid_json(self):
         run = self.answers([[{"httpRequest.uri": "/a"}], [], [], []], kiro="no json")

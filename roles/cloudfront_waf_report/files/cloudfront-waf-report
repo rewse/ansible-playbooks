@@ -88,7 +88,6 @@ _COMBINED_LINE = re.compile(r"^" + _REQUEST)
 DEFAULT_CONFIG = pathlib.Path("/etc/cloudfront-waf-report/config.json")
 SENDMAIL = ["/usr/sbin/sendmail", "-t", "-oi"]
 FALLBACK_ROWS = 10
-_API_KEY = re.compile(r'^export KIRO_API_KEY="([^"]+)"$', re.MULTILINE)
 
 _INSTRUCTIONS = """\
 あなたは自宅サービスの AWS WAF ログを毎週レビューする担当です。
@@ -282,11 +281,11 @@ class Aws:
 
 
 def read_api_key(path: pathlib.Path) -> str:
-    """Return KIRO_API_KEY from the export line in the environment file."""
-    match = _API_KEY.search(path.read_text())
-    if match is None:
-        raise RuntimeError(f"KIRO_API_KEY not found in {path}")
-    return match.group(1)
+    """Return the Kiro API key from a file that holds only the key."""
+    api_key = path.read_text().strip()
+    if not api_key:
+        raise RuntimeError(f"Kiro API key file is empty: {path}")
+    return api_key
 
 
 def _log_data(value: object) -> str:
@@ -769,7 +768,7 @@ def main(
         findings: list[dict] | None = []
         if any(candidates.values()):
             try:
-                api_key = read_api_key(pathlib.Path(config["kiro_env_file"]))
+                api_key = read_api_key(pathlib.Path(config["kiro_api_key_file"]))
                 findings = investigate(
                     aws,
                     lambda prompt: ask_kiro(prompt, api_key, run),
