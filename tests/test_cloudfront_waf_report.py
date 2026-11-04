@@ -939,6 +939,104 @@ class ApacheTest(unittest.TestCase):
         ]
         self.assertEqual(report.annotate_scans(rows, statuses), [])
 
+    def test_success_sizes_records_kind_per_log(self):
+        (self.dir / "other_vhosts_access.log").write_text(
+            VHOST_LINE.replace('" 404 271', '" 200 4836')
+        )
+        (self.dir / "access.log").write_text(APEX_LINE)
+        sizes = report.success_sizes(self.dir, PERIOD)
+        self.assertEqual(
+            sizes[("nas.rewse.jp", "/.env.local", "203.0.113.7")], [("total", 4836)]
+        )
+        self.assertEqual(
+            sizes[("rewse.jp", "/index.php", "203.0.113.8")], [("body", 5120)]
+        )
+
+    def test_probe_fallback_uses_loopback_and_random_path(self):
+        run = FakeRun([(["curl"], "200 4500 340"), (["curl"], "200 8460 350")])
+        self.assertEqual(
+            report.probe_fallback("nas.rewse.jp", run), [(4500, 4840), (8460, 8810)]
+        )
+        for call in run.calls:
+            argv = call["argv"]
+            self.assertEqual(
+                argv[argv.index("--resolve") + 1], "nas.rewse.jp:443:127.0.0.1"
+            )
+            url = argv[-1]
+            self.assertTrue(
+                url.startswith("https://nas.rewse.jp/cloudfront-waf-report-probe-")
+            )
+        self.assertEqual(
+            sum("Accept-Encoding: gzip" in c["argv"] for c in run.calls), 1
+        )
+
+    def test_probe_fallback_is_empty_when_host_answers_not_found(self):
+        run = FakeRun([(["curl"], "404 271 300"), (["curl"], "404 271 300")])
+        self.assertEqual(report.probe_fallback("rewse.jp", run), [])
+
+    def test_probe_fallback_is_empty_when_curl_fails(self):
+        run = FakeRun(
+            [
+                (["curl"], subprocess.CalledProcessError(7, ["curl"])),
+                (["curl"], "garbage"),
+            ]
+        )
+        self.assertEqual(report.probe_fallback("rewse.jp", run), [])
+
+    def scan_rows(self):
+        return [
+            {
+                "httpRequest.host": "nas.rewse.jp",
+                "httpRequest.uri": u,
+                "httpRequest.clientIp": "1.1.1.1",
+            }
+            for u in ("/.env.local", "/.git/config", "/boom")
+        ]
+
+    def test_annotate_scans_drops_fallback_pages(self):
+        statuses = {
+            ("nas.rewse.jp", u, "1.1.1.1"): collections.Counter({c: 1})
+            for u, c in (
+                ("/.env.local", "200"),
+                ("/.git/config", "200"),
+                ("/boom", "500"),
+            )
+        }
+        sizes = {
+            ("nas.rewse.jp", "/.env.local", "1.1.1.1"): [("total", 4836)],
+            ("nas.rewse.jp", "/.git/config", "1.1.1.1"): [("total", 20000)],
+            ("nas.rewse.jp", "/boom", "1.1.1.1"): [("total", 4836)],
+        }
+        probes = []
+
+        def probe(host):
+            probes.append(host)
+            return [(4500, 4840)]
+
+        kept = report.annotate_scans(self.scan_rows(), statuses, sizes, probe)
+        self.assertEqual(
+            [r["httpRequest.uri"] for r in kept], ["/.git/config", "/boom"]
+        )
+        self.assertEqual(probes, ["nas.rewse.jp"])
+
+    def test_annotate_scans_compares_body_size_for_access_log(self):
+        statuses = {("rewse.jp", "/x.php", "1.1.1.1"): collections.Counter({"200": 1})}
+        sizes = {("rewse.jp", "/x.php", "1.1.1.1"): [("body", 4510)]}
+        rows = [
+            {
+                "httpRequest.host": "rewse.jp",
+                "httpRequest.uri": "/x.php",
+                "httpRequest.clientIp": "1.1.1.1",
+            }
+        ]
+        self.assertEqual(
+            report.annotate_scans(rows, statuses, sizes, lambda _: [(4500, 9000)]), []
+        )
+
+    def test_prompt_says_checks_are_done(self):
+        prompt = report.build_prompt(PERIOD, {}, [], [], [], final=False)
+        self.assertIn("確かめ済み", prompt)
+
     def test_prompt_explains_origin_status(self):
         self.assertIn(
             "origin_status", report.build_prompt(PERIOD, {}, [], [], [], final=False)
