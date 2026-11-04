@@ -12,11 +12,16 @@ worst it can do is ask for a Logs Insights query, which this script validates
 and runs against the WAF log group only.
 """
 
+import argparse
+import email.message
 import ipaddress
 import json
 import os
 import pathlib
 import re
+import socket
+import subprocess
+import sys
 import tempfile
 import time
 from collections.abc import Callable
@@ -34,9 +39,7 @@ MAX_QUERY_LENGTH = 2000
 
 _USER_AGENT = r'parse @message /"name":"[Uu]ser-[Aa]gent","value":"(?<ua>[^"]*)"/'
 _RATE_LIMIT_RULES = '["RateLimitLogin", "RateLimitAll"]'
-_SCAN_PATHS = (
-    r"/(?i)(wp-|xmlrpc|\.env|\.git|phpmyadmin|cgi-bin|\.php|\/actuator|\/vendor\/|\/\.)/"
-)
+_SCAN_PATHS = r"/(?i)(wp-|xmlrpc|\.env|\.git|phpmyadmin|cgi-bin|\.php|\/actuator|\/vendor\/|\/\.)/"
 _CONTROL = re.compile(r"[\x00-\x1f\x7f-\x9f]")
 OFFICE_IP_SET = "cloudfront-waf-office"
 POLL_INTERVAL = 2.0
@@ -66,6 +69,9 @@ AGENT = {
     "resources": [],
 }
 _JSON_BLOCK = re.compile(r"```json\s*\n(.*?)\n?```", re.DOTALL)
+DEFAULT_CONFIG = pathlib.Path("/etc/cloudfront-waf-report/config.json")
+SENDMAIL = ["/usr/sbin/sendmail", "-t", "-oi"]
+FALLBACK_ROWS = 10
 _API_KEY = re.compile(r'^export KIRO_API_KEY="([^"]+)"$', re.MULTILINE)
 
 _INSTRUCTIONS = """\
@@ -106,7 +112,9 @@ def report_period(now: datetime) -> tuple[datetime, datetime]:
 def origin_filter(office_cidrs: list[str]) -> str:
     """Return a Logs Insights condition matching Japan and the office."""
     terms = ['httpRequest.country = "JP"']
-    terms += [f'isIpv4InSubnet(httpRequest.clientIp, "{cidr}")' for cidr in office_cidrs]
+    terms += [
+        f'isIpv4InSubnet(httpRequest.clientIp, "{cidr}")' for cidr in office_cidrs
+    ]
     return "(" + " or ".join(terms) + ")"
 
 
@@ -165,9 +173,8 @@ def sanitize(value: str, limit: int = 200) -> str:
 
 
 def _parse_time(value: object) -> datetime:
-    if not isinstance(value, str):
-        raise ValueError("time must be an ISO 8601 string")
-    parsed = datetime.fromisoformat(value)
+    # fromisoformat raises ValueError for anything that is not ISO 8601.
+    parsed = datetime.fromisoformat(value if isinstance(value, str) else "")
     if parsed.tzinfo is None:
         raise ValueError("time must carry a UTC offset")
     return parsed
@@ -194,12 +201,16 @@ def validate_followup(spec: dict, now: datetime) -> tuple[str, datetime, datetim
 class Aws:
     """Read the WAF logs and the office IP set through the AWS CLI."""
 
-    def __init__(self, run: Runner, sleep: Callable[[float], None] = time.sleep) -> None:
+    def __init__(
+        self, run: Runner, sleep: Callable[[float], None] = time.sleep
+    ) -> None:
         self._run = run
         self._sleep = sleep
 
     def _call(self, *args: str) -> dict:
-        return json.loads(self._run(["aws", *args, "--region", REGION, "--output", "json"]))
+        return json.loads(
+            self._run(["aws", *args, "--region", REGION, "--output", "json"])
+        )
 
     def office_cidrs(self) -> list[str]:
         """Return the CIDRs of the office IP set that the web ACL references."""
@@ -207,8 +218,14 @@ class Aws:
         for ip_set in listing.get("IPSets", []):
             if ip_set.get("Name") == OFFICE_IP_SET:
                 found = self._call(
-                    "wafv2", "get-ip-set", "--scope", "CLOUDFRONT",
-                    "--name", OFFICE_IP_SET, "--id", ip_set["Id"],
+                    "wafv2",
+                    "get-ip-set",
+                    "--scope",
+                    "CLOUDFRONT",
+                    "--name",
+                    OFFICE_IP_SET,
+                    "--id",
+                    ip_set["Id"],
                 )
                 return list(found["IPSet"]["Addresses"])
         raise RuntimeError(f"IP set {OFFICE_IP_SET} not found")
@@ -216,18 +233,29 @@ class Aws:
     def query(self, query: str, start: datetime, end: datetime) -> list[dict[str, str]]:
         """Run a Logs Insights query on the WAF log group and return its rows."""
         started = self._call(
-            "logs", "start-query",
-            "--log-group-name", LOG_GROUP,
-            "--start-time", str(int(start.timestamp())),
-            "--end-time", str(int(end.timestamp())),
-            "--query-string", query,
+            "logs",
+            "start-query",
+            "--log-group-name",
+            LOG_GROUP,
+            "--start-time",
+            str(int(start.timestamp())),
+            "--end-time",
+            str(int(end.timestamp())),
+            "--query-string",
+            query,
         )
         for _ in range(POLL_ATTEMPTS):
-            result = self._call("logs", "get-query-results", "--query-id", started["queryId"])
+            result = self._call(
+                "logs", "get-query-results", "--query-id", started["queryId"]
+            )
             status = result.get("status")
             if status == "Complete":
                 return [
-                    {cell["field"]: cell["value"] for cell in row if cell["field"] != "@ptr"}
+                    {
+                        cell["field"]: cell["value"]
+                        for cell in row
+                        if cell["field"] != "@ptr"
+                    }
                     for row in result.get("results", [])
                 ]
             if status not in ("Scheduled", "Running"):
@@ -265,7 +293,9 @@ def build_prompt(
         f"accepted: {json.dumps(accepted, ensure_ascii=False)}",
     ]
     if final:
-        parts.append("追加のクエリはもう実行できません。今回は findings だけを返してください。")
+        parts.append(
+            "追加のクエリはもう実行できません。今回は findings だけを返してください。"
+        )
     data = {"candidates": candidates, "previous": previous, "followups": followups}
     parts.append(f"<log-data>\n{_log_data(data)}\n</log-data>")
     return "\n\n".join(parts)
@@ -314,7 +344,15 @@ def ask_kiro(prompt: str, api_key: str, run: Runner) -> str:
             "PATH": os.environ.get("PATH", "/usr/local/bin:/usr/bin:/bin"),
         }
         return run(
-            ["kiro-cli", "chat", "--no-interactive", "--trust-tools=", "--agent", AGENT_NAME, prompt],
+            [
+                "kiro-cli",
+                "chat",
+                "--no-interactive",
+                "--trust-tools=",
+                "--agent",
+                AGENT_NAME,
+                prompt,
+            ],
             env=env,
             cwd=home,
             timeout=KIRO_TIMEOUT,
@@ -341,12 +379,229 @@ def investigate(
         if final:
             raise ValueError("kiro-cli asked for queries after the last round")
         for spec in response["queries"][:MAX_QUERIES_PER_ROUND]:
-            purpose = sanitize(str(spec.get("purpose", ""))) if isinstance(spec, dict) else ""
+            purpose = (
+                sanitize(str(spec.get("purpose", ""))) if isinstance(spec, dict) else ""
+            )
             try:
-                query, start, end = validate_followup(spec if isinstance(spec, dict) else {}, now)
+                query, start, end = validate_followup(
+                    spec if isinstance(spec, dict) else {}, now
+                )
             except ValueError as error:
                 followups.append({"purpose": purpose, "rejected": f"拒否: {error}"})
                 continue
-            rows = [{k: sanitize(v) for k, v in row.items()} for row in aws.query(query, start, end)]
+            rows = [
+                {k: sanitize(v) for k, v in row.items()}
+                for row in aws.query(query, start, end)
+            ]
             followups.append({"purpose": purpose, "query": query, "rows": rows})
     raise AssertionError("unreachable")
+
+
+def prepare_rows(
+    rows: list[dict[str, str]], office_networks: list[ipaddress.IPv4Network]
+) -> list[dict[str, str]]:
+    """Sanitize candidate rows, label their origin, and hide office addresses."""
+    prepared = []
+    for row in rows:
+        origin = label_origin(
+            row.get("httpRequest.country", ""),
+            row.get("httpRequest.clientIp", ""),
+            office_networks,
+        )
+        clean = {key: sanitize(value) for key, value in row.items()}
+        if origin == "office":
+            # The office ranges are not public; the label is enough to judge.
+            clean.pop("httpRequest.clientIp", None)
+        clean["origin"] = origin
+        prepared.append(clean)
+    return prepared
+
+
+def apply_accepted(findings: list[dict], accepted: list[dict]) -> list[dict]:
+    """Drop findings that match every given key of an accepted entry."""
+
+    def matches(finding: dict, entry: dict) -> bool:
+        return all(
+            finding.get(key) == value for key, value in entry.items() if key != "reason"
+        )
+
+    return [f for f in findings if not any(matches(f, entry) for entry in accepted)]
+
+
+def drop_empty(findings: list[dict]) -> list[dict]:
+    """Drop findings without a next action."""
+    return [f for f in findings if f.get("next_action", "").strip()]
+
+
+def load_previous(state_dir: pathlib.Path) -> list[dict]:
+    """Return last week's findings, or none when the state is missing or broken."""
+    try:
+        state = json.loads((state_dir / "last.json").read_text())
+    except (OSError, ValueError):
+        return []
+    findings = state.get("findings") if isinstance(state, dict) else None
+    if not isinstance(findings, list):
+        return []
+    return [f for f in findings if isinstance(f, dict)]
+
+
+def save_report(state_dir: pathlib.Path, findings: list[dict]) -> None:
+    """Keep this week's findings for next week's run."""
+    state_dir.mkdir(parents=True, exist_ok=True)
+    path = state_dir / "last.json"
+    temporary = path.with_suffix(".tmp")
+    temporary.write_text(
+        json.dumps({"findings": findings}, ensure_ascii=False, indent=1)
+    )
+    temporary.replace(path)
+
+
+def describe_error(error: BaseException) -> str:
+    """Describe a failure without command arguments, which hold office CIDRs."""
+    if isinstance(error, subprocess.CalledProcessError):
+        command = error.cmd if isinstance(error.cmd, list) else [str(error.cmd)]
+        stderr = error.stderr if isinstance(error.stderr, str) else ""
+        tail = sanitize(stderr.strip()[-500:], 500)
+        return f"{' '.join(command[:3])} exited with {error.returncode}: {tail}".rstrip(
+            ": "
+        )
+    return f"{type(error).__name__}: {sanitize(str(error), 500)}"
+
+
+def render_mail(
+    host: str,
+    period: tuple[datetime, datetime],
+    findings: list[dict] | None,
+    candidates: dict[str, list[dict[str, str]]] | None,
+    error: str | None,
+) -> tuple[str, str]:
+    """Return the subject and body of the report mail."""
+    start, end = period
+    span = f"{start:%Y-%m-%d}〜{end - timedelta(days=1):%Y-%m-%d}"
+    prefix = f"[{host}] WAF 週次レポート {span}"
+    if error is not None:
+        return f"{prefix}: 作成失敗", f"レポートの作成に失敗しました。\n\n{error}\n"
+    if findings is None:
+        lines = ["kiro-cli の判定に失敗したため、候補をそのまま載せます。"]
+        for name, rows in (candidates or {}).items():
+            if rows:
+                lines += ["", f"■ {name}（{len(rows)} 行）"]
+                lines += [
+                    json.dumps(row, ensure_ascii=False) for row in rows[:FALLBACK_ROWS]
+                ]
+        return f"{prefix}: AI 判定なし", "\n".join(lines) + "\n"
+    new = [f for f in findings if not f.get("continued")]
+    continued = [f for f in findings if f.get("continued")]
+    if not findings:
+        return f"{prefix}: 対応不要", "対応が必要な項目はありません。\n"
+    count = f"対応 {len(new)} 件" + (f"（継続 {len(continued)} 件）" if not new else "")
+    blocks = [
+        f"■ {f['title']}\n根拠: {f['evidence']}\nnext action: {f['next_action']}\n"
+        for f in new
+    ]
+    body = "\n".join(blocks)
+    if continued:
+        body += ("\n" if blocks else "") + "".join(
+            f"- 前週から継続: {f['title']}\n" for f in continued
+        )
+    return f"{prefix}: {count}", body
+
+
+def send_mail(subject: str, body: str, recipient: str, run: Runner) -> None:
+    """Hand the mail to the local MTA."""
+    message = email.message.EmailMessage()
+    message["To"] = recipient
+    message["Subject"] = subject
+    message.set_content(body)
+    run(SENDMAIL, stdin=message.as_string())
+
+
+def run_command(
+    argv: list[str],
+    *,
+    stdin: str | None = None,
+    env: dict[str, str] | None = None,
+    cwd: str | None = None,
+    timeout: float | None = None,
+) -> str:
+    """Run a command and return its standard output."""
+    return subprocess.run(
+        argv,
+        input=stdin,
+        env=env,
+        cwd=cwd,
+        timeout=timeout,
+        check=True,
+        capture_output=True,
+        text=True,
+    ).stdout
+
+
+def main(
+    argv: list[str] | None = None,
+    run: Runner = run_command,
+    now: datetime | None = None,
+) -> int:
+    parser = argparse.ArgumentParser(
+        description="Mail the weekly cloudfront-waf report."
+    )
+    parser.add_argument("--config", type=pathlib.Path, default=DEFAULT_CONFIG)
+    parser.add_argument(
+        "--dry-run", action="store_true", help="print the mail instead of sending it"
+    )
+    args = parser.parse_args(argv)
+    config = json.loads(args.config.read_text())
+    state_dir = pathlib.Path(config["state_dir"])
+    period = report_period(now or datetime.now(JST))
+    host = socket.gethostname().split(".")[0]
+
+    def deliver(subject: str, body: str) -> None:
+        if args.dry_run:
+            print(f"Subject: {subject}\n\n{body}", end="")
+        else:
+            send_mail(subject, body, config["recipient"], run)
+
+    try:
+        aws = Aws(run)
+        networks = [ipaddress.IPv4Network(cidr) for cidr in aws.office_cidrs()]
+        cidrs = [str(net) for net in networks]
+        candidates = {
+            name: prepare_rows(aws.query(query, *period), networks)
+            for name, query in candidate_queries(cidrs).items()
+        }
+        findings: list[dict] | None = []
+        if any(candidates.values()):
+            try:
+                api_key = read_api_key(pathlib.Path(config["kiro_env_file"]))
+                findings = investigate(
+                    aws,
+                    lambda prompt: ask_kiro(prompt, api_key, run),
+                    period,
+                    candidates,
+                    load_previous(state_dir),
+                    config.get("accepted", []),
+                    now or datetime.now(JST),
+                )
+            except (
+                RuntimeError,
+                ValueError,
+                OSError,
+                subprocess.SubprocessError,
+            ) as error:
+                print(
+                    f"kiro-cli triage failed: {describe_error(error)}", file=sys.stderr
+                )
+                findings = None
+        if findings is not None:
+            findings = drop_empty(apply_accepted(findings, config.get("accepted", [])))
+        deliver(*render_mail(host, period, findings, candidates, None))
+        if findings is not None and not args.dry_run:
+            save_report(state_dir, findings)
+        return 0
+    except Exception as error:  # noqa: BLE001 - any failure must still reach the mailbox.
+        deliver(*render_mail(host, period, None, None, describe_error(error)))
+        return 1
+
+
+if __name__ == "__main__":
+    sys.exit(main())
