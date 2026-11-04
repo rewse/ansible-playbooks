@@ -1,19 +1,18 @@
 ---
+# zinit itself is installed globally so root and the admin user share one copy.
+# Each user's plugins stay in their own ~/.local/share/zinit.
 - name: zinit | Install
-  # The vendor installer has no module.
+  # The vendor installer has no module. chezmoi owns .zshrc, so the installer
+  # leaves it alone.
   ansible.builtin.shell: bash -c "$(curl --fail --show-error --silent --location https://raw.githubusercontent.com/zdharma-continuum/zinit/HEAD/scripts/install.sh)"
   args:
-    creates: /root/.local/share/zinit/zinit.git
+    creates: /usr/local/share/zinit/zinit.git/zinit.zsh
   environment:
+    NO_EDIT: "1"
     NO_INPUT: "1"
-
-- name: zinit | Link into /usr/local/share
-  ansible.builtin.file:
-    src: /root/.local/share/zinit
-    dest: /usr/local/share/zinit
-    state: link
+    ZINIT_HOME: /usr/local/share/zinit
 
 - name: zinit | Update
   # zinit updates itself from zsh; no module manages it.
-  ansible.builtin.command: zsh -ic "zinit self-update"
+  ansible.builtin.command: zsh -c "source /usr/local/share/zinit/zinit.git/zinit.zsh && zinit self-update"
   changed_when: false
