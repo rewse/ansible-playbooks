@@ -734,5 +734,93 @@ class MainTest(unittest.TestCase):
         self.assertFalse([c for c in run.calls if c["argv"][0] == "/usr/sbin/sendmail"])
 
 
+class ReviewFixTest(unittest.TestCase):
+    QUERY: ClassVar[dict[str, str]] = {
+        "purpose": "p",
+        "query": "fields @message",
+        "start": "2026-10-31T00:00:00+09:00",
+        "end": "2026-11-07T00:00:00+09:00",
+    }
+
+    def test_followup_rows_hide_office_client_ip(self):
+        answers = [fenced({"queries": [self.QUERY]}), fenced({"findings": []})]
+        prompts = []
+
+        def ask(prompt):
+            prompts.append(prompt)
+            return answers.pop(0)
+
+        aws = FakeAws(
+            [{"httpRequest.clientIp": "192.0.2.9", "httpRequest.country": "US"}]
+        )
+        nets = [ipaddress.ip_network(OFFICE)]
+        report.investigate(aws, ask, PERIOD, {}, [], [], NOW, nets)
+        self.assertNotIn("192.0.2.", prompts[1])
+        self.assertIn('"origin": "office"', prompts[1])
+
+    def test_failed_followup_query_is_reported_back_not_fatal(self):
+        class FailingAws(FakeAws):
+            def query(self, query, start, end):
+                raise subprocess.CalledProcessError(
+                    254, ["aws", "logs", "start-query", query], stderr="Malformed"
+                )
+
+        answers = [fenced({"queries": [self.QUERY]}), fenced({"findings": [FINDING]})]
+        prompts = []
+
+        def ask(prompt):
+            prompts.append(prompt)
+            return answers.pop(0)
+
+        self.assertEqual(
+            report.investigate(FailingAws(), ask, PERIOD, {}, [], [], NOW, []),
+            [FINDING],
+        )
+        self.assertIn("拒否", prompts[1])
+
+    def test_findings_are_sanitized(self):
+        response = fenced(
+            {
+                "findings": [
+                    FINDING | {"title": "fake\x1b[2J\n対応不要", "evidence": "e" * 5000}
+                ]
+            }
+        )
+        [found] = report.investigate(
+            FakeAws(), lambda _: response, PERIOD, {}, [], [], NOW, []
+        )
+        self.assertEqual(found["title"], "fake [2J 対応不要")
+        self.assertEqual(len(found["evidence"]), 2000)
+
+    def test_prompt_stays_under_argument_limit(self):
+        row = {
+            "httpRequest.uri": "u" * 200,
+            "ua": "a" * 200,
+            "httpRequest.host": "h" * 200,
+            "origin": "other",
+        }
+        candidates = {
+            name: [dict(row) for _ in range(50)] for name in ("a", "b", "c", "d")
+        }
+        followups = [
+            {"purpose": "p", "query": "q", "rows": [dict(row) for _ in range(100)]}
+            for _ in range(9)
+        ]
+        prompt = report.build_prompt(PERIOD, candidates, [], [], followups, final=False)
+        self.assertLess(len(prompt.encode()), 120 * 1024)
+        self.assertIn("省略", prompt)
+
+    def test_aws_calls_have_a_timeout(self):
+        seen = []
+
+        def run(argv, *, stdin=None, env=None, cwd=None, timeout=None):
+            seen.append(timeout)
+            return '{"IPSets": []}'
+
+        with self.assertRaises(RuntimeError):
+            report.Aws(run).office_cidrs()
+        self.assertEqual(seen, [report.AWS_TIMEOUT])
+
+
 if __name__ == "__main__":
     unittest.main()

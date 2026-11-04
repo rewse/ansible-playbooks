@@ -55,6 +55,8 @@ class RoleTest(unittest.TestCase):
             service["Service"]["ExecStart"], "/usr/local/bin/cloudfront-waf-report"
         )
         self.assertEqual(service["Unit"]["OnFailure"], "failure-notify@%n.service")
+        # A hung call must fail the unit so that OnFailure reports it.
+        self.assertEqual(service["Service"]["TimeoutStartSec"], "2h")
 
     def test_config_template_renders_valid_json(self):
         accepted = [

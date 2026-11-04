@@ -13,6 +13,7 @@ and runs against the WAF log group only.
 """
 
 import argparse
+import copy
 import email.message
 import ipaddress
 import json
@@ -24,7 +25,7 @@ import subprocess
 import sys
 import tempfile
 import time
-from collections.abc import Callable
+from collections.abc import Callable, Sequence
 from datetime import datetime
 from datetime import timedelta
 from zoneinfo import ZoneInfo
@@ -44,6 +45,10 @@ _CONTROL = re.compile(r"[\x00-\x1f\x7f-\x9f]")
 OFFICE_IP_SET = "cloudfront-waf-office"
 POLL_INTERVAL = 2.0
 POLL_ATTEMPTS = 150
+AWS_TIMEOUT = 120
+# Linux caps one argv element at 128 KiB, and the prompt is one argument.
+PROMPT_LIMIT = 100_000
+FINDING_LIMIT = 2000
 
 # run(argv, *, stdin=None, env=None, cwd=None, timeout=None) returns stdout and
 # raises subprocess.CalledProcessError when the command fails.
@@ -208,9 +213,8 @@ class Aws:
         self._sleep = sleep
 
     def _call(self, *args: str) -> dict:
-        return json.loads(
-            self._run(["aws", *args, "--region", REGION, "--output", "json"])
-        )
+        argv = ["aws", *args, "--region", REGION, "--output", "json"]
+        return json.loads(self._run(argv, timeout=AWS_TIMEOUT))
 
     def office_cidrs(self) -> list[str]:
         """Return the CIDRs of the office IP set that the web ACL references."""
@@ -296,9 +300,29 @@ def build_prompt(
         parts.append(
             "追加のクエリはもう実行できません。今回は findings だけを返してください。"
         )
-    data = {"candidates": candidates, "previous": previous, "followups": followups}
+    data = _fit(
+        {"candidates": candidates, "previous": previous, "followups": followups}
+    )
     parts.append(f"<log-data>\n{_log_data(data)}\n</log-data>")
     return "\n\n".join(parts)
+
+
+def _fit(data: dict) -> dict:
+    """Trim the longest row lists until the data fits in the prompt limit."""
+    data = copy.deepcopy(data)
+    lists = list(data["candidates"].values())
+    lists += [f["rows"] for f in data["followups"] if isinstance(f.get("rows"), list)]
+    omitted = 0
+    while len(_log_data(data).encode()) > PROMPT_LIMIT and any(lists):
+        longest = max(lists, key=len)
+        keep = len(longest) * 3 // 4
+        omitted += len(longest) - keep
+        del longest[keep:]
+    if omitted:
+        data["note"] = (
+            f"長さの上限のため、各一覧の末尾から {omitted} 行を省略しました。"
+        )
+    return data
 
 
 def parse_response(text: str) -> dict:
@@ -325,7 +349,11 @@ def _check_findings(items: list) -> list[dict]:
             isinstance(item.get(field, ""), str) for field in FINDING_FIELDS
         ):
             raise ValueError("finding fields must be strings")
-        finding: dict = {field: item.get(field, "") for field in FINDING_FIELDS}
+        # The model read attacker-controlled text, so its output is cleaned too.
+        finding: dict = {
+            field: sanitize(item.get(field, ""), FINDING_LIMIT)
+            for field in FINDING_FIELDS
+        }
         finding["continued"] = item.get("continued") is True
         findings.append(finding)
     return findings
@@ -367,6 +395,7 @@ def investigate(
     previous: list[dict],
     accepted: list[dict],
     now: datetime,
+    office_networks: Sequence[ipaddress.IPv4Network] = (),
 ) -> list[dict]:
     """Let kiro-cli triage the candidates, running the queries it asks for."""
     followups: list[dict] = []
@@ -389,10 +418,12 @@ def investigate(
             except ValueError as error:
                 followups.append({"purpose": purpose, "rejected": f"拒否: {error}"})
                 continue
-            rows = [
-                {k: sanitize(v) for k, v in row.items()}
-                for row in aws.query(query, start, end)
-            ]
+            try:
+                rows = prepare_rows(aws.query(query, start, end), list(office_networks))
+            except (RuntimeError, subprocess.SubprocessError) as error:
+                rejected = f"拒否: {describe_error(error)}"
+                followups.append({"purpose": purpose, "rejected": rejected})
+                continue
             followups.append({"purpose": purpose, "query": query, "rows": rows})
     raise AssertionError("unreachable")
 
@@ -581,6 +612,7 @@ def main(
                     load_previous(state_dir),
                     config.get("accepted", []),
                     now or datetime.now(JST),
+                    networks,
                 )
             except (
                 RuntimeError,

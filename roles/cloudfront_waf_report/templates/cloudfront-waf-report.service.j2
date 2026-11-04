@@ -8,3 +8,5 @@ OnFailure=failure-notify@%n.service
 Type=oneshot
 User={{ admin_user }}
 ExecStart=/usr/local/bin/cloudfront-waf-report
+# A hung AWS or kiro-cli call fails the unit, so OnFailure still reports it.
+TimeoutStartSec=2h
