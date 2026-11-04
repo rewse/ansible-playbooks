@@ -8,7 +8,7 @@
 
 **Tech Stack:** chezmoi テンプレート、Python 3 標準ライブラリ、unittest、Ansible、systemd
 
-**Spec:** `docs/superpowers/specs/2026-11-04-cloudfront-waf-report-kiro-key-file-design.md`
+**Spec:** `docs/superpowers/archive/specs/2026-11-04-cloudfront-waf-report-kiro-key-file-design.md`
 
 ## Global Constraints
 
