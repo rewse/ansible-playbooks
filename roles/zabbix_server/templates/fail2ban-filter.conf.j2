@@ -1,3 +1,5 @@
+{{ ansible_managed | comment }}
+#
 # The status code is what separates a failure from a success, not 401: Zabbix
 # answers both with 200 or 302 over the same URL. A wrong password re-renders the
 # login form as 200, and a correct one redirects, 302, to the MFA step. The MFA
@@ -7,9 +9,13 @@
 # Nothing else posts to either path, so no legitimate request is at risk: across
 # the retained logs the only entries are from testing this filter.
 #
-# Reads Apache's access.log, where Zabbix is served under /zabbix on the default
-# virtual host. That file is combined format, so <HOST> is the first field, unlike
-# the vhost_combined used for the named hosts.
+# The first pattern reads Apache's access.log, where the default virtual host
+# serves /zabbix to trusted networks. That file is combined format, so <HOST> is
+# the first field. The second reads other_vhosts_access.log, where the virtual
+# host open to the internet logs in vhost_combined format: %v:%p comes first and
+# <HOST> second, and the name is pinned because that file carries every virtual
+# host.
 [Definition]
 failregex = ^<HOST> \S+ \S+ \[\] "POST /zabbix/index(?:_mfa)?\.php\S* HTTP/[\d.]+" 200 \d+
+            ^{{ zabbix_server_hostname | regex_escape }}:\d+ <HOST> \S+ \S+ \[\] "POST /zabbix/index(?:_mfa)?\.php\S* HTTP/[\d.]+" 200 \d+
 ignoreregex =

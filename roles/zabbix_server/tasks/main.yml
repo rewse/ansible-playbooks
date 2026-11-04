@@ -14,6 +14,11 @@
   tags:
     - zabbix_server_frontend
 
+- name: Import apache tasks
+  ansible.builtin.import_tasks: apache.yml
+  tags:
+    - zabbix_server_apache
+
 - name: Import ssl_cert_check tasks
   ansible.builtin.import_tasks: ssl_cert_check.yml
   tags:

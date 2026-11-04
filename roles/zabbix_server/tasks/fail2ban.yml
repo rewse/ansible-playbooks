@@ -1,7 +1,7 @@
 ---
-- name: fail2ban | Copy filter
-  ansible.builtin.copy:
-    src: fail2ban-filter.conf
+- name: fail2ban | Deploy filter
+  ansible.builtin.template:
+    src: fail2ban-filter.conf.j2
     dest: /etc/fail2ban/filter.d/zabbix-web.conf
     mode: "0644"
   notify: Restart fail2ban

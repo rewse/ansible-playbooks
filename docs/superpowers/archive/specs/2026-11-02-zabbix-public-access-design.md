@@ -163,3 +163,11 @@ MCP 用のユーザー:
 - `RedirectMatch` か `RewriteRule` か
 - 読み取りユーザー、MCP 用ユーザー、それぞれのグループとロールの名前、1Password の新しい項目の名前（Common Standards の命名に従う）
 - WAF のルールの優先度の番号
+
+## 実装中に決めたこと
+
+- `Admin` は Zabbix 上のユーザー名が `tats`（userid 1）だった。組み込みの Super admin ロールは、無制限の Super admin が 1 人以上いることを求めるので、MCP 用ユーザーにはカスタムロールではなく組み込みの Super admin ロールを付けた
+- API の `user.login` は、API を取り上げたユーザーでもセッション ID を返す。そのセッションでの呼び出しは拒否されるが、外から `tats` のパスワードを試したり、わざと失敗させて画面のログインを締め出したりはできる。fail2ban は API の失敗を数えられない
+- Apache で Authorization ヘッダーを必須にする案は採らなかった。`user.login` と `apiinfo.version` はヘッダー付きの呼び出しを拒否し、IntelliTrend Mobile は `apiinfo.version` をヘッダーなしで呼ぶためである
+- 代わりに、`tats` のユーザー名を公開していないランダムな名前に変えた。名前は 1Password の Private の項目 `Zabbix - tats` にある。ロックされたアカウントでもトークンでの API は使えるので、締め出しはアプリと MCP には影響しない
+- 画面にログインできるのは、MFA 付きのこのユーザーだけにした。家族用の `akiko` は削除し、`guest` は無効にした

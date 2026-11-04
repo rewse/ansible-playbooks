@@ -8,7 +8,7 @@
 
 **Tech Stack:** Apache 2.4、fail2ban、Ansible、Zabbix 7.4 API、AWS CloudFormation（WAFv2、Security Agent、EventBridge Scheduler）、pytest、1Password CLI
 
-**Spec:** `docs/superpowers/specs/2026-11-02-zabbix-public-access-design.md`
+**Spec:** `docs/superpowers/archive/specs/2026-11-02-zabbix-public-access-design.md`
 
 ## Global Constraints
 
