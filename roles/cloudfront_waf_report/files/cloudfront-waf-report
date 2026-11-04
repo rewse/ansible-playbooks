@@ -1,0 +1,131 @@
+#!/usr/bin/python3
+"""Mail a weekly report of the cloudfront-waf web ACL logs.
+
+The report lists only what needs action: legitimate traffic that the WAF
+blocks, the owner locked out by a rate limit, and suspicious requests that the
+WAF let through. Fixed Logs Insights queries pick the candidates, and kiro-cli
+triages them and writes the next actions.
+
+kiro-cli runs without any tool. The log fields come from whoever sent the
+request, so text in them may try to instruct the model; with no tool, the
+worst it can do is ask for a Logs Insights query, which this script validates
+and runs against the WAF log group only.
+"""
+
+import ipaddress
+import re
+from datetime import datetime
+from datetime import timedelta
+from zoneinfo import ZoneInfo
+
+JST = ZoneInfo("Asia/Tokyo")
+LOG_GROUP = "aws-waf-logs-cloudfront-waf"
+REGION = "us-east-1"
+RETENTION = timedelta(days=90)
+CANDIDATE_LIMIT = 50
+FOLLOWUP_LIMIT = 100
+MAX_QUERY_LENGTH = 2000
+
+_USER_AGENT = r'parse @message /"name":"[Uu]ser-[Aa]gent","value":"(?<ua>[^"]*)"/'
+_RATE_LIMIT_RULES = '["RateLimitLogin", "RateLimitAll"]'
+_SCAN_PATHS = (
+    r"/(?i)(wp-|xmlrpc|\.env|\.git|phpmyadmin|cgi-bin|\.php|\/actuator|\/vendor\/|\/\.)/"
+)
+_CONTROL = re.compile(r"[\x00-\x1f\x7f-\x9f]")
+
+
+def report_period(now: datetime) -> tuple[datetime, datetime]:
+    """Return the last full Saturday-to-Friday week in JST before now."""
+    local = now.astimezone(JST)
+    midnight = local.replace(hour=0, minute=0, second=0, microsecond=0)
+    # Monday is 0, so Saturday is 5.
+    end = midnight - timedelta(days=(midnight.weekday() - 5) % 7)
+    return end - timedelta(days=7), end
+
+
+def origin_filter(office_cidrs: list[str]) -> str:
+    """Return a Logs Insights condition matching Japan and the office."""
+    terms = ['httpRequest.country = "JP"']
+    terms += [f'isIpv4InSubnet(httpRequest.clientIp, "{cidr}")' for cidr in office_cidrs]
+    return "(" + " or ".join(terms) + ")"
+
+
+def _candidate(condition: str, fields: str) -> str:
+    return (
+        f"{_USER_AGENT}\n"
+        f"| filter {condition}\n"
+        f"| stats count(*) as requests by {fields}\n"
+        f"| sort requests desc\n"
+        f"| limit {CANDIDATE_LIMIT}"
+    )
+
+
+def candidate_queries(office_cidrs: list[str]) -> dict[str, str]:
+    """Return the fixed queries that pick the report candidates."""
+    origin = origin_filter(office_cidrs)
+    return {
+        "blocked_from_self": _candidate(
+            f'action = "BLOCK" and terminatingRuleId not in {_RATE_LIMIT_RULES} and {origin}',
+            "terminatingRuleId, httpRequest.host, httpRequest.country, httpRequest.clientIp,"
+            " httpRequest.uri, ua",
+        ),
+        "blocked_on_services": _candidate(
+            'action = "BLOCK" and httpRequest.host not in ["rewse.jp", "www.rewse.jp"]'
+            f" and not {origin}",
+            "terminatingRuleId, httpRequest.host, httpRequest.country, httpRequest.uri, ua",
+        ),
+        "rate_limited_self": _candidate(
+            f'action = "BLOCK" and terminatingRuleId in {_RATE_LIMIT_RULES} and {origin}',
+            "terminatingRuleId, httpRequest.host, httpRequest.clientIp, httpRequest.country",
+        ),
+        "allowed_scans": _candidate(
+            'action = "ALLOW" and terminatingRuleId != "AllowSecurityAgentPentest"'
+            f" and not {origin} and httpRequest.uri like {_SCAN_PATHS}",
+            "httpRequest.host, httpRequest.country, httpRequest.clientIp, httpRequest.uri, ua",
+        ),
+    }
+
+
+def label_origin(
+    country: str, client_ip: str, office_networks: list[ipaddress.IPv4Network]
+) -> str:
+    """Classify a client as office, japan, or other, preferring office."""
+    try:
+        address = ipaddress.ip_address(client_ip)
+    except ValueError:
+        address = None
+    if address is not None and any(address in net for net in office_networks):
+        return "office"
+    return "japan" if country == "JP" else "other"
+
+
+def sanitize(value: str, limit: int = 200) -> str:
+    """Replace control characters with spaces and cut the value to limit."""
+    return _CONTROL.sub(" ", value)[:limit]
+
+
+def _parse_time(value: object) -> datetime:
+    if not isinstance(value, str):
+        raise ValueError("time must be an ISO 8601 string")
+    parsed = datetime.fromisoformat(value)
+    if parsed.tzinfo is None:
+        raise ValueError("time must carry a UTC offset")
+    return parsed
+
+
+def validate_followup(spec: dict, now: datetime) -> tuple[str, datetime, datetime]:
+    """Check a follow-up query that kiro-cli asked for and bound its result."""
+    query = spec.get("query")
+    if not isinstance(query, str) or not query.strip():
+        raise ValueError("query must be a non-empty string")
+    if len(query) > MAX_QUERY_LENGTH:
+        raise ValueError(f"query must be at most {MAX_QUERY_LENGTH} characters")
+    if re.search(r"\bsource\b", query, re.IGNORECASE) or "loggroup" in query.lower():
+        raise ValueError("query must not select a log group")
+    start = _parse_time(spec.get("start"))
+    end = _parse_time(spec.get("end"))
+    if not now - RETENTION <= start < end <= now:
+        raise ValueError("period must lie within the last 90 days and end by now")
+    if not re.search(r"\blimit\b", query, re.IGNORECASE):
+        query = f"{query.rstrip()}\n| limit {FOLLOWUP_LIMIT}"
+    return query, start, end
