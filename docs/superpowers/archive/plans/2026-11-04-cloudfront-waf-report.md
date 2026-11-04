@@ -8,7 +8,7 @@
 
 **Tech Stack:** Python 3.12（fox の `/usr/bin/python3`、標準ライブラリのみ）、AWS CLI v2、kiro-cli 3、mailutils、systemd timer、Ansible、unittest（pytest で実行）。
 
-**Spec:** `docs/superpowers/specs/2026-11-04-cloudfront-waf-report-design.md`
+**Spec:** `docs/superpowers/archive/specs/2026-11-04-cloudfront-waf-report-design.md`
 
 ## Global Constraints
 

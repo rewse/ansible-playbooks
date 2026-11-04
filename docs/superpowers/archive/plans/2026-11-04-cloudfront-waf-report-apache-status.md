@@ -8,7 +8,7 @@
 
 **Tech Stack:** Python 3.12 標準ライブラリ（`gzip`、`re`、`collections.Counter`）。
 
-**Spec:** `docs/superpowers/specs/2026-11-04-cloudfront-waf-report-design.md` の「Apache の応答コードによる絞り込み」
+**Spec:** `docs/superpowers/archive/specs/2026-11-04-cloudfront-waf-report-design.md` の「Apache の応答コードによる絞り込み」
 
 ## Global Constraints
 
