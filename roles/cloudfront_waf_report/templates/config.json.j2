@@ -1,0 +1,7 @@
+{
+  "recipient": "root",
+  "state_dir": "/home/{{ admin_user }}/.local/state/cloudfront-waf-report",
+  "kiro_env_file": "/home/{{ admin_user }}/.config/environment/kiro.sh",
+  "apache_log_dir": "/var/log/apache2",
+  "accepted": {{ cloudfront_waf_report_accepted | to_json }}
+}

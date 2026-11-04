@@ -1,0 +1,10 @@
+---
+# Findings the owner decided to leave as they are. The weekly report drops a
+# finding when every key given here, other than reason, matches it. This
+# repository is public, so name rules, hosts, and countries; never addresses.
+#
+# - rule: RateLimitLogin
+#   host: hass.rewse.jp
+#   country: JP
+#   reason: The Home Assistant app retries on wake; 100 per 5 minutes is intended.
+cloudfront_waf_report_accepted: []

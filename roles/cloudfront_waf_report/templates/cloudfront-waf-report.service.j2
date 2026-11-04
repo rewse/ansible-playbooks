@@ -1,0 +1,12 @@
+[Unit]
+Description=Weekly cloudfront-waf report
+After=network-online.target
+Wants=network-online.target
+OnFailure=failure-notify@%n.service
+
+[Service]
+Type=oneshot
+User={{ admin_user }}
+ExecStart=/usr/local/bin/cloudfront-waf-report
+# A hung AWS or kiro-cli call fails the unit, so OnFailure still reports it.
+TimeoutStartSec=2h

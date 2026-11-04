@@ -1,0 +1,10 @@
+---
+- name: Reload systemd
+  ansible.builtin.systemd:
+    daemon_reload: true
+
+- name: Restart cloudfront-waf-report timer
+  ansible.builtin.systemd:
+    name: cloudfront-waf-report.timer
+    state: restarted
+    daemon_reload: true

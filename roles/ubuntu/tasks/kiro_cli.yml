@@ -1,4 +1,7 @@
 ---
+# kiro-cli is installed globally so root and the admin user share one copy. A
+# per-user install under /root cannot be shared through links because /root is
+# not readable by other users.
 - name: kiro_cli | Download installer
   ansible.builtin.get_url:
     url: https://cli.kiro.dev/install
@@ -6,22 +9,15 @@
     mode: "0755"
 
 - name: kiro_cli | Install
-  # The vendor installer has no module.
-  ansible.builtin.command: bash /usr/local/src/kiro-cli-install.sh
+  # The vendor installer has no module. Q_INSTALL_GLOBAL selects /usr/local/bin.
+  ansible.builtin.command: bash /usr/local/src/kiro-cli-install.sh --no-modify-path
   args:
-    creates: /root/.local/bin/kiro-cli
-
-- name: kiro_cli | Link binaries into /usr/local/bin
-  ansible.builtin.file:
-    src: /root/.local/bin/{{ item }}
-    dest: /usr/local/bin/{{ item }}
-    state: link
-  loop:
-    - kiro-cli
-    - kiro-cli-chat
-    - kiro-cli-term
+    creates: /usr/local/bin/kiro-cli
+  environment:
+    Q_INSTALL_GLOBAL: "1"
 
 - name: kiro_cli | Update
   # kiro-cli updates itself; no module manages it.
-  ansible.builtin.command: /usr/local/bin/kiro-cli update
-  changed_when: false
+  ansible.builtin.command: /usr/local/bin/kiro-cli update --non-interactive
+  register: __ubuntu_kiro_cli_update
+  changed_when: "'You are on the current version' not in __ubuntu_kiro_cli_update.stdout"

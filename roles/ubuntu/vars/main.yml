@@ -3,3 +3,10 @@
 # the shortest timer here, five minutes, so an outage lasting a working day
 # reaches the inbox a handful of times rather than a hundred.
 ubuntu_failure_notify_repeat_after: 3600
+
+# uv tools are installed for every user. Tool environments and the Python they
+# link to stay outside /root, which other users cannot read.
+ubuntu_uv_tool_environment:
+  UV_PYTHON_INSTALL_DIR: /opt/uv/python
+  UV_TOOL_BIN_DIR: /usr/local/bin
+  UV_TOOL_DIR: /opt/uv/tools
