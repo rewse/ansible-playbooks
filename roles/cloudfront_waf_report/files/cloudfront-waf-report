@@ -13,7 +13,10 @@ and runs against the WAF log group only.
 """
 
 import ipaddress
+import json
 import re
+import time
+from collections.abc import Callable
 from datetime import datetime
 from datetime import timedelta
 from zoneinfo import ZoneInfo
@@ -32,6 +35,13 @@ _SCAN_PATHS = (
     r"/(?i)(wp-|xmlrpc|\.env|\.git|phpmyadmin|cgi-bin|\.php|\/actuator|\/vendor\/|\/\.)/"
 )
 _CONTROL = re.compile(r"[\x00-\x1f\x7f-\x9f]")
+OFFICE_IP_SET = "cloudfront-waf-office"
+POLL_INTERVAL = 2.0
+POLL_ATTEMPTS = 150
+
+# run(argv, *, stdin=None, env=None, cwd=None, timeout=None) returns stdout and
+# raises subprocess.CalledProcessError when the command fails.
+Runner = Callable[..., str]
 
 
 def report_period(now: datetime) -> tuple[datetime, datetime]:
@@ -129,3 +139,48 @@ def validate_followup(spec: dict, now: datetime) -> tuple[str, datetime, datetim
     if not re.search(r"\blimit\b", query, re.IGNORECASE):
         query = f"{query.rstrip()}\n| limit {FOLLOWUP_LIMIT}"
     return query, start, end
+
+
+class Aws:
+    """Read the WAF logs and the office IP set through the AWS CLI."""
+
+    def __init__(self, run: Runner, sleep: Callable[[float], None] = time.sleep) -> None:
+        self._run = run
+        self._sleep = sleep
+
+    def _call(self, *args: str) -> dict:
+        return json.loads(self._run(["aws", *args, "--region", REGION, "--output", "json"]))
+
+    def office_cidrs(self) -> list[str]:
+        """Return the CIDRs of the office IP set that the web ACL references."""
+        listing = self._call("wafv2", "list-ip-sets", "--scope", "CLOUDFRONT")
+        for ip_set in listing.get("IPSets", []):
+            if ip_set.get("Name") == OFFICE_IP_SET:
+                found = self._call(
+                    "wafv2", "get-ip-set", "--scope", "CLOUDFRONT",
+                    "--name", OFFICE_IP_SET, "--id", ip_set["Id"],
+                )
+                return list(found["IPSet"]["Addresses"])
+        raise RuntimeError(f"IP set {OFFICE_IP_SET} not found")
+
+    def query(self, query: str, start: datetime, end: datetime) -> list[dict[str, str]]:
+        """Run a Logs Insights query on the WAF log group and return its rows."""
+        started = self._call(
+            "logs", "start-query",
+            "--log-group-name", LOG_GROUP,
+            "--start-time", str(int(start.timestamp())),
+            "--end-time", str(int(end.timestamp())),
+            "--query-string", query,
+        )
+        for _ in range(POLL_ATTEMPTS):
+            result = self._call("logs", "get-query-results", "--query-id", started["queryId"])
+            status = result.get("status")
+            if status == "Complete":
+                return [
+                    {cell["field"]: cell["value"] for cell in row if cell["field"] != "@ptr"}
+                    for row in result.get("results", [])
+                ]
+            if status not in ("Scheduled", "Running"):
+                raise RuntimeError(f"Logs Insights query ended with status {status}")
+            self._sleep(POLL_INTERVAL)
+        raise RuntimeError("Logs Insights query did not complete in time")

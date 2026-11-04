@@ -3,6 +3,7 @@
 
 import importlib.machinery
 import ipaddress
+import json
 import pathlib
 import types
 import unittest
@@ -127,6 +128,96 @@ class FollowupTest(unittest.TestCase):
         for spec in [{}, self.spec(query=5), self.spec(start="yesterday"), self.spec(query="x" * 2001)]:
             with self.subTest(spec=str(spec)[:40]), self.assertRaises(ValueError):
                 report.validate_followup(spec, self.NOW)
+
+
+class FakeRun:
+    """Record argv and answer each call from a queue of (prefix, output) pairs."""
+
+    def __init__(self, answers):
+        self.answers = list(answers)
+        self.calls = []
+
+    def __call__(self, argv, *, stdin=None, env=None, cwd=None, timeout=None):
+        self.calls.append({"argv": argv, "stdin": stdin, "env": env, "cwd": cwd})
+        for index, (prefix, output) in enumerate(self.answers):
+            if argv[: len(prefix)] == prefix:
+                del self.answers[index]
+                if isinstance(output, BaseException):
+                    raise output
+                return output(argv, env, cwd) if callable(output) else output
+        raise AssertionError(f"unexpected command: {argv}")
+
+
+START_QUERY = ["aws", "logs", "start-query"]
+GET_RESULTS = ["aws", "logs", "get-query-results"]
+
+
+def results(status, rows=()):
+    return json.dumps(
+        {
+            "status": status,
+            "results": [
+                [{"field": k, "value": v} for k, v in row.items()] + [{"field": "@ptr", "value": "x"}]
+                for row in rows
+            ],
+        }
+    )
+
+
+class AwsTest(unittest.TestCase):
+    START = datetime(2026, 10, 31, tzinfo=JST)
+    END = datetime(2026, 11, 7, tzinfo=JST)
+
+    def test_query_always_targets_the_fixed_log_group(self):
+        run = FakeRun([(START_QUERY, '{"queryId": "q1"}'), (GET_RESULTS, results("Complete"))])
+        report.Aws(run, sleep=lambda _: None).query("fields @message", self.START, self.END)
+        argv = run.calls[0]["argv"]
+        index = argv.index("--log-group-name")
+        self.assertEqual(argv[index + 1], "aws-waf-logs-cloudfront-waf")
+        self.assertEqual(argv[argv.index("--start-time") + 1], str(int(self.START.timestamp())))
+        self.assertEqual(argv[argv.index("--end-time") + 1], str(int(self.END.timestamp())))
+        self.assertEqual(argv[argv.index("--region") + 1], "us-east-1")
+
+    def test_query_polls_until_complete_and_flattens_rows(self):
+        row = {"requests": "3", "httpRequest.host": "hass.rewse.jp"}
+        run = FakeRun(
+            [
+                (START_QUERY, '{"queryId": "q1"}'),
+                (GET_RESULTS, results("Running")),
+                (GET_RESULTS, results("Complete", [row])),
+            ]
+        )
+        rows = report.Aws(run, sleep=lambda _: None).query("q", self.START, self.END)
+        self.assertEqual(rows, [row])
+
+    def test_query_raises_on_failed_status(self):
+        run = FakeRun([(START_QUERY, '{"queryId": "q1"}'), (GET_RESULTS, results("Failed"))])
+        with self.assertRaises(RuntimeError):
+            report.Aws(run, sleep=lambda _: None).query("q", self.START, self.END)
+
+    def test_query_gives_up_when_it_never_completes(self):
+        answers = [(START_QUERY, '{"queryId": "q1"}')] + [(GET_RESULTS, results("Running"))] * 150
+        with self.assertRaises(RuntimeError):
+            report.Aws(FakeRun(answers), sleep=lambda _: None).query("q", self.START, self.END)
+
+    def test_office_cidrs_reads_the_named_ip_set(self):
+        ip_sets = {"IPSets": [{"Name": "other", "Id": "i0"}, {"Name": "cloudfront-waf-office", "Id": "i1"}]}
+        ip_set = {"IPSet": {"Addresses": ["192.0.2.0/24"]}}
+        run = FakeRun(
+            [
+                (["aws", "wafv2", "list-ip-sets"], json.dumps(ip_sets)),
+                (["aws", "wafv2", "get-ip-set"], json.dumps(ip_set)),
+            ]
+        )
+        self.assertEqual(report.Aws(run).office_cidrs(), ["192.0.2.0/24"])
+        argv = run.calls[1]["argv"]
+        self.assertEqual(argv[argv.index("--id") + 1], "i1")
+        self.assertEqual(argv[argv.index("--scope") + 1], "CLOUDFRONT")
+
+    def test_office_cidrs_raises_when_missing(self):
+        run = FakeRun([(["aws", "wafv2", "list-ip-sets"], '{"IPSets": []}')])
+        with self.assertRaises(RuntimeError):
+            report.Aws(run).office_cidrs()
 
 
 if __name__ == "__main__":
