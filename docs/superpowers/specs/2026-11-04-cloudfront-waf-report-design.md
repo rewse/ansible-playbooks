@@ -47,7 +47,7 @@
 
 ```mermaid
 flowchart LR
-  cron["cron（tats、毎週土曜の朝）"] --> script[レポートスクリプト]
+  timer["systemd timer（tats、毎週土曜の朝）"] --> script[レポートスクリプト]
   script -->|固定クエリ| logs["CloudWatch Logs Insights<br/>aws-waf-logs-cloudfront-waf"]
   script -->|"候補（データとして）"| kiro["kiro-cli<br/>ツールなし"]
   kiro -->|追加クエリの JSON| script
@@ -60,7 +60,7 @@ flowchart LR
 ### 置き場所と実行
 
 - ansible-playbooks に新しいロールを作り、`home-primary.yml`（fox）に追加する。fox で動く AWS 関連のスクリプトを ansible-playbooks で管理している既存の形（`zabbix_aws` の `cloudfront_waf.sh`）に合わせる。
-- ユーザー `tats` の cron で動かす。`tats` の `~/.aws` と `~/.config/environment/kiro.sh` を使うためである。
+- systemd の timer と oneshot service で、ユーザー `tats` として動かす。`tats` の `~/.aws` と `~/.config/environment/kiro.sh` を使うためである。ansible-playbooks の定期ジョブは systemd timer で書く慣習があり、`OnFailure=failure-notify@%n.service` で失敗もメールで届く。
 - kiro-cli は `/usr/local/bin/kiro-cli` のグローバルインストールを使う（`roles/ubuntu/tasks/kiro_cli.yml` で修正済み）。
 
 ### 候補の抽出（決まったクエリ）
@@ -118,7 +118,7 @@ cloudfront_waf_report_accepted:
 - 抽出 4 から `AllowSecurityAgentPentest` で許可されたリクエストを除くこと、`www.rewse.jp` を `rewse.jp` と同じに扱うこと。
 - 前週のレポートの保存場所と形式。
 - スクリプトの言語。fox の system python3 の標準ライブラリと `aws` CLI の組み合わせを想定するが、テストしやすさで決めてよい。
-- 土曜日の朝の中での実行時刻。既存の cron と分をずらすこと。
+- 土曜日の朝の中での実行時刻。既存の timer と分をずらすこと。
 - 候補ごとの上位件数、URI のパターン、文字列の切り詰め長。
 - kiro-cli の専用 agent の作り方と置き場所。ツールが実行されないことは実際に試して確かめる。
 - テストの範囲。少なくとも、候補が無い週、kiro-cli の失敗、不正な JSON、別のロググループを指定する追加クエリの拒否、next action が空の項目の除外を確かめる。
