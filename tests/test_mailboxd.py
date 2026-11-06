@@ -141,6 +141,15 @@ class MailboxdConfigTest(unittest.TestCase):
         self.assertEqual(compose["state"], "present")
         self.assertEqual(compose["recreate"], "always")
 
+    def test_recreate_handler_waits_for_healthy(self):
+        # The start task checks health before handlers run, so only the
+        # handler can catch a configuration that the new container rejects.
+        handlers = yaml.safe_load((ROLE / "handlers" / "main.yml").read_text())
+        handler = next(h for h in handlers if h["name"] == "Recreate mailboxd")
+        compose = handler["community.docker.docker_compose_v2"]
+        self.assertIs(compose["wait"], True)
+        self.assertEqual(compose["wait_timeout"], 120)
+
 
 IMAGE = {"ref": "psyb0t/mailbox:v0.8.0@sha256:0"}
 
@@ -252,6 +261,31 @@ class MailboxdApacheTest(unittest.TestCase):
 
     def test_vhost_is_open_to_any_address(self):
         self.assertNotIn("Require ip", render("mail-mcp.rewse.jp.conf.j2"))
+
+    def test_vhost_denies_every_path_but_mcp_and_health(self):
+        # mailboxd answers a wrong token with 401 on its whole REST API, but
+        # the jail counts only /mcp, so the other paths must not reach it.
+        text = render("mail-mcp.rewse.jp.conf.j2")
+        match = re.search(
+            r'<LocationMatch "(?P<pattern>[^"]+)">\s*Require all denied\s*</LocationMatch>',
+            text,
+        )
+        self.assertIsNotNone(match)
+        assert match is not None
+        denied = re.compile(match["pattern"])
+        for path in (
+            "/mailboxes",
+            "/messages/1",
+            "/mcpx",
+            "/healthz",
+            "/.well-known/x",
+            "/",
+        ):
+            with self.subTest(path=path):
+                self.assertIsNotNone(denied.match(path))
+        for path in ("/mcp", "/mcp/", "/health"):
+            with self.subTest(path=path):
+                self.assertIsNone(denied.match(path))
 
     def test_role_depends_on_fail2ban_and_httpd(self):
         meta = yaml.safe_load((ROLE / "meta" / "main.yml").read_text())

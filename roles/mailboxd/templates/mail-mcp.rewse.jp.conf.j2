@@ -12,9 +12,17 @@
     ProxyPass / http://127.0.0.1:{{ mailboxd_port }}/ flushpackets=on
     ProxyPassReverse / http://127.0.0.1:{{ mailboxd_port }}/
 
-    # Open to every address. Muse connects from Meta's cloud, whose addresses are not
-    # published, so the bearer token, the fail2ban jail, and the WAF in front of
-    # CloudFront are what protect the mailboxes.
+    # Open to every address. Muse connects from Meta's cloud, whose addresses
+    # are not published, so the bearer token, the fail2ban jail, and the WAF in
+    # front of CloudFront are what protect the mailboxes.
+    #
+    # Only the MCP endpoint and the health check are published. mailboxd also
+    # serves a REST API that answers a wrong token with 401 on every path, and
+    # the jail counts 401s on /mcp only, so a guess against any other path
+    # would never be banned. Muse uses MCP alone.
+    <LocationMatch "^/(?!(mcp(/.*)?|health)$)">
+        Require all denied
+    </LocationMatch>
 
     SSLCertificateFile /etc/letsencrypt/live/rewse.jp/fullchain.pem
     SSLCertificateKeyFile /etc/letsencrypt/live/rewse.jp/privkey.pem
