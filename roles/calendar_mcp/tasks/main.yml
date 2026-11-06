@@ -1,0 +1,6 @@
+---
+- name: Import source tasks
+  ansible.builtin.import_tasks: source.yml
+  tags:
+    - calendar_mcp_source
+    - update
