@@ -1,6 +1,7 @@
 #!/usr/bin/env python3
 """Contract tests for the calendar_mcp role."""
 
+import json
 import pathlib
 import re
 import unittest
@@ -21,14 +22,24 @@ def render(name: str, **overrides) -> str:
         loader=jinja2.FileSystemLoader(ROLE / "templates"),
         undefined=jinja2.StrictUndefined,
     )
-    environment.filters["comment"] = lambda text: f"#\n# {text}\n#"
+    environment.filters["comment"] = lambda text, style="plain": (
+        f"//\n// {text}\n//" if style == "c" else f"#\n# {text}\n#"
+    )
     environment.filters["regex_escape"] = re.escape
+    environment.filters["to_json"] = json.dumps
     context = {"ansible_managed": "Ansible managed"}
     context.update(
         (key, value) for key, value in role_vars().items() if "{{" not in str(value)
     )
     context.update(overrides)
     return environment.get_template(name).render(**context)
+
+
+def load_settings(text: str) -> dict:
+    """Parse appsettings.json, whose header is a // comment as .NET allows."""
+    return json.loads(
+        "\n".join(line for line in text.splitlines() if not line.startswith("//"))
+    )
 
 
 def task_named(file: str, name: str) -> dict:
@@ -87,6 +98,122 @@ class CalendarMcpSourceTest(unittest.TestCase):
         users = role_vars()["calendar_mcp_users"]
         self.assertEqual([u["name"] for u in users], ["ts", "ubiqu"])
         self.assertEqual([u["port"] for u in users], [8084, 8085])
+
+
+ACCOUNT = {
+    "name": "alice",
+    "port": 8084,
+    "address": "alice@example.com",
+    "sakura_password": "s-pass",
+    "apple_id": "alice@icloud.com",
+    "apple_password": "aaaa-bbbb-cccc-dddd",
+    "token": "t",
+    "admin_token": "a",
+}
+FLAGS = {
+    "emailRead",
+    "emailSend",
+    "calendarRead",
+    "calendarWrite",
+    "contactsRead",
+    "contactsWrite",
+}
+
+
+class CalendarMcpConfigTest(unittest.TestCase):
+    def settings(self, account=ACCOUNT) -> dict:
+        return load_settings(render("appsettings.json.j2", account=account))[
+            "CalendarMcp"
+        ]
+
+    def test_exactly_two_accounts_with_explicit_permissions(self):
+        accounts = self.settings()["Accounts"]
+        self.assertEqual(
+            [(a["Id"], a["Provider"]) for a in accounts],
+            [("alice-sakura", "imap"), ("alice-icloud", "dav")],
+        )
+        for account in accounts:
+            with self.subTest(account=account["Id"]):
+                self.assertEqual(set(account["Permissions"]), FLAGS)
+                self.assertIs(account["Permissions"]["emailSend"], False)
+
+    def test_imap_reads_mail_only(self):
+        imap = self.settings()["Accounts"][0]
+        self.assertEqual(
+            {k for k, v in imap["Permissions"].items() if v}, {"emailRead"}
+        )
+        config = imap["ProviderConfig"]
+        self.assertEqual(config["imapHost"], "rewse.sakura.ne.jp")
+        self.assertEqual(config["imapPort"], "993")
+        self.assertEqual(config["smtpHost"], "smtp.invalid")
+        self.assertEqual(config["username"], "alice@example.com")
+
+    def test_imap_uses_the_sakura_folders(self):
+        config = self.settings()["Accounts"][0]["ProviderConfig"]
+        self.assertEqual(
+            (
+                config["sentFolder"],
+                config["trashFolder"],
+                config["junkFolder"],
+                config["draftsFolder"],
+            ),
+            ("INBOX.Sent", "INBOX.Trash", "INBOX.spam", "INBOX.Draft"),
+        )
+
+    def test_dav_has_calendar_and_contacts_only(self):
+        dav = self.settings()["Accounts"][1]
+        self.assertEqual(
+            {k for k, v in dav["Permissions"].items() if v},
+            {"calendarRead", "calendarWrite", "contactsRead", "contactsWrite"},
+        )
+        config = dav["ProviderConfig"]
+        self.assertEqual(config["preset"], "icloud")
+        self.assertEqual(
+            (config["enableCalendar"], config["enableContacts"]), ("true", "true")
+        )
+        self.assertEqual(config["username"], "alice@icloud.com")
+
+    def test_no_router_and_no_admin_sign_in(self):
+        root = load_settings(render("appsettings.json.j2", account=ACCOUNT))
+        self.assertNotIn("Router", root["CalendarMcp"])
+        self.assertNotIn("AdminAuth", root)
+
+    def test_external_url_is_the_https_path(self):
+        self.assertEqual(
+            self.settings()["ExternalBaseUrl"],
+            "https://calendar-mcp.rewse.jp/mcp/alice",
+        )
+
+    def test_odd_password_stays_intact(self):
+        odd = dict(ACCOUNT, sakura_password='a"b\\c$d', token="x$y")
+        imap = self.settings(odd)["Accounts"][0]
+        self.assertEqual(imap["ProviderConfig"]["password"], 'a"b\\c$d')
+        self.assertIn(
+            "CALENDAR_MCP_MCP_KEY=x$y", render("env.j2", account=odd).splitlines()
+        )
+
+    def test_env_carries_only_the_two_keys(self):
+        lines = [
+            line
+            for line in render("env.j2", account=ACCOUNT).splitlines()
+            if line and not line.startswith("#")
+        ]
+        self.assertEqual(
+            lines, ["CALENDAR_MCP_MCP_KEY=t", "CALENDAR_MCP_ADMIN_TOKEN=a"]
+        )
+
+    def test_secret_files_are_private(self):
+        settings = task_named("config.yml", "config | Deploy settings")
+        self.assertEqual(settings["ansible.builtin.template"]["mode"], "0400")
+        self.assertEqual(
+            settings["ansible.builtin.template"]["owner"], "{{ calendar_mcp_uid }}"
+        )
+        env = task_named("config.yml", "config | Deploy environment file")
+        self.assertEqual(env["ansible.builtin.template"]["mode"], "0600")
+        self.assertEqual(env["ansible.builtin.template"]["owner"], "root")
+        for task in (settings, env):
+            self.assertTrue(task["no_log"])
+            self.assertEqual(task["notify"], "Recreate calendar-mcp")
 
 
 if __name__ == "__main__":

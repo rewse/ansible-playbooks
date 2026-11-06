@@ -4,3 +4,8 @@
   tags:
     - calendar_mcp_source
     - update
+
+- name: Import config tasks
+  ansible.builtin.import_tasks: config.yml
+  tags:
+    - calendar_mcp_config

@@ -8,6 +8,17 @@ calendar_mcp_source_dir: /usr/local/src/calendar-mcp
 # keyring the server writes.
 calendar_mcp_data_dir: /srv/calendar_mcp
 
+# mcpuser, created by `useradd -r` in the upstream Dockerfile on the aspnet image.
+calendar_mcp_uid: 999
+
+# Sakura's IMAP folder names. The server advertises no SPECIAL-USE, and the
+# upstream defaults are Gmail's.
+calendar_mcp_sakura_folders:
+  drafts: INBOX.Draft
+  junk: INBOX.spam
+  sent: INBOX.Sent
+  trash: INBOX.Trash
+
 # One container per user, because an MCP key reaches every account its server
 # holds. The Sakura item gives the address and IMAP password, the Apple item the
 # Apple ID and its app-specific password, and the token item the MCP key
