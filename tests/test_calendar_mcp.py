@@ -296,7 +296,7 @@ def location_block(text: str, pattern: str) -> str:
     match = re.search(
         rf'<LocationMatch "{re.escape(pattern)}">(?P<body>.*?)</LocationMatch>',
         text,
-        re.S,
+        re.DOTALL,
     )
     assert match is not None, pattern
     return match["body"]
@@ -313,7 +313,9 @@ def denied_pattern(text: str) -> re.Pattern:
 
 def access_line(host: str, request: str, status: int) -> str:
     # A vhost_combined line as fail2ban sees it, with the timestamp removed.
-    return f'{host}:443 203.0.113.7 - - [] "{request} HTTP/1.1" {status} 28 "-" "curl" 512'
+    return (
+        f'{host}:443 203.0.113.7 - - [] "{request} HTTP/1.1" {status} 28 "-" "curl" 512'
+    )
 
 
 def matches(line: str) -> bool:
