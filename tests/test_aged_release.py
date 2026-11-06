@@ -392,3 +392,70 @@ def test_parse_time_honours_negative_offset():
     assert aged_release._parse_time("2026-09-20T09:00:00-05:00") == datetime(
         2026, 9, 20, 14, 0, tzinfo=UTC
     )
+
+
+RELEASE = r"^Release (\d+\.\d+\.\d+)"
+
+
+def commits_run(messages):
+    """Answer a 100-commit page whose subjects are given newest first."""
+    return FakeRun(
+        {
+            "gh api repos/o/r": {"default_branch": "master"},
+            f"gh api repos/o/r/commits?sha=master&until={iso(ago(4))}&per_page=100": [
+                {"sha": sha, "commit": {"message": message}}
+                for sha, message in messages
+            ],
+        }
+    )
+
+
+def test_commit_message_selects_newest_matching_release():
+    run = commits_run(
+        [
+            ("a", "Fix typo"),
+            ("b", "Release 1.9.0 (#115)\n\nbody"),
+            ("c", "Release 1.8.4 (#114)"),
+        ]
+    )
+    assert resolve("github-commit:o/r", run, message=RELEASE) == {
+        "version": "1.9.0",
+        "commit": "b",
+    }
+
+
+def test_commit_message_matches_only_the_subject_line():
+    run = commits_run([("a", "Merge branch x\n\nRelease 2.0.0")])
+    with pytest.raises(AnsibleLookupError, match="no commit"):
+        resolve("github-commit:o/r", run, message=RELEASE)
+
+
+def test_commit_message_without_match_raises():
+    run = commits_run([("a", "Fix typo")])
+    with pytest.raises(AnsibleLookupError, match="no commit"):
+        resolve("github-commit:o/r", run, message=RELEASE)
+
+
+def test_commit_message_is_part_of_the_cache_key(monkeypatch, tmp_path):
+    run = FakeRun(
+        {
+            "gh api repos/o/r": {"default_branch": "main"},
+            f"gh api repos/o/r/commits?sha=main&until={iso(ago(4))}&per_page=1": [
+                {"sha": "head"}
+            ],
+            f"gh api repos/o/r/commits?sha=main&until={iso(ago(4))}&per_page=100": [
+                {"sha": "head", "commit": {"message": "Fix typo"}},
+                {"sha": "rel", "commit": {"message": "Release 1.0.0"}},
+            ],
+        }
+    )
+    monkeypatch.setattr(aged_release, "_run", run)
+    monkeypatch.setattr(aged_release, "_now", lambda: NOW)
+    monkeypatch.setattr(aged_release, "_cache_path", lambda: tmp_path / "cache.json")
+    aged_release._CACHE.clear()
+    lookup = aged_release.LookupModule()
+    variables = {"supply_chain_cooldown_days": 4}
+    assert lookup.run(["github-commit:o/r"], variables) == [{"commit": "head"}]
+    assert lookup.run(["github-commit:o/r"], variables, message=RELEASE) == [
+        {"version": "1.0.0", "commit": "rel"}
+    ]
