@@ -269,11 +269,18 @@ class CalendarMcpComposeTest(unittest.TestCase):
         self.assertEqual(module["recreate"], "always")
         self.assertIs(module["wait"], True)
 
-    def test_start_waits_for_each_health_endpoint(self):
-        task = task_named("container.yml", "container | Wait for health")
-        self.assertIn("/health", task["ansible.builtin.uri"]["url"])
-        self.assertEqual(task["loop"], "{{ calendar_mcp_users }}")
-        self.assertIn("retries", task)
+    def test_start_waits_for_health(self):
+        task = task_named("container.yml", "container | Start containers")
+        module = task["community.docker.docker_compose_v2"]
+        self.assertIs(module["wait"], True)
+
+    def test_health_check_needs_no_curl(self):
+        # The upstream image declares a curl health check but ships no curl.
+        for service in self.services().values():
+            test = " ".join(service["healthcheck"]["test"])
+            self.assertIn("/dev/tcp/127.0.0.1/8080", test)
+            self.assertIn("GET /health", test)
+            self.assertNotIn("curl", test)
 
 
 NETWORKS = {

@@ -97,18 +97,8 @@
     project_src: /etc/compose/calendar_mcp
     state: present
     pull: never
+    # The health check reads /health, so waiting for healthy confirms that the
+    # configuration loaded and the server answers.
+    wait: true
+    wait_timeout: 120
   when: not (ansible_check_mode and __calendar_mcp_compose is changed)
-
-- name: container | Wait for health
-  # The aspnet image has no curl or wget for a container health check, so the
-  # host polls /health, which answers once the configuration has loaded.
-  ansible.builtin.uri:
-    url: http://127.0.0.1:{{ item.port }}/health
-  register: __calendar_mcp_health
-  until: __calendar_mcp_health.status == 200
-  retries: 24
-  delay: 5
-  loop: "{{ calendar_mcp_users }}"
-  loop_control:
-    label: "{{ item.name }}"
-  when: not ansible_check_mode
