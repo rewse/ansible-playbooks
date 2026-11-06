@@ -15,8 +15,8 @@
            'sakura_password': lookup('pipe', 'op read "op://ansible/' ~ item.sakura_item ~ '/password"'),
            'apple_id': lookup('pipe', 'op read "op://ansible/' ~ item.apple_item ~ '/username"'),
            'apple_password': lookup('pipe', 'op read "op://ansible/' ~ item.apple_item ~ '/password"'),
-           'token': lookup('pipe', 'op read "op://ansible/' ~ item.token_item ~ '/credential"'),
-           'admin_token': lookup('pipe', 'op read "op://ansible/' ~ item.token_item ~ '/admin token"'),
+           'token': lookup('pipe', 'op read "op://ansible/' ~ item.mcp_item ~ '/credential"'),
+           'admin_token': lookup('pipe', 'op read "op://ansible/' ~ item.mcp_item ~ '/admin token"'),
          }] }}
   loop: "{{ calendar_mcp_users }}"
   loop_control:
