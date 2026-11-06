@@ -1,0 +1,12 @@
+{{ ansible_managed | comment }}
+#
+# The server answers a missing or wrong MCP key with 401. Only the MCP paths
+# are matched: an MCP client may read the OAuth metadata under /.well-known
+# before it sends a token, and that must not count against it.
+#
+# The virtual host is pinned because other_vhosts_access.log carries every name
+# Apache serves, and the vhost_combined format puts %v:%p ahead of the client
+# address, which is why <HOST> is the second field rather than the first.
+[Definition]
+failregex = ^{{ calendar_mcp_hostname | regex_escape }}:\d+ <HOST> \S+ \S+ \[\] "\S+ /mcp/(?:{{ calendar_mcp_users | map(attribute='name') | join('|') }})(?:\?\S*)? HTTP/[\d.]+" 401 \d+
+ignoreregex =

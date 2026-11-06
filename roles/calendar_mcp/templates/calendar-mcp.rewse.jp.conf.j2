@@ -1,0 +1,46 @@
+{{ ansible_managed | comment }}
+{% set users = calendar_mcp_users | map(attribute='name') | join('|') %}
+<VirtualHost *:443>
+    ServerAdmin hostmaster@rewse.jp
+    ServerName {{ calendar_mcp_hostname }}
+
+    ProxyPreserveHost on
+    ProxyRequests off
+
+    # One path per user, each to that user's container, which serves MCP at its
+    # root. Streamable HTTP can answer a call as server-sent events, which reach
+    # the client only as Apache flushes them. 127.0.0.1 rather than localhost,
+    # which resolves to ::1 first while the containers publish on IPv4 only.
+{% for user in calendar_mcp_users %}
+    ProxyPassMatch "^/mcp/{{ user.name }}$" "http://127.0.0.1:{{ user.port }}/" flushpackets=on
+    ProxyPassMatch "^/health/{{ user.name }}$" "http://127.0.0.1:{{ user.port }}/health"
+{% endfor %}
+
+    # Only the exact MCP and health paths are published. The same port serves
+    # the admin console, the admin API and attachments, which a path below
+    # /mcp/<user> would otherwise reach, and the jail counts 401s on the MCP
+    # paths only. Muse connects from Meta's cloud, whose addresses are not
+    # published, so the bearer token, the jail, and the WAF in front of
+    # CloudFront protect the MCP paths.
+    <LocationMatch "^/(?!(mcp|health)/({{ users }})$)">
+        Require all denied
+    </LocationMatch>
+
+    # Health checks are for home, the VPN and the office. Behind CloudFront,
+    # mod_remoteip has already restored the client address that Require ip tests.
+    <LocationMatch "^/health/">
+        Require ip 127.0.0.1
+        Require ip ::1
+        Require ip {{ networks.home_private_ipv4 }}
+        Require ip {{ networks.home_private_ipv6 }}
+        Require ip {{ networks.home_public_ipv4 }}
+        Require ip {{ networks.home_public_ipv6 }}
+        Require ip {{ networks.aws_private_ipv4 }}
+        Require ip {{ networks.aws_public_ipv6 }}
+        Require ip {{ networks.office_public_ipv4 | join(' ') }}
+    </LocationMatch>
+
+    SSLCertificateFile /etc/letsencrypt/live/rewse.jp/fullchain.pem
+    SSLCertificateKeyFile /etc/letsencrypt/live/rewse.jp/privkey.pem
+    Include /etc/letsencrypt/options-ssl-apache.conf
+</VirtualHost>

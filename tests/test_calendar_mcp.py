@@ -1,6 +1,7 @@
 #!/usr/bin/env python3
 """Contract tests for the calendar_mcp role."""
 
+import configparser
 import json
 import pathlib
 import re
@@ -273,6 +274,143 @@ class CalendarMcpComposeTest(unittest.TestCase):
         self.assertIn("/health", task["ansible.builtin.uri"]["url"])
         self.assertEqual(task["loop"], "{{ calendar_mcp_users }}")
         self.assertIn("retries", task)
+
+
+NETWORKS = {
+    "aws_private_ipv4": "10.0.0.0/16",
+    "aws_public_ipv6": "2406:da14::/56",
+    "home_private_ipv4": "192.168.0.0/24",
+    "home_private_ipv6": "fd20::/64",
+    "home_public_ipv4": "198.51.100.9/32",
+    "home_public_ipv6": "2001:db8::/64",
+    "office_public_ipv4": ["203.0.113.0/24"],
+}
+HOSTNAME = "calendar-mcp.rewse.jp"
+
+
+def vhost() -> str:
+    return render("calendar-mcp.rewse.jp.conf.j2", networks=NETWORKS)
+
+
+def location_block(text: str, pattern: str) -> str:
+    match = re.search(
+        rf'<LocationMatch "{re.escape(pattern)}">(?P<body>.*?)</LocationMatch>',
+        text,
+        re.S,
+    )
+    assert match is not None, pattern
+    return match["body"]
+
+
+def denied_pattern(text: str) -> re.Pattern:
+    match = re.search(
+        r'<LocationMatch "(?P<pattern>[^"]+)">\s*Require all denied\s*</LocationMatch>',
+        text,
+    )
+    assert match is not None
+    return re.compile(match["pattern"])
+
+
+def access_line(host: str, request: str, status: int) -> str:
+    # A vhost_combined line as fail2ban sees it, with the timestamp removed.
+    return f'{host}:443 203.0.113.7 - - [] "{request} HTTP/1.1" {status} 28 "-" "curl" 512'
+
+
+def matches(line: str) -> bool:
+    failregex = next(
+        entry
+        for entry in render("fail2ban-filter.conf.j2").splitlines()
+        if entry.startswith("failregex = ")
+    )
+    regex = re.compile(
+        failregex.removeprefix("failregex = ").replace("<HOST>", r"(?P<host>\S+)")
+    )
+    match = regex.search(line)
+    return match is not None and match["host"] == "203.0.113.7"
+
+
+class CalendarMcpApacheTest(unittest.TestCase):
+    def test_only_exact_user_paths_are_open(self):
+        denied = denied_pattern(vhost())
+        for path in ("/mcp/ts", "/mcp/ubiqu", "/health/ts", "/health/ubiqu"):
+            with self.subTest(path=path):
+                self.assertIsNone(denied.match(path))
+        for path in (
+            "/",
+            "/mcp",
+            "/mcp/ts/",
+            "/mcp/ts/admin",
+            "/mcp/ts/admin/ui",
+            "/mcp/ts/attachments",
+            "/mcp/ts/sse",
+            "/mcp/tsx",
+            "/mcp/kyn",
+            "/admin",
+            "/health",
+            "/health/ts/ready",
+        ):
+            with self.subTest(path=path):
+                self.assertIsNotNone(denied.match(path))
+
+    def test_each_path_reaches_its_own_port(self):
+        lines = [line.strip() for line in vhost().splitlines()]
+        for expected in (
+            "ServerName calendar-mcp.rewse.jp",
+            "ProxyPreserveHost on",
+            'ProxyPassMatch "^/mcp/ts$" "http://127.0.0.1:8084/" flushpackets=on',
+            'ProxyPassMatch "^/mcp/ubiqu$" "http://127.0.0.1:8085/" flushpackets=on',
+            'ProxyPassMatch "^/health/ts$" "http://127.0.0.1:8084/health"',
+            'ProxyPassMatch "^/health/ubiqu$" "http://127.0.0.1:8085/health"',
+            "SSLCertificateFile /etc/letsencrypt/live/rewse.jp/fullchain.pem",
+        ):
+            with self.subTest(line=expected):
+                self.assertIn(expected, lines)
+
+    def test_health_is_limited_to_known_networks(self):
+        block = location_block(vhost(), "^/health/")
+        self.assertIn("Require ip 192.168.0.0/24", block)
+        self.assertIn("Require ip 203.0.113.0/24", block)
+        self.assertNotIn("Require all granted", block)
+
+    def test_components_are_imported_in_order(self):
+        imports = [
+            task["ansible.builtin.import_tasks"]
+            for task in yaml.safe_load((ROLE / "tasks" / "main.yml").read_text())
+        ]
+        self.assertEqual(
+            imports, ["config.yml", "container.yml", "apache.yml", "fail2ban.yml"]
+        )
+
+
+class CalendarMcpFail2banTest(unittest.TestCase):
+    def test_filter_matches_rejected_mcp_calls(self):
+        for request in ("POST /mcp/ts", "GET /mcp/ubiqu", "POST /mcp/ts?x=1"):
+            with self.subTest(request=request):
+                self.assertTrue(matches(access_line(HOSTNAME, request, 401)))
+
+    def test_filter_ignores_metadata_success_and_other_vhosts(self):
+        for line in (
+            access_line(HOSTNAME, "GET /.well-known/oauth-protected-resource", 401),
+            access_line(HOSTNAME, "POST /mcp/ts", 200),
+            access_line(HOSTNAME, "GET /health/ts", 200),
+            access_line("mail-mcp.rewse.jp", "POST /mcp/ts", 401),
+        ):
+            with self.subTest(line=line):
+                self.assertFalse(matches(line))
+
+    def test_jail_reads_the_apache_log(self):
+        parser = configparser.ConfigParser(interpolation=None)
+        parser.read_string(
+            "\n".join(
+                line
+                for line in render("fail2ban-jail.conf.j2").splitlines()
+                if not line.lstrip().startswith("#")
+            )
+        )
+        jail = parser["calendar_mcp"]
+        self.assertEqual(jail["filter"], "calendar_mcp")
+        self.assertEqual(jail["backend"], "auto")
+        self.assertEqual(jail["logpath"], "/var/log/apache2/other_vhosts_access.log")
 
 
 if __name__ == "__main__":
