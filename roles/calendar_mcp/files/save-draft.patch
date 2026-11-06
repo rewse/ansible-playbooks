@@ -1,8 +1,21 @@
 diff --git a/src/CalendarMcp.Core/Providers/ImapProviderService.cs b/src/CalendarMcp.Core/Providers/ImapProviderService.cs
-index e305963..03733fe 100644
+index e305963..d3a949d 100644
 --- a/src/CalendarMcp.Core/Providers/ImapProviderService.cs
 +++ b/src/CalendarMcp.Core/Providers/ImapProviderService.cs
-@@ -578,6 +578,80 @@ public class ImapProviderService : IImapProviderService, IAsyncDisposable, IDisp
+@@ -137,7 +137,11 @@ public class ImapProviderService : IImapProviderService, IAsyncDisposable, IDisp
+             InboxFolder: Get(pc, "inboxFolder", DefaultInbox),
+             SentFolder: Get(pc, "sentFolder", DefaultSent),
+             TrashFolder: Get(pc, "trashFolder", DefaultTrash),
+-            JunkFolder: Get(pc, "junkFolder", DefaultJunk));
++            JunkFolder: Get(pc, "junkFolder", DefaultJunk),
++            // No default: without it, drafts resolve through SPECIAL-USE.
++            DraftsFolder: pc.TryGetValue("draftsFolder", out var drafts) && !string.IsNullOrWhiteSpace(drafts)
++                ? drafts
++                : null);
+ 
+         static string Get(IDictionary<string, string> d, string key, string fallback) =>
+             d.TryGetValue(key, out var v) && !string.IsNullOrWhiteSpace(v) ? v : fallback;
+@@ -578,6 +582,80 @@ public class ImapProviderService : IImapProviderService, IAsyncDisposable, IDisp
          }, cancellationToken);
      }
  
@@ -83,6 +96,24 @@ index e305963..03733fe 100644
      public async Task<string?> MoveEmailAsync(
          string accountId, string emailId, string destinationFolder,
          CancellationToken cancellationToken = default)
+@@ -630,6 +708,7 @@ public class ImapProviderService : IImapProviderService, IAsyncDisposable, IDisp
+             WellKnownMailFolder.Sent => cfg.SentFolder,
+             WellKnownMailFolder.Trash => cfg.TrashFolder,
+             WellKnownMailFolder.Spam => cfg.JunkFolder,
++            WellKnownMailFolder.Drafts => cfg.DraftsFolder,
+             _ => null
+         };
+ 
+@@ -869,7 +948,8 @@ public class ImapProviderService : IImapProviderService, IAsyncDisposable, IDisp
+         string ImapHost, int ImapPort,
+         string SmtpHost, int SmtpPort,
+         string Username, string Password,
+-        string InboxFolder, string SentFolder, string TrashFolder, string JunkFolder);
++        string InboxFolder, string SentFolder, string TrashFolder, string JunkFolder,
++        string? DraftsFolder = null);
+ 
+     // ── Disposal ─────────────────────────────────────────────────────
+ 
 diff --git a/src/CalendarMcp.Core/Services/IProviderService.cs b/src/CalendarMcp.Core/Services/IProviderService.cs
 index 1cfb0e3..c26964f 100644
 --- a/src/CalendarMcp.Core/Services/IProviderService.cs
@@ -196,13 +227,22 @@ index e126be8..18afc61 100644
              .WithTools<CalendarMcp.Core.Tools.BulkMarkEmailsAsReadTool>()
              .WithTools<CalendarMcp.Core.Tools.BulkMoveEmailsTool>()
 diff --git a/src/CalendarMcp.Tests/Providers/ImapProviderServiceTests.cs b/src/CalendarMcp.Tests/Providers/ImapProviderServiceTests.cs
-index 8a43a2d..a8f5135 100644
+index 8a43a2d..542159e 100644
 --- a/src/CalendarMcp.Tests/Providers/ImapProviderServiceTests.cs
 +++ b/src/CalendarMcp.Tests/Providers/ImapProviderServiceTests.cs
-@@ -95,4 +95,35 @@ public class ImapProviderServiceTests
+@@ -95,4 +95,44 @@ public class ImapProviderServiceTests
  
          Assert.IsNull(ImapProviderService.ResolveConfiguredFolder(folder, CustomFolders));
      }
++
++    [TestMethod]
++    public void ResolveConfiguredFolder_MapsDraftsToConfiguredFolder()
++    {
++        Assert.IsTrue(MailFolderAliases.TryParse("drafts", out var folder));
++
++        Assert.AreEqual("INBOX.Draft", ImapProviderService.ResolveConfiguredFolder(
++            folder, CustomFolders with { DraftsFolder = "INBOX.Draft" }));
++    }
 +
 +    [TestMethod]
 +    public void BuildDraftMessage_SetsHeadersAndUtf8Body()
