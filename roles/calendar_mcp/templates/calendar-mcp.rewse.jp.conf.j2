@@ -8,12 +8,14 @@
     ProxyRequests off
 
     # One path per user, each to that user's container, which serves MCP at its
-    # root. Streamable HTTP can answer a call as server-sent events, which reach
-    # the client only as Apache flushes them. 127.0.0.1 rather than localhost,
-    # which resolves to ::1 first while the containers publish on IPv4 only.
+    # root. A path below these prefixes would also be proxied, so the deny rule
+    # below is what keeps the rest of the server unreachable. Streamable HTTP
+    # can answer a call as server-sent events, which reach the client only as
+    # Apache flushes them. 127.0.0.1 rather than localhost, which resolves to
+    # ::1 first while the containers publish on IPv4 only.
 {% for user in calendar_mcp_users %}
-    ProxyPassMatch "^/mcp/{{ user.name }}$" "http://127.0.0.1:{{ user.port }}/" flushpackets=on
-    ProxyPassMatch "^/health/{{ user.name }}$" "http://127.0.0.1:{{ user.port }}/health"
+    ProxyPass /mcp/{{ user.name }} http://127.0.0.1:{{ user.port }}/ flushpackets=on
+    ProxyPass /health/{{ user.name }} http://127.0.0.1:{{ user.port }}/health
 {% endfor %}
 
     # Only the exact MCP and health paths are published. The same port serves

@@ -366,10 +366,12 @@ class CalendarMcpApacheTest(unittest.TestCase):
         for expected in (
             "ServerName calendar-mcp.rewse.jp",
             "ProxyPreserveHost on",
-            'ProxyPassMatch "^/mcp/ts$" "http://127.0.0.1:8084/" flushpackets=on',
-            'ProxyPassMatch "^/mcp/ubiqu$" "http://127.0.0.1:8085/" flushpackets=on',
-            'ProxyPassMatch "^/health/ts$" "http://127.0.0.1:8084/health"',
-            'ProxyPassMatch "^/health/ubiqu$" "http://127.0.0.1:8085/health"',
+            # ProxyPass rather than ProxyPassMatch, which appends the whole
+            # request path to a target without a backreference.
+            "ProxyPass /mcp/ts http://127.0.0.1:8084/ flushpackets=on",
+            "ProxyPass /mcp/ubiqu http://127.0.0.1:8085/ flushpackets=on",
+            "ProxyPass /health/ts http://127.0.0.1:8084/health",
+            "ProxyPass /health/ubiqu http://127.0.0.1:8085/health",
             "SSLCertificateFile /etc/letsencrypt/live/rewse.jp/fullchain.pem",
         ):
             with self.subTest(line=expected):
