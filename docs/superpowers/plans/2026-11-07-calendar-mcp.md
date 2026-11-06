@@ -15,11 +15,11 @@
 - ロール名 `calendar_mcp`、ホスト名 `calendar-mcp.rewse.jp`、Compose プロジェクト `/etc/compose/calendar_mcp/compose.yaml`（`name: calendar_mcp`）、データ `/srv/calendar_mcp/<名前>`、checkout `/usr/local/src/calendar-mcp`
 - 利用者は `ts`（`127.0.0.1:8084`）と `ubiqu`（`127.0.0.1:8085`）。fox で 8080 から 8083 は使用中、8084 と 8085 は空き。fox は aarch64
 - 上流: `https://github.com/MarimerLLC/calendar-mcp.git`、`lookup('aged_release', 'github-commit:MarimerLLC/calendar-mcp', message='^Release (\d+\.\d+\.\d+)')`
-- アカウント ID は `<名前>-mail`（IMAP）と `<名前>-icloud`（DAV）
+- アカウント ID は `<名前>-sakura`（IMAP）と `<名前>-icloud`（DAV）
 - `Permissions` は全アカウントに六つのフラグすべてを明示する。IMAP は `emailRead` だけ true、DAV は `calendarRead`、`calendarWrite`、`contactsRead`、`contactsWrite` だけ true。`emailSend` はどこでも false
 - IMAP: `imapHost: rewse.sakura.ne.jp`、`imapPort: "993"`、`smtpHost: smtp.invalid`。DAV: `preset: icloud`、`enableCalendar: "true"`、`enableContacts: "true"`
 - `ExternalBaseUrl: https://calendar-mcp.rewse.jp/mcp/<名前>`。Router と `AdminAuth` は書かない
-- 秘密の置き場所: `CALENDAR_MCP_MCP_KEY` と `CALENDAR_MCP_ADMIN_TOKEN` は `/etc/compose/calendar_mcp/<名前>.env`（root、`"0600"`、`format: raw`）。パスワードと App 用パスワードは `/etc/compose/calendar_mcp/<名前>/appsettings.json`（コンテナの uid、`"0400"`、`/app/data/appsettings.json` に `:ro` でマウント）
+- 秘密の置き場所: `CALENDAR_MCP_MCP_KEY` と `CALENDAR_MCP_ADMIN_TOKEN` は `/etc/compose/calendar_mcp/<名前>.env`（root、`"0600"`、`format: raw`）。パスワードと App 用パスワードは `/etc/compose/calendar_mcp/<名前>/appsettings.json`（コンテナの uid、`"0400"`、`/app/data/appsettings.json` に `:ro` でマウント）。Ansible が書く設定は `/etc/compose/<role>/`（mailboxd の `config.yaml` と同じ）、コンテナが書く状態は `/srv/<role>/` に分ける
 - 外から届くパスは `/mcp/ts` と `/mcp/ubiqu` の完全一致だけ。`/health/<名前>` は `networks` の家、VPN、オフィスからだけ。それ以外は `Require all denied`
 - 公開リポジトリなので、メールアドレス、Apple ID、1Password の項目名をコミットしない。コミットするのは項目 ID だけ
 - AGENTS.md の Ansible の規約（`roles/filebrowser` と `roles/mailboxd` が手本）、タグ、タスク名、変数の接頭辞に従う
@@ -28,7 +28,7 @@
 
 ## Review Focus
 
-- ts のトークンで `/mcp/ubiqu` を呼ぶ、または `accountId` に `ubiqu-mail` を渡す。前者は 401、後者は存在しないアカウントとして拒否されること（Task 7 Step 4）
+- ts のトークンで `/mcp/ubiqu` を呼ぶ、または `accountId` に `ubiqu-sakura` を渡す。前者は 401、後者は存在しないアカウントとして拒否されること（Task 7 Step 4）
 - `/mcp/ts/`（末尾のスラッシュ）、`/mcp/ts/admin/ui`、`/mcp/ts/attachments`、`/mcp/kyn` のような完全一致でないパス。どれも 403 で、コンテナに届かないこと（Task 6 のテスト）
 - 上流の新しい Release でパッチが当たらない。古いイメージのまま動き続け、play は失敗で終わること（Task 3 のテスト）
 - パッチの内容だけを変えたとき。上流のコミットが同じでもイメージを作り直すこと（Task 3 のテスト、タグにパッチのハッシュを入れる）
@@ -286,7 +286,7 @@ class CalendarMcpConfigTest(unittest.TestCase):
     def test_exactly_two_accounts_with_explicit_permissions(self):
         accounts = self.settings()["Accounts"]
         self.assertEqual([(a["Id"], a["Provider"]) for a in accounts],
-                         [("alice-mail", "imap"), ("alice-icloud", "dav")])
+                         [("alice-sakura", "imap"), ("alice-icloud", "dav")])
         flags = {"emailRead", "emailSend", "calendarRead", "calendarWrite", "contactsRead", "contactsWrite"}
         for a in accounts:
             self.assertEqual(set(a["Permissions"]), flags)
@@ -522,8 +522,8 @@ Expected: 成功。二回目は `changed=0`
 - `https://calendar-mcp.rewse.jp/health/ts` が 200
 - トークンなしの `POST /mcp/ts` が 401 で、fail2ban のフィルタが行に一致する（`fail2ban-regex`）
 - `/mcp/ts/`、`/mcp/ts/admin`、`/mcp/ts/admin/ui`、`/mcp/ts/attachments` が 403
-- ts のトークンで `initialize` と `tools/list`。`save_draft` があり、`list_accounts` が `ts-mail` と `ts-icloud` だけを返す
-- ts のトークンで `/mcp/ubiqu` が 401。`accountId: ubiqu-mail` は拒否される
+- ts のトークンで `initialize` と `tools/list`。`save_draft` があり、`list_accounts` が `ts-sakura` と `ts-icloud` だけを返す
+- ts のトークンで `/mcp/ubiqu` が 401。`accountId: ubiqu-sakura` は拒否される
 - `send_email`（宛先は ts 自身）と `unsubscribe_from_email` が権限エラーになる
 - `docker logs calendar-mcp-ts` で、ツールの呼び出しがどこまで記録されるかを見る。設計の「残るリスク」に関わるので、結果を利用者に報告する
 
