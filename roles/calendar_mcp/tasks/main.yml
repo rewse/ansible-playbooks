@@ -1,11 +1,11 @@
 ---
-- name: Import source tasks
-  ansible.builtin.import_tasks: source.yml
-  tags:
-    - calendar_mcp_source
-    - update
-
 - name: Import config tasks
   ansible.builtin.import_tasks: config.yml
   tags:
     - calendar_mcp_config
+
+- name: Import container tasks
+  ansible.builtin.import_tasks: container.yml
+  tags:
+    - calendar_mcp_container
+    - update

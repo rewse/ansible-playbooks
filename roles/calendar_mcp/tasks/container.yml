@@ -1,5 +1,24 @@
 ---
-- name: source | Resolve aged release
+- name: container | Create compose directory
+  ansible.builtin.file:
+    path: /etc/compose/calendar_mcp
+    state: directory
+    mode: "0755"
+
+- name: container | Create data directories
+  # Created here rather than left to Docker, which would make a missing bind
+  # source owned by root and leave the container user unable to write its state.
+  ansible.builtin.file:
+    path: "{{ calendar_mcp_data_dir }}/{{ item.name }}"
+    state: directory
+    owner: "{{ calendar_mcp_uid }}"
+    group: "{{ calendar_mcp_uid }}"
+    mode: "0750"
+  loop: "{{ calendar_mcp_users }}"
+  loop_control:
+    label: "{{ item.name }}"
+
+- name: container | Resolve aged release
   ansible.builtin.set_fact:
     # Upstream has no tags or releases; each version lands as one commit whose
     # subject is "Release x.y.z".
@@ -7,7 +26,7 @@
       {{ lookup('aged_release', 'github-commit:MarimerLLC/calendar-mcp',
                 message='^Release (\d+\.\d+\.\d+)') }}
 
-- name: source | Name image
+- name: container | Name image
   ansible.builtin.set_fact:
     # The patch checksum is part of the tag, so a changed patch builds a new
     # image even when the upstream commit stays the same.
@@ -16,12 +35,12 @@
          ~ '-' ~ __calendar_mcp_source.commit[:7]
          ~ '-' ~ (lookup('ansible.builtin.file', 'save-draft.patch') | hash('sha256'))[:8] }}
 
-- name: source | Read image
+- name: container | Read image
   community.docker.docker_image_info:
     name: "{{ __calendar_mcp_image }}"
   register: __calendar_mcp_image_info
 
-- name: source | Remove previous checkout
+- name: container | Remove previous checkout
   # A forced checkout keeps untracked files, and the patch adds one, so the
   # next version's patch would refuse to create it again.
   ansible.builtin.file:
@@ -29,20 +48,20 @@
     state: absent
   when: not ansible_check_mode and __calendar_mcp_image_info.images | length == 0
 
-- name: source | Check out repository
+- name: container | Check out repository
   ansible.builtin.git:
     repo: https://github.com/MarimerLLC/calendar-mcp.git
     dest: "{{ calendar_mcp_source_dir }}"
     version: "{{ __calendar_mcp_source.commit }}"
   when: __calendar_mcp_image_info.images | length == 0
 
-- name: source | Report skipped build in check mode
+- name: container | Report skipped build in check mode
   ansible.builtin.debug:
     msg: Patch and build skipped because the checkout is not written in check mode
     verbosity: 0
   when: ansible_check_mode and __calendar_mcp_image_info.images | length == 0
 
-- name: source | Apply patch
+- name: container | Apply patch
   # A patch that no longer applies fails the play here, so the running container
   # keeps its image until the patch is fixed.
   ansible.posix.patch:
@@ -51,10 +70,45 @@
     strip: 1
   when: not ansible_check_mode and __calendar_mcp_image_info.images | length == 0
 
-- name: source | Build image
+- name: container | Build image
   community.docker.docker_image_build:
     name: "{{ __calendar_mcp_image.split(':')[0] }}"
     tag: "{{ __calendar_mcp_image.split(':')[1] }}"
     path: "{{ calendar_mcp_source_dir }}"
     dockerfile: Dockerfile
   when: not ansible_check_mode and __calendar_mcp_image_info.images | length == 0
+
+- name: container | Deploy compose file
+  ansible.builtin.template:
+    src: compose.yaml.j2
+    dest: /etc/compose/calendar_mcp/compose.yaml
+    mode: "0644"
+  register: __calendar_mcp_compose
+  notify: Recreate calendar-mcp
+
+- name: container | Report skipped start in check mode
+  ansible.builtin.debug:
+    msg: Start skipped because the compose file is not written in check mode
+    verbosity: 0
+  when: ansible_check_mode and __calendar_mcp_compose is changed
+
+- name: container | Start containers
+  community.docker.docker_compose_v2:
+    project_src: /etc/compose/calendar_mcp
+    state: present
+    pull: never
+  when: not (ansible_check_mode and __calendar_mcp_compose is changed)
+
+- name: container | Wait for health
+  # The aspnet image has no curl or wget for a container health check, so the
+  # host polls /health, which answers once the configuration has loaded.
+  ansible.builtin.uri:
+    url: http://127.0.0.1:{{ item.port }}/health
+  register: __calendar_mcp_health
+  until: __calendar_mcp_health.status == 200
+  retries: 24
+  delay: 5
+  loop: "{{ calendar_mcp_users }}"
+  loop_control:
+    label: "{{ item.name }}"
+  when: not ansible_check_mode

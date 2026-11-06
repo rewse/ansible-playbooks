@@ -47,9 +47,9 @@ def task_named(file: str, name: str) -> dict:
     return next(task for task in tasks if task["name"] == name)
 
 
-class CalendarMcpSourceTest(unittest.TestCase):
+class CalendarMcpBuildTest(unittest.TestCase):
     def test_lookup_selects_release_commits(self):
-        fact = task_named("source.yml", "source | Resolve aged release")[
+        fact = task_named("container.yml", "container | Resolve aged release")[
             "ansible.builtin.set_fact"
         ]
         self.assertIn(
@@ -59,7 +59,7 @@ class CalendarMcpSourceTest(unittest.TestCase):
 
     def test_image_tag_changes_with_the_patch(self):
         # The tag carries the patch checksum, so editing only the patch rebuilds.
-        fact = task_named("source.yml", "source | Name image")[
+        fact = task_named("container.yml", "container | Name image")[
             "ansible.builtin.set_fact"
         ]
         self.assertIn("save-draft.patch", fact["__calendar_mcp_image"])
@@ -67,31 +67,31 @@ class CalendarMcpSourceTest(unittest.TestCase):
 
     def test_build_is_skipped_when_the_image_exists(self):
         for name in (
-            "source | Check out repository",
-            "source | Apply patch",
-            "source | Build image",
+            "container | Check out repository",
+            "container | Apply patch",
+            "container | Build image",
         ):
             with self.subTest(task=name):
                 self.assertIn(
                     "__calendar_mcp_image_info.images",
-                    str(task_named("source.yml", name)["when"]),
+                    str(task_named("container.yml", name)["when"]),
                 )
 
     def test_patch_failure_stops_the_play(self):
-        task = task_named("source.yml", "source | Apply patch")
+        task = task_named("container.yml", "container | Apply patch")
         self.assertNotIn("ignore_errors", task)
         self.assertNotIn("failed_when", task)
 
     def test_checkout_starts_clean(self):
         # A forced checkout keeps untracked files, and the patch creates one, so
         # a later version would fail to apply over the leftover file.
-        tasks = yaml.safe_load((ROLE / "tasks" / "source.yml").read_text())
+        tasks = yaml.safe_load((ROLE / "tasks" / "container.yml").read_text())
         names = [task["name"] for task in tasks]
-        remove = task_named("source.yml", "source | Remove previous checkout")
+        remove = task_named("container.yml", "container | Remove previous checkout")
         self.assertEqual(remove["ansible.builtin.file"]["state"], "absent")
         self.assertLess(
-            names.index("source | Remove previous checkout"),
-            names.index("source | Check out repository"),
+            names.index("container | Remove previous checkout"),
+            names.index("container | Check out repository"),
         )
 
     def test_users_and_ports(self):
@@ -214,6 +214,65 @@ class CalendarMcpConfigTest(unittest.TestCase):
         for task in (settings, env):
             self.assertTrue(task["no_log"])
             self.assertEqual(task["notify"], "Recreate calendar-mcp")
+
+
+class CalendarMcpComposeTest(unittest.TestCase):
+    def services(self) -> dict:
+        text = render(
+            "compose.yaml.j2",
+            __calendar_mcp_image="calendar-mcp:1.9.0-abc1234-12345678",
+        )
+        return yaml.safe_load(text)["services"]
+
+    def test_one_service_per_user_on_loopback(self):
+        services = self.services()
+        self.assertEqual(sorted(services), ["calendar-mcp-ts", "calendar-mcp-ubiqu"])
+        self.assertEqual(services["calendar-mcp-ts"]["ports"], ["127.0.0.1:8084:8080"])
+        self.assertEqual(
+            services["calendar-mcp-ubiqu"]["ports"], ["127.0.0.1:8085:8080"]
+        )
+
+    def test_each_service_sees_only_its_own_files(self):
+        for name, service in self.services().items():
+            user = name.removeprefix("calendar-mcp-")
+            with self.subTest(user=user):
+                self.assertEqual(
+                    service["env_file"], [{"path": f"{user}.env", "format": "raw"}]
+                )
+                self.assertEqual(
+                    service["volumes"],
+                    [
+                        f"/srv/calendar_mcp/{user}:/app/data",
+                        (
+                            f"/etc/compose/calendar_mcp/{user}/appsettings.json"
+                            ":/app/data/appsettings.json:ro"
+                        ),
+                    ],
+                )
+
+    def test_image_is_the_local_build(self):
+        for service in self.services().values():
+            self.assertEqual(service["image"], "calendar-mcp:1.9.0-abc1234-12345678")
+            self.assertEqual(service["pull_policy"], "never")
+
+    def test_hardening(self):
+        for service in self.services().values():
+            self.assertEqual(service["cap_drop"], ["ALL"])
+            self.assertIs(service["read_only"], True)
+            self.assertIn("no-new-privileges:true", service["security_opt"])
+
+    def test_recreate_handler_waits(self):
+        handlers = yaml.safe_load((ROLE / "handlers" / "main.yml").read_text())
+        recreate = next(h for h in handlers if h["name"] == "Recreate calendar-mcp")
+        module = recreate["community.docker.docker_compose_v2"]
+        self.assertEqual(module["recreate"], "always")
+        self.assertIs(module["wait"], True)
+
+    def test_start_waits_for_each_health_endpoint(self):
+        task = task_named("container.yml", "container | Wait for health")
+        self.assertIn("/health", task["ansible.builtin.uri"]["url"])
+        self.assertEqual(task["loop"], "{{ calendar_mcp_users }}")
+        self.assertIn("retries", task)
 
 
 if __name__ == "__main__":
