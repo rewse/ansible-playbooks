@@ -689,7 +689,7 @@ Expected: 成功。`ci.yml` に `workflow_dispatch` がなく `workflow run` が
 
 ### Task 13: IMAP の `draftsFolder`
 
-以下、fork の Task はすべて `~/git/calendar-mcp` の `rewse` ブランチで行う。.NET の SDK は Mac に入っていないので、`DOTNET='container run --rm -m 6G -c 4 -v '"$PWD"':/src -w /src mcr.microsoft.com/dotnet/sdk:10.0 dotnet'` として `$DOTNET test src/CalendarMcp.Tests ...` で走らせる。
+以下、fork の Task はすべて `~/git/calendar-mcp` の `rewse` ブランチで行う。.NET の SDK は Mac の `dotnet`（10.0、darwin ロールで入れている）を使う。
 
 **Files:**
 - Modify: `src/CalendarMcp.Core/Providers/ImapProviderService.cs`（`ImapAccountConfig`、`ResolveConfigAsync`、`ResolveConfiguredFolder`）
@@ -722,7 +722,7 @@ public void ResolveConfiguredFolder_MapsDraftsToConfiguredFolder()
 
 - [ ] **Step 3: 失敗を確かめる**
 
-Run: `$DOTNET test src/CalendarMcp.Tests --filter ResolveConfiguredFolder`
+Run: `dotnet test src/CalendarMcp.Tests --filter ResolveConfiguredFolder`
 Expected: `ResolveConfiguredFolder_MapsDraftsToConfiguredFolder` だけが `Assert.AreEqual failed. Expected:<INBOX.Draft>. Actual:<(null)>` で FAIL
 
 - [ ] **Step 4: 実装する**
@@ -731,7 +731,7 @@ Expected: `ResolveConfiguredFolder_MapsDraftsToConfiguredFolder` だけが `Asse
 
 - [ ] **Step 5: 通ることを確かめる**
 
-Run: `$DOTNET test src/CalendarMcp.Tests`
+Run: `dotnet test src/CalendarMcp.Tests`
 Expected: `Failed: 0`
 
 - [ ] **Step 6: Commit**
@@ -839,7 +839,7 @@ public void BuildDraftMessage_ThreadsAReply()
 
 - [ ] **Step 3: 失敗を確かめる**
 
-Run: `$DOTNET test src/CalendarMcp.Tests --filter "SaveDraft|BuildDraftMessage"`
+Run: `dotnet test src/CalendarMcp.Tests --filter "SaveDraft|BuildDraftMessage"`
 Expected: 新しい七つがすべて FAIL。ツールのテストは `NotImplementedException` が期待した `McpException` でないため、`BuildDraftMessage` のテストはアサーションで落ちる
 
 - [ ] **Step 4: 実装する**
@@ -851,7 +851,7 @@ Expected: 新しい七つがすべて FAIL。ツールのテストは `NotImplem
 
 - [ ] **Step 5: 通ることを確かめる**
 
-Run: `$DOTNET test src/CalendarMcp.Tests && $DOTNET build src/CalendarMcp.HttpServer -c Release`
+Run: `dotnet test src/CalendarMcp.Tests && dotnet build src/CalendarMcp.HttpServer -c Release`
 Expected: `Failed: 0` と `Build succeeded.`
 
 - [ ] **Step 6: Commit**
@@ -919,7 +919,7 @@ public async Task GetEmailDetails_HeadersNullWhenProviderHasNone()
 
 - [ ] **Step 3: 失敗を確かめる**
 
-Run: `$DOTNET test src/CalendarMcp.Tests --filter "ToEmailHeaders|GetEmailDetails"`
+Run: `dotnet test src/CalendarMcp.Tests --filter "ToEmailHeaders|GetEmailDetails"`
 Expected: 新しい三つが FAIL（`ToEmailHeaders` は件数のアサーション、ツールの二つは `TryGetProperty` が false）。既存の `GetEmailDetails_*` は PASS
 
 - [ ] **Step 4: 実装する**
@@ -928,7 +928,7 @@ Expected: 新しい三つが FAIL（`ToEmailHeaders` は件数のアサーショ
 
 - [ ] **Step 5: 通ることを確かめる**
 
-Run: `$DOTNET test src/CalendarMcp.Tests && $DOTNET build src/CalendarMcp.HttpServer -c Release`
+Run: `dotnet test src/CalendarMcp.Tests && dotnet build src/CalendarMcp.HttpServer -c Release`
 Expected: `Failed: 0` と `Build succeeded.`
 
 - [ ] **Step 6: Commit と push**
