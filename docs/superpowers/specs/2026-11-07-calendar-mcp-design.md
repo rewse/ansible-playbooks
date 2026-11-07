@@ -99,7 +99,7 @@ flowchart LR
 
 - `get_email_headers` の引数は `accountId` と `emailId` とし、応答は `headers`（`name` と `value` の組の並び）だけにする。並びはメッセージの中の順で、`Received` のように繰り返す欄は別々の要素にする。権限は `emailRead` で判定する
 - ツールは上流の `get_unsubscribe_info` と同じく `GetEmailDetailsAsync` を呼び、結果の `EmailMessage.Headers` を返す。`IProviderService` は変えない
-- `EmailMessage.Headers` は、IMAP、M365、Outlook.com、Google の四つのプロバイダーで、詳細を取るときに埋める。四つとも詳細を取るときにヘッダーをもう受け取っている（IMAP は MIME メッセージ、M365 と Outlook.com は `internetMessageHeaders`、Google は `Payload.Headers`）。一覧と検索では埋めない。IMAP 以外は手元にアカウントがないので、変換の単体テストまでで確かめる
+- `EmailMessage.Headers` は、IMAP、M365、Outlook.com、Google の四つのプロバイダーで、詳細を取るときに埋める。四つとも詳細を取るときにヘッダーをもう受け取っている（IMAP は MIME メッセージ、M365 と Outlook.com は `internetMessageHeaders`、Google は `Payload.Headers`）。一覧と検索では埋めない。M365 と Outlook.com は手元にアカウントがないので、変換の単体テストまでで確かめる。Google は単体テストに加えて、利用者の Gmail のアカウントで実際に確かめる（「確かめること」の段階 1）
 - `Headers` が null のプロバイダーでは、ツールはヘッダーを返せないというエラーにする
 - `get_email_details` の応答と説明文は変えない
 - 上流の作法に合わせて `changelogs/` に記録を足す。`docs/mcp-tools.md` と `src/CalendarMcp.Core/Skills/email.md` は、上流に PR を出すときに `save_draft` とあわせて書く
@@ -202,6 +202,7 @@ AGENTS.md の「Subdomains」の手順に従う。
 
 ## 確かめること
 
+- 段階 1: Mac で動かした fork に、利用者の Gmail のアカウントを権限 `emailRead` だけで一時的に足す。`get_email_headers` が、`Received` と認証の結果（`Authentication-Results` か `ARC-Authentication-Results`）を含むヘッダーを返す。上流の CLI は送信を含む既定のスコープで認可を求めるので、確かめたらアカウントを外し、Google のアカウントの設定でこのアプリのアクセスを取り消す。fox には Gmail のアカウントを入れない
 - 段階 2
   - 家から `/mcp/ts` にトークンなしで POST すると 401 が返る
   - `/mcp/ts/admin`、`/mcp/ts/admin/ui`、`/mcp/ts/attachments` は 403 が返る
