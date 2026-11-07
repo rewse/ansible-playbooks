@@ -19,3 +19,8 @@
   ansible.builtin.import_tasks: fail2ban.yml
   tags:
     - calendar_mcp_fail2ban
+
+- name: Import legacy tasks
+  ansible.builtin.import_tasks: legacy.yml
+  tags:
+    - calendar_mcp_legacy

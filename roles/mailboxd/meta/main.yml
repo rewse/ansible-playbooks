@@ -1,8 +1,0 @@
----
-dependencies:
-  - role: fail2ban
-    tags:
-      - fail2ban
-  - role: httpd
-    tags:
-      - httpd

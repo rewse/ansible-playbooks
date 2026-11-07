@@ -58,9 +58,6 @@
     - role: litellm
       tags:
         - litellm
-    - role: mailboxd
-      tags:
-        - mailboxd
     - role: matterjs_server
       tags:
         - matterjs_server

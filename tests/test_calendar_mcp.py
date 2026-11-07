@@ -381,7 +381,55 @@ class CalendarMcpApacheTest(unittest.TestCase):
             for task in yaml.safe_load((ROLE / "tasks" / "main.yml").read_text())
         ]
         self.assertEqual(
-            imports, ["config.yml", "container.yml", "apache.yml", "fail2ban.yml"]
+            imports,
+            ["config.yml", "container.yml", "apache.yml", "fail2ban.yml", "legacy.yml"],
+        )
+
+
+class CalendarMcpLegacyTest(unittest.TestCase):
+    @staticmethod
+    def removed_paths(tasks):
+        for t in tasks:
+            module = t.get("ansible.builtin.file")
+            if module:
+                yield from (
+                    t["loop"] if module["path"] == "{{ item }}" else [module["path"]]
+                )
+
+    def test_removes_only_mailboxd_state(self):
+        tasks = yaml.safe_load((ROLE / "tasks" / "legacy.yml").read_text())
+        paths = sorted(self.removed_paths(tasks))
+        self.assertEqual(
+            paths,
+            [
+                "/etc/apache2/sites-available/mail-mcp.rewse.jp.conf",
+                "/etc/apache2/sites-enabled/mail-mcp.rewse.jp.conf",
+                "/etc/compose/mailboxd",
+                "/etc/fail2ban/filter.d/mailboxd.conf",
+                "/etc/fail2ban/jail.d/mailboxd.conf",
+                "/srv/mailboxd",
+            ],
+        )
+        for t in tasks:
+            if "ansible.builtin.file" in t:
+                self.assertEqual(t["ansible.builtin.file"]["state"], "absent")
+
+    def test_stops_mailboxd_only_while_its_compose_file_exists(self):
+        tasks = yaml.safe_load((ROLE / "tasks" / "legacy.yml").read_text())
+        stat = next(t for t in tasks if "ansible.builtin.stat" in t)
+        down = next(t for t in tasks if "community.docker.docker_compose_v2" in t)
+        self.assertEqual(
+            stat["ansible.builtin.stat"]["path"], "/etc/compose/mailboxd/compose.yaml"
+        )
+        self.assertEqual(
+            down["community.docker.docker_compose_v2"]["project_src"],
+            "/etc/compose/mailboxd",
+        )
+        self.assertEqual(down["community.docker.docker_compose_v2"]["state"], "absent")
+        self.assertIn(stat["register"], down["when"])
+        self.assertLess(
+            tasks.index(down),
+            min(i for i, t in enumerate(tasks) if "ansible.builtin.file" in t),
         )
 
 
@@ -396,7 +444,7 @@ class CalendarMcpFail2banTest(unittest.TestCase):
             access_line(HOSTNAME, "GET /.well-known/oauth-protected-resource", 401),
             access_line(HOSTNAME, "POST /mcp/ts", 200),
             access_line(HOSTNAME, "GET /health/ts", 200),
-            access_line("mail-mcp.rewse.jp", "POST /mcp/ts", 401),
+            access_line("zabbix-mcp.rewse.jp", "POST /mcp/ts", 401),
         ):
             with self.subTest(line=line):
                 self.assertFalse(matches(line))
