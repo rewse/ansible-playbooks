@@ -22,9 +22,6 @@
     - role: zabbix_agent
       tags:
         - zabbix_agent
-    - role: calendar_mcp
-      tags:
-        - calendar_mcp
     - role: cloudfront_waf_report
       tags:
         - cloudfront_waf_report
