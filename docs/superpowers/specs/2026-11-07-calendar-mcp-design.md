@@ -30,7 +30,7 @@ Muse の Secure Credentials Store が資格情報を差し込めるのは HTTPS 
 - calendar-mcp の LLM ルーター（Ollama、OpenAI などに問い合わせてアカウントを選ぶ機能）。外部に問い合わせさせない
 - OAuth による認可
 - 管理画面（`/admin/ui`）と管理 API（`/admin`）の利用。設定は Ansible が書く
-- fork の作成と保守
+- 上流のリポジトリの外で独自の変更を配布すること（fork から Release やイメージを出すこと）
 
 ## 制約
 
@@ -50,18 +50,19 @@ Muse の Secure Credentials Store が資格情報を差し込めるのは HTTPS 
 
 | 方式 | 内容 | 判断 |
 |---|---|---|
-| A | MarimerLLC/calendar-mcp を一人一つのコンテナで動かす。fox で上流のコミットからビルドし、下書きのツールを小さなパッチで足す | 採用 |
+| A | MarimerLLC/calendar-mcp を一人一つのコンテナで動かす。上流を `rewse/calendar-mcp` に fork し、足りない機能をテスト付きのコミットで足して、fox でその fork からビルドする | 採用 |
 | B | ni-c/caldav-mcp を一人一つ動かし、stdio を HTTP に変える中継を挟む。メールは mailboxd のまま | 不採用。中継とベアラートークンの検証を自前で組むことになり、部品が増える。2026-09 に始まり 2 スターの若いプロジェクトである |
 | C | CalDAV、CardDAV、IMAP の MCP サーバーを自作する | 不採用。必要な機能は A にそろっており、保守をすべて抱えることになる |
 | A' | A でメールは mailboxd に残す | 不採用。コネクタが一人二つになり、似た公開の仕組みを二つ持つことになる |
-| A'' | A を fork し、fork で Release とイメージを出す | 不採用。独自の変更が下書きのツールだけなら、ビルド時のパッチで足りる。fork を上流に追いつかせる作業は、コミット SHA を上げる作業と変わらない |
+| A'' | A で、fork の代わりに上流の Release にビルド時のパッチを当てる | 不採用。上流の更新に自動で追いつける利点はあるが、足す機能が下書き、下書きフォルダーの設定、ヘッダーの三つになり、そのテストもパッチに入る。上流の `Dockerfile` はテストを走らせず、このリポジトリの CI も .NET のテストを走らせないので、パッチのテストはどこでも実行されない。パッチを直すたびに clone、適用、差分の取り直しが要る |
 
 A の弱点と対策は次のとおり。
 
 - API キーがアカウントに結びつかない。一人一つのコンテナに分け、各コンテナには本人のアカウントだけを入れる
 - 送信と配信停止を一つずつ止められない。`emailSend: false` で両方まとめて止める
-- 下書きのツールがない。ビルド時のパッチで `save_draft` を足す
-- 配布イメージがない。`aged_release` で `Release x.y.z` のコミットを選び、fox でビルドする
+- 下書きのツール、下書きフォルダーの設定、ヘッダーの取得がない。fork にテスト付きで足し、上流にも PR を出す
+- 配布イメージがない。fox で fork からビルドする
+- 上流の更新に自動では追いつかない。上流の新しい Release が待機期間を過ぎたら、fork の既定ブランチをその上に手で rebase する。PR がすべて取り込まれたら fork をやめ、上流の Release を `aged_release` で追う形に戻す
 
 ## 構成
 
@@ -81,22 +82,25 @@ flowchart LR
 
 ### calendar_mcp ロール
 
-新しいロール `calendar_mcp` を作り、fox の playbook（`home-primary.yml`）に加える。`roles/filebrowser` と `roles/mailboxd` を手本にし、コンポーネントは source、config、container、apache、fail2ban とする。
+新しいロール `calendar_mcp` を作り、fox の playbook（`home-primary.yml`）に加える。`roles/filebrowser` と `roles/mailboxd` を手本にし、コンポーネントは config、container、apache、fail2ban とする。イメージのビルドは、compose がそのイメージを使うので container コンポーネントに含める。
 
-#### source コンポーネント
+#### fork（`rewse/calendar-mcp`）
 
-- `aged_release` の `github-commit:` に、コミットの題に当てる正規表現の引数（例: `message='^Release (\d+\.\d+\.\d+)'`）を足す。既定ブランチで、cooldown 日数より古く、題が一致する最新のコミットを選び、`{version, commit}` を返す。`version` は正規表現の最初のグループとする。引数がなければ今の動作のままにする。`tests/test_aged_release.py` にテストを足す
-- 上流を `/usr/local/src/calendar-mcp` に、選んだコミット SHA で checkout する
-- パッチ（`files/save-draft.patch`）を checkout に当てる。当たらなければ失敗させ、古いイメージのまま動かし続ける。当てる前に、すでに当たっているかを `git apply --check --reverse` などで判定し、二回目の実行で `changed` にしない
-- ビルドは上流の `Dockerfile` を使い、イメージのタグに版とコミット SHA を入れる（例: `calendar-mcp:1.9.0-6486836`）。ビルドは fox で行う
+- `~/git/calendar-mcp` に clone する。既定ブランチは `rewse` とし、待機期間を過ぎた上流の `Release x.y.z` のコミットの上に、自分たちのコミットを積む。上流の `main` はそのまま上流を映す
+- 足す変更は三つで、それぞれをコードとテストを含む一つのコミットにする。上流の作法（`src/CalendarMcp.Tests` の MSTest と Rocks のモック、`changelogs/`）に合わせる
+  - 下書きフォルダーの設定: IMAP の `providerConfig` に任意の `draftsFolder` を足し、`drafts` の別名（`move_email` と `get_emails` の `folder`）がそれを使う。Sakura は SPECIAL-USE を広告せず、下書きフォルダーは `INBOX.Draft` なので、これがないと下書きの置き場所が見つからない
+  - 下書きの保存: ツール `save_draft` を足す。引数は `accountId`、宛先、件名、本文、本文の形式、CC、返信元のメール ID（任意）とする。返信元があれば `In-Reply-To` と `References` を付ける。権限は `emailRead` で判定する。メールボックスの中を整理する操作と同じ扱いで、外には何も出さないからである。`IProviderService` には既定の実装（`NotSupportedException` を投げる）付きでメソッドを足し、IMAP 以外のプロバイダーには手を入れない
+  - ヘッダー: IMAP の `get_email_details` が、すべてのヘッダーを順番のまま `headers`（`name` と `value` の組の並び）で返す。上流はヘッダーを返さず、Muse が迷惑メールの判定に使う `ARC-Authentication-Results` を読めない
+- 三つの変更はそれぞれ上流の `main` を元にしたブランチにも置き、上流に PR を出す（PR を出すのは後日でよい）
+- 上流の `ci.yml` は `main` でしか走らないので、`rewse` でも `dotnet test` が走るよう、fork だけのコミットで CI の対象ブランチを足す。上流の `release.yml` と `claude.yml` は fork では無効にする
+- fork は AGENTS.md の「GitHub Configuration」の対象外（upstream の fork）とする
 
-#### 下書きのパッチ
+#### イメージのビルド
 
-- IMAP のプロバイダー（`ImapProviderService`）に、メッセージを Drafts フォルダーに `\Draft` と `\Seen` のフラグで APPEND するメソッドを足す。Drafts フォルダーは既存の特殊フォルダーの解決（`SpecialFolder.Drafts`）で見つける
-- `IProviderService` には既定の実装（`NotSupportedException` を投げる）付きでメソッドを足し、ほかのプロバイダーには手を入れない
-- ツール `save_draft` を足す。引数は `accountId`、宛先、件名、本文、返信元のメール ID（任意）とする。返信元があれば `In-Reply-To` と `References` を付ける。権限は `emailRead` で判定する。メールボックスの中を整理する操作と同じ扱いで、外には何も出さないからである
-- パッチは小さく保つ。新しいファイル一つと既存のファイル数個を想定する
-- パッチの単体テストは上流のテストプロジェクト（`src/CalendarMcp.Tests`）に足し、ビルド時に走らせるかどうかは実装者が決める
+- `aged_release` の `github-commit:` で `rewse/calendar-mcp` の既定ブランチの最新のコミットを選ぶ。自分のリポジトリなので待機期間は付けない（`days=0`）。上流から取り込むコミットの待機期間は、rebase の元を待機期間を過ぎた Release に限ることで守る
+- `/usr/local/src/calendar-mcp` に、選んだコミット SHA で checkout する
+- ビルドは fork の `Dockerfile` を使い、イメージのタグはコミット SHA の先頭 12 文字にする（例: `calendar-mcp:6486836...`）。checkout の前にイメージの有無を確かめるので、checkout してから分かる版はタグに入れない。ビルドは fox で行い、同じタグのイメージがあればビルドを飛ばす
+- `aged_release` の `github-commit:` に足した題の正規表現の引数（`message`）は、PR がすべて取り込まれて上流の Release を追う形に戻すときに使う
 
 #### config コンポーネント
 
@@ -170,11 +174,11 @@ AGENTS.md の「Subdomains」の手順に従う。
 
 ### 更新
 
-`update` タグで `aged_release` が新しい `Release x.y.z` のコミットを選び、ビルドし直す。上流は 1.x で、変更ごとに changelog（`changelogs/`）を残している。新しい版を入れたときにパッチが当たらなければビルドが止まるので、パッチを直す。
+上流の新しい Release が待機期間（`supply_chain_cooldown_days`）を過ぎたら、fork の `rewse` をその上に rebase し、`dotnet test` を通して push する。`update` タグでは fork の新しいコミットを選び、ビルドし直す。上流は 1.x で、変更ごとに changelog（`changelogs/`）を残しているので、rebase の前に読む。PR が上流に取り込まれたら、そのコミットは rebase で消える。三つとも取り込まれたら、`aged_release` の対象を上流の Release（`message='^Release (\d+\.\d+\.\d+)'`）に戻し、fork を archive する。
 
 ## 進め方
 
-1. `aged_release` に題の正規表現の引数を足す
+1. `aged_release` に題の正規表現の引数を足し、fork を作って三つの変更をテスト付きで積む
 2. fox に `calendar_mcp` ロールを入れる。まず ts のコンテナだけを使い、家から確かめる。この段階では mailboxd はそのまま動かしておく
 3. Cloudflare の Quick Tunnel を fox で手で起動し、ts のコンテナに直接つないで、Muse から確かめる。確かめ終わったらトンネルを止める。mailboxd で使った手順と同じ
 4. 段階 3 が通ったら、cloudfront-waf、UniFi の DNS、security-agent を入れ、Muse のコネクタの URL を `https://calendar-mcp.rewse.jp/mcp/ts` に替える
@@ -202,9 +206,9 @@ AGENTS.md の「Subdomains」の手順に従う。
 ## 残るリスク
 
 - App 用パスワードは iCloud のメール、連絡先、カレンダーすべてに届く。fox が侵害されると、二人の iCloud と Sakura のメールが読まれる。App 用パスワードは appleid.apple.com で一つずつ取り消せる
-- 監査ログが mailboxd より弱いかもしれない。mailboxd はツールの呼び出しごとに SQLite に記録していたが、calendar-mcp がツールの呼び出しをどこまでログに残すかは確かめていない。足りなければ、ログの水準を上げるか、パッチで記録を足すかを実装者が判断する
+- 監査ログが mailboxd より弱いかもしれない。mailboxd はツールの呼び出しごとに SQLite に記録していたが、calendar-mcp がツールの呼び出しをどこまでログに残すかは確かめていない。fox で試した範囲では、ツールの呼び出しは accountId 付きで INF のログに残る
 - 予定と連絡先の削除は取り消せない。利用者が選んだ
-- 上流の開発が止まる、または互換性のない変更が続く場合。コミット SHA で固定しているので急に壊れはしない。パッチの手直しが重くなれば、fork や乗り換えをその時点で判断する
+- 上流の開発が止まる、または互換性のない変更が続く場合。fork のコミット SHA で固定しているので急に壊れはしない。rebase の手直しが重くなれば、乗り換えをその時点で判断する。PR が断られた変更は fork に残り続ける
 - 一人一つのコンテナに .NET のランタイムが載るので、mailboxd よりメモリを使う
 
 ## 実装者に任せること
@@ -213,7 +217,7 @@ AGENTS.md の「Subdomains」の手順に従う。
 - 1Password の項目の作り方と項目 ID
 - 一人ずつの設定を並べる変数の形
 - `aged_release` の新しい引数の名前
-- パッチの細部（ツールの説明文、引数名、HTML 本文への対応）
+- fork の変更の細部（ツールの説明文、引数名、HTML 本文への対応）
 - ビルドの方法（`community.docker.docker_image_build` か Compose の `build:` か）とイメージのタグの形
 - `/srv/calendar_mcp` をバックアップの対象に加えるかどうか
 - ログの水準とメモリの上限
