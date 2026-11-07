@@ -8,7 +8,7 @@
 
 **Tech Stack:** Ansible（community.docker 5.2.1）、pytest、CloudFormation、AWS CLI（Route53、Security Agent）、UniFi Site Manager API、gh
 
-**Spec:** `docs/superpowers/specs/2026-11-07-mailboxd-restore-design.md`
+**Spec:** `docs/superpowers/archive/specs/2026-11-07-mailboxd-restore-design.md`
 
 ## Global Constraints
 
