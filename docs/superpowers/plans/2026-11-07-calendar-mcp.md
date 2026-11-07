@@ -10,7 +10,7 @@
 
 **Spec:** `docs/superpowers/specs/2026-11-07-calendar-mcp-design.md`
 
-**改訂（2026-11-07）:** 設計を fork 方式に改めた。Task 2 と Task 3 は実施済みの記録として残すが、そのパッチの作成と適用は、Task 12（fork に三つの変更をテスト付きで積む）と Task 13（ロールを fork からのビルドに切り替える）で置き換える。Task 12 と 13 は Task 8 より前に行う。
+**改訂（2026-11-07）:** 設計を fork 方式に改めた。Task 2 と Task 3 は実施済みの記録として残すが、そのパッチの作成と適用は、Task 12 から 15（fork と三つの変更をテスト付きで積む）と Task 16（ロールを fork からのビルドに切り替える）で置き換える。Task 12 から 16 は Task 8 より前に行う。
 
 ## Global Constraints
 
@@ -32,8 +32,8 @@
 
 - ts のトークンで `/mcp/ubiqu` を呼ぶ、または `accountId` に `ubiqu-sakura` を渡す。前者は 401、後者は存在しないアカウントとして拒否されること（Task 7 Step 4）
 - `/mcp/ts/`（末尾のスラッシュ）、`/mcp/ts/admin/ui`、`/mcp/ts/attachments`、`/mcp/kyn` のような完全一致でないパス。どれも 403 で、コンテナに届かないこと（Task 6 のテスト）
-- fork の既定ブランチに新しいコミットを push したとき。次の `update` でイメージを作り直し、同じコミットなら作り直さないこと（Task 13 のテスト、タグにコミット SHA を入れる）
-- `save_draft` を `emailRead` のないアカウントで呼ぶ。プロバイダーを呼ばずに拒否されること（Task 12 のテスト）
+- fork の既定ブランチに新しいコミットを push したとき。次の `update` でイメージを作り直し、同じコミットなら作り直さないこと（Task 16 のテスト、タグにコミット SHA を入れる）
+- `save_draft` を `emailRead` のないアカウントで呼ぶ。プロバイダーを呼ばずに拒否されること（Task 14 のテスト）
 - 引用符、バックスラッシュ、`$` を含むパスワード。`appsettings.json` が正しい JSON のままで、`.env` の値も変わらないこと（Task 4 のテスト）
 
 ---
@@ -108,9 +108,9 @@ git add plugins/lookup/aged_release.py tests/test_aged_release.py
 git commit -m "feat(aged_release): select a commit by a subject pattern"
 ```
 
-### Task 2: 下書きのパッチ（Task 12 で置き換え）
+### Task 2: 下書きのパッチ（Task 13 から 15 で置き換え）
 
-> 実施済み。fork 方式への改訂で、ここで作るパッチは Task 13 で削除し、同じ変更を Task 12 で fork にテスト付きで積み直す。新しく実行しない。
+> 実施済み。fork 方式への改訂で、ここで作るパッチは Task 16 で削除し、同じ変更を Task 13 から 15 で fork にテスト付きで積み直す。新しく実行しない。
 
 上流の作業用 clone で変更とテストを書き、差分をロールのファイルにする。
 
@@ -192,9 +192,9 @@ git add roles/calendar_mcp/files/save-draft.patch
 git commit -m "feat(calendar_mcp): add a save_draft tool patch for the IMAP provider"
 ```
 
-### Task 3: source コンポーネント（Task 13 で置き換え）
+### Task 3: source コンポーネント（Task 16 で置き換え）
 
-> 実施済み。Task 5 で container コンポーネントに統合し、パッチの適用は Task 13 で fork からのビルドに置き換える。新しく実行しない。
+> 実施済み。Task 5 で container コンポーネントに統合し、パッチの適用は Task 16 で fork からのビルドに置き換える。新しく実行しない。
 
 **Files:**
 - Create: `roles/calendar_mcp/tasks/main.yml`、`roles/calendar_mcp/tasks/source.yml`、`roles/calendar_mcp/vars/main.yml`、`roles/calendar_mcp/meta/main.yml`（`fail2ban` と `httpd` に依存、mailboxd と同じ）
@@ -647,128 +647,370 @@ cloudfront-waf から `mail-mcp.rewse.jp` を外してデプロイと DNS の切
 
 ブランチ全体のレビューのあと、`main` にマージする。マージのコミットで、mailboxd の設計と計画（`2026-11-02-mailboxd-mcp-design.md`、`2026-11-02-mailboxd-mcp.md`）とこの設計と計画を `git mv` で `docs/superpowers/archive/specs/` と `docs/superpowers/archive/plans/` に移す。
 
-### Task 12: fork に三つの変更をテスト付きで積む
-
-`~/git/calendar-mcp`（fork の clone）で行う。三つの変更は、`/tmp/calmcp-patch.*` の作業ツリーと `roles/calendar_mcp/files/calendar-mcp.patch` にある実装を参考にしてよいが、テストを先に書いてアサーションで落ちるのを確かめてから実装を入れる。コンパイルエラーは RED とみなさない。テストが参照する型やメソッドは、先に中身のない形（`throw new NotImplementedException()` や空の戻り値）で足してコンパイルを通す。
+### Task 12: fork と CI
 
 **Files（fork の中）:**
-- Modify: `.github/workflows/ci.yml`（`push.branches` と `pull_request.branches` に `rewse`）
-- Modify: `src/CalendarMcp.Core/Providers/ImapProviderService.cs`、`src/CalendarMcp.Core/Services/IProviderService.cs`、`src/CalendarMcp.Core/Models/EmailMessage.cs`、`src/CalendarMcp.Core/Tools/GetEmailDetailsTool.cs`、`src/CalendarMcp.HttpServer/Program.cs`、`src/CalendarMcp.StdioServer/Program.cs`（ツールの登録は両方のサーバーに）、`docs/IMAP-SETUP.md`（`draftsFolder`）
-- Create: `src/CalendarMcp.Core/Tools/SaveDraftTool.cs`、`changelogs/2026-11-07-imap-drafts-folder.md`、`changelogs/2026-11-07-save-draft-tool.md`、`changelogs/2026-11-07-email-headers.md`
-- Test: `src/CalendarMcp.Tests/Providers/ImapProviderServiceTests.cs`、`src/CalendarMcp.Tests/Tools/SaveDraftToolTests.cs`（新規）、`src/CalendarMcp.Tests/Tools/GetEmailDetailsToolTests.cs`、`src/CalendarMcp.Tests/Tools/PermissionEnforcementTests.cs`
+- Modify: `.github/workflows/ci.yml`（`on.push.branches` と `on.pull_request.branches`）
 
 **Interfaces:**
-- Produces: fork `rewse/calendar-mcp` の既定ブランチ `rewse`。上流の `6486836`（Release 1.9.0）の上に、CI のコミットと三つの変更のコミットがこの順で載る
-- Produces: Task 2 の Interfaces と同じ `save_draft`、`IProviderService.SaveDraftAsync`、`ImapProviderService.BuildDraftMessage`。加えて `ImapAccountConfig.DraftsFolder`（`string?`、既定 null）、`internal static List<EmailHeader> ImapProviderService.ToEmailHeaders(HeaderList)`、`EmailMessage.Headers`（`List<EmailHeader>?`）、`public sealed record EmailHeader(string Name, string Value)`、`get_email_details` の応答の `headers`（`[{name, value}]`、ヘッダーを持たないプロバイダーでは null）
+- Produces: fork `rewse/calendar-mcp`、その clone `~/git/calendar-mcp`（remote `origin` が fork、`upstream` が MarimerLLC）、既定ブランチ `rewse`（上流の `6486836` Release 1.9.0 の上に CI のコミット一つ）。Task 13 から 15 はこのブランチに積む
 
-- [ ] **Step 1: fork と clone**
+- [ ] **Step 1: fork する**
 
-Run: `gh repo fork MarimerLLC/calendar-mcp --clone=false && git clone https://github.com/rewse/calendar-mcp.git ~/git/calendar-mcp && cd ~/git/calendar-mcp && git remote add upstream https://github.com/MarimerLLC/calendar-mcp.git && git switch -c rewse 6486836`
-Expected: `git -P log --oneline -1` が `6486836 Release 1.9.0 (#115)`
+Run: `gh repo fork MarimerLLC/calendar-mcp --clone=false`
+Expected: `gh repo view rewse/calendar-mcp --json parent -q .parent.nameWithOwner` が `MarimerLLC/calendar-mcp`
 
-- [ ] **Step 2: CI の対象ブランチ**
+- [ ] **Step 2: clone してブランチを作る**
 
-`ci.yml` の二つの `branches` に `rewse` を足して commit する（`ci: run CI on the rewse branch`）。fork の Actions を有効にし、`gh workflow disable release.yml -R rewse/calendar-mcp` と `gh workflow disable claude.yml -R rewse/calendar-mcp` で二つを止める。
+Run: `git clone -q https://github.com/rewse/calendar-mcp.git ~/git/calendar-mcp && git -C ~/git/calendar-mcp remote add upstream https://github.com/MarimerLLC/calendar-mcp.git && git -C ~/git/calendar-mcp switch -c rewse 6486836`
+Expected: `git -C ~/git/calendar-mcp -P log --oneline -1` が `6486836 Release 1.9.0 (#115)`
 
-- [ ] **Step 3: 下書きフォルダーの設定（RED）**
+- [ ] **Step 3: CI の対象に `rewse` を足す**
 
-`ImapProviderServiceTests` に `ResolveConfiguredFolder_MapsDraftsToConfiguredFolder`（`CustomFolders with { DraftsFolder = "INBOX.Draft" }` で `drafts` が `"INBOX.Draft"`）を書く。`ImapAccountConfig` に `string? DraftsFolder = null` だけを足してコンパイルを通す。
-Run: `container run --rm -m 6G -c 4 -v "$PWD":/src -w /src mcr.microsoft.com/dotnet/sdk:10.0 dotnet test src/CalendarMcp.Tests --filter ResolveConfiguredFolder`
-Expected: `MapsDraftsToConfiguredFolder` が `Assert.AreEqual failed. Expected:<INBOX.Draft>. Actual:<(null)>` で FAIL、ほかは PASS
+`.github/workflows/ci.yml` の `on.push.branches` と `on.pull_request.branches` を `[main, rewse]` にする。ほかの行は変えない（上流に送らない fork だけのコミットなので、差分を小さく保つ）。
 
-- [ ] **Step 4: 下書きフォルダーの設定（GREEN）と commit**
+- [ ] **Step 4: Commit と push**
 
-`ResolveConfiguredFolder` の `Drafts` と `ResolveConfigAsync` の `draftsFolder` を足し、`docs/IMAP-SETUP.md` の設定の表と changelog を書く。全テストを通して commit する（`Add an optional draftsFolder for IMAP accounts`）。`ResolveConfigAsync` は上流にも単体テストがなく、`sentFolder` なども同じなので、`draftsFolder` の読み取りは Task 13 の実機の確認で押さえる。
-
-- [ ] **Step 5: 下書きの保存（RED）**
-
-`SaveDraftToolTests` に次を書く。`SaveDraftTool` は引数を受けて `throw new NotImplementedException()` するだけの形、`IProviderService.SaveDraftAsync` は既定の実装付きの宣言、`BuildDraftMessage` は `new MimeMessage()` を返すだけの形で先に足す。
-
-```csharp
-SaveDraft_EmptyAccountId_ThrowsMcpException          // "accountId is required"
-SaveDraft_NoRecipients_ThrowsMcpException            // to = [] → "At least one recipient is required in 'to'."
-SaveDraft_AccountWithoutEmailRead_IsRefused          // Scoped(..., CalendarRead) → McpException, provider not called
-SaveDraft_EmailReadOnly_SavesWithoutSendPermission   // Scoped(..., EmailRead): provider.SaveDraftAsync("acc-1", "a@example.com, b@example.com", "s", "b", "text", null, "INBOX/1/2", ...) once; JSON success=true, draftEmailId="INBOX.Draft/9/3"
+```bash
+git add .github/workflows/ci.yml
+git commit -m "ci: run CI on the rewse branch"
+git push -u origin rewse
 ```
 
-`ImapProviderServiceTests` に Task 2 の `BuildDraftMessage_SetsHeadersAndUtf8Body` と `BuildDraftMessage_ThreadsAReply` を書く。`PermissionEnforcementTests` に、`emailRead` のない IMAP アカウントで `save_draft` が拒否されるテストを、既存の `move_email` の形に合わせて足す。
-Run: `... dotnet test src/CalendarMcp.Tests --filter "SaveDraft|BuildDraftMessage|PermissionEnforcement"`
-Expected: 新しいテストが `NotImplementedException` かアサーションで FAIL
+- [ ] **Step 5: 既定ブランチと Actions を設定する**
 
-- [ ] **Step 6: 下書きの保存（GREEN）と commit**
+Run: `gh repo edit rewse/calendar-mcp --default-branch rewse && gh api -X PUT repos/rewse/calendar-mcp/actions/permissions -F enabled=true -f allowed_actions=all && gh workflow disable release.yml -R rewse/calendar-mcp && gh workflow disable claude.yml -R rewse/calendar-mcp`
+Expected: `gh workflow list -R rewse/calendar-mcp --all` で `Build and Release` と `Claude Code` が `disabled_manually`、`CI Build` が `active`
 
-Task 2 Step 4 の内容で実装し、二つのサーバーの `Program.cs` に登録して changelog を書く。全テストを通して commit する（`Add a save_draft tool for IMAP accounts`）。IMAP の APPEND とフラグは上流にも IMAP サーバーのモックがないので、Task 13 の実機の確認で押さえる。
+- [ ] **Step 6: CI が通ることを確かめる**
 
-- [ ] **Step 7: ヘッダー（RED）**
+Run: `gh workflow run ci.yml -R rewse/calendar-mcp --ref rewse && sleep 10 && gh run watch -R rewse/calendar-mcp --exit-status "$(gh run list -R rewse/calendar-mcp -w ci.yml -b rewse -L 1 --json databaseId -q '.[0].databaseId')"`
+Expected: 成功。`ci.yml` に `workflow_dispatch` がなく `workflow run` が拒まれたら、Step 4 の push で起きた run を `gh run list` で探して待つ
 
-`ImapProviderServiceTests` に `ToEmailHeaders_KeepsEveryFieldInOrder`（Received が二つ、`ARC-Authentication-Results` が一つ、順番と値が保たれる）、`GetEmailDetailsToolTests` に `GetEmailDetails_ReturnsHeadersWhenProviderHasThem`（応答の `headers[0].name` と `value`）と `GetEmailDetails_HeadersNullWhenProviderHasNone` を書く。`EmailHeader` と `EmailMessage.Headers` を宣言し、`ToEmailHeaders` は空のリストを返す形で先に足す。
-Run: `... dotnet test src/CalendarMcp.Tests --filter "ToEmailHeaders|GetEmailDetails"`
-Expected: 新しい三つのうち、`ToEmailHeaders` と `ReturnsHeaders` がアサーションで FAIL
+### Task 13: IMAP の `draftsFolder`
 
-- [ ] **Step 8: ヘッダー（GREEN）と commit**
+以下、fork の Task はすべて `~/git/calendar-mcp` の `rewse` ブランチで行う。.NET の SDK は Mac に入っていないので、`DOTNET='container run --rm -m 6G -c 4 -v '"$PWD"':/src -w /src mcr.microsoft.com/dotnet/sdk:10.0 dotnet'` として `$DOTNET test src/CalendarMcp.Tests ...` で走らせる。
 
-IMAP の詳細の組み立てで `Headers = ToEmailHeaders(m.Headers)` を設定し、ツールの応答に `headers` を足して、ツールの説明文と changelog を直す。全テストを通して commit する（`Return email headers from get_email_details`）。
+**Files:**
+- Modify: `src/CalendarMcp.Core/Providers/ImapProviderService.cs`（`ImapAccountConfig`、`ResolveConfigAsync`、`ResolveConfiguredFolder`）
+- Modify: `docs/IMAP-SETUP.md`（設定の表に `draftsFolder`）
+- Create: `changelogs/2026-11-07-imap-drafts-folder.md`（`changelogs/2026-09-23-move-email-folder-aliases.md` と同じ見出しの形）
+- Test: `src/CalendarMcp.Tests/Providers/ImapProviderServiceTests.cs`
 
-- [ ] **Step 9: push と CI**
+**Interfaces:**
+- Produces: `ImapAccountConfig` の末尾の引数 `string? DraftsFolder = null`。`providerConfig` の `draftsFolder`（任意、既定なし）から読む
+- Produces: `ResolveConfiguredFolder(WellKnownMailFolder.Drafts, cfg)` が `cfg.DraftsFolder` を返す。null なら今までどおり SPECIAL-USE に落ちる
 
-Run: `git push -u origin rewse && gh repo edit rewse/calendar-mcp --default-branch rewse && gh run watch -R rewse/calendar-mcp --exit-status $(gh run list -R rewse/calendar-mcp -b rewse -L 1 --json databaseId -q '.[0].databaseId')`
-Expected: CI Build が成功
+- [ ] **Step 1: 失敗するテストを書く**
 
-### Task 13: ロールを fork からのビルドに切り替える
+```csharp
+[TestMethod]
+public void ResolveConfiguredFolder_MapsDraftsToConfiguredFolder()
+{
+    Assert.IsTrue(MailFolderAliases.TryParse("drafts", out var folder));
+
+    Assert.AreEqual("INBOX.Draft", ImapProviderService.ResolveConfiguredFolder(
+        folder, CustomFolders with { DraftsFolder = "INBOX.Draft" }));
+}
+```
+
+既存の `ResolveConfiguredFolder_ReturnsNullForSpecialUseOnlyAliases`（`archive` と `drafts`）は、`CustomFolders` が `DraftsFolder` を持たないので変えずに通る。そのコメントの「No providerConfig key for these」は「No providerConfig key for archive, and none set here for drafts」に直す。
+
+- [ ] **Step 2: コンパイルだけ通す**
+
+`ImapAccountConfig` の末尾に `string? DraftsFolder = null` を足す。ほかは変えない。
+
+- [ ] **Step 3: 失敗を確かめる**
+
+Run: `$DOTNET test src/CalendarMcp.Tests --filter ResolveConfiguredFolder`
+Expected: `ResolveConfiguredFolder_MapsDraftsToConfiguredFolder` だけが `Assert.AreEqual failed. Expected:<INBOX.Draft>. Actual:<(null)>` で FAIL
+
+- [ ] **Step 4: 実装する**
+
+`ResolveConfiguredFolder` に `WellKnownMailFolder.Drafts => cfg.DraftsFolder` を足し、`ResolveConfigAsync` で `draftsFolder` が空でなければ渡す（空なら null）。`docs/IMAP-SETUP.md` の表と changelog に、SPECIAL-USE を広告しないサーバー（例として `INBOX.Draft` を使うもの）のための設定であることを書く。`ResolveConfigAsync` の読み取りは、`sentFolder` などと同じく上流に単体テストがないので、Task 16 の実機で確かめる。
+
+- [ ] **Step 5: 通ることを確かめる**
+
+Run: `$DOTNET test src/CalendarMcp.Tests`
+Expected: `Failed: 0`
+
+- [ ] **Step 6: Commit**
+
+```bash
+git add src/CalendarMcp.Core/Providers/ImapProviderService.cs src/CalendarMcp.Tests/Providers/ImapProviderServiceTests.cs docs/IMAP-SETUP.md changelogs/2026-11-07-imap-drafts-folder.md
+git commit -m "Add an optional draftsFolder for IMAP accounts"
+```
+
+### Task 14: `save_draft`
+
+**Files:**
+- Create: `src/CalendarMcp.Core/Tools/SaveDraftTool.cs`、`changelogs/2026-11-07-save-draft-tool.md`
+- Modify: `src/CalendarMcp.Core/Services/IProviderService.cs`（CRLF のまま）、`src/CalendarMcp.Core/Providers/ImapProviderService.cs`、`src/CalendarMcp.HttpServer/Program.cs`、`src/CalendarMcp.StdioServer/Program.cs`（どちらも `MoveEmailTool` の次に登録）
+- Test: `src/CalendarMcp.Tests/Tools/SaveDraftToolTests.cs`（新規）、`src/CalendarMcp.Tests/Tools/PermissionEnforcementTests.cs`、`src/CalendarMcp.Tests/Providers/ImapProviderServiceTests.cs`
+
+**Interfaces:**
+- Consumes: Task 13 の `ImapAccountConfig.DraftsFolder`（`drafts` の解決に使う）
+- Produces: `IProviderService.SaveDraftAsync(string accountId, string to, string subject, string body, string bodyFormat = "html", List<string>? cc = null, string? inReplyToEmailId = null, CancellationToken cancellationToken = default)`、返り値 `Task<string?>`（下書きのメール ID、UID が分からなければ null）。既定の実装は `NotSupportedException("This provider does not support saving drafts.")`
+- Produces: `public sealed class SaveDraftTool(IAccountRegistry, IProviderServiceFactory, ILogger<SaveDraftTool>)` の `Task<string> SaveDraft(string accountId, List<string> to, string subject, string body = "", string bodyFormat = "html", List<string>? cc = null, string? inReplyToEmailId = null)`。MCP の名前は `save_draft`。応答は `{success, accountId, draftEmailId, message}`
+- Produces: `internal static MimeMessage ImapProviderService.BuildDraftMessage(string from, string to, List<string>? cc, string subject, string body, string bodyFormat, string? inReplyToMessageId, IEnumerable<string>? references)`
+
+- [ ] **Step 1: 失敗するテストを書く**
+
+`SaveDraftToolTests.cs`（`MoveEmailToolTests` と同じ using と組み立て。`NewTool()` は空の `IAccountRegistryCreateExpectations` と `IProviderServiceFactoryCreateExpectations` で `SaveDraftTool` を作る補助）:
+
+```csharp
+[TestMethod]
+public async Task SaveDraft_EmptyAccountId_ThrowsMcpException()
+{
+    var ex = await Assert.ThrowsExactlyAsync<McpException>(
+        () => NewTool().SaveDraft("", ["a@example.com"], "s"));
+    Assert.AreEqual("accountId is required", ex.Message);
+}
+
+[TestMethod]
+public async Task SaveDraft_NoRecipients_ThrowsMcpException()
+{
+    var ex = await Assert.ThrowsExactlyAsync<McpException>(
+        () => NewTool().SaveDraft("acc-1", [], "s"));
+    Assert.AreEqual("At least one recipient is required in 'to'.", ex.Message);
+}
+
+[TestMethod]
+public async Task SaveDraft_Success_PassesArgumentsAndReturnsDraftId()
+{
+    // regExp: GetAccountAsync("acc-1") → TestData.CreateAccount(id: "acc-1", provider: "imap")
+    // provExp.Setups.SaveDraftAsync("acc-1", "a@example.com, b@example.com", "s", "b", "text",
+    //     null, "INBOX/1/2", Arg.Any<CancellationToken>()).ReturnValue(Task.FromResult<string?>("INBOX.Draft/9/3"))
+    // factExp.Setups.GetProvider("imap").ReturnValue(provExp.Instance())
+    var doc = JsonDocument.Parse(await tool.SaveDraft(
+        "acc-1", ["a@example.com", "b@example.com"], "s", "b", "text", null, "INBOX/1/2"));
+    Assert.IsTrue(doc.RootElement.GetProperty("success").GetBoolean());
+    Assert.AreEqual("INBOX.Draft/9/3", doc.RootElement.GetProperty("draftEmailId").GetString());
+    regExp.Verify(); factExp.Verify(); provExp.Verify();
+}
+```
+
+`PermissionEnforcementTests.cs`（`SendEmail_ReadOnlyAccount_Throws` と同じ形）:
+
+```csharp
+SaveDraft_AccountWithoutEmailRead_Throws
+    // Scoped("cal-only", AccountPermission.CalendarRead, provider: "imap"); provider factory with no setups
+    // McpException whose message contains "does not permit reading email"
+SaveDraft_ReadOnlyAccount_SavesWithoutSendPermission
+    // Scoped("read-only", AccountPermission.EmailRead, provider: "imap"); SaveDraftAsync set up as above
+    // returns success=true — saving a draft needs no emailSend
+```
+
+`ImapProviderServiceTests.cs`:
+
+```csharp
+[TestMethod]
+public void BuildDraftMessage_SetsHeadersAndUtf8Body()
+{
+    var m = ImapProviderService.BuildDraftMessage(
+        "me@example.com", "a@example.com, b@example.com", null, "件名テスト", "本文テスト", "text", null, null);
+    Assert.AreEqual("me@example.com", m.From.Mailboxes.Single().Address);
+    CollectionAssert.AreEqual(new[] { "a@example.com", "b@example.com" },
+        m.To.Mailboxes.Select(x => x.Address).ToArray());
+    Assert.AreEqual("件名テスト", m.Subject);
+    var part = m.Body as MimeKit.TextPart;
+    Assert.IsNotNull(part);
+    Assert.AreEqual("本文テスト", part.Text);
+    Assert.IsTrue(part.IsPlain);
+}
+
+[TestMethod]
+public void BuildDraftMessage_ThreadsAReply()
+{
+    var m = ImapProviderService.BuildDraftMessage(
+        "me@example.com", "a@example.com", null, "Re: x", "<p>y</p>", "html",
+        "orig@example.com", new[] { "root@example.com", "orig@example.com" });
+    Assert.AreEqual("orig@example.com", m.InReplyTo);
+    CollectionAssert.AreEqual(new[] { "root@example.com", "orig@example.com" }, m.References.ToArray());
+    var part = m.Body as MimeKit.TextPart;
+    Assert.IsNotNull(part);
+    Assert.IsTrue(part.IsHtml);
+}
+```
+
+- [ ] **Step 2: コンパイルだけ通す**
+
+`IProviderService.SaveDraftAsync` を既定の実装付きで宣言する。`SaveDraftTool` を上の形で作り、`SaveDraft` の本体は `throw new NotImplementedException();` にする。`BuildDraftMessage` は `new MimeMessage()` を返すだけにする。Rocks が `IProviderService` の既定の実装を持つメソッドの `Setups` を作らなければ、そのテストは `IImapProviderService` のモックに替える。
+
+- [ ] **Step 3: 失敗を確かめる**
+
+Run: `$DOTNET test src/CalendarMcp.Tests --filter "SaveDraft|BuildDraftMessage"`
+Expected: 新しい七つがすべて FAIL。ツールのテストは `NotImplementedException` が期待した `McpException` でないため、`BuildDraftMessage` のテストはアサーションで落ちる
+
+- [ ] **Step 4: 実装する**
+
+- `SaveDraftTool.SaveDraft`: `MoveEmailTool` と同じ順で `ToolGuard.RequireNonEmpty(accountId)`、宛先の確認、`ToolGuard.RequireAccountAsync(..., AccountPermission.EmailRead)`、プロバイダーの呼び出し。宛先は `string.Join(", ", to)` で渡す。説明文に、下書きを保存するだけで送信しないことと、返信には `inReplyToEmailId` を渡すことを書く
+- `ImapProviderService.SaveDraftAsync`: 返信元があれば `ParseEmailId` と `EnsureUidValidity` のうえで `MessageSummaryItems.Envelope | MessageSummaryItems.References` を fetch し、`In-Reply-To` は返信元の Message-Id、`References` は返信元の References に Message-Id を足したものにする。下書きの置き場所は `ResolveFolderAsync(client, cfg, "drafts", ct)`、フラグは `MessageFlags.Draft | MessageFlags.Seen`。ID は APPEND が返す UID と `UidValidity` から `FormatEmailId` で作る
+- `BuildDraftMessage`: 差出人は `cfg.Username`、本文は `bodyFormat` が `text` なら plain、それ以外は html の `TextPart`。`SendEmailAsync` の組み立てとは共有しない
+- 二つの `Program.cs` に登録し、changelog に `emailRead` で判定する理由（外に何も出さない）を書く
+
+- [ ] **Step 5: 通ることを確かめる**
+
+Run: `$DOTNET test src/CalendarMcp.Tests && $DOTNET build src/CalendarMcp.HttpServer -c Release`
+Expected: `Failed: 0` と `Build succeeded.`
+
+- [ ] **Step 6: Commit**
+
+```bash
+git add src changelogs/2026-11-07-save-draft-tool.md
+git commit -m "Add a save_draft tool for IMAP accounts"
+```
+
+### Task 15: `get_email_details` のヘッダー
+
+**Files:**
+- Modify: `src/CalendarMcp.Core/Models/EmailMessage.cs`、`src/CalendarMcp.Core/Providers/ImapProviderService.cs`（詳細の組み立て）、`src/CalendarMcp.Core/Tools/GetEmailDetailsTool.cs`（応答と説明文）
+- Create: `changelogs/2026-11-07-email-headers.md`
+- Test: `src/CalendarMcp.Tests/Providers/ImapProviderServiceTests.cs`、`src/CalendarMcp.Tests/Tools/GetEmailDetailsToolTests.cs`
+
+**Interfaces:**
+- Produces: `public sealed record EmailHeader(string Name, string Value)`、`EmailMessage.Headers`（`List<EmailHeader>?`、既定 null）、`internal static List<EmailHeader> ImapProviderService.ToEmailHeaders(HeaderList headers)`
+- Produces: `get_email_details` の応答の `headers`。IMAP では `[{"name": ..., "value": ...}]` をメッセージの順で、ほかのプロバイダーでは null
+
+- [ ] **Step 1: 失敗するテストを書く**
+
+```csharp
+// ImapProviderServiceTests
+[TestMethod]
+public void ToEmailHeaders_KeepsEveryFieldInOrder()
+{
+    var headers = new MimeKit.HeaderList
+    {
+        { "Received", "from a" },
+        { "Received", "from b" },
+        { "ARC-Authentication-Results", "i=1; rewse.jp; spf=pass" },
+    };
+    var result = ImapProviderService.ToEmailHeaders(headers);
+    CollectionAssert.AreEqual(new[] { "Received", "Received", "ARC-Authentication-Results" },
+        result.Select(h => h.Name).ToArray());
+    Assert.AreEqual("from b", result[1].Value);
+    Assert.AreEqual("i=1; rewse.jp; spf=pass", result[2].Value);
+}
+
+// GetEmailDetailsToolTests — provider returns
+// new EmailMessage { Id = "email-1", AccountId = "acc-1", Headers = [new EmailHeader("ARC-Authentication-Results", "i=1; spf=pass")] }
+[TestMethod]
+public async Task GetEmailDetails_IncludesHeadersFromProvider()
+{
+    // ...
+    Assert.IsTrue(doc.RootElement.TryGetProperty("headers", out var headers));
+    Assert.AreEqual("ARC-Authentication-Results", headers[0].GetProperty("name").GetString());
+    Assert.AreEqual("i=1; spf=pass", headers[0].GetProperty("value").GetString());
+}
+
+// provider returns TestData.CreateEmail(id: "email-1", accountId: "acc-1") (Headers is null)
+[TestMethod]
+public async Task GetEmailDetails_HeadersNullWhenProviderHasNone()
+{
+    // ...
+    Assert.IsTrue(doc.RootElement.TryGetProperty("headers", out var headers));
+    Assert.AreEqual(JsonValueKind.Null, headers.ValueKind);
+}
+```
+
+- [ ] **Step 2: コンパイルだけ通す**
+
+`EmailHeader` と `EmailMessage.Headers` を宣言し、`ToEmailHeaders` は空のリストを返すだけにする。ツールと詳細の組み立ては変えない。
+
+- [ ] **Step 3: 失敗を確かめる**
+
+Run: `$DOTNET test src/CalendarMcp.Tests --filter "ToEmailHeaders|GetEmailDetails"`
+Expected: 新しい三つが FAIL（`ToEmailHeaders` は件数のアサーション、ツールの二つは `TryGetProperty` が false）。既存の `GetEmailDetails_*` は PASS
+
+- [ ] **Step 4: 実装する**
+
+`ToEmailHeaders` は各 `Header` の `Field` と `Value` をそのまま並べる。IMAP の詳細の組み立てで `Headers = ToEmailHeaders(m.Headers)` を設定する。ツールの応答に `headers = email.Headers?.Select(h => new { name = h.Name, value = h.Value })` を足し、説明文に IMAP ではヘッダーが付くこと（SPF、DKIM、DMARC の結果の確認向け）を書く。
+
+- [ ] **Step 5: 通ることを確かめる**
+
+Run: `$DOTNET test src/CalendarMcp.Tests && $DOTNET build src/CalendarMcp.HttpServer -c Release`
+Expected: `Failed: 0` と `Build succeeded.`
+
+- [ ] **Step 6: Commit と push**
+
+```bash
+git add src changelogs/2026-11-07-email-headers.md
+git commit -m "Return email headers from get_email_details"
+git push
+```
+
+Expected: `gh run watch -R rewse/calendar-mcp --exit-status "$(gh run list -R rewse/calendar-mcp -b rewse -L 1 --json databaseId -q '.[0].databaseId')"` が成功
+
+### Task 16: ロールを fork からのビルドに切り替える
+
+ansible-playbooks の `feat/calendar-mcp` で行う。
 
 **Files:**
 - Modify: `roles/calendar_mcp/tasks/container.yml`、`tests/test_calendar_mcp.py`
 - Delete: `roles/calendar_mcp/files/calendar-mcp.patch`
 
 **Interfaces:**
-- Consumes: Task 12 の `rewse/calendar-mcp` の既定ブランチ
-- Produces: `__calendar_mcp_image` は `calendar-mcp:<commit の先頭 12 文字>`
+- Consumes: Task 15 の時点の `rewse/calendar-mcp` の既定ブランチ
+- Produces: `__calendar_mcp_source`（`{commit}`）、`__calendar_mcp_image`（`calendar-mcp:<commit の先頭 12 文字>`）。compose と handler は今のまま
 
 - [ ] **Step 1: 失敗するテストを書く**
 
-`CalendarMcpBuildTest` を次に置き換える。
+`CalendarMcpBuildTest` の `test_lookup_selects_release_commits`、`test_image_tag_changes_with_the_patch`、`test_patch_failure_stops_the_play`、`test_checkout_starts_clean` を消し、次を足す。
 
 ```python
 def test_lookup_follows_the_fork_without_cooldown(self):
-    fact = task_named("container.yml", "container | Resolve fork commit")["ansible.builtin.set_fact"]["__calendar_mcp_source"]
+    fact = task_named("container.yml", "container | Resolve fork commit")[
+        "ansible.builtin.set_fact"]["__calendar_mcp_source"]
     self.assertIn("github-commit:rewse/calendar-mcp", fact)
     self.assertIn("days=0", fact)
 
 def test_image_tag_is_the_commit(self):
-    fact = task_named("container.yml", "container | Name image")["ansible.builtin.set_fact"]["__calendar_mcp_image"]
+    fact = task_named("container.yml", "container | Name image")[
+        "ansible.builtin.set_fact"]["__calendar_mcp_image"]
     self.assertIn("__calendar_mcp_source.commit[:12]", fact)
+    self.assertNotIn("hash(", fact)
 
 def test_checkout_is_the_fork(self):
     git = task_named("container.yml", "container | Check out repository")["ansible.builtin.git"]
     self.assertEqual(git["repo"], "https://github.com/rewse/calendar-mcp.git")
+    self.assertIs(git["force"], True)
 
 def test_no_patch_is_applied(self):
     self.assertNotIn("ansible.posix.patch", (ROLE / "tasks" / "container.yml").read_text())
     self.assertFalse((ROLE / "files" / "calendar-mcp.patch").exists())
 ```
 
-`test_build_is_skipped_when_the_image_exists` は「Apply patch」を外して残す。`test_checkout_starts_clean` は消す（パッチがなければ forced checkout で足りる）。
+`test_build_is_skipped_when_the_image_exists` の対象は `container | Check out repository` と `container | Build image` の二つにする。
 
 - [ ] **Step 2: 失敗を確かめる**
 
 Run: `uv run --with pytest --with ansible-core pytest tests/test_calendar_mcp.py -v`
-Expected: 新しい四つが FAIL
+Expected: 新しい四つが FAIL、`test_build_is_skipped_when_the_image_exists` は PASS
 
 - [ ] **Step 3: 実装する**
 
-`container.yml` の lookup を `lookup('aged_release', 'github-commit:rewse/calendar-mcp', days=0)` に、名前を `container | Resolve fork commit` に、タグを `'calendar-mcp:' ~ __calendar_mcp_source.commit[:12]` に、checkout を fork の URL と `force: true` にする。`Remove previous checkout` と `Apply patch` を消し、パッチのファイルを `git rm` する。コメントは、fork を自分のリポジトリとして待機期間なしで追い、上流の待機期間は rebase の元で守ることを書く。
+`container.yml` で、lookup を `lookup('aged_release', 'github-commit:rewse/calendar-mcp', days=0)`、タスク名を `container | Resolve fork commit`、タグを `'calendar-mcp:' ~ __calendar_mcp_source.commit[:12]`、checkout を fork の URL と `force: true` にする。`container | Remove previous checkout` と `container | Apply patch` を消し、パッチのファイルを `git rm` する。lookup のコメントには、fork は自分のリポジトリなので待機期間なしで追い、上流のコードの待機期間は rebase の元を待機期間を過ぎた Release に限ることで守る、と書く。
 
 - [ ] **Step 4: 通ることを確かめる**
 
-Run: `uv run --with pytest --with ansible-core pytest tests -q` と pre-commit
-Expected: どちらも通る
+Run: `uv run --with pytest --with ansible-core pytest tests -q && uvx --with pre-commit-uv==4.3.0 pre-commit@4.6.2 run --all-files --show-diff-on-failure`
+Expected: 失敗なし
 
-- [ ] **Step 5: Commit、適用、確認**
+- [ ] **Step 5: Commit**
 
 ```bash
 git add -A roles/calendar_mcp tests/test_calendar_mcp.py
 git commit -m "feat(calendar_mcp): build from the rewse fork instead of a patch"
 ```
 
-Run: `direnv exec . ansible-playbook home-primary.yml --tags calendar_mcp`
-Expected: 成功し、二回目は `changed=0`。Task 7 Step 4 の確認（`/tmp/calmcp-verify/mcp.py`）をもう一度通し、加えて `get_email_details` が `ARC-Authentication-Results` を含む `headers` を返す。`save_draft` で自分宛ての下書きを一つ保存し、Sakura の `INBOX.Draft` に `\Draft` 付きで入り、`INBOX.Sent` に何も増えないことを IMAP で確かめてから、その下書きを消す
+- [ ] **Step 6: 適用する**
+
+Run: `direnv exec . ansible-playbook home-primary.yml --tags calendar_mcp`、続けてもう一度
+Expected: 一回目は成功してイメージのタグが `calendar-mcp:<Task 15 の commit の先頭 12 文字>` に変わり、二回目は `changed=0`
+
+- [ ] **Step 7: 家から確かめる**
+
+Task 7 Step 4 の確認を `/tmp/calmcp-verify/mcp.py` でもう一度通す（トークンは `op read` から渡す。401 を五回続けると fail2ban が自分を BAN するので、トークンなしの確認は一回にとどめる）。加えて次を確かめる。
+
+- `get_email_details` の `headers` に `ARC-Authentication-Results` がある
+- `save_draft` で自分宛ての下書きを一つ保存すると、IMAP の `INBOX.Draft` に `\Draft` 付きで一通増え、`INBOX.Sent` の件数は変わらない。確かめたらその下書きを消す
