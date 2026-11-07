@@ -17,6 +17,7 @@
   loop: "{{ calendar_mcp_users }}"
   loop_control:
     label: "{{ item.name }}"
+  register: __calendar_mcp_data_dirs
 
 - name: container | Own data files
   # A file the server wrote under another number blocks the container user: it
@@ -24,15 +25,21 @@
   # containers recreates a container as soon as the compose file changes, so the
   # files change hands before that. No mode, which would give every file the
   # directories' 0750.
+  #
+  # The walk runs as root over a directory the container writes, so it follows
+  # no link, which would hand the host path behind it to the container user,
+  # and runs only when the directory was just created or changed owner.
   ansible.builtin.file:
-    path: "{{ calendar_mcp_data_dir }}/{{ item.name }}"
+    path: "{{ calendar_mcp_data_dir }}/{{ item.item.name }}"
     state: directory
     recurse: true
+    follow: false
     owner: "{{ calendar_mcp_uid }}"
     group: "{{ calendar_mcp_gid }}"
-  loop: "{{ calendar_mcp_users }}"
+  loop: "{{ __calendar_mcp_data_dirs.results }}"
   loop_control:
-    label: "{{ item.name }}"
+    label: "{{ item.item.name }}"
+  when: item is changed  # noqa: no-handler a handler runs after Start containers has recreated them
 
 - name: container | Resolve fork commit
   ansible.builtin.set_fact:

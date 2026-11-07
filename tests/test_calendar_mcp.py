@@ -338,14 +338,33 @@ class CalendarMcpUserTest(unittest.TestCase):
             names.index("container | Start containers"),
         )
         own = task_named("container.yml", "container | Own data files")
-        directories = task_named("container.yml", "container | Create data directories")
         self.assertTrue(own["ansible.builtin.file"]["recurse"])
         self.assertNotIn("mode", own["ansible.builtin.file"])
+
+    def test_data_walk_follows_no_link_and_runs_only_after_a_change(self):
+        # The walk runs as root over a directory the container writes, so a
+        # followed link would chown the host path it points at. In steady state
+        # the directories are unchanged and root does not walk them at all.
+        directories = task_named("container.yml", "container | Create data directories")
+        own = task_named("container.yml", "container | Own data files")
+        self.assertIs(own["ansible.builtin.file"]["follow"], False)
+        self.assertEqual(directories["register"], "__calendar_mcp_data_dirs")
+        self.assertEqual(own["loop"], "{{ __calendar_mcp_data_dirs.results }}")
+        self.assertEqual(own["when"], "item is changed")
         self.assertEqual(
-            own["ansible.builtin.file"]["path"],
-            directories["ansible.builtin.file"]["path"],
+            render_expression(
+                own["ansible.builtin.file"]["path"],
+                **(role_vars() | {"item": {"item": {"name": "ts"}}}),
+            ),
+            "/srv/calendar_mcp/ts",
         )
-        self.assertEqual(own["loop"], directories["loop"])
+        self.assertEqual(
+            render_expression(
+                directories["ansible.builtin.file"]["path"],
+                **(role_vars() | {"item": {"name": "ts"}}),
+            ),
+            "/srv/calendar_mcp/ts",
+        )
 
 
 class CalendarMcpComposeTest(unittest.TestCase):
