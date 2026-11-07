@@ -49,6 +49,13 @@ def task_named(file: str, name: str) -> dict:
 
 
 class CalendarMcpBuildTest(unittest.TestCase):
+    def test_depends_on_the_docker_role(self):
+        # The role sorts before docker in home-primary.yml, and --tags
+        # calendar_mcp alone must still install Docker and buildx first.
+        meta = yaml.safe_load((ROLE / "meta" / "main.yml").read_text())
+        roles = [dependency["role"] for dependency in meta["dependencies"]]
+        self.assertIn("docker", roles)
+
     def test_lookup_follows_the_fork_without_cooldown(self):
         fact = task_named("container.yml", "container | Resolve fork commit")[
             "ansible.builtin.set_fact"
