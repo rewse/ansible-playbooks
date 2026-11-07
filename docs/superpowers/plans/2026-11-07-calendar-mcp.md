@@ -4,7 +4,7 @@
 
 **Goal:** fox で MarimerLLC/calendar-mcp を ts と ubiqu の一人一つずつ動かし、Muse から iCloud のカレンダーと連絡先、Sakura のメールを使えるようにする。メールは下書きまでで、送信と配信停止はできない。最後に mailboxd を撤去する。
 
-**Architecture:** 上流を `rewse/calendar-mcp` に fork し、待機期間を過ぎた上流の Release の上に三つの変更をテスト付きで積む。`aged_release` で fork の既定ブランチの最新のコミットを選び、fox で checkout とビルドを行う。新しいロール `calendar_mcp` が Compose で二つのコンテナを `127.0.0.1:8084` と `127.0.0.1:8085` に立て、Apache の vhost `calendar-mcp.rewse.jp` が `/mcp/ts` と `/mcp/ubiqu` だけを流す。Quick Tunnel で Muse から確かめてから、CloudFront、UniFi の DNS、security-agent を入れる。
+**Architecture:** 上流を `rewse/calendar-mcp` に fork し、待機期間を過ぎた上流の Release の上に四つの変更をテスト付きで積む。`aged_release` で fork の既定ブランチの最新のコミットを選び、fox で checkout とビルドを行う。新しいロール `calendar_mcp` が Compose で二つのコンテナを `127.0.0.1:8084` と `127.0.0.1:8085` に立て、Apache の vhost `calendar-mcp.rewse.jp` が `/mcp/ts` と `/mcp/ubiqu` だけを流す。Quick Tunnel で Muse から確かめてから、CloudFront、UniFi の DNS、security-agent を入れる。
 
 **Tech Stack:** Ansible（community.docker）、Docker Compose、.NET 10（上流）、MSTest と Rocks（fork のテスト）、Apache、fail2ban、1Password CLI、pytest と unittest + jinja2
 
@@ -13,6 +13,8 @@
 **改訂（2026-11-07）:** 設計を fork 方式に改めた。Task 2 と Task 3 は実施済みの記録として残すが、そのパッチの作成と適用は、Task 12 から 15（fork と三つの変更をテスト付きで積む）と Task 16（ロールを fork からのビルドに切り替える）で置き換える。Task 12 から 16 は Task 8 より前に行う。
 
 **改訂（2026-11-07、二回目）:** ヘッダーは `get_email_details` に足さず、新しいツール `get_email_headers` で返す設計に改めた。Task 15 は実施済みの記録として残し、そのコミット fbc6950 は fork で 30936fe として revert した。代わりに Task 17 を行う。Task 16 は Step 5 まで実施済みで、Step 6 と Step 7 は Task 17 の push のあとに行う。順番は Task 17、Task 16 の Step 6 と Step 7、Task 8 となる。
+
+**改訂（2026-11-07、三回目）:** Task 8 で、Sakura の IMAP では `get_emails` が頼んだ件数より少なく返ることが分かった（設計の「UID の並び」）。Task 18 で直す。Task 8 は Step 1 から 3 まで実施済みで、一覧のほかはすべて通った。Task 18 の Step 8 が通ったら Task 8 を完了とする。Muse からの一覧の確かめ直しは、Task 9 で CloudFront 経由の段階 3 を確かめるときに行う。
 
 ## Global Constraints
 
@@ -1208,3 +1210,85 @@ git push
 ```
 
 Expected: 30936fe と新しいコミットが push され、`gh run watch -R rewse/calendar-mcp --exit-status "$(gh run list -R rewse/calendar-mcp -b rewse -L 1 --json databaseId -q '.[0].databaseId')"` が成功
+
+### Task 18: IMAP の UID を古い順で FETCH する
+
+`~/git/calendar-mcp` の `rewse` ブランチで、f611c90（`get_email_headers`）の上に積む。
+
+**Files:**
+- Modify: `src/CalendarMcp.Core/Providers/ImapProviderService.cs`（`GetEmailsAsync`、`SearchEmailsAsync`、新しい `NewestUids`）
+- Create: `changelogs/2026-11-07-imap-ascending-uid-fetch.md`（`changelogs/2026-11-07-save-draft-tool.md` と同じ見出しの形）
+- Test: `src/CalendarMcp.Tests/Providers/ImapProviderServiceTests.cs`
+
+**Interfaces:**
+- Produces: `internal static IList<UniqueId> ImapProviderService.NewestUids(IEnumerable<UniqueId> uids, int count)`。値の大きい順に `count` 個を選び、古い順（昇順）に並べて返す。`GetEmailsAsync` と `SearchEmailsAsync` は、これを `FetchAsync` に渡す
+- 応答の並び（日付の新しい順）と件数の上限は変えない
+
+- [ ] **Step 1: 失敗するテストを書く**
+
+`ImapProviderServiceTests.cs`（`UniqueIdSet.ToString` は MailKit が FETCH に書く UID の文字列を作る）:
+
+```csharp
+private static IEnumerable<MailKit.UniqueId> Uids(params uint[] ids) =>
+    ids.Select(id => new MailKit.UniqueId(id));
+
+[TestMethod]
+public void NewestUids_SendsAscendingRanges()
+{
+    // Courier-IMAP answers a reversed range such as 36045:36043 with one message.
+    var newest = ImapProviderService.NewestUids(Uids(36026, 36027, 36043, 36044, 36045, 36047, 36050), 5);
+
+    Assert.AreEqual("36043:36045,36047,36050", MailKit.UniqueIdSet.ToString(newest));
+}
+
+[TestMethod]
+public void NewestUids_CountAboveTotal_ReturnsEveryUid()
+{
+    var newest = ImapProviderService.NewestUids(Uids(7, 3, 5), 20);
+
+    Assert.AreEqual("3,5,7", MailKit.UniqueIdSet.ToString(newest));
+}
+```
+
+- [ ] **Step 2: 今の選び方をそのまま `NewestUids` に移す**
+
+`NewestUids` の本体を今の二か所と同じ `uids.OrderByDescending(u => u.Id).Take(count).ToList()` にし、`GetEmailsAsync` と `SearchEmailsAsync` からそれを呼ぶ。振る舞いはまだ変えない。
+
+- [ ] **Step 3: 失敗を確かめる**
+
+Run: `dotnet test src/CalendarMcp.Tests --filter NewestUids`
+Expected: 二つとも FAIL。`Expected:<36043:36045,36047,36050>. Actual:<36050,36047,36045:36043>` と `Expected:<3,5,7>. Actual:<7,5,3>`（今の並びが逆順の範囲を作ることの確認）
+
+- [ ] **Step 4: 実装する**
+
+`NewestUids` で、選んだ UID を昇順に並べ直して返す。メソッドのコメントに、Courier-IMAP は `5:3` のような逆順の範囲に 1 通しか返さないので、FETCH には昇順で渡すこと（RFC 3501 では `5:3` と `3:5` は同じ）を書く。changelog に、症状（`get_emails` が頼んだ件数より少なく返る）、原因、応答の並びは変わらないことを書く。
+
+- [ ] **Step 5: 通ることを確かめる**
+
+Run: `dotnet test src/CalendarMcp.Tests && dotnet build src/CalendarMcp.HttpServer -c Release`
+Expected: `Failed: 0`（801 件）と `Build succeeded.`
+
+- [ ] **Step 6: Commit と push**
+
+```bash
+git add src changelogs/2026-11-07-imap-ascending-uid-fetch.md
+git commit -m "Fetch IMAP messages in ascending UID order"
+git push
+```
+
+Expected: `gh run watch -R rewse/calendar-mcp --exit-status "$(gh run list -R rewse/calendar-mcp -b rewse -L 1 --json databaseId -q '.[0].databaseId')"` が成功
+
+- [ ] **Step 7: 適用する**
+
+ansible-playbooks で Run: `direnv exec . ansible-playbook home-primary.yml --tags calendar_mcp`、続けてもう一度
+Expected: 一回目でイメージのタグが `calendar-mcp:<Step 6 の commit の先頭 12 文字>` に変わり、二回目は `changed=0`。二つのコンテナが healthy
+
+- [ ] **Step 8: 家から確かめる**
+
+`/tmp/calmcp-verify/mcp.py` で ts のトークンを使う。生の IMAP の確認は、Sakura のユーザー名とパスワードを `op read` から標準入力で渡すスクリプト（`/tmp/calmcp-verify/imapsearch.py` と同じ形）で行う。
+
+- `get_emails`（`ts-sakura`、count 5）が 5 件を返し、その ID の UID が、生の IMAP の `UID SEARCH ALL` の最後の 5 個と一致する。並びは日付の新しい順
+- `get_emails`（count 20）が 20 件を返す
+- `search_emails`（query `Amazon`、count 10）が返す UID が、生の IMAP の `UID SEARCH OR OR SUBJECT Amazon BODY Amazon FROM Amazon` の最後の 10 個（ヒットが 10 件未満なら全部）と一致する
+
+確かめたら、Task 8 を完了にする。
