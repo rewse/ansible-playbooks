@@ -8,6 +8,9 @@ services:
     image: {{ __calendar_mcp_image }}
     # Built on this host by the container component; there is no registry copy.
     pull_policy: never
+    # The image's mcpuser has a number the host never registered, so the
+    # container runs as the calendar-mcp account the user component creates.
+    user: "{{ calendar_mcp_uid }}:{{ calendar_mcp_gid }}"
     # Reached only through the Apache vhost, which terminates TLS and is the only
     # place a client can arrive from.
     ports:

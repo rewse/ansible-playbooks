@@ -39,7 +39,7 @@
     # Holds the IMAP and iCloud passwords, and the container user has to read
     # it. Mounted read-only, so the server cannot rewrite it.
     owner: "{{ calendar_mcp_uid }}"
-    group: "{{ calendar_mcp_uid }}"
+    group: "{{ calendar_mcp_gid }}"
     mode: "0400"
   loop: "{{ __calendar_mcp_accounts }}"
   loop_control:

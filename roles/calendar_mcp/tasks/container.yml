@@ -12,8 +12,24 @@
     path: "{{ calendar_mcp_data_dir }}/{{ item.name }}"
     state: directory
     owner: "{{ calendar_mcp_uid }}"
-    group: "{{ calendar_mcp_uid }}"
+    group: "{{ calendar_mcp_gid }}"
     mode: "0750"
+  loop: "{{ calendar_mcp_users }}"
+  loop_control:
+    label: "{{ item.name }}"
+
+- name: container | Own data files
+  # A file the server wrote under another number blocks the container user: it
+  # cannot read the 0600 DataProtection keys or append to the logs. Start
+  # containers recreates a container as soon as the compose file changes, so the
+  # files change hands before that. No mode, which would give every file the
+  # directories' 0750.
+  ansible.builtin.file:
+    path: "{{ calendar_mcp_data_dir }}/{{ item.name }}"
+    state: directory
+    recurse: true
+    owner: "{{ calendar_mcp_uid }}"
+    group: "{{ calendar_mcp_gid }}"
   loop: "{{ calendar_mcp_users }}"
   loop_control:
     label: "{{ item.name }}"

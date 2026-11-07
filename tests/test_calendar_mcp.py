@@ -301,6 +301,52 @@ class CalendarMcpUserTest(unittest.TestCase):
         self.assertEqual(user["shell"], "/usr/sbin/nologin")
         self.assertFalse(user["create_home"])
 
+    def test_containers_run_as_the_registered_account(self):
+        services = yaml.safe_load(
+            render(
+                "compose.yaml.j2",
+                __calendar_mcp_image="calendar-mcp:x",
+                **ACCOUNT_IDS,
+            )
+        )["services"]
+        for name, service in services.items():
+            with self.subTest(service=name):
+                self.assertEqual(service.get("user"), "1980:1981")
+
+    def test_account_owns_the_settings_and_data(self):
+        for file, name, module in (
+            ("config.yml", "config | Deploy settings", "ansible.builtin.template"),
+            (
+                "container.yml",
+                "container | Create data directories",
+                "ansible.builtin.file",
+            ),
+            ("container.yml", "container | Own data files", "ansible.builtin.file"),
+        ):
+            with self.subTest(task=name):
+                args = task_named(file, name)[module]
+                self.assertEqual(resolved(args["owner"]), "1980")
+                self.assertEqual(resolved(args["group"]), "1981")
+
+    def test_data_files_change_owner_before_the_containers_start(self):
+        names = [
+            task["name"]
+            for task in yaml.safe_load((ROLE / "tasks" / "container.yml").read_text())
+        ]
+        self.assertLess(
+            names.index("container | Own data files"),
+            names.index("container | Start containers"),
+        )
+        own = task_named("container.yml", "container | Own data files")
+        directories = task_named("container.yml", "container | Create data directories")
+        self.assertTrue(own["ansible.builtin.file"]["recurse"])
+        self.assertNotIn("mode", own["ansible.builtin.file"])
+        self.assertEqual(
+            own["ansible.builtin.file"]["path"],
+            directories["ansible.builtin.file"]["path"],
+        )
+        self.assertEqual(own["loop"], directories["loop"])
+
 
 class CalendarMcpComposeTest(unittest.TestCase):
     def services(self) -> dict:
