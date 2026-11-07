@@ -18,57 +18,36 @@
   loop_control:
     label: "{{ item.name }}"
 
-- name: container | Resolve aged release
+- name: container | Resolve fork commit
   ansible.builtin.set_fact:
-    # Upstream has no tags or releases; each version lands as one commit whose
-    # subject is "Release x.y.z".
-    __calendar_mcp_source: >-
-      {{ lookup('aged_release', 'github-commit:MarimerLLC/calendar-mcp',
-                message='^Release (\d+\.\d+\.\d+)') }}
+    # The fork carries the changes upstream lacks (drafts folder, save_draft,
+    # headers) on top of an upstream release. It is this account's own
+    # repository, so it is followed without a cooldown; upstream code reaches
+    # it only by rebasing onto a release older than supply_chain_cooldown_days.
+    __calendar_mcp_source: "{{ lookup('aged_release', 'github-commit:rewse/calendar-mcp', days=0) }}"
 
 - name: container | Name image
   ansible.builtin.set_fact:
-    # The patch checksum is part of the tag, so a changed patch builds a new
-    # image even when the upstream commit stays the same.
-    __calendar_mcp_image: >-
-      {{ 'calendar-mcp:' ~ __calendar_mcp_source.version
-         ~ '-' ~ __calendar_mcp_source.commit[:7]
-         ~ '-' ~ (lookup('ansible.builtin.file', 'calendar-mcp.patch') | hash('sha256'))[:8] }}
+    __calendar_mcp_image: "{{ 'calendar-mcp:' ~ __calendar_mcp_source.commit[:12] }}"
 
 - name: container | Read image
   community.docker.docker_image_info:
     name: "{{ __calendar_mcp_image }}"
   register: __calendar_mcp_image_info
 
-- name: container | Remove previous checkout
-  # A forced checkout keeps untracked files, and the patch adds one, so the
-  # next version's patch would refuse to create it again.
-  ansible.builtin.file:
-    path: "{{ calendar_mcp_source_dir }}"
-    state: absent
-  when: not ansible_check_mode and __calendar_mcp_image_info.images | length == 0
-
 - name: container | Check out repository
   ansible.builtin.git:
-    repo: https://github.com/MarimerLLC/calendar-mcp.git
+    repo: https://github.com/rewse/calendar-mcp.git
     dest: "{{ calendar_mcp_source_dir }}"
     version: "{{ __calendar_mcp_source.commit }}"
+    force: true
   when: __calendar_mcp_image_info.images | length == 0
 
 - name: container | Report skipped build in check mode
   ansible.builtin.debug:
-    msg: Patch and build skipped because the checkout is not written in check mode
+    msg: Build skipped because the checkout is not written in check mode
     verbosity: 0
   when: ansible_check_mode and __calendar_mcp_image_info.images | length == 0
-
-- name: container | Apply patch
-  # A patch that no longer applies fails the play here, so the running container
-  # keeps its image until the patch is fixed.
-  ansible.posix.patch:
-    src: calendar-mcp.patch
-    basedir: "{{ calendar_mcp_source_dir }}"
-    strip: 1
-  when: not ansible_check_mode and __calendar_mcp_image_info.images | length == 0
 
 - name: container | Build image
   community.docker.docker_image_build:

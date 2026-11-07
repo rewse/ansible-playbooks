@@ -49,27 +49,36 @@ def task_named(file: str, name: str) -> dict:
 
 
 class CalendarMcpBuildTest(unittest.TestCase):
-    def test_lookup_selects_release_commits(self):
-        fact = task_named("container.yml", "container | Resolve aged release")[
+    def test_lookup_follows_the_fork_without_cooldown(self):
+        fact = task_named("container.yml", "container | Resolve fork commit")[
             "ansible.builtin.set_fact"
-        ]
-        self.assertIn(
-            "github-commit:MarimerLLC/calendar-mcp", fact["__calendar_mcp_source"]
-        )
-        self.assertIn(r"^Release (\d+\.\d+\.\d+)", fact["__calendar_mcp_source"])
+        ]["__calendar_mcp_source"]
+        self.assertIn("github-commit:rewse/calendar-mcp", fact)
+        self.assertIn("days=0", fact)
 
-    def test_image_tag_changes_with_the_patch(self):
-        # The tag carries the patch checksum, so editing only the patch rebuilds.
+    def test_image_tag_is_the_commit(self):
         fact = task_named("container.yml", "container | Name image")[
             "ansible.builtin.set_fact"
+        ]["__calendar_mcp_image"]
+        self.assertIn("__calendar_mcp_source.commit[:12]", fact)
+        self.assertNotIn("hash(", fact)
+
+    def test_checkout_is_the_fork(self):
+        git = task_named("container.yml", "container | Check out repository")[
+            "ansible.builtin.git"
         ]
-        self.assertIn("calendar-mcp.patch", fact["__calendar_mcp_image"])
-        self.assertIn("hash('sha256')", fact["__calendar_mcp_image"])
+        self.assertEqual(git["repo"], "https://github.com/rewse/calendar-mcp.git")
+        self.assertIs(git["force"], True)
+
+    def test_no_patch_is_applied(self):
+        self.assertNotIn(
+            "ansible.posix.patch", (ROLE / "tasks" / "container.yml").read_text()
+        )
+        self.assertFalse((ROLE / "files" / "calendar-mcp.patch").exists())
 
     def test_build_is_skipped_when_the_image_exists(self):
         for name in (
             "container | Check out repository",
-            "container | Apply patch",
             "container | Build image",
         ):
             with self.subTest(task=name):
@@ -77,23 +86,6 @@ class CalendarMcpBuildTest(unittest.TestCase):
                     "__calendar_mcp_image_info.images",
                     str(task_named("container.yml", name)["when"]),
                 )
-
-    def test_patch_failure_stops_the_play(self):
-        task = task_named("container.yml", "container | Apply patch")
-        self.assertNotIn("ignore_errors", task)
-        self.assertNotIn("failed_when", task)
-
-    def test_checkout_starts_clean(self):
-        # A forced checkout keeps untracked files, and the patch creates one, so
-        # a later version would fail to apply over the leftover file.
-        tasks = yaml.safe_load((ROLE / "tasks" / "container.yml").read_text())
-        names = [task["name"] for task in tasks]
-        remove = task_named("container.yml", "container | Remove previous checkout")
-        self.assertEqual(remove["ansible.builtin.file"]["state"], "absent")
-        self.assertLess(
-            names.index("container | Remove previous checkout"),
-            names.index("container | Check out repository"),
-        )
 
     def test_users_and_ports(self):
         users = role_vars()["calendar_mcp_users"]
