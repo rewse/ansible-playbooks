@@ -63,7 +63,7 @@ class CalendarMcpBuildTest(unittest.TestCase):
         fact = task_named("container.yml", "container | Name image")[
             "ansible.builtin.set_fact"
         ]
-        self.assertIn("save-draft.patch", fact["__calendar_mcp_image"])
+        self.assertIn("calendar-mcp.patch", fact["__calendar_mcp_image"])
         self.assertIn("hash('sha256')", fact["__calendar_mcp_image"])
 
     def test_build_is_skipped_when_the_image_exists(self):

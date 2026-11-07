@@ -33,7 +33,7 @@
     __calendar_mcp_image: >-
       {{ 'calendar-mcp:' ~ __calendar_mcp_source.version
          ~ '-' ~ __calendar_mcp_source.commit[:7]
-         ~ '-' ~ (lookup('ansible.builtin.file', 'save-draft.patch') | hash('sha256'))[:8] }}
+         ~ '-' ~ (lookup('ansible.builtin.file', 'calendar-mcp.patch') | hash('sha256'))[:8] }}
 
 - name: container | Read image
   community.docker.docker_image_info:
@@ -65,7 +65,7 @@
   # A patch that no longer applies fails the play here, so the running container
   # keeps its image until the patch is fixed.
   ansible.posix.patch:
-    src: save-draft.patch
+    src: calendar-mcp.patch
     basedir: "{{ calendar_mcp_source_dir }}"
     strip: 1
   when: not ansible_check_mode and __calendar_mcp_image_info.images | length == 0

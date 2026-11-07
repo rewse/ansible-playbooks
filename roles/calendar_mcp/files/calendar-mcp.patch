@@ -1,5 +1,30 @@
+diff --git a/src/CalendarMcp.Core/Models/EmailMessage.cs b/src/CalendarMcp.Core/Models/EmailMessage.cs
+index 2851e30..3d7c2c9 100644
+--- a/src/CalendarMcp.Core/Models/EmailMessage.cs
++++ b/src/CalendarMcp.Core/Models/EmailMessage.cs
+@@ -79,8 +79,20 @@ public class EmailMessage
+     /// Parsed unsubscribe information from List-Unsubscribe headers (RFC 2369/8058)
+     /// </summary>
+     public UnsubscribeInfo? UnsubscribeInfo { get; init; }
++
++    /// <summary>
++    /// Every header field in message order, for providers that read the raw
++    /// message (IMAP). Lets a client judge authentication results and routing.
++    /// </summary>
++    public List<EmailHeader>? Headers { get; init; }
+ }
+ 
++/// <summary>
++/// One header field of a received email. Repeated fields such as Received stay
++/// separate entries.
++/// </summary>
++public sealed record EmailHeader(string Name, string Value);
++
+ /// <summary>
+ /// Metadata for an attachment on a received email. Bytes are not included;
+ /// use the <c>get_email_attachment</c> tool with <see cref="AttachmentId"/>
 diff --git a/src/CalendarMcp.Core/Providers/ImapProviderService.cs b/src/CalendarMcp.Core/Providers/ImapProviderService.cs
-index e305963..d3a949d 100644
+index e305963..4eb86c4 100644
 --- a/src/CalendarMcp.Core/Providers/ImapProviderService.cs
 +++ b/src/CalendarMcp.Core/Providers/ImapProviderService.cs
 @@ -137,7 +137,11 @@ public class ImapProviderService : IImapProviderService, IAsyncDisposable, IDisp
@@ -104,7 +129,23 @@ index e305963..d3a949d 100644
              _ => null
          };
  
-@@ -869,7 +948,8 @@ public class ImapProviderService : IImapProviderService, IAsyncDisposable, IDisp
+@@ -832,10 +911,14 @@ public class ImapProviderService : IImapProviderService, IAsyncDisposable, IDisp
+             Attachments = attachments,
+             UnsubscribeInfo = UnsubscribeHeaderParser.Parse(
+                 m.Headers["List-Unsubscribe"],
+-                m.Headers["List-Unsubscribe-Post"])
++                m.Headers["List-Unsubscribe-Post"]),
++            Headers = ToEmailHeaders(m.Headers)
+         };
+     }
+ 
++    internal static List<EmailHeader> ToEmailHeaders(HeaderList headers) =>
++        headers.Select(h => new EmailHeader(h.Field, h.Value)).ToList();
++
+     private static (string Body, string Format) ExtractBody(MimeMessage m)
+     {
+         if (m.HtmlBody is { Length: > 0 } html)
+@@ -869,7 +952,8 @@ public class ImapProviderService : IImapProviderService, IAsyncDisposable, IDisp
          string ImapHost, int ImapPort,
          string SmtpHost, int SmtpPort,
          string Username, string Password,
@@ -140,6 +181,30 @@ index 1cfb0e3..c26964f 100644
      // Calendar operations
      Task<IEnumerable<CalendarInfo>> ListCalendarsAsync(
          string accountId,
+diff --git a/src/CalendarMcp.Core/Tools/GetEmailDetailsTool.cs b/src/CalendarMcp.Core/Tools/GetEmailDetailsTool.cs
+index c23ab7c..22f0195 100644
+--- a/src/CalendarMcp.Core/Tools/GetEmailDetailsTool.cs
++++ b/src/CalendarMcp.Core/Tools/GetEmailDetailsTool.cs
+@@ -17,7 +17,7 @@ public sealed class GetEmailDetailsTool(
+     IProviderServiceFactory providerFactory,
+     ILogger<GetEmailDetailsTool> logger)
+ {
+-    [McpServerTool, Description("Get full email content including body and attachments for a specific email. Both accountId and emailId are required — obtain them from the accountId and id fields returned by get_emails or search_emails.")]
++    [McpServerTool, Description("Get full email content including body, attachments and, for IMAP accounts, every header field (for SPF, DKIM and DMARC results) for a specific email. Both accountId and emailId are required — obtain them from the accountId and id fields returned by get_emails or search_emails.")]
+     public async Task<string> GetEmailDetails(
+         [Description("Required. Account ID that owns the email. Obtain from the accountId field returned by get_emails or search_emails.")] string accountId,
+         [Description("Required. Email ID — pass as parameter name 'emailId' (NOT 'messageId'). Use the value from the 'id' field returned by get_emails or search_emails.")] string emailId)
+@@ -58,7 +58,9 @@ public sealed class GetEmailDetailsTool(
+                     size = a.Size,
+                     contentType = a.ContentType,
+                     attachmentId = a.AttachmentId,
+-                })
++                }),
++                // Null for providers that do not read the raw message.
++                headers = email.Headers?.Select(h => new { name = h.Name, value = h.Value })
+             };
+ 
+             logger.LogInformation("Retrieved email details for {EmailId} from account {AccountId}",
 diff --git a/src/CalendarMcp.Core/Tools/SaveDraftTool.cs b/src/CalendarMcp.Core/Tools/SaveDraftTool.cs
 new file mode 100644
 index 0000000..52d92cb
@@ -227,10 +292,10 @@ index e126be8..18afc61 100644
              .WithTools<CalendarMcp.Core.Tools.BulkMarkEmailsAsReadTool>()
              .WithTools<CalendarMcp.Core.Tools.BulkMoveEmailsTool>()
 diff --git a/src/CalendarMcp.Tests/Providers/ImapProviderServiceTests.cs b/src/CalendarMcp.Tests/Providers/ImapProviderServiceTests.cs
-index 8a43a2d..542159e 100644
+index 8a43a2d..ca40546 100644
 --- a/src/CalendarMcp.Tests/Providers/ImapProviderServiceTests.cs
 +++ b/src/CalendarMcp.Tests/Providers/ImapProviderServiceTests.cs
-@@ -95,4 +95,44 @@ public class ImapProviderServiceTests
+@@ -95,4 +95,62 @@ public class ImapProviderServiceTests
  
          Assert.IsNull(ImapProviderService.ResolveConfiguredFolder(folder, CustomFolders));
      }
@@ -242,6 +307,24 @@ index 8a43a2d..542159e 100644
 +
 +        Assert.AreEqual("INBOX.Draft", ImapProviderService.ResolveConfiguredFolder(
 +            folder, CustomFolders with { DraftsFolder = "INBOX.Draft" }));
++    }
++
++    [TestMethod]
++    public void ToEmailHeaders_KeepsEveryFieldInOrder()
++    {
++        var headers = new MimeKit.HeaderList
++        {
++            { "Received", "from a" },
++            { "Received", "from b" },
++            { "ARC-Authentication-Results", "i=1; rewse.jp; spf=pass" },
++        };
++
++        var result = ImapProviderService.ToEmailHeaders(headers);
++
++        CollectionAssert.AreEqual(
++            new[] { "Received", "Received", "ARC-Authentication-Results" },
++            result.Select(h => h.Name).ToArray());
++        Assert.AreEqual("i=1; rewse.jp; spf=pass", result[2].Value);
 +    }
 +
 +    [TestMethod]
