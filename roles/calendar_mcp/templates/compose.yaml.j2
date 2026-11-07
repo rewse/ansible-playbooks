@@ -6,7 +6,7 @@ services:
   calendar-mcp-{{ user.name }}:
     container_name: calendar-mcp-{{ user.name }}
     image: {{ __calendar_mcp_image }}
-    # Built on this host by the source component; there is no registry copy.
+    # Built on this host by the container component; there is no registry copy.
     pull_policy: never
     # Reached only through the Apache vhost, which terminates TLS and is the only
     # place a client can arrive from.

@@ -21,14 +21,33 @@
 - name: container | Resolve fork commit
   ansible.builtin.set_fact:
     # The fork carries the changes upstream lacks (drafts folder, save_draft,
-    # headers) on top of an upstream release. It is this account's own
-    # repository, so it is followed without a cooldown; upstream code reaches
-    # it only by rebasing onto a release older than supply_chain_cooldown_days.
+    # headers, ascending UID fetches, base image arguments) on top of an
+    # upstream release. It is this account's own repository, so it is followed
+    # without a cooldown; upstream code reaches it only by rebasing onto a
+    # release older than supply_chain_cooldown_days.
     __calendar_mcp_source: "{{ lookup('aged_release', 'github-commit:rewse/calendar-mcp', days=0) }}"
+
+- name: container | Resolve SDK image
+  ansible.builtin.set_fact:
+    __calendar_mcp_sdk_image: >-
+      {{ lookup('aged_release', 'oci:mcr.microsoft.com/dotnet/sdk',
+                pattern='^' ~ (calendar_mcp_container_dotnet_version | regex_escape) ~ '\.\d+$',
+                platform='linux/' ~ ('arm64' if ansible_facts['architecture'] == 'aarch64' else 'amd64')) }}
+
+- name: container | Resolve runtime image
+  ansible.builtin.set_fact:
+    __calendar_mcp_runtime_image: >-
+      {{ lookup('aged_release', 'oci:mcr.microsoft.com/dotnet/aspnet',
+                pattern='^' ~ (calendar_mcp_container_dotnet_version | regex_escape) ~ '\.\d+$',
+                platform='linux/' ~ ('arm64' if ansible_facts['architecture'] == 'aarch64' else 'amd64')) }}
 
 - name: container | Name image
   ansible.builtin.set_fact:
-    __calendar_mcp_image: "{{ 'calendar-mcp:' ~ __calendar_mcp_source.commit[:12] }}"
+    # A new fork commit or a new base image gives a new tag, which the build
+    # below waits for; the same inputs reuse the image already built.
+    __calendar_mcp_image: >-
+      {{ 'calendar-mcp:' ~ __calendar_mcp_source.commit[:12] ~ '-'
+         ~ ((__calendar_mcp_sdk_image.ref ~ ' ' ~ __calendar_mcp_runtime_image.ref) | hash('sha256'))[:12] }}
 
 - name: container | Read image
   community.docker.docker_image_info:
@@ -55,6 +74,9 @@
     tag: "{{ __calendar_mcp_image.split(':')[1] }}"
     path: "{{ calendar_mcp_source_dir }}"
     dockerfile: Dockerfile
+    args:
+      SDK_IMAGE: "{{ __calendar_mcp_sdk_image.ref }}"
+      RUNTIME_IMAGE: "{{ __calendar_mcp_runtime_image.ref }}"
   when: not ansible_check_mode and __calendar_mcp_image_info.images | length == 0
 
 - name: container | Deploy compose file

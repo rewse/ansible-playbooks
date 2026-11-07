@@ -2,6 +2,7 @@
 """Contract tests for the calendar_mcp role."""
 
 import configparser
+import hashlib
 import json
 import pathlib
 import re
@@ -48,6 +49,15 @@ def task_named(file: str, name: str) -> dict:
     return next(task for task in tasks if task["name"] == name)
 
 
+def render_expression(expression: str, **facts) -> str:
+    """Render a set_fact expression as Ansible would, with the facts given."""
+    environment = jinja2.Environment(undefined=jinja2.StrictUndefined)
+    environment.filters["hash"] = lambda text, algorithm: hashlib.new(
+        algorithm, text.encode()
+    ).hexdigest()
+    return environment.from_string(expression).render(**facts)
+
+
 class CalendarMcpBuildTest(unittest.TestCase):
     def test_depends_on_the_docker_role(self):
         # The role sorts before docker in home-primary.yml, and --tags
@@ -63,12 +73,60 @@ class CalendarMcpBuildTest(unittest.TestCase):
         self.assertIn("github-commit:rewse/calendar-mcp", fact)
         self.assertIn("days=0", fact)
 
-    def test_image_tag_is_the_commit(self):
-        fact = task_named("container.yml", "container | Name image")[
+    def test_image_tag_joins_the_commit_and_the_base_images(self):
+        expression = task_named("container.yml", "container | Name image")[
             "ansible.builtin.set_fact"
         ]["__calendar_mcp_image"]
-        self.assertIn("__calendar_mcp_source.commit[:12]", fact)
-        self.assertNotIn("hash(", fact)
+        sdk = "mcr.microsoft.com/dotnet/sdk:10.0.402@sha256:aaa"
+        runtime = "mcr.microsoft.com/dotnet/aspnet:10.0.13@sha256:bbb"
+        tag = render_expression(
+            expression,
+            __calendar_mcp_source={
+                "commit": "08680d87ba0918b8e10c3302ce6c02b58516b94b"
+            },
+            __calendar_mcp_sdk_image={"ref": sdk},
+            __calendar_mcp_runtime_image={"ref": runtime},
+        )
+        self.assertEqual(
+            tag,
+            "calendar-mcp:08680d87ba09-"
+            + hashlib.sha256(f"{sdk} {runtime}".encode()).hexdigest()[:12],
+        )
+
+    def test_base_images_are_aged_releases_of_the_target_framework(self):
+        for name, var, repo in (
+            (
+                "container | Resolve SDK image",
+                "__calendar_mcp_sdk_image",
+                "oci:mcr.microsoft.com/dotnet/sdk",
+            ),
+            (
+                "container | Resolve runtime image",
+                "__calendar_mcp_runtime_image",
+                "oci:mcr.microsoft.com/dotnet/aspnet",
+            ),
+        ):
+            with self.subTest(name=name):
+                fact = task_named("container.yml", name)["ansible.builtin.set_fact"][
+                    var
+                ]
+                self.assertIn(repo, fact)
+                self.assertIn("calendar_mcp_container_dotnet_version", fact)
+                # The default supply-chain cooldown applies.
+                self.assertNotIn("days=", fact)
+        self.assertEqual(role_vars()["calendar_mcp_container_dotnet_version"], "10.0")
+
+    def test_build_passes_the_pinned_base_images(self):
+        build = task_named("container.yml", "container | Build image")[
+            "community.docker.docker_image_build"
+        ]
+        self.assertEqual(
+            build["args"],
+            {
+                "SDK_IMAGE": "{{ __calendar_mcp_sdk_image.ref }}",
+                "RUNTIME_IMAGE": "{{ __calendar_mcp_runtime_image.ref }}",
+            },
+        )
 
     def test_checkout_is_the_fork(self):
         git = task_named("container.yml", "container | Check out repository")[

@@ -4,6 +4,11 @@ calendar_mcp_hostname: calendar-mcp.rewse.jp
 # Upstream publishes no image, so the role builds one from this checkout.
 calendar_mcp_source_dir: /usr/local/src/calendar-mcp
 
+# The .NET release of the SDK and ASP.NET Core base images. Pinned because it
+# must match the fork's TargetFramework (net10.0); raise it when upstream moves
+# to a new .NET release.
+calendar_mcp_container_dotnet_version: "10.0"
+
 # Parent of each user's /app/data: API key hashes, logs and the DataProtection
 # keyring the server writes.
 calendar_mcp_data_dir: /srv/calendar_mcp
