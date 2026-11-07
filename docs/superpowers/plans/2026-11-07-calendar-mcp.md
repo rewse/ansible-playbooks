@@ -12,6 +12,8 @@
 
 **改訂（2026-11-07）:** 設計を fork 方式に改めた。Task 2 と Task 3 は実施済みの記録として残すが、そのパッチの作成と適用は、Task 12 から 15（fork と三つの変更をテスト付きで積む）と Task 16（ロールを fork からのビルドに切り替える）で置き換える。Task 12 から 16 は Task 8 より前に行う。
 
+**改訂（2026-11-07、二回目）:** ヘッダーは `get_email_details` に足さず、新しいツール `get_email_headers` で返す設計に改めた。Task 15 は実施済みの記録として残し、そのコミット fbc6950 は fork で 30936fe として revert した。代わりに Task 17 を行う。Task 16 は Step 5 まで実施済みで、Step 6 と Step 7 は Task 17 の push のあとに行う。順番は Task 17、Task 16 の Step 6 と Step 7、Task 8 となる。
+
 ## Global Constraints
 
 - ロール名 `calendar_mcp`、ホスト名 `calendar-mcp.rewse.jp`、Compose プロジェクト `/etc/compose/calendar_mcp/compose.yaml`（`name: calendar_mcp`）、データ `/srv/calendar_mcp/<名前>`、checkout `/usr/local/src/calendar-mcp`
@@ -33,8 +35,8 @@
 - ts のトークンで `/mcp/ubiqu` を呼ぶ、または `accountId` に `ubiqu-sakura` を渡す。前者は 401、後者は存在しないアカウントとして拒否されること（Task 7 Step 4）
 - `/mcp/ts/`（末尾のスラッシュ）、`/mcp/ts/admin/ui`、`/mcp/ts/attachments`、`/mcp/kyn` のような完全一致でないパス。どれも 403 で、コンテナに届かないこと（Task 6 のテスト）
 - fork の既定ブランチに新しいコミットを push したとき。次の `update` でイメージを作り直し、同じコミットなら作り直さないこと（Task 16 のテスト、タグにコミット SHA を入れる）
+- Muse がメールのツール `get_email_headers` に iCloud のアカウント（`ts-icloud`）を渡す。DAV はメールを扱わないので、空のヘッダーを返さず `Failed to get email headers: This account does not support this operation.` で拒否されること（Task 17 のテスト）
 - `save_draft` を `emailRead` のないアカウントで呼ぶ。プロバイダーを呼ばずに拒否されること（Task 14 のテスト）
-- 引用符、バックスラッシュ、`$` を含むパスワード。`appsettings.json` が正しい JSON のままで、`.env` の値も変わらないこと（Task 4 のテスト）
 
 ---
 
@@ -861,7 +863,9 @@ git add src changelogs/2026-11-07-save-draft-tool.md
 git commit -m "Add a save_draft tool for IMAP accounts"
 ```
 
-### Task 15: `get_email_details` のヘッダー
+### Task 15: `get_email_details` のヘッダー（Task 17 で置き換え）
+
+> 実施済み（fbc6950）。ヘッダーは新しいツール `get_email_headers` で返す設計に改め、fbc6950 は 30936fe で revert した。同じ目的を Task 17 で積み直す。新しく実行しない。
 
 **Files:**
 - Modify: `src/CalendarMcp.Core/Models/EmailMessage.cs`、`src/CalendarMcp.Core/Providers/ImapProviderService.cs`（詳細の組み立て）、`src/CalendarMcp.Core/Tools/GetEmailDetailsTool.cs`（応答と説明文）
@@ -945,12 +949,14 @@ Expected: `gh run watch -R rewse/calendar-mcp --exit-status "$(gh run list -R re
 
 ansible-playbooks の `feat/calendar-mcp` で行う。
 
+> Step 1 から 5（b15856dc）と、Step 6 の一回目の適用は fbc6950 の時点で実施済み。Step 6 は Task 17 の push のあとに一回目からやり直す。
+
 **Files:**
 - Modify: `roles/calendar_mcp/tasks/container.yml`、`tests/test_calendar_mcp.py`
 - Delete: `roles/calendar_mcp/files/calendar-mcp.patch`
 
 **Interfaces:**
-- Consumes: Task 15 の時点の `rewse/calendar-mcp` の既定ブランチ
+- Consumes: Task 17 の時点の `rewse/calendar-mcp` の既定ブランチ
 - Produces: `__calendar_mcp_source`（`{commit}`）、`__calendar_mcp_image`（`calendar-mcp:<commit の先頭 12 文字>`）。compose と handler は今のまま
 
 - [ ] **Step 1: 失敗するテストを書く**
@@ -1006,11 +1012,199 @@ git commit -m "feat(calendar_mcp): build from the rewse fork instead of a patch"
 - [ ] **Step 6: 適用する**
 
 Run: `direnv exec . ansible-playbook home-primary.yml --tags calendar_mcp`、続けてもう一度
-Expected: 一回目は成功してイメージのタグが `calendar-mcp:<Task 15 の commit の先頭 12 文字>` に変わり、二回目は `changed=0`
+Expected: 一回目は成功してイメージのタグが `calendar-mcp:<Task 17 の commit の先頭 12 文字>` に変わり、二回目は `changed=0`
 
 - [ ] **Step 7: 家から確かめる**
 
 Task 7 Step 4 の確認を `/tmp/calmcp-verify/mcp.py` でもう一度通す（トークンは `op read` から渡す。401 を五回続けると fail2ban が自分を BAN するので、トークンなしの確認は一回にとどめる）。加えて次を確かめる。
 
-- `get_email_details` の `headers` に `ARC-Authentication-Results` がある
+- `get_email_headers` で自分宛てのメールを読むと、`headers` に `ARC-Authentication-Results` と `Received` がある。同じメールの `get_email_details` の応答には `headers` がない
+- `get_email_headers` に `ts-icloud` を渡すと `Failed to get email headers: This account does not support this operation.` が返る
 - `save_draft` で自分宛ての下書きを一つ保存すると、IMAP の `INBOX.Draft` に `\Draft` 付きで一通増え、`INBOX.Sent` の件数は変わらない。確かめたらその下書きを消す
+
+### Task 17: `get_email_headers`
+
+`~/git/calendar-mcp` の `rewse` ブランチで、30936fe（fbc6950 の revert）の上に積む。Task 16 の Step 6 より前に行う。
+
+**Files:**
+- Create: `src/CalendarMcp.Core/Utilities/EmailHeaderMapper.cs`、`src/CalendarMcp.Core/Tools/GetEmailHeadersTool.cs`、`changelogs/2026-11-07-email-headers-tool.md`（`changelogs/2026-11-07-save-draft-tool.md` と同じ見出しの形）
+- Modify: `src/CalendarMcp.Core/Models/EmailMessage.cs`
+- Modify: `src/CalendarMcp.Core/Providers/ImapProviderService.cs`（`MessageToEmail` を `internal` にする）、`GoogleProviderService.cs`（`ConvertToEmailMessage` を `internal static` にする。インスタンスの状態は使っていない）、`M365ProviderService.cs` と `OutlookComProviderService.cs`（どちらも `GetEmailDetailsAsync` の `EmailMessage` の組み立て）
+- Modify: `src/CalendarMcp.HttpServer/Program.cs`、`src/CalendarMcp.StdioServer/Program.cs`（どちらも `GetEmailDetailsTool` の次に登録）
+- Test: `src/CalendarMcp.Tests/Utilities/EmailHeaderMapperTests.cs`、`src/CalendarMcp.Tests/Providers/GoogleEmailConversionTests.cs`、`src/CalendarMcp.Tests/Tools/GetEmailHeadersToolTests.cs`（三つとも新規）、`src/CalendarMcp.Tests/Providers/ImapProviderServiceTests.cs`、`src/CalendarMcp.Tests/Tools/PermissionEnforcementTests.cs`
+
+**Interfaces:**
+- Produces: `public sealed record EmailHeader(string Name, string Value)`（`EmailMessage.cs`）と `EmailMessage.Headers`（`List<EmailHeader>?`、既定 null）。null はプロバイダーがヘッダーを返さないこと、空の並びはヘッダーのないメールを表す。詳細を取るときだけ埋め、一覧と検索では null のまま
+- Produces: `public static class EmailHeaderMapper`（`CalendarMcp.Core.Utilities`）の `List<EmailHeader> FromMime(MimeKit.HeaderList headers)`、`List<EmailHeader> FromGraph(IEnumerable<Microsoft.Graph.Models.InternetMessageHeader>? headers)`、`List<EmailHeader> FromGmail(IEnumerable<Google.Apis.Gmail.v1.Data.MessagePartHeader>? headers)`。どれも入力の順を保ち、null の入力は空の並び、null の `Name` と `Value` は空文字にする
+- Produces: `public sealed class GetEmailHeadersTool(IAccountRegistry, IProviderServiceFactory, ILogger<GetEmailHeadersTool>)` の `Task<string> GetEmailHeaders(string accountId, string emailId)`。MCP の名前は `get_email_headers`。応答は `{"headers": [{"name": ..., "value": ...}]}`（`WriteIndented`、`get_unsubscribe_info` と同じ）
+- `get_email_details` の応答と説明文は変えない
+
+- [ ] **Step 1: 失敗するテストを書く**
+
+`EmailHeaderMapperTests.cs`:
+
+```csharp
+[TestMethod]
+public void FromMime_KeepsEveryFieldInOrder()
+{
+    var headers = new MimeKit.HeaderList
+    {
+        { "Received", "from a" },
+        { "Received", "from b" },
+        { "ARC-Authentication-Results", "i=1; rewse.jp; spf=pass" },
+    };
+    var result = EmailHeaderMapper.FromMime(headers);
+    CollectionAssert.AreEqual(new[] { "Received", "Received", "ARC-Authentication-Results" },
+        result.Select(h => h.Name).ToArray());
+    Assert.AreEqual("from b", result[1].Value);
+    Assert.AreEqual("i=1; rewse.jp; spf=pass", result[2].Value);
+}
+
+[TestMethod]
+public void FromGraph_KeepsEveryFieldInOrder()
+{
+    var result = EmailHeaderMapper.FromGraph(
+    [
+        new InternetMessageHeader { Name = "Received", Value = "from a" },
+        new InternetMessageHeader { Name = "Received", Value = "from b" },
+        new InternetMessageHeader { Name = "Authentication-Results", Value = "spf=pass" },
+    ]);
+    CollectionAssert.AreEqual(new[] { "Received", "Received", "Authentication-Results" },
+        result.Select(h => h.Name).ToArray());
+    Assert.AreEqual("from b", result[1].Value);
+}
+
+[TestMethod]
+public void FromGraph_Null_ReturnsEmpty()
+{
+    Assert.AreEqual(0, EmailHeaderMapper.FromGraph(null).Count);
+}
+
+[TestMethod]
+public void FromGmail_KeepsEveryFieldInOrder()
+{
+    var result = EmailHeaderMapper.FromGmail(
+    [
+        new MessagePartHeader { Name = "Received", Value = "from a" },
+        new MessagePartHeader { Name = "Authentication-Results", Value = "mx.google.com; spf=pass" },
+    ]);
+    CollectionAssert.AreEqual(new[] { "Received", "Authentication-Results" },
+        result.Select(h => h.Name).ToArray());
+    Assert.AreEqual("mx.google.com; spf=pass", result[1].Value);
+}
+```
+
+`GoogleEmailConversionTests.cs`（`GmailMessage()` は `Id = "m1"`、`Payload = new MessagePart { MimeType = "text/plain", Headers = [Received: from a、Authentication-Results: mx.google.com; spf=pass、Subject: s] }` の `Message` を返す補助）:
+
+```csharp
+[TestMethod]
+public void ConvertToEmailMessage_Details_IncludesHeaders()
+{
+    var email = GoogleProviderService.ConvertToEmailMessage(GmailMessage(), "acc-1", includeBody: true);
+    Assert.IsNotNull(email.Headers);
+    CollectionAssert.AreEqual(new[] { "Received", "Authentication-Results", "Subject" },
+        email.Headers.Select(h => h.Name).ToArray());
+}
+
+[TestMethod]
+public void ConvertToEmailMessage_List_LeavesHeadersNull()
+{
+    Assert.IsNull(GoogleProviderService.ConvertToEmailMessage(GmailMessage(), "acc-1").Headers);
+}
+```
+
+`ImapProviderServiceTests.cs`:
+
+```csharp
+[TestMethod]
+public void MessageToEmail_IncludesEveryHeader()
+{
+    var m = new MimeMessage();
+    m.From.Add(MailboxAddress.Parse("a@example.com"));
+    m.Headers.Add("Received", "from a");
+    m.Headers.Add("ARC-Authentication-Results", "i=1; spf=pass");
+    m.Subject = "s";
+    m.Body = new TextPart("plain") { Text = "b" };
+
+    var email = ImapProviderService.MessageToEmail(m, "INBOX", 1, 2, "acc-1", isRead: true);
+
+    Assert.IsNotNull(email.Headers);
+    CollectionAssert.AreEqual(m.Headers.Select(h => h.Field).ToArray(),
+        email.Headers.Select(h => h.Name).ToArray());
+}
+```
+
+`GetEmailHeadersToolTests.cs`（`GetUnsubscribeInfoToolTests` と同じ組み立て。アカウントは `TestData.CreateAccount(id: "acc-1", provider: "imap")`、プロバイダーの `GetEmailDetailsAsync("acc-1", <emailId>, Arg.Any<CancellationToken>())` に返り値を設定する）:
+
+```csharp
+GetEmailHeaders_EmptyAccountId_ThrowsMcpException
+    // ex.Message == "accountId is required"
+GetEmailHeaders_EmptyEmailId_ThrowsMcpException
+    // ex.Message == "emailId is required"
+GetEmailHeaders_EmailNotFound_ThrowsMcpException
+    // provider returns null for "missing"; ex.Message == "Email 'missing' not found in account 'acc-1'"
+
+[TestMethod]
+public async Task GetEmailHeaders_ReturnsHeadersInOrder()
+{
+    // provider returns new EmailMessage { Id = "email-1", AccountId = "acc-1", Headers =
+    //     [new("Received", "from a"), new("Received", "from b"), new("ARC-Authentication-Results", "i=1; spf=pass")] }
+    var headers = JsonDocument.Parse(await tool.GetEmailHeaders("acc-1", "email-1"))
+        .RootElement.GetProperty("headers");
+    Assert.AreEqual(3, headers.GetArrayLength());
+    Assert.AreEqual("from b", headers[1].GetProperty("value").GetString());
+    Assert.AreEqual("ARC-Authentication-Results", headers[2].GetProperty("name").GetString());
+    regExp.Verify(); factExp.Verify(); provExp.Verify();
+}
+
+GetEmailHeaders_MessageWithoutHeaders_ReturnsEmptyArray
+    // Headers = []; headers.GetArrayLength() == 0
+GetEmailHeaders_ProviderWithoutHeaders_ThrowsMcpException
+    // provider returns TestData.CreateEmail(id: "email-1", accountId: "acc-1") (Headers is null)
+    // ex.Message == "Account 'acc-1' does not provide email headers"
+GetEmailHeaders_DavAccount_ThrowsMcpException
+    // account provider "dav"; GetEmailDetailsAsync .Callback((_, _, _) => throw new NotSupportedException(
+    //     "DAV provider does not support email. Use an IMAP account for mail."))
+    // ex.Message == "Failed to get email headers: This account does not support this operation."
+```
+
+`PermissionEnforcementTests.cs`（`SaveDraft_AccountWithoutEmailRead_Throws` と同じ形）:
+
+```csharp
+GetEmailHeaders_AccountWithoutEmailRead_Throws
+    // Scoped("cal-only", AccountPermission.CalendarRead, provider: "imap"); provider factory with no setups
+    // McpException whose message contains "does not permit reading email"
+```
+
+- [ ] **Step 2: コンパイルだけ通す**
+
+`EmailHeader` と `EmailMessage.Headers` を宣言する。`EmailHeaderMapper` の三つは `throw new NotImplementedException();`、`GetEmailHeadersTool.GetEmailHeaders` の本体も `throw new NotImplementedException();` にする。`MessageToEmail` を `internal`、`ConvertToEmailMessage` を `internal static` にする。プロバイダーの組み立てと `Program.cs` は変えない。
+
+- [ ] **Step 3: 失敗を確かめる**
+
+Run: `dotnet test src/CalendarMcp.Tests --filter "EmailHeaderMapper|ConvertToEmailMessage|MessageToEmail|GetEmailHeaders"`
+Expected: `ConvertToEmailMessage_List_LeavesHeadersNull` だけ PASS（一覧で埋めないことを固定するテストで、今の実装でも通る）。ほかの十四は FAIL。`EmailHeaderMapper` の四つとツールの八つ（`PermissionEnforcementTests` の一つを含む）は `NotImplementedException`（ツールのテストは期待した `McpException` でないため）、`ConvertToEmailMessage_Details_IncludesHeaders` と `MessageToEmail_IncludesEveryHeader` は `Assert.IsNotNull` で落ちる
+
+- [ ] **Step 4: 実装する**
+
+- `EmailHeaderMapper`: 入力の各要素から `EmailHeader` を作って並べる。`FromMime` は `Header.Field` と `Header.Value`
+- `ImapProviderService.MessageToEmail`: `Headers = EmailHeaderMapper.FromMime(m.Headers)`
+- `GoogleProviderService.ConvertToEmailMessage`: `Headers = includeBody ? EmailHeaderMapper.FromGmail(headers) : null`
+- `M365ProviderService` と `OutlookComProviderService` の `GetEmailDetailsAsync`: `Headers = EmailHeaderMapper.FromGraph(message.InternetMessageHeaders)`。どちらも詳細の取得で `internetMessageHeaders` をもう `Select` している。Graph を呼ぶ部分なので単体テストはなく、この一行はレビューで読む
+- `GetEmailHeadersTool.GetEmailHeaders`: `GetUnsubscribeInfoTool` と同じ順で `ToolGuard.RequireNonEmpty`（`accountId`、`emailId`）、`ToolGuard.RequireAccountAsync(..., AccountPermission.EmailRead)`、`GetEmailDetailsAsync`。null なら `Email '<emailId>' not found in account '<accountId>'`、`Headers` が null なら `Account '<accountId>' does not provide email headers` の `McpException`。ほかの例外は `ToolGuard.Failure("get email headers", ex)`。説明文には、すべてのヘッダーをメッセージの順で返すこと、認証の結果（`Authentication-Results`、`ARC-Authentication-Results` の SPF、DKIM、DMARC）と経路（`Received`）の確認に使うこと、`accountId` と `emailId` は `get_emails` か `search_emails` の結果から取ることを書く
+- 二つの `Program.cs` に登録し、changelog に、`get_email_details` の応答を膨らませないために別のツールにしたこと、四つのプロバイダーで詳細の取得のときだけヘッダーを埋めることを書く。`docs/mcp-tools.md` と `src/CalendarMcp.Core/Skills/email.md` は、上流に PR を出すときに `save_draft` とあわせて書く（設計のとおり）
+
+- [ ] **Step 5: 通ることを確かめる**
+
+Run: `dotnet test src/CalendarMcp.Tests && dotnet build src/CalendarMcp.HttpServer -c Release && dotnet build src/CalendarMcp.StdioServer -c Release`
+Expected: `Failed: 0`（798 件）と、二つの `Build succeeded.`
+
+- [ ] **Step 6: Commit と push**
+
+```bash
+git add src changelogs/2026-11-07-email-headers-tool.md
+git commit -m "Add a get_email_headers tool"
+git push
+```
+
+Expected: 30936fe と新しいコミットが push され、`gh run watch -R rewse/calendar-mcp --exit-status "$(gh run list -R rewse/calendar-mcp -b rewse -L 1 --json databaseId -q '.[0].databaseId')"` が成功
