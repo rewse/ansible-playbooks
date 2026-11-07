@@ -10,6 +10,8 @@
 
 **Spec:** `docs/superpowers/specs/2026-11-07-calendar-mcp-design.md`
 
+**改訂（2026-11-07）:** 設計を fork 方式に改めた。Task 2 のパッチと Task 3 のパッチの適用は、Task 12（fork に三つの変更をテスト付きで積む）と Task 13（ロールを fork からのビルドに切り替える）で置き換える。Task 12 と 13 は Task 8 より前に行う。
+
 ## Global Constraints
 
 - ロール名 `calendar_mcp`、ホスト名 `calendar-mcp.rewse.jp`、Compose プロジェクト `/etc/compose/calendar_mcp/compose.yaml`（`name: calendar_mcp`）、データ `/srv/calendar_mcp/<名前>`、checkout `/usr/local/src/calendar-mcp`
