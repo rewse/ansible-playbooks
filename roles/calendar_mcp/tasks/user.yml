@@ -1,0 +1,16 @@
+---
+- name: user | Create system group
+  ansible.builtin.group:
+    name: calendar-mcp
+    gid: "{{ calendar_mcp_gid }}"
+    system: true
+
+- name: user | Create system user
+  ansible.builtin.user:
+    name: calendar-mcp
+    uid: "{{ calendar_mcp_uid }}"
+    group: calendar-mcp
+    system: true
+    shell: /usr/sbin/nologin
+    home: "{{ calendar_mcp_data_dir }}"
+    create_home: false

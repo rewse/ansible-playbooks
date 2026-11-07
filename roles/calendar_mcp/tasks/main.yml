@@ -1,4 +1,9 @@
 ---
+- name: Import user tasks
+  ansible.builtin.import_tasks: user.yml
+  tags:
+    - calendar_mcp_user
+
 - name: Import config tasks
   ansible.builtin.import_tasks: config.yml
   tags:

@@ -13,8 +13,12 @@ calendar_mcp_container_dotnet_version: "10.0"
 # keyring the server writes.
 calendar_mcp_data_dir: /srv/calendar_mcp
 
-# mcpuser, created by `useradd -r` in the upstream Dockerfile on the aspnet image.
-calendar_mcp_uid: 999
+# The container user. The image's mcpuser is 999, a number Ubuntu hands out to
+# its own system accounts (dnsmasq and systemd-journal on fox), so the role
+# registers calendar-mcp on the host with these numbers and runs the containers
+# as that account.
+calendar_mcp_uid: 980
+calendar_mcp_gid: 980
 
 # Sakura's IMAP folder names. The server advertises no SPECIAL-USE, and the
 # upstream defaults are Gmail's.

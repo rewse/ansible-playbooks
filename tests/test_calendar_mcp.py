@@ -58,6 +58,15 @@ def render_expression(expression: str, **facts) -> str:
     return environment.from_string(expression).render(**facts)
 
 
+# Distinct numbers, so a field that reads the other variable shows up.
+ACCOUNT_IDS = {"calendar_mcp_uid": 1980, "calendar_mcp_gid": 1981}
+
+
+def resolved(expression) -> str:
+    """Render a task argument with the role vars and ACCOUNT_IDS."""
+    return render_expression(str(expression), **(role_vars() | ACCOUNT_IDS))
+
+
 class CalendarMcpBuildTest(unittest.TestCase):
     def test_depends_on_the_docker_role(self):
         # The role sorts before docker in home-primary.yml, and --tags
@@ -274,6 +283,25 @@ class CalendarMcpConfigTest(unittest.TestCase):
             self.assertEqual(task["notify"], "Recreate calendar-mcp")
 
 
+class CalendarMcpUserTest(unittest.TestCase):
+    def test_account_is_a_system_account_without_login(self):
+        group = task_named("user.yml", "user | Create system group")[
+            "ansible.builtin.group"
+        ]
+        user = task_named("user.yml", "user | Create system user")[
+            "ansible.builtin.user"
+        ]
+        self.assertEqual(group["name"], "calendar-mcp")
+        self.assertTrue(group["system"])
+        self.assertEqual(resolved(group["gid"]), "1981")
+        self.assertEqual(user["name"], "calendar-mcp")
+        self.assertEqual(user["group"], "calendar-mcp")
+        self.assertTrue(user["system"])
+        self.assertEqual(resolved(user["uid"]), "1980")
+        self.assertEqual(user["shell"], "/usr/sbin/nologin")
+        self.assertFalse(user["create_home"])
+
+
 class CalendarMcpComposeTest(unittest.TestCase):
     def services(self) -> dict:
         text = render(
@@ -474,7 +502,14 @@ class CalendarMcpApacheTest(unittest.TestCase):
         ]
         self.assertEqual(
             imports,
-            ["config.yml", "container.yml", "apache.yml", "fail2ban.yml", "legacy.yml"],
+            [
+                "user.yml",
+                "config.yml",
+                "container.yml",
+                "apache.yml",
+                "fail2ban.yml",
+                "legacy.yml",
+            ],
         )
 
 
