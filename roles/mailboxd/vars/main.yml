@@ -1,0 +1,32 @@
+---
+mailboxd_hostname: mail-mcp.rewse.jp
+
+# Published on the loopback address only, so nothing off the host reaches it
+# except through the Apache vhost, which terminates TLS and logs the requests.
+mailboxd_port: 8083
+
+# Audit records, send counters and checkpoints. No message bodies are stored.
+mailboxd_data_dir: /srv/mailboxd
+
+# The user the image runs as, which has to own the state directory.
+mailboxd_uid: 10001
+
+# The authserv-id that Sakura writes in Authentication-Results. Only headers
+# stamped with it are reported as trusted SPF, DKIM and DMARC verdicts.
+#
+# Empty, because Sakura writes its verdicts only to ARC-Authentication-Results
+# (authserv-id rewse.jp), which mailboxd does not parse. A client that needs the
+# verdicts reads that header with get_message and headers=true.
+mailboxd_trusted_authserv_id: ""
+
+# One entry per mailbox. The address and the IMAP password come from the Sakura
+# item (its top-level username and password fields, not those of its SMTP
+# section) and the bearer token from the mailboxd item, so no address or name
+# of a family member is written here.
+mailboxd_accounts:
+  - sakura_item: scuhuvks3pdlwlgkvnzlaptyke
+    mailboxd_item: 7tbut3qmtfp7dettl6hqsh6tei
+  - sakura_item: 2eb4e5qbwgl555366yquo3wufy
+    mailboxd_item: pjplhxwrdrm25hob63i37iqdkm
+  - sakura_item: wxfyds7hbotucdsud3fvoxn5oe
+    mailboxd_item: b7wlevkrmcvdmd5x27wdzfgewu

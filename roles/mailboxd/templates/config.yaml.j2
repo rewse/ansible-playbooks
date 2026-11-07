@@ -1,0 +1,48 @@
+---
+{{ ansible_managed | comment }}
+log_level: INFO
+
+auth:
+{% if mailboxd_trusted_authserv_id %}
+  trusted_authserv_id: {{ mailboxd_trusted_authserv_id }}
+{% endif %}
+  # One token per person, each limited to that person's mailbox. Without send
+  # a token cannot mail anything out, and without delete it can move messages
+  # to the Trash but never erase them, so a prompt injection in a message
+  # cannot do either.
+  tokens:
+{% for mailbox in __mailboxd_mailboxes %}
+    - name: {{ mailbox.name }}
+      token: ${MAILBOXD_TOKEN_{{ mailbox.name | upper | replace('-', '_') }}}
+      scopes: [read, draft, organize]
+      mailboxes: [{{ mailbox.name }}]
+{% endfor %}
+
+state:
+  path: /var/lib/mailboxd/state.db
+
+# A second stop behind the token scopes: a send is only previewed.
+send_guard:
+  dry_run: true
+
+mailboxes:
+{% for mailbox in __mailboxd_mailboxes %}
+  - name: {{ mailbox.name }}
+    imap:
+      host: rewse.sakura.ne.jp
+      port: 993
+      tls: ssl
+      username: {{ mailbox.address }}
+      password: ${MAILBOXD_PASSWORD_{{ mailbox.name | upper | replace('-', '_') }}}
+    # Only for the sender of drafts, which mailboxd takes from from_address and
+    # refuses without an smtp section. The host does not resolve (RFC 2606) and
+    # the password is not a credential, so no SMTP login is possible from here.
+    smtp:
+      host: smtp.invalid
+      port: 587
+      tls: starttls
+      username: {{ mailbox.address }}
+      password: not-a-credential
+      from_address: {{ mailbox.address }}
+      save_sent: false
+{% endfor %}
