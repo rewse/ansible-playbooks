@@ -90,10 +90,25 @@ flowchart LR
 - 足す変更は三つで、それぞれをコードとテストを含む一つのコミットにする。上流の作法（`src/CalendarMcp.Tests` の MSTest と Rocks のモック、`changelogs/`）に合わせる
   - 下書きフォルダーの設定: IMAP の `providerConfig` に任意の `draftsFolder` を足し、`drafts` の別名（`move_email` と `get_emails` の `folder`）がそれを使う。Sakura は SPECIAL-USE を広告せず、下書きフォルダーは `INBOX.Draft` なので、これがないと下書きの置き場所が見つからない
   - 下書きの保存: ツール `save_draft` を足す。引数は `accountId`、宛先、件名、本文、本文の形式、CC、返信元のメール ID（任意）とする。返信元があれば `In-Reply-To` と `References` を付ける。権限は `emailRead` で判定する。メールボックスの中を整理する操作と同じ扱いで、外には何も出さないからである。`IProviderService` には既定の実装（`NotSupportedException` を投げる）付きでメソッドを足し、IMAP 以外のプロバイダーには手を入れない
-  - ヘッダー: IMAP の `get_email_details` が、すべてのヘッダーを順番のまま `headers`（`name` と `value` の組の並び）で返す。上流はヘッダーを返さず、Muse が迷惑メールの判定に使う `ARC-Authentication-Results` を読めない
+  - ヘッダー: ツール `get_email_headers` を足す（下の「ヘッダーの取得」）。上流はヘッダーを返さず、Muse が迷惑メールの判定に使う `ARC-Authentication-Results` を読めない
 - 三つの変更はそれぞれ上流の `main` を元にしたブランチにも置き、上流に PR を出す（PR を出すのは後日でよい）
 - 上流の `ci.yml` は `main` でしか走らないので、`rewse` でも `dotnet test` が走るよう、fork だけのコミットで CI の対象ブランチを足す。上流の `release.yml` と `claude.yml` は fork では無効にする
 - fork は AGENTS.md の「GitHub Configuration」の対象外（upstream の fork）とする
+
+#### ヘッダーの取得
+
+- `get_email_headers` の引数は `accountId` と `emailId` とし、応答は `headers`（`name` と `value` の組の並び）だけにする。並びはメッセージの中の順で、`Received` のように繰り返す欄は別々の要素にする。権限は `emailRead` で判定する
+- ツールは上流の `get_unsubscribe_info` と同じく `GetEmailDetailsAsync` を呼び、結果の `EmailMessage.Headers` を返す。`IProviderService` は変えない
+- `EmailMessage.Headers` は、IMAP、M365、Outlook.com、Google の四つのプロバイダーで、詳細を取るときに埋める。四つとも詳細を取るときにヘッダーをもう受け取っている（IMAP は MIME メッセージ、M365 と Outlook.com は `internetMessageHeaders`、Google は `Payload.Headers`）。一覧と検索では埋めない。IMAP 以外は手元にアカウントがないので、変換の単体テストまでで確かめる
+- `Headers` が null のプロバイダーでは、ツールはヘッダーを返せないというエラーにする
+- `get_email_details` の応答と説明文は変えない
+- 上流の作法に合わせて `changelogs/` に記録を足す。`docs/mcp-tools.md` と `src/CalendarMcp.Core/Skills/email.md` は、上流に PR を出すときに `save_draft` とあわせて書く
+
+| 方式 | 内容 | 判断 |
+|---|---|---|
+| H1 | 新しいツール `get_email_headers` | 採用。既存のツールの応答も引数も変わらない。上流にも、ヘッダーから読んだ情報を返す専用のツール `get_unsubscribe_info` がある。上流の PR で見る範囲が一番狭い |
+| H2 | `get_email_details` に引数 `includeHeaders`（既定 false）を足す | 不採用。ツールの数は増えないが、既存のツールの引数と説明文に条件が入る |
+| H3 | `get_email_details` が常にヘッダーを返す | 不採用。ヘッダーは DKIM の署名や `Received` の連なりで 1 通あたり数 KB になり、詳細を読むたびに応答が膨らむ。上流の PR で最も受け入れられにくい |
 
 #### イメージのビルド
 
@@ -197,7 +212,7 @@ AGENTS.md の「Subdomains」の手順に従う。
   - カレンダーの一覧（6 個）
   - 予定の作成、更新、削除
   - 連絡先の検索
-  - メールの一覧、検索、読み取り、移動、ゴミ箱への移動、下書きの保存
+  - メールの一覧、検索、読み取り、ヘッダーの取得、移動、ゴミ箱への移動、下書きの保存
   - 送信と配信停止は拒否される。下書きが Sakura の Drafts フォルダーにあり、送信済みフォルダーには何も増えていない
 - 段階 4: CloudFront 経由で段階 3 と同じことができる。WAF のログで、Muse の通信が誤検知されていないことを見る
 - 段階 5: ubiqu の Muse でも段階 3 と同じことができ、ts のアカウントは見えない
@@ -242,10 +257,11 @@ iCloud のカレンダー、連絡先と Sakura のメール用のカスタム�
 4. 連絡先で自分の名前を検索する
 5. INBOX の新しいメール 5 件の差出人、件名、日時
 6. 件名に「calendar-mcp テスト」を含むメールを検索し、本文を読む
-7. そのメールを迷惑メールのフォルダーに移動し、次に INBOX に戻す
-8. そのメールへの返信を save_draft で下書きとして保存する（送信はしない）
-9. そのメールをゴミ箱に移動する
-10. send_email と unsubscribe_from_email が拒否されることを確かめる。send_email を試すときの宛先は自分のアドレスにする
+7. そのメールのヘッダーを get_email_headers で取り、ARC-Authentication-Results（SPF、DKIM、DMARC の結果）と Received を見る
+8. そのメールを迷惑メールのフォルダーに移動し、次に INBOX に戻す
+9. そのメールへの返信を save_draft で下書きとして保存する（送信はしない）
+10. そのメールをゴミ箱に移動する
+11. send_email と unsubscribe_from_email が拒否されることを確かめる。send_email を試すときの宛先は自分のアドレスにする
 
 最後に、このコネクタの使い方をスキルとして保存して。URL はあとで差し替えるので、1 か所で変えられるようにしておいて。
 ```
