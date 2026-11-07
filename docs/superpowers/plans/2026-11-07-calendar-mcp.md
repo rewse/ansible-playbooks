@@ -16,6 +16,8 @@
 
 **改訂（2026-11-07、三回目）:** Task 8 で、Sakura の IMAP では `get_emails` が頼んだ件数より少なく返ることが分かった（設計の「UID の並び」）。Task 18 で直す。Task 8 は Step 1 から 3 まで実施済みで、一覧のほかはすべて通った。Task 18 の Step 8 が通ったら Task 8 を完了とする。Muse からの一覧の確かめ直しは、Task 9 で CloudFront 経由の段階 3 を確かめるときに行う。
 
+**改訂（2026-11-07、四回目）:** Task 10 は利用者の判断で飛ばした。最終レビューで、.NET のベースイメージが固定も更新もされないことが分かった（設計の「イメージのビルド」）。Task 19 で直し、そのあとで Task 11 の Step 8（マージ）を行う。
+
 ## Global Constraints
 
 - ロール名 `calendar_mcp`、ホスト名 `calendar-mcp.rewse.jp`、Compose プロジェクト `/etc/compose/calendar_mcp/compose.yaml`（`name: calendar_mcp`）、データ `/srv/calendar_mcp/<名前>`、checkout `/usr/local/src/calendar-mcp`
@@ -1292,3 +1294,94 @@ Expected: 一回目でイメージのタグが `calendar-mcp:<Step 6 の commit 
 - `search_emails`（query `Amazon`、count 10）が返す UID が、生の IMAP の `UID SEARCH OR OR SUBJECT Amazon BODY Amazon FROM Amazon` の最後の 10 個（ヒットが 10 件未満なら全部）と一致する
 
 確かめたら、Task 8 を完了にする。
+
+### Task 19: .NET のベースイメージを `aged_release` で固定する
+
+前半は `~/git/calendar-mcp` の `rewse`（08680d8 の上）、後半は ansible-playbooks の `feat/calendar-mcp` で行う。
+
+**Files:**
+- Modify（fork）: `Dockerfile`
+- Create（fork）: `changelogs/2026-11-07-dockerfile-base-image-args.md`（`changelogs/2026-11-07-save-draft-tool.md` と同じ見出しの形）
+- Modify: `roles/calendar_mcp/tasks/container.yml`（`container | Resolve SDK image` と `container | Resolve runtime image` を `container | Resolve fork commit` の次に足し、`container | Name image` と `container | Build image` を変える）、`roles/calendar_mcp/vars/main.yml`（`calendar_mcp_container_dotnet_version`）、`roles/calendar_mcp/templates/compose.yaml.j2`（古いコメント）
+- Test: `tests/test_calendar_mcp.py`（`CalendarMcpBuildTest`）
+
+**Interfaces:**
+- Produces（fork）: `Dockerfile` の最初の `FROM` の前に `ARG SDK_IMAGE=mcr.microsoft.com/dotnet/sdk:10.0` と `ARG RUNTIME_IMAGE=mcr.microsoft.com/dotnet/aspnet:10.0`。二つの段は `FROM ${SDK_IMAGE} AS build` と `FROM ${RUNTIME_IMAGE} AS runtime`
+- Produces: `calendar_mcp_container_dotnet_version: "10.0"`（fork の `TargetFramework` の `net10.0` に合わせた固定。理由をコメントに書く）
+- Produces: `__calendar_mcp_sdk_image` と `__calendar_mcp_runtime_image`（どちらも `aged_release` の `oci:` の返り値 `{version, ref}`。`ref` は `repo:tag@digest`）
+- Produces: `__calendar_mcp_image` は `'calendar-mcp:' ~ __calendar_mcp_source.commit[:12] ~ '-' ~ ((__calendar_mcp_sdk_image.ref ~ ' ' ~ __calendar_mcp_runtime_image.ref) | hash('sha256'))[:12]`
+
+- [ ] **Step 1: fork の `Dockerfile` を変える**
+
+二つの `ARG` を最初の `FROM` の前に置き、二つの `FROM` をそれに替える。既定値は今の `FROM` と同じにして、引数なしのビルドは変わらないようにする。changelog に、ビルドする側がベースを `tag@digest` で固定できるようにしたことを書く。
+
+- [ ] **Step 2: fork を Commit と push**
+
+```bash
+git add Dockerfile changelogs/2026-11-07-dockerfile-base-image-args.md
+git commit -m "Allow overriding the .NET base images in the Dockerfile"
+git push
+```
+
+Expected: fork の CI が成功。`dotnet test` は `Dockerfile` を使わないので、`Dockerfile` そのものは Step 8 のビルドで確かめる
+
+- [ ] **Step 3: 失敗するテストを書く**
+
+`render_expression(expression, **facts)` を test ファイルの補助として足す（jinja2 の `Environment` に `hash` フィルターを `hashlib` で足し、`{{ ... }}` を描画する）。`test_image_tag_is_the_commit` を最初のテストに置き換え、二つを足す。
+
+```python
+def test_image_tag_joins_the_commit_and_the_base_images(self):
+    expression = task_named("container.yml", "container | Name image")[
+        "ansible.builtin.set_fact"]["__calendar_mcp_image"]
+    sdk = "mcr.microsoft.com/dotnet/sdk:10.0.402@sha256:aaa"
+    runtime = "mcr.microsoft.com/dotnet/aspnet:10.0.13@sha256:bbb"
+    tag = render_expression(expression,
+        __calendar_mcp_source={"commit": "08680d87ba0918b8e10c3302ce6c02b58516b94b"},
+        __calendar_mcp_sdk_image={"ref": sdk}, __calendar_mcp_runtime_image={"ref": runtime})
+    self.assertEqual(tag, "calendar-mcp:08680d87ba09-"
+                     + hashlib.sha256(f"{sdk} {runtime}".encode()).hexdigest()[:12])
+
+def test_base_images_are_aged_releases_of_the_target_framework(self):
+    for name, var, repo in (
+        ("container | Resolve SDK image", "__calendar_mcp_sdk_image", "oci:mcr.microsoft.com/dotnet/sdk"),
+        ("container | Resolve runtime image", "__calendar_mcp_runtime_image", "oci:mcr.microsoft.com/dotnet/aspnet"),
+    ):
+        fact = task_named("container.yml", name)["ansible.builtin.set_fact"][var]
+        self.assertIn(repo, fact)
+        self.assertIn("calendar_mcp_container_dotnet_version", fact)
+        self.assertNotIn("days=", fact)  # the default supply-chain cooldown applies
+    self.assertEqual(role_vars()["calendar_mcp_container_dotnet_version"], "10.0")
+
+def test_build_passes_the_pinned_base_images(self):
+    build = task_named("container.yml", "container | Build image")["community.docker.docker_image_build"]
+    self.assertEqual(build["args"], {
+        "SDK_IMAGE": "{{ __calendar_mcp_sdk_image.ref }}",
+        "RUNTIME_IMAGE": "{{ __calendar_mcp_runtime_image.ref }}",
+    })
+```
+
+- [ ] **Step 4: 失敗を確かめる**
+
+Run: `uv run --with pytest --with ansible-core pytest tests/test_calendar_mcp.py -q -k "base_images or image_tag"`
+Expected: 三つとも FAIL（タグの描画はアサーション、二つの `Resolve` タスクは `StopIteration`、`args` は `KeyError`）
+
+- [ ] **Step 5: 実装する**
+
+二つの `Resolve` タスクは `lookup('aged_release', 'oci:mcr.microsoft.com/dotnet/<sdk か aspnet>', pattern='^' ~ (calendar_mcp_container_dotnet_version | regex_escape) ~ '\.\d+$', platform=...)`。`platform` はほかのロールと同じく `ansible_facts['architecture']` から決める。`Name image` を Interfaces の式にし、`Build image` に `args` を足す。`container | Resolve fork commit` のコメントの fork の変更の一覧に UID の並びとベースイメージを足し、`compose.yaml.j2` の「source component」を「container component」に直す（最終レビューの Minor のうち、このタスクで触れるファイルにあるもの）。
+
+- [ ] **Step 6: 通ることを確かめる**
+
+Run: `uv run --with pytest --with ansible-core pytest tests -q` と `uvx --with pre-commit-uv==4.3.0 pre-commit@4.6.2 run --all-files --show-diff-on-failure`
+Expected: どちらも通る
+
+- [ ] **Step 7: Commit**
+
+```bash
+git add roles/calendar_mcp tests/test_calendar_mcp.py
+git commit -m "fix(calendar_mcp): pin and refresh the .NET base images"
+```
+
+- [ ] **Step 8: 適用して確かめる**
+
+Run: `direnv exec . ansible-playbook home-primary.yml --tags calendar_mcp`、終わってからもう一度（二つを同時に流さない）
+Expected: 一回目でイメージのタグが `calendar-mcp:<Step 2 の commit の先頭 12 文字>-<12 文字>` になり、二つのコンテナが healthy。二回目は `changed=0`。`docker run --rm --entrypoint dotnet <image> --list-runtimes` の `Microsoft.AspNetCore.App` の版が、`aged_release` の選んだ `aspnet` のタグと同じ。家から `get_emails`（count 5）と `get_email_headers` をもう一度通す
