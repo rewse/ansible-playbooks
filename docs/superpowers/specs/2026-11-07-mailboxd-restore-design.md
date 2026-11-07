@@ -69,7 +69,7 @@ calendar-mcp の DNS ポリシー（`fb57fc89-e4bd-486f-9098-b788753e7fc7`）を
 
 - fox で mailboxd のコンテナが healthy で、calendar-mcp のコンテナ、イメージ、`.NET` のベースイメージ、上の各パス、`calendar-mcp` アカウントがない
 - `mail-mcp.rewse.jp/mcp` が、家からも CloudFront 経由でも、トークンなしで 401、`calendar-mcp.rewse.jp` は名前解決しない
-- 撤去前のトークン 1 件で MCP の `initialize` と `tools/list` が通る（値は表示しない）
+- 撤去前のトークン 1 件で MCP の `initialize` が 200 になる（値は表示しない）
 - 2 回目の適用が `changed=0` になる
 - Security Agent の mail-mcp の target domain が VERIFIED になる
 - 各リポジトリのテストとリント、CI が通る
