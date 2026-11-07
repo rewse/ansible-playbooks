@@ -87,13 +87,14 @@ flowchart LR
 #### fork（`rewse/calendar-mcp`）
 
 - `~/git/calendar-mcp` に clone する。既定ブランチは `rewse` とし、待機期間を過ぎた上流の `Release x.y.z` のコミットの上に、自分たちのコミットを積む。上流の `main` はそのまま上流を映す
-- 足す変更は五つで、それぞれをコードとテストを含む一つのコミットにする。上流の作法（`src/CalendarMcp.Tests` の MSTest と Rocks のモック、`changelogs/`）に合わせる
+- 足す変更は六つで、それぞれをコードとテストを含む一つのコミットにする。上流の作法（`src/CalendarMcp.Tests` の MSTest と Rocks のモック、`changelogs/`）に合わせる
   - 下書きフォルダーの設定: IMAP の `providerConfig` に任意の `draftsFolder` を足し、`drafts` の別名（`move_email` と `get_emails` の `folder`）がそれを使う。Sakura は SPECIAL-USE を広告せず、下書きフォルダーは `INBOX.Draft` なので、これがないと下書きの置き場所が見つからない
   - 下書きの保存: ツール `save_draft` を足す。引数は `accountId`、宛先、件名、本文、本文の形式、CC、返信元のメール ID（任意）とする。返信元があれば `In-Reply-To` と `References` を付ける。権限は `emailRead` で判定する。メールボックスの中を整理する操作と同じ扱いで、外には何も出さないからである。`IProviderService` には既定の実装（`NotSupportedException` を投げる）付きでメソッドを足し、IMAP 以外のプロバイダーには手を入れない
   - ヘッダー: ツール `get_email_headers` を足す（下の「ヘッダーの取得」）。上流はヘッダーを返さず、Muse が迷惑メールの判定に使う `ARC-Authentication-Results` を読めない
+  - 招待の制限: 参加者に招待や返信のメールが届く予定の操作は、`calendarWrite` に加えて `emailSend` を求める（下の「招待の制限」）。iCloud はカレンダーの書き込みを受けて自分で招待を送るので、`emailSend: false` だけではカレンダーからメールが出る
   - ベースイメージ: `Dockerfile` の `FROM` を `ARG` にする（下の「イメージのビルド」）。`Dockerfile` には単体テストがないので、fox でのビルドで確かめる
   - UID の並び: IMAP の一覧（`get_emails`）と検索（`search_emails`）は、FETCH に渡す UID を古い順に並べる。上流は新しい順の UID をそのまま渡し、MailKit はその連続した部分を `36045:36043` のような逆順の範囲にして送る。RFC 3501 では `4:2` と `2:4` は同じだが、Sakura の Courier-IMAP は逆順の範囲に 1 通しか返さないので、`get_emails` が頼んだ件数より少なく返る（5 件で 2 件、20 件で 3 件）。並べ替えるのは FETCH に渡す UID だけで、応答は今までどおり日付の新しい順にする
-- 五つの変更はそれぞれ上流の `main` を元にしたブランチにも置き、上流に PR を出す（PR を出すのは後日でよい）
+- 六つの変更はそれぞれ上流の `main` を元にしたブランチにも置き、上流に PR を出す（PR を出すのは後日でよい）
 - 上流の `ci.yml` は `main` でしか走らないので、`rewse` でも `dotnet test` が走るよう、fork だけのコミットで CI の対象ブランチを足す。上流の `release.yml` と `claude.yml` は fork では無効にする
 - fork は AGENTS.md の「GitHub Configuration」の対象外（upstream の fork）とする
 
@@ -111,6 +112,25 @@ flowchart LR
 | H1 | 新しいツール `get_email_headers` | 採用。既存のツールの応答も引数も変わらない。上流にも、ヘッダーから読んだ情報を返す専用のツール `get_unsubscribe_info` がある。上流の PR で見る範囲が一番狭い |
 | H2 | `get_email_details` に引数 `includeHeaders`（既定 false）を足す | 不採用。ツールの数は増えないが、既存のツールの引数と説明文に条件が入る |
 | H3 | `get_email_details` が常にヘッダーを返す | 不採用。ヘッダーは DKIM の署名や `Received` の連なりで 1 通あたり数 KB になり、詳細を読むたびに応答が膨らむ。上流の PR で最も受け入れられにくい |
+
+#### 招待の制限
+
+- iCloud は、主催者のいる予定に参加者があると、CalDAV の書き込みを受けて招待をメール（iMIP）で送る。主催者を自分にして参加者を付けた予定を PUT すると、参加者に `SCHEDULE-STATUS=1.1` が付いた。`SCHEDULE-AGENT=CLIENT` を付けても同じだったので、クライアントの側では止められない。M365 と Google も、参加者のいる予定ではサーバーが招待を送る
+- このため、`emailSend: false` でもカレンダーからメールが出る。迷惑メールに仕込まれた指示で、会議の参加者に変更や取り消しが届く、迷惑な招待への返事で送り主にアドレスが生きていると知らせる、といったことが起こる
+- メールが届く予定の操作は、`calendarWrite` に加えて `emailSend` を求める。`emailSend` が許可されたアカウントでは、今までどおりすべて通る。招待を使いたくなったら、そのアカウントの `emailSend` を有効にする（送信と配信停止も一緒に許可される）
+  - `create_event`: `attendees` が空でないとき
+  - `update_event`: `attendees` を渡したとき（空の並びも含む。参加者を外すと取り消しが届く）と、今の予定に参加者がいるとき
+  - `delete_event`: 今の予定に参加者がいるとき
+  - `respond_to_event`: いつも
+- 参加者がいるかは、`GetCalendarEventDetailsAsync` の結果の `Attendees` か `AttendeeDetails` が空でないかで決める。主催者だけでは決めない（M365 は参加者のいない予定にも主催者を付ける）。`emailSend` のあるアカウントでは、この読み取りをしない
+- 拒否はプロバイダーを呼ぶ前に、`emailSend` の権限の文言（`does not permit sending email`）で行う。`accountId` を省いたときの振り分けでは、必要な権限をすべて持つアカウントだけを候補にする
+- 四つのツールの説明文に、参加者や主催者にメールが届くことと `emailSend` が要ることを書く。権限の意味が変わるので、`docs/mcp-tools.md` と `docs/configuration.md` の権限の表もこのコミットで直す
+
+| 方式 | 内容 | 判断 |
+|---|---|---|
+| I1 | 参加者を付ける操作、返事、参加者のいる予定の変更と削除に `emailSend` を求める | 採用。カレンダーからメールが出る道をすべて `emailSend` にまとめる。参加者のいる予定は Muse からは読むだけになる |
+| I2 | 参加者を付ける操作と返事だけに `emailSend` を求める | 不採用。宛先は選べないが、会議の変更や取り消しが参加者に届き、迷惑な招待を消すと送り主に辞退が届くおそれがある |
+| I3 | 「残るリスク」として受け入れる | 不採用。送信と配信停止を止めた目的が、カレンダーの側で崩れる |
 
 #### イメージのビルド
 
@@ -203,7 +223,7 @@ AGENTS.md の「Subdomains」の手順に従う。
 
 ## 進め方
 
-1. `aged_release` に題の正規表現の引数を足し、fork を作って五つの変更をテスト付きで積む
+1. `aged_release` に題の正規表現の引数を足し、fork を作って六つの変更をテスト付きで積む
 2. fox に `calendar_mcp` ロールを入れる。まず ts のコンテナだけを使い、家から確かめる。この段階では mailboxd はそのまま動かしておく
 3. Cloudflare の Quick Tunnel を fox で手で起動し、ts のコンテナに直接つないで、Muse から確かめる。確かめ終わったらトンネルを止める。mailboxd で使った手順と同じ
 4. 段階 3 が通ったら、cloudfront-waf、UniFi の DNS、security-agent を入れ、Muse のコネクタの URL を `https://calendar-mcp.rewse.jp/mcp/ts` に替える
@@ -218,6 +238,7 @@ AGENTS.md の「Subdomains」の手順に従う。
   - ts のトークンで `list_accounts` を呼ぶと、ts の二つのアカウントだけが見える
   - ts のトークンで `/mcp/ubiqu` を呼ぶと 401 が返る
   - `send_email` と `unsubscribe_from_email` は呼ぶと拒否される
+  - 参加者を付けた `create_event`、参加者のいる予定への `update_event` と `delete_event`、`respond_to_event` は、`does not permit sending email` で拒否される。参加者のいない予定の作成、更新、削除は通る
 - 段階 3: Muse から次のことができる
   - カレンダーの一覧（6 個）
   - 予定の作成、更新、削除
