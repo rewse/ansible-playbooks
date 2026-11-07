@@ -16,7 +16,7 @@
 
 **改訂（2026-11-07、三回目）:** Task 8 で、Sakura の IMAP では `get_emails` が頼んだ件数より少なく返ることが分かった（設計の「UID の並び」）。Task 18 で直す。Task 8 は Step 1 から 3 まで実施済みで、一覧のほかはすべて通った。Task 18 の Step 8 が通ったら Task 8 を完了とする。Muse からの一覧の確かめ直しは、Task 9 で CloudFront 経由の段階 3 を確かめるときに行う。
 
-**改訂（2026-11-07、四回目）:** Task 10 は利用者の判断で飛ばした。最終レビューで、.NET のベースイメージが固定も更新もされないこと（設計の「イメージのビルド」）と、iCloud がカレンダーの書き込みを受けて招待のメールを送ること（設計の「招待の制限」）が分かった。Task 19 と Task 20 で直し、そのあとで Task 11 の Step 8（マージ）を行う。
+**改訂（2026-11-07、四回目）:** Task 10 は利用者の判断で飛ばした。最終レビューで、.NET のベースイメージが固定も更新もされないこと（設計の「イメージのビルド」）と、iCloud がカレンダーの書き込みを受けて招待のメールを送ること（設計の「招待の制限」）が分かった。Task 19 と Task 20 で直す。利用者の求めで、fork の変更ごとに `README.md`、`docs/`、`Skills/` の文書も直す（設計の「文書」）。すでに積んだ二つの文書は Task 21 で足す。そのあとで Task 11 の Step 8（マージ）を行う。
 
 ## Global Constraints
 
@@ -1300,7 +1300,7 @@ Expected: 一回目でイメージのタグが `calendar-mcp:<Step 6 の commit 
 前半は `~/git/calendar-mcp` の `rewse`（08680d8 の上）、後半は ansible-playbooks の `feat/calendar-mcp` で行う。
 
 **Files:**
-- Modify（fork）: `Dockerfile`
+- Modify（fork）: `Dockerfile`、`README.md`（「HTTP Server (Containerized)」の `docker build` の例）
 - Create（fork）: `changelogs/2026-11-07-dockerfile-base-image-args.md`（`changelogs/2026-11-07-save-draft-tool.md` と同じ見出しの形）
 - Modify: `roles/calendar_mcp/tasks/container.yml`（`container | Resolve SDK image` と `container | Resolve runtime image` を `container | Resolve fork commit` の次に足し、`container | Name image` と `container | Build image` を変える）、`roles/calendar_mcp/vars/main.yml`（`calendar_mcp_container_dotnet_version`）、`roles/calendar_mcp/templates/compose.yaml.j2`（古いコメント）
 - Test: `tests/test_calendar_mcp.py`（`CalendarMcpBuildTest`）
@@ -1313,12 +1313,12 @@ Expected: 一回目でイメージのタグが `calendar-mcp:<Step 6 の commit 
 
 - [ ] **Step 1: fork の `Dockerfile` を変える**
 
-二つの `ARG` を最初の `FROM` の前に置き、二つの `FROM` をそれに替える。既定値は今の `FROM` と同じにして、引数なしのビルドは変わらないようにする。changelog に、ビルドする側がベースを `tag@digest` で固定できるようにしたことを書く。
+二つの `ARG` を最初の `FROM` の前に置き、二つの `FROM` をそれに替える。既定値は今の `FROM` と同じにして、引数なしのビルドは変わらないようにする。changelog に、ビルドする側がベースを `tag@digest` で固定できるようにしたことを書く。`README.md` の `docker build` の例の下に、`--build-arg SDK_IMAGE=...` と `--build-arg RUNTIME_IMAGE=...` でベースを固定できることを一文と例で書く。
 
 - [ ] **Step 2: fork を Commit と push**
 
 ```bash
-git add Dockerfile changelogs/2026-11-07-dockerfile-base-image-args.md
+git add Dockerfile README.md changelogs/2026-11-07-dockerfile-base-image-args.md
 git commit -m "Allow overriding the .NET base images in the Dockerfile"
 git push
 ```
@@ -1392,7 +1392,7 @@ Expected: 一回目でイメージのタグが `calendar-mcp:<Step 2 の commit 
 
 **Files:**
 - Modify: `src/CalendarMcp.Core/Tools/ToolGuard.cs`（`HasAttendees`、`RequireEmailSendIfEventHasAttendeesAsync`）、`CreateEventTool.cs`、`UpdateEventTool.cs`、`DeleteEventTool.cs`、`RespondToEventTool.cs`（権限の確かめ方と説明文）
-- Modify: `docs/mcp-tools.md`（「Account permissions」の表と本文）、`docs/configuration.md`（`emailSend` の行と Notes）
+- Modify: `README.md`（権限の表）、`docs/mcp-tools.md`（「Account permissions」の表と本文、四つのツールの節）、`docs/configuration.md`（`emailSend` の行と Notes）、`docs/security.md`（「Per-Account Permissions」の脅威モデルの箇条）、`src/CalendarMcp.Core/Skills/calendar.md`（参加者と返事に `emailSend` が要ること、拒否されたら利用者にカレンダーのアプリでの操作を頼むこと）
 - Create: `changelogs/2026-11-07-calendar-invitations-need-email-send.md`（`changelogs/2026-11-07-save-draft-tool.md` と同じ見出しの形）
 - Test: `src/CalendarMcp.Tests/Tools/ToolGuardTests.cs`、`src/CalendarMcp.Tests/Tools/PermissionEnforcementTests.cs`
 
@@ -1459,7 +1459,7 @@ Expected: 新しいテストのうち十が FAIL。拒否を期待する六つ�
 
 - [ ] **Step 4: 実装する**
 
-Interfaces のとおりに `ToolGuard` と四つのツールを変える。権限の確かめはどれもプロバイダーの書き込みより前に置く。説明文には、`create_event` と `update_event` の `attendees` に「参加者には招待がメールで届くので、アカウントに `emailSend` が要る」、`update_event` と `delete_event` に「参加者のいる予定を変えると参加者にメールが届くので `emailSend` が要る」、`respond_to_event` に「主催者に返事がメールで届くので `emailSend` が要る」を書く。`docs/mcp-tools.md` の表の `emailSend` の行にこの四つの条件を足し、表の下に「`emailSend` はアカウントの代わりに新しいメールを出すことすべてで、サーバーが送る招待、変更、取り消し、返事も含む」を書く。`docs/configuration.md` の `emailSend` の行と Notes も同じ内容にする。changelog に、iCloud が CalDAV の書き込みを受けて招待を送り、`SCHEDULE-AGENT=CLIENT` を無視することを書く
+Interfaces のとおりに `ToolGuard` と四つのツールを変える。権限の確かめはどれもプロバイダーの書き込みより前に置く。説明文には、`create_event` と `update_event` の `attendees` に「参加者には招待がメールで届くので、アカウントに `emailSend` が要る」、`update_event` と `delete_event` に「参加者のいる予定を変えると参加者にメールが届くので `emailSend` が要る」、`respond_to_event` に「主催者に返事がメールで届くので `emailSend` が要る」を書く。`docs/mcp-tools.md` の表の `emailSend` の行にこの四つの条件を足し、表の下に「`emailSend` はアカウントの代わりに新しいメールを出すことすべてで、サーバーが送る招待、変更、取り消し、返事も含む」を書く。`README.md` と `docs/configuration.md` の権限の表の `emailSend` の行、`docs/configuration.md` の Notes、`docs/security.md` の脅威モデルの箇条も同じ内容にし、`docs/mcp-tools.md` の四つのツールの節と `Skills/calendar.md` に条件を書く。changelog に、iCloud が CalDAV の書き込みを受けて招待を送り、`SCHEDULE-AGENT=CLIENT` を無視することを書く
 
 - [ ] **Step 5: 通ることを確かめる**
 
@@ -1469,7 +1469,7 @@ Expected: `Failed: 0` と `Build succeeded.`
 - [ ] **Step 6: Commit と push**
 
 ```bash
-git add src docs changelogs/2026-11-07-calendar-invitations-need-email-send.md
+git add README.md src docs changelogs/2026-11-07-calendar-invitations-need-email-send.md
 git commit -m "Require emailSend for calendar operations that mail attendees"
 git push
 ```
@@ -1487,3 +1487,45 @@ ts のトークンで次を確かめる。参加者のいる予定は、主催�
 - 参加者のいない予定の `create_event`、`update_event`、`delete_event` は通る
 - 上の参加者のいる予定への `update_event` と `delete_event` は拒否され、予定は残る
 - `respond_to_event` は拒否される
+
+### Task 21: `save_draft` と `get_email_headers` の文書
+
+`~/git/calendar-mcp` の `rewse` ブランチで、Task 20 の fork のコミットの上に積む。文書だけのコミットを二つ足す（設計の「文書」。既定ブランチは書き換えず、PR のブランチを作るときに機能のコミットとまとめる）。文書にはテストを書かない。英語で書き、書き上げたら `~/.agents/skills/humanizer/SKILL.md` の型を取り除く。
+
+**Files:**
+- Modify: `README.md`（「MCP Tools」の一覧）、`docs/mcp-tools.md`（ツールの節と「Account permissions」の表の `emailRead` の行）、`src/CalendarMcp.Core/Skills/overview.md`（ツールの一覧）、`src/CalendarMcp.Core/Skills/email.md`
+- Modify（`save_draft` だけ）: `docs/IMAP-SETUP.md`（下書きの置き場所の決まり方）、`src/CalendarMcp.Core/Skills/providers.md`（`save_draft` は IMAP だけ）
+
+**Interfaces:**
+- Consumes: Task 14 の `save_draft`（引数、応答 `{success, accountId, draftEmailId, message}`、`emailRead`、IMAP のみ）と Task 17 の `get_email_headers`（引数、応答 `{"headers": [{name, value}]}`、`emailRead`、詳細を取るときだけ埋めるプロバイダー四つ、ヘッダーを返さないプロバイダーではエラー）。どちらもツールの `Description` と changelog の文言を正とする
+
+- [ ] **Step 1: `save_draft` の文書を書く**
+
+`README.md` の一覧で `send_email` の次に `save_draft`（送らずに下書きフォルダーへ保存する、返信なら元のメールにつながる）を足す。`docs/mcp-tools.md` は `send_email` の節の次に `#### \`save_draft\`` を置き、ほかの節と同じ形（説明、引数、応答の例）で書く。権限の表の `emailRead` の行に `save_draft` を足し、表の下の「Mailbox management ... sits under `emailRead`」の文に下書きを含める。`docs/IMAP-SETUP.md` には、下書きは `draftsFolder`、なければ SPECIAL-USE の `\Drafts` に置くことを書く。`Skills/overview.md` の一覧と `Skills/email.md` に、返事を頼まれて送信できないアカウントでは `save_draft` で下書きにし、送るのは利用者に任せることを書く。`Skills/providers.md` に、`save_draft` は IMAP だけで、ほかのプロバイダーでは使えないことを書く。
+
+- [ ] **Step 2: 確かめて Commit**
+
+Run: `rg -n '^#### \`save_draft\`' docs/mcp-tools.md && rg -n 'save_draft' README.md src/CalendarMcp.Core/Skills/overview.md src/CalendarMcp.Core/Skills/email.md src/CalendarMcp.Core/Skills/providers.md docs/IMAP-SETUP.md && dotnet test src/CalendarMcp.Tests`
+Expected: どのファイルにも `save_draft` があり、テストは `Failed: 0`（`Skills/*.md` は埋め込みリソースなので、ビルドが通ることも確かめる）
+
+```bash
+git add README.md docs src/CalendarMcp.Core/Skills
+git commit -m "Document the save_draft tool"
+```
+
+- [ ] **Step 3: `get_email_headers` の文書を書く**
+
+`README.md` の一覧で `get_email_details` の次に `get_email_headers`（すべてのヘッダーをメッセージの順で返す。SPF、DKIM、DMARC の結果と経路の確認に使う）を足す。`docs/mcp-tools.md` は `get_email_details` の節の次に `#### \`get_email_headers\`` を置き、IMAP、Microsoft 365、Outlook.com、Google が返し、ほかのプロバイダーではエラーになることを書く。権限の表の `emailRead` の行に足す。`Skills/overview.md` の一覧と `Skills/email.md` に、迷惑メールやなりすましを疑うときは本文より先に `get_email_headers` で `Authentication-Results`、`ARC-Authentication-Results`、`Received` を見ることを書く。
+
+- [ ] **Step 4: 確かめて Commit と push**
+
+Run: `rg -n '^#### \`get_email_headers\`' docs/mcp-tools.md && rg -n 'get_email_headers' README.md src/CalendarMcp.Core/Skills/overview.md src/CalendarMcp.Core/Skills/email.md && dotnet test src/CalendarMcp.Tests`
+Expected: どのファイルにも `get_email_headers` があり、テストは `Failed: 0`
+
+```bash
+git add README.md docs src/CalendarMcp.Core/Skills
+git commit -m "Document the get_email_headers tool"
+git push
+```
+
+Expected: fork の CI が成功。fox への反映は、Task 20 の Step 7 と同じ手順でもう一度流す（`Skills/*.md` は `get_guide` が返すので、イメージを作り直す）。二回目は `changed=0`
