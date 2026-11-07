@@ -105,7 +105,7 @@ flowchart LR
 - `EmailMessage.Headers` は、IMAP、M365、Outlook.com、Google の四つのプロバイダーで、詳細を取るときに埋める。四つとも詳細を取るときにヘッダーをもう受け取っている（IMAP は MIME メッセージ、M365 と Outlook.com は `internetMessageHeaders`、Google は `Payload.Headers`）。一覧と検索では埋めない。M365 と Outlook.com は手元にアカウントがないので、変換の単体テストまでで確かめる。Google は単体テストに加えて、上流に PR を出すときに利用者の Gmail のアカウントで実際に確かめる（「確かめること」の「上流に PR を出すとき」）。fox で使うのは IMAP だけなので、fox への反映はこの確認を待たない
 - `Headers` が null のプロバイダーでは、ツールはヘッダーを返せないというエラーにする
 - `get_email_details` の応答と説明文は変えない
-- 上流の作法に合わせて `changelogs/` に記録を足す。`docs/mcp-tools.md` と `src/CalendarMcp.Core/Skills/email.md` は、上流に PR を出すときに `save_draft` とあわせて書く
+- 上流の作法に合わせて `changelogs/` に記録を足す。文書は下の「文書」のとおり
 
 | 方式 | 内容 | 判断 |
 |---|---|---|
@@ -124,13 +124,20 @@ flowchart LR
   - `respond_to_event`: いつも
 - 参加者がいるかは、`GetCalendarEventDetailsAsync` の結果の `Attendees` か `AttendeeDetails` が空でないかで決める。主催者だけでは決めない（M365 は参加者のいない予定にも主催者を付ける）。`emailSend` のあるアカウントでは、この読み取りをしない
 - 拒否はプロバイダーを呼ぶ前に、`emailSend` の権限の文言（`does not permit sending email`）で行う。`accountId` を省いたときの振り分けでは、必要な権限をすべて持つアカウントだけを候補にする
-- 四つのツールの説明文に、参加者や主催者にメールが届くことと `emailSend` が要ることを書く。権限の意味が変わるので、`docs/mcp-tools.md` と `docs/configuration.md` の権限の表もこのコミットで直す
+- 四つのツールの説明文に、参加者や主催者にメールが届くことと `emailSend` が要ることを書く。文書は下の「文書」のとおり
 
 | 方式 | 内容 | 判断 |
 |---|---|---|
 | I1 | 参加者を付ける操作、返事、参加者のいる予定の変更と削除に `emailSend` を求める | 採用。カレンダーからメールが出る道をすべて `emailSend` にまとめる。参加者のいる予定は Muse からは読むだけになる |
 | I2 | 参加者を付ける操作と返事だけに `emailSend` を求める | 不採用。宛先は選べないが、会議の変更や取り消しが参加者に届き、迷惑な招待を消すと送り主に辞退が届くおそれがある |
 | I3 | 「残るリスク」として受け入れる | 不採用。送信と配信停止を止めた目的が、カレンダーの側で崩れる |
+
+#### 文書
+
+- 上流に PR を出すときに要るので、fork の変更ごとに、利用者向けの文書をコードと一緒に直す。対象は `README.md`、`docs/`、`src/CalendarMcp.Core/Skills/`（`get_guide` が AI に渡す手引き）のうち、その変更に触れるところすべてとする。たとえばツールを足したら、`README.md` のツールの一覧、`docs/mcp-tools.md` のツールの節と権限の表、`Skills/overview.md` と該当する `Skills/*.md` に書く
+- これから積む変更（ベースイメージ、招待の制限）は、文書を同じコミットに入れる
+- すでに積んだ `save_draft` と `get_email_headers` は、文書だけのコミットをそれぞれ足す。fork の既定ブランチは書き換えない（force push しない）。PR のブランチを作るときに、機能のコミットと文書のコミットを一つにまとめる
+- 下書きフォルダーの設定はすでに `docs/configuration.md` と `docs/IMAP-SETUP.md` に書いた。UID の並びは振る舞いを直しただけで、文書に書くことはない
 
 #### イメージのビルド
 
