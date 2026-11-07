@@ -87,12 +87,13 @@ flowchart LR
 #### fork（`rewse/calendar-mcp`）
 
 - `~/git/calendar-mcp` に clone する。既定ブランチは `rewse` とし、待機期間を過ぎた上流の `Release x.y.z` のコミットの上に、自分たちのコミットを積む。上流の `main` はそのまま上流を映す
-- 足す変更は四つで、それぞれをコードとテストを含む一つのコミットにする。上流の作法（`src/CalendarMcp.Tests` の MSTest と Rocks のモック、`changelogs/`）に合わせる
+- 足す変更は五つで、それぞれをコードとテストを含む一つのコミットにする。上流の作法（`src/CalendarMcp.Tests` の MSTest と Rocks のモック、`changelogs/`）に合わせる
   - 下書きフォルダーの設定: IMAP の `providerConfig` に任意の `draftsFolder` を足し、`drafts` の別名（`move_email` と `get_emails` の `folder`）がそれを使う。Sakura は SPECIAL-USE を広告せず、下書きフォルダーは `INBOX.Draft` なので、これがないと下書きの置き場所が見つからない
   - 下書きの保存: ツール `save_draft` を足す。引数は `accountId`、宛先、件名、本文、本文の形式、CC、返信元のメール ID（任意）とする。返信元があれば `In-Reply-To` と `References` を付ける。権限は `emailRead` で判定する。メールボックスの中を整理する操作と同じ扱いで、外には何も出さないからである。`IProviderService` には既定の実装（`NotSupportedException` を投げる）付きでメソッドを足し、IMAP 以外のプロバイダーには手を入れない
   - ヘッダー: ツール `get_email_headers` を足す（下の「ヘッダーの取得」）。上流はヘッダーを返さず、Muse が迷惑メールの判定に使う `ARC-Authentication-Results` を読めない
+  - ベースイメージ: `Dockerfile` の `FROM` を `ARG` にする（下の「イメージのビルド」）。`Dockerfile` には単体テストがないので、fox でのビルドで確かめる
   - UID の並び: IMAP の一覧（`get_emails`）と検索（`search_emails`）は、FETCH に渡す UID を古い順に並べる。上流は新しい順の UID をそのまま渡し、MailKit はその連続した部分を `36045:36043` のような逆順の範囲にして送る。RFC 3501 では `4:2` と `2:4` は同じだが、Sakura の Courier-IMAP は逆順の範囲に 1 通しか返さないので、`get_emails` が頼んだ件数より少なく返る（5 件で 2 件、20 件で 3 件）。並べ替えるのは FETCH に渡す UID だけで、応答は今までどおり日付の新しい順にする
-- 四つの変更はそれぞれ上流の `main` を元にしたブランチにも置き、上流に PR を出す（PR を出すのは後日でよい）
+- 五つの変更はそれぞれ上流の `main` を元にしたブランチにも置き、上流に PR を出す（PR を出すのは後日でよい）
 - 上流の `ci.yml` は `main` でしか走らないので、`rewse` でも `dotnet test` が走るよう、fork だけのコミットで CI の対象ブランチを足す。上流の `release.yml` と `claude.yml` は fork では無効にする
 - fork は AGENTS.md の「GitHub Configuration」の対象外（upstream の fork）とする
 
@@ -115,8 +116,16 @@ flowchart LR
 
 - `aged_release` の `github-commit:` で `rewse/calendar-mcp` の既定ブランチの最新のコミットを選ぶ。自分のリポジトリなので待機期間は付けない（`days=0`）。上流から取り込むコミットの待機期間は、rebase の元を待機期間を過ぎた Release に限ることで守る
 - `/usr/local/src/calendar-mcp` に、選んだコミット SHA で checkout する
-- ビルドは fork の `Dockerfile` を使い、イメージのタグはコミット SHA の先頭 12 文字にする（例: `calendar-mcp:6486836...`）。checkout の前にイメージの有無を確かめるので、checkout してから分かる版はタグに入れない。ビルドは fox で行い、同じタグのイメージがあればビルドを飛ばす
+- ビルドは fork の `Dockerfile` を使う。ビルドは fox で行い、同じタグのイメージがあればビルドを飛ばす
+- ベースイメージ（SDK と ASP.NET Core のランタイム）も、ほかの外部のイメージと同じく `aged_release` で選ぶ。`oci:mcr.microsoft.com/dotnet/sdk` と `oci:mcr.microsoft.com/dotnet/aspnet` の `10.0.N` のタグから待機期間を過ぎた最新を選び、`tag@digest` をビルド引数で渡す。fork の `Dockerfile` の二つの `FROM` は `ARG`（`SDK_IMAGE`、`RUNTIME_IMAGE`）にし、既定値は今の `sdk:10.0` と `aspnet:10.0` のままにする。上流のビルドは変わらないので、上流に PR を出せる。`10.0` は fork の `TargetFramework`（`net10.0`）に合わせた固定で、上流が .NET を上げたら一緒に上げる
+- イメージのタグは、コミット SHA の先頭 12 文字と、二つのベースイメージの参照のハッシュの先頭 12 文字をつないだものにする（例: `calendar-mcp:08680d87ba09-1a2b3c4d5e6f`）。fork のコミットかベースイメージのどちらかが変わると、`update` でビルドし直す。checkout の前にイメージの有無を確かめるので、checkout してから分かる版はタグに入れない
 - `aged_release` の `github-commit:` に足した題の正規表現の引数（`message`）は、PR がすべて取り込まれて上流の Release を追う形に戻すときに使う
+
+| 方式 | 内容 | 判断 |
+|---|---|---|
+| B1 | fork の `FROM` を `ARG` にし、`aged_release` で選んだ `tag@digest` を渡す。ベースの参照をタグに入れる | 採用。AGENTS.md の更新の方針（待機期間付きで選び、digest で固定する）どおりで、ベースの更新が `update` で反映される |
+| B2 | ビルドで毎回ベースを pull し（`pull: true`）、pull した digest をタグに入れる | 不採用。待機期間がかからず、公開直後のベースをそのまま使う |
+| B3 | `aged_release` で選んだベースを pull して、手元で `sdk:10.0` と `aspnet:10.0` の名前を付け直す | 不採用。fork を変えずに済むが、手元の `10.0` が mcr の `10.0` と違う中身を指し、どの版で作ったかがイメージから読めない |
 
 #### config コンポーネント
 
@@ -190,11 +199,11 @@ AGENTS.md の「Subdomains」の手順に従う。
 
 ### 更新
 
-上流の新しい Release が待機期間（`supply_chain_cooldown_days`）を過ぎたら、fork の `rewse` をその上に rebase し、`dotnet test` を通して push する。`update` タグでは fork の新しいコミットを選び、ビルドし直す。上流は 1.x で、変更ごとに changelog（`changelogs/`）を残しているので、rebase の前に読む。PR が上流に取り込まれたら、そのコミットは rebase で消える。四つとも取り込まれたら、`aged_release` の対象を上流の Release（`message='^Release (\d+\.\d+\.\d+)'`）に戻し、fork を archive する。
+上流の新しい Release が待機期間（`supply_chain_cooldown_days`）を過ぎたら、fork の `rewse` をその上に rebase し、`dotnet test` を通して push する。`update` タグでは fork の新しいコミットを選び、ビルドし直す。上流は 1.x で、変更ごとに changelog（`changelogs/`）を残しているので、rebase の前に読む。PR が上流に取り込まれたら、そのコミットは rebase で消える。すべて取り込まれたら、`aged_release` の対象を上流の Release（`message='^Release (\d+\.\d+\.\d+)'`）に戻し、fork を archive する。
 
 ## 進め方
 
-1. `aged_release` に題の正規表現の引数を足し、fork を作って四つの変更をテスト付きで積む
+1. `aged_release` に題の正規表現の引数を足し、fork を作って五つの変更をテスト付きで積む
 2. fox に `calendar_mcp` ロールを入れる。まず ts のコンテナだけを使い、家から確かめる。この段階では mailboxd はそのまま動かしておく
 3. Cloudflare の Quick Tunnel を fox で手で起動し、ts のコンテナに直接つないで、Muse から確かめる。確かめ終わったらトンネルを止める。mailboxd で使った手順と同じ
 4. 段階 3 が通ったら、cloudfront-waf、UniFi の DNS、security-agent を入れ、Muse のコネクタの URL を `https://calendar-mcp.rewse.jp/mcp/ts` に替える
