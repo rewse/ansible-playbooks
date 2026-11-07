@@ -296,8 +296,7 @@ class MailboxdApacheTest(unittest.TestCase):
     def test_components_are_imported_in_order(self):
         imports = main_imports()
         self.assertEqual(
-            list(imports),
-            ["config.yml", "container.yml", "apache.yml", "fail2ban.yml", "legacy.yml"],
+            list(imports), ["config.yml", "container.yml", "apache.yml", "fail2ban.yml"]
         )
         self.assertEqual(imports["apache.yml"], ["mailboxd_apache"])
         self.assertEqual(imports["fail2ban.yml"], ["mailboxd_fail2ban"])
@@ -336,89 +335,6 @@ class MailboxdPlaybookTest(unittest.TestCase):
         self.assertIn("mailboxd", roles)
         self.assertLess(roles.index("litellm"), roles.index("mailboxd"))
         self.assertLess(roles.index("mailboxd"), roles.index("matterjs_server"))
-
-
-class MailboxdLegacyTest(unittest.TestCase):
-    @staticmethod
-    def tasks() -> list:
-        return yaml.safe_load((ROLE / "tasks" / "legacy.yml").read_text())
-
-    @staticmethod
-    def removed_paths(tasks):
-        for t in tasks:
-            module = t.get("ansible.builtin.file")
-            if module:
-                yield from (
-                    t["loop"] if module["path"] == "{{ item }}" else [module["path"]]
-                )
-
-    def test_removes_only_calendar_mcp_state(self):
-        tasks = self.tasks()
-        self.assertEqual(
-            sorted(self.removed_paths(tasks)),
-            [
-                "/etc/apache2/sites-available/calendar-mcp.rewse.jp.conf",
-                "/etc/apache2/sites-enabled/calendar-mcp.rewse.jp.conf",
-                "/etc/compose/calendar_mcp",
-                "/etc/fail2ban/filter.d/calendar_mcp.conf",
-                "/etc/fail2ban/jail.d/calendar_mcp.conf",
-                "/srv/calendar_mcp",
-                "/usr/local/src/calendar-mcp",
-            ],
-        )
-        for t in tasks:
-            if "ansible.builtin.file" in t:
-                self.assertEqual(t["ansible.builtin.file"]["state"], "absent")
-
-    def test_stops_calendar_mcp_only_while_its_compose_file_exists(self):
-        tasks = self.tasks()
-        stat = next(t for t in tasks if "ansible.builtin.stat" in t)
-        down = next(t for t in tasks if "community.docker.docker_compose_v2" in t)
-        self.assertEqual(
-            stat["ansible.builtin.stat"]["path"],
-            "/etc/compose/calendar_mcp/compose.yaml",
-        )
-        args = down["community.docker.docker_compose_v2"]
-        self.assertEqual(args["project_src"], "/etc/compose/calendar_mcp")
-        self.assertEqual(args["state"], "absent")
-        self.assertEqual(args["remove_images"], "all")
-        self.assertIn(stat["register"], down["when"])
-        self.assertLess(
-            tasks.index(down),
-            min(i for i, t in enumerate(tasks) if "ansible.builtin.file" in t),
-        )
-
-    def test_removes_the_dotnet_base_images(self):
-        task = next(
-            t for t in self.tasks() if "community.docker.docker_image_remove" in t
-        )
-        self.assertEqual(
-            task["community.docker.docker_image_remove"]["name"], "{{ item }}"
-        )
-        self.assertEqual(
-            sorted(task["loop"]),
-            [
-                "mcr.microsoft.com/dotnet/aspnet:10.0",
-                "mcr.microsoft.com/dotnet/sdk:10.0",
-            ],
-        )
-
-    def test_removes_the_account_after_its_files(self):
-        tasks = self.tasks()
-        user = next(t for t in tasks if "ansible.builtin.user" in t)
-        group = next(t for t in tasks if "ansible.builtin.group" in t)
-        self.assertEqual(user["ansible.builtin.user"]["name"], "calendar-mcp")
-        self.assertEqual(user["ansible.builtin.user"]["state"], "absent")
-        self.assertEqual(group["ansible.builtin.group"]["name"], "calendar-mcp")
-        self.assertEqual(group["ansible.builtin.group"]["state"], "absent")
-        last_file = max(i for i, t in enumerate(tasks) if "ansible.builtin.file" in t)
-        self.assertLess(last_file, tasks.index(user))
-        self.assertLess(tasks.index(user), tasks.index(group))
-
-    def test_legacy_is_imported_last(self):
-        imports = main_imports()
-        self.assertEqual(list(imports)[-1], "legacy.yml")
-        self.assertEqual(imports["legacy.yml"], ["mailboxd_legacy"])
 
 
 if __name__ == "__main__":

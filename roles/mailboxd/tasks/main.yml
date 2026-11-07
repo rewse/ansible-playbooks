@@ -19,8 +19,3 @@
   ansible.builtin.import_tasks: fail2ban.yml
   tags:
     - mailboxd_fail2ban
-
-- name: Import legacy tasks
-  ansible.builtin.import_tasks: legacy.yml
-  tags:
-    - mailboxd_legacy
