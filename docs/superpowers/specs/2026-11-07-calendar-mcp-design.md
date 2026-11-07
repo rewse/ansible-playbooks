@@ -60,7 +60,7 @@ A の弱点と対策は次のとおり。
 
 - API キーがアカウントに結びつかない。一人一つのコンテナに分け、各コンテナには本人のアカウントだけを入れる
 - 送信と配信停止を一つずつ止められない。`emailSend: false` で両方まとめて止める
-- 下書きのツール、下書きフォルダーの設定、ヘッダーの取得がない。fork にテスト付きで足し、上流にも PR を出す
+- 下書きのツール、下書きフォルダーの設定、ヘッダーの取得がなく、Sakura の IMAP では一覧が件数どおりに返らない。fork にテスト付きで足し、上流にも PR を出す
 - 配布イメージがない。fox で fork からビルドする
 - 上流の更新に自動では追いつかない。上流の新しい Release が待機期間を過ぎたら、fork の既定ブランチをその上に手で rebase する。PR がすべて取り込まれたら fork をやめ、上流の Release を `aged_release` で追う形に戻す
 
@@ -87,11 +87,12 @@ flowchart LR
 #### fork（`rewse/calendar-mcp`）
 
 - `~/git/calendar-mcp` に clone する。既定ブランチは `rewse` とし、待機期間を過ぎた上流の `Release x.y.z` のコミットの上に、自分たちのコミットを積む。上流の `main` はそのまま上流を映す
-- 足す変更は三つで、それぞれをコードとテストを含む一つのコミットにする。上流の作法（`src/CalendarMcp.Tests` の MSTest と Rocks のモック、`changelogs/`）に合わせる
+- 足す変更は四つで、それぞれをコードとテストを含む一つのコミットにする。上流の作法（`src/CalendarMcp.Tests` の MSTest と Rocks のモック、`changelogs/`）に合わせる
   - 下書きフォルダーの設定: IMAP の `providerConfig` に任意の `draftsFolder` を足し、`drafts` の別名（`move_email` と `get_emails` の `folder`）がそれを使う。Sakura は SPECIAL-USE を広告せず、下書きフォルダーは `INBOX.Draft` なので、これがないと下書きの置き場所が見つからない
   - 下書きの保存: ツール `save_draft` を足す。引数は `accountId`、宛先、件名、本文、本文の形式、CC、返信元のメール ID（任意）とする。返信元があれば `In-Reply-To` と `References` を付ける。権限は `emailRead` で判定する。メールボックスの中を整理する操作と同じ扱いで、外には何も出さないからである。`IProviderService` には既定の実装（`NotSupportedException` を投げる）付きでメソッドを足し、IMAP 以外のプロバイダーには手を入れない
   - ヘッダー: ツール `get_email_headers` を足す（下の「ヘッダーの取得」）。上流はヘッダーを返さず、Muse が迷惑メールの判定に使う `ARC-Authentication-Results` を読めない
-- 三つの変更はそれぞれ上流の `main` を元にしたブランチにも置き、上流に PR を出す（PR を出すのは後日でよい）
+  - UID の並び: IMAP の一覧（`get_emails`）と検索（`search_emails`）は、FETCH に渡す UID を古い順に並べる。上流は新しい順の UID をそのまま渡し、MailKit はその連続した部分を `36045:36043` のような逆順の範囲にして送る。RFC 3501 では `4:2` と `2:4` は同じだが、Sakura の Courier-IMAP は逆順の範囲に 1 通しか返さないので、`get_emails` が頼んだ件数より少なく返る（5 件で 2 件、20 件で 3 件）。並べ替えるのは FETCH に渡す UID だけで、応答は今までどおり日付の新しい順にする
+- 四つの変更はそれぞれ上流の `main` を元にしたブランチにも置き、上流に PR を出す（PR を出すのは後日でよい）
 - 上流の `ci.yml` は `main` でしか走らないので、`rewse` でも `dotnet test` が走るよう、fork だけのコミットで CI の対象ブランチを足す。上流の `release.yml` と `claude.yml` は fork では無効にする
 - fork は AGENTS.md の「GitHub Configuration」の対象外（upstream の fork）とする
 
@@ -189,11 +190,11 @@ AGENTS.md の「Subdomains」の手順に従う。
 
 ### 更新
 
-上流の新しい Release が待機期間（`supply_chain_cooldown_days`）を過ぎたら、fork の `rewse` をその上に rebase し、`dotnet test` を通して push する。`update` タグでは fork の新しいコミットを選び、ビルドし直す。上流は 1.x で、変更ごとに changelog（`changelogs/`）を残しているので、rebase の前に読む。PR が上流に取り込まれたら、そのコミットは rebase で消える。三つとも取り込まれたら、`aged_release` の対象を上流の Release（`message='^Release (\d+\.\d+\.\d+)'`）に戻し、fork を archive する。
+上流の新しい Release が待機期間（`supply_chain_cooldown_days`）を過ぎたら、fork の `rewse` をその上に rebase し、`dotnet test` を通して push する。`update` タグでは fork の新しいコミットを選び、ビルドし直す。上流は 1.x で、変更ごとに changelog（`changelogs/`）を残しているので、rebase の前に読む。PR が上流に取り込まれたら、そのコミットは rebase で消える。四つとも取り込まれたら、`aged_release` の対象を上流の Release（`message='^Release (\d+\.\d+\.\d+)'`）に戻し、fork を archive する。
 
 ## 進め方
 
-1. `aged_release` に題の正規表現の引数を足し、fork を作って三つの変更をテスト付きで積む
+1. `aged_release` に題の正規表現の引数を足し、fork を作って四つの変更をテスト付きで積む
 2. fox に `calendar_mcp` ロールを入れる。まず ts のコンテナだけを使い、家から確かめる。この段階では mailboxd はそのまま動かしておく
 3. Cloudflare の Quick Tunnel を fox で手で起動し、ts のコンテナに直接つないで、Muse から確かめる。確かめ終わったらトンネルを止める。mailboxd で使った手順と同じ
 4. 段階 3 が通ったら、cloudfront-waf、UniFi の DNS、security-agent を入れ、Muse のコネクタの URL を `https://calendar-mcp.rewse.jp/mcp/ts` に替える
@@ -212,7 +213,7 @@ AGENTS.md の「Subdomains」の手順に従う。
   - カレンダーの一覧（6 個）
   - 予定の作成、更新、削除
   - 連絡先の検索
-  - メールの一覧、検索、読み取り、ヘッダーの取得、移動、ゴミ箱への移動、下書きの保存
+  - メールの一覧、検索、読み取り、ヘッダーの取得、移動、ゴミ箱への移動、下書きの保存。一覧は頼んだ件数（INBOX にそれ以上あるとき）を新しい順に返す
   - 送信と配信停止は拒否される。下書きが Sakura の Drafts フォルダーにあり、送信済みフォルダーには何も増えていない
 - 段階 4: CloudFront 経由で段階 3 と同じことができる。WAF のログで、Muse の通信が誤検知されていないことを見る
 - 段階 5: ubiqu の Muse でも段階 3 と同じことができ、ts のアカウントは見えない
