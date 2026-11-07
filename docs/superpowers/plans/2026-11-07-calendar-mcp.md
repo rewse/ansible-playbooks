@@ -16,7 +16,7 @@
 
 **改訂（2026-11-07、三回目）:** Task 8 で、Sakura の IMAP では `get_emails` が頼んだ件数より少なく返ることが分かった（設計の「UID の並び」）。Task 18 で直す。Task 8 は Step 1 から 3 まで実施済みで、一覧のほかはすべて通った。Task 18 の Step 8 が通ったら Task 8 を完了とする。Muse からの一覧の確かめ直しは、Task 9 で CloudFront 経由の段階 3 を確かめるときに行う。
 
-**改訂（2026-11-07、四回目）:** Task 10 は利用者の判断で飛ばした。最終レビューで、.NET のベースイメージが固定も更新もされないことが分かった（設計の「イメージのビルド」）。Task 19 で直し、そのあとで Task 11 の Step 8（マージ）を行う。
+**改訂（2026-11-07、四回目）:** Task 10 は利用者の判断で飛ばした。最終レビューで、.NET のベースイメージが固定も更新もされないこと（設計の「イメージのビルド」）と、iCloud がカレンダーの書き込みを受けて招待のメールを送ること（設計の「招待の制限」）が分かった。Task 19 と Task 20 で直し、そのあとで Task 11 の Step 8（マージ）を行う。
 
 ## Global Constraints
 
@@ -1385,3 +1385,105 @@ git commit -m "fix(calendar_mcp): pin and refresh the .NET base images"
 
 Run: `direnv exec . ansible-playbook home-primary.yml --tags calendar_mcp`、終わってからもう一度（二つを同時に流さない）
 Expected: 一回目でイメージのタグが `calendar-mcp:<Step 2 の commit の先頭 12 文字>-<12 文字>` になり、二つのコンテナが healthy。二回目は `changed=0`。`docker run --rm --entrypoint dotnet <image> --list-runtimes` の `Microsoft.AspNetCore.App` の版が、`aged_release` の選んだ `aspnet` のタグと同じ。家から `get_emails`（count 5）と `get_email_headers` をもう一度通す
+
+### Task 20: 招待メールが出る予定の操作に `emailSend` を求める
+
+`~/git/calendar-mcp` の `rewse` ブランチで、Task 19 の fork のコミットの上に積む。fox への反映は最後の Step で行う。
+
+**Files:**
+- Modify: `src/CalendarMcp.Core/Tools/ToolGuard.cs`（`HasAttendees`、`RequireEmailSendIfEventHasAttendeesAsync`）、`CreateEventTool.cs`、`UpdateEventTool.cs`、`DeleteEventTool.cs`、`RespondToEventTool.cs`（権限の確かめ方と説明文）
+- Modify: `docs/mcp-tools.md`（「Account permissions」の表と本文）、`docs/configuration.md`（`emailSend` の行と Notes）
+- Create: `changelogs/2026-11-07-calendar-invitations-need-email-send.md`（`changelogs/2026-11-07-save-draft-tool.md` と同じ見出しの形）
+- Test: `src/CalendarMcp.Tests/Tools/ToolGuardTests.cs`、`src/CalendarMcp.Tests/Tools/PermissionEnforcementTests.cs`
+
+**Interfaces:**
+- Produces: `internal static bool ToolGuard.HasAttendees(CalendarEvent evt)`。`evt.Attendees` か `evt.AttendeeDetails` が空でなければ true。`Organizer` は見ない
+- Produces: `internal static async Task ToolGuard.RequireEmailSendIfEventHasAttendeesAsync(IProviderService provider, AccountInfo account, string calendarId, string eventId)`。アカウントが `EmailSend` を持てば何も読まずに戻る。持たなければ `GetCalendarEventDetailsAsync` で予定を読み、null なら `Event '<eventId>' not found in account '<accountId>'`、`HasAttendees` が true なら `RequirePermission(account, AccountPermission.EmailSend)` の例外を投げる
+- 振る舞い（設計の「招待の制限」）: `create_event` は `attendees` が空でないとき、`update_event` は `attendees` が null でないときに `RequirePermission(account, EmailSend)`。`update_event` と `delete_event` は、そのあと `RequireEmailSendIfEventHasAttendeesAsync`。`respond_to_event` はいつも `EmailSend` を求める。`accountId` を省いた振り分けでは、`create_event`（参加者あり）と `respond_to_event` は `CalendarWrite` と `EmailSend` の両方で絞る。`delete_event` の振り分けは今のまま `CalendarWrite` で選び、選んだアカウントに `RequireEmailSendIfEventHasAttendeesAsync` をかける
+
+- [ ] **Step 1: 失敗するテストを書く**
+
+`ToolGuardTests.cs`:
+
+```csharp
+[TestMethod]
+public void HasAttendees_ReadsBothAttendeeLists()
+{
+    Assert.IsTrue(ToolGuard.HasAttendees(new CalendarEvent { Id = "e", AccountId = "a", Attendees = ["x@example.com"] }));
+    Assert.IsTrue(ToolGuard.HasAttendees(new CalendarEvent { Id = "e", AccountId = "a",
+        AttendeeDetails = [new EventAttendee { Email = "x@example.com" }] }));
+    // M365 sets an organizer on events nobody else attends.
+    Assert.IsFalse(ToolGuard.HasAttendees(new CalendarEvent { Id = "e", AccountId = "a", Organizer = "me@example.com" }));
+}
+```
+
+`PermissionEnforcementTests.cs`（`Permits(id, provider, params AccountPermission[])` を補助として足す。`AccountPermissions.None` に `With` を重ねる。プロバイダーの呼び出しを期待しないテストは、セットアップのない `IProviderServiceCreateExpectations` を渡し、予期しない呼び出しで Rocks が落ちることで「呼ばない」を確かめる）:
+
+```csharp
+CreateEvent_AttendeesWithoutEmailSend_Throws
+    // Permits("cal", "dav", CalendarWrite); attendees ["x@example.com"]; message contains "does not permit sending email"
+CreateEvent_AttendeesWithEmailSend_Creates
+    // Permits("both", "dav", CalendarWrite, EmailSend); CreateEventAsync returns "evt-1"; success
+CreateEvent_NoAttendeesWithoutEmailSend_Creates
+    // Permits("cal", "dav", CalendarWrite); attendees null; CreateEventAsync returns "evt-1"; success
+CreateEvent_NoAccountIdWithAttendees_PicksAnAccountThatPermitsSending
+    // GetAllAccountsAsync → [Permits("cal", "dav", CalendarWrite), Permits("both", "dav", CalendarWrite, EmailSend)]; accountUsed == "both"
+UpdateEvent_AttendeesWithoutEmailSend_Throws
+    // Permits("cal", "dav", CalendarWrite); attendees []; no provider call; "does not permit sending email"
+UpdateEvent_EventWithAttendeesWithoutEmailSend_Throws
+    // GetCalendarEventDetailsAsync("cal", "c1", "e1") → event with Attendees ["x@example.com"]; UpdateEventAsync not set up
+UpdateEvent_EventWithoutAttendeesWithoutEmailSend_Updates
+    // details → event without attendees; UpdateEventAsync set up; success
+UpdateEvent_WithEmailSend_DoesNotReadTheEvent
+    // Permits("both", "dav", CalendarWrite, EmailSend); only UpdateEventAsync set up; success
+DeleteEvent_EventWithAttendeesWithoutEmailSend_Throws
+    // details → event with AttendeeDetails; DeleteEventAsync not set up; "does not permit sending email"
+DeleteEvent_EventWithoutAttendeesWithoutEmailSend_Deletes
+    // details → event without attendees; DeleteEventAsync set up; success
+DeleteEvent_MissingEventWithoutEmailSend_Throws
+    // details → null; message == "Event 'e1' not found in account 'cal'"
+RespondToEvent_WithoutEmailSend_Throws
+    // Permits("cal", "dav", CalendarWrite); "does not permit sending email"; no provider call
+RespondToEvent_WithEmailSend_Responds
+    // Permits("both", "dav", CalendarWrite, EmailSend); RespondToEventAsync set up; success
+```
+
+- [ ] **Step 2: コンパイルだけ通す**
+
+`HasAttendees` は `false` を返し、`RequireEmailSendIfEventHasAttendeesAsync` は `Task.CompletedTask` を返すだけにする。ツールは変えない。
+
+- [ ] **Step 3: 失敗を確かめる**
+
+Run: `dotnet test src/CalendarMcp.Tests --filter "HasAttendees|PermissionEnforcementTests"`
+Expected: 新しいテストのうち十が FAIL。拒否を期待する六つ（`*_Throws`）、`HasAttendees_ReadsBothAttendeeLists`、`CreateEvent_NoAccountIdWithAttendees_PicksAnAccountThatPermitsSending`（`cal` が選ばれ、Rocks が予期しない呼び出しで落ちる）、予定を読むことを期待する `UpdateEvent_EventWithoutAttendeesWithoutEmailSend_Updates` と `DeleteEvent_EventWithoutAttendeesWithoutEmailSend_Deletes`（`Verify` で落ちる）。残りの四つ（`CreateEvent_AttendeesWithEmailSend_Creates`、`CreateEvent_NoAttendeesWithoutEmailSend_Creates`、`UpdateEvent_WithEmailSend_DoesNotReadTheEvent`、`RespondToEvent_WithEmailSend_Responds`）は今の実装でも PASS（拒否しすぎないことを固定するテスト）。既存の `PermissionEnforcementTests` は PASS
+
+- [ ] **Step 4: 実装する**
+
+Interfaces のとおりに `ToolGuard` と四つのツールを変える。権限の確かめはどれもプロバイダーの書き込みより前に置く。説明文には、`create_event` と `update_event` の `attendees` に「参加者には招待がメールで届くので、アカウントに `emailSend` が要る」、`update_event` と `delete_event` に「参加者のいる予定を変えると参加者にメールが届くので `emailSend` が要る」、`respond_to_event` に「主催者に返事がメールで届くので `emailSend` が要る」を書く。`docs/mcp-tools.md` の表の `emailSend` の行にこの四つの条件を足し、表の下に「`emailSend` はアカウントの代わりに新しいメールを出すことすべてで、サーバーが送る招待、変更、取り消し、返事も含む」を書く。`docs/configuration.md` の `emailSend` の行と Notes も同じ内容にする。changelog に、iCloud が CalDAV の書き込みを受けて招待を送り、`SCHEDULE-AGENT=CLIENT` を無視することを書く
+
+- [ ] **Step 5: 通ることを確かめる**
+
+Run: `dotnet test src/CalendarMcp.Tests && dotnet build src/CalendarMcp.HttpServer -c Release`
+Expected: `Failed: 0` と `Build succeeded.`
+
+- [ ] **Step 6: Commit と push**
+
+```bash
+git add src docs changelogs/2026-11-07-calendar-invitations-need-email-send.md
+git commit -m "Require emailSend for calendar operations that mail attendees"
+git push
+```
+
+Expected: fork の CI が成功
+
+- [ ] **Step 7: 適用して家から確かめる**
+
+ansible-playbooks で Run: `direnv exec . ansible-playbook home-primary.yml --tags calendar_mcp`、終わってからもう一度
+Expected: 一回目でイメージのタグのコミットの部分が Step 6 のコミットになり、二回目は `changed=0`
+
+ts のトークンで次を確かめる。参加者のいる予定は、主催者を付けずに `ATTENDEE` だけを持つ予定を CalDAV で直接 PUT して作る（主催者がいないので iCloud は招待を送らない）。確かめたら CalDAV で消す。
+
+- `create_event` に `attendees`（`rewselab1@gmail.com`）を付けると `does not permit sending email` で拒否され、予定は増えない
+- 参加者のいない予定の `create_event`、`update_event`、`delete_event` は通る
+- 上の参加者のいる予定への `update_event` と `delete_event` は拒否され、予定は残る
+- `respond_to_event` は拒否される
