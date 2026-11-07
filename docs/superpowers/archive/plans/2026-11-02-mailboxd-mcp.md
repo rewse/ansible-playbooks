@@ -8,7 +8,7 @@
 
 **Tech Stack:** Ansible（community.docker.docker_compose_v2）、Docker Compose、Apache、fail2ban、1Password CLI、Python unittest + jinja2（テンプレートのテスト）
 
-**Spec:** `docs/superpowers/specs/2026-11-02-mailboxd-mcp-design.md`
+**Spec:** `docs/superpowers/archive/specs/2026-11-02-mailboxd-mcp-design.md`
 
 ## Global Constraints
 

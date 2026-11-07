@@ -1,0 +1,50 @@
+{{ ansible_managed | comment }}
+name: calendar_mcp
+
+services:
+{% for user in calendar_mcp_users %}
+  calendar-mcp-{{ user.name }}:
+    container_name: calendar-mcp-{{ user.name }}
+    image: {{ __calendar_mcp_image }}
+    # Built on this host by the container component; there is no registry copy.
+    pull_policy: never
+    # Reached only through the Apache vhost, which terminates TLS and is the only
+    # place a client can arrive from.
+    ports:
+      - "127.0.0.1:{{ user.port }}:8080"
+    environment:
+      CALENDAR_MCP_CONFIG: /app/data
+    # Raw, because Compose otherwise interpolates $ in the values and a token
+    # containing one would arrive changed.
+    env_file:
+      - path: {{ user.name }}.env
+        format: raw
+    volumes:
+      - {{ calendar_mcp_data_dir }}/{{ user.name }}:/app/data
+      - /etc/compose/calendar_mcp/{{ user.name }}/appsettings.json:/app/data/appsettings.json:ro
+    # The service holds one person's IMAP and iCloud passwords, so it keeps no
+    # capability and cannot write outside its data directory.
+    init: true
+    cap_drop: [ALL]
+    security_opt: ["no-new-privileges:true"]
+    read_only: true
+    tmpfs:
+      - /tmp:size=64m,noexec,nosuid
+    mem_limit: 512m
+    cpus: 1
+    pids_limit: 256
+    logging:
+      driver: json-file
+      options:
+        max-size: "10m"
+        max-file: "5"
+    # Replaces the upstream image's check, which calls curl, a tool the aspnet
+    # image does not have. /health answers once the configuration has loaded.
+    healthcheck:
+      test: ["CMD", "bash", "-c", "exec 3<>/dev/tcp/127.0.0.1/8080 && printf 'GET /health HTTP/1.0\\r\\nHost: localhost\\r\\n\\r\\n' >&3 && head -1 <&3 | grep -q ' 200 '"]
+      interval: 30s
+      timeout: 5s
+      retries: 3
+      start_period: 30s
+    restart: unless-stopped
+{% endfor %}

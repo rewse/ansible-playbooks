@@ -2,20 +2,25 @@
 - name: Import config tasks
   ansible.builtin.import_tasks: config.yml
   tags:
-    - mailboxd_config
+    - calendar_mcp_config
 
 - name: Import container tasks
   ansible.builtin.import_tasks: container.yml
   tags:
-    - mailboxd_container
+    - calendar_mcp_container
     - update
 
 - name: Import apache tasks
   ansible.builtin.import_tasks: apache.yml
   tags:
-    - mailboxd_apache
+    - calendar_mcp_apache
 
 - name: Import fail2ban tasks
   ansible.builtin.import_tasks: fail2ban.yml
   tags:
-    - mailboxd_fail2ban
+    - calendar_mcp_fail2ban
+
+- name: Import legacy tasks
+  ansible.builtin.import_tasks: legacy.yml
+  tags:
+    - calendar_mcp_legacy

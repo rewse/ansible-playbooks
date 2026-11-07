@@ -323,12 +323,12 @@ class JailActionTest(unittest.TestCase):
         self.assertEqual(
             [path.parent.parent.name for path in files],
             [
+                "calendar_mcp",
                 "couchdb",
                 "filebrowser",
                 "gnucash_quick_expense",
                 "homeassistant",
                 "litellm",
-                "mailboxd",
                 "nvr",
                 "teslamate",
                 "zabbix_mcp",

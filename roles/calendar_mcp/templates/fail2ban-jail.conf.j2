@@ -6,7 +6,7 @@
 # backend has to be stated. jail.d/defaults-debian.conf from the package sets
 # systemd for every jail, and jail.d is read after jail.local, so a jail that
 # names a logpath without this reads the journal instead and monitors no file.
-[mailboxd]
+[calendar_mcp]
 enabled = true
 backend = auto
 port = http,https
@@ -14,5 +14,5 @@ port = http,https
 # arrive through CloudFront, whose edge servers the firewall cannot single out.
 action = %(action_)s
          apache-deny
-filter = mailboxd
+filter = calendar_mcp
 logpath = /var/log/apache2/other_vhosts_access.log

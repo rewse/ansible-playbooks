@@ -4,15 +4,14 @@
     name: apache2
     state: reloaded
 
-- name: Recreate mailboxd
+- name: Recreate calendar-mcp
   community.docker.docker_compose_v2:
-    project_src: /etc/compose/mailboxd
+    project_src: /etc/compose/calendar_mcp
     state: present
     # A restart keeps the environment the container was created with, so a
     # changed .env takes effect only in a new container.
     recreate: always
-    # The start task checks health before handlers run, so only this wait
-    # catches a configuration that the new container refuses to start with.
+    pull: never
     wait: true
     wait_timeout: 120
   # The project directory may not exist yet in check mode.

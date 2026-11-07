@@ -42,6 +42,11 @@ options:
     description: Image platform for oci:, such as linux/arm64.
   asset:
     description: Release asset name for github-release:; {version} expands to the tag.
+  message:
+    description:
+      - Regular expression for github-commit: that the commit subject must match.
+      - The newest aged commit whose subject matches is returned, with the first
+        group as its version.
 """
 
 RETURN = r"""
@@ -217,18 +222,37 @@ def _tag(repo, pattern, days, run, now):
     )
 
 
-def _commit(repo, days, run, now):
+def _commit(repo, days, run, now, message=None):
     branch = _json(run, ["gh", "api", f"repos/{repo}"])["default_branch"]
     until = _iso(now - timedelta(days=days))
+    if message is None:
+        commits = _json(
+            run,
+            [
+                "gh",
+                "api",
+                f"repos/{repo}/commits?sha={branch}&until={until}&per_page=1",
+            ],
+        )
+        if not commits:
+            raise AnsibleLookupError(
+                f"{repo} has no commit on {branch} at least {days} day(s) old"
+            )
+        return {"commit": commits[0]["sha"]}
+    # One page: a project that marks releases with a commit subject releases far
+    # more often than once per 100 commits.
     commits = _json(
         run,
-        ["gh", "api", f"repos/{repo}/commits?sha={branch}&until={until}&per_page=1"],
+        ["gh", "api", f"repos/{repo}/commits?sha={branch}&until={until}&per_page=100"],
     )
-    if not commits:
-        raise AnsibleLookupError(
-            f"{repo} has no commit on {branch} at least {days} day(s) old"
-        )
-    return {"commit": commits[0]["sha"]}
+    regex = re.compile(message)
+    for commit in commits:
+        match = regex.search(commit["commit"]["message"].split("\n", 1)[0])
+        if match:
+            return {"version": match.group(1), "commit": commit["sha"]}
+    raise AnsibleLookupError(
+        f"no commit of {repo} on {branch} matching {message} is at least {days} day(s) old"
+    )
 
 
 def resolve(
@@ -240,6 +264,7 @@ def resolve(
     asset: str | None,
     run: Callable[[list[str]], str],
     now: datetime,
+    message: str | None = None,
 ) -> dict:
     kind, sep, source = term.partition(":")
     if not sep or not source:
@@ -252,7 +277,7 @@ def resolve(
         if kind == "github-tag":
             return _tag(source, pattern, days, run, now)
         if kind == "github-commit":
-            return _commit(source, days, run, now)
+            return _commit(source, days, run, now, message)
     except AnsibleLookupError:
         raise
     except Exception as exc:
@@ -312,9 +337,10 @@ class LookupModule(LookupBase):
         days = int(days)
         platform = kwargs.get("platform")
         asset = kwargs.get("asset")
+        message = kwargs.get("message")
         results = []
         for term in terms:
-            key = (term, pattern, days, platform, asset)
+            key = (term, pattern, days, platform, asset, message)
             results.append(
                 _cached(
                     key,
@@ -326,6 +352,7 @@ class LookupModule(LookupBase):
                         asset=asset,
                         run=_run,
                         now=_now(),
+                        message=message,
                     ),
                 )
             )

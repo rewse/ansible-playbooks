@@ -1,0 +1,65 @@
+---
+- name: config | Reset accounts
+  # The next task appends to the fact, so a second run of the component in one
+  # play would otherwise list every user twice.
+  ansible.builtin.set_fact:
+    __calendar_mcp_accounts: []
+
+- name: config | Resolve accounts
+  ansible.builtin.set_fact:
+    __calendar_mcp_accounts: >-
+      {{ __calendar_mcp_accounts + [{
+           'name': item.name,
+           'port': item.port,
+           'address': lookup('pipe', 'op read "op://ansible/' ~ item.sakura_item ~ '/username"'),
+           'sakura_password': lookup('pipe', 'op read "op://ansible/' ~ item.sakura_item ~ '/password"'),
+           'apple_id': lookup('pipe', 'op read "op://ansible/' ~ item.apple_item ~ '/username"'),
+           'apple_password': lookup('pipe', 'op read "op://ansible/' ~ item.apple_item ~ '/password"'),
+           'token': lookup('pipe', 'op read "op://ansible/' ~ item.mcp_item ~ '/credential"'),
+           'admin_token': lookup('pipe', 'op read "op://ansible/' ~ item.mcp_item ~ '/admin token"'),
+         }] }}
+  loop: "{{ calendar_mcp_users }}"
+  loop_control:
+    label: "{{ item.name }}"
+  no_log: true
+
+- name: config | Create user directories
+  ansible.builtin.file:
+    path: /etc/compose/calendar_mcp/{{ item.name }}
+    state: directory
+    mode: "0755"
+  loop: "{{ calendar_mcp_users }}"
+  loop_control:
+    label: "{{ item.name }}"
+
+- name: config | Deploy settings
+  ansible.builtin.template:
+    src: appsettings.json.j2
+    dest: /etc/compose/calendar_mcp/{{ account.name }}/appsettings.json
+    # Holds the IMAP and iCloud passwords, and the container user has to read
+    # it. Mounted read-only, so the server cannot rewrite it.
+    owner: "{{ calendar_mcp_uid }}"
+    group: "{{ calendar_mcp_uid }}"
+    mode: "0400"
+  loop: "{{ __calendar_mcp_accounts }}"
+  loop_control:
+    loop_var: account
+    label: "{{ account.name }}"
+  no_log: true
+  notify: Recreate calendar-mcp
+
+- name: config | Deploy environment file
+  ansible.builtin.template:
+    src: env.j2
+    dest: /etc/compose/calendar_mcp/{{ account.name }}.env
+    owner: root
+    group: root
+    # Carries the MCP key and the admin token. Docker reads it as root and hands
+    # the values to the container.
+    mode: "0600"
+  loop: "{{ __calendar_mcp_accounts }}"
+  loop_control:
+    loop_var: account
+    label: "{{ account.name }}"
+  no_log: true
+  notify: Recreate calendar-mcp

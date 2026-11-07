@@ -1,0 +1,44 @@
+---
+calendar_mcp_hostname: calendar-mcp.rewse.jp
+
+# Upstream publishes no image, so the role builds one from this checkout.
+calendar_mcp_source_dir: /usr/local/src/calendar-mcp
+
+# The .NET release of the SDK and ASP.NET Core base images. Pinned because it
+# must match the fork's TargetFramework (net10.0); raise it when upstream moves
+# to a new .NET release.
+calendar_mcp_container_dotnet_version: "10.0"
+
+# Parent of each user's /app/data: API key hashes, logs and the DataProtection
+# keyring the server writes.
+calendar_mcp_data_dir: /srv/calendar_mcp
+
+# mcpuser, created by `useradd -r` in the upstream Dockerfile on the aspnet image.
+calendar_mcp_uid: 999
+
+# Sakura's IMAP folder names. The server advertises no SPECIAL-USE, and the
+# upstream defaults are Gmail's.
+calendar_mcp_sakura_folders:
+  drafts: INBOX.Draft
+  junk: INBOX.spam
+  sent: INBOX.Sent
+  trash: INBOX.Trash
+
+# One container per user, because an MCP key reaches every account its server
+# holds. The Sakura item gives the address and IMAP password, the Apple item the
+# Apple ID and its app-specific password, and the mcp item the MCP key
+# (credential) and the admin token, so no address of a family member is written
+# here. Each port is published on the loopback address only.
+calendar_mcp_users:
+  - name: ts
+    port: 8084
+    sakura_item: scuhuvks3pdlwlgkvnzlaptyke
+    apple_item: brulolg3b7ueon4euns6sas4ue
+    mcp_item: 5zlakmuuiqvxjm2jdeow73pawa
+  - name: ubiqu
+    port: 8085
+    sakura_item: 2eb4e5qbwgl555366yquo3wufy
+    # TODO: ubiqu's own Apple item. ts's stands in until it exists, so the
+    # ubiqu token must not be handed out before then.
+    apple_item: brulolg3b7ueon4euns6sas4ue
+    mcp_item: pgjjmszjzbgt7dddzg2etejuui
