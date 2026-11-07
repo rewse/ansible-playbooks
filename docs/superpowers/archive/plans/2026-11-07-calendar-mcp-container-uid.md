@@ -8,7 +8,7 @@
 
 **Tech Stack:** Ansible（`ansible.builtin.group`、`ansible.builtin.user`、`ansible.builtin.file`）、Docker Compose、pytest（unittest 形式の契約テスト）
 
-**Spec:** `docs/superpowers/specs/2026-11-07-calendar-mcp-container-uid-design.md`
+**Spec:** `docs/superpowers/archive/specs/2026-11-07-calendar-mcp-container-uid-design.md`
 
 ## Global Constraints
 
