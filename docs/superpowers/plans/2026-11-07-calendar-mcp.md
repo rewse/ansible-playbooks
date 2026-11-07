@@ -4,13 +4,13 @@
 
 **Goal:** fox で MarimerLLC/calendar-mcp を ts と ubiqu の一人一つずつ動かし、Muse から iCloud のカレンダーと連絡先、Sakura のメールを使えるようにする。メールは下書きまでで、送信と配信停止はできない。最後に mailboxd を撤去する。
 
-**Architecture:** `aged_release` で上流の `Release x.y.z` のコミットを選び、fox で checkout、下書きのパッチ、ビルドを行う。新しいロール `calendar_mcp` が Compose で二つのコンテナを `127.0.0.1:8084` と `127.0.0.1:8085` に立て、Apache の vhost `calendar-mcp.rewse.jp` が `/mcp/ts` と `/mcp/ubiqu` だけを流す。Quick Tunnel で Muse から確かめてから、CloudFront、UniFi の DNS、security-agent を入れる。
+**Architecture:** 上流を `rewse/calendar-mcp` に fork し、待機期間を過ぎた上流の Release の上に三つの変更をテスト付きで積む。`aged_release` で fork の既定ブランチの最新のコミットを選び、fox で checkout とビルドを行う。新しいロール `calendar_mcp` が Compose で二つのコンテナを `127.0.0.1:8084` と `127.0.0.1:8085` に立て、Apache の vhost `calendar-mcp.rewse.jp` が `/mcp/ts` と `/mcp/ubiqu` だけを流す。Quick Tunnel で Muse から確かめてから、CloudFront、UniFi の DNS、security-agent を入れる。
 
-**Tech Stack:** Ansible（community.docker）、Docker Compose、.NET 10（上流）、MSTest（パッチのテスト）、Apache、fail2ban、1Password CLI、pytest と unittest + jinja2
+**Tech Stack:** Ansible（community.docker）、Docker Compose、.NET 10（上流）、MSTest と Rocks（fork のテスト）、Apache、fail2ban、1Password CLI、pytest と unittest + jinja2
 
 **Spec:** `docs/superpowers/specs/2026-11-07-calendar-mcp-design.md`
 
-**改訂（2026-11-07）:** 設計を fork 方式に改めた。Task 2 のパッチと Task 3 のパッチの適用は、Task 12（fork に三つの変更をテスト付きで積む）と Task 13（ロールを fork からのビルドに切り替える）で置き換える。Task 12 と 13 は Task 8 より前に行う。
+**改訂（2026-11-07）:** 設計を fork 方式に改めた。Task 2 と Task 3 は実施済みの記録として残すが、そのパッチの作成と適用は、Task 12（fork に三つの変更をテスト付きで積む）と Task 13（ロールを fork からのビルドに切り替える）で置き換える。Task 12 と 13 は Task 8 より前に行う。
 
 ## Global Constraints
 
@@ -32,8 +32,8 @@
 
 - ts のトークンで `/mcp/ubiqu` を呼ぶ、または `accountId` に `ubiqu-sakura` を渡す。前者は 401、後者は存在しないアカウントとして拒否されること（Task 7 Step 4）
 - `/mcp/ts/`（末尾のスラッシュ）、`/mcp/ts/admin/ui`、`/mcp/ts/attachments`、`/mcp/kyn` のような完全一致でないパス。どれも 403 で、コンテナに届かないこと（Task 6 のテスト）
-- 上流の新しい Release でパッチが当たらない。古いイメージのまま動き続け、play は失敗で終わること（Task 3 のテスト）
-- パッチの内容だけを変えたとき。上流のコミットが同じでもイメージを作り直すこと（Task 3 のテスト、タグにパッチのハッシュを入れる）
+- fork の既定ブランチに新しいコミットを push したとき。次の `update` でイメージを作り直し、同じコミットなら作り直さないこと（Task 13 のテスト、タグにコミット SHA を入れる）
+- `save_draft` を `emailRead` のないアカウントで呼ぶ。プロバイダーを呼ばずに拒否されること（Task 12 のテスト）
 - 引用符、バックスラッシュ、`$` を含むパスワード。`appsettings.json` が正しい JSON のままで、`.env` の値も変わらないこと（Task 4 のテスト）
 
 ---
@@ -108,7 +108,9 @@ git add plugins/lookup/aged_release.py tests/test_aged_release.py
 git commit -m "feat(aged_release): select a commit by a subject pattern"
 ```
 
-### Task 2: 下書きのパッチ
+### Task 2: 下書きのパッチ（Task 12 で置き換え）
+
+> 実施済み。fork 方式への改訂で、ここで作るパッチは Task 13 で削除し、同じ変更を Task 12 で fork にテスト付きで積み直す。新しく実行しない。
 
 上流の作業用 clone で変更とテストを書き、差分をロールのファイルにする。
 
@@ -190,7 +192,9 @@ git add roles/calendar_mcp/files/save-draft.patch
 git commit -m "feat(calendar_mcp): add a save_draft tool patch for the IMAP provider"
 ```
 
-### Task 3: source コンポーネント
+### Task 3: source コンポーネント（Task 13 で置き換え）
+
+> 実施済み。Task 5 で container コンポーネントに統合し、パッチの適用は Task 13 で fork からのビルドに置き換える。新しく実行しない。
 
 **Files:**
 - Create: `roles/calendar_mcp/tasks/main.yml`、`roles/calendar_mcp/tasks/source.yml`、`roles/calendar_mcp/vars/main.yml`、`roles/calendar_mcp/meta/main.yml`（`fail2ban` と `httpd` に依存、mailboxd と同じ）
