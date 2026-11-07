@@ -30,7 +30,9 @@
 
     # Health checks are for home, the VPN and the office. Behind CloudFront,
     # mod_remoteip has already restored the client address that Require ip tests.
-    <LocationMatch "^/health/">
+    # This section's Require replaces the deny rule's above, so it matches the
+    # exact health paths only.
+    <LocationMatch "^/health/({{ users }})$">
         Require ip 127.0.0.1
         Require ip ::1
         Require ip {{ networks.home_private_ipv4 }}

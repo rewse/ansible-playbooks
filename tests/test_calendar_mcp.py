@@ -375,6 +375,15 @@ def denied_pattern(text: str) -> re.Pattern:
     return re.compile(match["pattern"])
 
 
+def network_pattern(text: str) -> re.Pattern:
+    match = re.search(
+        r'<LocationMatch "(?P<pattern>[^"]+)">\s*Require ip ',
+        text,
+    )
+    assert match is not None
+    return re.compile(match["pattern"])
+
+
 def access_line(host: str, request: str, status: int) -> str:
     # A vhost_combined line as fail2ban sees it, with the timestamp removed.
     return (
@@ -434,8 +443,26 @@ class CalendarMcpApacheTest(unittest.TestCase):
             with self.subTest(line=expected):
                 self.assertIn(expected, lines)
 
+    def test_network_rule_reopens_no_denied_path(self):
+        # The network rule follows the deny rule, and Apache lets the later
+        # section's Require replace the earlier one, so a path both match would
+        # be open to the listed networks.
+        allowed = network_pattern(vhost())
+        for path in ("/health/ts", "/health/ubiqu"):
+            with self.subTest(path=path):
+                self.assertIsNotNone(allowed.match(path))
+        for path in (
+            "/health/",
+            "/health/ts/",
+            "/health/ts/ready",
+            "/health/tsx",
+            "/health/kyn",
+        ):
+            with self.subTest(path=path):
+                self.assertIsNone(allowed.match(path))
+
     def test_health_is_limited_to_known_networks(self):
-        block = location_block(vhost(), "^/health/")
+        block = location_block(vhost(), network_pattern(vhost()).pattern)
         self.assertIn("Require ip 192.168.0.0/24", block)
         self.assertIn("Require ip 203.0.113.0/24", block)
         self.assertNotIn("Require all granted", block)
