@@ -1,10 +1,147 @@
 #!/usr/bin/env python3
 """Regression tests for the zabbix_aws CloudFront and WAF collector."""
 
+import json
+import os
 import pathlib
+import subprocess
+import sys
+import tempfile
 import unittest
+from datetime import UTC
+from datetime import datetime
 
 FILES = pathlib.Path(__file__).resolve().parents[1] / "roles" / "zabbix_aws" / "files"
+
+NOW = 1794092400 + 700  # 2026-11-08 08:11:40 JST, inside a bucket
+BUCKET = (NOW // 300) * 300 - 600
+
+
+def iso(epoch):
+    return datetime.fromtimestamp(epoch, UTC).isoformat()
+
+
+FAKE_AWS = """\
+import json, os, sys
+args = sys.argv[1:]
+if "describe-stacks" in args:
+    print("E123")
+    sys.exit(0)
+queries = args[args.index("--metric-data-queries") + 1].removeprefix("file://")
+with open(queries) as f:
+    ids = [q["Id"] for q in json.load(f)]
+if ids and all(i.startswith("bucket_") for i in ids):
+    window = [args[args.index("--start-time") + 1], args[args.index("--end-time") + 1]]
+    with open(os.environ["BUCKET_WINDOW"], "w") as f:
+        json.dump(window, f)
+    sys.stdout.write(os.environ["BUCKET_ROWS"])
+else:
+    sys.stdout.write(os.environ["LATEST_ROWS"])
+"""
+
+FAKE_DATE = """\
+import os, sys
+from datetime import datetime, timezone
+now = int(os.environ["FAKE_NOW"])
+args = sys.argv[1:]
+if args == ["+%s"]:
+    print(now)
+    sys.exit(0)
+epoch = now
+if "--date" in args:
+    when = args[args.index("--date") + 1]
+    epoch = int(when[1:]) if when.startswith("@") else now - 600
+print(datetime.fromtimestamp(epoch, timezone.utc).isoformat())
+"""
+
+FAKE_SENDER = """\
+import json, os, sys
+with open(os.environ["SENDER_CALLS"], "a") as f:
+    f.write(json.dumps({"args": sys.argv[1:], "input": sys.stdin.read()}) + "\\n")
+"""
+
+
+class CollectorRun:
+    def __init__(self, bucket_window, calls):
+        self.bucket_window = bucket_window
+        timestamped = [c for c in calls if "-T" in c["args"]]
+        latest = [c for c in calls if "-T" not in c["args"]]
+        self.timestamped_args = timestamped[0]["args"] if timestamped else None
+        self.timestamped_input = timestamped[0]["input"] if timestamped else None
+        self.latest_input = latest[0]["input"] if latest else None
+
+
+def run_collector(bucket_rows, latest_rows=""):
+    """Run cloudfront_waf.sh with fake aws, date, and zabbix_sender."""
+    with tempfile.TemporaryDirectory() as tmp:
+        tmp_path = pathlib.Path(tmp)
+        bin_dir = tmp_path / "bin"
+        bin_dir.mkdir()
+        for name, body in (
+            ("aws", FAKE_AWS),
+            ("date", FAKE_DATE),
+            ("zabbix_sender", FAKE_SENDER),
+        ):
+            fake = bin_dir / name
+            fake.write_text(f"#!{sys.executable}\n{body}")
+            fake.chmod(0o755)
+        window_file = tmp_path / "window.json"
+        calls_file = tmp_path / "calls.jsonl"
+        env = {
+            **os.environ,
+            "BUCKET_ROWS": bucket_rows,
+            "BUCKET_WINDOW": str(window_file),
+            "FAKE_NOW": str(NOW),
+            "LATEST_ROWS": latest_rows,
+            "PATH": f"{bin_dir}:{os.environ['PATH']}",
+            "SENDER_CALLS": str(calls_file),
+            "TMPDIR": tmp,
+        }
+        subprocess.run(
+            ["bash", str(FILES / "cloudfront_waf.sh")],
+            capture_output=True,
+            env=env,
+            check=False,
+        )
+        window = (
+            tuple(json.loads(window_file.read_text())) if window_file.exists() else None
+        )
+        calls = (
+            [json.loads(line) for line in calls_file.read_text().splitlines()]
+            if calls_file.exists()
+            else []
+        )
+        return CollectorRun(window, calls)
+
+
+class CloudfrontBucketTest(unittest.TestCase):
+    def test_sends_bucket_requests_and_5xx_count(self):
+        result = run_collector(
+            "bucket_requests\t1996.0\nbucket_rate_5xx\t13.977955911823647\n"
+        )
+        self.assertIn("-T", result.timestamped_args or [])
+        self.assertEqual(
+            (result.timestamped_input or "").splitlines(),
+            [
+                f"- cloudfront.bucket.requests {BUCKET} 1996",
+                f"- cloudfront.bucket.errors.5xx {BUCKET} 279",
+            ],
+        )
+
+    def test_asks_for_exactly_the_bucket(self):
+        result = run_collector("bucket_requests\t10.0\nbucket_rate_5xx\t0.0\n")
+        self.assertEqual(result.bucket_window, (iso(BUCKET), iso(BUCKET + 300)))
+
+    def test_sends_nothing_without_bucket_data(self):
+        result = run_collector("bucket_requests\tNone\nbucket_rate_5xx\tNone\n")
+        self.assertIsNone(result.timestamped_input)
+
+    def test_latest_values_are_still_sent(self):
+        result = run_collector(
+            "bucket_requests\t10.0\nbucket_rate_5xx\t0.0\n",
+            latest_rows="mcloudfront_requests\t733.0\n",
+        )
+        self.assertIn("- cloudfront.requests 733.0", result.latest_input or "")
 
 
 class CloudfrontWafTest(unittest.TestCase):
