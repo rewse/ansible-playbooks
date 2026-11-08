@@ -4,9 +4,16 @@
 # hands them to the server as trapper values.
 #
 # Both services publish to CloudWatch in us-east-1 whatever region the origin
-# lives in. Everything is asked for in one request and delivered in one, because
-# the AWS CLI spends most of a second starting and the agent allows a
-# UserParameter 30 seconds, a ceiling that cannot be raised.
+# lives in. The AWS CLI spends most of a second starting and the agent allows a
+# UserParameter 30 seconds, a ceiling that cannot be raised, so the script makes
+# only two requests: one for the newest value of every metric, and one for the
+# CloudFront totals of a closed five-minute bucket.
+#
+# The bucket is [B, B+300), where B is the current time rounded down to five
+# minutes, less ten minutes, so CloudWatch has its complete data. Its requests
+# and 5xx count are sent stamped with B. security-agent-pentest-counts on the
+# origin hosts sends the AWS Security Agent pentest counts for the same bucket,
+# and Zabbix subtracts them to rate the 5xx responses real clients get.
 
 trap 'my_exit 1' 1 2 3 15
 
@@ -14,6 +21,7 @@ trap 'my_exit 1' 1 2 3 15
 # files behind.
 queryfile=
 resultfile=
+bucketfile=
 readonly region=us-east-1
 readonly stack=cloudfront-waf
 
@@ -39,7 +47,7 @@ queries=()
 # {{{ my_exit()
 
 my_exit() {
-    rm -f "$queryfile" "$resultfile"
+    rm -f "$queryfile" "$resultfile" "$bucketfile"
     echo "$1"
     exit "$1"
 }
@@ -127,6 +135,55 @@ fetch() {
 }
 
 # }}}
+# {{{ fetch_bucket()
+
+# Prints the requests and the 5xx rate of the bucket starting at $2 for the
+# distribution $1, one "<id> <value>" line each.
+fetch_bucket() {
+    local cf start=$2
+
+    cf="$(dimension DistributionId "$1"),$(dimension Region "$cf_region")"
+
+    printf '[%s,%s]' \
+        "$(printf '{"Id":"bucket_requests","MetricStat":{"Metric":{"Namespace":"AWS/CloudFront","MetricName":"Requests","Dimensions":[%s]},"Period":%d,"Stat":"Sum"}}' "$cf" "$period")" \
+        "$(printf '{"Id":"bucket_rate_5xx","MetricStat":{"Metric":{"Namespace":"AWS/CloudFront","MetricName":"5xxErrorRate","Dimensions":[%s]},"Period":%d,"Stat":"Average"}}' "$cf" "$period")" \
+        > "$bucketfile"
+
+    aws cloudwatch get-metric-data \
+        --region "$region" \
+        --metric-data-queries "file://$bucketfile" \
+        --start-time "$(date --iso-8601=seconds --date "@$start")" \
+        --end-time "$(date --iso-8601=seconds --date "@$((start + period))")" \
+        --query 'MetricDataResults[*].[Id,Values[0]]' \
+        --output text 2> /dev/null
+}
+
+# }}}
+# {{{ send_bucket()
+
+# Reads fetch_bucket output and sends the bucket's requests and 5xx count
+# stamped with the bucket start $1. Sends nothing unless both values are
+# there, so a missing datapoint is not reported as zero.
+send_bucket() {
+    local start=$1 id value requests='' rate=''
+
+    while read -r id value; do
+        [ "$value" = "None" ] && continue
+        case $id in
+            bucket_requests) requests=$value ;;
+            bucket_rate_5xx) rate=$value ;;
+        esac
+    done
+
+    { [ -z "$requests" ] || [ -z "$rate" ]; } && return
+
+    awk -v start="$start" -v requests="$requests" -v rate="$rate" 'BEGIN {
+        printf "- cloudfront.bucket.requests %d %.0f\n", start, requests
+        printf "- cloudfront.bucket.errors.5xx %d %.0f\n", start, requests * rate / 100
+    }' | zabbix_sender -c /etc/zabbix/zabbix_agentd.conf -T -i - > /dev/null 2>&1
+}
+
+# }}}
 # {{{ payload()
 
 payload() {
@@ -142,6 +199,11 @@ payload() {
 
 # }}}
 # {{{ Main
+
+# Fixed before any request, so a slow AWS CLI cannot move it into the next
+# five minutes and make this run skip one bucket and the next send it twice.
+bucket_start=$(( $(date +%s) / period * period - 2 * period ))
+readonly bucket_start
 
 distribution=$(distribution_id)
 
@@ -164,6 +226,10 @@ while read -r id value; do
 done < "$resultfile"
 
 payload | zabbix_sender -c /etc/zabbix/zabbix_agentd.conf -i - > /dev/null 2>&1
+
+bucketfile=$(mktemp --tmpdir cloudfront_waf.XXXXXXXXXX)
+
+fetch_bucket "$distribution" "$bucket_start" | send_bucket "$bucket_start"
 
 my_exit 0
 

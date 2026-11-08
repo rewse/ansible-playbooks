@@ -8,7 +8,7 @@
 
 **Tech Stack:** Ansible、Apache httpd 2.4、bash、AWS CLI（CloudWatch `get-metric-data`）、Zabbix 7.4.16（trapper、計算アイテム、`mcporter call zabbix.*`）、Python `unittest`
 
-**Spec:** `docs/superpowers/specs/2026-11-08-cloudfront-5xx-exclude-security-agent-design.md`
+**Spec:** `docs/superpowers/archive/specs/2026-11-08-cloudfront-5xx-exclude-security-agent-design.md`
 
 ## Global Constraints
 
