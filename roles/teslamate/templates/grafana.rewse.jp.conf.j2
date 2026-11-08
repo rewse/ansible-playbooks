@@ -20,12 +20,13 @@
     # A CustomLog here stops the vhost inheriting the server's, so the shared
     # access log is named again. The entry is stamped with the time the response
     # finished, as the httpd role does for the shared formats. The pentest log of
-    # the httpd role is named again for the same reason. The auth scheme is
+    # the httpd role is named again for the same reason, with the format the
+    # httpd role defines. The auth scheme is
     # case-insensitive, so the header is matched in any case.
     SetEnvIfNoCase Authorization "^Basic " grafana_basic_auth
     CustomLog ${APACHE_LOG_DIR}/other_vhosts_access.log vhost_combined
     CustomLog ${APACHE_LOG_DIR}/grafana_basic_auth.log "%v:%p %a basic %{end:[%d/%b/%Y:%H:%M:%S %z]}t \"%r\" %>s %O" env=grafana_basic_auth
-    CustomLog ${APACHE_LOG_DIR}/security_agent_pentest.log "%{sec}t %a" env=security_agent_pentest
+    CustomLog ${APACHE_LOG_DIR}/security_agent_pentest.log security_agent_pentest env=security_agent_pentest
 
     SSLCertificateFile /etc/letsencrypt/live/rewse.jp/fullchain.pem
     SSLCertificateKeyFile /etc/letsencrypt/live/rewse.jp/privkey.pem
