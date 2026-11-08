@@ -856,7 +856,7 @@ class SecurityAgentPentestTest(unittest.TestCase):
     # ignores their address. Apache records which addresses sent it.
     LOG_LINE = (
         "CustomLog ${APACHE_LOG_DIR}/security_agent_pentest.log "
-        '"%{sec}t %a" env=security_agent_pentest'
+        "security_agent_pentest env=security_agent_pentest"
     )
     SCRIPT = HTTPD / "files" / "fail2ban-ignore-security-agent"
 
