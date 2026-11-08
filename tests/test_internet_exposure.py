@@ -872,16 +872,17 @@ class SecurityAgentPentestTest(unittest.TestCase):
 
     def test_apache_marks_and_strips_the_header(self):
         text = (HTTPD / "templates" / "security-agent-pentest.conf.j2").read_text()
-        self.assertRegex(
-            text,
-            # The token is a regular expression here, so it is escaped to be
-            # matched literally.
-            r'(?m)^SetEnvIf X-Security-Agent-Pentest "\^\{\{ '
-            r"httpd_security_agent_pentest_token \| regex_escape \}\}\$\" "
-            r"security_agent_pentest$",
-        )
-        # Not "early": that runs before SetEnvIf reads the header.
-        self.assertRegex(text, r"(?m)^RequestHeader unset X-Security-Agent-Pentest$")
+        for header in ("X-Security-Agent-Pentest", "X-Continuum-Pentest"):
+            self.assertRegex(
+                text,
+                # The token is a regular expression here, so it is escaped to
+                # be matched literally.
+                rf'(?m)^SetEnvIf {header} "\^\{{\{{ '
+                r"httpd_security_agent_pentest_token \| regex_escape \}\}\$\" "
+                r"security_agent_pentest$",
+            )
+            # Not "early": that runs before SetEnvIf reads the header.
+            self.assertRegex(text, rf"(?m)^RequestHeader unset {header}$")
         self.assertIn(self.LOG_LINE, text.splitlines())
 
     def test_vhosts_with_their_own_logs_also_record_the_header(self):
