@@ -18,7 +18,7 @@
 - 5 分枠の開始 B は `now` を 300 秒で切り捨てた値から 600 を引いたもの。枠は [B, B+300)。値は `zabbix_sender -T` で時刻 B として送る
 - 既存の trapper キー（`cloudfront.requests`、`cloudfront.error_rate.5xx` など）と、それを送る処理は変えない
 - 除外後の値が負になったら 0 で止める
-- 除外後のアイテムに 30 分値がないときは、今のトリガー式で判定する
+- 除外後の判定はリクエスト数 50 以上を条件にする。除外後のアイテムに 30 分値がないときは、今のトリガー式（リクエスト数 30 以上）で判定する
 - AGENTS.md の Ansible 規約（タスク名の接頭辞、`mode` の書き方、`changed_when`、check mode で変更しない、2 回目の実行で `changed=0`）に従う
 - コードのコメントとコミットメッセージは英語、Conventional Commits
 
@@ -357,7 +357,7 @@ Expected: それぞれ itemid が返る
 テンプレートのトリガー 17035 を `trigger_update` で更新する。`T` を `/MyTemplate AWS CloudFront WAF` として、expression を次の式にし、opdata を `{ITEM.LASTVALUE1}, {ITEM.LASTVALUE2}`（除外後の率とリクエスト数）にする。名前と重大度は変えない。
 
 ```
-(last(T/cloudfront.public.error_rate.5xx)>5 and last(T/cloudfront.public.requests)>=30) or (min(T/cloudfront.error_rate.5xx,15m)>5 and count(T/cloudfront.error_rate.5xx,15m)>=3 and sum(T/cloudfront.requests,15m)>=30 and nodata(T/cloudfront.public.error_rate.5xx,30m)=1)
+(last(T/cloudfront.public.error_rate.5xx)>5 and last(T/cloudfront.public.requests)>=50) or (min(T/cloudfront.error_rate.5xx,15m)>5 and count(T/cloudfront.error_rate.5xx,15m)>=3 and sum(T/cloudfront.requests,15m)>=30 and nodata(T/cloudfront.public.error_rate.5xx,30m)=1)
 ```
 
 Expected: triggerids に 17035 が返る。`trigger_get` で見た alfa のトリガー 17039 の expression が、`/alfa.rewse.jp/` の同じ式になっている
@@ -380,7 +380,7 @@ Expected: trapper アイテムの `lastclock` が 300 の倍数。計算アイ�
 
 - [ ] **Step 1: 2026-11-08 の枠で除外後の値を確かめる**
 
-アクセスログで数えた 07:10、07:15、07:20 の枠のペンテストの (リクエスト数, 5xx 数) は (1238, 110)、(1988, 279)、(1781, 156)。CloudWatch では (1252, 111)、(1996, 279)、(1788, 157) だった。除外後のリクエスト数は 29、5xx 数は 2 で、リクエスト数が 30 未満のため新しい式は発火しない。この計算を最終報告に書き、Task 5 Step 6 の計算アイテムの値と式が同じ形で出ていることを確かめる。
+アクセスログで数えた 07:10、07:15、07:20 の枠のペンテストの (リクエスト数, 5xx 数) は (1238, 110)、(1988, 279)、(1781, 156)。CloudWatch では (1252, 111)、(1996, 279)、(1788, 157) だった。除外後のリクエスト数は 29、5xx 数は 2 で、リクエスト数が 50 未満のため新しい式は発火しない。この計算を最終報告に書き、Task 5 Step 6 の計算アイテムの値と式が同じ形で出ていることを確かめる。
 Expected: 新しい式の条件が偽
 
 - [ ] **Step 2: マージして push する**
