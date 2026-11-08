@@ -27,3 +27,22 @@
     dest: /etc/fail2ban/jail.d/00-security-agent.conf
     mode: "0644"
   notify: Restart fail2ban
+
+- name: security_agent | Create agentscripts directory
+  ansible.builtin.file:
+    path: /usr/lib/zabbix/agentscripts
+    state: directory
+    mode: "0755"
+
+- name: security_agent | Copy pentest count script
+  ansible.builtin.copy:
+    src: security-agent-pentest-counts
+    dest: /usr/lib/zabbix/agentscripts/security-agent-pentest-counts
+    mode: "0755"
+
+- name: security_agent | Copy pentest count agent config
+  ansible.builtin.copy:
+    src: security-agent-pentest-counts.conf
+    dest: /etc/zabbix/zabbix_agentd.d/security-agent-pentest-counts.conf
+    mode: "0644"
+  notify: Restart zabbix-agent
