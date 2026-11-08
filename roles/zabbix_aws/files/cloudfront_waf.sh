@@ -200,6 +200,11 @@ payload() {
 # }}}
 # {{{ Main
 
+# Fixed before any request, so a slow AWS CLI cannot move it into the next
+# five minutes and make this run skip one bucket and the next send it twice.
+bucket_start=$(( $(date +%s) / period * period - 2 * period ))
+readonly bucket_start
+
 distribution=$(distribution_id)
 
 # Without a distribution there is nothing to read, and sending nothing leaves
@@ -222,7 +227,6 @@ done < "$resultfile"
 
 payload | zabbix_sender -c /etc/zabbix/zabbix_agentd.conf -i - > /dev/null 2>&1
 
-bucket_start=$(( $(date +%s) / period * period - 2 * period ))
 bucketfile=$(mktemp --tmpdir cloudfront_waf.XXXXXXXXXX)
 
 fetch_bucket "$distribution" "$bucket_start" | send_bucket "$bucket_start"

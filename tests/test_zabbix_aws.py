@@ -24,6 +24,11 @@ def iso(epoch):
 FAKE_AWS = """\
 import json, os, sys
 args = sys.argv[1:]
+# Each call advances the fake clock, as a slow AWS CLI would.
+clock = os.environ["FAKE_CLOCK"]
+elapsed = int(open(clock).read()) if os.path.exists(clock) else 0
+with open(clock, "w") as f:
+    f.write(str(elapsed + int(os.environ["AWS_CALL_SECONDS"])))
 if "describe-stacks" in args:
     print("E123")
     sys.exit(0)
@@ -42,7 +47,9 @@ else:
 FAKE_DATE = """\
 import os, sys
 from datetime import datetime, timezone
+clock = os.environ["FAKE_CLOCK"]
 now = int(os.environ["FAKE_NOW"])
+now += int(open(clock).read()) if os.path.exists(clock) else 0
 args = sys.argv[1:]
 if args == ["+%s"]:
     print(now)
@@ -71,7 +78,7 @@ class CollectorRun:
         self.latest_input = latest[0]["input"] if latest else None
 
 
-def run_collector(bucket_rows, latest_rows=""):
+def run_collector(bucket_rows, latest_rows="", aws_call_seconds=0):
     """Run cloudfront_waf.sh with fake aws, date, and zabbix_sender."""
     with tempfile.TemporaryDirectory() as tmp:
         tmp_path = pathlib.Path(tmp)
@@ -89,8 +96,10 @@ def run_collector(bucket_rows, latest_rows=""):
         calls_file = tmp_path / "calls.jsonl"
         env = {
             **os.environ,
+            "AWS_CALL_SECONDS": str(aws_call_seconds),
             "BUCKET_ROWS": bucket_rows,
             "BUCKET_WINDOW": str(window_file),
+            "FAKE_CLOCK": str(tmp_path / "clock"),
             "FAKE_NOW": str(NOW),
             "LATEST_ROWS": latest_rows,
             "PATH": f"{bin_dir}:{os.environ['PATH']}",
@@ -130,6 +139,14 @@ class CloudfrontBucketTest(unittest.TestCase):
 
     def test_asks_for_exactly_the_bucket(self):
         result = run_collector("bucket_requests\t10.0\nbucket_rate_5xx\t0.0\n")
+        self.assertEqual(result.bucket_window, (iso(BUCKET), iso(BUCKET + 300)))
+
+    def test_bucket_is_fixed_before_the_first_request(self):
+        # A slow AWS CLI must not move the bucket into the next five minutes,
+        # which would skip one bucket and send the next twice.
+        result = run_collector(
+            "bucket_requests\t10.0\nbucket_rate_5xx\t0.0\n", aws_call_seconds=200
+        )
         self.assertEqual(result.bucket_window, (iso(BUCKET), iso(BUCKET + 300)))
 
     def test_sends_nothing_without_bucket_data(self):
