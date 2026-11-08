@@ -8,7 +8,7 @@
 
 **Tech Stack:** Ansible、bash、Jinja2、Zabbix 7.4.16（`mcporter call zabbix.*`）、Python `unittest`
 
-**Spec:** `docs/superpowers/specs/2026-11-08-security-agent-counts-single-item-design.md`
+**Spec:** `docs/superpowers/archive/specs/2026-11-08-security-agent-counts-single-item-design.md`
 
 ## Global Constraints
 
