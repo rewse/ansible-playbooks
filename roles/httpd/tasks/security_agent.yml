@@ -41,8 +41,8 @@
     mode: "0755"
 
 - name: security_agent | Copy pentest count agent config
-  ansible.builtin.copy:
-    src: security-agent-pentest-counts.conf
+  ansible.builtin.template:
+    src: security-agent-pentest-counts.conf.j2
     dest: /etc/zabbix/zabbix_agentd.d/security-agent-pentest-counts.conf
     mode: "0644"
   notify: Restart zabbix-agent
