@@ -8,7 +8,7 @@
 
 **Tech Stack:** Home Assistant YAML、Ansible（`home-primary.yml`）、ha-mcp（mcporter 経由）
 
-**Spec:** `docs/superpowers/specs/2026-11-09-model-y-insurance-distance-design.md`
+**Spec:** `docs/superpowers/archive/specs/2026-11-09-model-y-insurance-distance-design.md`
 
 ## Global Constraints
 
