@@ -9,11 +9,11 @@ Model Y の自動車保険には保険期間 1 年あたりの走行距離条件
 - 保険期間内の走行距離を自動で数え、毎年 8月26日に 0 へ戻す。
 - 条件距離は `input_number` で持ち、UI から変えられる。
 - 80% に達したら `binary_sensor` を on にし、off→on のときに通知する。
+- ダッシュボード `dashboard-tesla`（ビュー `model-y`）で走行距離、条件距離、警告を見られるようにする（利用者の依頼）。
 
 ## 非ゴール
 
 - 期間開始時のオドメーター値の手入力と、その更新漏れの警告。utility meter が期間の区切りを持つので不要になった。
-- ダッシュボードへの追加。
 - 期間末の走行距離の予測。
 
 ## アプローチ
@@ -30,6 +30,12 @@ Model Y の自動車保険には保険期間 1 年あたりの走行距離条件
 - `input_numbers.yaml` に `model_y_insurance_distance_limit`（km、`mode: box`）を追加する。
 - `templates.yaml` の Model Y の節に `binary_sensor.model_y_insurance_distance_warning` を追加する。状態は `sensor.model_y_insurance_distance >= input_number.model_y_insurance_distance_limit * 0.8`。両方が数値で、条件距離が 0 より大きいときだけ available にする。
 - `automations-alarm.yaml` に `automation.alarm_model_y_insurance_distance_warning` を追加する。既存の `automation.alarm_model_y_battery_full_charge_due` と同じく、`from: "off"` `to: "on"` で `notify.tats_devices` に `⚠ ALARM` を送る。メッセージには走行距離と条件距離を入れる。
+- ダッシュボード `dashboard-tesla` の `model-y` ビューの最初のセクション（見出し "Model Y"）で、"Last Seen" タイルの後ろに次のタイルを足す。配置は実装者の判断で、走行距離が "Odometer" の近くにあり、警告タイルは既存の "Health" や "Full Charge Due" と同じく on のときだけ表示する形に合わせた。
+  - `sensor.model_y_insurance_distance`（名前 "Insurance Distance"、`grid_options` 6 列 1 行）
+  - `input_number.model_y_insurance_distance_limit`（名前 "Insurance Limit"、6 列 1 行）
+  - `binary_sensor.model_y_insurance_distance_warning`（名前 "Insurance Distance Warning"、12 列 1 行、`visibility` は state が `on` のとき）
+
+  ダッシュボードは storage モードでこのリポジトリの管理外なので、ha-mcp の `ha_config_set_dashboard` で書き換える。エンティティがないとタイルが壊れて見えるため、デプロイ後に行う。
 - `roles/homeassistant/tests/` に `model_y_full_charge_due.yml` と同じ形式のテストを追加し、上記の構成を検証する。
 
 ## 導入手順
