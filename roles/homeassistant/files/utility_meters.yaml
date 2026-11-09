@@ -40,10 +40,13 @@ enecoq_power_usage_hourly:
   cycle: hourly
 
 # Counts the distance driven in each insurance policy year, which starts on
-# August 26. The odometer never decreases, so a temporary drop must not be
-# taken as a source reset that adds the whole odometer reading on recovery.
+# August 26. The odometer reading dips slightly and recovers while driving, so
+# net consumption lets each dip cancel its recovery instead of counting the
+# recovery twice. Measuring from the last valid reading keeps the distance
+# driven while the odometer was unavailable.
 model_y_insurance_distance:
   unique_id: sensor.model_y_insurance_distance
   source: sensor.model_y_odometer
   cron: "0 0 26 8 *"
+  net_consumption: true
   periodically_resetting: false

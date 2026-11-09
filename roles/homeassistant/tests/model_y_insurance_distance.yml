@@ -31,6 +31,7 @@
           - homeassistant_utility_meters.model_y_insurance_distance.source == 'sensor.model_y_odometer'
           - homeassistant_utility_meters.model_y_insurance_distance.cron == '0 0 26 8 *'
           - homeassistant_utility_meters.model_y_insurance_distance.periodically_resetting == false
+          - homeassistant_utility_meters.model_y_insurance_distance.net_consumption == true
           - "'cycle' not in homeassistant_utility_meters.model_y_insurance_distance"
 
     - name: Verify insurance distance limit contract
