@@ -18,6 +18,6 @@ jobs:
           fetch-depth: 0
           persist-credentials: false
 
-      - uses: rewse/actions/trufflehog@34ded731c37181d550c0c82419743c53f7ab6540  # v1.1.7
+      - uses: rewse/actions/trufflehog@90d01bd07cb0cb6f5fb1dcb89a01b3165bb50c2b  # v1.1.8
         with:
           extra-args: --results=verified,unknown
