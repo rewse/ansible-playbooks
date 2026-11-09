@@ -58,5 +58,5 @@
             homeassistant_alarm_automations[0].triggers
             == [{'trigger': 'state', 'entity_id': 'binary_sensor.model_y_insurance_distance_warning', 'from': 'off', 'to': 'on'}]
           - homeassistant_alarm_automations[0].actions[0].action == 'notify.tats_devices'
-          - homeassistant_alarm_automations[0].actions[0].data.title == '⚠ ALARM'
+          - homeassistant_alarm_automations[0].actions[0].data.title == '⚠️ ALARM'
           - homeassistant_alarm_automations[0].trace.stored_traces == 100

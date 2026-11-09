@@ -296,7 +296,7 @@
   actions:
     - action: notify.tats_devices
       data:
-        title: "⚠ ALARM"
+        title: "⚠️ ALARM"
         message: >-
           Model Y has driven
           {{ states('sensor.model_y_insurance_distance') | float | round(0) | int }} km
