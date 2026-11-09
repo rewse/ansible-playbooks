@@ -684,6 +684,17 @@ living_room_tv_light_brightness_turned_down_more:
   max: 100
   icon: mdi:brightness-percent
 
+# Model Y
+
+model_y_insurance_distance_limit:
+  name: "Model Y Insurance Distance Limit"
+  min: 0
+  max: 100000
+  step: 100
+  mode: box
+  unit_of_measurement: "km"
+  icon: "mdi:car-cog"
+
 # Mom’s Room
 
 moms_room_climate_auto_off_minutes:

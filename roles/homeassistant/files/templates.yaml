@@ -291,6 +291,21 @@
         >= 30 * 86400
       }}
     icon: "mdi:battery-alert-variant-outline"
+  # Turns on when the distance driven in the current insurance policy year reaches
+  # 80% of the policy's distance limit.
+  - unique_id: binary_sensor.model_y_insurance_distance_warning
+    name: "Model Y Insurance Distance Warning"
+    availability: >-
+      {{
+        is_number(states('sensor.model_y_insurance_distance')) and
+        states('input_number.model_y_insurance_distance_limit') | float(0) > 0
+      }}
+    state: >-
+      {{
+        states('sensor.model_y_insurance_distance') | float >=
+        states('input_number.model_y_insurance_distance_limit') | float * 0.8
+      }}
+    icon: "mdi:car-clock"
   # Mom’s Room
   - unique_id: binary_sensor.moms_room_ac_cooldry
     name: "Mom’s Room AC CoolDry"

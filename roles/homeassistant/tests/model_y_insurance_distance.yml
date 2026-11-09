@@ -1,0 +1,61 @@
+---
+- name: Test Model Y insurance distance warning
+  hosts: localhost
+  connection: local
+  gather_facts: false
+  tasks:
+    - name: Parse configuration
+      ansible.builtin.set_fact:
+        homeassistant_alarm_automation_list: "{{ lookup('file', '../files/automations-alarm.yaml') | from_yaml }}"
+        homeassistant_input_numbers: "{{ lookup('file', '../files/input_numbers.yaml') | from_yaml }}"
+        homeassistant_template_groups: "{{ lookup('file', '../files/templates.yaml') | from_yaml }}"
+        homeassistant_utility_meters: "{{ lookup('file', '../files/utility_meters.yaml') | from_yaml }}"
+
+    - name: Find entities
+      ansible.builtin.set_fact:
+        homeassistant_alarm_automations: >-
+          {{ homeassistant_alarm_automation_list
+             | selectattr('id', 'equalto', 'automation.alarm_model_y_insurance_distance_warning')
+             | list }}
+        homeassistant_warning_sensors: >-
+          {{ homeassistant_template_groups
+             | selectattr('binary_sensor', 'defined')
+             | map(attribute='binary_sensor') | flatten
+             | selectattr('unique_id', 'equalto', 'binary_sensor.model_y_insurance_distance_warning')
+             | list }}
+
+    - name: Verify insurance distance meter contract
+      ansible.builtin.assert:
+        that:
+          - homeassistant_utility_meters.model_y_insurance_distance.unique_id == 'sensor.model_y_insurance_distance'
+          - homeassistant_utility_meters.model_y_insurance_distance.source == 'sensor.model_y_odometer'
+          - homeassistant_utility_meters.model_y_insurance_distance.cron == '0 0 26 8 *'
+          - homeassistant_utility_meters.model_y_insurance_distance.periodically_resetting == false
+          - "'cycle' not in homeassistant_utility_meters.model_y_insurance_distance"
+
+    - name: Verify insurance distance limit contract
+      ansible.builtin.assert:
+        that:
+          - homeassistant_input_numbers.model_y_insurance_distance_limit.min == 0
+          - homeassistant_input_numbers.model_y_insurance_distance_limit.unit_of_measurement == 'km'
+          - homeassistant_input_numbers.model_y_insurance_distance_limit.mode == 'box'
+
+    - name: Verify warning sensor contract
+      ansible.builtin.assert:
+        that:
+          - homeassistant_warning_sensors | length == 1
+          - "'sensor.model_y_insurance_distance' in homeassistant_warning_sensors[0].availability"
+          - "'input_number.model_y_insurance_distance_limit' in homeassistant_warning_sensors[0].availability"
+          - "'> 0' in homeassistant_warning_sensors[0].availability"
+          - "'0.8' in homeassistant_warning_sensors[0].state"
+
+    - name: Verify warning alarm contract
+      ansible.builtin.assert:
+        that:
+          - homeassistant_alarm_automations | length == 1
+          - >-
+            homeassistant_alarm_automations[0].triggers
+            == [{'trigger': 'state', 'entity_id': 'binary_sensor.model_y_insurance_distance_warning', 'from': 'off', 'to': 'on'}]
+          - homeassistant_alarm_automations[0].actions[0].action == 'notify.tats_devices'
+          - homeassistant_alarm_automations[0].actions[0].data.title == '⚠ ALARM'
+          - homeassistant_alarm_automations[0].trace.stored_traces == 100
