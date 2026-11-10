@@ -13,12 +13,15 @@
 
 - name: Run couchdb init script
   # The script only applies CouchDB settings over HTTP; there is no module for them.
-  ansible.builtin.command: /usr/local/src/couchdb-init.sh
+  ansible.builtin.command: "{{ couchdb_livesync_dir }}/utils/couchdb/couchdb-init.sh"
   changed_when: true
   environment:
     hostname: "{{ couchdb_url }}"
-    username: "{{ admin_user }}"
     password: "{{ couchdb_password }}"
+    # The script falls back to this URL when provision.ts is not beside it, so
+    # a missing copy fails instead of running the upstream default branch.
+    provision_script_url: "{{ couchdb_livesync_dir }}/utils/couchdb/provision.ts"
+    username: "{{ admin_user }}"
   no_log: true
 
 - name: Restart fail2ban

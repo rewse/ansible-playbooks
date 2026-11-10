@@ -1,4 +1,15 @@
 ---
+couchdb_livesync_dir: /usr/local/src/obsidian-livesync
+# Paths under utils/ in the obsidian-livesync repository. couchdb-init.sh runs
+# provision.ts from the upstream default branch unless it finds the file beside
+# itself, and runs Deno with --frozen against the lockfile only when it finds
+# the lockfile and config in ../flyio, so the files keep the upstream layout.
+couchdb_livesync_files:
+  - couchdb/couchdb-init.sh
+  - couchdb/livesync-commonlib.ts
+  - couchdb/provision.ts
+  - flyio/deno.jsonc
+  - flyio/deno.lock
 couchdb_password: "{{ lookup('pipe', 'op read op://ansible/stw5hklwupgn4cjnd4vh3ia5me/credential') }}"
 couchdb_security_agent_database: security-agent-pentest
 couchdb_security_agent_password: "{{ lookup('pipe', 'op read op://ansible/4sxe6btt7pa5jxgp7d4fg6axtu/password') }}"
