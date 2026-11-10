@@ -10,6 +10,9 @@
     uid: "{{ muse_uid }}"
     group: muse
     shell: /bin/bash
+    # Muse signs in with its key, and admins switch with sudo, so no password
+    # is needed. sshd still accepts the key for a locked account with UsePAM.
+    password_lock: true
     skeleton: /etc/skel
 
 - name: user | Install authorized key
