@@ -92,5 +92,74 @@ class GitToolPinTest(unittest.TestCase):
         )
 
 
+class CouchdbInitScriptTest(unittest.TestCase):
+    """The LiveSync init script runs with the CouchDB admin password."""
+
+    ROLE = ROLES / "couchdb"
+    RAW = "https://raw.githubusercontent.com/vrtmrz/obsidian-livesync/"
+    # couchdb-init.sh finds provision.ts beside itself and the Deno lockfile
+    # and config in ../flyio, so the files keep the upstream layout.
+    FILES = frozenset(
+        {
+            "couchdb/couchdb-init.sh",
+            "couchdb/livesync-commonlib.ts",
+            "couchdb/provision.ts",
+            "flyio/deno.jsonc",
+            "flyio/deno.lock",
+        }
+    )
+
+    def setUp(self):
+        self.vars = yaml.safe_load((self.ROLE / "vars" / "main.yml").read_text())
+        self.tasks = yaml.safe_load((self.ROLE / "tasks" / "database.yml").read_text())
+        self.handlers = yaml.safe_load(
+            (self.ROLE / "handlers" / "main.yml").read_text()
+        )
+        self.base = self.vars["couchdb_livesync_dir"] + "/utils"
+
+    def expand(self, text: str) -> str:
+        return text.replace(
+            "{{ couchdb_livesync_dir }}", self.vars["couchdb_livesync_dir"]
+        )
+
+    def test_role_never_names_an_upstream_branch(self):
+        branch = re.compile(r"obsidian-livesync/(?:refs/heads/)?(?:main|master)\b")
+        for path in self.ROLE.rglob("*"):
+            if path.is_file():
+                with self.subTest(path=path.name):
+                    self.assertIsNone(branch.search(path.read_text()))
+
+    def test_files_come_from_the_pinned_commit(self):
+        fetch = next(t for t in self.tasks if "ansible.builtin.uri" in t)
+        self.assertEqual(
+            fetch["ansible.builtin.uri"]["url"],
+            self.RAW + "{{ __couchdb_livesync.commit }}/utils/{{ item }}",
+        )
+        self.assertEqual(fetch["loop"], "{{ couchdb_livesync_files }}")
+        self.assertEqual(set(self.vars["couchdb_livesync_files"]), self.FILES)
+
+    def test_files_keep_the_upstream_layout(self):
+        install = next(t for t in self.tasks if "ansible.builtin.copy" in t)
+        self.assertEqual(
+            self.expand(install["ansible.builtin.copy"]["dest"]),
+            self.base + "/{{ item.item }}",
+        )
+
+    def test_handler_runs_the_local_provision_script(self):
+        handler = next(
+            h for h in self.handlers if h["name"] == "Run couchdb init script"
+        )
+        self.assertEqual(
+            self.expand(handler["ansible.builtin.command"]),
+            self.base + "/couchdb/couchdb-init.sh",
+        )
+        # The script falls back to this URL when provision.ts is not beside it,
+        # so a local path makes a missing copy fail instead of fetching upstream.
+        self.assertEqual(
+            self.expand(handler["environment"]["provision_script_url"]),
+            self.base + "/couchdb/provision.ts",
+        )
+
+
 if __name__ == "__main__":
     unittest.main()
