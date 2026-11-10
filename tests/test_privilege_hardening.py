@@ -128,6 +128,42 @@ class StandbySyncTest(unittest.TestCase):
         )
 
 
+class StandbyProbeTest(unittest.TestCase):
+    # The standby asks the primary's Home Assistant whether it is up over plain
+    # HTTP on the LAN, so the probe has to carry no credential: a token there
+    # would cross the network in clear text and show up in the process list.
+    # Unauthenticated, /api/ answers 401 and counts towards an IP ban, while
+    # /manifest.json is public and served once the HTTP server is listening.
+    SCRIPTS = (
+        SECONDARY / "templates" / "homeassistant-failback.j2",
+        SECONDARY / "templates" / "homeassistant-failover.j2",
+    )
+
+    def test_probe_sends_no_credential(self):
+        for script in self.SCRIPTS:
+            with self.subTest(script=script.name):
+                text = script.read_text()
+                self.assertNotRegex(text, r"(?i)authorization|bearer|token")
+                self.assertNotIn("/api/", text)
+
+    def test_probe_expects_the_public_manifest(self):
+        for script in self.SCRIPTS:
+            with self.subTest(script=script.name):
+                text = script.read_text()
+                self.assertIn(
+                    'PRIMARY_PROBE="http://${PRIMARY_HOST}:8123/manifest.json"',
+                    text,
+                )
+                self.assertRegex(text, r"\n\s+200\)\n")
+                self.assertNotRegex(text, r"2\?\?|3\?\?")
+
+    def test_standby_defines_no_token(self):
+        for path in sorted(SECONDARY.rglob("*")):
+            if path.is_file():
+                with self.subTest(path=path.relative_to(SECONDARY).as_posix()):
+                    self.assertNotIn("_token", path.read_text())
+
+
 class ZabbixAgentTest(unittest.TestCase):
     def test_bluetooth_agent_allows_only_restart_command(self):
         keys = [
@@ -299,7 +335,7 @@ class HomeAssistantSecretFilesTest(unittest.TestCase):
                 self.assertEqual(task["owner"], "root")
                 self.assertEqual(task["group"], "root")
 
-    def test_token_bearing_failover_scripts_are_private(self):
+    def test_failover_scripts_are_private(self):
         tasks = template_tasks(SECONDARY / "tasks" / "failover.yml")
         for name in (
             "homeassistant-failback",

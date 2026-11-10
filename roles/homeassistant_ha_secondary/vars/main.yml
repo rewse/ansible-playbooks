@@ -1,5 +1,4 @@
 ---
-homeassistant_ha_secondary_token: "{{ lookup('pipe', 'op read \"op://ansible/5xhph5yv3c3vzkubj5v33cgkya/credential\"') }}"
 # 15 minutes filters a primary that is only rebooting, which accounted for one of
 # the two failovers seen so far, while still covering the hour-long outage of the
 # other one.

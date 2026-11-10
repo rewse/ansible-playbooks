@@ -9,7 +9,8 @@
   ansible.builtin.template:
     src: homeassistant-failover.j2
     dest: /usr/local/bin/homeassistant-failover
-    # Carries the Home Assistant token; the failover timer runs it as root.
+    # Root alone runs it, from the failover timer, and it calls the root-only
+    # name switch.
     owner: root
     group: root
     mode: "0700"
@@ -42,7 +43,7 @@
   ansible.builtin.template:
     src: homeassistant-failback.j2
     dest: /usr/local/bin/homeassistant-failback
-    # Carries the Home Assistant token; it is run with sudo.
+    # Run with sudo, and it calls the root-only name switch.
     owner: root
     group: root
     mode: "0700"
