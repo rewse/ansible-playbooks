@@ -8,6 +8,9 @@ import subprocess
 import tempfile
 import unittest
 
+import jinja2
+import yaml
+
 REPO_ROOT = pathlib.Path(__file__).resolve().parents[1]
 ROLES = REPO_ROOT / "roles"
 # What fail2ban's <HOST> accepts, close enough for these filters.
@@ -96,12 +99,39 @@ class HomeAssistantFilterTest(unittest.TestCase):
         self.assertEqual(fail2ban_regex(self.FILTER, log + "\n"), "203.0.113.7\n")
 
 
-def access_line(vhost: str, request: str, status: int, user: str = "-") -> str:
+def access_line(
+    vhost: str,
+    request: str,
+    status: int,
+    user: str = "-",
+    path: str | None = None,
+    user_agent: str = "curl",
+) -> str:
     # A vhost_combined line as fail2ban sees it, with the timestamp removed.
+    # path is %U, the decoded path Apache routes by; by default the request's
+    # path without its query string.
+    if path is None:
+        path = request.split()[1].partition("?")[0]
     return (
         f'{vhost}:443 203.0.113.7 - {user} [] "{request} HTTP/1.1" {status} 28 '
-        '"-" "curl" 512'
+        f'"-" "{user_agent}" 512 "{path}"'
     )
+
+
+def render_filter(template: pathlib.Path, directory: str, **variables) -> pathlib.Path:
+    """Render a filter template into directory and return the file."""
+    environment = jinja2.Environment(
+        loader=jinja2.FileSystemLoader(template.parent),
+        undefined=jinja2.StrictUndefined,
+    )
+    environment.filters["comment"] = lambda text: f"#\n# {text}\n#"
+    environment.filters["regex_escape"] = re.escape
+    text = environment.get_template(template.name).render(
+        ansible_managed="Ansible managed", **variables
+    )
+    path = pathlib.Path(directory) / template.name.removesuffix(".j2")
+    path.write_text(text)
+    return path
 
 
 class CouchDBFilterTest(unittest.TestCase):
@@ -150,6 +180,68 @@ class TeslaMateFilterTest(unittest.TestCase):
         self.assertRegex(
             self.VHOST.read_text(),
             r'(?m)^\s*SetEnvIfNoCase Authorization "\^Basic " grafana_basic_auth$',
+        )
+
+
+class NvrFilterTest(unittest.TestCase):
+    TEMPLATE = ROLES / "nvr" / "templates" / "fail2ban-filter.conf.j2"
+    HOSTNAME = yaml.safe_load((ROLES / "nvr" / "vars" / "main.yml").read_text())[
+        "nvr_hostname"
+    ]
+    # Each request reaches Frigate's login endpoint. The second field is %U as
+    # Apache logs it: decoded, without the query string, and with repeated
+    # slashes merged unless MergeSlashes is off.
+    LOGINS = (
+        ("POST /api/login", "/api/login"),
+        ("POST /api/login?x=1", "/api/login"),
+        ("POST //api/login", "/api/login"),
+        ("POST /api/%6Cogin", "/api/login"),
+        ("POST //api/login", "//api/login"),
+    )
+
+    @classmethod
+    def setUpClass(cls):
+        cls.tmp = tempfile.TemporaryDirectory()
+        cls.FILTER = render_filter(
+            cls.TEMPLATE, cls.tmp.name, nvr_hostname=cls.HOSTNAME
+        )
+
+    @classmethod
+    def tearDownClass(cls):
+        cls.tmp.cleanup()
+
+    def test_counts_a_failed_login_in_any_spelling(self):
+        for request, path in self.LOGINS:
+            with self.subTest(request=request, path=path):
+                line = access_line(self.HOSTNAME, request, 401, path=path)
+                self.assertEqual(banned_host(self.FILTER, line), "203.0.113.7")
+
+    def test_ignores_other_requests(self):
+        # A user agent that imitates the %U field; Apache escapes its quotes.
+        forged = 'curl\\" 512 \\"/api/login'
+        for line in (
+            access_line(self.HOSTNAME, "POST /api/login", 200),
+            access_line(self.HOSTNAME, "GET /api/profile", 401),
+            access_line(self.HOSTNAME, "POST /api/logout", 401),
+            access_line(self.HOSTNAME, "POST /api/loginx", 401),
+            access_line(self.HOSTNAME, "POST /api/events", 401, user_agent=forged),
+            access_line("grafana.rewse.jp", "POST /api/login", 401),
+        ):
+            with self.subTest(line=line):
+                self.assertIsNone(banned_host(self.FILTER, line))
+
+    @unittest.skipUnless(shutil.which("fail2ban-regex"), "no fail2ban-regex")
+    def test_fail2ban_bans_a_failed_login_in_any_spelling(self):
+        lines = [
+            access_line(self.HOSTNAME, request, 401, path=path)
+            for request, path in self.LOGINS
+        ]
+        lines.append(access_line(self.HOSTNAME, "POST /api/login?x=1", 200))
+        log = "".join(
+            line.replace("[]", "[10/Nov/2026:12:34:56 +0900]") + "\n" for line in lines
+        )
+        self.assertEqual(
+            fail2ban_regex(self.FILTER, log), "203.0.113.7\n" * len(self.LOGINS)
         )
 
 

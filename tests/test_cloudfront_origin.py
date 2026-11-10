@@ -68,24 +68,54 @@ class RemoteIpTest(unittest.TestCase):
             text = (HTTPD / "templates" / name).read_text()
             self.assertTrue(text.startswith("{{ ansible_managed | comment }}"), name)
 
-    def test_fail2ban_never_bans_cloudfront(self):
-        # If an edge address ever shows up as the client, banning it would
-        # deny every visitor that CloudFront routes through it.
-        prefixes = ["130.176.0.0/18", "64.252.64.0/18"]
+    HOME_NETWORKS = (
+        "home_private_ipv4",
+        "home_private_ipv6",
+        "home_public_ipv4",
+        "home_public_ipv6",
+    )
+
+    @staticmethod
+    def ignoreip(networks: dict, prefixes: list[str]) -> list[str]:
         text = render(
             "fail2ban-cloudfront.conf.j2",
             __httpd_remoteip_cloudfront_prefixes=prefixes,
-            networks={"home_public_ipv4": "106.163.184.9/32"},
+            networks=networks,
         )
         parser = configparser.ConfigParser(interpolation=None)
         parser.read_string(
             "\n".join(line for line in text.splitlines() if not line.startswith("#"))
         )
-        self.assertEqual(parser.sections(), [])
+        assert parser.sections() == []
+        return parser.defaults()["ignoreip"].split()
+
+    def test_fail2ban_never_bans_cloudfront_or_home(self):
+        # If an edge address ever shows up as the client, banning it would
+        # deny every visitor that CloudFront routes through it. A home client
+        # appears as a home address, private when it reaches this host
+        # directly and public when it comes through CloudFront.
+        prefixes = ["130.176.0.0/18", "64.252.64.0/18"]
+        networks = yaml.safe_load(SITE.read_text())["networks"]
         self.assertEqual(
-            parser.defaults()["ignoreip"].split(),
-            ["127.0.0.1/8", "::1", "106.163.184.9/32", *prefixes],
+            self.ignoreip(networks, prefixes),
+            [
+                "127.0.0.1/8",
+                "::1",
+                *(networks[name] for name in self.HOME_NETWORKS),
+                *prefixes,
+            ],
         )
+
+    def test_fail2ban_home_networks_may_be_lists(self):
+        # site.yml allows each network to be a CIDR or a list of CIDRs.
+        networks: dict[str, str | list[str]] = {
+            name: "192.0.2.0/24" for name in self.HOME_NETWORKS
+        }
+        networks["home_private_ipv6"] = ["2001:db8:1::/64", "2001:db8:2::/64"]
+        found = self.ignoreip(networks, [])
+        self.assertIn("2001:db8:1::/64", found)
+        self.assertIn("2001:db8:2::/64", found)
+        self.assertFalse(any("[" in value for value in found), found)
 
     def test_fail2ban_exemption_uses_the_same_ranges(self):
         tasks = yaml.safe_load((HTTPD / "tasks" / "remoteip.yml").read_text())
@@ -129,14 +159,16 @@ class RemoteIpTest(unittest.TestCase):
             self.assertIn("%a", spec)
             self.assertNotIn("%h", spec)
 
-    def test_log_formats_end_with_the_received_bytes(self):
-        # The fail2ban filters leave the tail of a line unanchored, so %I goes
-        # last where it cannot shift the fields they match.
+    def test_log_formats_end_with_the_received_bytes_and_decoded_path(self):
+        # Most fail2ban filters leave the tail of a line unanchored, so %I and
+        # %U go last where they cannot shift the fields those filters match. A
+        # filter that anchors on %U at the end of the line reads the path Apache
+        # routes by, which the client cannot alter by encoding it differently.
         text = (HTTPD / "files" / "log-format.conf").read_text()
         specs = re.findall(r'(?m)^LogFormat "(.*)" \S+$', text)
         self.assertEqual(len(specs), 2)
         for spec in specs:
-            self.assertTrue(spec.endswith(" %I"), spec)
+            self.assertTrue(spec.endswith(' %I \\"%U\\"'), spec)
 
     def test_no_role_logs_the_connection_address(self):
         # Behind CloudFront %h is the edge server, so a log fail2ban reads must

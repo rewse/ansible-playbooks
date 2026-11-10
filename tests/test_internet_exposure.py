@@ -83,8 +83,13 @@ def filter_regexes(
 
 
 def access_line(vhost: str, request: str, status: int) -> str:
-    # A vhost_combined line as fail2ban sees it, with the timestamp removed.
-    return f'{vhost}:443 203.0.113.7 - - [] "{request} HTTP/1.1" {status} 28 "-" "curl" 512'
+    # A vhost_combined line as fail2ban sees it, with the timestamp removed. It
+    # ends with %U, here the request's path without its query string.
+    path = request.split()[1].partition("?")[0]
+    return (
+        f'{vhost}:443 203.0.113.7 - - [] "{request} HTTP/1.1" {status} 28 "-" '
+        f'"curl" 512 "{path}"'
+    )
 
 
 NETWORKS = {

@@ -1,11 +1,14 @@
 {{ ansible_managed | comment }}
 #
 # The form sends the PostgreSQL username and password with every API request,
-# and the server answers a rejected login with 401 on any of them.
+# and the server answers 401 only when the database rejects them. Any POST that
+# gets 401 therefore counts, whatever its path: the request line is logged as
+# the client sent it, and Apache still routes a query string, repeated slashes,
+# or percent-encoded characters to the same API.
 #
 # The virtual host is pinned because other_vhosts_access.log carries every name
 # Apache serves, and the vhost_combined format puts %v:%p ahead of the client
 # address, which is why <HOST> is the second field rather than the first.
 [Definition]
-failregex = ^{{ gnucash_quick_expense_hostname | regex_escape }}:\d+ <HOST> \S+ \S+ \[\] "POST /api/(?:accounts|expenses|rate) HTTP/[\d.]+" 401 \d+
+failregex = ^{{ gnucash_quick_expense_hostname | regex_escape }}:\d+ <HOST> \S+ \S+ \[\] "POST \S+ HTTP/[\d.]+" 401 \d+
 ignoreregex =

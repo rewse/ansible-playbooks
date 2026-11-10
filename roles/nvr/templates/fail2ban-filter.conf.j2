@@ -4,9 +4,15 @@
 # Only that endpoint is matched: other API paths also answer 401 once a session
 # expires, and banning a browser for an old cookie stops no guessing.
 #
+# The endpoint is matched in %U, the last field of the line, rather than in the
+# request line. Apache proxies by that decoded path, so a query string,
+# repeated slashes, or percent-encoded characters in the request line reach the
+# same endpoint and still log it as /api/login. The end anchor keeps a quoted
+# value in the user agent from standing in for it.
+#
 # The virtual host is pinned because other_vhosts_access.log carries every name
 # Apache serves, and the vhost_combined format puts %v:%p ahead of the client
 # address, which is why <HOST> is the second field rather than the first.
 [Definition]
-failregex = ^{{ nvr_hostname | regex_escape }}:\d+ <HOST> \S+ \S+ \[\] "POST /api/login\S* HTTP/[\d.]+" 401 \d+
+failregex = ^{{ nvr_hostname | regex_escape }}:\d+ <HOST> \S+ \S+ \[\] "POST \S+ HTTP/[\d.]+" 401 \d+ .* "/+api/+login"$
 ignoreregex =
