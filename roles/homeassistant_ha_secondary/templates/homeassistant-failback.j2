@@ -3,10 +3,9 @@
 set -uo pipefail
 
 PRIMARY_HOST="fox.rewse.jp"
-PRIMARY_API="http://${PRIMARY_HOST}:8123/api/"
+PRIMARY_PROBE="http://${PRIMARY_HOST}:8123/manifest.json"
 PRIMARY_SSH_PORT="11022"
 PRIMARY_SSH_USER="[% admin_user %]"
-HA_TOKEN="[% homeassistant_ha_secondary_token %]"
 CONFIG_DIR="/srv/homeassistant/config"
 COMPOSE_FILE="/etc/compose/homeassistant/compose.yaml"
 FAILOVER_TIMER="homeassistant-failover.timer"
@@ -290,13 +289,15 @@ fi
 # -----------------------------------------------------------------------------
 # Step 7: Wait for fox API to respond
 # -----------------------------------------------------------------------------
-log "Waiting up to ${API_WAIT_TIMEOUT}s for ${PRIMARY_API} to respond..."
+# The same unauthenticated probe as homeassistant-failover: the manifest is
+# served once Home Assistant's HTTP server is listening.
+log "Waiting up to ${API_WAIT_TIMEOUT}s for ${PRIMARY_PROBE} to respond..."
 elapsed=0
 api_ready=false
 while [ "${elapsed}" -lt "${API_WAIT_TIMEOUT}" ]; do
-    http_code=$(curl --silent --max-time 5 -o /dev/null -w "%{http_code}" -H "Authorization: Bearer ${HA_TOKEN}" "${PRIMARY_API}" 2>/dev/null || echo "000")
+    http_code=$(curl --silent --max-time 5 -o /dev/null -w "%{http_code}" "${PRIMARY_PROBE}" 2>/dev/null || echo "000")
     case "${http_code}" in
-        2??|3??)
+        200)
             api_ready=true
             break
             ;;

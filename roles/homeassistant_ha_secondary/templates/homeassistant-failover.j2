@@ -3,10 +3,9 @@
 set -uo pipefail
 
 PRIMARY_HOST="fox.rewse.jp"
-PRIMARY_API="http://${PRIMARY_HOST}:8123/api/"
+PRIMARY_PROBE="http://${PRIMARY_HOST}:8123/manifest.json"
 PRIMARY_SSH_PORT="11022"
 PRIMARY_SSH_USER="[% admin_user %]"
-HA_TOKEN="[% homeassistant_ha_secondary_token %]"
 HEALTHCHECK_TIMEOUT=5
 # How long the primary has to stay unreachable before the standby takes over.
 # The timer fires every 5 minutes, so the clock is kept in a file rather than by
@@ -52,16 +51,20 @@ local_ha_running() {
     docker ps --format '{{.Names}}' | grep -q '^homeassistant$'
 }
 
-# 2xx/3xx means Home Assistant is up and the token is accepted.
+# Home Assistant serves its manifest without authentication, and only once its
+# HTTP server is listening, which it starts after setting up the frontend. The
+# probe carries no credential because it crosses the LAN in clear text; the REST
+# API would need one, and answers 401 without it, which Home Assistant counts as
+# a failed login towards banning this host.
 check_primary_api() {
     local http_code
-    http_code=$(curl --silent --max-time "${HEALTHCHECK_TIMEOUT}" -o /dev/null -w "%{http_code}" -H "Authorization: Bearer ${HA_TOKEN}" "${PRIMARY_API}" 2>/dev/null || echo "000")
+    http_code=$(curl --silent --max-time "${HEALTHCHECK_TIMEOUT}" -o /dev/null -w "%{http_code}" "${PRIMARY_PROBE}" 2>/dev/null || echo "000")
     case "${http_code}" in
-        2??|3??)
+        200)
             return 0
             ;;
         *)
-            log "Primary API returned HTTP ${http_code}"
+            log "Primary returned HTTP ${http_code} for ${PRIMARY_PROBE}"
             return 1
             ;;
     esac
