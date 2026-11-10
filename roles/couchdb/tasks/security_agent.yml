@@ -145,3 +145,56 @@
       - 201
   changed_when: true
   when: __couchdb_security_agent_sample.status == 404
+
+# CouchDB lets any signed-in user read a database whose security object lists
+# no members, so every other database must name members of its own that leave
+# the pentest user out, and must refuse that user. Database names may contain
+# "/", which the URL path must escape.
+- name: security_agent | List databases
+  ansible.builtin.uri:
+    url: "{{ couchdb_url }}/_all_dbs"
+    url_username: "{{ admin_user }}"
+    url_password: "{{ couchdb_password }}"
+    force_basic_auth: true
+  register: __couchdb_security_agent_all_dbs
+  changed_when: false
+  check_mode: false
+
+- name: security_agent | Read other database security
+  ansible.builtin.uri:
+    url: "{{ couchdb_url }}/{{ item | urlencode | replace('/', '%2F') }}/_security"
+    url_username: "{{ admin_user }}"
+    url_password: "{{ couchdb_password }}"
+    force_basic_auth: true
+  loop: "{{ __couchdb_security_agent_all_dbs.json | reject('match', '_') | reject('equalto', couchdb_security_agent_database) }}"
+  register: __couchdb_security_agent_other_security
+  changed_when: false
+  check_mode: false
+
+- name: security_agent | Assert other databases exclude pentest user
+  ansible.builtin.assert:
+    that:
+      - __couchdb_security_agent_members.names | default([]) | length > 0 or __couchdb_security_agent_members.roles | default([]) | length > 0
+      - couchdb_security_agent_user not in __couchdb_security_agent_members.names | default([])
+    fail_msg: "{{ item.item }} must list members, and {{ couchdb_security_agent_user }} must not be one"
+    quiet: true
+  loop: "{{ __couchdb_security_agent_other_security.results }}"
+  loop_control:
+    label: "{{ item.item }}"
+  vars:
+    __couchdb_security_agent_members: "{{ item.json.members | default({}) }}"
+
+# In check mode the pentest user keeps its old password when sign-in failed,
+# so CouchDB would answer 401 before checking authorization.
+- name: security_agent | Check pentest user is refused other databases
+  ansible.builtin.uri:
+    url: "{{ couchdb_url }}/{{ item | urlencode | replace('/', '%2F') }}/_all_docs?limit=0"
+    url_username: "{{ couchdb_security_agent_user }}"
+    url_password: "{{ couchdb_security_agent_password }}"
+    force_basic_auth: true
+    status_code:
+      - 403
+  loop: "{{ __couchdb_security_agent_other_security.results | map(attribute='item') }}"
+  changed_when: false
+  check_mode: false
+  when: not ansible_check_mode or __couchdb_security_agent_session.status == 200
