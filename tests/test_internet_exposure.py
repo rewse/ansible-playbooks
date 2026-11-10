@@ -460,6 +460,41 @@ class UdmCloudfrontTest(unittest.TestCase):
         for port in ("443", "80"):
             self.assertIn(f"selectattr('dst_port', 'equalto', '{port}')", text)
 
+    def test_https_check_accounts_for_every_web_forward(self):
+        # A forward that reaches a web port by a range, a list, or another WAN
+        # port bypasses the CloudFront limit, so the check before any change
+        # sees every forward the filter selects, not only exact port matches.
+        tasks = self.tasks()
+        selection = next(
+            t
+            for t in tasks
+            if "__udm_cloudfront_https_forwards"
+            in t.get("ansible.builtin.set_fact", {})
+        )
+        text = str(selection)
+        reads = re.findall(r"__udm_cloudfront_forwards\.json\.data[^}]*", text)
+        self.assertTrue(reads)
+        for read in reads:
+            self.assertRegex(
+                read,
+                r"^__udm_cloudfront_forwards\.json\.data\s*\|\s*udm_web_forwards\b",
+            )
+        check = next(
+            t
+            for t in tasks
+            if "__udm_cloudfront_https_forwards | length == 1"
+            in t.get("ansible.builtin.assert", {}).get("that", [])
+        )
+        self.assertIn("__udm_cloudfront_web_forwards", str(check))
+        self.assertIn("__udm_cloudfront_http_forwards", str(check))
+        first_write = next(
+            i
+            for i, t in enumerate(tasks)
+            if t.get("ansible.builtin.uri", {}).get("method") in ("DELETE", "PUT")
+            and "traffic-matching-lists" not in t["ansible.builtin.uri"]["url"]
+        )
+        self.assertLess(tasks.index(check), first_write)
+
     def test_component_is_imported_and_off_by_default(self):
         imports = {
             task["ansible.builtin.import_tasks"]: task.get("tags")
@@ -833,6 +868,124 @@ class UdmFirewallFilterTest(unittest.TestCase):
         derived = self.policy("derived", "https", metadata={"origin": "DERIVED"})
 
         self.assertEqual(self.module.udm_web_only([derived], self.LISTS), [])
+
+    def test_counts_an_unknown_preset_as_tcp(self):
+        # A preset the filter does not know may include TCP.
+        scope = {
+            "ipVersion": "IPV6",
+            "protocolFilter": {"type": "PRESET", "preset": {"name": "ALL_NEW"}},
+        }
+        policies = [self.policy("new preset", [self.port(443)], ipProtocolScope=scope)]
+
+        web = self.module.udm_web_allows(policies, self.LISTS, self.EXTERNAL)
+
+        self.assertEqual(self.names(web), ["new preset"])
+
+    def test_unparsed_port_items_cover_the_web_ports(self):
+        unknown = {"type": "PORT_GROUP", "value": "web"}
+        opposite = {
+            "unknown item": [self.port(443), unknown],
+            "web ports and unknown item": [self.port(80), self.port(443), unknown],
+            "open range": [self.port(443), {"type": "PORT_NUMBER_RANGE", "start": 1}],
+            "text port": [self.port(80), {"type": "PORT_NUMBER", "value": "443"}],
+        }
+        named = {
+            "text port": [{"type": "PORT_NUMBER", "value": "443"}],
+            "open range": [{"type": "PORT_NUMBER_RANGE", "start": 1}],
+        }
+        cases = [
+            (
+                "opposite",
+                name,
+                self.policy(
+                    name,
+                    None,
+                    destination={
+                        "zoneId": "internal-zone",
+                        "trafficFilter": {
+                            "portFilter": {
+                                "type": "PORTS",
+                                "matchOpposite": True,
+                                "items": items,
+                            }
+                        },
+                    },
+                ),
+            )
+            for name, items in opposite.items()
+        ] + [("named", name, self.policy(name, items)) for name, items in named.items()]
+        for kind, name, policy in cases:
+            with self.subTest(kind=kind, policy=name):
+                self.assertEqual(
+                    self.module._admitted_web_ports(policy, self.LISTS), {80, 443}
+                )
+                web = self.module.udm_web_allows([policy], self.LISTS, self.EXTERNAL)
+                self.assertEqual(self.names(web), [name])
+                self.assertEqual(self.module.udm_web_only(web, self.LISTS), [])
+
+    @staticmethod
+    def forward(name: str, dst_port, fwd_port=None, **overrides) -> dict:
+        forward = {
+            "_id": f"id-{name}",
+            "name": name,
+            "enabled": True,
+            "pfwd_interface": "wan",
+            "dst_port": dst_port,
+            "fwd": "192.0.2.10",
+            "fwd_port": dst_port if fwd_port is None else fwd_port,
+            "proto": "tcp_udp",
+        }
+        forward.update(overrides)
+        return forward
+
+    def test_selects_every_enabled_forward_that_reaches_a_web_port(self):
+        unset_enabled = self.forward("enabled unset", "443")
+        del unset_enabled["enabled"]
+        unset_proto = self.forward("protocol unset", "80")
+        del unset_proto["proto"]
+        forwards = [
+            self.forward("https", "443"),
+            self.forward("http", "80", proto="tcp"),
+            self.forward("alternate https", "8443", "443"),
+            self.forward("http to https", "80", "443"),
+            self.forward("low range", "1-1024"),
+            self.forward("web list", "80,443"),
+            self.forward("spaced list", "8080, 443"),
+            self.forward("number", 443),
+            self.forward("unparsed port", "443-"),
+            self.forward("fwd port unset", "443", ""),
+            self.forward("unknown protocol", "443", proto="sctp_tcp"),
+            unset_enabled,
+            unset_proto,
+            # None of these reaches a web port over TCP.
+            self.forward("ssh", "11022", "22", proto="tcp"),
+            self.forward("ssh fwd port unset", "21022", ""),
+            self.forward("quic", "443", proto="udp"),
+            self.forward("disabled", "443", enabled=False),
+            self.forward("high range", "8000-8100"),
+            self.forward("high list", "8080,8443"),
+        ]
+
+        web = self.module.udm_web_forwards(forwards)
+
+        self.assertEqual(
+            self.names(web),
+            [
+                "https",
+                "http",
+                "alternate https",
+                "http to https",
+                "low range",
+                "web list",
+                "spaced list",
+                "number",
+                "unparsed port",
+                "fwd port unset",
+                "unknown protocol",
+                "enabled unset",
+                "protocol unset",
+            ],
+        )
 
 
 class InternetTlsVerificationTest(unittest.TestCase):
