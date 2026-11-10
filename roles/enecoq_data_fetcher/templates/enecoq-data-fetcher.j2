@@ -12,10 +12,14 @@ export UV_EXCLUDE_NEWER
 OWN_PACKAGE="enecoq-data-fetcher=$(date -u +%Y-%m-%dT%H:%M:%SZ)"
 readonly OWN_PACKAGE
 
+# The fetcher reads its credentials from the environment, which only root can
+# read, unlike its command line, which every local user can.
+ENECOQ_EMAIL=[% enecoq_data_fetcher_enecoq.email | quote %]
+ENECOQ_PASSWORD=[% enecoq_data_fetcher_enecoq.password | quote %]
+export ENECOQ_EMAIL ENECOQ_PASSWORD
+
 fetch() {
   uvx --exclude-newer-package "$OWN_PACKAGE" enecoq-data-fetcher@latest \
-    --email '[% enecoq_data_fetcher_enecoq.email %]' \
-    --password '[% enecoq_data_fetcher_enecoq.password %]' \
     --period month \
     --format json \
     --output "$OUTPUT"
