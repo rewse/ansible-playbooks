@@ -25,6 +25,20 @@ ZABBIX_ACCESS_CONF = (
     REPO_ROOT / "roles" / "zabbix_server" / "templates" / "zabbix-api.conf.j2"
 )
 
+
+def tracked_files(directory: pathlib.Path) -> list[pathlib.Path]:
+    # Ignored files such as Finder's binary .DS_Store are never deployed, and
+    # reading them as text fails.
+    listing = subprocess.run(
+        ["git", "ls-files", "-z", "--", str(directory)],
+        cwd=REPO_ROOT,
+        capture_output=True,
+        text=True,
+        check=True,
+    ).stdout
+    return [REPO_ROOT / name for name in sorted(listing.split("\0")) if name]
+
+
 # The Zabbix script "Restart bluetooth" runs this command on the agent.
 RESTART_BLUETOOTH = "sudo systemctl daemon-reload; sudo systemctl restart bluetooth"
 
@@ -158,10 +172,9 @@ class StandbyProbeTest(unittest.TestCase):
                 self.assertNotRegex(text, r"2\?\?|3\?\?")
 
     def test_standby_defines_no_token(self):
-        for path in sorted(SECONDARY.rglob("*")):
-            if path.is_file():
-                with self.subTest(path=path.relative_to(SECONDARY).as_posix()):
-                    self.assertNotIn("_token", path.read_text())
+        for path in tracked_files(SECONDARY):
+            with self.subTest(path=path.relative_to(SECONDARY).as_posix()):
+                self.assertNotIn("_token", path.read_text())
 
 
 class ZabbixAgentTest(unittest.TestCase):
