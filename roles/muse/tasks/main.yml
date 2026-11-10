@@ -1,0 +1,5 @@
+---
+- name: Import user tasks
+  ansible.builtin.import_tasks: user.yml
+  tags:
+    - muse_user

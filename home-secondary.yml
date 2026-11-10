@@ -34,6 +34,9 @@
     - role: mhz19
       tags:
         - mhz19
+    - role: muse
+      tags:
+        - muse
     - role: network_failover
       tags:
         - network_failover

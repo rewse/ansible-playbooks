@@ -67,6 +67,9 @@
     - role: mosquitto
       tags:
         - mosquitto
+    - role: muse
+      tags:
+        - muse
     - role: nas
       tags:
         - nas

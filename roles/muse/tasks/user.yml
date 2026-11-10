@@ -1,0 +1,19 @@
+---
+# The uid, gid, shell, and password are left to each host: the accounts on fox
+# and hotel were created by hand with different ids, and fixing them here would
+# renumber files the account already owns.
+- name: user | Create group
+  ansible.builtin.group:
+    name: muse
+
+- name: user | Create user
+  ansible.builtin.user:
+    name: muse
+    group: muse
+    skeleton: /etc/skel
+
+- name: user | Install authorized key
+  ansible.posix.authorized_key:
+    user: muse
+    key: "{{ muse_ssh_public_key }}"
+    exclusive: true

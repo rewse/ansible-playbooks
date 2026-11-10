@@ -1,0 +1,4 @@
+---
+# Meta Muse signs in with this key over SSH. The account has no sudo and no
+# supplementary groups, so this key reaches only what the muse user can read.
+muse_ssh_public_key: ssh-ed25519 AAAAC3NzaC1lZDI1NTE5AAAAIO1bAJl1D6WKx0PBV47KkLSGS1ClX9JE4Qn3OXDKYT2H hatch
