@@ -1,15 +1,15 @@
 ---
-# The uid, gid, shell, and password are left to each host: the accounts on fox
-# and hotel were created by hand with different ids, and fixing them here would
-# renumber files the account already owns.
 - name: user | Create group
   ansible.builtin.group:
     name: muse
+    gid: "{{ muse_gid }}"
 
 - name: user | Create user
   ansible.builtin.user:
     name: muse
+    uid: "{{ muse_uid }}"
     group: muse
+    shell: /bin/bash
     skeleton: /etc/skel
 
 - name: user | Install authorized key

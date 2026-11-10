@@ -2,3 +2,8 @@
 # Meta Muse signs in with this key over SSH. The account has no sudo and no
 # supplementary groups, so this key reaches only what the muse user can read.
 muse_ssh_public_key: ssh-ed25519 AAAAC3NzaC1lZDI1NTE5AAAAIO1bAJl1D6WKx0PBV47KkLSGS1ClX9JE4Qn3OXDKYT2H hatch
+
+# The same on every host so files copied between hosts keep their owner. 2000
+# is the admin user, and uid 2001 and gid 2001-2002 are taken on fox.
+muse_gid: 2003
+muse_uid: 2002
