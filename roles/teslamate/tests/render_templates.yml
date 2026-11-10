@@ -62,7 +62,7 @@
           - "'GF_AUTH_LOGIN_MAXIMUM_LIFETIME_DURATION=120M' in teslamate_test_grafana_env_output"
           - "'GF_SECURITY_COOKIE_SECURE=true' in teslamate_test_grafana_env_output"
           - "'GF_SERVER_ROOT_URL=https://grafana.rewse.jp' in teslamate_test_grafana_env_output"
-          - "'DATABASE_USER=\\\"grafana_ro\\\"' in teslamate_test_grafana_env_output"
+          - "'DATABASE_USER=\\\"grafana\\\"' in teslamate_test_grafana_env_output"
           - (teslamate_grafana_database_password | replace('$', '$$')) in teslamate_test_grafana_env_output
           - (teslamate_database_password | replace('$', '$$')) not in teslamate_test_grafana_env_output
           - (teslamate_grafana_admin_password | replace('$', '$$')) in teslamate_test_grafana_env_output
