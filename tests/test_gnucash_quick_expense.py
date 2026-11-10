@@ -4,8 +4,12 @@
 import configparser
 import pathlib
 import re
+import shutil
+import subprocess
+import tempfile
 import unittest
 
+import jinja2
 import yaml
 
 REPO_ROOT = pathlib.Path(__file__).resolve().parents[1]
@@ -165,6 +169,18 @@ class ApacheTest(unittest.TestCase):
 
 
 class Fail2banTest(unittest.TestCase):
+    # The server answers 401 only when the database rejects the login, so a
+    # path the routes would also reach through Apache counts in any spelling.
+    REJECTED_PATHS = (
+        "/api/accounts",
+        "/api/rate",
+        "/api/expenses",
+        "/api/accounts?x=1",
+        "/api/expenses?",
+        "//api/rate",
+        "/api/%61ccounts",
+    )
+
     def test_jail_reads_the_apache_log(self):
         section = jail(
             ROLE / "templates" / "fail2ban-jail.conf.j2", "gnucash-quick-expense"
@@ -183,7 +199,7 @@ class Fail2banTest(unittest.TestCase):
             "gnucash_quick_expense_hostname",
             hostname,
         )
-        for path in ("/api/accounts", "/api/rate", "/api/expenses"):
+        for path in self.REJECTED_PATHS:
             match = regex.search(access_line(hostname, f"POST {path}", 401))
             with self.subTest(path=path):
                 self.assertIsNotNone(match)
@@ -191,12 +207,48 @@ class Fail2banTest(unittest.TestCase):
                 self.assertEqual(match["host"], "203.0.113.7")
         for line in (
             access_line(hostname, "POST /api/accounts", 200),
+            access_line(hostname, "POST /api/accounts?x=1", 200),
             access_line(hostname, "POST /api/expenses", 400),
             access_line(hostname, "GET / ", 401),
             access_line("nas.rewse.jp", "POST /api/accounts", 401),
         ):
             with self.subTest(line=line):
                 self.assertIsNone(regex.search(line))
+
+    @unittest.skipUnless(shutil.which("fail2ban-regex"), "no fail2ban-regex")
+    def test_fail2ban_bans_a_rejected_login_in_any_spelling(self):
+        hostname = VARS["gnucash_quick_expense_hostname"]
+        environment = jinja2.Environment(
+            loader=jinja2.FileSystemLoader(ROLE / "templates"),
+            undefined=jinja2.StrictUndefined,
+        )
+        environment.filters["comment"] = lambda text: f"#\n# {text}\n#"
+        environment.filters["regex_escape"] = re.escape
+        text = environment.get_template("fail2ban-filter.conf.j2").render(
+            ansible_managed="Ansible managed",
+            gnucash_quick_expense_hostname=hostname,
+        )
+        lines = [
+            access_line(hostname, f"POST {path}", 401) for path in self.REJECTED_PATHS
+        ]
+        lines.append(access_line(hostname, "POST /api/accounts?x=1", 200))
+        log = "".join(
+            line.replace("[]", "[10/Nov/2026:12:34:56 +0900]") + "\n" for line in lines
+        )
+        binary = shutil.which("fail2ban-regex")
+        assert binary is not None
+        with tempfile.TemporaryDirectory() as tmp:
+            filter_path = pathlib.Path(tmp) / "gnucash-quick-expense.conf"
+            filter_path.write_text(text)
+            log_path = pathlib.Path(tmp) / "test.log"
+            log_path.write_text(log)
+            result = subprocess.run(
+                [binary, "--out", "ip", str(log_path), str(filter_path)],
+                capture_output=True,
+                text=True,
+                check=True,
+            )
+        self.assertEqual(result.stdout, "203.0.113.7\n" * len(self.REJECTED_PATHS))
 
 
 if __name__ == "__main__":
