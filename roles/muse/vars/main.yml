@@ -7,3 +7,11 @@ muse_ssh_public_key: ssh-ed25519 AAAAC3NzaC1lZDI1NTE5AAAAIO1bAJl1D6WKx0PBV47KkLS
 # is the admin user, and uid 2001 and gid 2001-2002 are taken on fox.
 muse_gid: 2003
 muse_uid: 2002
+
+# The read-only PostgreSQL role muse on Aurora. libpq reads the file named by
+# PGPASSFILE, which the pgpass component points at the XDG config directory.
+muse_pgpass_file: /home/muse/.config/pg/pgpass
+muse_pgpass_host: rewse-pg.rewse.jp
+muse_pgpass_password: "{{ lookup('pipe', 'op read \"op://ansible/wi3josvnu5dujxoosdh74igisq/password\"') }}"
+muse_pgpass_port: 5432
+muse_pgpass_username: "{{ lookup('pipe', 'op read \"op://ansible/wi3josvnu5dujxoosdh74igisq/username\"') }}"

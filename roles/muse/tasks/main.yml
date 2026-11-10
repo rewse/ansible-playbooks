@@ -3,3 +3,8 @@
   ansible.builtin.import_tasks: user.yml
   tags:
     - muse_user
+
+- name: Import pgpass tasks
+  ansible.builtin.import_tasks: pgpass.yml
+  tags:
+    - muse_pgpass

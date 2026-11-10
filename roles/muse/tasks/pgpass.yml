@@ -1,0 +1,43 @@
+---
+- name: pgpass | Create config directories
+  ansible.builtin.file:
+    path: "{{ item.path }}"
+    state: directory
+    owner: muse
+    group: muse
+    mode: "{{ item.mode }}"
+  loop:
+    - path: /home/muse/.config
+      mode: "0755"
+    - path: "{{ muse_pgpass_file | dirname }}"
+      mode: "0700"
+
+# Only the entry for this host and user is managed, so connection entries
+# Muse adds for other servers or roles stay in the file.
+- name: pgpass | Install Aurora entry
+  ansible.builtin.lineinfile:
+    path: "{{ muse_pgpass_file }}"
+    regexp: "^{{ muse_pgpass_host | regex_escape }}:{{ muse_pgpass_port }}:[^:]*:{{ muse_pgpass_username | regex_escape }}:"
+    # pgpass treats backslash and colon as special inside a field. Ansible
+    # leaves backslash escapes in Jinja string literals undecoded, so the
+    # backslash comes from a variable.
+    line: "{{ muse_pgpass_host }}:{{ muse_pgpass_port }}:*:{{ muse_pgpass_username }}:{{ muse_pgpass_password | replace(muse_backslash, muse_backslash ~ muse_backslash) | replace(':', muse_backslash ~ ':') }}"
+    create: true
+    owner: muse
+    group: muse
+    mode: "0600"
+  vars:
+    muse_backslash: '\'
+  no_log: true
+
+# Ubuntu's .bashrc returns early for non-interactive shells, so the export goes
+# at the top, where commands run as `ssh muse@host psql` still read it.
+- name: pgpass | Point PGPASSFILE at the XDG config directory
+  ansible.builtin.lineinfile:
+    path: /home/muse/.bashrc
+    regexp: "^export PGPASSFILE="
+    line: "export PGPASSFILE=\"${XDG_CONFIG_HOME:-$HOME/.config}/pg/pgpass\""
+    insertbefore: BOF
+    owner: muse
+    group: muse
+    mode: "0644"
