@@ -349,6 +349,36 @@ class HomeAssistantSecretFilesTest(unittest.TestCase):
                 self.assertEqual(task["group"], "root")
 
 
+class EnecoqDataFetcherCredentialsTest(unittest.TestCase):
+    # Any local user can read a process's command line, so the enecoQ
+    # credentials reach the fetcher through its environment, set in a script
+    # that only root can read.
+    ROLE = REPO_ROOT / "roles" / "enecoq_data_fetcher"
+    SCRIPT = "/usr/local/sbin/enecoq-data-fetcher"
+
+    def test_credentials_stay_off_the_command_line(self):
+        text = (self.ROLE / "templates" / "enecoq-data-fetcher.j2").read_text()
+        self.assertNotIn("--email", text)
+        self.assertNotIn("--password", text)
+
+    def test_credentials_are_exported_shell_quoted(self):
+        text = (self.ROLE / "templates" / "enecoq-data-fetcher.j2").read_text()
+        for name, field in (
+            ("ENECOQ_EMAIL", "email"),
+            ("ENECOQ_PASSWORD", "password"),
+        ):
+            with self.subTest(name=name):
+                self.assertIn(
+                    f"{name}=[% enecoq_data_fetcher_enecoq.{field} | quote %]",
+                    text.splitlines(),
+                )
+        self.assertIn("export ENECOQ_EMAIL ENECOQ_PASSWORD", text.splitlines())
+
+    def test_script_is_private(self):
+        task = template_tasks(self.ROLE / "tasks" / "service.yml")[self.SCRIPT]
+        self.assertEqual(task["mode"], "0700")
+
+
 class SecretOutputTest(unittest.TestCase):
     # Under --diff or -v these print the secret they write, into the terminal
     # and into the transcript of an agent that runs the playbook.
