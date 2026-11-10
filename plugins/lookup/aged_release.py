@@ -369,10 +369,10 @@ def _tag(repo, pattern, days, run, now):
         elif name in published:
             when = published[name]
         else:
-            raise AnsibleLookupError(
-                f"{repo} tag {name} has no published release, so GitHub records no "
-                "time to age it by"
-            )
+            # Without a release GitHub records no time to age the tag by, so
+            # it is never taken; an older tag with a release may still be.
+            _display.vvv(f"aged_release: {repo} tag {name} has no published release")
+            continue
         if now - when >= timedelta(days=days):
             return {"version": name, "commit": shas[name]}
     raise AnsibleLookupError(

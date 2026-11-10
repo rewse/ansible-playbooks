@@ -507,14 +507,31 @@ def test_tag_backdated_commit_does_not_skip_the_cooldown():
     assert resolve("github-tag:o/r", run)["commit"] == "s10"
 
 
-def test_tag_without_release_raises():
+def test_tag_without_release_is_skipped():
+    # Some projects publish a release under a different tag name, which leaves
+    # a tag with no time to age it by.
+    run = FakeRun(
+        {
+            TAGS: [
+                [
+                    {"name": "v1.1.0", "commit": {"sha": "s11"}},
+                    {"name": "v1.0.0", "commit": {"sha": "s10"}},
+                ]
+            ],
+            RELEASES: [[release("v1.1.0-rel", 30), release("v1.0.0", 40)]],
+        }
+    )
+    assert resolve("github-tag:o/r", run) == {"version": "v1.0.0", "commit": "s10"}
+
+
+def test_tag_without_release_raises_when_no_tag_has_one():
     run = FakeRun(
         {
             TAGS: [[{"name": "v1.0.0", "commit": {"sha": "s10"}}]],
             RELEASES: [[release("v1.0.0", 30, draft=True)]],
         }
     )
-    with pytest.raises(AnsibleLookupError, match="v1.0.0 has no published release"):
+    with pytest.raises(AnsibleLookupError, match="no tag of o/r matching"):
         resolve("github-tag:o/r", run)
 
 
