@@ -9,6 +9,8 @@ import re
 import shutil
 import subprocess
 import tempfile
+import urllib.parse
+import urllib.request
 from collections.abc import Callable
 from datetime import UTC
 from datetime import datetime
@@ -27,7 +29,17 @@ description:
     or default-branch commit that was published at least O(days) days ago.
   - The result is pinned by content (image digest, asset sha256, or commit SHA)
     so a later re-push under the same name is not adopted.
-  - Runs on the controller with C(skopeo) and C(gh).
+  - Ages come from times the hosting service records, never from the image
+    Created field or a committer date, which the publisher sets. An image is
+    aged by its Docker Hub tag push time or its GitHub package version
+    creation time, a tag by the publication of its release, a commit by the
+    push that put it on the default branch, and a release asset by the later
+    of its release publication and its last upload. When no such time is
+    available the lookup fails rather than fall back to a publisher's date.
+  - With O(days=0), for sources this account owns, the newest version is taken
+    without asking for those times.
+  - Runs on the controller with C(skopeo) and C(gh). Ageing a ghcr.io image
+    needs the read:packages scope on the gh token.
 options:
   _terms:
     description: One source, prefixed with oci:, github-release:, github-tag:, or github-commit:.
@@ -73,6 +85,15 @@ def _run(cmd: list[str]) -> str:
     if proc.returncode != 0:
         raise RuntimeError(proc.stderr.strip() or f"{cmd[0]} exited {proc.returncode}")
     return proc.stdout
+
+
+def _fetch(url: str) -> str:
+    """GET an HTTPS URL and return the body; raise on an HTTP error."""
+    if not url.startswith("https://"):
+        raise ValueError(f"refusing to fetch {url}")
+    request = urllib.request.Request(url, headers={"User-Agent": "aged_release"})
+    with urllib.request.urlopen(request, timeout=30) as response:
+        return response.read().decode()
 
 
 def _now() -> datetime:
@@ -145,10 +166,107 @@ def _pages(run: Callable[[list[str]], str], path: str) -> list:
 # every tag look old enough and silently skip the cooldown.
 _EARLIEST_CREATED = datetime(2000, 1, 1, tzinfo=UTC)
 
+_DOCKER_HUB = ("docker.io", "index.docker.io", "registry-1.docker.io")
+_READ_PACKAGES_HINT = "gh auth refresh -s read:packages"
 
-def _oci(repo, pattern, days, platform, run, now):
+
+def _registry(repo: str) -> tuple[str, str]:
+    """Split an image name into its registry and the path within it."""
+    first, sep, rest = repo.partition("/")
+    if sep and ("." in first or ":" in first or first == "localhost"):
+        return first, rest
+    return "docker.io", repo
+
+
+def _docker_hub_pushed(path, fetch):
+    """Return a function giving the Docker Hub push time of a tag at a digest."""
+    namespace, _, name = path.rpartition("/")
+    # Official images live in the library namespace.
+    namespace = namespace or "library"
+
+    def pushed(tag, digest):
+        data = json.loads(
+            fetch(
+                f"https://hub.docker.com/v2/namespaces/{namespace}"
+                f"/repositories/{name}/tags/{tag}"
+            )
+        )
+        if not data.get("tag_last_pushed"):
+            raise AnsibleLookupError(
+                f"Docker Hub reports no push time for {namespace}/{name}:{tag}"
+            )
+        if data.get("digest") != digest:
+            # The push time belongs to another digest, so it does not date the
+            # one that would be pinned.
+            _display.vvv(
+                f"aged_release: {namespace}/{name}:{tag} is {data.get('digest')} "
+                f"on Docker Hub but {digest} in the registry"
+            )
+            return None
+        return _parse_time(data["tag_last_pushed"])
+
+    return pushed
+
+
+def _ghcr_pushed(path, run):
+    """Return a function giving the GitHub creation time of a package digest."""
+    owner, _, name = path.partition("/")
+    kind = (
+        "orgs"
+        if _json(run, ["gh", "api", f"users/{owner}"]).get("type") == "Organization"
+        else "users"
+    )
+    base = (
+        f"{kind}/{owner}/packages/container/{urllib.parse.quote(name, safe='')}"
+        "/versions?per_page=100"
+    )
+    created: dict[str, str | None] = {}
+    page = 0
+    exhausted = False
+
+    def pushed(tag, digest):
+        nonlocal page, exhausted
+        # Versions are listed newest first, so recent tags need few pages.
+        while digest not in created and not exhausted:
+            page += 1
+            try:
+                versions = _json(run, ["gh", "api", f"{base}&page={page}"])
+            except RuntimeError as exc:
+                if "HTTP 403" in str(exc) or "HTTP 404" in str(exc):
+                    raise AnsibleLookupError(
+                        f"cannot read the package versions of ghcr.io/{path}; give "
+                        "the controller's gh token the read:packages scope with "
+                        f"`{_READ_PACKAGES_HINT}`"
+                    ) from exc
+                raise
+            for item in versions:
+                created[item["name"]] = item.get("created_at")
+            exhausted = len(versions) < 100
+        if not created.get(digest):
+            raise AnsibleLookupError(
+                f"GitHub lists no creation time for ghcr.io/{path}:{tag} at {digest}"
+            )
+        return _parse_time(str(created[digest]))
+
+    return pushed
+
+
+def _push_times(repo, run, fetch):
+    registry, path = _registry(repo)
+    if registry in _DOCKER_HUB:
+        return _docker_hub_pushed(path, fetch)
+    if registry == "ghcr.io":
+        return _ghcr_pushed(path, run)
+    raise AnsibleLookupError(
+        f"{repo}: {registry} offers no push time to age images by; "
+        "only Docker Hub and ghcr.io images can have a cooldown"
+    )
+
+
+def _oci(repo, pattern, days, platform, run, fetch, now):
     os_name, _, arch = (platform or "linux/amd64").partition("/")
     tags = _json(run, ["skopeo", "list-tags", f"docker://{repo}"])["Tags"]
+    pushed = None if days == 0 else _push_times(repo, run, fetch)
     for tag in ordered(tags, pattern):
         # Inspecting is one request per tag, so stop at the first aged tag.
         meta = _json(
@@ -163,11 +281,16 @@ def _oci(repo, pattern, days, platform, run, now):
                 f"docker://{repo}:{tag}",
             ],
         )
-        created = _parse_time(meta["Created"])
-        if created < _EARLIEST_CREATED:
-            raise AnsibleLookupError(
-                f"{repo}:{tag} Created {meta['Created']} is before 2000"
-            )
+        if pushed is None:
+            created = _parse_time(meta["Created"])
+            if created < _EARLIEST_CREATED:
+                raise AnsibleLookupError(
+                    f"{repo}:{tag} Created {meta['Created']} is before 2000"
+                )
+        else:
+            created = pushed(tag, meta["Digest"])
+            if created is None:
+                continue
         if now - created >= timedelta(days=days):
             return {"version": tag, "ref": f"{repo}:{tag}@{meta['Digest']}"}
     raise AnsibleLookupError(
@@ -175,65 +298,129 @@ def _oci(repo, pattern, days, platform, run, now):
     )
 
 
+def _find_asset(assets, asset, version):
+    """Return the asset whose name matches, with {version} with or without v."""
+    names = (
+        asset.replace("{version}", version.lstrip("v")),
+        asset.replace("{version}", version),
+    )
+    return next((item for item in assets if item["name"] in names), None)
+
+
 def _release(repo, pattern, days, asset, run, now):
     releases = _pages(run, f"repos/{repo}/releases?per_page=100")
-    candidates = [
-        {
-            "version": r["tag_name"],
-            "published": _parse_time(r["published_at"]),
-            "assets": r["assets"],
-        }
-        for r in releases
-        if not r["draft"] and not r["prerelease"] and r.get("published_at")
-    ]
+    candidates = []
+    for r in releases:
+        if r["draft"] or r["prerelease"] or not r.get("published_at"):
+            continue
+        published = _parse_time(r["published_at"])
+        item = None if asset is None else _find_asset(r["assets"], asset, r["tag_name"])
+        if item is not None:
+            # An asset can be uploaded again after its release is published.
+            if not item.get("updated_at"):
+                raise AnsibleLookupError(
+                    f"{repo} {r['tag_name']} {item['name']} has no upload time"
+                )
+            published = max(published, _parse_time(item["updated_at"]))
+        candidates.append(
+            {"version": r["tag_name"], "published": published, "asset": item}
+        )
     try:
         chosen = select(candidates, pattern, days, now)
     except AnsibleLookupError as exc:
         raise AnsibleLookupError(f"{repo}: {exc}") from exc
     if asset is None:
         return {"version": chosen["version"], "url": "", "checksum": ""}
-    name = asset.replace("{version}", chosen["version"].lstrip("v"))
-    for item in chosen["assets"]:
-        if item["name"] in (name, asset.replace("{version}", chosen["version"])):
-            checksum = item.get("digest") or ""
-            if not checksum:
-                _display.vvv(
-                    f"aged_release: {repo} {chosen['version']} {item['name']} has no digest"
-                )
-            return {
-                "version": chosen["version"],
-                "url": item["browser_download_url"],
-                "checksum": checksum,
-            }
-    raise AnsibleLookupError(f"{repo} {chosen['version']} has no asset named {name}")
+    item = chosen["asset"]
+    if item is None:
+        name = asset.replace("{version}", chosen["version"].lstrip("v"))
+        raise AnsibleLookupError(
+            f"{repo} {chosen['version']} has no asset named {name}"
+        )
+    checksum = item.get("digest") or ""
+    if not checksum:
+        _display.vvv(
+            f"aged_release: {repo} {chosen['version']} {item['name']} has no digest"
+        )
+    return {
+        "version": chosen["version"],
+        "url": item["browser_download_url"],
+        "checksum": checksum,
+    }
 
 
 def _tag(repo, pattern, days, run, now):
     tags = _pages(run, f"repos/{repo}/tags?per_page=100")
     shas = {t["name"]: t["commit"]["sha"] for t in tags}
+    # A tag records no push time, so the publication of its release dates it.
+    published = (
+        None
+        if days == 0
+        else {
+            r["tag_name"]: _parse_time(r["published_at"])
+            for r in _pages(run, f"repos/{repo}/releases?per_page=100")
+            if not r["draft"] and r.get("published_at")
+        }
+    )
     for name in ordered(list(shas), pattern):
-        commit = _json(run, ["gh", "api", f"repos/{repo}/commits/{shas[name]}"])
-        if now - _parse_time(commit["commit"]["committer"]["date"]) >= timedelta(
-            days=days
-        ):
+        if published is None:
+            commit = _json(run, ["gh", "api", f"repos/{repo}/commits/{shas[name]}"])
+            when = _parse_time(commit["commit"]["committer"]["date"])
+        elif name in published:
+            when = published[name]
+        else:
+            raise AnsibleLookupError(
+                f"{repo} tag {name} has no published release, so GitHub records no "
+                "time to age it by"
+            )
+        if now - when >= timedelta(days=days):
             return {"version": name, "commit": shas[name]}
     raise AnsibleLookupError(
         f"no tag of {repo} matching {pattern} is at least {days} day(s) old"
     )
 
 
+_NULL_SHA = "0" * 40
+
+
+def _pushed_head(repo, branch, days, run, now):
+    """Return the branch head left by the newest push at least days old."""
+    ref = f"refs/heads/{branch}"
+    cutoff = now - timedelta(days=days)
+    # Merges through the web interface are recorded as pr_merge or
+    # merge_queue_merge rather than push, so every activity that leaves the
+    # branch at a commit counts.
+    activities = sorted(
+        (
+            a
+            for a in _pages(run, f"repos/{repo}/activity?ref={ref}&per_page=100")
+            if a.get("ref") == ref
+            and a["activity_type"] != "branch_deletion"
+            and a.get("after")
+            and a["after"] != _NULL_SHA
+        ),
+        key=lambda a: _parse_time(a["timestamp"]),
+        reverse=True,
+    )
+    for activity in activities:
+        if _parse_time(activity["timestamp"]) <= cutoff:
+            return activity["after"]
+    raise AnsibleLookupError(
+        f"{repo} has no push to {branch} at least {days} day(s) old"
+    )
+
+
 def _commit(repo, days, run, now, message=None):
     branch = _json(run, ["gh", "api", f"repos/{repo}"])["default_branch"]
-    until = _iso(now - timedelta(days=days))
+    if days == 0:
+        query = f"sha={branch}&until={_iso(now)}"
+    else:
+        head = _pushed_head(repo, branch, days, run, now)
+        if message is None:
+            return {"commit": head}
+        query = f"sha={head}"
     if message is None:
-        commits = _json(
-            run,
-            [
-                "gh",
-                "api",
-                f"repos/{repo}/commits?sha={branch}&until={until}&per_page=1",
-            ],
-        )
+        commits = _json(run, ["gh", "api", f"repos/{repo}/commits?{query}&per_page=1"])
         if not commits:
             raise AnsibleLookupError(
                 f"{repo} has no commit on {branch} at least {days} day(s) old"
@@ -241,10 +428,7 @@ def _commit(repo, days, run, now, message=None):
         return {"commit": commits[0]["sha"]}
     # One page: a project that marks releases with a commit subject releases far
     # more often than once per 100 commits.
-    commits = _json(
-        run,
-        ["gh", "api", f"repos/{repo}/commits?sha={branch}&until={until}&per_page=100"],
-    )
+    commits = _json(run, ["gh", "api", f"repos/{repo}/commits?{query}&per_page=100"])
     regex = re.compile(message)
     for commit in commits:
         match = regex.search(commit["commit"]["message"].split("\n", 1)[0])
@@ -263,6 +447,7 @@ def resolve(
     platform: str | None,
     asset: str | None,
     run: Callable[[list[str]], str],
+    fetch: Callable[[str], str],
     now: datetime,
     message: str | None = None,
 ) -> dict:
@@ -271,7 +456,7 @@ def resolve(
         raise AnsibleLookupError(f"aged_release: malformed term {term!r}")
     try:
         if kind == "oci":
-            return _oci(source, pattern, days, platform, run, now)
+            return _oci(source, pattern, days, platform, run, fetch, now)
         if kind == "github-release":
             return _release(source, pattern, days, asset, run, now)
         if kind == "github-tag":
@@ -351,6 +536,7 @@ class LookupModule(LookupBase):
                         platform=platform,
                         asset=asset,
                         run=_run,
+                        fetch=_fetch,
                         now=_now(),
                         message=message,
                     ),
