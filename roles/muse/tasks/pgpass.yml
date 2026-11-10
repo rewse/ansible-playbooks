@@ -12,20 +12,23 @@
     - path: "{{ muse_pgpass_file | dirname }}"
       mode: "0700"
 
-# Only the entry for this host and user is managed, so connection entries
-# Muse adds for other servers or roles stay in the file.
-- name: pgpass | Install Aurora entry
+# Only the entries for these hosts and users are managed, so connection
+# entries Muse adds for other servers or roles stay in the file.
+- name: pgpass | Install entries
   ansible.builtin.lineinfile:
     path: "{{ muse_pgpass_file }}"
-    regexp: "^{{ muse_pgpass_host | regex_escape }}:{{ muse_pgpass_port }}:[^:]*:{{ muse_pgpass_username | regex_escape }}:"
+    regexp: "^{{ item.host | regex_escape }}:{{ item.port }}:[^:]*:{{ item.username | regex_escape }}:"
     # pgpass treats backslash and colon as special inside a field. Ansible
     # leaves backslash escapes in Jinja string literals undecoded, so the
     # backslash comes from a variable.
-    line: "{{ muse_pgpass_host }}:{{ muse_pgpass_port }}:*:{{ muse_pgpass_username }}:{{ muse_pgpass_password | replace(muse_backslash, muse_backslash ~ muse_backslash) | replace(':', muse_backslash ~ ':') }}"
+    line: "{{ item.host }}:{{ item.port }}:*:{{ item.username }}:{{ item.password | replace(muse_backslash, muse_backslash ~ muse_backslash) | replace(':', muse_backslash ~ ':') }}"
     create: true
     owner: muse
     group: muse
     mode: "0600"
+  loop: "{{ muse_pgpass_entries }}"
+  loop_control:
+    label: "{{ item.host }}"
   vars:
     muse_backslash: '\'
   no_log: true
