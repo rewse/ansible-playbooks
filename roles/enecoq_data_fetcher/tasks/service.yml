@@ -30,6 +30,6 @@
 - name: service | Enable and start timer
   ansible.builtin.systemd:
     name: enecoq-data-fetcher.timer
-    enabled: true
-    state: started
+    enabled: "{{ enecoq_data_fetcher_timer_enabled }}"
+    state: "{{ 'started' if enecoq_data_fetcher_timer_enabled else 'stopped' }}"
     daemon_reload: true
