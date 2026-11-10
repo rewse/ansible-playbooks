@@ -6,12 +6,19 @@
 # ip-ranges.json fetch as remoteip.conf. 127.0.0.1/8 and ::1 are the addresses
 # fail2ban suggests ignoring by default.
 #
-# Never ban the home WAN address either. A home client that resolves a public
-# name through public DNS reaches this host through CloudFront and is restored
-# as that address, so a ban on it would deny every IPv4 client at home.
+# Never ban a home address either. A home client that resolves a public name
+# through public DNS reaches this host through CloudFront and is restored as the
+# home WAN address, so a ban on it would deny every IPv4 client at home. One
+# that resolves it through the home DNS reaches this host directly from a home
+# private address or a home public IPv6 address.
 [DEFAULT]
 ignoreip = 127.0.0.1/8 ::1
-           {{ networks.home_public_ipv4 }}
+{# Each network is a CIDR or a list of CIDRs. #}
+{% for value in [networks.home_private_ipv4, networks.home_private_ipv6, networks.home_public_ipv4, networks.home_public_ipv6] %}
+{% for cidr in ([value] if value is string else value) %}
+           {{ cidr }}
+{% endfor %}
+{% endfor %}
 {% for prefix in __httpd_remoteip_cloudfront_prefixes %}
            {{ prefix }}
 {% endfor %}
