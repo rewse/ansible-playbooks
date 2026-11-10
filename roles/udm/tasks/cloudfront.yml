@@ -197,17 +197,18 @@
       when: udm_cloudfront_enforce
 
     # Forwards are matched on the port, because their names follow whichever
-    # host the failover script last pointed them at.
+    # host the failover script last pointed them at. Every enabled forward that
+    # may carry TCP to port 80 or 443, by its WAN or its forwarded port and
+    # alone, in a range, or in a list, is a web forward; see
+    # filter_plugins/udm_firewall.py. Of those, the forward of WAN 443 is
+    # limited and the forwards of WAN 80 are removed.
     - name: cloudfront | Set web forwards and legacy group
+      vars:
+        web_forwards: "{{ __udm_cloudfront_forwards.json.data | udm_web_forwards }}"
       ansible.builtin.set_fact:
-        __udm_cloudfront_https_forwards: >-
-          {{ __udm_cloudfront_forwards.json.data
-          | selectattr('dst_port', 'equalto', '443')
-          | selectattr('proto', 'in', ['tcp', 'tcp_udp']) }}
-        __udm_cloudfront_http_forwards: >-
-          {{ __udm_cloudfront_forwards.json.data
-          | selectattr('dst_port', 'equalto', '80')
-          | selectattr('proto', 'in', ['tcp', 'tcp_udp']) }}
+        __udm_cloudfront_web_forwards: "{{ web_forwards }}"
+        __udm_cloudfront_https_forwards: "{{ web_forwards | selectattr('dst_port', 'equalto', '443') }}"
+        __udm_cloudfront_http_forwards: "{{ web_forwards | selectattr('dst_port', 'equalto', '80') }}"
         # The legacy twin exists only once the list does, which a check run
         # against a console without the list never sees.
         __udm_cloudfront_firewall_group_id: >-
@@ -216,14 +217,27 @@
           | map(attribute='_id') | first | default('') }}
       when: udm_cloudfront_enforce
 
+    # Any other web forward would reach a web server around the limit, and
+    # changing it here could close whatever else it carries, so it is left for
+    # a person before anything changes.
     - name: cloudfront | Check HTTPS forward
+      vars:
+        other_web_forwards: >-
+          {{ __udm_cloudfront_web_forwards
+          | rejectattr('_id', 'in', (__udm_cloudfront_https_forwards + __udm_cloudfront_http_forwards)
+          | map(attribute='_id') | list)
+          | map(attribute='name') | list }}
       ansible.builtin.assert:
         that:
           - __udm_cloudfront_https_forwards | length == 1
+          - other_web_forwards | length == 0
           - __udm_cloudfront_firewall_group_id != '' or ansible_check_mode
         fail_msg: >-
-          Expected one TCP forward of port 443 and the legacy twin of
-          {{ udm_cloudfront_group_name }}.
+          Expected one TCP forward of port 443, no other forward to port 80 or
+          443 than forwards of port 80, and the legacy twin of
+          {{ udm_cloudfront_group_name }}. Other forwards to a web port:
+          {{ other_web_forwards | join(', ') or 'none' }}. Remove or narrow them
+          in the UniFi UI and run again.
         quiet: true
       when: udm_cloudfront_enforce
 

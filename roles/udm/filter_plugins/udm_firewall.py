@@ -3,11 +3,17 @@
 The policies are the documented API's firewall/policies objects, and the port
 lists are its traffic-matching-lists objects. Apache listens on TCP 80 and 443
 only, so a policy matters when it admits new TCP connections to either port
-over IPv6, whether it names IPv6 alone or both IP versions.
+over IPv6, whether it names IPv6 alone or both IP versions. The forwards are
+the legacy rest/portforward objects, which carry IPv4 from the WAN.
+
+Every test errs towards exposure: a protocol, port item, or port field this
+module cannot read counts as admitting TCP to both web ports, so an object of a
+form it does not know is reported rather than passed over.
 """
 
 from __future__ import annotations
 
+import re
 from typing import Any
 
 WEB_PORTS = frozenset({80, 443})
@@ -27,17 +33,21 @@ def _port_items(
     return None
 
 
-def _item_ports(item: dict[str, Any], candidates: frozenset[int]) -> set[int]:
-    if item.get("type") == "PORT_NUMBER":
-        return {port for port in candidates if item.get("value") == port}
-    if item.get("type") == "PORT_NUMBER_RANGE":
-        return {
-            port
-            for port in candidates
-            if item.get("start", 0) <= port <= item.get("stop", -1)
-        }
-    # An item of an unknown kind may cover anything.
-    return set(candidates)
+def _is_port(value: Any) -> bool:
+    return isinstance(value, int) and not isinstance(value, bool)
+
+
+def _item_ports(item: dict[str, Any]) -> set[int] | None:
+    """Returns the web ports an item names, or None when it cannot be read."""
+    if item.get("type") == "PORT_NUMBER" and _is_port(item.get("value")):
+        return {port for port in WEB_PORTS if item["value"] == port}
+    if (
+        item.get("type") == "PORT_NUMBER_RANGE"
+        and _is_port(item.get("start"))
+        and _is_port(item.get("stop"))
+    ):
+        return {port for port in WEB_PORTS if item["start"] <= port <= item["stop"]}
+    return None
 
 
 def _admitted_web_ports(
@@ -51,8 +61,14 @@ def _admitted_web_ports(
     items = _port_items(port_filter, lists)
     if items is None:
         return set(WEB_PORTS)
-    named = set().union(*(_item_ports(item, WEB_PORTS) for item in items))
-    return set(WEB_PORTS) - named if port_filter.get("matchOpposite") else named
+    named = [_item_ports(item) for item in items]
+    # An item that cannot be read may name either web port, so it counts as
+    # admitting both, whether the filter selects the ports it names or every
+    # port but those.
+    if any(ports is None for ports in named):
+        return set(WEB_PORTS)
+    union = set().union(*(ports for ports in named if ports is not None))
+    return set(WEB_PORTS) - union if port_filter.get("matchOpposite") else union
 
 
 def _admits_tcp(policy: dict[str, Any]) -> bool:
@@ -60,8 +76,9 @@ def _admits_tcp(policy: dict[str, Any]) -> bool:
     if not protocol:
         return True
     kind = protocol.get("type")
+    # A preset other than TCP_UDP may include TCP too, so every preset counts.
     if kind == "PRESET":
-        return (protocol.get("preset") or {}).get("name") == "TCP_UDP"
+        return True
     if kind == "NAMED_PROTOCOL":
         matches = (protocol.get("protocol") or {}).get("name") == "TCP"
     elif kind == "PROTOCOL_NUMBER":
@@ -124,6 +141,55 @@ def udm_web_only(
     return selected
 
 
+def _forward_ports(value: Any) -> set[int] | None:
+    """Returns the web ports a forward's port field names, or None if unread.
+
+    The field holds one port, a range such as 1000-2000, or a comma-separated
+    list of either.
+    """
+    if _is_port(value):
+        value = str(value)
+    if not isinstance(value, str) or not value.strip():
+        return None
+    ports: set[int] = set()
+    for part in value.split(","):
+        bounds = re.fullmatch(r"(\d+)(?:-(\d+))?", part.strip(), re.ASCII)
+        if not bounds:
+            return None
+        low, high = int(bounds[1]), int(bounds[2] or bounds[1])
+        if low > high:
+            return None
+        ports |= {port for port in WEB_PORTS if low <= port <= high}
+    return ports
+
+
+def _forwards_to_web_port(forward: dict[str, Any]) -> bool:
+    wan = _forward_ports(forward.get("dst_port"))
+    # A forward without fwd_port keeps the WAN port.
+    lan = _forward_ports(forward.get("fwd_port") or forward.get("dst_port"))
+    return wan is None or lan is None or bool(wan | lan)
+
+
+def udm_web_forwards(forwards: list[dict[str, Any]]) -> list[dict[str, Any]]:
+    """Enabled forwards that may carry TCP to port 80 or 443.
+
+    A forward counts when its WAN port or its forwarded port is a web port,
+    whether named alone, in a range, or in a list, because either way the
+    internet reaches a web server through it.
+    """
+    return [
+        forward
+        for forward in forwards
+        if forward.get("enabled", True) is not False
+        and forward.get("proto") != "udp"
+        and _forwards_to_web_port(forward)
+    ]
+
+
 class FilterModule:
     def filters(self) -> dict[str, Any]:
-        return {"udm_web_allows": udm_web_allows, "udm_web_only": udm_web_only}
+        return {
+            "udm_web_allows": udm_web_allows,
+            "udm_web_forwards": udm_web_forwards,
+            "udm_web_only": udm_web_only,
+        }
