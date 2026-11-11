@@ -20,10 +20,42 @@ my_exit() {
 }
 
 # }}}
+# {{{ status_value
+
+# Prints the numeric value of a key in the machine-readable status. The key
+# must start the line, so text that clients control cannot supply it. Apache
+# omits the leading zero of fractions (".733"), which is restored here.
+status_value() {
+    awk -v key="$1" '
+        index($0, key ": ") == 1 {
+            value = substr($0, length(key) + 3)
+            if (value ~ /^[0-9.]+([eE][-+]?[0-9]+)?$/) {
+                sub(/^\./, "0.", value)
+                print value
+            }
+            exit
+        }
+    ' "$tmpfile"
+}
+
+# }}}
+# {{{ send_value
+
+# Sends nothing when the status lacks the value, so Zabbix marks the item
+# unsupported instead of storing false data.
+send_value() {
+    if [ -n "$2" ]; then
+        zabbix_sender -c /etc/zabbix/zabbix_agentd.conf \
+            -k "$1" \
+            -o "$2" > /dev/null 2>&1
+    fi
+}
+
+# }}}
 # {{{ send_server_status
 
 send_server_status() {
-    curl -so "$tmpfile" "https://$hostname/server-status"
+    curl -so "$tmpfile" "https://$hostname/server-status?auto"
 
     retval=$?
 
@@ -31,23 +63,11 @@ send_server_status() {
         my_exit $retval
     fi
 
-    working_processes=$(grep 'requests currently being processed' "$tmpfile" | awk '{print $1}' | sed 's/<dt>//')
-    idle_processes=$(grep 'requests currently being processed' "$tmpfile" | awk '{print $10}')
-    reqps=$(grep 'requests/sec' "$tmpfile" | awk '{print $1}' | sed 's/<dt>//')
-    byteps=$(grep 'B/second' "$tmpfile" | awk '{print $4}')
-
-    zabbix_sender -c /etc/zabbix/zabbix_agentd.conf \
-        -k apache.proc.num[working] \
-        -o "$working_processes" > /dev/null 2>&1
-    zabbix_sender -c /etc/zabbix/zabbix_agentd.conf \
-        -k apache.proc.num[idle] \
-        -o "$idle_processes" > /dev/null 2>&1
-    zabbix_sender -c /etc/zabbix/zabbix_agentd.conf \
-        -k apache.perf[reqps] \
-        -o "$reqps" > /dev/null 2>&1
-    zabbix_sender -c /etc/zabbix/zabbix_agentd.conf \
-        -k apache.perf[byteps] \
-        -o "$byteps" > /dev/null 2>&1
+    send_value 'apache.proc.num[working]' "$(status_value BusyWorkers)"
+    send_value 'apache.proc.num[idle]' "$(status_value IdleWorkers)"
+    send_value 'apache.perf[reqps]' "$(status_value ReqPerSec)"
+    # BytesPerSec is in bytes, matching the B/s unit of the item.
+    send_value 'apache.perf[byteps]' "$(status_value BytesPerSec)"
 }
 
 # }}}
