@@ -12,9 +12,9 @@ gnucash_quick_expense_venv: /var/lib/gnucash-quick-expense/venv
 
 # Where the GnuCash database is. The username and password are not here: the
 # form asks for them on every entry and the server keeps neither.
-gnucash_quick_expense_db_host: "{{ lookup('pipe', 'op read \"op://ansible/wypbfjrqxkssvefhycefqcfn5y/server\"') }}"
-gnucash_quick_expense_db_port: "{{ lookup('pipe', 'op read \"op://ansible/wypbfjrqxkssvefhycefqcfn5y/port\"') }}"
-gnucash_quick_expense_db_name: "{{ lookup('pipe', 'op read \"op://ansible/wypbfjrqxkssvefhycefqcfn5y/database\"') }}"
+gnucash_quick_expense_db_host: rewse-pg.rewse.jp
+gnucash_quick_expense_db_port: 5432
+gnucash_quick_expense_db_name: gnucash
 
 # The accounts the form offers. "**" matches one or more account names.
 gnucash_quick_expense_from_accounts:
@@ -27,3 +27,9 @@ gnucash_quick_expense_to_accounts:
   patterns:
     - "Expenses:**"
   default: "Expenses:Foods:Dining"
+
+# The PostgreSQL roles the form may sign in as. The form is open to the
+# internet and the database server hosts other services' roles, so any other
+# username is rejected like a wrong password before the form connects.
+gnucash_quick_expense_db_users:
+  - quick-expense
