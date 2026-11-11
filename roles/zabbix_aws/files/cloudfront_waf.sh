@@ -15,6 +15,14 @@
 # origin hosts sends the AWS Security Agent pentest counts for the same bucket,
 # and Zabbix subtracts them to rate the 5xx responses real clients get.
 
+# The item keys live in associative arrays, which need bash 4. Under an older
+# bash, such as /bin/bash 3.2 on macOS, every key would collapse into one and
+# the wrong values would be sent, so the script stops before any request.
+if (( BASH_VERSINFO[0] < 4 )); then
+    echo 1
+    exit 1
+fi
+
 trap 'my_exit 1' 1 2 3 15
 
 # Created only once there is a distribution to read, so an early exit leaves no
