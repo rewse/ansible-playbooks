@@ -147,6 +147,12 @@ class ServiceTest(unittest.TestCase):
                 self.assertNotIn("password", text)
                 self.assertNotIn("username", text)
 
+    def test_database_location_needs_no_secret_lookup(self):
+        for name in ("host", "port", "name"):
+            with self.subTest(name=name):
+                value = str(VARS[f"gnucash_quick_expense_db_{name}"])
+                self.assertNotIn("lookup(", value)
+
     def test_config_lists_the_allowed_users(self):
         environment = jinja2.Environment(
             loader=jinja2.FileSystemLoader(ROLE / "templates"),
