@@ -416,6 +416,140 @@ class FileBrowserForwardedForTest(unittest.TestCase):
         self.assertRegex(text, r"(?m)^\s*RequestHeader unset X-Real-IP$")
 
 
+def directive_lines(text: str, prefix: str) -> list[str]:
+    return [
+        line.strip() for line in text.splitlines() if line.strip().startswith(prefix)
+    ]
+
+
+def quoted_arguments(line: str) -> list[str]:
+    return re.findall(r'"([^"]*)"', line)
+
+
+class FileBrowserBrowserPolicyTest(unittest.TestCase):
+    APP_POLICY = (
+        "script-src 'self' 'nonce-abc123' https://cdn.jsdelivr.net"
+        " https://www.google.com https://www.gstatic.com"
+    )
+
+    @classmethod
+    def setUpClass(cls):
+        cls.text = render_vhost(
+            FILEBROWSER,
+            "nas.rewse.jp.conf.j2",
+            filebrowser_hostname="nas.rewse.jp",
+            filebrowser_port=8080,
+        )
+
+    def test_app_policy_loses_third_party_script_sources(self):
+        # The app's own policy arrives with the proxied response, which lives in
+        # the onsuccess table, so the edit must not use always.
+        edits = directive_lines(self.text, "Header edit* Content-Security-Policy ")
+        self.assertEqual(len(edits), 1)
+        pattern, replacement = quoted_arguments(edits[0])
+        self.assertEqual(replacement, "")
+        edited = re.sub(pattern, replacement, self.APP_POLICY)
+        self.assertEqual(edited, "script-src 'self' 'nonce-abc123'")
+        self.assertNotRegex(
+            self.text, r"(?m)^\s*Header always edit\*? Content-Security"
+        )
+
+    def test_edit_keeps_other_hosts_that_share_a_prefix(self):
+        edits = directive_lines(self.text, "Header edit* Content-Security-Policy ")
+        pattern, replacement = quoted_arguments(edits[0])
+        policy = "script-src 'self' https://www.google.com.example"
+        self.assertEqual(re.sub(pattern, replacement, policy), policy)
+
+    def test_second_policy_covers_everything_but_scripts(self):
+        # A second policy is enforced alongside the app's. It sets no
+        # default-src or script-src, which would block the app's nonce scripts.
+        lines = directive_lines(self.text, "Header always set Content-Security-Policy ")
+        self.assertEqual(len(lines), 1)
+        (policy,) = quoted_arguments(lines[0])
+        directives = {
+            part.split()[0]: part.split()[1:]
+            for part in (piece.strip() for piece in policy.split(";"))
+            if part
+        }
+        self.assertEqual(
+            directives,
+            {
+                "base-uri": ["'self'"],
+                "font-src": ["'self'", "data:"],
+                "form-action": ["'self'"],
+                "frame-ancestors": ["'self'"],
+                "img-src": ["'self'", "data:", "blob:"],
+                "media-src": ["'self'", "blob:"],
+                "object-src": ["'none'"],
+                "style-src": ["'self'", "'unsafe-inline'"],
+            },
+        )
+
+    def test_vhost_sets_framing_and_transport_headers(self):
+        for directive in (
+            'Header always set Cross-Origin-Opener-Policy "same-origin"',
+            'Header always set Strict-Transport-Security "max-age=31536000"',
+            'Header always set X-Content-Type-Options "nosniff"',
+            'Header always set X-Frame-Options "SAMEORIGIN"',
+        ):
+            with self.subTest(directive=directive):
+                self.assertIn(directive, directive_lines(self.text, "Header "))
+
+    def test_cross_site_api_writes_are_rejected_before_the_proxy(self):
+        block = re.search(
+            r"(?ms)^\s*RewriteCond %\{REQUEST_METHOD\} (\S+)\n"
+            r"\s*RewriteCond %\{HTTP:Sec-Fetch-Site\} =cross-site\n"
+            r"\s*RewriteRule (\S+) - \[F\]$",
+            self.text,
+        )
+        self.assertIsNotNone(block)
+        assert block is not None
+        method, path = re.compile(block[1].lstrip("!")), re.compile(block[2])
+        self.assertTrue(block[1].startswith("!"))
+        for allowed in ("GET", "HEAD", "OPTIONS"):
+            self.assertIsNotNone(method.search(allowed))
+        for rejected in ("DELETE", "PATCH", "POST", "PUT"):
+            self.assertIsNone(method.search(rejected))
+        self.assertIsNotNone(path.search("/api/resources"))
+        self.assertIsNone(path.search("/files/api/"))
+        self.assertLess(block.start(), self.text.index("[P,L]"))
+
+    def auth_rule(self) -> tuple[re.Pattern, re.Pattern]:
+        block = re.search(
+            r"(?ms)^\s*RewriteCond %\{THE_REQUEST\} (\S+)\n"
+            r"\s*RewriteRule (\S+) - \[F\]$",
+            self.text,
+        )
+        self.assertIsNotNone(block)
+        assert block is not None
+        self.assertLess(block.start(), self.text.index("[P,L]"))
+        return re.compile(block[1]), re.compile(block[2])
+
+    def test_login_is_reached_only_in_its_canonical_spelling(self):
+        # The fail2ban filter matches the request line as logged, so a login
+        # spelled another way that Apache still maps to /api/auth/login would
+        # be counted by nothing. Apache normalizes the URI the rule sees, so
+        # every case below arrives at the rule as /api/auth/login.
+        request, uri = self.auth_rule()
+        self.assertIsNotNone(uri.search("/api/auth/login"))
+        for target in ("/api/auth/login", "/api/auth/login?x=%20"):
+            with self.subTest(target=target):
+                self.assertIsNone(request.search(f"POST {target} HTTP/1.1"))
+        for target in (
+            "//api/auth/login",
+            "/api//auth/login",
+            "/api/auth/./login",
+            "/api/x/../auth/login",
+            "/api/auth/%6cogin",
+        ):
+            with self.subTest(target=target):
+                self.assertIsNotNone(request.search(f"POST {target} HTTP/1.1"))
+
+    def test_rewrite_engine_is_on_before_the_rules(self):
+        engine = self.text.index("RewriteEngine on")
+        self.assertLess(engine, self.text.index("RewriteCond"))
+
+
 class GrafanaCookieTest(unittest.TestCase):
     def test_session_cookie_is_sent_over_https_only(self):
         # Sessions last ten years, and a cookie without Secure also goes out
