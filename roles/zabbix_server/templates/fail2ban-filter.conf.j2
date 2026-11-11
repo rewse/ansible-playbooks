@@ -15,7 +15,13 @@
 # host open to the internet logs in vhost_combined format: %v:%p comes first and
 # <HOST> second, and the name is pinned because that file carries every virtual
 # host.
+#
+# The path is matched in %U, the last field of both formats, rather than in the
+# request line. Apache routes by that decoded path, so a query string, repeated
+# slashes, dot segments, or percent-encoded characters in the request line reach
+# the same script and still log it as /zabbix/index.php. The end anchor keeps a
+# quoted value in the user agent from standing in for it.
 [Definition]
-failregex = ^<HOST> \S+ \S+ \[\] "POST /zabbix/index(?:_mfa)?\.php\S* HTTP/[\d.]+" 200 \d+
-            ^{{ zabbix_server_hostname | regex_escape }}:\d+ <HOST> \S+ \S+ \[\] "POST /zabbix/index(?:_mfa)?\.php\S* HTTP/[\d.]+" 200 \d+
+failregex = ^<HOST> \S+ \S+ \[\] "POST \S+ HTTP/[\d.]+" 200 \d+ .* "/+zabbix/+index(?:_mfa)?\.php"$
+            ^{{ zabbix_server_hostname | regex_escape }}:\d+ <HOST> \S+ \S+ \[\] "POST \S+ HTTP/[\d.]+" 200 \d+ .* "/+zabbix/+index(?:_mfa)?\.php"$
 ignoreregex =
