@@ -260,6 +260,76 @@ class NvrFail2banTest(unittest.TestCase):
                 self.assertIsNone(regex.search(line))
 
 
+class NvrProxyHeaderTest(unittest.TestCase):
+    TEXT = (NVR / "files" / "nvr.rewse.jp.conf").read_text()
+
+    def lines(self, prefix: str) -> list[str]:
+        return [
+            line.strip()
+            for line in self.TEXT.splitlines()
+            if line.strip().startswith(prefix)
+        ]
+
+    def test_vhost_drops_client_proxy_auth_headers(self):
+        # Frigate's nginx trusts these on its unauthenticated login and logout
+        # locations and reflects X-Ingress-Path into the page, so only Apache
+        # may decide what reaches it. The unset runs in fixups, before mod_proxy
+        # builds the backend request.
+        unset = self.lines("RequestHeader unset ")
+        for header in (
+            "Remote-Email",
+            "Remote-Groups",
+            "Remote-Name",
+            "Remote-Role",
+            "Remote-User",
+            "X-Forwarded-User",
+            "X-Ingress-Path",
+            "X-Proxy-Secret",
+        ):
+            with self.subTest(header=header):
+                self.assertIn(f"RequestHeader unset {header}", unset)
+
+    def test_vhost_hides_the_backend_cache_status(self):
+        self.assertIn("Header unset X-Cache-Status", self.lines("Header "))
+
+    def test_vhost_sets_framing_and_transport_headers(self):
+        for directive in (
+            "Header always set Content-Security-Policy \"frame-ancestors 'self'\"",
+            'Header always set Cross-Origin-Opener-Policy "same-origin"',
+            'Header always set Strict-Transport-Security "max-age=31536000"',
+            'Header always set X-Content-Type-Options "nosniff"',
+            'Header always set X-Frame-Options "SAMEORIGIN"',
+        ):
+            with self.subTest(directive=directive):
+                self.assertIn(directive, self.lines("Header "))
+
+    def test_session_cookie_gains_secure_once(self):
+        # The backend's Set-Cookie lives in the onsuccess table, which an
+        # always edit would not see.
+        edits = self.lines("Header edit Set-Cookie ")
+        self.assertEqual(len(edits), 1)
+        pattern, replacement = re.findall(r'"([^"]*)"', edits[0])
+        replacement = replacement.replace("$1", r"\1")
+        for cookie, expected in (
+            (
+                "frigate_token=abc; HttpOnly; Path=/",
+                "frigate_token=abc; HttpOnly; Path=/; Secure",
+            ),
+            (
+                "frigate_token=abc; Secure; HttpOnly; Path=/",
+                "frigate_token=abc; Secure; HttpOnly; Path=/",
+            ),
+            (
+                "frigate_token=abc; HttpOnly; Path=/; secure",
+                "frigate_token=abc; HttpOnly; Path=/; secure",
+            ),
+            ("other=1; Path=/", "other=1; Path=/"),
+        ):
+            with self.subTest(cookie=cookie):
+                self.assertEqual(re.sub(pattern, replacement, cookie), expected)
+        self.assertNotRegex(self.TEXT, r"(?m)^\s*Header always edit\*? Set-Cookie")
+
+
 class ZabbixPublicVhostTest(unittest.TestCase):
     # zabbix.rewse.jp opens the frontend and the API to the internet; the
     # default virtual host keeps /zabbix limited to trusted networks.
