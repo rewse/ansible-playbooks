@@ -68,6 +68,30 @@ with open(os.environ["SENDER_CALLS"], "a") as f:
 """
 
 
+def bash_with_associative_arrays():
+    """Returns the first bash in PATH that has associative arrays, or None.
+
+    cloudfront_waf.sh runs on the Linux hosts under bash 5. macOS ships bash
+    3.2 as /bin/bash, where `declare -A` fails and every string subscript
+    evaluates to index 0, so all metrics collapse into the last one.
+    """
+    for directory in os.environ.get("PATH", "").split(os.pathsep):
+        candidate = pathlib.Path(directory) / "bash"
+        if not os.access(candidate, os.X_OK):
+            continue
+        probe = subprocess.run(
+            [str(candidate), "-c", "declare -A probe"],
+            capture_output=True,
+            check=False,
+        )
+        if probe.returncode == 0:
+            return str(candidate)
+    return None
+
+
+BASH = bash_with_associative_arrays()
+
+
 class CollectorRun:
     def __init__(self, bucket_window, calls):
         self.bucket_window = bucket_window
@@ -80,6 +104,7 @@ class CollectorRun:
 
 def run_collector(bucket_rows, latest_rows="", aws_call_seconds=0):
     """Run cloudfront_waf.sh with fake aws, date, and zabbix_sender."""
+    assert BASH is not None
     with tempfile.TemporaryDirectory() as tmp:
         tmp_path = pathlib.Path(tmp)
         bin_dir = tmp_path / "bin"
@@ -107,7 +132,7 @@ def run_collector(bucket_rows, latest_rows="", aws_call_seconds=0):
             "TMPDIR": tmp,
         }
         subprocess.run(
-            ["bash", str(FILES / "cloudfront_waf.sh")],
+            [BASH, str(FILES / "cloudfront_waf.sh")],
             capture_output=True,
             env=env,
             check=False,
@@ -123,6 +148,7 @@ def run_collector(bucket_rows, latest_rows="", aws_call_seconds=0):
         return CollectorRun(window, calls)
 
 
+@unittest.skipUnless(BASH, "no bash with associative arrays in PATH")
 class CloudfrontBucketTest(unittest.TestCase):
     def test_sends_bucket_requests_and_5xx_count(self):
         result = run_collector(
