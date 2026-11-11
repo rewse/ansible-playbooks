@@ -27,3 +27,9 @@ gnucash_quick_expense_to_accounts:
   patterns:
     - "Expenses:**"
   default: "Expenses:Foods:Dining"
+
+# The PostgreSQL roles the form may sign in as. The form is open to the
+# internet and the database server hosts other services' roles, so any other
+# username is rejected like a wrong password before the form connects.
+gnucash_quick_expense_db_users:
+  - quick-expense

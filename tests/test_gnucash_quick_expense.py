@@ -2,6 +2,7 @@
 """Regression tests for the gnucash_quick_expense role."""
 
 import configparser
+import json
 import pathlib
 import re
 import shutil
@@ -145,6 +146,18 @@ class ServiceTest(unittest.TestCase):
             with self.subTest(name=name):
                 self.assertNotIn("password", text)
                 self.assertNotIn("username", text)
+
+    def test_config_lists_the_allowed_users(self):
+        environment = jinja2.Environment(
+            loader=jinja2.FileSystemLoader(ROLE / "templates"),
+            undefined=jinja2.StrictUndefined,
+        )
+        environment.filters["comment"] = lambda text: f"#\n# {text}\n#"
+        environment.filters["to_json"] = json.dumps
+        text = environment.get_template("config.yaml.j2").render(
+            ansible_managed="Ansible managed", **VARS
+        )
+        self.assertEqual(yaml.safe_load(text)["users"], ["quick-expense"])
 
     def test_env_requires_tls(self):
         text = (ROLE / "templates" / "gnucash-quick-expense.env.j2").read_text()

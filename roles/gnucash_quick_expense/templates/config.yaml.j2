@@ -8,3 +8,7 @@
 {% endfor %}
   default: {{ choice.default | to_json }}
 {% endfor %}
+users:
+{% for user in gnucash_quick_expense_db_users %}
+  - {{ user | to_json }}
+{% endfor %}
