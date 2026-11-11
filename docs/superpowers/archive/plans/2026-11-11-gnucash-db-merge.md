@@ -8,7 +8,7 @@
 
 **Tech Stack:** Aurora PostgreSQL 16.11、psql/pg_dump 16.15(fox)、AWS CLI、1Password CLI、Ansible、Python 3(Starlette、pytest)、chezmoi。
 
-**Spec:** `docs/superpowers/specs/2026-11-11-gnucash-db-merge-design.md`
+**Spec:** `docs/superpowers/archive/specs/2026-11-11-gnucash-db-merge-design.md`
 
 ## Global Constraints
 
