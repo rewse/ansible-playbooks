@@ -153,6 +153,9 @@ class ServiceTest(unittest.TestCase):
                 value = str(VARS[f"gnucash_quick_expense_db_{name}"])
                 self.assertNotIn("lookup(", value)
 
+    def test_database_is_on_rewse_pg(self):
+        self.assertEqual(VARS["gnucash_quick_expense_db_host"], "rewse-pg.rewse.jp")
+
     def test_config_lists_the_allowed_users(self):
         environment = jinja2.Environment(
             loader=jinja2.FileSystemLoader(ROLE / "templates"),

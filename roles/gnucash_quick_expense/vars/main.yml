@@ -12,7 +12,7 @@ gnucash_quick_expense_venv: /var/lib/gnucash-quick-expense/venv
 
 # Where the GnuCash database is. The username and password are not here: the
 # form asks for them on every entry and the server keeps neither.
-gnucash_quick_expense_db_host: gnucash-db.rewse.jp
+gnucash_quick_expense_db_host: rewse-pg.rewse.jp
 gnucash_quick_expense_db_port: 5432
 gnucash_quick_expense_db_name: gnucash
 

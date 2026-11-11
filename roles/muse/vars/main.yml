@@ -11,10 +11,6 @@ muse_uid: 2002
 # Read-only PostgreSQL roles named muse. libpq reads the file named by
 # PGPASSFILE, which the pgpass component points at the XDG config directory.
 muse_pgpass_entries:
-  - host: gnucash-db.rewse.jp
-    password: "{{ lookup('pipe', 'op read \"op://ansible/bfw2z4gziah6gnt44v7hl7k22q/password\"') }}"
-    port: 5432
-    username: "{{ lookup('pipe', 'op read \"op://ansible/bfw2z4gziah6gnt44v7hl7k22q/username\"') }}"
   - host: rewse-pg.rewse.jp
     password: "{{ lookup('pipe', 'op read \"op://ansible/wi3josvnu5dujxoosdh74igisq/password\"') }}"
     port: 5432

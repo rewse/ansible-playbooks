@@ -44,3 +44,13 @@
     owner: muse
     group: muse
     mode: "0644"
+
+# The gnucash database moved into rewse-pg, whose muse role has its own
+# password, so the entry for the retired gnucash-db name goes away.
+- name: pgpass | Remove gnucash-db entry
+  ansible.builtin.lineinfile:
+    path: "{{ muse_pgpass_file }}"
+    regexp: '^gnucash-db\.rewse\.jp:'
+    state: absent
+  # The removed line holds a password, which --diff would print.
+  no_log: true
