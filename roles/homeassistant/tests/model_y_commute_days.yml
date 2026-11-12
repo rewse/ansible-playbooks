@@ -76,6 +76,10 @@
           - "'this.attributes.dates' in homeassistant_commute_text"
           - homeassistant_commute_sensor.name == 'Model Y Commute Days'
           - "'dates' in homeassistant_commute_sensor.attributes"
+          # Block variables render before any entity, where `this` is undefined.
+          - "'this' not in (homeassistant_commute_groups[0].variables | to_json)"
+          - "'this.attributes.dates' in homeassistant_commute_sensor.state"
+          - "'this.attributes.dates' in homeassistant_commute_sensor.attributes.dates"
 
     - name: Verify commute days warning sensors
       ansible.builtin.assert:

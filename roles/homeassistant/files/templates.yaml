@@ -1060,23 +1060,25 @@
         states('sensor.model_y_geofence') | lower in commute_parkings and
         as_local(states.sensor.model_y_geofence.last_changed).date() == now().date()
       }}
-    previous: >-
-      {{
-        trigger.event.data.dates | default([])
-        if trigger.id == 'set' else
-        this.attributes.dates | default([])
-      }}
-    dates: >-
-      {{
-        (previous + ([today] if arrived else []))
-        | unique | select('>=', cutoff) | sort | list
-      }}
+    new_dates: "{{ [today] if arrived else [] }}"
+  # The `this` variable exists only in entity templates, so each one merges the
+  # previous list itself.
   sensor:
     - unique_id: sensor.model_y_commute_days
       name: "Model Y Commute Days"
-      state: "{{ dates | count }}"
+      state: >-
+        {{
+          ((trigger.event.data.dates | default([]) if trigger.id == 'set'
+            else this.attributes.dates | default([])) + new_dates)
+          | unique | select('>=', cutoff) | list | count
+        }}
       attributes:
-        dates: "{{ dates }}"
+        dates: >-
+          {{
+            ((trigger.event.data.dates | default([]) if trigger.id == 'set'
+              else this.attributes.dates | default([])) + new_dates)
+            | unique | select('>=', cutoff) | sort | list
+          }}
       icon: "mdi:car-clock"
       state_class: measurement
       unit_of_measurement: "days"
