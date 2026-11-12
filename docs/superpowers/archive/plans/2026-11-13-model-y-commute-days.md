@@ -8,7 +8,7 @@
 
 **Tech Stack:** Home Assistant YAML（trigger-based template）、Ansible（`home-primary.yml`）、ha-mcp（mcporter 経由）
 
-**Spec:** `docs/superpowers/specs/2026-11-13-model-y-commute-days-design.md`
+**Spec:** `docs/superpowers/archive/specs/2026-11-13-model-y-commute-days-design.md`
 
 ## Global Constraints
 
