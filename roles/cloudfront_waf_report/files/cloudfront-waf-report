@@ -43,7 +43,18 @@ MAX_QUERY_LENGTH = 2000
 
 _USER_AGENT = r'parse @message /"name":"[Uu]ser-[Aa]gent","value":"(?<ua>[^"]*)"/'
 _RATE_LIMIT_RULES = '["RateLimitLogin", "RateLimitAll"]'
-_SCAN_PATHS = r"/(?i)(wp-|xmlrpc|\.env|\.git|phpmyadmin|cgi-bin|\.php|\/actuator|\/vendor\/|\/\.)/"
+# httpRequest.uri is the path as the client sent it, still percent-encoded, and
+# Logs Insights cannot decode it. Apache decodes %2E to a dot and %2D to a
+# hyphen before it maps the path, so each dot and hyphen also matches its
+# encoded form; (?i) covers %2e and %2d.
+_DOT = r"(\.|%2e)"
+_SCAN_PATHS = (
+    rf"/(?i)(wp(-|%2d)|xmlrpc|{_DOT}env|{_DOT}git|phpmyadmin|cgi(-|%2d)bin"
+    rf"|{_DOT}php|\/actuator|\/vendor\/|\/{_DOT})/"
+)
+# The blog's host names in any spelling that reaches the same site: the Host
+# header is case-insensitive and may carry a trailing dot or a port.
+_BLOG_HOSTS = r"/(?i)^(www\.)?rewse\.jp\.?(:[0-9]+)?$/"
 _CONTROL = re.compile(r"[\x00-\x1f\x7f-\x9f]")
 OFFICE_IP_SET = "cloudfront-waf-office"
 POLL_INTERVAL = 2.0
@@ -155,7 +166,7 @@ def candidate_queries(office_cidrs: list[str]) -> dict[str, str]:
             " httpRequest.uri, ua",
         ),
         "blocked_on_services": _candidate(
-            'action = "BLOCK" and httpRequest.host not in ["rewse.jp", "www.rewse.jp"]'
+            f'action = "BLOCK" and not (httpRequest.host like {_BLOG_HOSTS})'
             f" and not {origin}",
             "terminatingRuleId, httpRequest.host, httpRequest.country, httpRequest.uri, ua",
         ),
@@ -460,7 +471,16 @@ def prepare_rows(
     return prepared
 
 
+def _normal_host(host: str) -> str:
+    # The Host header is case-insensitive and may end with a dot or a port,
+    # while Apache logs the ServerName of the vhost that answered.
+    host = host.lower()
+    host = re.sub(r":[0-9]+$", "", host)
+    return host.rstrip(".")
+
+
 def _apache_host(host: str) -> str:
+    host = _normal_host(host)
     return APEX if host in (APEX, f"www.{APEX}") else host
 
 
@@ -592,7 +612,7 @@ def annotate_scans(
         if counts and all(code[0] in "34" for code in counts):
             continue
         if counts and probe is not None and all(code[0] in "234" for code in counts):
-            host = row.get("httpRequest.host", "")
+            host = _normal_host(row.get("httpRequest.host", ""))
             if host not in fallbacks:
                 fallbacks[host] = probe(host)
             if _is_fallback((sizes or {}).get(key, []), fallbacks[host]):

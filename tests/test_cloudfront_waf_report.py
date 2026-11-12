@@ -1055,5 +1055,93 @@ class ApacheTest(unittest.TestCase):
         )
 
 
+class NormalizationTest(unittest.TestCase):
+    """Spellings a client controls must not change how a request is classified."""
+
+    @staticmethod
+    def like_regex(query: str, field: str) -> re.Pattern:
+        # Logs Insights writes a regular expression between slashes, with any
+        # slash inside it escaped; Python reads the same syntax here.
+        match = re.search(re.escape(field) + r" like /((?:\\.|[^/\\])*)/", query)
+        assert match is not None, f"{field} like /.../ not found"
+        return re.compile(match.group(1))
+
+    def test_allowed_scans_match_percent_encoded_dots(self):
+        q = report.candidate_queries([])["allowed_scans"]
+        regex = self.like_regex(q, "httpRequest.uri")
+        for uri in (
+            "/.env",
+            "/%2Eenv",
+            "/%2egit/config",
+            "/app/%2E%2E/%2e%2E/etc/passwd",
+            "/index%2Ephp",
+            "/wp-login.php",
+            "/wp%2Dlogin%2ephp",
+        ):
+            with self.subTest(uri=uri):
+                self.assertTrue(regex.search(uri))
+        for uri in ("/", "/about", "/blog/post-1", "/%E3%81%82"):
+            with self.subTest(uri=uri):
+                self.assertFalse(regex.search(uri))
+
+    def test_blocked_on_services_excludes_every_spelling_of_the_blog(self):
+        q = report.candidate_queries([])["blocked_on_services"]
+        self.assertIn("not (httpRequest.host like /", q)
+        regex = self.like_regex(q, "httpRequest.host")
+        for host in (
+            "rewse.jp",
+            "www.rewse.jp",
+            "REWSE.JP",
+            "Www.Rewse.Jp",
+            "rewse.jp.",
+            "rewse.jp:443",
+            "www.rewse.jp.:443",
+        ):
+            with self.subTest(host=host):
+                self.assertTrue(regex.search(host))
+        for host in (
+            "nas.rewse.jp",
+            "NAS.rewse.jp.",
+            "evilrewse.jp",
+            "rewse.jp.example.com",
+            "wwwxrewse.jp",
+        ):
+            with self.subTest(host=host):
+                self.assertFalse(regex.search(host))
+
+    def test_apache_host_ignores_case_trailing_dot_and_port(self):
+        for host, expected in (
+            ("WWW.REWSE.JP.", "rewse.jp"),
+            ("www.rewse.jp:443", "rewse.jp"),
+            ("Rewse.JP", "rewse.jp"),
+            ("NAS.rewse.jp.:443", "nas.rewse.jp"),
+            ("nas.rewse.jp", "nas.rewse.jp"),
+        ):
+            with self.subTest(host=host):
+                self.assertEqual(report._apache_host(host), expected)
+
+    def test_annotate_scans_finds_the_vhost_for_any_spelling(self):
+        statuses = {
+            ("nas.rewse.jp", "/.env", "1.1.1.1"): collections.Counter({"200": 1})
+        }
+        sizes = {("nas.rewse.jp", "/.env", "1.1.1.1"): [("total", 4836)]}
+        rows = [
+            {
+                "httpRequest.host": host,
+                "httpRequest.uri": "/.env",
+                "httpRequest.clientIp": "1.1.1.1",
+            }
+            for host in ("NAS.Rewse.JP", "nas.rewse.jp.", "nas.rewse.jp:443")
+        ]
+        probes = []
+
+        def probe(host):
+            probes.append(host)
+            return [(4500, 4840)]
+
+        self.assertEqual(report.annotate_scans(rows, statuses, sizes, probe), [])
+        self.assertEqual(probes, ["nas.rewse.jp"])
+
+
 if __name__ == "__main__":
     unittest.main()
