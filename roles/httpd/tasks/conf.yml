@@ -83,6 +83,18 @@
   changed_when: "'already enabled' not in __httpd_a2enconf_status.stdout"
   notify: Reload Apache
 
+- name: conf | Disable javascript-common config
+  # The javascript-common package enables an alias of /javascript to
+  # /usr/share/javascript with MultiViews, which no site here uses. a2disconf
+  # records the conf as disabled by the admin so package upgrades keep it off;
+  # removes skips the command where the conf is not enabled or not installed.
+  ansible.builtin.command:
+    cmd: a2disconf javascript-common
+    removes: /etc/apache2/conf-enabled/javascript-common.conf
+  register: __httpd_a2disconf_javascript_common
+  changed_when: "'already disabled' not in __httpd_a2disconf_javascript_common.stdout"
+  notify: Reload Apache
+
 - name: conf | Remove admin directory
   ansible.builtin.file:
     path: /srv/www/html/admin
