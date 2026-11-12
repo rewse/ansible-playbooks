@@ -23,6 +23,18 @@
 # On these names the frontend is used from home and the office only, so the
 # login page is not offered to anyone else. Apache applies Location blocks in
 # file order, so the narrower API block has to follow this one to override it.
+#
+# Zabbix reads the login fields from $_REQUEST, so a query string logs in as a
+# form post does, but the zabbix-web filter counts only POST. The <If> refuses
+# any other method on the login pages when the query string names enter or
+# password; Zabbix logs in only when enter is present. Apache merges <If> after
+# the Require lines of its <Location>, so its Require all denied replaces them.
+# REQUEST_URI is the decoded, normalized path Apache maps, and PHP's path info
+# reaches the same script. The query string is matched as sent, because PHP
+# splits it on & and = before decoding: each letter may be percent-encoded and
+# anything may precede the field name in its pair, such as + or a decoded
+# space. unescape() would return the string unchanged on any malformed escape.
+# zabbix.rewse.jp repeats the rule inside its own <Location>.
 <Location "/zabbix">
     Require ip 127.0.0.1
     Require ip ::1
@@ -31,6 +43,9 @@
     Require ip {{ networks.home_public_ipv6 }}
     Require ip {{ networks.home_private_ipv6 }}
     Require ip {{ networks.office_public_ipv4 | join(' ') }}
+    <If "%{REQUEST_METHOD} != 'POST' && %{REQUEST_URI} =~ m#^/zabbix(/(index(_mfa)?\.php(/.*)?)?)?$# && %{QUERY_STRING} =~ /(^|&)[^&=]*((e|%65)(n|%6e)(t|%74)(e|%65)(r|%72)|(p|%70)(a|%61)(s|%73)(s|%73)(w|%77)(o|%6f)(r|%72)(d|%64))/i">
+        Require all denied
+    </If>
 </Location>
 
 <Location "/zabbix/api_jsonrpc.php">

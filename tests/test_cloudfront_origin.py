@@ -379,11 +379,17 @@ class OriginGateTest(unittest.TestCase):
     def test_no_other_if_sections(self):
         # Apache merges If sections last, so another one could override the deny.
         # The fail2ban ban script writes deny-only sections, which
-        # tests/test_fail2ban_apache.py checks; nothing else may write one.
+        # tests/test_fail2ban_apache.py checks. The Zabbix login rule is
+        # deny-only as well, so it can only narrow access; nothing else may
+        # write one.
+        deny_only = {
+            ROLES / "zabbix_server" / "templates" / "zabbix-api.conf.j2",
+            ROLES / "zabbix_server" / "templates" / "zabbix.rewse.jp.conf.j2",
+        }
         allowed = {
             HTTPD / "templates" / "cloudfront-origin.conf.j2",
             HTTPD / "files" / "fail2ban-apache-deny",
-        }
+        } | deny_only
         found = [
             str(path.relative_to(REPO_ROOT))
             for path in sorted(ROLES.rglob("*"))
@@ -394,6 +400,13 @@ class OriginGateTest(unittest.TestCase):
         self.assertEqual(found, [])
         for path in allowed:
             self.assertRegex(path.read_text(), r"<If\b", path)
+        for path in deny_only:
+            text = path.read_text()
+            self.assertNotRegex(text, r"<(?:ElseIf|Else)\b", path)
+            bodies = re.findall(r'(?ms)^\s*<If "[^"]*">\n(.*?)^\s*</If>$', text)
+            self.assertEqual(len(bodies), len(re.findall(r"(?m)^\s*<If ", text)), path)
+            for body in bodies:
+                self.assertEqual(body.strip(), "Require all denied", path)
 
     def test_hotel_gets_the_same_gate(self):
         dependencies = yaml.safe_load(

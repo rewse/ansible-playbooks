@@ -13,6 +13,11 @@
 # has nothing to match, and it takes no MFA. Zabbix roles protect it instead.
 # Admin's role has no API access, and the account the app uses may only call
 # get methods.
+#
+# The <If> is the one in zabbix-api.conf: it refuses methods other than POST on
+# the login pages when the query string names a login field, because the
+# zabbix-web filter counts only POST. Inside this <Location> it replaces the
+# Require all granted above it for those requests.
 <VirtualHost *:443>
     ServerAdmin hostmaster@rewse.jp
     ServerName {{ zabbix_server_hostname }}
@@ -21,6 +26,9 @@
 
     <Location "/zabbix">
         Require all granted
+        <If "%{REQUEST_METHOD} != 'POST' && %{REQUEST_URI} =~ m#^/zabbix(/(index(_mfa)?\.php(/.*)?)?)?$# && %{QUERY_STRING} =~ /(^|&)[^&=]*((e|%65)(n|%6e)(t|%74)(e|%65)(r|%72)|(p|%70)(a|%61)(s|%73)(s|%73)(w|%77)(o|%6f)(r|%72)(d|%64))/i">
+            Require all denied
+        </If>
     </Location>
 
     SSLCertificateFile /etc/letsencrypt/live/rewse.jp/fullchain.pem
