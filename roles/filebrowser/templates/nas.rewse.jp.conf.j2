@@ -34,10 +34,50 @@
     # from depending on that default.
     RequestHeader unset X-Real-IP
 
+    # FileBrowser sends its own Content-Security-Policy, which limits scripts
+    # to itself and its per-page nonce but also allows jsDelivr, from which the
+    # editor loads its language modes, and Google, for a reCAPTCHA that is not
+    # configured here. Dropping both leaves only scripts FileBrowser serves; the
+    # editor then shows files without syntax highlighting. The policy arrives
+    # with the proxied response, in the onsuccess table, so this edit has no
+    # always.
+    Header edit* Content-Security-Policy " https://(?:cdn\.jsdelivr\.net|www\.google\.com|www\.gstatic\.com)(?=[ ;]|$)" ""
+
+    # A second policy, which browsers enforce alongside FileBrowser's, for
+    # everything FileBrowser's leaves open. It has no default-src, which would
+    # also govern scripts and block the nonce scripts FileBrowser's policy
+    # allows. connect-src, frame-src and worker-src stay open: the app calls
+    # only its own API, and previews are framed from the same origin.
+    Header always set Content-Security-Policy "object-src 'none'; base-uri 'self'; form-action 'self'; frame-ancestors 'self'; img-src 'self' data: blob:; font-src 'self' data:; style-src 'self' 'unsafe-inline'; media-src 'self' blob:"
+    Header always set Cross-Origin-Opener-Policy "same-origin"
+    Header always set Strict-Transport-Security "max-age=31536000"
+    Header always set X-Content-Type-Options "nosniff"
+    Header always set X-Frame-Options "SAMEORIGIN"
+
     ProxyPass / http://localhost:{{ filebrowser_port }}/
     ProxyPassReverse / http://localhost:{{ filebrowser_port }}/
 
+    # mod_rewrite runs before mod_proxy maps the request, so these rules reject
+    # a request before it reaches FileBrowser.
     RewriteEngine on
+
+    # The session cookie goes with any request a browser makes to this name,
+    # including one another site starts. Browsers mark those with
+    # Sec-Fetch-Site, which CloudFront forwards to the origin, so a write to the
+    # API from another site is refused. A request without the header, from a
+    # client that is not a browser or from an older browser, passes.
+    RewriteCond %{REQUEST_METHOD} !^(GET|HEAD|OPTIONS)$
+    RewriteCond %{HTTP:Sec-Fetch-Site} =cross-site
+    RewriteRule ^/api/ - [F]
+
+    # The fail2ban filter matches the login request line as logged, but Apache
+    # maps doubled slashes, dot segments and percent-encoded letters to the same
+    # endpoint, and a login spelled that way would be counted by nothing. The
+    # rule sees the normalized path and the condition the raw request line, of
+    # which only the path before any query string is checked.
+    RewriteCond %{THE_REQUEST} ^\S+\s+[^?\s]*(?://|/\.\.?/|%)
+    RewriteRule ^/api/auth/ - [F]
+
     RewriteCond %{HTTP:Upgrade} =websocket [NC]
     RewriteRule /(.*) ws://localhost:{{ filebrowser_port }}/$1 [P,L]
     RewriteCond %{HTTP:Upgrade} !=websocket [NC]
