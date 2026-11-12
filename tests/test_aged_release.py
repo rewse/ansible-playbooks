@@ -20,6 +20,14 @@ import aged_release
 NOW = datetime(2026, 9, 27, tzinfo=UTC)
 
 
+@pytest.fixture(autouse=True)
+def state_home(monkeypatch, tmp_path):
+    """Keep the tag history of every test out of the real state directory."""
+    home = tmp_path / "state"
+    monkeypatch.setenv("XDG_STATE_HOME", str(home))
+    return home
+
+
 def ago(days):
     return NOW - timedelta(days=days)
 
@@ -545,7 +553,7 @@ def test_tag_prerelease_counts_as_published():
     assert resolve("github-tag:o/r", run) == {"version": "v0.9.1", "commit": "s"}
 
 
-def test_tag_without_cooldown_needs_no_release():
+def test_tag_without_cooldown_needs_no_release(state_home):
     run = FakeRun(
         {
             TAGS: [[{"name": "v1.0.0", "commit": {"sha": "s10"}}]],
@@ -556,6 +564,104 @@ def test_tag_without_cooldown_needs_no_release():
         "version": "v1.0.0",
         "commit": "s10",
     }
+    assert not (state_home / "aged_release").exists()
+
+
+def tag_run(sha11):
+    """Answer a repository whose newest tag v1.1.0 points at sha11."""
+    return FakeRun(
+        {
+            TAGS: [
+                [
+                    {"name": "v1.1.0", "commit": {"sha": sha11}},
+                    {"name": "v1.0.0", "commit": {"sha": "s10"}},
+                ]
+            ],
+            RELEASES: [[release("v1.1.0", 30), release("v1.0.0", 40)]],
+        }
+    )
+
+
+def resolve_at(when, run):
+    return aged_release.resolve(
+        "github-tag:o/r",
+        pattern=aged_release.DEFAULT_PATTERN,
+        days=4,
+        platform=None,
+        asset=None,
+        run=run,
+        fetch=run,
+        now=when,
+    )
+
+
+def test_tag_moved_after_its_release_waits_for_the_cooldown():
+    # The release date belongs to the commit the tag pointed at when it was
+    # published, not to the commit it was moved to later.
+    assert resolve("github-tag:o/r", tag_run("s11")) == {
+        "version": "v1.1.0",
+        "commit": "s11",
+    }
+    assert resolve("github-tag:o/r", tag_run("moved")) == {
+        "version": "v1.0.0",
+        "commit": "s10",
+    }
+    assert resolve_at(NOW + timedelta(days=3), tag_run("moved"))["commit"] == "s10"
+    assert resolve_at(NOW + timedelta(days=4), tag_run("moved")) == {
+        "version": "v1.1.0",
+        "commit": "moved",
+    }
+
+
+def test_tag_moved_back_to_the_commit_first_seen_is_taken():
+    resolve("github-tag:o/r", tag_run("s11"))
+    resolve("github-tag:o/r", tag_run("moved"))
+    assert resolve("github-tag:o/r", tag_run("s11"))["commit"] == "s11"
+
+
+def test_tag_moved_with_no_older_tag_raises():
+    run = FakeRun(
+        {
+            TAGS: [[{"name": "v1.0.0", "commit": {"sha": "s10"}}]],
+            RELEASES: [[release("v1.0.0", 30)]],
+        }
+    )
+    resolve("github-tag:o/r", run)
+    run.table[TAGS] = [[{"name": "v1.0.0", "commit": {"sha": "moved"}}]]
+    with pytest.raises(AnsibleLookupError, match="no tag of o/r matching"):
+        resolve("github-tag:o/r", run)
+
+
+def test_tag_history_is_kept_under_xdg_state_home(state_home):
+    resolve("github-tag:o/r", tag_run("s11"))
+    history = json.loads((state_home / "aged_release" / "tags.json").read_text())
+    assert history["o/r"]["v1.1.0"][0]["commit"] == "s11"
+
+
+def test_tag_history_survives_a_lookup_that_finds_nothing(state_home):
+    run = FakeRun(
+        {
+            TAGS: [[{"name": "v1.0.0", "commit": {"sha": "s10"}}]],
+            RELEASES: [[release("v1.0.0", 1)]],
+        }
+    )
+    with pytest.raises(AnsibleLookupError):
+        resolve("github-tag:o/r", run)
+    history = json.loads((state_home / "aged_release" / "tags.json").read_text())
+    assert history["o/r"]["v1.0.0"][0]["commit"] == "s10"
+
+
+def test_tag_history_defaults_to_local_state(monkeypatch, tmp_path):
+    monkeypatch.delenv("XDG_STATE_HOME")
+    monkeypatch.setenv("HOME", str(tmp_path))
+    assert aged_release._state_dir() == tmp_path / ".local" / "state" / "aged_release"
+
+
+def test_unreadable_tag_history_raises(state_home):
+    (state_home / "aged_release").mkdir(parents=True)
+    (state_home / "aged_release" / "tags.json").write_text("{")
+    with pytest.raises(AnsibleLookupError, match="tags.json"):
+        resolve("github-tag:o/r", tag_run("s11"))
 
 
 def test_commit_returns_newest_aged():
