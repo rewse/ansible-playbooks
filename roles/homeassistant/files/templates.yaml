@@ -1032,10 +1032,12 @@
       icon: "mdi:clock"
 # Counts the days in the last 30 days, today included, on which Model Y
 # arrived at a commute parking lot, to keep commuting under the 15 days a month
-# that the insurance "daily and leisure use" class allows. A day counts only
-# when the geofence changed to the lot that day, so the midnight recount does
-# not count a car left parked overnight as another commute. The
-# model_y_commute_days_set event replaces the list, for seeding and corrections.
+# that the insurance "daily and leisure use" class allows. A day counts only on
+# a geofence change from somewhere else to a lot. A change from unavailable or
+# unknown is a restart or MQTT reconnect, not an arrival, and the midnight,
+# start, and event triggers only drop old dates, so a car left parked overnight
+# is not counted again. The model_y_commute_days_set event replaces the list,
+# for seeding and corrections.
 - triggers:
     - trigger: state
       entity_id: sensor.model_y_geofence
@@ -1057,12 +1059,16 @@
     cutoff: "{{ (now().date() - timedelta(days=29)) | string }}"
     arrived: >-
       {{
-        states('sensor.model_y_geofence') | lower in commute_parkings and
-        as_local(states.sensor.model_y_geofence.last_changed).date() == now().date()
+        trigger.platform == 'state' and
+        trigger.to_state is not none and
+        trigger.to_state.state | lower in commute_parkings and
+        trigger.from_state is not none and
+        trigger.from_state.state not in ['unavailable', 'unknown'] and
+        trigger.from_state.state | lower not in commute_parkings
       }}
     new_dates: "{{ [today] if arrived else [] }}"
   # The `this` variable exists only in entity templates, so each one merges the
-  # previous list itself.
+  # previous list itself. Keep the state and dates expressions in sync.
   sensor:
     - unique_id: sensor.model_y_commute_days
       name: "Model Y Commute Days"

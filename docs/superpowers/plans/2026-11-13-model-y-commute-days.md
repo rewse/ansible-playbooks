@@ -14,7 +14,7 @@
 
 - 通勤先の駐車場（小文字で比較）: `apa hotel & resort roppongi ekihigashi`、`ark hills sengokuyama mori tower`、`tns azabudai 3-chome`
 - sensor: `unique_id: sensor.model_y_commute_days`、name `"Model Y Commute Days"`、状態は `dates` の件数、属性 `dates` は `YYYY-MM-DD` 文字列の昇順リスト（重複なし、今日から29日前以降）
-- 日付の追加条件: ジオフェンスが通勤先のどれかで、かつ `as_local(states.sensor.model_y_geofence.last_changed).date() == now().date()`
+- 日付の追加条件: state トリガーで、`trigger.to_state.state | lower` が通勤先のどれかで、`trigger.from_state` があり、その状態が `unavailable`・`unknown` でなく、小文字にして通勤先のどれでもないこと（`last_changed` は再起動や再接続で新しくなるので使わない）
 - トリガー: `sensor.model_y_geofence` の state（`to: null`）、`time` `at: "00:00:00"`、`homeassistant` `event: start`、`event` `event_type: model_y_commute_days_set`（`id: set`。`trigger.event.data.dates` でリストを置き換える）
 - binary_sensor: `unique_id: binary_sensor.model_y_commute_days_80_percent`（`>= 15 * 0.8`）と `binary_sensor.model_y_commute_days_90_percent`（`>= 15 * 0.9`）。どちらも `sensor.model_y_commute_days` が数値のときだけ available
 - アラーム: id `automation.alarm_model_y_commute_days_warning`、2つの binary_sensor の `from: "off"` `to: "on"`、`notify.tats_devices`、title `"⚠️ ALARM"`（U+FE0F 付き）、メッセージに通勤日数と達したしきい値

@@ -70,7 +70,13 @@
           - "'ark hills sengokuyama mori tower' in homeassistant_commute_text"
           - "'tns azabudai 3-chome' in homeassistant_commute_text"
           - "'| lower' in homeassistant_commute_text"
-          - "'last_changed' in homeassistant_commute_text"
+          # Restarts and MQTT reconnects reset last_changed, so arrivals are
+          # judged from the state transition instead.
+          - "'last_changed' not in homeassistant_commute_text"
+          - "'trigger.from_state' in homeassistant_commute_groups[0].variables.arrived"
+          - "'trigger.to_state' in homeassistant_commute_groups[0].variables.arrived"
+          - "'unavailable' in homeassistant_commute_groups[0].variables.arrived"
+          - "'unknown' in homeassistant_commute_groups[0].variables.arrived"
           - "'timedelta(days=29)' in homeassistant_commute_text"
           - "'trigger.event.data.dates' in homeassistant_commute_text"
           - "'this.attributes.dates' in homeassistant_commute_text"

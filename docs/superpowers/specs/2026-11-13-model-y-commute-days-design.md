@@ -43,7 +43,7 @@ history_stats は回数か時間しか数えられず、日数を数えられな
   - 毎日 0:00（古い日付を捨てるため）
   - Home Assistant の起動
   - イベント `model_y_commute_days_set`（初期値の流し込みと手での修正用。`dates` に `YYYY-MM-DD` のリストを渡すと、リストをそれで置き換える）
-- 日付の追加条件: ジオフェンスが通勤先の駐車場のどれかで、その状態の `last_changed` の日付が今日であること。日付は HA のタイムゾーン（Asia/Tokyo）で数える。0:00 の再計算で、前日から停めたままの車を翌日の通勤として数えないためにこの条件を置く。
+- 日付の追加条件: `sensor.model_y_geofence` の状態変化トリガーで、変化後が通勤先の駐車場のどれかで、変化前が通勤先の駐車場でも `unavailable`・`unknown` でもないこと。日付は HA のタイムゾーン（Asia/Tokyo）で数える。0:00・起動・イベントのトリガーは古い日付を捨てるだけで、日付を足さない。`last_changed` は HA の再起動や MQTT の再接続でも新しくなるので、到着の判定には使わない。こうすると、前日から停めたままの車が再起動や再接続で翌日の通勤として数えられることはない。代わりに、HA が止まっている間やセンサーが `unavailable` の間に着いた日は数えられない。その時間は数分なので許容する。
 - 日付は `YYYY-MM-DD` の文字列で持ち、重複を除いて並べ、今日から29日前より古いものを捨てる。
 - `sensor.model_y_commute_days`: 状態はリストの件数、属性 `dates` にリストを持つ。
 - `binary_sensor.model_y_commute_days_80_percent`: `sensor.model_y_commute_days` が 15 × 0.8 = 12 以上で on。
