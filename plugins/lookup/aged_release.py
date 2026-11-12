@@ -8,7 +8,7 @@ import os
 import re
 import shutil
 import subprocess
-import tempfile
+import time
 import urllib.parse
 import urllib.request
 from collections.abc import Callable
@@ -43,6 +43,9 @@ description:
     tag is aged by its release alone; a tag later found at another commit is
     not taken until that commit has been seen for O(days) days. A tag moved
     before this lookup first saw it is aged by its release.
+  - Results are cached for one ansible-playbook run in a C(run-*.json) file in
+    the same directory. A run removes cache files untouched for longer than the
+    cache lifetime of 12 hours when it creates its own.
   - A ghcr.io package version keeps its creation time when a tag is added to
     it, so an older image newly given a matching tag is aged from its build.
   - With O(days=0), for sources this account owns, the newest version is taken
@@ -537,17 +540,31 @@ def _cache_path() -> Path:
 
     Ansible templates each task in a worker forked per host, so a module-level
     cache dies with the worker. The workers share the playbook's process group,
-    which keys a file every host and task of the run can read.
+    which keys a file every host and task of the run can read. The file lives
+    in the state directory, which only the controller user can open.
     """
-    return (
-        Path(tempfile.gettempdir()) / f"aged_release-{os.getuid()}-{os.getpgrp()}.json"
-    )
+    return _state_dir() / f"run-{os.getpgrp()}.json"
+
+
+def _remove_expired_run_caches(directory: Path) -> None:
+    """Delete run caches whose entries have all outlived the cache TTL."""
+    cutoff = time.time() - _CACHE_TTL.total_seconds()
+    for path in directory.glob("run-*.json"):
+        try:
+            if path.stat().st_mtime < cutoff:
+                path.unlink()
+        except FileNotFoundError:
+            # Another run removed it first.
+            pass
 
 
 def _cached(key: tuple, compute: Callable[[], dict]) -> dict:
     if key in _CACHE:
         return _CACHE[key]
     path = _cache_path()
+    if not path.exists():
+        path.parent.mkdir(mode=0o700, parents=True, exist_ok=True)
+        _remove_expired_run_caches(path.parent)
     name = json.dumps(key)
     with open(path, "a+", encoding="utf-8") as handle:
         # Held across the resolution so parallel hosts resolve a term once.

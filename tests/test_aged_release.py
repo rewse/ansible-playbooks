@@ -1,9 +1,11 @@
 """Tests for the aged_release lookup plugin."""
 
 import json
+import os
 import pathlib
 import re
 import sys
+import time
 from datetime import UTC
 from datetime import datetime
 from datetime import timedelta
@@ -799,6 +801,42 @@ def test_cache_is_shared_across_worker_processes(monkeypatch, tmp_path):
         {"commit": "abc"}
     ]
     assert len(run.calls) == 2
+
+
+def test_run_cache_lives_in_the_state_directory(monkeypatch, state_home):
+    run = aged_head_run()
+    monkeypatch.setattr(aged_release, "_run", run)
+    monkeypatch.setattr(aged_release, "_now", lambda: NOW)
+    aged_release._CACHE.clear()
+    aged_release.LookupModule().run(
+        ["github-commit:o/r"], {"supply_chain_cooldown_days": 4}
+    )
+    directory = state_home / "aged_release"
+    assert aged_release._cache_path().parent == directory
+    assert aged_release._cache_path().is_file()
+    assert directory.stat().st_mode & 0o777 == 0o700
+
+
+def test_new_run_cache_removes_expired_run_caches(monkeypatch, state_home):
+    directory = state_home / "aged_release"
+    directory.mkdir(mode=0o700, parents=True)
+    expired = directory / "run-1.json"
+    recent = directory / "run-2.json"
+    for path in (expired, recent):
+        path.write_text("{}")
+    old = time.time() - aged_release._CACHE_TTL.total_seconds() - 60
+    os.utime(expired, (old, old))
+    (directory / "tags.json").write_text("{}")
+    os.utime(directory / "tags.json", (old, old))
+    monkeypatch.setattr(aged_release, "_run", aged_head_run())
+    monkeypatch.setattr(aged_release, "_now", lambda: NOW)
+    aged_release._CACHE.clear()
+    aged_release.LookupModule().run(
+        ["github-commit:o/r"], {"supply_chain_cooldown_days": 4}
+    )
+    assert not expired.exists()
+    assert recent.exists()
+    assert (directory / "tags.json").exists()
 
 
 def test_release_error_names_repository():
