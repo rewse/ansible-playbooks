@@ -82,13 +82,22 @@ def filter_regexes(
     ]
 
 
-def access_line(vhost: str, request: str, status: int) -> str:
+def access_line(vhost: str, request: str, status: int, path: str | None = None) -> str:
     # A vhost_combined line as fail2ban sees it, with the timestamp removed. It
-    # ends with %U, here the request's path without its query string.
-    path = request.split()[1].partition("?")[0]
+    # ends with %U, by default the request's path without its query string.
+    if path is None:
+        path = request.split()[1].partition("?")[0]
     return (
         f'{vhost}:443 203.0.113.7 - - [] "{request} HTTP/1.1" {status} 28 "-" '
         f'"curl" 512 "{path}"'
+    )
+
+
+def combined_line(request: str, status: int, path: str) -> str:
+    # A combined line as fail2ban sees it, with the timestamp removed and %U,
+    # the path Apache routes by, at the end.
+    return (
+        f'203.0.113.7 - - [] "{request} HTTP/1.1" {status} 28 "-" "curl" 512 "{path}"'
     )
 
 
@@ -334,8 +343,16 @@ class ZabbixPublicVhostTest(unittest.TestCase):
     # zabbix.rewse.jp opens the frontend and the API to the internet; the
     # default virtual host keeps /zabbix limited to trusted networks.
     HOSTNAME = "zabbix.rewse.jp"
-    COMBINED = (
-        '203.0.113.7 - - [] "POST /zabbix/index.php HTTP/1.1" 200 28 "-" "curl" 512'
+    # Request lines that Apache routes to the login form, logged with the %U
+    # it routes them by.
+    LOGIN_SPELLINGS = (
+        ("POST /zabbix/index.php", "/zabbix/index.php"),
+        ("POST /zabbix/index.php?request=x", "/zabbix/index.php"),
+        ("POST //zabbix//index.php", "/zabbix/index.php"),
+        ("POST /zabbix/./index.php", "/zabbix/index.php"),
+        ("POST /zabbix/%69ndex.php", "/zabbix/index.php"),
+        ("POST /%7Aabbix/index%5Fmfa.php", "/zabbix/index_mfa.php"),
+        ("POST /zabbix/index_mfa.php", "/zabbix/index_mfa.php"),
     )
 
     def test_vhost_is_deployed_from_the_template(self):
@@ -374,14 +391,13 @@ class ZabbixPublicVhostTest(unittest.TestCase):
             "zabbix_server_hostname",
             self.HOSTNAME,
         )
-        for line in (
-            # A wrong password re-renders the login form.
-            access_line(self.HOSTNAME, "POST /zabbix/index.php", 200),
-            # A wrong verification code re-renders the MFA form.
-            access_line(self.HOSTNAME, "POST /zabbix/index_mfa.php", 200),
-            # The same failure on the default virtual host.
-            self.COMBINED,
-        ):
+        lines = []
+        for request, path in self.LOGIN_SPELLINGS:
+            # A wrong password or verification code re-renders the form, on
+            # the public virtual host and on the default one.
+            lines.append(access_line(self.HOSTNAME, request, 200, path))
+            lines.append(combined_line(request, 200, path))
+        for line in lines:
             with self.subTest(line=line):
                 matches = [m for m in (r.search(line) for r in regexes) if m]
                 self.assertTrue(matches)
@@ -389,8 +405,25 @@ class ZabbixPublicVhostTest(unittest.TestCase):
         for line in (
             # A successful login redirects.
             access_line(self.HOSTNAME, "POST /zabbix/index.php", 302),
+            access_line(
+                self.HOSTNAME, "POST //zabbix/index.php", 302, "/zabbix/index.php"
+            ),
+            combined_line("POST /zabbix/index.php", 302, "/zabbix/index.php"),
+            # Loading the login form.
+            access_line(self.HOSTNAME, "GET /zabbix/index.php", 200),
+            combined_line("GET /zabbix/index.php", 200, "/zabbix/index.php"),
             # The API answers every call with 200, failed or not.
             access_line(self.HOSTNAME, "POST /zabbix/api_jsonrpc.php", 200),
+            access_line(
+                self.HOSTNAME,
+                "POST /zabbix/api_jsonrpc.php?/zabbix/index.php",
+                200,
+            ),
+            combined_line(
+                "POST /zabbix/index.php/../api_jsonrpc.php",
+                200,
+                "/zabbix/api_jsonrpc.php",
+            ),
             # Another virtual host.
             access_line("nas.rewse.jp", "POST /zabbix/index.php", 200),
         ):
