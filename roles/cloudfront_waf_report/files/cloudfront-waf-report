@@ -91,6 +91,8 @@ _JSON_BLOCK = re.compile(r"```json\s*\n(.*?)\n?```", re.DOTALL)
 DEFAULT_APACHE_LOG_DIR = "/var/log/apache2"
 FALLBACK_TOLERANCE = 0.05
 APEX = "rewse.jp"
+# A lowercase DNS name, as _normal_host returns it, for probe URLs.
+_HOSTNAME = re.compile(r"[a-z0-9-]+(\.[a-z0-9-]+)*")
 # vhost_combined and combined as roles/httpd/files/log-format.conf defines them;
 # %a is the real client because mod_remoteip trusts CloudFront.
 _REQUEST = r'(?P<ip>\S+) \S+ \S+ \[(?P<time>[^\]]+)\] "\S+ (?P<target>\S+)[^"]*" (?P<status>\d{3}) (?P<size>\d+|-) '
@@ -548,7 +550,13 @@ def probe_fallback(host: str, run: Runner) -> list[tuple[int, int]]:
     check exempts, once plain and once gzip-encoded. The scanned paths themselves
     are never fetched, so no real secret is ever read. A 2xx answer means the
     host serves the same page for any path, such as a single-page app.
+
+    A host that is not a plain DNS name returns no sizes, as a failed request
+    does, because characters such as @, /, ? or : would change the URL's
+    authority. --connect-to sends every connection to loopback regardless.
     """
+    if not _HOSTNAME.fullmatch(host):
+        return []
     url = f"https://{host}/cloudfront-waf-report-probe-{uuid.uuid4().hex}"
     sizes = []
     for extra in ([], ["-H", "Accept-Encoding: gzip"]):
@@ -561,8 +569,8 @@ def probe_fallback(host: str, run: Runner) -> list[tuple[int, int]]:
             "20",
             "-w",
             "%{http_code} %{size_download} %{size_header}",
-            "--resolve",
-            f"{host}:443:127.0.0.1",
+            "--connect-to",
+            "::127.0.0.1:443",
             *extra,
             url,
         ]

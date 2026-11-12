@@ -971,9 +971,7 @@ class ApacheTest(unittest.TestCase):
         )
         for call in run.calls:
             argv = call["argv"]
-            self.assertEqual(
-                argv[argv.index("--resolve") + 1], "nas.rewse.jp:443:127.0.0.1"
-            )
+            self.assertEqual(argv[argv.index("--connect-to") + 1], "::127.0.0.1:443")
             url = argv[-1]
             self.assertTrue(
                 url.startswith("https://nas.rewse.jp/cloudfront-waf-report-probe-")
@@ -981,6 +979,22 @@ class ApacheTest(unittest.TestCase):
         self.assertEqual(
             sum("Accept-Encoding: gzip" in c["argv"] for c in run.calls), 1
         )
+
+    def test_probe_fallback_skips_hosts_that_are_not_plain_hostnames(self):
+        for host in (
+            "",
+            "rewse.jp@example.com",
+            "example.com/x?",
+            "example.com#x",
+            "example.com:8443",
+            "[::1]",
+            "a..b",
+            "rewse.jp\n",
+            "user:pass@rewse.jp",
+        ):
+            with self.subTest(host=host):
+                # FakeRun fails on any command, so a curl call fails the test.
+                self.assertEqual(report.probe_fallback(host, FakeRun([])), [])
 
     def test_probe_fallback_is_empty_when_host_answers_not_found(self):
         run = FakeRun([(["curl"], "404 271 300"), (["curl"], "404 271 300")])
