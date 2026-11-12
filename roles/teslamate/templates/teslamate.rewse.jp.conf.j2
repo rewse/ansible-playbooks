@@ -9,25 +9,42 @@
     ProxyRequests off
     RequestHeader set X-Forwarded-Proto "https"
 
+    Header always set Strict-Transport-Security "max-age=31536000"
+    Header always set X-Content-Type-Options "nosniff"
+    Header always set X-Frame-Options "SAMEORIGIN"
+
+    # mod_rewrite runs before mod_proxy maps the request and before
+    # authentication, so this rule rejects a request before it reaches
+    # TeslaMate. Browsers resend Basic credentials with any request to this
+    # name, including a form post another site starts, and Basic auth has no
+    # SameSite equivalent. Browsers mark those requests with Sec-Fetch-Site, so
+    # a write from another site or a sibling subdomain is refused. A request
+    # without the header, from a client that is not a browser, passes.
+    RewriteEngine on
+    RewriteCond %{REQUEST_METHOD} !^(GET|HEAD|OPTIONS)$
+    RewriteCond %{HTTP:Sec-Fetch-Site} ^(cross-site|same-site)$
+    RewriteRule ^ - [F]
+
     ProxyPass /live/websocket ws://127.0.0.1:{{ teslamate_port }}/live/websocket
     ProxyPassReverse /live/websocket ws://127.0.0.1:{{ teslamate_port }}/live/websocket
     ProxyPass / http://127.0.0.1:{{ teslamate_port }}/
     ProxyPassReverse / http://127.0.0.1:{{ teslamate_port }}/
 
-    <Proxy "http://127.0.0.1:{{ teslamate_port }}/*">
+    # A <Location> section applies to every request path, whichever backend
+    # worker serves it.
+    <Location "/">
         AuthType Basic
         AuthName "TeslaMate"
         AuthUserFile /etc/apache2/.teslamate.htpasswd
-        # The LiveView socket is left outside basic auth. Joining it needs a
-        # session token signed into a page that basic auth protects, so the
-        # socket alone exposes no data.
+        # Only the exact LiveView socket path is left outside basic auth;
+        # REQUEST_URI excludes the query string the client appends. Joining the
+        # socket needs a session token that TeslaMate signs into a page basic
+        # auth protects, so the socket alone exposes no data.
         <RequireAny>
-            <RequireAll>
-                Require expr %{REQUEST_URI} =~ m#^/live/websocket#
-            </RequireAll>
             Require valid-user
+            Require expr "%{REQUEST_URI} == '/live/websocket'"
         </RequireAny>
-    </Proxy>
+    </Location>
 
     SSLCertificateFile /etc/letsencrypt/live/rewse.jp/fullchain.pem
     SSLCertificateKeyFile /etc/letsencrypt/live/rewse.jp/privkey.pem
