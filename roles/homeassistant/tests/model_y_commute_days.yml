@@ -1,0 +1,104 @@
+---
+- name: Test Model Y commute days warning
+  hosts: localhost
+  connection: local
+  gather_facts: false
+  tasks:
+    - name: Parse configuration
+      ansible.builtin.set_fact:
+        homeassistant_alarm_automation_list: "{{ lookup('file', '../files/automations-alarm.yaml') | from_yaml }}"
+        homeassistant_template_groups: "{{ lookup('file', '../files/templates.yaml') | from_yaml }}"
+
+    - name: Find commute days block
+      ansible.builtin.set_fact:
+        homeassistant_commute_groups: >-
+          {%- set ns = namespace(found=[]) -%}
+          {%- for group in homeassistant_template_groups
+              if group.triggers is defined and group.sensor is defined
+              and 'sensor.model_y_commute_days' in (group.sensor | map(attribute='unique_id') | list) -%}
+          {%- set ns.found = ns.found + [group] -%}
+          {%- endfor -%}
+          {{ ns.found }}
+
+    - name: Find entities
+      ansible.builtin.set_fact:
+        homeassistant_alarm_automations: >-
+          {{ homeassistant_alarm_automation_list
+             | selectattr('id', 'equalto', 'automation.alarm_model_y_commute_days_warning')
+             | list }}
+        homeassistant_commute_80: >-
+          {{ homeassistant_template_groups
+             | selectattr('binary_sensor', 'defined')
+             | map(attribute='binary_sensor') | flatten
+             | selectattr('unique_id', 'equalto', 'binary_sensor.model_y_commute_days_80_percent')
+             | list }}
+        homeassistant_commute_90: >-
+          {{ homeassistant_template_groups
+             | selectattr('binary_sensor', 'defined')
+             | map(attribute='binary_sensor') | flatten
+             | selectattr('unique_id', 'equalto', 'binary_sensor.model_y_commute_days_90_percent')
+             | list }}
+        homeassistant_commute_sensor: >-
+          {{ (homeassistant_commute_groups | first | default({})).sensor | default([{}]) | first }}
+        homeassistant_commute_text: "{{ homeassistant_commute_groups | first | default({}) | to_json }}"
+
+    - name: Verify commute days triggers
+      ansible.builtin.assert:
+        that:
+          - homeassistant_commute_groups | length == 1
+          - >-
+            homeassistant_commute_groups[0].triggers
+            | selectattr('trigger', 'equalto', 'state') | list
+            == [{'trigger': 'state', 'entity_id': 'sensor.model_y_geofence', 'to': None}]
+          - >-
+            homeassistant_commute_groups[0].triggers
+            | selectattr('trigger', 'equalto', 'time') | map(attribute='at') | list
+            == ['00:00:00']
+          - >-
+            homeassistant_commute_groups[0].triggers
+            | selectattr('trigger', 'equalto', 'homeassistant') | map(attribute='event') | list
+            == ['start']
+          - >-
+            homeassistant_commute_groups[0].triggers
+            | selectattr('trigger', 'equalto', 'event') | list
+            == [{'trigger': 'event', 'event_type': 'model_y_commute_days_set', 'id': 'set'}]
+
+    - name: Verify commute days counting
+      ansible.builtin.assert:
+        that:
+          - "'apa hotel & resort roppongi ekihigashi' in homeassistant_commute_text"
+          - "'ark hills sengokuyama mori tower' in homeassistant_commute_text"
+          - "'tns azabudai 3-chome' in homeassistant_commute_text"
+          - "'| lower' in homeassistant_commute_text"
+          - "'last_changed' in homeassistant_commute_text"
+          - "'timedelta(days=29)' in homeassistant_commute_text"
+          - "'trigger.event.data.dates' in homeassistant_commute_text"
+          - "'this.attributes.dates' in homeassistant_commute_text"
+          - homeassistant_commute_sensor.name == 'Model Y Commute Days'
+          - "'dates' in homeassistant_commute_sensor.attributes"
+
+    - name: Verify commute days warning sensors
+      ansible.builtin.assert:
+        that:
+          - homeassistant_commute_80 | length == 1
+          - homeassistant_commute_90 | length == 1
+          - "'binary_sensor' not in homeassistant_commute_groups[0]"
+          - "'sensor.model_y_commute_days' in homeassistant_commute_80[0].availability"
+          - "'sensor.model_y_commute_days' in homeassistant_commute_90[0].availability"
+          - "'15 * 0.8' in homeassistant_commute_80[0].state"
+          - "'15 * 0.9' in homeassistant_commute_90[0].state"
+
+    - name: Verify commute days alarm
+      ansible.builtin.assert:
+        that:
+          - homeassistant_alarm_automations | length == 1
+          - >-
+            homeassistant_alarm_automations[0].triggers
+            == [{'trigger': 'state',
+                 'entity_id': ['binary_sensor.model_y_commute_days_80_percent',
+                               'binary_sensor.model_y_commute_days_90_percent'],
+                 'from': 'off', 'to': 'on'}]
+          - homeassistant_alarm_automations[0].actions[0].action == 'notify.tats_devices'
+          - homeassistant_alarm_automations[0].actions[0].data.title == '⚠️ ALARM'
+          - "'sensor.model_y_commute_days' in homeassistant_alarm_automations[0].actions[0].data.message"
+          - homeassistant_alarm_automations[0].trace.stored_traces == 100

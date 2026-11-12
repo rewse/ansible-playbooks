@@ -291,6 +291,18 @@
         >= 30 * 86400
       }}
     icon: "mdi:battery-alert-variant-outline"
+  # Turn on when the commute days in the last 30 days reach 80% and 90% of the
+  # 15 days a month that the insurance "daily and leisure use" class allows.
+  - unique_id: binary_sensor.model_y_commute_days_80_percent
+    name: "Model Y Commute Days 80 Percent"
+    availability: "{{ is_number(states('sensor.model_y_commute_days')) }}"
+    state: "{{ states('sensor.model_y_commute_days') | int >= 15 * 0.8 }}"
+    icon: "mdi:car-clock"
+  - unique_id: binary_sensor.model_y_commute_days_90_percent
+    name: "Model Y Commute Days 90 Percent"
+    availability: "{{ is_number(states('sensor.model_y_commute_days')) }}"
+    state: "{{ states('sensor.model_y_commute_days') | int >= 15 * 0.9 }}"
+    icon: "mdi:car-clock"
   # Turns on when the distance driven in the current insurance policy year reaches
   # 80% of the policy's distance limit.
   - unique_id: binary_sensor.model_y_insurance_distance_warning
@@ -1018,3 +1030,53 @@
           }}
         {% endif %}
       icon: "mdi:clock"
+# Counts the days in the last 30 days, today included, on which Model Y
+# arrived at a commute parking lot, to keep commuting under the 15 days a month
+# that the insurance "daily and leisure use" class allows. A day counts only
+# when the geofence changed to the lot that day, so the midnight recount does
+# not count a car left parked overnight as another commute. The
+# model_y_commute_days_set event replaces the list, for seeding and corrections.
+- triggers:
+    - trigger: state
+      entity_id: sensor.model_y_geofence
+      to: null
+    - trigger: time
+      at: "00:00:00"
+    - trigger: homeassistant
+      event: start
+    - trigger: event
+      event_type: model_y_commute_days_set
+      id: set
+  variables:
+    # TeslaMate geofence names are edited by hand, so compare case-insensitively.
+    commute_parkings:
+      - apa hotel & resort roppongi ekihigashi
+      - ark hills sengokuyama mori tower
+      - tns azabudai 3-chome
+    today: "{{ now().date() | string }}"
+    cutoff: "{{ (now().date() - timedelta(days=29)) | string }}"
+    arrived: >-
+      {{
+        states('sensor.model_y_geofence') | lower in commute_parkings and
+        as_local(states.sensor.model_y_geofence.last_changed).date() == now().date()
+      }}
+    previous: >-
+      {{
+        trigger.event.data.dates | default([])
+        if trigger.id == 'set' else
+        this.attributes.dates | default([])
+      }}
+    dates: >-
+      {{
+        (previous + ([today] if arrived else []))
+        | unique | select('>=', cutoff) | sort | list
+      }}
+  sensor:
+    - unique_id: sensor.model_y_commute_days
+      name: "Model Y Commute Days"
+      state: "{{ dates | count }}"
+      attributes:
+        dates: "{{ dates }}"
+      icon: "mdi:car-clock"
+      state_class: measurement
+      unit_of_measurement: "days"

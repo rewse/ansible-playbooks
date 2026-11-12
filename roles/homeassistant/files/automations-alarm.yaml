@@ -305,6 +305,28 @@
           insurance limit this policy year
   trace:
     stored_traces: 100
+- id: automation.alarm_model_y_commute_days_warning
+  alias: "ALARM: Model Y Commute Days Warning"
+  triggers:
+    # Starting from "off" keeps a restart from repeating the notification.
+    - trigger: state
+      entity_id:
+        - binary_sensor.model_y_commute_days_80_percent
+        - binary_sensor.model_y_commute_days_90_percent
+      from: "off"
+      to: "on"
+  actions:
+    - action: notify.tats_devices
+      data:
+        title: "⚠️ ALARM"
+        message: >-
+          Model Y has been used for commuting on
+          {{ states('sensor.model_y_commute_days') }} of the last 30 days,
+          reaching the
+          {{ 14 if trigger.entity_id == 'binary_sensor.model_y_commute_days_90_percent' else 12 }}-day
+          warning for the 15-day insurance limit
+  trace:
+    stored_traces: 100
 - id: automation.alarm_plug_switch_offline
   alias: "ALARM: Plug Switch is Offline"
   triggers:
