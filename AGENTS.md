@@ -8,7 +8,6 @@
 
 - Upgrade OS package managers (apt, brew) and their official repositories to the latest version on every run, in the OS role's final `upgrade.yml`.
 - Resolve third-party container images, GitHub releases, git repositories, and Home Assistant custom components at run time with the `aged_release` lookup, which returns the newest release published at least `supply_chain_cooldown_days` days ago. Pin the result by content: an image as `tag@digest`, a release asset by its sha256 when the release publishes one, and a checkout by commit SHA.
-- The `aged_release` lookup keeps the commit each `github-tag:` tag points at in `~/.local/state/aged_release/tags.json` on the controller and rewrites the file on every such lookup with a cooldown. At the start of a session, delete the file 30 days after its last modification.
 - Track release tags rather than branches; for a repository without tags, use `github-commit:` for the newest commit that old.
 - Track the default branch of repositories and images owned by this account without a cooldown (`days=0`).
 - Pass `supply_chain_cooldown_environment` as `environment` to every task that runs npm or uv, so npm and PyPI releases get the same cooldown. A `uv sync` against a committed lockfile of this account's own repository is exempt. Keep `min-release-age` in the chezmoi npmrc and `exclude-newer` in the chezmoi uv.toml at the same number of days for interactive use.

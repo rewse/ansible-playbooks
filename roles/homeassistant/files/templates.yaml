@@ -291,6 +291,18 @@
         >= 30 * 86400
       }}
     icon: "mdi:battery-alert-variant-outline"
+  # Turn on when the commute days in the last 30 days reach 80% and 90% of the
+  # 15 days a month that the insurance "daily and leisure use" class allows.
+  - unique_id: binary_sensor.model_y_commute_days_80_percent
+    name: "Model Y Commute Days 80 Percent"
+    availability: "{{ is_number(states('sensor.model_y_commute_days')) }}"
+    state: "{{ states('sensor.model_y_commute_days') | int >= 15 * 0.8 }}"
+    icon: "mdi:car-clock"
+  - unique_id: binary_sensor.model_y_commute_days_90_percent
+    name: "Model Y Commute Days 90 Percent"
+    availability: "{{ is_number(states('sensor.model_y_commute_days')) }}"
+    state: "{{ states('sensor.model_y_commute_days') | int >= 15 * 0.9 }}"
+    icon: "mdi:car-clock"
   # Turns on when the distance driven in the current insurance policy year reaches
   # 80% of the policy's distance limit.
   - unique_id: binary_sensor.model_y_insurance_distance_warning
@@ -1018,3 +1030,61 @@
           }}
         {% endif %}
       icon: "mdi:clock"
+# Counts the days in the last 30 days, today included, on which Model Y
+# arrived at a commute parking lot, to keep commuting under the 15 days a month
+# that the insurance "daily and leisure use" class allows. A day counts only on
+# a geofence change from somewhere else to a lot. A change from unavailable or
+# unknown is a restart or MQTT reconnect, not an arrival, and the midnight,
+# start, and event triggers only drop old dates, so a car left parked overnight
+# is not counted again. The model_y_commute_days_set event replaces the list,
+# for seeding and corrections.
+- triggers:
+    - trigger: state
+      entity_id: sensor.model_y_geofence
+      to: null
+    - trigger: time
+      at: "00:00:00"
+    - trigger: homeassistant
+      event: start
+    - trigger: event
+      event_type: model_y_commute_days_set
+      id: set
+  variables:
+    # TeslaMate geofence names are edited by hand, so compare case-insensitively.
+    commute_parkings:
+      - apa hotel & resort roppongi ekihigashi
+      - ark hills sengokuyama mori tower
+      - tns azabudai 3-chome
+    today: "{{ now().date() | string }}"
+    cutoff: "{{ (now().date() - timedelta(days=29)) | string }}"
+    arrived: >-
+      {{
+        trigger.platform == 'state' and
+        trigger.to_state is not none and
+        trigger.to_state.state | lower in commute_parkings and
+        trigger.from_state is not none and
+        trigger.from_state.state not in ['unavailable', 'unknown'] and
+        trigger.from_state.state | lower not in commute_parkings
+      }}
+    new_dates: "{{ [today] if arrived else [] }}"
+  # The `this` variable exists only in entity templates, so each one merges the
+  # previous list itself. Keep the state and dates expressions in sync.
+  sensor:
+    - unique_id: sensor.model_y_commute_days
+      name: "Model Y Commute Days"
+      state: >-
+        {{
+          ((trigger.event.data.dates | default([]) if trigger.id == 'set'
+            else this.attributes.dates | default([])) + new_dates)
+          | unique | select('>=', cutoff) | list | count
+        }}
+      attributes:
+        dates: >-
+          {{
+            ((trigger.event.data.dates | default([]) if trigger.id == 'set'
+              else this.attributes.dates | default([])) + new_dates)
+            | unique | select('>=', cutoff) | sort | list
+          }}
+      icon: "mdi:car-clock"
+      state_class: measurement
+      unit_of_measurement: "days"
