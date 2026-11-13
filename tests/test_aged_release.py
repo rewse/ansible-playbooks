@@ -20,14 +20,6 @@ import aged_release
 NOW = datetime(2026, 9, 27, tzinfo=UTC)
 
 
-@pytest.fixture(autouse=True)
-def state_home(monkeypatch, tmp_path):
-    """Keep the tag history of every test out of the real state directory."""
-    home = tmp_path / "state"
-    monkeypatch.setenv("XDG_STATE_HOME", str(home))
-    return home
-
-
 def ago(days):
     return NOW - timedelta(days=days)
 
@@ -109,6 +101,29 @@ def push(after, timestamp, activity_type="push", ref="refs/heads/master"):
 TAGS = "gh api --paginate --slurp repos/o/r/tags?per_page=100"
 RELEASES = "gh api --paginate --slurp repos/o/r/releases?per_page=100"
 ACTIVITY = "gh api --paginate --slurp repos/o/r/activity?ref=refs/heads/{}&per_page=100"
+
+
+def compare(base, head):
+    return f"gh api repos/o/r/compare/{base}...{head}?per_page=1 --jq {{status}}"
+
+
+def tag_run(tags, releases, statuses, head="h", pushed=5):
+    """Answer a repository whose default branch main was at head pushed days ago.
+
+    tags maps a tag to its commit, releases a tag to the days since its release
+    was published, and statuses a commit to how head compares with it.
+    """
+    table = {
+        TAGS: [[{"name": n, "commit": {"sha": s}} for n, s in tags.items()]],
+        RELEASES: [[release(n, d) for n, d in releases.items()]],
+        "gh api repos/o/r": {"default_branch": "main"},
+        ACTIVITY.format("main"): [[push(head, pushed, ref="refs/heads/main")]],
+    }
+    for sha, status in statuses.items():
+        table[compare(sha, head)] = (
+            status if isinstance(status, Exception) else {"status": status}
+        )
+    return FakeRun(table)
 
 
 def test_version_key_orders_numerically():
@@ -481,16 +496,10 @@ def test_release_asset_updated_after_publication_counts_from_the_update():
 
 
 def test_tag_returns_commit_sha():
-    run = FakeRun(
-        {
-            TAGS: [
-                [
-                    {"name": "v1.1.0", "commit": {"sha": "s11"}},
-                    {"name": "v1.0.0", "commit": {"sha": "s10"}},
-                ]
-            ],
-            RELEASES: [[release("v1.1.0", 1), release("v1.0.0", 30)]],
-        }
+    run = tag_run(
+        {"v1.1.0": "s11", "v1.0.0": "s10"},
+        {"v1.1.0": 1, "v1.0.0": 30},
+        {"s10": "ahead"},
     )
     assert resolve("github-tag:o/r", run) == {"version": "v1.0.0", "commit": "s10"}
 
@@ -498,36 +507,24 @@ def test_tag_returns_commit_sha():
 def test_tag_backdated_commit_does_not_skip_the_cooldown():
     # The committer date is chosen by whoever pushes the tag; the release
     # publication time is recorded by GitHub.
-    run = FakeRun(
-        {
-            TAGS: [
-                [
-                    {"name": "v1.1.0", "commit": {"sha": "s11"}},
-                    {"name": "v1.0.0", "commit": {"sha": "s10"}},
-                ]
-            ],
-            "gh api repos/o/r/commits/s11": {
-                "commit": {"committer": {"date": iso(300)}}
-            },
-            RELEASES: [[release("v1.1.0", 1), release("v1.0.0", 30)]],
-        }
+    run = tag_run(
+        {"v1.1.0": "s11", "v1.0.0": "s10"},
+        {"v1.1.0": 1, "v1.0.0": 30},
+        {"s10": "ahead"},
     )
+    run.table["gh api repos/o/r/commits/s11"] = {
+        "commit": {"committer": {"date": iso(300)}}
+    }
     assert resolve("github-tag:o/r", run)["commit"] == "s10"
 
 
 def test_tag_without_release_is_skipped():
     # Some projects publish a release under a different tag name, which leaves
     # a tag with no time to age it by.
-    run = FakeRun(
-        {
-            TAGS: [
-                [
-                    {"name": "v1.1.0", "commit": {"sha": "s11"}},
-                    {"name": "v1.0.0", "commit": {"sha": "s10"}},
-                ]
-            ],
-            RELEASES: [[release("v1.1.0-rel", 30), release("v1.0.0", 40)]],
-        }
+    run = tag_run(
+        {"v1.1.0": "s11", "v1.0.0": "s10"},
+        {"v1.1.0-rel": 30, "v1.0.0": 40},
+        {"s10": "ahead"},
     )
     assert resolve("github-tag:o/r", run) == {"version": "v1.0.0", "commit": "s10"}
 
@@ -544,16 +541,12 @@ def test_tag_without_release_raises_when_no_tag_has_one():
 
 
 def test_tag_prerelease_counts_as_published():
-    run = FakeRun(
-        {
-            TAGS: [[{"name": "v0.9.1", "commit": {"sha": "s"}}]],
-            RELEASES: [[release("v0.9.1", 5, prerelease=True)]],
-        }
-    )
+    run = tag_run({"v0.9.1": "s"}, {}, {"s": "ahead"})
+    run.table[RELEASES] = [[release("v0.9.1", 5, prerelease=True)]]
     assert resolve("github-tag:o/r", run) == {"version": "v0.9.1", "commit": "s"}
 
 
-def test_tag_without_cooldown_needs_no_release(state_home):
+def test_tag_without_cooldown_needs_no_release():
     run = FakeRun(
         {
             TAGS: [[{"name": "v1.0.0", "commit": {"sha": "s10"}}]],
@@ -564,104 +557,72 @@ def test_tag_without_cooldown_needs_no_release(state_home):
         "version": "v1.0.0",
         "commit": "s10",
     }
-    assert not (state_home / "aged_release").exists()
 
 
-def tag_run(sha11):
-    """Answer a repository whose newest tag v1.1.0 points at sha11."""
-    return FakeRun(
-        {
-            TAGS: [
-                [
-                    {"name": "v1.1.0", "commit": {"sha": sha11}},
-                    {"name": "v1.0.0", "commit": {"sha": "s10"}},
-                ]
-            ],
-            RELEASES: [[release("v1.1.0", 30), release("v1.0.0", 40)]],
-        }
+@pytest.mark.parametrize("status", ["ahead", "identical"])
+def test_tag_on_a_commit_the_default_branch_held_is_taken(status):
+    run = tag_run({"v1.0.0": "s10"}, {"v1.0.0": 30}, {"s10": status})
+    assert resolve("github-tag:o/r", run) == {"version": "v1.0.0", "commit": "s10"}
+
+
+@pytest.mark.parametrize("status", ["behind", "diverged"])
+def test_tag_on_a_commit_the_default_branch_did_not_hold_is_skipped(status):
+    # An old release renamed to a new tag, or a tag moved after its release,
+    # dates a commit that may have been pushed a minute ago.
+    run = tag_run(
+        {"v1.1.0": "fresh", "v1.0.0": "s10"},
+        {"v1.1.0": 30, "v1.0.0": 30},
+        {"fresh": status, "s10": "ahead"},
     )
+    assert resolve("github-tag:o/r", run) == {"version": "v1.0.0", "commit": "s10"}
 
 
-def resolve_at(when, run):
-    return aged_release.resolve(
-        "github-tag:o/r",
-        pattern=aged_release.DEFAULT_PATTERN,
-        days=4,
-        platform=None,
-        asset=None,
-        run=run,
-        fetch=run,
-        now=when,
+def test_tag_on_a_commit_with_no_shared_history_is_skipped():
+    # GitHub answers 404 when the commits share no history.
+    run = tag_run(
+        {"v1.1.0": "orphan", "v1.0.0": "s10"},
+        {"v1.1.0": 30, "v1.0.0": 30},
+        {"orphan": RuntimeError("No common ancestor (HTTP 404)"), "s10": "ahead"},
     )
-
-
-def test_tag_moved_after_its_release_waits_for_the_cooldown():
-    # The release date belongs to the commit the tag pointed at when it was
-    # published, not to the commit it was moved to later.
-    assert resolve("github-tag:o/r", tag_run("s11")) == {
-        "version": "v1.1.0",
-        "commit": "s11",
-    }
-    assert resolve("github-tag:o/r", tag_run("moved")) == {
-        "version": "v1.0.0",
-        "commit": "s10",
-    }
-    assert resolve_at(NOW + timedelta(days=3), tag_run("moved"))["commit"] == "s10"
-    assert resolve_at(NOW + timedelta(days=4), tag_run("moved")) == {
-        "version": "v1.1.0",
-        "commit": "moved",
-    }
-
-
-def test_tag_moved_back_to_the_commit_first_seen_is_taken():
-    resolve("github-tag:o/r", tag_run("s11"))
-    resolve("github-tag:o/r", tag_run("moved"))
-    assert resolve("github-tag:o/r", tag_run("s11"))["commit"] == "s11"
+    assert resolve("github-tag:o/r", run) == {"version": "v1.0.0", "commit": "s10"}
 
 
 def test_tag_moved_with_no_older_tag_raises():
-    run = FakeRun(
-        {
-            TAGS: [[{"name": "v1.0.0", "commit": {"sha": "s10"}}]],
-            RELEASES: [[release("v1.0.0", 30)]],
-        }
-    )
-    resolve("github-tag:o/r", run)
-    run.table[TAGS] = [[{"name": "v1.0.0", "commit": {"sha": "moved"}}]]
+    run = tag_run({"v1.0.0": "moved"}, {"v1.0.0": 30}, {"moved": "behind"})
     with pytest.raises(AnsibleLookupError, match="no tag of o/r matching"):
         resolve("github-tag:o/r", run)
 
 
-def test_tag_history_is_kept_under_xdg_state_home(state_home):
-    resolve("github-tag:o/r", tag_run("s11"))
-    history = json.loads((state_home / "aged_release" / "tags.json").read_text())
-    assert history["o/r"]["v1.1.0"][0]["commit"] == "s11"
+def test_tag_is_checked_against_the_branch_head_at_the_cooldown():
+    # The head pushed a day ago may already contain a commit pushed today; the
+    # one pushed five days ago is what the branch held at the cooldown.
+    run = tag_run({"v1.0.0": "s10"}, {"v1.0.0": 30}, {"s10": "ahead"}, head="old")
+    run.table[ACTIVITY.format("main")] = [
+        [push("new", 1, ref="refs/heads/main"), push("old", 5, ref="refs/heads/main")]
+    ]
+    assert resolve("github-tag:o/r", run)["commit"] == "s10"
+    assert compare("s10", "new") not in run.calls
 
 
-def test_tag_history_survives_a_lookup_that_finds_nothing(state_home):
-    run = FakeRun(
-        {
-            TAGS: [[{"name": "v1.0.0", "commit": {"sha": "s10"}}]],
-            RELEASES: [[release("v1.0.0", 1)]],
-        }
-    )
-    with pytest.raises(AnsibleLookupError):
+def test_tag_without_an_aged_push_to_the_default_branch_raises():
+    run = tag_run({"v1.0.0": "s10"}, {"v1.0.0": 30}, {"s10": "ahead"}, pushed=1)
+    with pytest.raises(AnsibleLookupError, match="no push to main at least 4 day"):
         resolve("github-tag:o/r", run)
-    history = json.loads((state_home / "aged_release" / "tags.json").read_text())
-    assert history["o/r"]["v1.0.0"][0]["commit"] == "s10"
 
 
-def test_tag_history_defaults_to_local_state(monkeypatch, tmp_path):
-    monkeypatch.delenv("XDG_STATE_HOME")
+def test_tag_reads_the_branch_only_for_an_aged_release():
+    run = tag_run({"v1.0.0": "s10"}, {"v1.0.0": 1}, {})
+    with pytest.raises(AnsibleLookupError, match="no tag of o/r matching"):
+        resolve("github-tag:o/r", run)
+    assert run.calls == [TAGS, RELEASES]
+
+
+def test_tag_writes_no_state(monkeypatch, tmp_path):
+    monkeypatch.setenv("XDG_STATE_HOME", str(tmp_path))
     monkeypatch.setenv("HOME", str(tmp_path))
-    assert aged_release._state_dir() == tmp_path / ".local" / "state" / "aged_release"
-
-
-def test_unreadable_tag_history_raises(state_home):
-    (state_home / "aged_release").mkdir(parents=True)
-    (state_home / "aged_release" / "tags.json").write_text("{")
-    with pytest.raises(AnsibleLookupError, match="tags.json"):
-        resolve("github-tag:o/r", tag_run("s11"))
+    run = tag_run({"v1.0.0": "s10"}, {"v1.0.0": 30}, {"s10": "ahead"})
+    resolve("github-tag:o/r", run)
+    assert list(tmp_path.iterdir()) == []
 
 
 def test_commit_returns_newest_aged():
@@ -770,17 +731,7 @@ def test_lookup_caches_identical_calls(monkeypatch, tmp_path):
 
 
 def test_default_pattern_ignores_single_number_tags():
-    run = FakeRun(
-        {
-            TAGS: [
-                [
-                    {"name": "14", "commit": {"sha": "old"}},
-                    {"name": "v4.2.1", "commit": {"sha": "new"}},
-                ]
-            ],
-            RELEASES: [[release("v4.2.1", 10)]],
-        }
-    )
+    run = tag_run({"14": "old", "v4.2.1": "new"}, {"v4.2.1": 10}, {"new": "ahead"})
     assert resolve("github-tag:o/r", run) == {"version": "v4.2.1", "commit": "new"}
 
 
@@ -817,6 +768,9 @@ def test_tags_are_read_across_pages():
                 [{"name": "v1.0", "commit": {"sha": "old"}}],
             ],
             RELEASES: [[release("v2.0", 1)], [release("v1.0", 5)]],
+            "gh api repos/o/r": {"default_branch": "main"},
+            ACTIVITY.format("main"): [[push("h", 5, ref="refs/heads/main")]],
+            compare("old", "h"): {"status": "ahead"},
         }
     )
     assert resolve("github-tag:o/r", run) == {"version": "v1.0", "commit": "old"}

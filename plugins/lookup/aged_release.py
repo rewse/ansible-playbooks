@@ -32,17 +32,14 @@ description:
   - Ages come from times the hosting service records, never from the image
     Created field or a committer date, which the publisher sets. An image is
     aged by its Docker Hub tag push time or its GitHub package version
-    creation time, a tag by the later of the publication of its release and
-    the time this lookup first saw the tag at its current commit, a commit by
-    the push that put it on the default branch, and a release asset by the
-    later of its release publication and its last upload. When no such time is
-    available the lookup fails rather than fall back to a publisher's date.
-  - GitHub records no time for creating or moving a tag, so the commit of each
-    tag is kept in C($XDG_STATE_HOME/aged_release/tags.json), by default
-    C(~/.local/state/aged_release/tags.json). The commit first recorded for a
-    tag is aged by its release alone; a tag later found at another commit is
-    not taken until that commit has been seen for O(days) days. A tag moved
-    before this lookup first saw it is aged by its release.
+    creation time, a commit by the push that put it on the default branch,
+    and a release asset by the later of its release publication and its last
+    upload. When no such time is available the lookup fails rather than fall
+    back to a publisher's date.
+  - A tag needs a release published at least O(days) days ago, and its
+    current commit must already have been on the default branch O(days) days
+    ago. GitHub records no time for creating, moving, or renaming a tag, so
+    the release alone does not date the commit the tag points at now.
   - A ghcr.io package version keeps its creation time when a tag is added to
     it, so an older image newly given a matching tag is aged from its build.
   - With O(days=0), for sources this account owns, the newest version is taken
@@ -358,88 +355,73 @@ def _release(repo, pattern, days, asset, run, now):
     }
 
 
-def _state_dir() -> Path:
-    """Return the directory that keeps state across runs on the controller."""
-    base = os.environ.get("XDG_STATE_HOME") or str(Path.home() / ".local" / "state")
-    return Path(base) / "aged_release"
-
-
-def _tag_moves(repo, shas, now):
-    """Return, per tag, when this lookup first saw it at a later commit.
-
-    GitHub records no time for creating or moving a tag, so the commit each
-    tag points at is kept in the state directory. The commit first recorded
-    for a tag maps to None and is dated by its release alone. Any other commit
-    maps to when it was first seen, so a tag moved after its release waits out
-    the cooldown from then.
-    """
-    directory = _state_dir()
-    directory.mkdir(mode=0o700, parents=True, exist_ok=True)
-    path = directory / "tags.json"
-    moves: dict[str, datetime | None] = {}
-    with open(path, "a+", encoding="utf-8") as handle:
-        # Parallel hosts and terms for the same repository share the file.
-        fcntl.flock(handle, fcntl.LOCK_EX)
-        handle.seek(0)
-        text = handle.read()
-        try:
-            data = json.loads(text) if text else {}
-        except json.JSONDecodeError as exc:
-            # Starting over would forget the commits recorded first and date
-            # a moved tag by its release again.
-            raise AnsibleLookupError(
-                f"cannot read the tag history in {path}: {exc}"
-            ) from exc
-        history = data.setdefault(repo, {})
-        for name, sha in shas.items():
-            entries = history.setdefault(name, [])
-            entry = next((e for e in entries if e["commit"] == sha), None)
-            if entry is None:
-                entry = {"commit": sha, "seen": _iso(now)}
-                entries.append(entry)
-                if len(entries) > 1:
-                    _display.warning(
-                        f"aged_release: {repo} tag {name} moved from "
-                        f"{entries[-2]['commit']} to {sha}; it is aged from now"
-                    )
-            moves[name] = None if entry is entries[0] else _parse_time(entry["seen"])
-        handle.seek(0)
-        handle.truncate()
-        handle.write(json.dumps(data, indent=1, sort_keys=True))
-    return moves
+def _on_branch(repo, sha, head, run):
+    """Return whether sha is head or one of its ancestors."""
+    try:
+        status = _json(
+            run,
+            [
+                "gh",
+                "api",
+                f"repos/{repo}/compare/{sha}...{head}?per_page=1",
+                "--jq",
+                "{status}",
+            ],
+        )["status"]
+    except RuntimeError as exc:
+        # GitHub answers 404 when the two commits share no history.
+        if "HTTP 404" in str(exc):
+            return False
+        raise
+    return status in ("ahead", "identical")
 
 
 def _tag(repo, pattern, days, run, now):
     tags = _pages(run, f"repos/{repo}/tags?per_page=100")
     shas = {t["name"]: t["commit"]["sha"] for t in tags}
     names = ordered(list(shas), pattern)
-    # A tag records no push time, so the publication of its release dates it,
-    # unless the tag has since been seen at another commit.
-    published: dict[str, datetime] | None = None
-    moves: dict[str, datetime | None] = {}
-    if days != 0:
-        published = {
-            r["tag_name"]: _parse_time(r["published_at"])
-            for r in _pages(run, f"repos/{repo}/releases?per_page=100")
-            if not r["draft"] and r.get("published_at")
-        }
-        moves = _tag_moves(repo, {n: shas[n] for n in names if n in published}, now)
-    for name in names:
-        if published is None:
+    if days == 0:
+        for name in names:
             commit = _json(run, ["gh", "api", f"repos/{repo}/commits/{shas[name]}"])
-            when = _parse_time(commit["commit"]["committer"]["date"])
-        elif name in published:
-            when = max(published[name], moves[name] or published[name])
-        else:
+            if _parse_time(commit["commit"]["committer"]["date"]) <= now:
+                return {"version": name, "commit": shas[name]}
+    else:
+        chosen = _aged_tag(repo, names, shas, days, run, now)
+        if chosen is not None:
+            return {"version": chosen, "commit": shas[chosen]}
+    raise AnsibleLookupError(
+        f"no tag of {repo} matching {pattern} is at least {days} day(s) old"
+    )
+
+
+def _aged_tag(repo, names, shas, days, run, now):
+    """Return the newest tag whose release and commit are both days old."""
+    published = {
+        r["tag_name"]: _parse_time(r["published_at"])
+        for r in _pages(run, f"repos/{repo}/releases?per_page=100")
+        if not r["draft"] and r.get("published_at")
+    }
+    branch = head = None
+    for name in names:
+        if name not in published:
             # Without a release GitHub records no time to age the tag by, so
             # it is never taken; an older tag with a release may still be.
             _display.vvv(f"aged_release: {repo} tag {name} has no published release")
             continue
-        if now - when >= timedelta(days=days):
-            return {"version": name, "commit": shas[name]}
-    raise AnsibleLookupError(
-        f"no tag of {repo} matching {pattern} is at least {days} day(s) old"
-    )
+        if now - published[name] < timedelta(days=days):
+            continue
+        if head is None:
+            branch = _json(run, ["gh", "api", f"repos/{repo}"])["default_branch"]
+            head = _pushed_head(repo, branch, days, run, now)
+        # The release dates the tag name only; a tag can be moved, or an old
+        # release renamed, onto a commit pushed a minute ago.
+        if _on_branch(repo, shas[name], head, run):
+            return name
+        _display.vvv(
+            f"aged_release: {repo} tag {name} is at {shas[name]}, which {branch} "
+            f"did not hold {days} day(s) ago"
+        )
+    return None
 
 
 _NULL_SHA = "0" * 40
