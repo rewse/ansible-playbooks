@@ -2,9 +2,12 @@
 """Regression tests for services the internet reaches through Apache."""
 
 import configparser
+import http.client
 import importlib.util
 import pathlib
 import re
+import shutil
+import socket
 import subprocess
 import tempfile
 import time
@@ -16,6 +19,11 @@ import yaml
 
 REPO_ROOT = pathlib.Path(__file__).resolve().parents[1]
 ROLES = REPO_ROOT / "roles"
+# Module directories of the Apache builds a developer may have locally.
+APACHE_MODULE_DIRS = (
+    pathlib.Path("/usr/lib/apache2/modules"),
+    pathlib.Path("/usr/libexec/apache2"),
+)
 COUCHDB = ROLES / "couchdb"
 FAIL2BAN = ROLES / "fail2ban"
 LITELLM = ROLES / "litellm"
@@ -441,6 +449,192 @@ class ZabbixPublicVhostTest(unittest.TestCase):
                 "/var/log/apache2/other_vhosts_access.log",
             ],
         )
+
+
+class ZabbixLoginMethodTest(unittest.TestCase):
+    # Zabbix reads the login fields from $_REQUEST, so a query string logs in
+    # as well as a form post, while the zabbix-web filter counts only POST.
+    # Both the default virtual host and zabbix.rewse.jp refuse other methods
+    # on the login pages when the query string names a login field.
+    HOSTNAME = "zabbix.rewse.jp"
+    TEMPLATES = ("zabbix-api.conf.j2", f"{HOSTNAME}.conf.j2")
+    # Requests that keep working: the login form, the redirects and links
+    # Zabbix itself builds, the Duo callback, and pages other than the login.
+    ALLOWED = (
+        ("GET", "/zabbix/"),
+        ("GET", "/zabbix/index.php"),
+        ("GET", "/zabbix/index.php?form=default"),
+        ("GET", "/zabbix/index.php?reconnect=1"),
+        ("GET", "/zabbix/index.php?request=zabbix.php%3Faction%3Ddashboard.view"),
+        ("GET", "/zabbix/index_mfa.php?request=zabbix.php"),
+        ("GET", "/zabbix/index_mfa.php?duo_code=abc&state=def"),
+        ("GET", "/zabbix/zabbix.php?action=host.view&filter_name=center"),
+        ("GET", "/zabbix/zabbix.php?enter=1&password=x"),
+    )
+    # Spellings Apache maps to a login page, with a query string that PHP
+    # reads as a login field.
+    REFUSED = (
+        ("GET", "/zabbix?enter=1&name=Admin&password=x"),
+        ("GET", "/zabbix/?enter=1&name=Admin&password=x"),
+        ("GET", "/zabbix/index.php?enter=1&name=Admin&password=x"),
+        ("GET", "/zabbix/index.php?name=Admin&password=x"),
+        ("GET", "/zabbix/index_mfa.php?enter=1&verification_code=123456"),
+        ("GET", "//zabbix//index.php?enter=1"),
+        ("GET", "/zabbix/./index.php?enter=1"),
+        ("GET", "/%7Aabbix/index%2Ephp?enter=1"),
+        ("GET", "/zabbix/index.php/x?enter=1"),
+        ("GET", "/zabbix/index.php?%65nter=1"),
+        ("GET", "/zabbix/index.php?%65nter=1&x=%zz"),
+        ("GET", "/zabbix/index.php?%65nter=1&x=%00"),
+        ("GET", "/zabbix/index.php?x=1&+enter=1"),
+        ("GET", "/zabbix/index.php?enter%5B%5D=1"),
+        ("GET", "/zabbix/index.php?enter[]=1"),
+        ("GET", "/zabbix/index.php?p%61ssword=x"),
+        ("HEAD", "/zabbix/index.php?enter=1"),
+        ("PUT", "/zabbix/index.php?enter=1"),
+    )
+
+    def rendered(self, name: str) -> str:
+        return render_vhost(ZABBIX_SERVER, name, zabbix_server_hostname=self.HOSTNAME)
+
+    def test_both_scopes_carry_the_same_rule_inside_the_zabbix_location(self):
+        rules = []
+        for name in self.TEMPLATES:
+            with self.subTest(template=name):
+                block = re.search(
+                    r'(?ms)^\s*<Location "/zabbix">\n(.*?)^\s*</Location>',
+                    self.rendered(name),
+                )
+                self.assertIsNotNone(block)
+                assert block is not None
+                rule = re.search(
+                    r'(?ms)^\s*<If "([^"]+)">\n\s*Require all denied\n\s*</If>',
+                    block.group(1),
+                )
+                self.assertIsNotNone(rule)
+                assert rule is not None
+                self.assertIn("%{REQUEST_METHOD} != 'POST'", rule.group(1))
+                rules.append(rule.group(1))
+        self.assertEqual(len(set(rules)), 1)
+
+    @unittest.skipUnless(
+        shutil.which("httpd") or shutil.which("apache2"), "no Apache to test with"
+    )
+    def test_apache_refuses_credentials_outside_post(self):
+        module_dir = next(
+            (d for d in APACHE_MODULE_DIRS if (d / "mod_authz_core.so").exists()),
+            None,
+        )
+        if module_dir is None:
+            self.skipTest("no Apache modules found")
+        with tempfile.TemporaryDirectory() as tmp:
+            root = pathlib.Path(tmp)
+            with socket.socket() as probe:
+                probe.bind(("127.0.0.1", 0))
+                port = probe.getsockname()[1]
+            ui = root / "ui"
+            ui.mkdir()
+            for page in ("index.php", "index_mfa.php", "zabbix.php"):
+                (ui / page).write_text("ok\n")
+            vhost = "\n".join(
+                line.replace("*:443", f"127.0.0.1:{port}")
+                for line in self.rendered(self.TEMPLATES[1]).splitlines()
+                if not line.strip().startswith(("SSL", "Include "))
+            )
+            (root / "api.conf").write_text(self.rendered(self.TEMPLATES[0]))
+            (root / "vhost.conf").write_text(vhost)
+            modules = [
+                f"LoadModule {name}_module {module_dir}/mod_{name}.so"
+                for name in (
+                    "mpm_prefork",
+                    "authz_core",
+                    "authz_host",
+                    "alias",
+                    "dir",
+                    "unixd",
+                )
+                if (module_dir / f"mod_{name}.so").exists()
+            ]
+            config = root / "httpd.conf"
+            config.write_text(
+                "\n".join(
+                    [
+                        *modules,
+                        f"Listen 127.0.0.1:{port}",
+                        f"PidFile {root}/httpd.pid",
+                        f"ErrorLog {root}/error.log",
+                        "ServerName localhost",
+                        f"DocumentRoot {root}",
+                        "DirectoryIndex index.php",
+                        f"Alias /zabbix {ui}",
+                        f'<Directory "{ui}">',
+                        "    Require all granted",
+                        "</Directory>",
+                        # The default virtual host, which rewse.jp reaches.
+                        f"<VirtualHost 127.0.0.1:{port}>",
+                        "    ServerName rewse.jp",
+                        "</VirtualHost>",
+                        f"Include {root}/api.conf",
+                        f"Include {root}/vhost.conf",
+                    ]
+                )
+                + "\n"
+            )
+            binary = shutil.which("httpd") or shutil.which("apache2")
+            assert binary is not None
+            server = subprocess.Popen(
+                [binary, "-X", "-f", str(config)],
+                stdout=subprocess.DEVNULL,
+                stderr=subprocess.PIPE,
+                text=True,
+            )
+            try:
+                self.wait_for(port, server)
+                for host in ("rewse.jp", self.HOSTNAME):
+                    for method, target in self.ALLOWED:
+                        with self.subTest(host=host, method=method, target=target):
+                            self.assertNotEqual(
+                                self.status(port, host, method, target), 403
+                            )
+                    for method, target in self.REFUSED:
+                        with self.subTest(host=host, method=method, target=target):
+                            self.assertEqual(
+                                self.status(port, host, method, target), 403
+                            )
+                    # The form post itself reaches the page; the static file
+                    # handler answers it with 405 instead of PHP's 200.
+                    self.assertNotEqual(
+                        self.status(
+                            port, host, "POST", "/zabbix/index.php?enter=1", b"x=1"
+                        ),
+                        403,
+                    )
+            finally:
+                server.terminate()
+                server.wait(timeout=10)
+
+    @staticmethod
+    def wait_for(port: int, server: subprocess.Popen) -> None:
+        for _ in range(100):
+            if server.poll() is not None:
+                raise AssertionError(server.stderr.read() if server.stderr else "")
+            try:
+                with socket.create_connection(("127.0.0.1", port), timeout=1):
+                    return
+            except OSError:
+                time.sleep(0.05)
+        raise AssertionError("Apache did not start")
+
+    @staticmethod
+    def status(
+        port: int, host: str, method: str, target: str, body: bytes | None = None
+    ) -> int:
+        connection = http.client.HTTPConnection("127.0.0.1", port, timeout=5)
+        try:
+            connection.request(method, target, body=body, headers={"Host": host})
+            return connection.getresponse().status
+        finally:
+            connection.close()
 
 
 class StandbyHomeAssistantFail2banTest(unittest.TestCase):
