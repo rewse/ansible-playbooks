@@ -2,7 +2,6 @@
 enecoq_data_fetcher_enecoq:
   email: "{{ lookup('pipe', 'op read op://ansible/ylie2zpjuu2nnp5sym3vejwlcq/username') }}"
   password: "{{ lookup('pipe', 'op read op://ansible/ylie2zpjuu2nnp5sym3vejwlcq/credential') }}"
-# The enecoQ service is down, and every run sends a login that it rejects, so
-# the timer stays stopped.
-# TODO: Set back to true once the enecoQ service is back.
-enecoq_data_fetcher_timer_enabled: false
+# Set to false while the enecoQ service is down, so the timer does not keep
+# sending logins that it rejects.
+enecoq_data_fetcher_timer_enabled: true
