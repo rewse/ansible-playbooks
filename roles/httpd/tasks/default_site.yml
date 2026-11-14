@@ -29,6 +29,15 @@
     - /etc/apache2/sites-enabled/default-ssl.conf
   notify: Reload Apache
 
+- name: default_site | Remove stock index page
+  # apache2's postinst copies the Ubuntu default page into the default site's
+  # document root. No page links to it, because / redirects to the blog, and
+  # Apache compresses it on the fly, which serves two representations under
+  # one validator and byte ranges into the compressed copy.
+  ansible.builtin.file:
+    path: /srv/www/html/index.html
+    state: absent
+
 - name: default_site | Set ServerName for HTTP
   ansible.builtin.lineinfile:
     dest: /etc/apache2/sites-available/000-default.conf
