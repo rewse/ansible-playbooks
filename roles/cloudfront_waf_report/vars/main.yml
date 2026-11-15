@@ -1,10 +1,11 @@
 ---
-# Findings the owner decided to leave as they are. The weekly report drops a
-# finding when every key given here, other than reason, matches it. This
-# repository is public, so name rules, hosts, and countries; never addresses.
-#
-# - rule: RateLimitLogin
-#   host: hass.rewse.jp
-#   country: JP
-#   reason: The Home Assistant app retries on wake; 100 per 5 minutes is intended.
-cloudfront_waf_report_accepted: []
+# The bucket of the private findings repository, which turns each weekly
+# report into issues, and the AWS CLI profile that assumes its writer role.
+# To keep a finding from coming back, close its issue as not planned there.
+cloudfront_waf_report_aws_profile: security-findings-waf-writer
+cloudfront_waf_report_bucket: continuum-waffindingsbucket-4wyeemnziaeg
+
+# The model that triages the candidates, called through the AWS CLI profile
+# that assumes the bedrock role.
+cloudfront_waf_report_bedrock_model_id: global.anthropic.claude-sonnet-5-5
+cloudfront_waf_report_bedrock_profile: bedrock

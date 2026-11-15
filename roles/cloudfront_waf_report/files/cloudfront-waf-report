@@ -1,28 +1,29 @@
 #!/usr/bin/python3
-"""Mail a weekly report of the cloudfront-waf web ACL logs.
+"""Upload a weekly report of the cloudfront-waf web ACL logs to S3.
 
 The report lists only what needs action: legitimate traffic that the WAF
 blocks, the owner locked out by a rate limit, and suspicious requests that the
-WAF let through. Fixed Logs Insights queries pick the candidates, and kiro-cli
-triages them and writes the next actions.
+WAF let through. Fixed Logs Insights queries pick the candidates, and a Bedrock
+model triages them and writes the next actions.
 
-kiro-cli runs without any tool. The log fields come from whoever sent the
+The model runs without any tool. The log fields come from whoever sent the
 request, so text in them may try to instruct the model; with no tool, the
 worst it can do is ask for a Logs Insights query, which this script validates
 and runs against the WAF log group only.
+
+The report goes as JSON under waf/ in the S3 bucket of the private findings
+repository, whose sync turns each rule and host into an issue. Client
+addresses are replaced with <ip> before the upload.
 """
 
 import argparse
 import collections
 import copy
-import email.message
 import gzip
 import ipaddress
 import json
-import os
 import pathlib
 import re
-import socket
 import subprocess
 import sys
 import tempfile
@@ -68,25 +69,13 @@ FINDING_LIMIT = 2000
 # raises subprocess.CalledProcessError when the command fails.
 Runner = Callable[..., str]
 
-AGENT_NAME = "cloudfront-waf-report"
 MAX_ROUNDS = 3
 MAX_QUERIES_PER_ROUND = 3
-KIRO_TIMEOUT = 600
+BEDROCK_TIMEOUT = 600
+# A findings answer for 50 candidates per query fits well within this; an
+# answer that reaches it is cut off and is treated as a failed triage.
+BEDROCK_MAX_TOKENS = 16000
 FINDING_FIELDS = ("title", "evidence", "next_action", "rule", "host", "country")
-# The agent has no tools, MCP servers, or resources. kiro-cli runs it from an
-# empty HOME, so the user's agents, steering, hooks, and permission policies,
-# which allow read-only shell commands, are never loaded. It has no
-# permissions key: kiro-cli 3 fails to load an agent whose policies are empty.
-AGENT = {
-    "name": AGENT_NAME,
-    "description": "Weekly WAF report analyst without tools",
-    "prompt": None,
-    "mcpServers": {},
-    "includeMcpJson": False,
-    "tools": [],
-    "toolAliases": {},
-    "resources": [],
-}
 _JSON_BLOCK = re.compile(r"```json\s*\n(.*?)\n?```", re.DOTALL)
 DEFAULT_APACHE_LOG_DIR = "/var/log/apache2"
 FALLBACK_TOLERANCE = 0.05
@@ -99,8 +88,14 @@ _REQUEST = r'(?P<ip>\S+) \S+ \S+ \[(?P<time>[^\]]+)\] "\S+ (?P<target>\S+)[^"]*"
 _VHOST_LINE = re.compile(r"^(?P<host>[^\s:]+):\d+ " + _REQUEST)
 _COMBINED_LINE = re.compile(r"^" + _REQUEST)
 DEFAULT_CONFIG = pathlib.Path("/etc/cloudfront-waf-report/config.json")
-SENDMAIL = ["/usr/sbin/sendmail", "-t", "-oi"]
-FALLBACK_ROWS = 10
+UPLOAD_PREFIX = "waf/"
+UPLOAD_VERSION = 1
+# Dotted quads that are not part of a longer dotted number; ipaddress then
+# rejects octets above 255.
+_IPV4 = re.compile(r"(?<!\d)(?<!\d\.)(?:\d{1,3}\.){3}\d{1,3}(?!\.?\d)")
+# Runs of hex digits and colons, inside which _redact_ipv6 looks for addresses.
+_IPV6_RUN = re.compile(r"[0-9A-Fa-f:]*:[0-9A-Fa-f:]*:[0-9A-Fa-f:]*")
+_IPV6_MAX = 39
 
 _INSTRUCTIONS = """\
 あなたは自宅サービスの AWS WAF ログを毎週レビューする担当です。
@@ -117,7 +112,6 @@ _INSTRUCTIONS = """\
 - next_action には、人にしかできない変更を、どのリポジトリで何をするかが分かる 1 文で書いてください。例: rewse/cloudfront-waf の infra/template.yaml に rule action override を足す、RateLimitLogin のしきい値を見直す、漏れた認証情報を入れ替える。
 - fox の Apache の応答コードと、どのパスにも同じページを返しているだけかどうかは、このレポートを作るスクリプトが確かめ済みです。これらの確認を next action に書かないでください。スクリプトで確かめられないもの（hotel が応答した期間など）に限り、確認を next action にしてかまいません。
 - previous は前週の項目です。同じ問題が続いていれば continued を true にしてください。
-- accepted は利用者が「このままでよい」と判断した項目です。これに当たるものは出さないでください。
 - 各項目の rule、host、country には、その項目の代表的な値を入れてください。
 - title、evidence、next_action は日本語で書いてください。
 - allowed_scans の各行の origin_status は、fox の Apache がそのリクエストに返した応答コードと件数です。「不明」は fox のログに見つからなかったもの（hotel が代わりに応答した期間など）で、中身が返ったかは分かりません。3xx と 4xx だけの行と、存在しないパスへの応答と同じ大きさの 2xx だけの行は渡していません。残っている 2xx は、本物のファイルが返った疑いがあるものです。
@@ -211,7 +205,7 @@ def _parse_time(value: object) -> datetime:
 
 
 def validate_followup(spec: dict, now: datetime) -> tuple[str, datetime, datetime]:
-    """Check a follow-up query that kiro-cli asked for and bound its result."""
+    """Check a follow-up query that the model asked for and bound its result."""
     query = spec.get("query")
     if not isinstance(query, str) or not query.strip():
         raise ValueError("query must be a non-empty string")
@@ -293,14 +287,6 @@ class Aws:
         raise RuntimeError("Logs Insights query did not complete in time")
 
 
-def read_api_key(path: pathlib.Path) -> str:
-    """Return the Kiro API key from a file that holds only the key."""
-    api_key = path.read_text().strip()
-    if not api_key:
-        raise RuntimeError(f"Kiro API key file is empty: {path}")
-    return api_key
-
-
 def _log_data(value: object) -> str:
     # "<" is escaped so that no log field can close the <log-data> element.
     return json.dumps(value, ensure_ascii=False, indent=1).replace("<", "\\u003c")
@@ -310,16 +296,14 @@ def build_prompt(
     period: tuple[datetime, datetime],
     candidates: dict[str, list[dict[str, str]]],
     previous: list[dict],
-    accepted: list[dict],
     followups: list[dict],
     final: bool,
 ) -> str:
-    """Build the kiro-cli prompt with the log-derived data fenced off."""
+    """Build the model prompt with the log-derived data fenced off."""
     start, end = period
     parts = [
         _INSTRUCTIONS.format(max_queries=MAX_QUERIES_PER_ROUND),
         f"対象期間: {start.isoformat()} から {end.isoformat()} まで（JST）",
-        f"accepted: {json.dumps(accepted, ensure_ascii=False)}",
     ]
     if final:
         parts.append(
@@ -351,7 +335,7 @@ def _fit(data: dict) -> dict:
 
 
 def parse_response(text: str) -> dict:
-    """Read the last JSON code block of a kiro-cli response."""
+    """Read the last JSON code block of a model response."""
     blocks = _JSON_BLOCK.findall(text)
     if not blocks:
         raise ValueError("response has no JSON code block")
@@ -384,32 +368,46 @@ def _check_findings(items: list) -> list[dict]:
     return findings
 
 
-def ask_kiro(prompt: str, api_key: str, run: Runner) -> str:
-    """Ask kiro-cli once from an empty HOME with a tool-less agent."""
-    with tempfile.TemporaryDirectory(prefix="cloudfront-waf-report-") as home:
-        agents = pathlib.Path(home) / ".kiro" / "agents"
-        agents.mkdir(parents=True)
-        (agents / f"{AGENT_NAME}.json").write_text(json.dumps(AGENT))
-        env = {
-            "HOME": home,
-            "KIRO_API_KEY": api_key,
-            "LANG": "C.UTF-8",
-            "PATH": os.environ.get("PATH", "/usr/local/bin:/usr/bin:/bin"),
-        }
-        return run(
+def ask_bedrock(prompt: str, model_id: str, profile: str, run: Runner) -> str:
+    """Ask the Bedrock model once through the Converse API, without tools.
+
+    The prompt goes in a file rather than on the command line, so it stays out
+    of the process list and under the argument length limit.
+    """
+    messages = [{"role": "user", "content": [{"text": prompt}]}]
+    with tempfile.TemporaryDirectory(prefix="cloudfront-waf-report-") as tmp:
+        path = pathlib.Path(tmp) / "messages.json"
+        path.write_text(json.dumps(messages, ensure_ascii=False))
+        output = run(
             [
-                "kiro-cli",
-                "chat",
-                "--no-interactive",
-                "--trust-tools=",
-                "--agent",
-                AGENT_NAME,
-                prompt,
+                "aws",
+                "bedrock-runtime",
+                "converse",
+                "--profile",
+                profile,
+                "--region",
+                REGION,
+                "--model-id",
+                model_id,
+                "--messages",
+                f"file://{path}",
+                "--inference-config",
+                json.dumps({"maxTokens": BEDROCK_MAX_TOKENS}),
+                "--cli-read-timeout",
+                str(BEDROCK_TIMEOUT),
+                "--output",
+                "json",
             ],
-            env=env,
-            cwd=home,
-            timeout=KIRO_TIMEOUT,
+            timeout=BEDROCK_TIMEOUT + 60,
         )
+    response = json.loads(output)
+    if response.get("stopReason") == "max_tokens":
+        raise RuntimeError("the model answer was cut off at the token limit")
+    content = response.get("output", {}).get("message", {}).get("content", [])
+    for block in content:
+        if isinstance(block, dict) and isinstance(block.get("text"), str):
+            return block["text"]
+    raise RuntimeError("the model answer has no text")
 
 
 def investigate(
@@ -418,20 +416,19 @@ def investigate(
     period: tuple[datetime, datetime],
     candidates: dict[str, list[dict[str, str]]],
     previous: list[dict],
-    accepted: list[dict],
     now: datetime,
     office_networks: Sequence[ipaddress.IPv4Network] = (),
 ) -> list[dict]:
-    """Let kiro-cli triage the candidates, running the queries it asks for."""
+    """Let the model triage the candidates, running the queries it asks for."""
     followups: list[dict] = []
     for round_number in range(MAX_ROUNDS + 1):
         final = round_number == MAX_ROUNDS
-        prompt = build_prompt(period, candidates, previous, accepted, followups, final)
+        prompt = build_prompt(period, candidates, previous, followups, final)
         response = parse_response(ask(prompt))
         if "findings" in response:
             return _check_findings(response["findings"])
         if final:
-            raise ValueError("kiro-cli asked for queries after the last round")
+            raise ValueError("the model asked for queries after the last round")
         for spec in response["queries"][:MAX_QUERIES_PER_ROUND]:
             purpose = (
                 sanitize(str(spec.get("purpose", ""))) if isinstance(spec, dict) else ""
@@ -634,17 +631,6 @@ def annotate_scans(
     return kept
 
 
-def apply_accepted(findings: list[dict], accepted: list[dict]) -> list[dict]:
-    """Drop findings that match every given key of an accepted entry."""
-
-    def matches(finding: dict, entry: dict) -> bool:
-        return all(
-            finding.get(key) == value for key, value in entry.items() if key != "reason"
-        )
-
-    return [f for f in findings if not any(matches(f, entry) for entry in accepted)]
-
-
 def drop_empty(findings: list[dict]) -> list[dict]:
     """Drop findings without a next action."""
     return [f for f in findings if f.get("next_action", "").strip()]
@@ -685,52 +671,94 @@ def describe_error(error: BaseException) -> str:
     return f"{type(error).__name__}: {sanitize(str(error), 500)}"
 
 
-def render_mail(
-    host: str,
-    period: tuple[datetime, datetime],
-    findings: list[dict] | None,
-    candidates: dict[str, list[dict[str, str]]] | None,
-    error: str | None,
-) -> tuple[str, str]:
-    """Return the subject and body of the report mail."""
-    start, end = period
-    span = f"{start:%Y-%m-%d}〜{end - timedelta(days=1):%Y-%m-%d}"
-    prefix = f"[{host}] WAF 週次レポート {span}"
-    if error is not None:
-        return f"{prefix}: 作成失敗", f"レポートの作成に失敗しました。\n\n{error}\n"
-    if findings is None:
-        lines = ["kiro-cli の判定に失敗したため、候補をそのまま載せます。"]
-        for name, rows in (candidates or {}).items():
-            if rows:
-                lines += ["", f"■ {name}（{len(rows)} 行）"]
-                lines += [
-                    json.dumps(row, ensure_ascii=False) for row in rows[:FALLBACK_ROWS]
-                ]
-        return f"{prefix}: AI 判定なし", "\n".join(lines) + "\n"
-    new = [f for f in findings if not f.get("continued")]
-    continued = [f for f in findings if f.get("continued")]
-    if not findings:
-        return f"{prefix}: 対応不要", "対応が必要な項目はありません。\n"
-    count = f"対応 {len(new)} 件" + (f"（継続 {len(continued)} 件）" if not new else "")
-    blocks = [
-        f"■ {f['title']}\n根拠: {f['evidence']}\nnext action: {f['next_action']}\n"
-        for f in new
-    ]
-    body = "\n".join(blocks)
-    if continued:
-        body += ("\n" if blocks else "") + "".join(
-            f"- 前週から継続: {f['title']}\n" for f in continued
+def _redact_ipv4(match: re.Match[str]) -> str:
+    try:
+        ipaddress.IPv4Address(match.group(0))
+    except ValueError:
+        return match.group(0)
+    return "<ip>"
+
+
+def _redact_ipv6(match: re.Match[str]) -> str:
+    """Replace the longest IPv6 addresses inside a run of hex digits and colons.
+
+    The run can carry neighbouring text such as a "ip:" label or a port, so
+    the address is searched for inside it rather than matched as a whole.
+    """
+    token = match.group(0)
+    parts = []
+    start = 0
+    i = 0
+    while i < len(token):
+        found = 0
+        for end in range(min(len(token), i + _IPV6_MAX), i + 1, -1):
+            candidate = token[i:end]
+            if candidate.count(":") < 2:
+                continue
+            try:
+                ipaddress.IPv6Address(candidate)
+            except ValueError:
+                continue
+            found = end
+            break
+        if found:
+            parts += [token[start:i], "<ip>"]
+            start = i = found
+        else:
+            i += 1
+    parts.append(token[start:])
+    return "".join(parts)
+
+
+def redact_addresses(text: str) -> str:
+    """Replace every IPv4 and IPv6 address in text with <ip>."""
+    text = _IPV4.sub(_redact_ipv4, text)
+    return _IPV6_RUN.sub(_redact_ipv6, text).replace("[<ip>]", "<ip>")
+
+
+def build_upload(
+    period: tuple[datetime, datetime], findings: list[dict]
+) -> tuple[str, bytes]:
+    """Return the S3 key and body of the report in the shared version 1 format."""
+    start, end = (moment.astimezone(JST) for moment in period)
+    data = {
+        "version": UPLOAD_VERSION,
+        "period_start": start.isoformat(),
+        "period_end": end.isoformat(),
+        "findings": [
+            {field: redact_addresses(str(f.get(field, ""))) for field in FINDING_FIELDS}
+            for f in findings
+        ],
+    }
+    key = f"{UPLOAD_PREFIX}{end.date().isoformat()}.json"
+    return key, json.dumps(data, ensure_ascii=False, indent=1).encode()
+
+
+def upload(key: str, body: bytes, config: dict, run: Runner) -> None:
+    """Put the report into the findings bucket through the writer profile."""
+    with tempfile.TemporaryDirectory(prefix="cloudfront-waf-report-") as tmp:
+        path = pathlib.Path(tmp) / "report.json"
+        path.write_bytes(body)
+        run(
+            [
+                "aws",
+                "s3api",
+                "put-object",
+                "--profile",
+                config["aws_profile"],
+                "--region",
+                REGION,
+                "--bucket",
+                config["bucket"],
+                "--key",
+                key,
+                "--body",
+                str(path),
+                "--content-type",
+                "application/json",
+            ],
+            timeout=AWS_TIMEOUT,
         )
-    return f"{prefix}: {count}", body
-
-
-def send_mail(subject: str, body: str, recipient: str, run: Runner) -> None:
-    """Hand the mail to the local MTA."""
-    message = email.message.EmailMessage()
-    message["To"] = recipient
-    message["Subject"] = subject
-    message.set_content(body)
-    run(SENDMAIL, stdin=message.as_string())
 
 
 def run_command(
@@ -760,24 +788,18 @@ def main(
     now: datetime | None = None,
 ) -> int:
     parser = argparse.ArgumentParser(
-        description="Mail the weekly cloudfront-waf report."
+        description="Upload the weekly cloudfront-waf findings to S3."
     )
     parser.add_argument("--config", type=pathlib.Path, default=DEFAULT_CONFIG)
     parser.add_argument(
-        "--dry-run", action="store_true", help="print the mail instead of sending it"
+        "--dry-run", action="store_true", help="print the JSON instead of uploading it"
     )
     args = parser.parse_args(argv)
     config = json.loads(args.config.read_text())
     state_dir = pathlib.Path(config["state_dir"])
     period = report_period(now or datetime.now(JST))
-    host = socket.gethostname().split(".")[0]
 
-    def deliver(subject: str, body: str) -> None:
-        if args.dry_run:
-            print(f"Subject: {subject}\n\n{body}", end="")
-        else:
-            send_mail(subject, body, config["recipient"], run)
-
+    # Any failure exits non-zero, and systemd's OnFailure reports it.
     try:
         aws = Aws(run)
         networks = [ipaddress.IPv4Network(cidr) for cidr in aws.office_cidrs()]
@@ -793,17 +815,20 @@ def main(
             success_sizes(log_dir, period),
             lambda host: probe_fallback(host, run),
         )
-        findings: list[dict] | None = []
+        findings: list[dict] = []
         if any(candidates.values()):
             try:
-                api_key = read_api_key(pathlib.Path(config["kiro_api_key_file"]))
                 findings = investigate(
                     aws,
-                    lambda prompt: ask_kiro(prompt, api_key, run),
+                    lambda prompt: ask_bedrock(
+                        prompt,
+                        config["bedrock_model_id"],
+                        config["bedrock_profile"],
+                        run,
+                    ),
                     period,
                     candidates,
                     load_previous(state_dir),
-                    config.get("accepted", []),
                     now or datetime.now(JST),
                     networks,
                 )
@@ -813,18 +838,18 @@ def main(
                 OSError,
                 subprocess.SubprocessError,
             ) as error:
-                print(
-                    f"kiro-cli triage failed: {describe_error(error)}", file=sys.stderr
-                )
-                findings = None
-        if findings is not None:
-            findings = drop_empty(apply_accepted(findings, config.get("accepted", [])))
-        deliver(*render_mail(host, period, findings, candidates, None))
-        if findings is not None and not args.dry_run:
-            save_report(state_dir, findings)
+                print(f"model triage failed: {describe_error(error)}", file=sys.stderr)
+                return 1
+        findings = drop_empty(findings)
+        key, body = build_upload(period, findings)
+        if args.dry_run:
+            print(body.decode())
+            return 0
+        upload(key, body, config, run)
+        save_report(state_dir, findings)
         return 0
-    except Exception as error:  # noqa: BLE001 - any failure must still reach the mailbox.
-        deliver(*render_mail(host, period, None, None, describe_error(error)))
+    except Exception as error:  # noqa: BLE001 - every failure must reach OnFailure.
+        print(describe_error(error), file=sys.stderr)
         return 1
 
 

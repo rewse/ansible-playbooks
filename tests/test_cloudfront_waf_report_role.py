@@ -4,7 +4,6 @@
 import configparser
 import json
 import pathlib
-import re
 import unittest
 
 import jinja2
@@ -59,38 +58,38 @@ class RoleTest(unittest.TestCase):
         self.assertEqual(service["Service"]["TimeoutStartSec"], "2h")
 
     def test_config_template_renders_valid_json(self):
-        accepted = [
-            {
-                "rule": "RateLimitLogin",
-                "host": "hass.rewse.jp",
-                "country": "JP",
-                "reason": "ok",
-            }
-        ]
         config = json.loads(
             render(
                 "config.json.j2",
                 admin_user="tats",
-                cloudfront_waf_report_accepted=accepted,
+                cloudfront_waf_report_aws_profile="security-findings-waf-writer",
+                cloudfront_waf_report_bedrock_model_id="global.anthropic.claude-sonnet-5-5",
+                cloudfront_waf_report_bedrock_profile="bedrock",
+                cloudfront_waf_report_bucket="continuum-waffindingsbucket-4wyeemnziaeg",
             )
         )
         self.assertEqual(
             config,
             {
-                "recipient": "root",
                 "state_dir": "/home/tats/.local/state/cloudfront-waf-report",
-                "kiro_api_key_file": "/home/tats/.config/cloudfront-waf-report/kiro-api-key",
+                "bucket": "continuum-waffindingsbucket-4wyeemnziaeg",
+                "aws_profile": "security-findings-waf-writer",
+                "bedrock_model_id": "global.anthropic.claude-sonnet-5-5",
+                "bedrock_profile": "bedrock",
                 "apache_log_dir": "/var/log/apache2",
-                "accepted": accepted,
             },
         )
 
-    def test_accepted_entries_hold_no_ip_addresses(self):
-        text = (ROLE / "vars" / "main.yml").read_text()
-        self.assertIsInstance(
-            yaml.safe_load(text)["cloudfront_waf_report_accepted"], list
+    def test_vars_name_the_upload_target(self):
+        values = yaml.safe_load((ROLE / "vars" / "main.yml").read_text())
+        self.assertEqual(
+            values["cloudfront_waf_report_bucket"],
+            "continuum-waffindingsbucket-4wyeemnziaeg",
         )
-        self.assertIsNone(re.search(r"\d{1,3}(?:\.\d{1,3}){3}", text))
+        self.assertEqual(
+            values["cloudfront_waf_report_aws_profile"], "security-findings-waf-writer"
+        )
+        self.assertNotIn("cloudfront_waf_report_accepted", values)
 
     def test_tasks_install_script_config_and_timer(self):
         tasks = yaml.safe_load((ROLE / "tasks" / "main.yml").read_text())
