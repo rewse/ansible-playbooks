@@ -9,6 +9,37 @@
     ProxyRequests off
     RequestHeader set X-Forwarded-Proto "https"
 
+    Header always set Strict-Transport-Security "max-age=31536000"
+    Header always set X-Content-Type-Options "nosniff"
+    Header always set X-Frame-Options "SAMEORIGIN"
+
+    # These sections run at authorization, after Apache has decoded the path,
+    # merged repeated slashes, and mapped the request to the proxy, so neither
+    # the spelling of the path nor the order of translation affects them. Each
+    # only denies; a grant here would replace the server-wide Require lines.
+    #
+    # Grafana signs out and switches the organization on GET, and its session
+    # cookie is SameSite=Lax, so a link on another site would act for the user.
+    # Browsers mark such a navigation with Sec-Fetch-Site. A bookmark, a link
+    # inside Grafana, and a client that sends no header pass.
+    <If "%{REQUEST_URI} =~ m#^/(logout|profile/switch-org)(/|$)#i && req('Sec-Fetch-Site') in {'cross-site', 'same-site'}">
+        Require all denied
+    </If>
+    # SMTP is not configured, so a password reset cannot complete, and its
+    # endpoints only reveal whether a login exists.
+    <If "%{REQUEST_URI} =~ m#^/(api/)?user/password/(reset|send-reset-email)(/|$)#i">
+        Require all denied
+    </If>
+    # No dashboard link sets base_url or the pg_stat_statements_* variables in
+    # its URL, so a dashboard URL that sets them as var-<name> is refused. The
+    # browser splits the query string on & and decodes each name, so every
+    # character of a name may arrive percent-encoded. The raw string is matched
+    # because unescape() returns its input unchanged when any escape in it is
+    # malformed.
+    <If "%{QUERY_STRING} =~ /(^|&)(v|%76)(a|%61)(r|%72)(-|%2d)((b|%62)(a|%61)(s|%73)(e|%65)(_|%5f)(u|%75)(r|%72)(l|%6c)(=|&|$)|(p|%70)(g|%67)(_|%5f)(s|%73)(t|%74)(a|%61)(t|%74)(_|%5f)(s|%73)(t|%74)(a|%61)(t|%74)(e|%65)(m|%6d)(e|%65)(n|%6e)(t|%74)(s|%73)(_|%5f))/i">
+        Require all denied
+    </If>
+
     ProxyPass /api/live/ws ws://127.0.0.1:{{ teslamate_grafana_port }}/api/live/ws
     ProxyPassReverse /api/live/ws ws://127.0.0.1:{{ teslamate_grafana_port }}/api/live/ws
     ProxyPass / http://127.0.0.1:{{ teslamate_grafana_port }}/

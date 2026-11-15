@@ -2,6 +2,7 @@
 """Regression tests for services the internet reaches through Apache."""
 
 import configparser
+import contextlib
 import http.client
 import http.server
 import importlib.util
@@ -15,6 +16,7 @@ import tempfile
 import threading
 import time
 import unittest
+from collections.abc import Callable, Iterator
 from typing import ClassVar
 
 import jinja2
@@ -163,19 +165,6 @@ def vhost_deploy_task(role: pathlib.Path, hostname: str) -> dict:
         if "ansible.builtin.template" in task
         and task["ansible.builtin.template"]["src"] == f"{hostname}.conf.j2"
     )
-
-
-def wait_for_port(port: int, server: subprocess.Popen) -> None:
-    # Waits until the Apache under test accepts connections.
-    for _ in range(100):
-        if server.poll() is not None:
-            raise AssertionError(server.stderr.read() if server.stderr else "")
-        try:
-            with socket.create_connection(("127.0.0.1", port), timeout=1):
-                return
-        except OSError:
-            time.sleep(0.05)
-    raise AssertionError("Apache did not start")
 
 
 def couchdb_vhost() -> str:
@@ -450,7 +439,7 @@ class CouchDBApacheTest(unittest.TestCase):
             text=True,
         )
         try:
-            wait_for_port(cls.port, cls.server)
+            wait_for_apache(cls.port, cls.server)
         except AssertionError as error:
             log = (
                 (root / "error.log").read_text()
@@ -939,108 +928,198 @@ class ZabbixLoginMethodTest(unittest.TestCase):
         shutil.which("httpd") or shutil.which("apache2"), "no Apache to test with"
     )
     def test_apache_refuses_credentials_outside_post(self):
-        module_dir = next(
-            (d for d in APACHE_MODULE_DIRS if (d / "mod_authz_core.so").exists()),
-            None,
-        )
-        if module_dir is None:
-            self.skipTest("no Apache modules found")
-        with tempfile.TemporaryDirectory() as tmp:
-            root = pathlib.Path(tmp)
-            with socket.socket() as probe:
-                probe.bind(("127.0.0.1", 0))
-                port = probe.getsockname()[1]
-            ui = root / "ui"
-            ui.mkdir()
-            for page in ("index.php", "index_mfa.php", "zabbix.php"):
-                (ui / page).write_text("ok\n")
-            vhost = "\n".join(
-                line.replace("*:443", f"127.0.0.1:{port}")
-                for line in self.rendered(self.TEMPLATES[1]).splitlines()
-                if not line.strip().startswith(("SSL", "Include "))
-            )
-            (root / "api.conf").write_text(self.rendered(self.TEMPLATES[0]))
-            (root / "vhost.conf").write_text(vhost)
-            modules = [
-                f"LoadModule {name}_module {module_dir}/mod_{name}.so"
-                for name in (
-                    "mpm_prefork",
-                    "authz_core",
-                    "authz_host",
-                    "alias",
-                    "dir",
-                    "unixd",
+        with zabbix_apache(self, self.rendered) as port:
+            for host in ("rewse.jp", self.HOSTNAME):
+                for method, target in self.ALLOWED:
+                    with self.subTest(host=host, method=method, target=target):
+                        self.assertNotEqual(
+                            http_status(port, host, method, target), 403
+                        )
+                for method, target in self.REFUSED:
+                    with self.subTest(host=host, method=method, target=target):
+                        self.assertEqual(http_status(port, host, method, target), 403)
+                # The form post itself reaches the page; the static file
+                # handler answers it with 405 instead of PHP's 200.
+                self.assertNotEqual(
+                    http_status(
+                        port, host, "POST", "/zabbix/index.php?enter=1", b"x=1"
+                    ),
+                    403,
                 )
-                if (module_dir / f"mod_{name}.so").exists()
-            ]
-            config = root / "httpd.conf"
-            config.write_text(
-                "\n".join(
-                    [
-                        *modules,
-                        f"Listen 127.0.0.1:{port}",
-                        f"PidFile {root}/httpd.pid",
-                        f"ErrorLog {root}/error.log",
-                        "ServerName localhost",
-                        f"DocumentRoot {root}",
-                        "DirectoryIndex index.php",
-                        f"Alias /zabbix {ui}",
-                        f'<Directory "{ui}">',
-                        "    Require all granted",
-                        "</Directory>",
-                        # The default virtual host, which rewse.jp reaches.
-                        f"<VirtualHost 127.0.0.1:{port}>",
-                        "    ServerName rewse.jp",
-                        "</VirtualHost>",
-                        f"Include {root}/api.conf",
-                        f"Include {root}/vhost.conf",
-                    ]
-                )
-                + "\n"
-            )
-            binary = shutil.which("httpd") or shutil.which("apache2")
-            assert binary is not None
-            server = subprocess.Popen(
-                [binary, "-X", "-f", str(config)],
-                stdout=subprocess.DEVNULL,
-                stderr=subprocess.PIPE,
-                text=True,
-            )
-            try:
-                wait_for_port(port, server)
-                for host in ("rewse.jp", self.HOSTNAME):
-                    for method, target in self.ALLOWED:
-                        with self.subTest(host=host, method=method, target=target):
-                            self.assertNotEqual(
-                                self.status(port, host, method, target), 403
-                            )
-                    for method, target in self.REFUSED:
-                        with self.subTest(host=host, method=method, target=target):
-                            self.assertEqual(
-                                self.status(port, host, method, target), 403
-                            )
-                    # The form post itself reaches the page; the static file
-                    # handler answers it with 405 instead of PHP's 200.
-                    self.assertNotEqual(
-                        self.status(
-                            port, host, "POST", "/zabbix/index.php?enter=1", b"x=1"
-                        ),
-                        403,
-                    )
-            finally:
-                server.terminate()
-                server.wait(timeout=10)
 
-    @staticmethod
-    def status(
-        port: int, host: str, method: str, target: str, body: bytes | None = None
-    ) -> int:
-        connection = http.client.HTTPConnection("127.0.0.1", port, timeout=5)
+
+class ZabbixPathInfoTest(unittest.TestCase):
+    # Apache logs %U with any path info after the script, so the zabbix-web
+    # filter, which reads the script name at the end of %U, would not count a
+    # sign-in posted with path info. Both scopes refuse path info after every
+    # script under /zabbix, which also leaves SCIM unreachable.
+    HOSTNAME = "zabbix.rewse.jp"
+    TEMPLATES = ("zabbix-api.conf.j2", f"{HOSTNAME}.conf.j2")
+    SERVED = (
+        ("GET", "/zabbix/"),
+        ("GET", "/zabbix/index.php"),
+        ("GET", "/zabbix/index.php?request=zabbix.php%3Faction%3Ddashboard.view"),
+        ("GET", "/zabbix/zabbix.php?action=dashboard.view"),
+    )
+    REFUSED = (
+        ("GET", "/zabbix/index.php/x"),
+        ("GET", "/zabbix/index.php/;x/"),
+        ("GET", "//zabbix//index.php/;x/"),
+        ("GET", "/zabbix/%69ndex.php/x"),
+        ("GET", "/zabbix/index.php%2Fx"),
+        ("GET", "/zabbix/index.php/index.php"),
+        ("GET", "/zabbix/index_mfa.php/x"),
+        ("GET", "/zabbix/zabbix.php/x?action=dashboard.view"),
+        ("GET", "/zabbix/api_scim.php/Users"),
+        ("POST", "/zabbix/index.php/x"),
+        ("POST", "/zabbix/index.php/;x/"),
+        ("POST", "//zabbix//index.php/;x/"),
+        ("POST", "/zabbix/index_mfa.php/x"),
+        ("POST", "/zabbix/api_jsonrpc.php/x"),
+    )
+
+    def rendered(self, name: str) -> str:
+        return render_vhost(ZABBIX_SERVER, name, zabbix_server_hostname=self.HOSTNAME)
+
+    def test_both_scopes_turn_off_path_info_inside_the_zabbix_location(self):
+        for name in self.TEMPLATES:
+            with self.subTest(template=name):
+                block = re.search(
+                    r'(?ms)^\s*<Location "/zabbix">\n(.*?)^\s*</Location>',
+                    self.rendered(name),
+                )
+                self.assertIsNotNone(block)
+                assert block is not None
+                self.assertRegex(block.group(1), r"(?m)^\s*AcceptPathInfo Off$")
+
+    @unittest.skipUnless(
+        shutil.which("httpd") or shutil.which("apache2"), "no Apache to test with"
+    )
+    def test_apache_refuses_path_info_after_a_script(self):
+        with zabbix_apache(self, self.rendered) as port:
+            for host in ("rewse.jp", self.HOSTNAME):
+                for method, target in self.SERVED:
+                    with self.subTest(host=host, method=method, target=target):
+                        self.assertEqual(http_status(port, host, method, target), 200)
+                for method, target in self.REFUSED:
+                    with self.subTest(host=host, method=method, target=target):
+                        self.assertIn(
+                            http_status(port, host, method, target, b"x=1"),
+                            (403, 404),
+                        )
+
+
+@contextlib.contextmanager
+def zabbix_apache(
+    test: unittest.TestCase, rendered: Callable[[str], str]
+) -> Iterator[int]:
+    """Serve stand-in Zabbix scripts through both rendered Apache scopes."""
+    module_dir = next(
+        (d for d in APACHE_MODULE_DIRS if (d / "mod_authz_core.so").exists()),
+        None,
+    )
+    if module_dir is None:
+        test.skipTest("no Apache modules found")
+    with tempfile.TemporaryDirectory() as tmp:
+        root = pathlib.Path(tmp)
+        with socket.socket() as probe:
+            probe.bind(("127.0.0.1", 0))
+            port = probe.getsockname()[1]
+        ui = root / "ui"
+        ui.mkdir()
+        for page in (
+            "api_jsonrpc.php",
+            "api_scim.php",
+            "index.php",
+            "index_mfa.php",
+            "zabbix.php",
+        ):
+            (ui / page).write_text("ok\n")
+        vhost = "\n".join(
+            line.replace("*:443", f"127.0.0.1:{port}")
+            for line in rendered("zabbix.rewse.jp.conf.j2").splitlines()
+            if not line.strip().startswith(("SSL", "Include "))
+        )
+        (root / "api.conf").write_text(rendered("zabbix-api.conf.j2"))
+        (root / "vhost.conf").write_text(vhost)
+        modules = [
+            f"LoadModule {name}_module {module_dir}/mod_{name}.so"
+            for name in (
+                "mpm_prefork",
+                "authz_core",
+                "authz_host",
+                "alias",
+                "dir",
+                "unixd",
+            )
+            if (module_dir / f"mod_{name}.so").exists()
+        ]
+        config = root / "httpd.conf"
+        config.write_text(
+            "\n".join(
+                [
+                    *modules,
+                    f"Listen 127.0.0.1:{port}",
+                    f"PidFile {root}/httpd.pid",
+                    f"ErrorLog {root}/error.log",
+                    "ServerName localhost",
+                    f"DocumentRoot {root}",
+                    "DirectoryIndex index.php",
+                    f"Alias /zabbix {ui}",
+                    f'<Directory "{ui}">',
+                    "    Require all granted",
+                    # mod_php accepts path info unless AcceptPathInfo says
+                    # otherwise; the static file handler that stands in for it
+                    # here rejects it by default.
+                    "    AcceptPathInfo On",
+                    "</Directory>",
+                    # The default virtual host, which rewse.jp reaches.
+                    f"<VirtualHost 127.0.0.1:{port}>",
+                    "    ServerName rewse.jp",
+                    "</VirtualHost>",
+                    f"Include {root}/api.conf",
+                    f"Include {root}/vhost.conf",
+                ]
+            )
+            + "\n"
+        )
+        binary = shutil.which("httpd") or shutil.which("apache2")
+        assert binary is not None
+        server = subprocess.Popen(
+            [binary, "-X", "-f", str(config)],
+            stdout=subprocess.DEVNULL,
+            stderr=subprocess.PIPE,
+            text=True,
+        )
         try:
-            connection.request(method, target, body=body, headers={"Host": host})
-            return connection.getresponse().status
+            wait_for_apache(port, server)
+            yield port
         finally:
-            connection.close()
+            server.terminate()
+            server.wait(timeout=10)
+
+
+def wait_for_apache(port: int, server: subprocess.Popen) -> None:
+    for _ in range(100):
+        if server.poll() is not None:
+            raise AssertionError(server.stderr.read() if server.stderr else "")
+        try:
+            with socket.create_connection(("127.0.0.1", port), timeout=1):
+                return
+        except OSError:
+            time.sleep(0.05)
+    raise AssertionError("Apache did not start")
+
+
+def http_status(
+    port: int, host: str, method: str, target: str, body: bytes | None = None
+) -> int:
+    connection = http.client.HTTPConnection("127.0.0.1", port, timeout=5)
+    try:
+        connection.request(method, target, body=body, headers={"Host": host})
+        return connection.getresponse().status
+    finally:
+        connection.close()
 
 
 class StandbyHomeAssistantFail2banTest(unittest.TestCase):
@@ -1259,6 +1338,30 @@ class GrafanaCookieTest(unittest.TestCase):
         # with any plain http:// request to the name, before a redirect.
         text = (TESLAMATE / "templates" / "grafana.env.j2").read_text()
         self.assertRegex(text, r"(?m)^GF_SECURITY_COOKIE_SECURE=true$")
+
+
+class GrafanaApiSurfaceTest(unittest.TestCase):
+    def setUp(self):
+        self.text = (TESLAMATE / "templates" / "grafana.env.j2").read_text()
+
+    def test_query_history_is_off(self):
+        # With the setting off, Grafana registers no query history routes.
+        self.assertRegex(self.text, r"(?m)^GF_QUERY_HISTORY_ENABLED=false$")
+
+    def test_example_app_serves_no_version(self):
+        # Grafana enables every version of the bundled example app, whatever
+        # its manifest says, so each version is turned off by name.
+        line = re.search(r"(?m)^GF_GRAFANA_APISERVER_RUNTIME_CONFIG=(.*)$", self.text)
+        self.assertIsNotNone(line)
+        assert line is not None
+        entries = dict(entry.split("=", 1) for entry in line.group(1).split(","))
+        self.assertEqual(
+            entries,
+            {
+                "example.grafana.app/v0alpha1": "false",
+                "example.grafana.app/v1alpha1": "false",
+            },
+        )
 
 
 def flatten_tasks(tasks: list[dict], inherited: dict | None = None) -> list[dict]:
