@@ -5,6 +5,7 @@ import configparser
 import http.client
 import http.server
 import importlib.util
+import json
 import pathlib
 import re
 import shutil
@@ -558,6 +559,80 @@ class CouchDBApacheTest(unittest.TestCase):
                     response.getheader("Strict-Transport-Security"), "max-age=31536000"
                 )
                 self.assertEqual(response.getheader("Set-Cookie"), cookie)
+
+
+class CouchDBConfigTest(unittest.TestCase):
+    SETTINGS: ClassVar[dict[str, str]] = {
+        "chttpd_auth/same_site": "strict",
+        "cors/origins": "app://obsidian.md,capacitor://localhost",
+        "uuids/algorithm": "random",
+    }
+
+    @staticmethod
+    def tasks() -> list[dict]:
+        return load_yaml(COUCHDB / "tasks" / "config.yml")
+
+    @staticmethod
+    def expression(text: str):
+        environment = jinja2.Environment(undefined=jinja2.StrictUndefined)
+        return environment.compile_expression(text)
+
+    def test_component_is_imported_after_the_init_script(self):
+        imports = [
+            (task["ansible.builtin.import_tasks"], task["tags"])
+            for task in load_yaml(COUCHDB / "tasks" / "main.yml")
+        ]
+        names = [name for name, _ in imports]
+        self.assertIn(("config.yml", ["couchdb_config"]), imports)
+        self.assertLess(names.index("container.yml"), names.index("config.yml"))
+        self.assertLess(names.index("database.yml"), names.index("config.yml"))
+
+    def test_settings_keep_cookie_authentication(self):
+        settings = load_yaml(COUCHDB / "vars" / "main.yml")["couchdb_config"]
+        self.assertEqual(settings, self.SETTINGS)
+        self.assertNotIn("chttpd/authentication_handlers", settings)
+
+    def test_pending_init_script_runs_before_the_settings(self):
+        self.assertEqual(self.tasks()[0].get("ansible.builtin.meta"), "flush_handlers")
+
+    def test_settings_are_read_then_written_only_when_different(self):
+        read, write = self.tasks()[1:]
+        for task in (read, write):
+            with self.subTest(task=task["name"]):
+                self.assertIs(task.get("no_log"), True)
+                uri = task["ansible.builtin.uri"]
+                self.assertTrue(
+                    uri["url"].startswith("{{ couchdb_url }}/_node/_local/_config/")
+                )
+                self.assertIs(uri["force_basic_auth"], True)
+        self.assertEqual(read["loop"], "{{ couchdb_config | dict2items }}")
+        self.assertIs(read["check_mode"], False)
+        self.assertEqual(read["ansible.builtin.uri"]["status_code"], [200, 404])
+        self.assertEqual(write["ansible.builtin.uri"]["method"], "PUT")
+        self.assertEqual(write["loop"], f"{{{{ {read['register']}.results }}}}")
+        when = self.expression(write["when"])
+        setting = {"key": "chttpd_auth/same_site", "value": "strict"}
+        for result, expected in (
+            ({"status": 404, "json": {"error": "not_found"}}, True),
+            ({"status": 200, "json": "lax"}, True),
+            ({"status": 200, "json": "strict"}, False),
+        ):
+            with self.subTest(result=result):
+                self.assertIs(when(item={**result, "item": setting}), expected)
+        environment = jinja2.Environment(undefined=jinja2.StrictUndefined)
+        environment.filters["to_json"] = json.dumps
+        body = environment.from_string(write["ansible.builtin.uri"]["body"])
+        self.assertEqual(body.render(item={"item": setting}), '"strict"')
+
+    def test_init_script_writes_the_same_origins(self):
+        handler = next(
+            task
+            for task in load_yaml(COUCHDB / "handlers" / "main.yml")
+            if task["name"] == "Run couchdb init script"
+        )
+        self.assertEqual(
+            handler["environment"]["origins"], "{{ couchdb_config['cors/origins'] }}"
+        )
 
 
 class LiteLLMNetworkTest(unittest.TestCase):

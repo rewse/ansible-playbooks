@@ -1,0 +1,36 @@
+---
+# The LiveSync init script also writes CouchDB settings, cors/origins among
+# them, so a pending run goes first and these values are the ones that stay.
+- name: config | Run pending init script
+  ansible.builtin.meta: flush_handlers
+
+# CouchDB has no module, so each setting is read over HTTP and written only
+# when it differs. CouchDB returns a set value as a JSON string and 404 for an
+# unset one.
+- name: config | Read settings
+  ansible.builtin.uri:
+    url: "{{ couchdb_url }}/_node/_local/_config/{{ item.key }}"
+    url_username: "{{ admin_user }}"
+    url_password: "{{ couchdb_password }}"
+    force_basic_auth: true
+    status_code:
+      - 200
+      - 404
+  loop: "{{ couchdb_config | dict2items }}"
+  register: __couchdb_config
+  check_mode: false
+  no_log: true
+
+- name: config | Set settings
+  ansible.builtin.uri:
+    url: "{{ couchdb_url }}/_node/_local/_config/{{ item.item.key }}"
+    method: PUT
+    url_username: "{{ admin_user }}"
+    url_password: "{{ couchdb_password }}"
+    force_basic_auth: true
+    body_format: json
+    body: "{{ item.item.value | to_json }}"
+  loop: "{{ __couchdb_config.results }}"
+  changed_when: true
+  when: item.status == 404 or item.json != item.item.value
+  no_log: true
