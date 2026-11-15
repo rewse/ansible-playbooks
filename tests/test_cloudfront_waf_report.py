@@ -10,7 +10,6 @@ import importlib.machinery
 import io
 import ipaddress
 import json
-import os
 import pathlib
 import re
 import subprocess
@@ -296,61 +295,63 @@ FINDING = {
 }
 
 
-class KiroTest(unittest.TestCase):
-    def test_ask_kiro_isolates_home_and_trusts_no_tools(self):
+def converse(text):
+    """Return a Bedrock Converse response that ends normally with text."""
+    return json.dumps(
+        {"output": {"message": {"content": [{"text": text}]}}, "stopReason": "end_turn"}
+    )
+
+
+class BedrockTest(unittest.TestCase):
+    def test_ask_bedrock_sends_the_prompt_in_a_file(self):
         seen = {}
 
-        def answer(argv, env, cwd):
-            agent = (
-                pathlib.Path(env["HOME"])
-                / ".kiro"
-                / "agents"
-                / "cloudfront-waf-report.json"
-            )
-            seen["agent"] = json.loads(agent.read_text())
-            seen["home"] = env["HOME"]
-            return "ok"
+        def run(argv, **kwargs):
+            seen["argv"] = argv
+            path = argv[argv.index("--messages") + 1].removeprefix("file://")
+            seen["messages"] = json.loads(pathlib.Path(path).read_text())
+            return converse("ok")
 
-        run = FakeRun([(["kiro-cli"], answer)])
-        with mock.patch.dict(os.environ, {"AWS_PROFILE": "x", "PATH": "/usr/bin"}):
-            self.assertEqual(report.ask_kiro("hello", "k", run), "ok")
-        call = run.calls[0]
+        self.assertEqual(report.ask_bedrock("hello", "m1", "bedrock", run), "ok")
+        argv = seen["argv"]
+        self.assertEqual(argv[:3], ["aws", "bedrock-runtime", "converse"])
+        for flag, value in (
+            ("--profile", "bedrock"),
+            ("--region", "us-east-1"),
+            ("--model-id", "m1"),
+            ("--cli-read-timeout", "600"),
+            ("--output", "json"),
+        ):
+            self.assertEqual(argv[argv.index(flag) + 1], value)
         self.assertEqual(
-            call["argv"],
-            [
-                "kiro-cli",
-                "chat",
-                "--no-interactive",
-                "--trust-tools=",
-                "--agent",
-                "cloudfront-waf-report",
-                "hello",
-            ],
+            json.loads(argv[argv.index("--inference-config") + 1]), {"maxTokens": 16000}
         )
-        self.assertEqual(call["env"]["KIRO_API_KEY"], "k")
-        self.assertFalse([k for k in call["env"] if k.startswith("AWS_")])
-        self.assertEqual(call["cwd"], seen["home"])
-        agent = seen["agent"]
-        self.assertEqual(agent["tools"], [])
-        self.assertEqual(agent["mcpServers"], {})
-        self.assertIs(agent["includeMcpJson"], False)
-        self.assertEqual(agent["resources"], [])
-        # kiro-cli 3 rejects an agent whose permissions hold empty policies.
-        self.assertNotIn("permissions", agent)
-        self.assertFalse(pathlib.Path(seen["home"]).exists())
+        self.assertNotIn("--tool-config", argv)
+        self.assertNotIn("hello", " ".join(argv))
+        self.assertEqual(
+            seen["messages"], [{"role": "user", "content": [{"text": "hello"}]}]
+        )
 
-    def test_read_api_key_strips_whitespace(self):
-        with tempfile.TemporaryDirectory() as tmp:
-            path = pathlib.Path(tmp) / "kiro-api-key"
-            path.write_text("abc-123\n")
-            self.assertEqual(report.read_api_key(path), "abc-123")
+    def test_ask_bedrock_rejects_a_truncated_answer(self):
+        def run(argv, **kwargs):
+            return json.dumps(
+                {
+                    "output": {"message": {"content": [{"text": "```json"}]}},
+                    "stopReason": "max_tokens",
+                }
+            )
 
-    def test_read_api_key_rejects_empty_file(self):
-        with tempfile.TemporaryDirectory() as tmp:
-            path = pathlib.Path(tmp) / "kiro-api-key"
-            path.write_text(" \n")
-            with self.assertRaisesRegex(RuntimeError, re.escape(str(path))):
-                report.read_api_key(path)
+        with self.assertRaises(RuntimeError):
+            report.ask_bedrock("hello", "m1", "bedrock", run)
+
+    def test_ask_bedrock_rejects_an_answer_without_text(self):
+        def run(argv, **kwargs):
+            return json.dumps(
+                {"output": {"message": {"content": []}}, "stopReason": "end_turn"}
+            )
+
+        with self.assertRaises(RuntimeError):
+            report.ask_bedrock("hello", "m1", "bedrock", run)
 
     def test_parse_response_takes_last_json_block(self):
         text = (
@@ -446,7 +447,7 @@ class InvestigateTest(unittest.TestCase):
         self.assertEqual(len(aws.queries), 1)
         self.assertIn("/a", prompts[1])
 
-    def test_investigate_drops_rejected_followups_and_tells_kiro(self):
+    def test_investigate_drops_rejected_followups_and_tells_the_model(self):
         bad = self.QUERY | {"query": "SOURCE logGroups(namePrefix: ['x'])"}
         answers = [fenced({"queries": [bad]}), fenced({"findings": []})]
         prompts = []
@@ -583,7 +584,7 @@ class FinishTest(unittest.TestCase):
         subject, body = report.render_mail("fox", PERIOD, None, candidates, None)
         self.assertTrue(subject.endswith(": AI 判定なし"))
         self.assertTrue(
-            body.startswith("kiro-cli の判定に失敗したため、候補をそのまま載せます。")
+            body.startswith("モデルの判定に失敗したため、候補をそのまま載せます。")
         )
         self.assertIn("/9", body)
         self.assertNotIn("/10", body)
@@ -625,21 +626,20 @@ class MainTest(unittest.TestCase):
         self.addCleanup(self.tmp.cleanup)
         root = pathlib.Path(self.tmp.name)
         self.state = root / "state"
-        self.key = root / "kiro-api-key"
-        self.key.write_text("k\n")
         self.config = root / "config.json"
         self.config.write_text(
             json.dumps(
                 {
                     "recipient": "root",
                     "state_dir": str(self.state),
-                    "kiro_api_key_file": str(self.key),
+                    "bedrock_model_id": "m1",
+                    "bedrock_profile": "bedrock",
                     "accepted": [],
                 }
             )
         )
 
-    def answers(self, rows_by_query, kiro=None):
+    def answers(self, rows_by_query, bedrock=None):
         ip_sets = json.dumps(
             {"IPSets": [{"Name": "cloudfront-waf-office", "Id": "i1"}]}
         )
@@ -655,8 +655,8 @@ class MainTest(unittest.TestCase):
                 (START_QUERY, '{"queryId": "q"}'),
                 (GET_RESULTS, results("Complete", rows)),
             ]
-        if kiro is not None:
-            answers.append((["kiro-cli"], kiro))
+        if bedrock is not None:
+            answers.append((["aws", "bedrock-runtime", "converse"], bedrock))
         answers.append((["/usr/sbin/sendmail"], ""))
         return FakeRun(answers)
 
@@ -671,30 +671,27 @@ class MainTest(unittest.TestCase):
         ):
             return report.main(["--config", str(self.config), *extra], run=run, now=NOW)
 
-    def test_main_sends_no_action_mail_without_calling_kiro(self):
+    def test_main_sends_no_action_mail_without_calling_the_model(self):
         run = self.answers([[], [], [], []])
         self.assertEqual(self.main(run), 0)
         self.assertTrue(self.sent(run)["Subject"].endswith(": 対応不要"))
-        self.assertFalse([c for c in run.calls if c["argv"][0] == "kiro-cli"])
+        self.assertFalse(
+            [c for c in run.calls if c["argv"][:2] == ["aws", "bedrock-runtime"]]
+        )
 
-    def test_main_falls_back_when_kiro_fails(self):
+    def test_main_falls_back_when_the_model_fails(self):
         run = self.answers(
             [[{"httpRequest.uri": "/a"}], [], [], []],
-            kiro=subprocess.CalledProcessError(4, ["kiro-cli"]),
+            bedrock=subprocess.CalledProcessError(255, ["aws", "bedrock-runtime"]),
         )
         self.assertEqual(self.main(run), 0)
         self.assertTrue(self.sent(run)["Subject"].endswith(": AI 判定なし"))
         self.assertFalse((self.state / "last.json").exists())
 
-    def test_missing_key_file_reports_without_ai(self):
-        self.key.unlink()
-        run = self.answers([[{"httpRequest.uri": "/a"}], [], [], []])
-        self.assertEqual(self.main(run), 0)
-        self.assertTrue(self.sent(run)["Subject"].endswith(": AI 判定なし"))
-        self.assertFalse([c for c in run.calls if c["argv"][0] == "kiro-cli"])
-
     def test_main_falls_back_on_invalid_json(self):
-        run = self.answers([[{"httpRequest.uri": "/a"}], [], [], []], kiro="no json")
+        run = self.answers(
+            [[{"httpRequest.uri": "/a"}], [], [], []], bedrock=converse("no json")
+        )
         self.assertEqual(self.main(run), 0)
         self.assertTrue(self.sent(run)["Subject"].endswith(": AI 判定なし"))
 
@@ -726,18 +723,25 @@ class MainTest(unittest.TestCase):
     def test_main_saves_findings_after_sending(self):
         run = self.answers(
             [[{"httpRequest.uri": "/a"}], [], [], []],
-            kiro=fenced({"findings": [FINDING]}),
+            bedrock=converse(fenced({"findings": [FINDING]})),
         )
         self.assertEqual(self.main(run), 0)
         self.assertTrue(self.sent(run)["Subject"].endswith(": 対応 1 件"))
         self.assertEqual(report.load_previous(self.state), [FINDING])
 
-    def test_main_never_sends_office_cidr_to_kiro(self):
+    def test_main_never_sends_office_cidr_to_the_model(self):
         rows = [{"httpRequest.country": "US", "httpRequest.clientIp": "192.0.2.9"}]
-        run = self.answers([rows, [], [], []], kiro=fenced({"findings": []}))
+        prompts = []
+
+        def answer(argv, env, cwd):
+            path = argv[argv.index("--messages") + 1].removeprefix("file://")
+            prompts.append(pathlib.Path(path).read_text())
+            return converse(fenced({"findings": []}))
+
+        run = self.answers([rows, [], [], []], bedrock=answer)
         self.main(run)
-        prompt = next(c["argv"][-1] for c in run.calls if c["argv"][0] == "kiro-cli")
-        self.assertNotIn("192.0.2.", prompt)
+        self.assertEqual(len(prompts), 1)
+        self.assertNotIn("192.0.2.", prompts[0])
 
     def test_main_filters_allowed_scans_by_apache_status(self):
         logs = pathlib.Path(self.tmp.name) / "apache"
@@ -754,7 +758,9 @@ class MainTest(unittest.TestCase):
         run = self.answers([[], [], [], [scan]])
         self.assertEqual(self.main(run), 0)
         self.assertTrue(self.sent(run)["Subject"].endswith(": 対応不要"))
-        self.assertFalse([c for c in run.calls if c["argv"][0] == "kiro-cli"])
+        self.assertFalse(
+            [c for c in run.calls if c["argv"][:2] == ["aws", "bedrock-runtime"]]
+        )
 
     def test_dry_run_prints_instead_of_mailing(self):
         run = FakeRun(self.answers([[], [], [], []]).answers[:-1])

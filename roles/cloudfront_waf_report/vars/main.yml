@@ -8,3 +8,8 @@
 #   country: JP
 #   reason: The Home Assistant app retries on wake; 100 per 5 minutes is intended.
 cloudfront_waf_report_accepted: []
+
+# The model that triages the candidates, called through the AWS CLI profile
+# that assumes the bedrock role.
+cloudfront_waf_report_bedrock_model_id: global.anthropic.claude-sonnet-5-5
+cloudfront_waf_report_bedrock_profile: bedrock

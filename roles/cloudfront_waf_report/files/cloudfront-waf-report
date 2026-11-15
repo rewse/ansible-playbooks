@@ -3,10 +3,10 @@
 
 The report lists only what needs action: legitimate traffic that the WAF
 blocks, the owner locked out by a rate limit, and suspicious requests that the
-WAF let through. Fixed Logs Insights queries pick the candidates, and kiro-cli
-triages them and writes the next actions.
+WAF let through. Fixed Logs Insights queries pick the candidates, and a Bedrock
+model triages them and writes the next actions.
 
-kiro-cli runs without any tool. The log fields come from whoever sent the
+The model runs without any tool. The log fields come from whoever sent the
 request, so text in them may try to instruct the model; with no tool, the
 worst it can do is ask for a Logs Insights query, which this script validates
 and runs against the WAF log group only.
@@ -19,7 +19,6 @@ import email.message
 import gzip
 import ipaddress
 import json
-import os
 import pathlib
 import re
 import socket
@@ -68,25 +67,13 @@ FINDING_LIMIT = 2000
 # raises subprocess.CalledProcessError when the command fails.
 Runner = Callable[..., str]
 
-AGENT_NAME = "cloudfront-waf-report"
 MAX_ROUNDS = 3
 MAX_QUERIES_PER_ROUND = 3
-KIRO_TIMEOUT = 600
+BEDROCK_TIMEOUT = 600
+# A findings answer for 50 candidates per query fits well within this; an
+# answer that reaches it is cut off and is treated as a failed triage.
+BEDROCK_MAX_TOKENS = 16000
 FINDING_FIELDS = ("title", "evidence", "next_action", "rule", "host", "country")
-# The agent has no tools, MCP servers, or resources. kiro-cli runs it from an
-# empty HOME, so the user's agents, steering, hooks, and permission policies,
-# which allow read-only shell commands, are never loaded. It has no
-# permissions key: kiro-cli 3 fails to load an agent whose policies are empty.
-AGENT = {
-    "name": AGENT_NAME,
-    "description": "Weekly WAF report analyst without tools",
-    "prompt": None,
-    "mcpServers": {},
-    "includeMcpJson": False,
-    "tools": [],
-    "toolAliases": {},
-    "resources": [],
-}
 _JSON_BLOCK = re.compile(r"```json\s*\n(.*?)\n?```", re.DOTALL)
 DEFAULT_APACHE_LOG_DIR = "/var/log/apache2"
 FALLBACK_TOLERANCE = 0.05
@@ -211,7 +198,7 @@ def _parse_time(value: object) -> datetime:
 
 
 def validate_followup(spec: dict, now: datetime) -> tuple[str, datetime, datetime]:
-    """Check a follow-up query that kiro-cli asked for and bound its result."""
+    """Check a follow-up query that the model asked for and bound its result."""
     query = spec.get("query")
     if not isinstance(query, str) or not query.strip():
         raise ValueError("query must be a non-empty string")
@@ -293,14 +280,6 @@ class Aws:
         raise RuntimeError("Logs Insights query did not complete in time")
 
 
-def read_api_key(path: pathlib.Path) -> str:
-    """Return the Kiro API key from a file that holds only the key."""
-    api_key = path.read_text().strip()
-    if not api_key:
-        raise RuntimeError(f"Kiro API key file is empty: {path}")
-    return api_key
-
-
 def _log_data(value: object) -> str:
     # "<" is escaped so that no log field can close the <log-data> element.
     return json.dumps(value, ensure_ascii=False, indent=1).replace("<", "\\u003c")
@@ -314,7 +293,7 @@ def build_prompt(
     followups: list[dict],
     final: bool,
 ) -> str:
-    """Build the kiro-cli prompt with the log-derived data fenced off."""
+    """Build the model prompt with the log-derived data fenced off."""
     start, end = period
     parts = [
         _INSTRUCTIONS.format(max_queries=MAX_QUERIES_PER_ROUND),
@@ -351,7 +330,7 @@ def _fit(data: dict) -> dict:
 
 
 def parse_response(text: str) -> dict:
-    """Read the last JSON code block of a kiro-cli response."""
+    """Read the last JSON code block of a model response."""
     blocks = _JSON_BLOCK.findall(text)
     if not blocks:
         raise ValueError("response has no JSON code block")
@@ -384,32 +363,46 @@ def _check_findings(items: list) -> list[dict]:
     return findings
 
 
-def ask_kiro(prompt: str, api_key: str, run: Runner) -> str:
-    """Ask kiro-cli once from an empty HOME with a tool-less agent."""
-    with tempfile.TemporaryDirectory(prefix="cloudfront-waf-report-") as home:
-        agents = pathlib.Path(home) / ".kiro" / "agents"
-        agents.mkdir(parents=True)
-        (agents / f"{AGENT_NAME}.json").write_text(json.dumps(AGENT))
-        env = {
-            "HOME": home,
-            "KIRO_API_KEY": api_key,
-            "LANG": "C.UTF-8",
-            "PATH": os.environ.get("PATH", "/usr/local/bin:/usr/bin:/bin"),
-        }
-        return run(
+def ask_bedrock(prompt: str, model_id: str, profile: str, run: Runner) -> str:
+    """Ask the Bedrock model once through the Converse API, without tools.
+
+    The prompt goes in a file rather than on the command line, so it stays out
+    of the process list and under the argument length limit.
+    """
+    messages = [{"role": "user", "content": [{"text": prompt}]}]
+    with tempfile.TemporaryDirectory(prefix="cloudfront-waf-report-") as tmp:
+        path = pathlib.Path(tmp) / "messages.json"
+        path.write_text(json.dumps(messages, ensure_ascii=False))
+        output = run(
             [
-                "kiro-cli",
-                "chat",
-                "--no-interactive",
-                "--trust-tools=",
-                "--agent",
-                AGENT_NAME,
-                prompt,
+                "aws",
+                "bedrock-runtime",
+                "converse",
+                "--profile",
+                profile,
+                "--region",
+                REGION,
+                "--model-id",
+                model_id,
+                "--messages",
+                f"file://{path}",
+                "--inference-config",
+                json.dumps({"maxTokens": BEDROCK_MAX_TOKENS}),
+                "--cli-read-timeout",
+                str(BEDROCK_TIMEOUT),
+                "--output",
+                "json",
             ],
-            env=env,
-            cwd=home,
-            timeout=KIRO_TIMEOUT,
+            timeout=BEDROCK_TIMEOUT + 60,
         )
+    response = json.loads(output)
+    if response.get("stopReason") == "max_tokens":
+        raise RuntimeError("the model answer was cut off at the token limit")
+    content = response.get("output", {}).get("message", {}).get("content", [])
+    for block in content:
+        if isinstance(block, dict) and isinstance(block.get("text"), str):
+            return block["text"]
+    raise RuntimeError("the model answer has no text")
 
 
 def investigate(
@@ -422,7 +415,7 @@ def investigate(
     now: datetime,
     office_networks: Sequence[ipaddress.IPv4Network] = (),
 ) -> list[dict]:
-    """Let kiro-cli triage the candidates, running the queries it asks for."""
+    """Let the model triage the candidates, running the queries it asks for."""
     followups: list[dict] = []
     for round_number in range(MAX_ROUNDS + 1):
         final = round_number == MAX_ROUNDS
@@ -431,7 +424,7 @@ def investigate(
         if "findings" in response:
             return _check_findings(response["findings"])
         if final:
-            raise ValueError("kiro-cli asked for queries after the last round")
+            raise ValueError("the model asked for queries after the last round")
         for spec in response["queries"][:MAX_QUERIES_PER_ROUND]:
             purpose = (
                 sanitize(str(spec.get("purpose", ""))) if isinstance(spec, dict) else ""
@@ -699,7 +692,7 @@ def render_mail(
     if error is not None:
         return f"{prefix}: 作成失敗", f"レポートの作成に失敗しました。\n\n{error}\n"
     if findings is None:
-        lines = ["kiro-cli の判定に失敗したため、候補をそのまま載せます。"]
+        lines = ["モデルの判定に失敗したため、候補をそのまま載せます。"]
         for name, rows in (candidates or {}).items():
             if rows:
                 lines += ["", f"■ {name}（{len(rows)} 行）"]
@@ -796,10 +789,14 @@ def main(
         findings: list[dict] | None = []
         if any(candidates.values()):
             try:
-                api_key = read_api_key(pathlib.Path(config["kiro_api_key_file"]))
                 findings = investigate(
                     aws,
-                    lambda prompt: ask_kiro(prompt, api_key, run),
+                    lambda prompt: ask_bedrock(
+                        prompt,
+                        config["bedrock_model_id"],
+                        config["bedrock_profile"],
+                        run,
+                    ),
                     period,
                     candidates,
                     load_previous(state_dir),
@@ -813,9 +810,7 @@ def main(
                 OSError,
                 subprocess.SubprocessError,
             ) as error:
-                print(
-                    f"kiro-cli triage failed: {describe_error(error)}", file=sys.stderr
-                )
+                print(f"model triage failed: {describe_error(error)}", file=sys.stderr)
                 findings = None
         if findings is not None:
             findings = drop_empty(apply_accepted(findings, config.get("accepted", [])))

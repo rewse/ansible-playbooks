@@ -72,6 +72,8 @@ class RoleTest(unittest.TestCase):
                 "config.json.j2",
                 admin_user="tats",
                 cloudfront_waf_report_accepted=accepted,
+                cloudfront_waf_report_bedrock_model_id="global.anthropic.claude-sonnet-5-5",
+                cloudfront_waf_report_bedrock_profile="bedrock",
             )
         )
         self.assertEqual(
@@ -79,7 +81,8 @@ class RoleTest(unittest.TestCase):
             {
                 "recipient": "root",
                 "state_dir": "/home/tats/.local/state/cloudfront-waf-report",
-                "kiro_api_key_file": "/home/tats/.config/cloudfront-waf-report/kiro-api-key",
+                "bedrock_model_id": "global.anthropic.claude-sonnet-5-5",
+                "bedrock_profile": "bedrock",
                 "apache_log_dir": "/var/log/apache2",
                 "accepted": accepted,
             },
