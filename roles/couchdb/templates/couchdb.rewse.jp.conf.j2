@@ -3,6 +3,14 @@
     ServerAdmin hostmaster@rewse.jp
     ServerName couchdb.rewse.jp
 
+    Header always set Strict-Transport-Security "max-age=31536000"
+
+    # CouchDB marks its session cookie Secure only when its own socket speaks
+    # TLS, and Apache reaches it over plain HTTP. The backend's Set-Cookie is in
+    # the onsuccess table, so this edit has no always, and the lookahead skips a
+    # cookie that already carries Secure.
+    Header edit Set-Cookie "^(AuthSession=(?!.*;\s*(?i:secure)\s*(?:;|$)).*)$" "$1; Secure"
+
     ProxyPreserveHost on
     ProxyRequests off
     ProxyPass / http://127.0.0.1:5984/
@@ -16,13 +24,14 @@
     RewriteCond %{HTTP:Upgrade} !=websocket [NC]
     RewriteRule /(.*)  http://127.0.0.1:5984/$1 [P,L]
 
-    # Obsidian LiveSync replicates through the database paths and signs in
-    # through /_session, so both stay open to every network. A database name
-    # cannot begin with an underscore, so every other path that does is a
-    # server-level endpoint (Fauxton, node config, replication, _users), used
-    # only from home, the VPN, and the office. Behind CloudFront, mod_remoteip
-    # has already restored the client address that Require ip tests.
-    <LocationMatch "^/_(?!session$)">
+    # Obsidian LiveSync replicates through the database paths with basic auth
+    # on every request, so they stay open to every network. A database name
+    # cannot begin with an underscore, so every path that does is a server-level
+    # endpoint (Fauxton and its /_session sign-in, node config, replication,
+    # _users), used only from home, the VPN, and the office. Behind CloudFront,
+    # mod_remoteip has already restored the client address that Require ip
+    # tests.
+    <LocationMatch "^/_">
         Require ip 127.0.0.1
         Require ip ::1
         Require ip {{ networks.home_private_ipv4 }}
@@ -33,6 +42,19 @@
         Require ip {{ networks.aws_public_ipv6 }}
         Require ip {{ networks.office_public_ipv4 | join(' ') }}
     </LocationMatch>
+
+    # These admin routes take no further path segment, so only the exact
+    # /{db}/<route> form is passed on.
+    <LocationMatch "^/+[^_/][^/]*/+_(?:nouveau_cleanup|search_cleanup|sync_shards|view_cleanup)/">
+        Require all denied
+    </LocationMatch>
+
+    # No client of this host sends a query string to /_session, so none is
+    # accepted from any network. An <If> merges after <Location>, so this
+    # overrides the list above.
+    <If "%{REQUEST_URI} =~ m#^/+_session(?:/|$)# && -n %{QUERY_STRING}">
+        Require all denied
+    </If>
 
     SSLCertificateFile /etc/letsencrypt/live/rewse.jp/fullchain.pem
     SSLCertificateKeyFile /etc/letsencrypt/live/rewse.jp/privkey.pem

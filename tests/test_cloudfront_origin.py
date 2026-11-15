@@ -379,10 +379,11 @@ class OriginGateTest(unittest.TestCase):
     def test_no_other_if_sections(self):
         # Apache merges If sections last, so another one could override the deny.
         # The fail2ban ban script writes deny-only sections, which
-        # tests/test_fail2ban_apache.py checks. The Zabbix login rule is
-        # deny-only as well, so it can only narrow access; nothing else may
-        # write one.
+        # tests/test_fail2ban_apache.py checks. The CouchDB /_session query
+        # rule and the Zabbix login rule are deny-only as well, so they can only
+        # narrow access; nothing else may write one.
         deny_only = {
+            ROLES / "couchdb" / "templates" / "couchdb.rewse.jp.conf.j2",
             ROLES / "zabbix_server" / "templates" / "zabbix-api.conf.j2",
             ROLES / "zabbix_server" / "templates" / "zabbix.rewse.jp.conf.j2",
         }
