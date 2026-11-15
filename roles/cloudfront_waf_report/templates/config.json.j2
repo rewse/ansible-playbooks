@@ -1,8 +1,8 @@
 {
-  "recipient": "root",
   "state_dir": "/home/{{ admin_user }}/.local/state/cloudfront-waf-report",
+  "bucket": {{ cloudfront_waf_report_bucket | to_json }},
+  "aws_profile": {{ cloudfront_waf_report_aws_profile | to_json }},
   "bedrock_model_id": {{ cloudfront_waf_report_bedrock_model_id | to_json }},
   "bedrock_profile": {{ cloudfront_waf_report_bedrock_profile | to_json }},
-  "apache_log_dir": "/var/log/apache2",
-  "accepted": {{ cloudfront_waf_report_accepted | to_json }}
+  "apache_log_dir": "/var/log/apache2"
 }
