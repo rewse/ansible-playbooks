@@ -557,6 +557,20 @@ class UploadTest(unittest.TestCase):
             "from <ip>, <ip> and <ip> at 10:30",
         )
 
+    def test_redact_addresses_next_to_other_characters(self):
+        for text, expected in (
+            ("IP:192.0.2.10", "IP:<ip>"),
+            ("送信元:192.0.2.10", "送信元:<ip>"),
+            ("ip:2001:db8::1", "ip:<ip>"),
+            ("...192.0.2.10.", "...<ip>."),
+            ("192.0.2.10:54321", "<ip>:54321"),
+            ("prefix 2001:db8:: only", "prefix <ip> only"),
+            ("ace192.0.2.1", "ace<ip>"),
+            ("version 1.2.3 and 999.1.1.1", "version 1.2.3 and 999.1.1.1"),
+        ):
+            with self.subTest(text=text):
+                self.assertEqual(report.redact_addresses(text), expected)
+
     def test_build_upload_matches_the_shared_format(self):
         period = (
             datetime(2026, 11, 7, tzinfo=JST),
