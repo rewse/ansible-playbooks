@@ -18,6 +18,10 @@
 # the login pages when the query string names a login field, because the
 # zabbix-web filter counts only POST. Inside this <Location> it replaces the
 # Require all granted above it for those requests.
+#
+# AcceptPathInfo Off is also the one in zabbix-api.conf: a script followed by
+# path info answers 404, so every login reaches the zabbix-web filter under
+# the script name it reads.
 <VirtualHost *:443>
     ServerAdmin hostmaster@rewse.jp
     ServerName {{ zabbix_server_hostname }}
@@ -25,6 +29,7 @@
     RedirectMatch ^/$ /zabbix/
 
     <Location "/zabbix">
+        AcceptPathInfo Off
         Require all granted
         <If "%{REQUEST_METHOD} != 'POST' && %{REQUEST_URI} =~ m#^/zabbix(/(index(_mfa)?\.php(/.*)?)?)?$# && %{QUERY_STRING} =~ /(^|&)[^&=]*((e|%65)(n|%6e)(t|%74)(e|%65)(r|%72)|(p|%70)(a|%61)(s|%73)(s|%73)(w|%77)(o|%6f)(r|%72)(d|%64))/i">
             Require all denied

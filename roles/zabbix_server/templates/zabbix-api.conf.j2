@@ -35,7 +35,16 @@
 # anything may precede the field name in its pair, such as + or a decoded
 # space. unescape() would return the string unchanged on any malformed escape.
 # zabbix.rewse.jp repeats the rule inside its own <Location>.
+#
+# AcceptPathInfo Off answers 404 for any script under /zabbix followed by path
+# info, such as /zabbix/index.php/x. PHP would otherwise run the script while
+# Apache logs %U with the suffix, which the zabbix-web filter does not read as
+# the login page. mod_php checks this setting before it runs a script;
+# php-fpm behind proxy_fcgi ignores it and would need an <If> on the path
+# instead. The only frontend script that needs path info is api_scim.php, and
+# SCIM provisioning is not used. zabbix.rewse.jp repeats the setting too.
 <Location "/zabbix">
+    AcceptPathInfo Off
     Require ip 127.0.0.1
     Require ip ::1
     Require ip {{ networks.home_private_ipv4 }}
