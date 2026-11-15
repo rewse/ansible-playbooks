@@ -1,12 +1,29 @@
 #!/usr/bin/env python3
 """Regression tests for the access rules of the TeslaMate virtual host."""
 
+import http.client
+import http.server
 import pathlib
 import re
+import shutil
+import socket
+import subprocess
+import tempfile
+import threading
+import time
 import unittest
+
+import jinja2
 
 TESLAMATE = pathlib.Path(__file__).resolve().parents[1] / "roles" / "teslamate"
 VHOST = TESLAMATE / "templates" / "teslamate.rewse.jp.conf.j2"
+GRAFANA_HOSTNAME = "grafana.rewse.jp"
+GRAFANA_VHOST = TESLAMATE / "templates" / f"{GRAFANA_HOSTNAME}.conf.j2"
+# Module directories of the Apache builds a developer may have locally.
+APACHE_MODULE_DIRS = (
+    pathlib.Path("/usr/lib/apache2/modules"),
+    pathlib.Path("/usr/libexec/apache2"),
+)
 
 
 def vhost() -> str:
@@ -78,6 +95,247 @@ class TeslamateVhostHeadersTest(unittest.TestCase):
                 "X-Frame-Options": "SAMEORIGIN",
             },
         )
+
+
+def grafana_vhost(port: int) -> str:
+    environment = jinja2.Environment(
+        loader=jinja2.FileSystemLoader(TESLAMATE / "templates"),
+        undefined=jinja2.StrictUndefined,
+    )
+    return environment.get_template(GRAFANA_VHOST.name).render(
+        ansible_managed="Ansible managed",
+        teslamate_grafana_hostname=GRAFANA_HOSTNAME,
+        teslamate_grafana_port=port,
+    )
+
+
+class GrafanaVhostHeadersTest(unittest.TestCase):
+    def test_sets_browser_headers_on_every_response(self):
+        headers = dict(
+            re.findall(
+                r'(?m)^\s*Header always set (\S+) "([^"]*)"\s*$', grafana_vhost(3000)
+            )
+        )
+        self.assertEqual(
+            headers,
+            {
+                "Strict-Transport-Security": "max-age=31536000",
+                "X-Content-Type-Options": "nosniff",
+                "X-Frame-Options": "SAMEORIGIN",
+            },
+        )
+
+    def test_rules_only_deny(self):
+        # The vhost's sections replace the server-wide Require lines for the
+        # requests they match, so a grant here would reopen what those deny.
+        requires = re.findall(r"(?m)^\s*Require (.+?)\s*$", grafana_vhost(3000))
+        self.assertTrue(requires)
+        self.assertEqual(set(requires), {"all denied"})
+
+
+class _Backend(http.server.BaseHTTPRequestHandler):
+    # Stands in for Grafana and answers every request with 200.
+    def answer(self) -> None:
+        length = int(self.headers.get("Content-Length") or 0)
+        self.rfile.read(length)
+        self.send_response(200)
+        self.send_header("Content-Length", "3")
+        self.end_headers()
+        if self.command != "HEAD":
+            self.wfile.write(b"ok\n")
+
+    do_DELETE = do_GET = do_HEAD = do_POST = do_PUT = answer
+
+    def log_message(self, format, *args):
+        pass
+
+
+@unittest.skipUnless(shutil.which("httpd") or shutil.which("apache2"), "no Apache")
+class GrafanaVhostApacheTest(unittest.TestCase):
+    # Requests that keep working: the login page and form, a bookmark, a
+    # sign-out from Grafana's own menu, dashboard links from TeslaMate (a
+    # sibling subdomain) and from other dashboards with their ordinary
+    # variables, and the signed-in password change.
+    ALLOWED = (
+        ("GET", "/login", None),
+        ("GET", "/login", "cross-site"),
+        ("POST", "/login", "same-origin"),
+        ("GET", "/logout", None),
+        ("GET", "/logout", "none"),
+        ("GET", "/logout", "same-origin"),
+        ("GET", "/profile/switch-org/1", "same-origin"),
+        ("GET", "/d/kOuP_Fggz/trip?orgId=1&var-car_id=1", "same-site"),
+        ("GET", "/d/zm7wN6Zgz/drive-details?var-car_id=1&var-drive_id=5", None),
+        ("GET", "/d/x/visited?var-city=Tokyo&var-country_code=JP&var-region=13", None),
+        ("GET", "/d/x/charges?var-selected_car_id=1&from=now-7d&to=now", None),
+        ("GET", "/d/x/y?var-base_urls=1&var-pg_stat=1&base_url=x", None),
+        ("GET", "/d/x/y?var-car_id=1&x=%zz", None),
+        ("GET", "/public/build/img/fav32.png", "cross-site"),
+        ("PUT", "/api/user/password", "same-origin"),
+        ("GET", "/user/password", None),
+    )
+    # Sign-out and organization switches another site starts, the password
+    # reset pages and endpoints, and URLs that set the variables dashboards
+    # use unescaped, in spellings Apache or the browser read the same way.
+    REFUSED = (
+        ("GET", "/logout", "cross-site"),
+        ("GET", "/logout", "same-site"),
+        ("GET", "/logout/", "cross-site"),
+        ("GET", "/logout?redirectTo=x", "cross-site"),
+        ("GET", "//logout", "cross-site"),
+        ("GET", "/%6cogout", "cross-site"),
+        ("GET", "/./logout", "cross-site"),
+        ("GET", "/LOGOUT", "cross-site"),
+        ("GET", "/profile/switch-org/2", "cross-site"),
+        ("GET", "/profile/switch-org/2", "same-site"),
+        ("GET", "//profile//switch-org/2", "cross-site"),
+        ("GET", "/profile/switch%2Dorg/2", "cross-site"),
+        ("GET", "/user/password/send-reset-email", None),
+        ("GET", "/user/password/reset?code=abc", None),
+        ("POST", "/api/user/password/send-reset-email", None),
+        ("POST", "/api/user/password/reset", None),
+        ("POST", "//api//user/password/reset", None),
+        ("POST", "/api/user/password/%72eset", None),
+        ("POST", "/API/user/password/reset", None),
+        ("GET", "/d/x/y?var-base_url=https://example.com", None),
+        ("GET", "/d/x/y?orgId=1&var-base_url=https://example.com", "same-origin"),
+        ("GET", "/d/x/y?var-base_url", None),
+        ("GET", "/d/x/y?var-base_url&orgId=1", None),
+        ("GET", "/d/x/y?%76ar-base%5Furl=x", None),
+        ("GET", "/d/x/y?var%2Dbase_url=x", None),
+        ("GET", "/d/x/y?var-base_url=x&y=%zz", None),
+        ("GET", "/d/x/y?y=%00&var-base_url=x", None),
+        ("GET", "/d/x/y?var-pg_stat_statements_top_20_mean=x", None),
+        ("GET", "/d/x/y?var-pg_stat_statements_enabled=1", None),
+        ("GET", "/d/x/y?var-pg%5fstat%5Fstatements_count=1", None),
+        ("GET", "/goto/abc?var-base_url=x", None),
+        ("GET", "/d-solo/x/y?panelId=1&var-base_url=x", None),
+    )
+
+    @classmethod
+    def setUpClass(cls):
+        module_dir = next(
+            (d for d in APACHE_MODULE_DIRS if (d / "mod_proxy_http.so").exists()),
+            None,
+        )
+        if module_dir is None:
+            raise unittest.SkipTest("no Apache proxy modules found")
+        cls.tmp = tempfile.TemporaryDirectory()
+        root = pathlib.Path(cls.tmp.name)
+        cls.backend = http.server.ThreadingHTTPServer(("127.0.0.1", 0), _Backend)
+        threading.Thread(target=cls.backend.serve_forever, daemon=True).start()
+        with socket.socket() as probe:
+            probe.bind(("127.0.0.1", 0))
+            cls.port = probe.getsockname()[1]
+        vhost = "\n".join(
+            line.replace("*:443", f"127.0.0.1:{cls.port}")
+            for line in grafana_vhost(cls.backend.server_address[1]).splitlines()
+            if not line.strip().startswith(("SSL", "Include "))
+        )
+        (root / "vhost.conf").write_text(vhost)
+        modules = [
+            f"LoadModule {name}_module {module_dir}/mod_{name}.so"
+            for name in (
+                "mpm_prefork",
+                "authz_core",
+                "headers",
+                "log_config",
+                "logio",
+                "proxy",
+                "proxy_http",
+                "proxy_wstunnel",
+                "setenvif",
+                "unixd",
+            )
+            if (module_dir / f"mod_{name}.so").exists()
+        ]
+        config = root / "httpd.conf"
+        config.write_text(
+            "\n".join(
+                [
+                    *modules,
+                    f"Define APACHE_LOG_DIR {root}",
+                    f"DefaultRuntimeDir {root}",
+                    f"Listen 127.0.0.1:{cls.port}",
+                    f"PidFile {root}/httpd.pid",
+                    f"ErrorLog {root}/error.log",
+                    "ServerName localhost",
+                    f"DocumentRoot {root}",
+                    f"Include {root}/vhost.conf",
+                ]
+            )
+            + "\n"
+        )
+        binary = shutil.which("httpd") or shutil.which("apache2")
+        assert binary is not None
+        cls.server = subprocess.Popen(
+            [binary, "-X", "-f", str(config)],
+            stdout=subprocess.DEVNULL,
+            stderr=subprocess.PIPE,
+            text=True,
+        )
+        try:
+            for _ in range(100):
+                if cls.server.poll() is not None:
+                    raise AssertionError(
+                        cls.server.stderr.read() if cls.server.stderr else ""
+                    )
+                try:
+                    with socket.create_connection(("127.0.0.1", cls.port), timeout=1):
+                        return
+                except OSError:
+                    time.sleep(0.05)
+            raise AssertionError("Apache did not start")
+        except BaseException:
+            cls.tearDownClass()
+            raise
+
+    @classmethod
+    def tearDownClass(cls):
+        cls.server.terminate()
+        cls.server.wait(timeout=10)
+        cls.backend.shutdown()
+        cls.backend.server_close()
+        cls.tmp.cleanup()
+
+    def request(
+        self, method: str, target: str, fetch_site: str | None
+    ) -> http.client.HTTPResponse:
+        headers = {"Host": GRAFANA_HOSTNAME}
+        if fetch_site is not None:
+            headers["Sec-Fetch-Site"] = fetch_site
+        connection = http.client.HTTPConnection("127.0.0.1", self.port, timeout=5)
+        try:
+            connection.request(
+                method, target, body=b"" if method != "GET" else None, headers=headers
+            )
+            response = connection.getresponse()
+            response.read()
+            return response
+        finally:
+            connection.close()
+
+    def test_ordinary_requests_reach_grafana(self):
+        for method, target, fetch_site in self.ALLOWED:
+            with self.subTest(method=method, target=target, fetch_site=fetch_site):
+                self.assertEqual(self.request(method, target, fetch_site).status, 200)
+
+    def test_refused_requests_answer_403(self):
+        for method, target, fetch_site in self.REFUSED:
+            with self.subTest(method=method, target=target, fetch_site=fetch_site):
+                self.assertEqual(self.request(method, target, fetch_site).status, 403)
+
+    def test_browser_headers_are_on_proxied_and_refused_responses(self):
+        for target in ("/login", "/user/password/reset"):
+            with self.subTest(target=target):
+                response = self.request("GET", target, None)
+                self.assertEqual(
+                    response.getheader("Strict-Transport-Security"), "max-age=31536000"
+                )
+                self.assertEqual(
+                    response.getheader("X-Content-Type-Options"), "nosniff"
+                )
+                self.assertEqual(response.getheader("X-Frame-Options"), "SAMEORIGIN")
 
 
 if __name__ == "__main__":
