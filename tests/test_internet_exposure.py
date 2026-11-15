@@ -855,6 +855,30 @@ class GrafanaCookieTest(unittest.TestCase):
         self.assertRegex(text, r"(?m)^GF_SECURITY_COOKIE_SECURE=true$")
 
 
+class GrafanaApiSurfaceTest(unittest.TestCase):
+    def setUp(self):
+        self.text = (TESLAMATE / "templates" / "grafana.env.j2").read_text()
+
+    def test_query_history_is_off(self):
+        # With the setting off, Grafana registers no query history routes.
+        self.assertRegex(self.text, r"(?m)^GF_QUERY_HISTORY_ENABLED=false$")
+
+    def test_example_app_serves_no_version(self):
+        # Grafana enables every version of the bundled example app, whatever
+        # its manifest says, so each version is turned off by name.
+        line = re.search(r"(?m)^GF_GRAFANA_APISERVER_RUNTIME_CONFIG=(.*)$", self.text)
+        self.assertIsNotNone(line)
+        assert line is not None
+        entries = dict(entry.split("=", 1) for entry in line.group(1).split(","))
+        self.assertEqual(
+            entries,
+            {
+                "example.grafana.app/v0alpha1": "false",
+                "example.grafana.app/v1alpha1": "false",
+            },
+        )
+
+
 def flatten_tasks(tasks: list[dict], inherited: dict | None = None) -> list[dict]:
     # Blocks pass their keywords down, so each task carries what it runs with.
     inherited = inherited or {}
