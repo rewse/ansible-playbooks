@@ -17,6 +17,8 @@
   changed_when: true
   environment:
     hostname: "{{ couchdb_url }}"
+    # Without it the script writes its default list, which adds http://localhost.
+    origins: "{{ couchdb_config['cors/origins'] }}"
     password: "{{ couchdb_password }}"
     # The script falls back to this URL when provision.ts is not beside it, so
     # a missing copy fails instead of running the upstream default branch.

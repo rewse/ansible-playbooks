@@ -1,4 +1,13 @@
 ---
+# CouchDB settings that tasks/config.yml applies over the _config API.
+couchdb_config:
+  # Keeps the Fauxton session cookie out of cross-site requests.
+  chttpd_auth/same_site: strict
+  # The origins of Obsidian on the desktop and on iOS. Obsidian on Android
+  # would need http://localhost, and no Android client syncs with this host.
+  cors/origins: app://obsidian.md,capacitor://localhost
+  # Server-assigned document IDs reveal nothing about earlier ones.
+  uuids/algorithm: random
 couchdb_livesync_dir: /usr/local/src/obsidian-livesync
 # Paths under utils/ in the obsidian-livesync repository. couchdb-init.sh runs
 # provision.ts from the upstream default branch unless it finds the file beside

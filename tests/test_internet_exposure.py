@@ -4,13 +4,16 @@
 import configparser
 import contextlib
 import http.client
+import http.server
 import importlib.util
+import json
 import pathlib
 import re
 import shutil
 import socket
 import subprocess
 import tempfile
+import threading
 import time
 import unittest
 from collections.abc import Callable, Iterator
@@ -164,14 +167,23 @@ def vhost_deploy_task(role: pathlib.Path, hostname: str) -> dict:
     )
 
 
+def couchdb_vhost() -> str:
+    return render_vhost(COUCHDB, "couchdb.rewse.jp.conf.j2")
+
+
 class CouchDBAdminPathTest(unittest.TestCase):
     # Obsidian LiveSync replicates through the database paths from anywhere.
     # The server-level paths, all of which begin with an underscore, administer
-    # CouchDB and are needed only from home, the VPN, and the office.
+    # CouchDB or sign in to Fauxton and are needed only from home, the VPN, and
+    # the office.
     HOSTNAME = "couchdb.rewse.jp"
 
     def admin_pattern(self) -> re.Pattern:
-        blocks = require_ip_blocks(render_vhost(COUCHDB, f"{self.HOSTNAME}.conf.j2"))
+        blocks = {
+            pattern: sources
+            for pattern, sources in require_ip_blocks(couchdb_vhost()).items()
+            if sources
+        }
         self.assertEqual(len(blocks), 1)
         ((pattern, sources),) = blocks.items()
         self.assertEqual(sources, TRUSTED_SOURCES)
@@ -197,19 +209,20 @@ class CouchDBAdminPathTest(unittest.TestCase):
             "/_replicate",
             "/_replicator/x",
             "/_scheduler/jobs",
+            "/_session",
+            "/_session/",
             "/_users/org.couchdb.user:x",
             "/_utils/",
         ):
             with self.subTest(path=path):
                 self.assertTrue(pattern.search(path))
 
-    def test_database_and_session_paths_stay_open(self):
-        # LiveSync signs in through /_session; database names cannot begin
-        # with an underscore, so their paths never match.
+    def test_database_paths_stay_open(self):
+        # Database names cannot begin with an underscore, so their paths never
+        # match.
         pattern = self.admin_pattern()
         for path in (
             "/",
-            "/_session",
             "/obsidian",
             "/obsidian/_changes",
             "/obsidian/_local/checkpoint",
@@ -217,6 +230,398 @@ class CouchDBAdminPathTest(unittest.TestCase):
         ):
             with self.subTest(path=path):
                 self.assertFalse(pattern.search(path))
+
+
+class CouchDBSessionQueryTest(unittest.TestCase):
+    # CouchDB copies the next and fail parameters of /_session into the
+    # Location header unchecked, and no client of this host sends a query
+    # string there, so Apache refuses any.
+    def test_vhost_refuses_a_session_query_string_from_every_network(self):
+        rules = re.findall(
+            r'(?ms)^\s*<If "([^"]+)">\n\s*Require all denied\n\s*</If>',
+            couchdb_vhost(),
+        )
+        self.assertEqual(len(rules), 1)
+        self.assertIn("%{QUERY_STRING}", rules[0])
+        self.assertIn("_session", rules[0])
+
+
+class CouchDBCleanupRouteTest(unittest.TestCase):
+    # CouchDB requires the admin role on these routes only for the exact
+    # /{db}/<route> path.
+    ROUTES = ("_nouveau_cleanup", "_search_cleanup", "_sync_shards", "_view_cleanup")
+
+    def denied_pattern(self) -> re.Pattern:
+        blocks = re.findall(
+            r'(?ms)^\s*<LocationMatch "([^"]+)">\n\s*Require all denied\n'
+            r"\s*</LocationMatch>",
+            couchdb_vhost(),
+        )
+        self.assertEqual(len(blocks), 1)
+        return re.compile(blocks[0])
+
+    def test_routes_with_another_segment_are_refused(self):
+        pattern = self.denied_pattern()
+        for route in self.ROUTES:
+            for path in (
+                f"/obsidian/{route}/x",
+                f"/obsidian/{route}/",
+                f"/obsidian/{route}/x/y",
+            ):
+                with self.subTest(path=path):
+                    self.assertTrue(pattern.search(path))
+
+    def test_canonical_routes_and_database_paths_pass(self):
+        pattern = self.denied_pattern()
+        for path in (
+            *(f"/obsidian/{route}" for route in self.ROUTES),
+            "/obsidian",
+            "/obsidian/_changes",
+            "/obsidian/_design/x/_view/y",
+            "/obsidian/doc/_view_cleanup",
+            "/_session",
+        ):
+            with self.subTest(path=path):
+                self.assertFalse(pattern.search(path))
+
+
+class CouchDBResponseHeaderTest(unittest.TestCase):
+    def test_vhost_sets_hsts(self):
+        self.assertIn(
+            'Header always set Strict-Transport-Security "max-age=31536000"',
+            directive_lines(couchdb_vhost(), "Header "),
+        )
+
+    def test_session_cookie_gains_secure_once(self):
+        # The backend's Set-Cookie lives in the onsuccess table, which an
+        # always edit would not see.
+        text = couchdb_vhost()
+        edits = directive_lines(text, "Header edit Set-Cookie ")
+        self.assertEqual(len(edits), 1)
+        pattern, replacement = quoted_arguments(edits[0])
+        replacement = replacement.replace("$1", r"\1")
+        for cookie, expected in (
+            (
+                "AuthSession=abc; Version=1; Path=/; HttpOnly",
+                "AuthSession=abc; Version=1; Path=/; HttpOnly; Secure",
+            ),
+            (
+                "AuthSession=; Version=1; Path=/; HttpOnly; Max-Age=0",
+                "AuthSession=; Version=1; Path=/; HttpOnly; Max-Age=0; Secure",
+            ),
+            (
+                "AuthSession=abc; Version=1; Secure; Path=/; HttpOnly",
+                "AuthSession=abc; Version=1; Secure; Path=/; HttpOnly",
+            ),
+            ("other=1; Path=/", "other=1; Path=/"),
+        ):
+            with self.subTest(cookie=cookie):
+                self.assertEqual(re.sub(pattern, replacement, cookie), expected)
+        self.assertNotRegex(text, r"(?m)^\s*Header always edit\*? Set-Cookie")
+
+
+class _CouchDBStub(http.server.BaseHTTPRequestHandler):
+    # Answers like CouchDB as far as the vhost cares: /_session sets the
+    # session cookie, /unauthorized answers 401 and clears it, and everything
+    # else answers 200.
+    def answer(self):
+        length = int(self.headers.get("Content-Length") or 0)
+        if length:
+            self.rfile.read(length)
+        path = self.path.partition("?")[0]
+        status = 401 if path == "/unauthorized" else 200
+        self.send_response(status)
+        if path == "/_session":
+            self.send_header(
+                "Set-Cookie", "AuthSession=abc; Version=1; Path=/; HttpOnly"
+            )
+        elif status == 401:
+            self.send_header(
+                "Set-Cookie", "AuthSession=; Version=1; Path=/; HttpOnly; Max-Age=0"
+            )
+        self.send_header("Content-Length", "0")
+        self.end_headers()
+
+    do_DELETE = do_GET = do_HEAD = do_POST = do_PUT = answer
+
+    def log_message(self, format: str, *args: object) -> None:
+        pass
+
+
+@unittest.skipUnless(
+    shutil.which("httpd") or shutil.which("apache2"), "no Apache to test with"
+)
+class CouchDBApacheTest(unittest.TestCase):
+    # Runs the rendered vhost in a local Apache in front of a stub CouchDB.
+    # mod_remoteip takes the client address from X-Forwarded-For, as it does
+    # behind CloudFront, so one listener can stand in for every network.
+    MODULES = (
+        "mpm_prefork",
+        "authz_core",
+        "authz_host",
+        "headers",
+        "proxy",
+        "proxy_http",
+        "proxy_wstunnel",
+        "remoteip",
+        "rewrite",
+        "unixd",
+    )
+    REQUIRED_MODULES = frozenset(
+        ("authz_core", "headers", "proxy", "proxy_http", "remoteip")
+    )
+    TRUSTED = "198.51.100.7"
+    UNTRUSTED = "192.0.2.77"
+    CLEANUP_ROUTES = (
+        "_nouveau_cleanup",
+        "_search_cleanup",
+        "_sync_shards",
+        "_view_cleanup",
+    )
+
+    @classmethod
+    def setUpClass(cls):
+        module_dir = next(
+            (d for d in APACHE_MODULE_DIRS if (d / "mod_authz_core.so").exists()),
+            None,
+        )
+        if module_dir is None or any(
+            not (module_dir / f"mod_{name}.so").exists()
+            for name in cls.REQUIRED_MODULES
+        ):
+            raise unittest.SkipTest("no Apache modules found")
+        cls.tmp = tempfile.TemporaryDirectory()
+        root = pathlib.Path(cls.tmp.name)
+        cls.backend = http.server.ThreadingHTTPServer(("127.0.0.1", 0), _CouchDBStub)
+        threading.Thread(target=cls.backend.serve_forever, daemon=True).start()
+        backend_port = cls.backend.server_address[1]
+        with socket.socket() as probe:
+            probe.bind(("127.0.0.1", 0))
+            cls.port = probe.getsockname()[1]
+        vhost = "\n".join(
+            line.replace("*:443", f"127.0.0.1:{cls.port}").replace(
+                "127.0.0.1:5984", f"127.0.0.1:{backend_port}"
+            )
+            for line in couchdb_vhost().splitlines()
+            if not line.strip().startswith(("SSL", "Include "))
+        )
+        (root / "vhost.conf").write_text(vhost)
+        modules = [
+            f"LoadModule {name}_module {module_dir}/mod_{name}.so"
+            for name in cls.MODULES
+            if (module_dir / f"mod_{name}.so").exists()
+        ]
+        config = root / "httpd.conf"
+        config.write_text(
+            "\n".join(
+                [
+                    *modules,
+                    f"Listen 127.0.0.1:{cls.port}",
+                    # mod_proxy creates its mutex here.
+                    f"DefaultRuntimeDir {root}",
+                    f"PidFile {root}/httpd.pid",
+                    f"ErrorLog {root}/error.log",
+                    "ServerName localhost",
+                    f"DocumentRoot {root}",
+                    "RemoteIPHeader X-Forwarded-For",
+                    "RemoteIPInternalProxy 127.0.0.1",
+                    f"Include {root}/vhost.conf",
+                ]
+            )
+            + "\n"
+        )
+        binary = shutil.which("httpd") or shutil.which("apache2")
+        assert binary is not None
+        cls.server = subprocess.Popen(
+            [binary, "-X", "-f", str(config)],
+            stdout=subprocess.DEVNULL,
+            stderr=subprocess.PIPE,
+            text=True,
+        )
+        try:
+            wait_for_apache(cls.port, cls.server)
+        except AssertionError as error:
+            log = (
+                (root / "error.log").read_text()
+                if (root / "error.log").exists()
+                else ""
+            )
+            cls.tearDownClass()
+            raise AssertionError(f"{error}{log}") from None
+
+    @classmethod
+    def tearDownClass(cls):
+        cls.server.terminate()
+        cls.server.wait(timeout=10)
+        cls.backend.shutdown()
+        cls.backend.server_close()
+        cls.tmp.cleanup()
+
+    def request(
+        self, method: str, target: str, source: str | None
+    ) -> http.client.HTTPResponse:
+        # Apache runs as one process, so a kept-alive connection would hold it
+        # until the next request times out.
+        headers = {"Connection": "close", "Host": "couchdb.rewse.jp"}
+        if source is not None:
+            headers["X-Forwarded-For"] = source
+        connection = http.client.HTTPConnection("127.0.0.1", self.port, timeout=5)
+        try:
+            connection.request(method, target, headers=headers)
+            response = connection.getresponse()
+            response.read()
+            return response
+        finally:
+            connection.close()
+
+    def assert_status(self, method: str, target: str, source, expected: int):
+        with self.subTest(method=method, target=target, source=source):
+            self.assertEqual(self.request(method, target, source).status, expected)
+
+    def test_database_paths_stay_open_to_every_network(self):
+        for source in (None, self.TRUSTED, self.UNTRUSTED):
+            for target in (
+                "/",
+                "/obsidian",
+                "/obsidian/_changes?since=0&feed=longpoll",
+                "/obsidian/_local/checkpoint",
+                "/obsidian/_design/x/_view/y?limit=1",
+                *(f"/obsidian/{route}" for route in self.CLEANUP_ROUTES),
+            ):
+                self.assert_status("GET", target, source, 200)
+            self.assert_status("POST", "/obsidian/_bulk_docs", source, 200)
+
+    def test_server_paths_are_refused_outside_trusted_networks(self):
+        for target in (
+            "/_all_dbs",
+            "/_session",
+            "/_session/",
+            "//_session",
+            "/%5Fsession",
+            "/_utils/",
+        ):
+            self.assert_status("GET", target, self.UNTRUSTED, 403)
+            self.assert_status("GET", target, self.TRUSTED, 200)
+        self.assert_status("POST", "/_session", self.UNTRUSTED, 403)
+        self.assert_status("POST", "/_session", self.TRUSTED, 200)
+
+    def test_session_query_string_is_refused_from_every_network(self):
+        for source in (None, self.TRUSTED, self.UNTRUSTED):
+            for method, target in (
+                ("DELETE", "/_session?next=/"),
+                ("GET", "/_session?basic=true"),
+                ("GET", "/_session/?next=/"),
+                ("GET", "//_session?next=/"),
+                ("GET", "///_session/?fail=/"),
+                ("GET", "/%5Fsession?next=/"),
+                ("POST", "/_session?fail=/"),
+                ("POST", "/_session?%6Eext=/"),
+            ):
+                self.assert_status(method, target, source, 403)
+
+    def test_cleanup_routes_with_another_segment_are_refused(self):
+        for source in (None, self.TRUSTED, self.UNTRUSTED):
+            for route in self.CLEANUP_ROUTES:
+                for target in (
+                    f"/obsidian/{route}/x",
+                    f"/obsidian/{route}/",
+                    f"/obsidian//{route}/x",
+                    f"//obsidian/{route}//x",
+                    f"/obsidian/%5F{route[1:]}/x",
+                ):
+                    self.assert_status("POST", target, source, 403)
+
+    def test_responses_carry_hsts_and_a_secure_session_cookie(self):
+        for target, status, cookie in (
+            ("/_session", 200, "AuthSession=abc; Version=1; Path=/; HttpOnly; Secure"),
+            (
+                "/unauthorized",
+                401,
+                "AuthSession=; Version=1; Path=/; HttpOnly; Max-Age=0; Secure",
+            ),
+            ("/_session?next=/", 403, None),
+        ):
+            with self.subTest(target=target):
+                response = self.request("GET", target, self.TRUSTED)
+                self.assertEqual(response.status, status)
+                self.assertEqual(
+                    response.getheader("Strict-Transport-Security"), "max-age=31536000"
+                )
+                self.assertEqual(response.getheader("Set-Cookie"), cookie)
+
+
+class CouchDBConfigTest(unittest.TestCase):
+    SETTINGS: ClassVar[dict[str, str]] = {
+        "chttpd_auth/same_site": "strict",
+        "cors/origins": "app://obsidian.md,capacitor://localhost",
+        "uuids/algorithm": "random",
+    }
+
+    @staticmethod
+    def tasks() -> list[dict]:
+        return load_yaml(COUCHDB / "tasks" / "config.yml")
+
+    @staticmethod
+    def expression(text: str):
+        environment = jinja2.Environment(undefined=jinja2.StrictUndefined)
+        return environment.compile_expression(text)
+
+    def test_component_is_imported_after_the_init_script(self):
+        imports = [
+            (task["ansible.builtin.import_tasks"], task["tags"])
+            for task in load_yaml(COUCHDB / "tasks" / "main.yml")
+        ]
+        names = [name for name, _ in imports]
+        self.assertIn(("config.yml", ["couchdb_config"]), imports)
+        self.assertLess(names.index("container.yml"), names.index("config.yml"))
+        self.assertLess(names.index("database.yml"), names.index("config.yml"))
+
+    def test_settings_keep_cookie_authentication(self):
+        settings = load_yaml(COUCHDB / "vars" / "main.yml")["couchdb_config"]
+        self.assertEqual(settings, self.SETTINGS)
+        self.assertNotIn("chttpd/authentication_handlers", settings)
+
+    def test_pending_init_script_runs_before_the_settings(self):
+        self.assertEqual(self.tasks()[0].get("ansible.builtin.meta"), "flush_handlers")
+
+    def test_settings_are_read_then_written_only_when_different(self):
+        read, write = self.tasks()[1:]
+        for task in (read, write):
+            with self.subTest(task=task["name"]):
+                self.assertIs(task.get("no_log"), True)
+                uri = task["ansible.builtin.uri"]
+                self.assertTrue(
+                    uri["url"].startswith("{{ couchdb_url }}/_node/_local/_config/")
+                )
+                self.assertIs(uri["force_basic_auth"], True)
+        self.assertEqual(read["loop"], "{{ couchdb_config | dict2items }}")
+        self.assertIs(read["check_mode"], False)
+        self.assertEqual(read["ansible.builtin.uri"]["status_code"], [200, 404])
+        self.assertEqual(write["ansible.builtin.uri"]["method"], "PUT")
+        self.assertEqual(write["loop"], f"{{{{ {read['register']}.results }}}}")
+        when = self.expression(write["when"])
+        setting = {"key": "chttpd_auth/same_site", "value": "strict"}
+        for result, expected in (
+            ({"status": 404, "json": {"error": "not_found"}}, True),
+            ({"status": 200, "json": "lax"}, True),
+            ({"status": 200, "json": "strict"}, False),
+        ):
+            with self.subTest(result=result):
+                self.assertIs(when(item={**result, "item": setting}), expected)
+        environment = jinja2.Environment(undefined=jinja2.StrictUndefined)
+        environment.filters["to_json"] = json.dumps
+        body = environment.from_string(write["ansible.builtin.uri"]["body"])
+        self.assertEqual(body.render(item={"item": setting}), '"strict"')
+
+    def test_init_script_writes_the_same_origins(self):
+        handler = next(
+            task
+            for task in load_yaml(COUCHDB / "handlers" / "main.yml")
+            if task["name"] == "Run couchdb init script"
+        )
+        self.assertEqual(
+            handler["environment"]["origins"], "{{ couchdb_config['cors/origins'] }}"
+        )
 
 
 class LiteLLMNetworkTest(unittest.TestCase):
