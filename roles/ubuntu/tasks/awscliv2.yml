@@ -4,12 +4,13 @@
     path: /usr/local/bin/aws
   register: __ubuntu_aws
 
+# Every run fetches the current installer, because the update below installs
+# from it and the vendor's unversioned URL always serves the latest release.
 - name: awscliv2 | Download and extract
   ansible.builtin.unarchive:
     src: https://awscli.amazonaws.com/awscli-exe-linux-{{ ansible_facts['architecture'] }}.zip
     dest: /usr/local/src
     remote_src: true
-  when: not __ubuntu_aws.stat.exists
 
 - name: awscliv2 | Install
   # The vendor installer has no module.
