@@ -32,13 +32,13 @@
     </If>
     # Dashboards use base_url and the pg_stat_statements_* variables unescaped,
     # so a dashboard URL that sets them as var-<name> is refused. Grafana writes
-    # every variable, hidden ones included, into the URL of the dashboard on
-    # screen, so a bookmark carries base_url set to TeslaMate's URL, and a
-    # base_url with exactly that value passes. The pg_stat_statements_* values
-    # are SQL, so none of them passes. The browser splits the query string on &
-    # and decodes each name, so every character of a name may arrive
-    # percent-encoded. The raw string is matched because unescape() returns its
-    # input unchanged when any escape in it is malformed.
+    # every variable without skipUrlSync, hidden ones included, into the URL of
+    # the dashboard on screen, so a bookmark can carry base_url set to
+    # TeslaMate's URL, and a base_url with exactly that value passes. The
+    # pg_stat_statements_* values are SQL, so none of them passes. The browser
+    # splits the query string on & and decodes each name, so every character of
+    # a name may arrive percent-encoded. The raw string is matched because
+    # unescape() returns its input unchanged when any escape in it is malformed.
     <If "%{QUERY_STRING} =~ m#(^|&)(v|%76)(a|%61)(r|%72)(-|%2d)((b|%62)(a|%61)(s|%73)(e|%65)(_|%5f)(u|%75)(r|%72)(l|%6c)(?!=https(:|%3a)(/|%2f)(/|%2f){{ teslamate_hostname | replace('.', '[.]') }}(&|$))(=|&|$)|(p|%70)(g|%67)(_|%5f)(s|%73)(t|%74)(a|%61)(t|%74)(_|%5f)(s|%73)(t|%74)(a|%61)(t|%74)(e|%65)(m|%6d)(e|%65)(n|%6e)(t|%74)(s|%73)(_|%5f))#i">
         Require all denied
     </If>
