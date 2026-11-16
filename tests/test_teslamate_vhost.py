@@ -106,6 +106,7 @@ def grafana_vhost(port: int) -> str:
         ansible_managed="Ansible managed",
         teslamate_grafana_hostname=GRAFANA_HOSTNAME,
         teslamate_grafana_port=port,
+        teslamate_hostname="teslamate.rewse.jp",
     )
 
 
@@ -155,7 +156,8 @@ class GrafanaVhostApacheTest(unittest.TestCase):
     # Requests that keep working: the login page and form, a bookmark, a
     # sign-out from Grafana's own menu, dashboard links from TeslaMate (a
     # sibling subdomain) and from other dashboards with their ordinary
-    # variables, and the signed-in password change.
+    # variables, a bookmark of a dashboard URL Grafana wrote with base_url set
+    # to TeslaMate's URL, and the signed-in password change.
     ALLOWED = (
         ("GET", "/login", None),
         ("GET", "/login", "cross-site"),
@@ -169,6 +171,17 @@ class GrafanaVhostApacheTest(unittest.TestCase):
         ("GET", "/d/x/visited?var-city=Tokyo&var-country_code=JP&var-region=13", None),
         ("GET", "/d/x/charges?var-selected_car_id=1&from=now-7d&to=now", None),
         ("GET", "/d/x/y?var-base_urls=1&var-pg_stat=1&base_url=x", None),
+        (
+            "GET",
+            (
+                "/d/FkUpJpQZk/trip?from=now-24h&to=now&timezone=browser"
+                "&var-car_id=$__all&var-base_url=https:%2F%2Fteslamate.rewse.jp"
+                "&var-from=1789726865169"
+            ),
+            None,
+        ),
+        ("GET", "/d/x/y?var-base_url=https://teslamate.rewse.jp", None),
+        ("GET", "/d/x/y?var-base_url=https%3A%2F%2Fteslamate.rewse.jp", None),
         ("GET", "/d/x/y?var-car_id=1&x=%zz", None),
         ("GET", "/public/build/img/fav32.png", "cross-site"),
         ("PUT", "/api/user/password", "same-origin"),
@@ -204,6 +217,15 @@ class GrafanaVhostApacheTest(unittest.TestCase):
         ("GET", "/d/x/y?%76ar-base%5Furl=x", None),
         ("GET", "/d/x/y?var%2Dbase_url=x", None),
         ("GET", "/d/x/y?var-base_url=x&y=%zz", None),
+        ("GET", "/d/x/y?var-base_url=https://teslamate.rewse.jp.example.com", None),
+        ("GET", "/d/x/y?var-base_url=https://teslamate.rewse.jp@example.com", None),
+        ("GET", "/d/x/y?var-base_url=https://teslamateXrewse.jp", None),
+        ("GET", "/d/x/y?var-base_url=https://teslamate.rewse.jp/x", None),
+        (
+            "GET",
+            "/d/x/y?var-base_url=https://teslamate.rewse.jp&var-base_url=x",
+            None,
+        ),
         ("GET", "/d/x/y?y=%00&var-base_url=x", None),
         ("GET", "/d/x/y?var-pg_stat_statements_top_20_mean=x", None),
         ("GET", "/d/x/y?var-pg_stat_statements_enabled=1", None),
