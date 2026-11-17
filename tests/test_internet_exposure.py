@@ -552,6 +552,8 @@ class CouchDBApacheTest(unittest.TestCase):
 
 class CouchDBConfigTest(unittest.TestCase):
     SETTINGS: ClassVar[dict[str, str]] = {
+        "chttpd/require_valid_user": "true",
+        "chttpd_auth/require_valid_user": "true",
         "chttpd_auth/same_site": "strict",
         "cors/origins": "app://obsidian.md,capacitor://localhost",
         "uuids/algorithm": "random",
@@ -572,7 +574,9 @@ class CouchDBConfigTest(unittest.TestCase):
             for task in load_yaml(COUCHDB / "tasks" / "main.yml")
         ]
         names = [name for name, _ in imports]
-        self.assertIn(("config.yml", ["couchdb_config"]), imports)
+        # The init script runs under the update tag and rewrites some of these
+        # settings, so the component has to run under it too.
+        self.assertIn(("config.yml", ["couchdb_config", "update"]), imports)
         self.assertLess(names.index("container.yml"), names.index("config.yml"))
         self.assertLess(names.index("database.yml"), names.index("config.yml"))
 
