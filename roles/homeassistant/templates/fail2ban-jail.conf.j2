@@ -23,3 +23,6 @@ action = %(action_)s
          apache-deny
 filter = homeassistant
 logpath = /srv/homeassistant/config/home-assistant.log
+# The filter takes the address Home Assistant logs, not the name next to it, so
+# no match needs a DNS lookup.
+usedns = no

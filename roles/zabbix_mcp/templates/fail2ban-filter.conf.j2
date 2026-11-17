@@ -4,9 +4,16 @@
 # 401. The OAuth metadata under /.well-known is not matched, because a client
 # reads it before it sends a token.
 #
+# The path is matched in %U, the last field of the line, rather than in the
+# request line. Apache proxies by that decoded path, so a query string, repeated
+# slashes, dot segments, or percent-encoded characters in the request line reach
+# the same endpoint and still log it under /mcp. A path below /mcp is read up to
+# the closing quote, skipping the quotes Apache escapes inside it, so a quoted
+# value in the user agent cannot stand in for it.
+#
 # The virtual host is pinned because other_vhosts_access.log carries every name
 # Apache serves, and the vhost_combined format puts %v:%p ahead of the client
 # address, which is why <HOST> is the second field rather than the first.
 [Definition]
-failregex = ^{{ zabbix_mcp_hostname | regex_escape }}:\d+ <HOST> \S+ \S+ \[\] "\S+ /mcp(?:[/?]\S*)? HTTP/[\d.]+" 401 \d+
+failregex = ^{{ zabbix_mcp_hostname | regex_escape }}:\d+ <HOST> \S+ \S+ \[\] "\S+ \S+ HTTP/[\d.]+" 401 \d+ .* "/+mcp(?:/(?:[^"\\]|\\.)*)?"$
 ignoreregex =
