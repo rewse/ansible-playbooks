@@ -84,6 +84,12 @@ class QueryTest(unittest.TestCase):
         self.assertIn('terminatingRuleId != "AllowSecurityAgentPentest"', q)
         self.assertIn("not (", q)
 
+    def test_allowed_scans_group_by_method(self):
+        # The method joins each row to the Apache responses it got.
+        q = report.candidate_queries([])["allowed_scans"]
+        by = q.split("| stats count(*) as requests by ", 1)[1].split("\n", 1)[0]
+        self.assertIn("httpRequest.httpMethod", [f.strip() for f in by.split(",")])
+
     def test_every_candidate_query_is_bounded(self):
         for name, q in report.candidate_queries([]).items():
             with self.subTest(name=name):
@@ -732,6 +738,7 @@ class MainTest(unittest.TestCase):
             "httpRequest.uri": "/.env.local",
             "httpRequest.clientIp": "203.0.113.7",
             "httpRequest.country": "US",
+            "httpRequest.httpMethod": "GET",
         }
         run = self.answers([[], [], [], [scan]])
         self.assertEqual(self.main(run), 0)
@@ -839,9 +846,9 @@ class ReviewFixTest(unittest.TestCase):
 
 VHOST_LINE = (
     'nas.rewse.jp:443 203.0.113.7 - - [01/Nov/2026:10:00:00 +0900] "GET /.env.local?x=1 HTTP/1.1" 404 271'
-    ' "-" "UA" 533\n'
+    ' "-" "UA" 533 "/.env.local"\n'
 )
-APEX_LINE = '203.0.113.8 - - [02/Nov/2026:11:00:00 +0900] "GET /index.php HTTP/1.1" 200 5120 "-" "UA" 900\n'
+APEX_LINE = '203.0.113.8 - - [02/Nov/2026:11:00:00 +0900] "GET /index.php HTTP/1.1" 200 5120 "-" "UA" 900 "/index.php"\n'
 
 
 class ApacheTest(unittest.TestCase):
@@ -855,17 +862,17 @@ class ApacheTest(unittest.TestCase):
         (self.dir / "access.log").write_text(APEX_LINE)
         statuses = report.origin_statuses(self.dir, PERIOD)
         self.assertEqual(
-            statuses[("nas.rewse.jp", "/.env.local", "203.0.113.7")], {"404": 2}
+            statuses[("nas.rewse.jp", "/.env.local", "203.0.113.7", "GET")], {"404": 2}
         )
         self.assertEqual(
-            statuses[("rewse.jp", "/index.php", "203.0.113.8")], {"200": 1}
+            statuses[("rewse.jp", "/index.php", "203.0.113.8", "GET")], {"200": 1}
         )
 
     def test_origin_statuses_reads_rotated_gzip(self):
         with gzip.open(self.dir / "other_vhosts_access.log.3.gz", "wt") as handle:
             handle.write(VHOST_LINE)
         self.assertIn(
-            ("nas.rewse.jp", "/.env.local", "203.0.113.7"),
+            ("nas.rewse.jp", "/.env.local", "203.0.113.7", "GET"),
             report.origin_statuses(self.dir, PERIOD),
         )
 
@@ -886,15 +893,20 @@ class ApacheTest(unittest.TestCase):
 
     def test_annotate_scans_drops_only_redirects_and_client_errors(self):
         statuses = {
-            ("rewse.jp", "/a", "1.1.1.1"): collections.Counter({"404": 2, "301": 1}),
-            ("rewse.jp", "/b", "1.1.1.1"): collections.Counter({"404": 1, "200": 1}),
-            ("rewse.jp", "/c", "1.1.1.1"): collections.Counter({"503": 1}),
+            ("rewse.jp", "/a", "1.1.1.1", "GET"): collections.Counter(
+                {"404": 2, "301": 1}
+            ),
+            ("rewse.jp", "/b", "1.1.1.1", "GET"): collections.Counter(
+                {"404": 1, "200": 1}
+            ),
+            ("rewse.jp", "/c", "1.1.1.1", "GET"): collections.Counter({"503": 1}),
         }
         rows = [
             {
                 "httpRequest.host": "rewse.jp",
                 "httpRequest.uri": u,
                 "httpRequest.clientIp": "1.1.1.1",
+                "httpRequest.httpMethod": "GET",
             }
             for u in ("/a", "/b", "/c")
         ]
@@ -908,29 +920,36 @@ class ApacheTest(unittest.TestCase):
                 "httpRequest.host": "nas.rewse.jp",
                 "httpRequest.uri": "/x",
                 "httpRequest.clientIp": "1.1.1.1",
+                "httpRequest.httpMethod": "GET",
             }
         ]
         self.assertEqual(report.annotate_scans(rows, {})[0]["origin_status"], "不明")
 
     def test_annotate_scans_treats_www_as_apex(self):
-        statuses = {("rewse.jp", "/a", "1.1.1.1"): collections.Counter({"404": 1})}
+        statuses = {
+            ("rewse.jp", "/a", "1.1.1.1", "GET"): collections.Counter({"404": 1})
+        }
         rows = [
             {
                 "httpRequest.host": "www.rewse.jp",
                 "httpRequest.uri": "/a",
                 "httpRequest.clientIp": "1.1.1.1",
+                "httpRequest.httpMethod": "GET",
             }
         ]
         self.assertEqual(report.annotate_scans(rows, statuses), [])
 
     def test_annotate_scans_falls_back_to_default_vhost(self):
         # A host without its own vhost, such as zabbix.rewse.jp, logs to access.log.
-        statuses = {("rewse.jp", "/a", "1.1.1.1"): collections.Counter({"404": 1})}
+        statuses = {
+            ("rewse.jp", "/a", "1.1.1.1", "GET"): collections.Counter({"404": 1})
+        }
         rows = [
             {
                 "httpRequest.host": "zabbix.rewse.jp",
                 "httpRequest.uri": "/a",
                 "httpRequest.clientIp": "1.1.1.1",
+                "httpRequest.httpMethod": "GET",
             }
         ]
         self.assertEqual(report.annotate_scans(rows, statuses), [])
@@ -942,10 +961,11 @@ class ApacheTest(unittest.TestCase):
         (self.dir / "access.log").write_text(APEX_LINE)
         sizes = report.success_sizes(self.dir, PERIOD)
         self.assertEqual(
-            sizes[("nas.rewse.jp", "/.env.local", "203.0.113.7")], [("total", 4836)]
+            sizes[("nas.rewse.jp", "/.env.local", "203.0.113.7", "GET")],
+            [("total", 4836)],
         )
         self.assertEqual(
-            sizes[("rewse.jp", "/index.php", "203.0.113.8")], [("body", 5120)]
+            sizes[("rewse.jp", "/index.php", "203.0.113.8", "GET")], [("body", 5120)]
         )
 
     def test_probe_fallback_uses_loopback_and_random_path(self):
@@ -999,13 +1019,14 @@ class ApacheTest(unittest.TestCase):
                 "httpRequest.host": "nas.rewse.jp",
                 "httpRequest.uri": u,
                 "httpRequest.clientIp": "1.1.1.1",
+                "httpRequest.httpMethod": "GET",
             }
             for u in ("/.env.local", "/.git/config", "/boom")
         ]
 
     def test_annotate_scans_drops_fallback_pages(self):
         statuses = {
-            ("nas.rewse.jp", u, "1.1.1.1"): collections.Counter({c: 1})
+            ("nas.rewse.jp", u, "1.1.1.1", "GET"): collections.Counter({c: 1})
             for u, c in (
                 ("/.env.local", "200"),
                 ("/.git/config", "200"),
@@ -1013,9 +1034,9 @@ class ApacheTest(unittest.TestCase):
             )
         }
         sizes = {
-            ("nas.rewse.jp", "/.env.local", "1.1.1.1"): [("total", 4836)],
-            ("nas.rewse.jp", "/.git/config", "1.1.1.1"): [("total", 20000)],
-            ("nas.rewse.jp", "/boom", "1.1.1.1"): [("total", 4836)],
+            ("nas.rewse.jp", "/.env.local", "1.1.1.1", "GET"): [("total", 4836)],
+            ("nas.rewse.jp", "/.git/config", "1.1.1.1", "GET"): [("total", 20000)],
+            ("nas.rewse.jp", "/boom", "1.1.1.1", "GET"): [("total", 4836)],
         }
         probes = []
 
@@ -1030,13 +1051,16 @@ class ApacheTest(unittest.TestCase):
         self.assertEqual(probes, ["nas.rewse.jp"])
 
     def test_annotate_scans_compares_body_size_for_access_log(self):
-        statuses = {("rewse.jp", "/x.php", "1.1.1.1"): collections.Counter({"200": 1})}
-        sizes = {("rewse.jp", "/x.php", "1.1.1.1"): [("body", 4510)]}
+        statuses = {
+            ("rewse.jp", "/x.php", "1.1.1.1", "GET"): collections.Counter({"200": 1})
+        }
+        sizes = {("rewse.jp", "/x.php", "1.1.1.1", "GET"): [("body", 4510)]}
         rows = [
             {
                 "httpRequest.host": "rewse.jp",
                 "httpRequest.uri": "/x.php",
                 "httpRequest.clientIp": "1.1.1.1",
+                "httpRequest.httpMethod": "GET",
             }
         ]
         self.assertEqual(
@@ -1046,6 +1070,121 @@ class ApacheTest(unittest.TestCase):
     def test_prompt_says_checks_are_done(self):
         prompt = report.build_prompt(PERIOD, {}, [], [], final=False)
         self.assertIn("確かめ済み", prompt)
+
+    def write_vhost_log(self, *requests: tuple[str, str, int, str]) -> None:
+        # Each request is (method, target, status, %U), from 203.0.113.7.
+        (self.dir / "other_vhosts_access.log").write_text(
+            "".join(
+                f"nas.rewse.jp:443 203.0.113.7 - - [01/Nov/2026:10:00:00 +0900] "
+                f'"{method} {target} HTTP/1.1" {status} 20000 "-" "UA" 533 "{path}"\n'
+                for method, target, status, path in requests
+            )
+        )
+
+    def annotate_from_log(self, *rows: tuple[str, str]) -> list[dict[str, str]]:
+        # Each row is the (method, uri) of a WAF row from 203.0.113.7.
+        scans = [
+            {
+                "httpRequest.host": "nas.rewse.jp",
+                "httpRequest.uri": uri,
+                "httpRequest.clientIp": "203.0.113.7",
+                "httpRequest.httpMethod": method,
+            }
+            for method, uri in rows
+        ]
+        return report.annotate_scans(
+            scans,
+            report.origin_statuses(self.dir, PERIOD),
+            report.success_sizes(self.dir, PERIOD),
+            lambda _: [(4500, 4840)],
+        )
+
+    def test_annotate_scans_drops_a_scan_path_that_routes_elsewhere(self):
+        # Dot segments make the request line look like a scan while Apache
+        # serves an ordinary file.
+        self.write_vhost_log(
+            ("GET", "/.env/../static/app.js", 200, "/static/app.js"),
+            ("GET", "/%2egit/%2e%2e/index.html", 200, "/index.html"),
+        )
+        self.assertEqual(
+            self.annotate_from_log(
+                ("GET", "/.env/../static/app.js"), ("GET", "/%2egit/%2e%2e/index.html")
+            ),
+            [],
+        )
+
+    def test_annotate_scans_keeps_a_scan_path_in_any_spelling(self):
+        self.write_vhost_log(
+            ("GET", "/%2eenv", 200, "/.env"),
+            ("GET", "/x/../.git/config", 200, "/.git/config"),
+            ("HEAD", "/wp-config.php", 200, "/wp-config.php"),
+            ("POST", "/.//.env", 200, "//.env"),
+        )
+        kept = self.annotate_from_log(
+            ("GET", "/%2eenv"),
+            ("GET", "/x/../.git/config"),
+            ("HEAD", "/wp-config.php"),
+            ("POST", "/.//.env"),
+        )
+        self.assertEqual(
+            [(r["httpRequest.uri"], r["origin_status"]) for r in kept],
+            [
+                ("/%2eenv", "200×1"),
+                ("/x/../.git/config", "200×1"),
+                ("/wp-config.php", "200×1"),
+                ("/.//.env", "200×1"),
+            ],
+        )
+
+    def test_annotate_scans_drops_an_options_answer(self):
+        # An application may answer a CORS preflight on any path with 200.
+        self.write_vhost_log(
+            ("GET", "/.env", 404, "/.env"),
+            ("OPTIONS", "/.env", 200, "/.env"),
+        )
+        self.assertEqual(
+            self.annotate_from_log(("GET", "/.env"), ("OPTIONS", "/.env")), []
+        )
+
+    def test_annotate_scans_keeps_a_write_that_succeeded(self):
+        self.write_vhost_log(
+            ("PUT", "/x.php", 201, "/x.php"),
+            ("PROPFIND", "/.git/", 207, "/.git/"),
+        )
+        kept = self.annotate_from_log(("PUT", "/x.php"), ("PROPFIND", "/.git/"))
+        self.assertEqual([r["origin_status"] for r in kept], ["201×1", "207×1"])
+
+    def test_annotate_scans_joins_on_the_method(self):
+        # A 200 to one method does not vouch for a WAF row of another.
+        self.write_vhost_log(("POST", "/.env", 200, "/.env"))
+        kept = self.annotate_from_log(("GET", "/.env"), ("POST", "/.env"))
+        self.assertEqual(
+            [(r["httpRequest.httpMethod"], r["origin_status"]) for r in kept],
+            [("GET", "不明"), ("POST", "200×1")],
+        )
+
+    def test_annotate_scans_labels_responses_for_another_path(self):
+        self.write_vhost_log(
+            ("GET", "/.env", 200, "/.env"),
+            ("GET", "/.env", 200, "/index.html"),
+        )
+        kept = self.annotate_from_log(("GET", "/.env"))
+        self.assertEqual(
+            [r["origin_status"] for r in kept],
+            [f"200×1, 200{report.NOT_SCANNED}×1"],
+        )
+
+    def test_annotate_scans_keeps_a_line_without_the_routed_path(self):
+        # Lines written before the log format ended with %U.
+        (self.dir / "other_vhosts_access.log").write_text(
+            VHOST_LINE.replace('" 404 271', '" 200 20000').replace(' "/.env.local"', "")
+        )
+        kept = self.annotate_from_log(("GET", "/.env.local"))
+        self.assertEqual([r["origin_status"] for r in kept], ["200×1"])
+
+    def test_prompt_explains_responses_that_returned_no_scanned_file(self):
+        prompt = report.build_prompt(PERIOD, {}, [], [], final=False)
+        self.assertIn(report.NOT_SCANNED, prompt)
 
     def test_prompt_explains_origin_status(self):
         self.assertIn(
@@ -1120,14 +1259,15 @@ class NormalizationTest(unittest.TestCase):
 
     def test_annotate_scans_finds_the_vhost_for_any_spelling(self):
         statuses = {
-            ("nas.rewse.jp", "/.env", "1.1.1.1"): collections.Counter({"200": 1})
+            ("nas.rewse.jp", "/.env", "1.1.1.1", "GET"): collections.Counter({"200": 1})
         }
-        sizes = {("nas.rewse.jp", "/.env", "1.1.1.1"): [("total", 4836)]}
+        sizes = {("nas.rewse.jp", "/.env", "1.1.1.1", "GET"): [("total", 4836)]}
         rows = [
             {
                 "httpRequest.host": host,
                 "httpRequest.uri": "/.env",
                 "httpRequest.clientIp": "1.1.1.1",
+                "httpRequest.httpMethod": "GET",
             }
             for host in ("NAS.Rewse.JP", "nas.rewse.jp.", "nas.rewse.jp:443")
         ]
