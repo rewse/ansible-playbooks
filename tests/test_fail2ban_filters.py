@@ -90,6 +90,34 @@ class HomeAssistantFilterTest(unittest.TestCase):
         line = self.line("203.0.113.7", "203.0.113.7", forged, "Mozilla/5.0")
         self.assertEqual(banned_host(self.FILTER, line), "203.0.113.7")
 
+    def test_bans_any_url_and_user_agent(self):
+        for url, user_agent in (
+            ("/", ""),
+            ("/api/", "None"),
+            ("/auth/token?x='y'", "Mozilla/5.0 (X11; Linux x86_64)"),
+        ):
+            with self.subTest(url=url, user_agent=user_agent):
+                line = self.line("203.0.113.7", "203.0.113.7", url, user_agent)
+                self.assertEqual(banned_host(self.FILTER, line), "203.0.113.7")
+
+    def test_ignores_the_message_inside_another_entry(self):
+        # Another logger that echoes text a client controls, such as an MQTT
+        # payload, can carry a copy of the message after its own prefix.
+        message = self.line("192.0.2.1", "192.0.2.1", "/", "curl").removeprefix(" ")
+        for line in (
+            f" ERROR (MainThread) [custom_components.x] {message}",
+            f" WARNING (MainThread) [homeassistant.components.mqtt] Payload: {message}",
+            f" WARNING (SyncWorker_0) [homeassistant.components.mqtt] {message}",
+        ):
+            with self.subTest(line=line):
+                self.assertIsNone(banned_host(self.FILTER, line))
+
+    def test_jail_bans_only_addresses(self):
+        # Home Assistant logs the reverse-DNS name next to the address. The
+        # filter takes the address, so the jail never needs to resolve a name.
+        jail = ROLES / "homeassistant" / "templates" / "fail2ban-jail.conf.j2"
+        self.assertRegex(jail.read_text(), r"(?m)^usedns = no$")
+
     @unittest.skipUnless(shutil.which("fail2ban-regex"), "no fail2ban-regex")
     def test_fail2ban_reads_the_client_address(self):
         forged = f"{self.PREFIX} 192.0.2.1 (192.0.2.1). Requested URL: '/'"
@@ -116,6 +144,28 @@ def access_line(
         f'{vhost}:443 203.0.113.7 - {user} [] "{request} HTTP/1.1" {status} 28 '
         f'"-" "{user_agent}" 512 "{path}"'
     )
+
+
+def respelled(method: str, path: str) -> list[tuple[str, str]]:
+    """Return request lines that reach path, each with the %U Apache logs.
+
+    %U is decoded, without the query string or dot segments, and with repeated
+    slashes merged unless MergeSlashes is off. path must not end in a slash.
+    """
+    head, _, last = path.rpartition("/")
+    encoded = f"{head}/{last[:-1]}%{ord(last[-1]):02X}"
+    return [
+        (f"{method} {path}", path),
+        (f"{method} {path}?", path),
+        (f"{method} {path}?x", path),
+        (f"{method} {path}?x=1", path),
+        (f"{method} /{path}", path),
+        (f"{method} /{path}", f"/{path}"),
+        (f"{method} /.{path}", path),
+        (f"{method} /x/..{path}", path),
+        (f"{method} {encoded}", path),
+        (f"{method} {path}/", f"{path}/"),
+    ]
 
 
 def render_filter(template: pathlib.Path, directory: str, **variables) -> pathlib.Path:
@@ -157,16 +207,26 @@ class TeslaMateFilterTest(unittest.TestCase):
     FILTER = ROLES / "teslamate" / "files" / "fail2ban-filter.conf"
     VHOST = ROLES / "teslamate" / "templates" / "grafana.rewse.jp.conf.j2"
 
-    def test_counts_a_failed_grafana_login(self):
-        for request in ("POST /login", "POST /login?x=1", "POST /login?"):
-            with self.subTest(request=request):
-                line = access_line("grafana.rewse.jp", request, 401)
+    def test_counts_a_failed_grafana_login_in_any_spelling(self):
+        for request, path in respelled("POST", "/login"):
+            with self.subTest(request=request, path=path):
+                line = access_line("grafana.rewse.jp", request, 401, path=path)
                 self.assertEqual(banned_host(self.FILTER, line), "203.0.113.7")
 
     def test_ignores_other_grafana_401s(self):
-        for request in ("GET /api/user", "POST /loginx", "POST /login/x"):
-            with self.subTest(request=request):
-                line = access_line("grafana.rewse.jp", request, 401)
+        # A user agent that imitates the %U field; Apache escapes its quotes.
+        forged = 'curl\\" 512 \\"/login'
+        for line in (
+            access_line("grafana.rewse.jp", "GET /api/user", 401),
+            access_line("grafana.rewse.jp", "POST /loginx", 401),
+            access_line("grafana.rewse.jp", "POST /login/x", 401),
+            access_line("grafana.rewse.jp", "POST /login", 200),
+            access_line("grafana.rewse.jp", "POST /api/x", 401, user_agent=forged),
+            access_line(
+                "grafana.rewse.jp", "POST /login/../api/user", 401, path="/api/user"
+            ),
+        ):
+            with self.subTest(line=line):
                 self.assertIsNone(banned_host(self.FILTER, line))
 
     def test_counts_a_teslamate_401_naming_a_user(self):
@@ -243,6 +303,87 @@ class NvrFilterTest(unittest.TestCase):
         self.assertEqual(
             fail2ban_regex(self.FILTER, log), "203.0.113.7\n" * len(self.LOGINS)
         )
+
+
+class LiteLLMFilterTest(unittest.TestCase):
+    FILTER = ROLES / "litellm" / "files" / "fail2ban-filter.conf"
+    HOSTNAME = "litellm.rewse.jp"
+
+    def test_counts_a_failed_sign_in_in_any_spelling(self):
+        for path in ("/login", "/v2/login"):
+            for request, logged in respelled("POST", path):
+                with self.subTest(request=request, path=logged):
+                    line = access_line(self.HOSTNAME, request, 401, path=logged)
+                    self.assertEqual(banned_host(self.FILTER, line), "203.0.113.7")
+
+    def test_ignores_other_requests(self):
+        # A user agent that imitates the %U field; Apache escapes its quotes.
+        forged = 'curl\\" 512 \\"/login'
+        for line in (
+            access_line(self.HOSTNAME, "POST /login", 200),
+            access_line(self.HOSTNAME, "GET /v1/models", 401),
+            access_line(self.HOSTNAME, "POST /loginx", 401),
+            access_line(self.HOSTNAME, "POST /mcp", 401, user_agent=forged),
+            access_line(self.HOSTNAME, "POST /login/../mcp", 401, path="/mcp"),
+            access_line("grafana.rewse.jp", "POST /login", 401),
+        ):
+            with self.subTest(line=line):
+                self.assertIsNone(banned_host(self.FILTER, line))
+
+
+class McpFilterTest(unittest.TestCase):
+    """The mailboxd and zabbix-mcp filters, which both guard /mcp."""
+
+    MCP_ROLES = ("mailboxd", "zabbix_mcp")
+
+    @classmethod
+    def setUpClass(cls):
+        cls.tmp = tempfile.TemporaryDirectory()
+        cls.filters = {}
+        for role in cls.MCP_ROLES:
+            template = ROLES / role / "templates" / "fail2ban-filter.conf.j2"
+            variable = f"{role}_hostname"
+            hostname = yaml.safe_load((ROLES / role / "vars" / "main.yml").read_text())[
+                variable
+            ]
+            directory = pathlib.Path(cls.tmp.name) / role
+            directory.mkdir()
+            path = render_filter(template, str(directory), **{variable: hostname})
+            cls.filters[role] = (hostname, path)
+
+    @classmethod
+    def tearDownClass(cls):
+        cls.tmp.cleanup()
+
+    def test_counts_a_rejected_call_in_any_spelling(self):
+        requests = respelled("POST", "/mcp") + respelled("GET", "/mcp/x")
+        for role, (hostname, path) in self.filters.items():
+            for request, logged in requests:
+                with self.subTest(role=role, request=request, path=logged):
+                    line = access_line(hostname, request, 401, path=logged)
+                    self.assertEqual(banned_host(path, line), "203.0.113.7")
+
+    def test_ignores_other_requests(self):
+        # A user agent and a path that imitate the %U field; Apache escapes the
+        # quotes in both.
+        forged_agent = 'curl\\" 512 \\"/mcp'
+        for role, (hostname, path) in self.filters.items():
+            for line in (
+                access_line(hostname, "POST /mcp", 200),
+                access_line(hostname, "GET /.well-known/oauth-protected-resource", 401),
+                access_line(hostname, "GET /mcpx", 401),
+                access_line(
+                    hostname,
+                    "GET /mcp/../.well-known/oauth-protected-resource",
+                    401,
+                    path="/.well-known/oauth-protected-resource",
+                ),
+                access_line(hostname, "GET /x", 401, user_agent=forged_agent),
+                access_line(hostname, "GET /x", 401, user_agent="/mcp/x", path="/x"),
+                access_line("grafana.rewse.jp", "POST /mcp", 401),
+            ):
+                with self.subTest(role=role, line=line):
+                    self.assertIsNone(banned_host(path, line))
 
 
 if __name__ == "__main__":
