@@ -14,4 +14,9 @@ services:
     volumes:
       - {{ matterjs_server_data_dir }}:/data
     network_mode: host
+    # The image runs as an unprivileged user and needs no capability: host
+    # networking alone lets it listen on loopback and use mDNS and Matter on
+    # the primary interface.
+    cap_drop: [ALL]
+    security_opt: ["no-new-privileges:true"]
     restart: unless-stopped
