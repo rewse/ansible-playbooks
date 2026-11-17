@@ -819,23 +819,27 @@
       id: "custom_event"
       event_data:
         sender: "thanks@aplus.co.jp"
+  # Anyone can write a From address. Sakura puts its own verdict in the topmost
+  # ARC-Authentication-Results (authserv-id rewse.jp), one result per folded
+  # line, so a DKIM pass for the sender's domain at the start of a line there
+  # is Sakura's finding and not text the sender wrote.
+  conditions:
+    - condition: template
+      value_template: >-
+        {{
+          (trigger.event.data['headers'].get('ARC-Authentication-Results') or [''])
+          | first
+          | regex_search('(?s)^[ \t]*i=[0-9]+;[ \t]*rewse[.]jp;.*;\r?\n[ \t]+dkim=pass [(]good signature[)] header[.]d=aplus[.]co[.]jp[ ;\r\n]')
+        }}
   sensor:
     - unique_id: sensor.aplus
       name: "Aplus"
       state: "{{ trigger.event.data['subject'] }}"
       attributes:
         Message: "{{ trigger.event.data['text'] }}"
-        Server: "{{ trigger.event.data['server'] }}"
-        Username: "{{ trigger.event.data['username'] }}"
-        Search: "{{ trigger.event.data['search'] }}"
-        Folder: "{{ trigger.event.data['folder'] }}"
         Sender: "{{ trigger.event.data['sender'] }}"
         Date: "{{ trigger.event.data['date'] }}"
         Subject: "{{ trigger.event.data['subject'] }}"
-        To: "{{ trigger.event.data['headers']['Delivered-To'][0] }}"
-        Return_Path: "{{ trigger.event.data['headers']['Return-Path'][0] }}"
-        Received-first: "{{ trigger.event.data['headers']['Received'][0] }}"
-        Received-last: "{{ trigger.event.data['headers']['Received'][-1] }}"
       icon: "mdi:credit-card"
     - unique_id: sensor.aplus_amount
       name: "Aplus Amount"
@@ -871,23 +875,27 @@
       event_data:
         sender: "e-ask@orico.co.jp"
         subject: "【eオリコ】カードご利用のお知らせ（速報）"
+  # Anyone can write a From address. Sakura puts its own verdict in the topmost
+  # ARC-Authentication-Results (authserv-id rewse.jp), one result per folded
+  # line, so a DKIM pass for the sender's domain at the start of a line there
+  # is Sakura's finding and not text the sender wrote.
+  conditions:
+    - condition: template
+      value_template: >-
+        {{
+          (trigger.event.data['headers'].get('ARC-Authentication-Results') or [''])
+          | first
+          | regex_search('(?s)^[ \t]*i=[0-9]+;[ \t]*rewse[.]jp;.*;\r?\n[ \t]+dkim=pass [(]good signature[)] header[.]d=orico[.]co[.]jp[ ;\r\n]')
+        }}
   sensor:
     - unique_id: sensor.hills_card
       name: "HILLS CARD"
       state: "{{ trigger.event.data['subject'] }}"
       attributes:
         Message: "{{ trigger.event.data['text'] }}"
-        Server: "{{ trigger.event.data['server'] }}"
-        Username: "{{ trigger.event.data['username'] }}"
-        Search: "{{ trigger.event.data['search'] }}"
-        Folder: "{{ trigger.event.data['folder'] }}"
         Sender: "{{ trigger.event.data['sender'] }}"
         Date: "{{ trigger.event.data['date'] }}"
         Subject: "{{ trigger.event.data['subject'] }}"
-        To: "{{ trigger.event.data['headers']['Delivered-To'][0] }}"
-        Return_Path: "{{ trigger.event.data['headers']['Return-Path'][0] }}"
-        Received-first: "{{ trigger.event.data['headers']['Received'][0] }}"
-        Received-last: "{{ trigger.event.data['headers']['Received'][-1] }}"
       icon: "mdi:credit-card"
     - unique_id: sensor.hills_card_amount
       name: "HILLS CARD Amount"
@@ -923,23 +931,27 @@
       id: "custom_event"
       event_data:
         sender: "info@mamorail.jp"
+  # Anyone can write a From address. Sakura puts its own verdict in the topmost
+  # ARC-Authentication-Results (authserv-id rewse.jp), one result per folded
+  # line, so a DKIM pass for the sender's domain at the start of a line there
+  # is Sakura's finding and not text the sender wrote.
+  conditions:
+    - condition: template
+      value_template: >-
+        {{
+          (trigger.event.data['headers'].get('ARC-Authentication-Results') or [''])
+          | first
+          | regex_search('(?s)^[ \t]*i=[0-9]+;[ \t]*rewse[.]jp;.*;\r?\n[ \t]+dkim=pass [(]good signature[)] header[.]d=mamorail[.]jp[ ;\r\n]')
+        }}
   sensor:
     - unique_id: sensor.mamorail
       name: "Mamorail"
       state: "{{ trigger.event.data['subject'] }}"
       attributes:
         Message: "{{ trigger.event.data['text'] }}"
-        Server: "{{ trigger.event.data['server'] }}"
-        Username: "{{ trigger.event.data['username'] }}"
-        Search: "{{ trigger.event.data['search'] }}"
-        Folder: "{{ trigger.event.data['folder'] }}"
         Sender: "{{ trigger.event.data['sender'] }}"
         Date: "{{ trigger.event.data['date'] }}"
         Subject: "{{ trigger.event.data['subject'] }}"
-        To: "{{ trigger.event.data['headers']['Delivered-To'][0] }}"
-        Return_Path: "{{ trigger.event.data['headers']['Return-Path'][0] }}"
-        Received-first: "{{ trigger.event.data['headers']['Received'][0] }}"
-        Received-last: "{{ trigger.event.data['headers']['Received'][-1] }}"
       icon: "mdi:train"
     - unique_id: sensor.mamorail_action
       name: "Mamorail Action"
@@ -991,23 +1003,27 @@
       id: "custom_event"
       event_data:
         sender: "miwada_studyroom@outlook.com"
+  # Anyone can write a From address. Sakura puts its own verdict in the topmost
+  # ARC-Authentication-Results (authserv-id rewse.jp), one result per folded
+  # line, so a DKIM pass for the sender's domain at the start of a line there
+  # is Sakura's finding and not text the sender wrote.
+  conditions:
+    - condition: template
+      value_template: >-
+        {{
+          (trigger.event.data['headers'].get('ARC-Authentication-Results') or [''])
+          | first
+          | regex_search('(?s)^[ \t]*i=[0-9]+;[ \t]*rewse[.]jp;.*;\r?\n[ \t]+dkim=pass [(]good signature[)] header[.]d=outlook[.]com[ ;\r\n]')
+        }}
   sensor:
     - unique_id: sensor.mll
       name: "MLL"
       state: "{{ trigger.event.data['subject'] }}"
       attributes:
         Message: "{{ trigger.event.data['text'] }}"
-        Server: "{{ trigger.event.data['server'] }}"
-        Username: "{{ trigger.event.data['username'] }}"
-        Search: "{{ trigger.event.data['search'] }}"
-        Folder: "{{ trigger.event.data['folder'] }}"
         Sender: "{{ trigger.event.data['sender'] }}"
         Date: "{{ trigger.event.data['date'] }}"
         Subject: "{{ trigger.event.data['subject'] }}"
-        To: "{{ trigger.event.data['headers']['Delivered-To'][0] }}"
-        Return_Path: "{{ trigger.event.data['headers']['Return-Path'][0] }}"
-        Received-first: "{{ trigger.event.data['headers']['Received'][0] }}"
-        Received-last: "{{ trigger.event.data['headers']['Received'][-1] }}"
       icon: "mdi:school"
     - unique_id: sensor.mll_action
       name: "MLL Action"
