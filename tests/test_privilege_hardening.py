@@ -461,6 +461,89 @@ class AnsibleConfigTest(unittest.TestCase):
             parser.getboolean("defaults", "host_key_checking", fallback=True)
         )
 
+    def test_remote_tmp_is_private_to_the_remote_user(self):
+        # Any local user can create a directory under /tmp before Ansible does,
+        # for example after a reboot empties it, and then read or swap the
+        # files Ansible stages there. The home directory is the user's own.
+        parser = configparser.ConfigParser(interpolation=None)
+        parser.read(REPO_ROOT / "ansible.cfg")
+        remote_tmp = parser.get("defaults", "remote_tmp", fallback="~/.ansible/tmp")
+        self.assertTrue(remote_tmp.startswith("~/"), remote_tmp)
+
+
+# Home and state directories of accounts that are less trusted than root. Their
+# owners can replace any entry in them with a symlink, so a task that writes
+# there as root would write wherever the link points.
+USER_OWNED_DIRECTORIES = {
+    "/home/muse": "muse",
+    "/var/lib/zabbix": "zabbix",
+}
+FILE_MODULES = (
+    "ansible.builtin.blockinfile",
+    "ansible.builtin.copy",
+    "ansible.builtin.file",
+    "ansible.builtin.lineinfile",
+    "ansible.builtin.template",
+)
+
+
+def role_variables() -> dict[str, str]:
+    variables = {}
+    for path in sorted((REPO_ROOT / "roles").glob("*/vars/*.yml")):
+        for name, value in (yaml.safe_load(path.read_text()) or {}).items():
+            if isinstance(value, str):
+                variables[name] = value
+    return variables
+
+
+def task_lists() -> list[tuple[pathlib.Path, list[dict]]]:
+    paths = sorted((REPO_ROOT / "roles").glob("*/tasks/*.yml"))
+    paths += sorted((REPO_ROOT / "roles").glob("*/handlers/*.yml"))
+    return [(path, yaml.safe_load(path.read_text()) or []) for path in paths]
+
+
+class UserOwnedPathTest(unittest.TestCase):
+    def owner_of(self, text: str, variables: dict[str, str]) -> str | None:
+        for name, value in variables.items():
+            if re.search(rf"\b{re.escape(name)}\b", text):
+                text += " " + value
+        for directory, user in USER_OWNED_DIRECTORIES.items():
+            if re.search(rf"{re.escape(directory)}(/|\b)", text):
+                return user
+        return None
+
+    def test_file_tasks_in_user_owned_directories_run_as_the_user(self):
+        variables = role_variables()
+        checked = 0
+        for path, tasks in task_lists():
+            for task in tasks:
+                module = next((m for m in FILE_MODULES if m in task), None)
+                if module is None:
+                    continue
+                spec = task[module]
+                target = str(spec.get("path", spec.get("dest", "")))
+                if "item" in target:
+                    target += " " + json.dumps(task.get("loop", ""))
+                user = self.owner_of(target, variables)
+                if user is None:
+                    continue
+                checked += 1
+                with self.subTest(file=str(path), task=task["name"]):
+                    self.assertEqual(task.get("become_user"), user)
+        self.assertGreater(checked, 0)
+
+    def test_authorized_keys_are_written_as_their_user(self):
+        for path, tasks in task_lists():
+            for task in tasks:
+                spec = task.get("ansible.posix.authorized_key")
+                if (
+                    spec is None
+                    or spec.get("user") not in USER_OWNED_DIRECTORIES.values()
+                ):
+                    continue
+                with self.subTest(file=str(path), task=task["name"]):
+                    self.assertEqual(task.get("become_user"), spec["user"])
+
 
 def home_assistant_service(role: pathlib.Path) -> dict:
     lines = [

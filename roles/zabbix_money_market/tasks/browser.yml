@@ -20,6 +20,8 @@
     file_type: file
   register: __zabbix_money_market_chromium_builds
 
+# The link tasks run as zabbix because zabbix can replace anything in its home
+# with a symlink, and root would follow the link to create or chown its target.
 - name: browser | Create link directory
   ansible.builtin.file:
     path: /var/lib/zabbix/.local/bin
@@ -27,6 +29,8 @@
     owner: zabbix
     group: zabbix
     mode: "0755"
+  become: true
+  become_user: zabbix
 
 - name: browser | Link chromium to the newest build
   # agent-browser finds Chrome for Testing only on x86_64 and otherwise looks up
@@ -38,6 +42,8 @@
     owner: zabbix
     group: zabbix
     force: true
+  become: true
+  become_user: zabbix
   # A dry run on a host without Chromium has no build to link yet.
   when: __zabbix_money_market_chromium_builds.files | map(attribute='path') | select('search', '/chromium-[0-9]+/') | length > 0
 

@@ -1,4 +1,6 @@
 ---
+# These tasks run as muse because muse can replace anything in its home with a
+# symlink, and root would follow the link to write or chown its target.
 - name: pgpass | Create config directories
   ansible.builtin.file:
     path: "{{ item.path }}"
@@ -11,6 +13,8 @@
       mode: "0755"
     - path: "{{ muse_pgpass_file | dirname }}"
       mode: "0700"
+  become: true
+  become_user: muse
 
 # Only the entries for these hosts and users are managed, so connection
 # entries Muse adds for other servers or roles stay in the file.
@@ -29,6 +33,8 @@
   loop: "{{ muse_pgpass_entries }}"
   loop_control:
     label: "{{ item.host }}"
+  become: true
+  become_user: muse
   vars:
     muse_backslash: '\'
   no_log: true
@@ -44,3 +50,5 @@
     owner: muse
     group: muse
     mode: "0644"
+  become: true
+  become_user: muse
