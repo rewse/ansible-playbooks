@@ -1,4 +1,9 @@
 ---
+- name: Import user tasks
+  ansible.builtin.import_tasks: user.yml
+  tags:
+    - enecoq_data_fetcher_user
+
 - name: Import browser tasks
   ansible.builtin.import_tasks: browser.yml
   tags:
