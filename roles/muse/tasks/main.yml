@@ -1,4 +1,9 @@
 ---
+- name: Import firewall tasks
+  ansible.builtin.import_tasks: firewall.yml
+  tags:
+    - muse_firewall
+
 - name: Import user tasks
   ansible.builtin.import_tasks: user.yml
   tags:

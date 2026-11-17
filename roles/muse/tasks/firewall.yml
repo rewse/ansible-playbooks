@@ -1,0 +1,38 @@
+---
+- name: firewall | Create rules directory
+  ansible.builtin.file:
+    path: /etc/nftables.d
+    state: directory
+    owner: root
+    group: root
+    mode: "0755"
+
+- name: firewall | Deploy rules
+  ansible.builtin.template:
+    src: muse.nft.j2
+    dest: /etc/nftables.d/muse.nft
+    owner: root
+    group: root
+    mode: "0644"
+    validate: nft -c -f %s
+  notify: Reload muse-firewall
+
+# A dedicated unit rather than Ubuntu's nftables unit, which loads a file that
+# flushes the whole ruleset and with it the rules Docker adds.
+- name: firewall | Install systemd unit
+  ansible.builtin.copy:
+    src: muse-firewall.service
+    dest: /etc/systemd/system/muse-firewall.service
+    owner: root
+    group: root
+    mode: "0644"
+  register: __muse_firewall_unit
+
+- name: firewall | Enable and start service
+  ansible.builtin.systemd:
+    name: muse-firewall
+    enabled: true
+    state: started
+    daemon_reload: true
+  # A dry run does not install the unit on a first run.
+  when: not (ansible_check_mode and __muse_firewall_unit is changed)

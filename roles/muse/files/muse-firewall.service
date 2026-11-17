@@ -1,0 +1,17 @@
+[Unit]
+Description=Firewall rules for the muse account
+Documentation=man:nft(8)
+DefaultDependencies=no
+Wants=network-pre.target
+Before=network-pre.target shutdown.target
+Conflicts=shutdown.target
+
+[Service]
+Type=oneshot
+RemainAfterExit=yes
+ExecStart=/usr/sbin/nft -f /etc/nftables.d/muse.nft
+ExecReload=/usr/sbin/nft -f /etc/nftables.d/muse.nft
+ExecStop=/usr/sbin/nft delete table inet muse
+
+[Install]
+WantedBy=sysinit.target
