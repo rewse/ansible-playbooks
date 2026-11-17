@@ -53,6 +53,19 @@ _SCAN_PATHS = (
     rf"/(?i)(wp(-|%2d)|xmlrpc|{_DOT}env|{_DOT}git|phpmyadmin|cgi(-|%2d)bin"
     rf"|{_DOT}php|\/actuator|\/vendor\/|\/{_DOT})/"
 )
+# _SCAN_PATHS for %U, the path Apache routes by, which is already decoded and
+# has no dot segments. A request line that matches _SCAN_PATHS only through a
+# dot segment, such as /.env/../app.js, routes to a path this does not match.
+_ROUTED_SCAN_PATH = re.compile(
+    r"(?i)wp-|xmlrpc|\.env|\.git|phpmyadmin|cgi-bin|\.php|/actuator|/vendor/|/\."
+)
+# A 2xx to OPTIONS, such as a CORS preflight that an application answers with
+# 200 on any path, sends no file. Other methods keep their 2xx: a write method
+# that succeeds on a scanned path matters at least as much as a read.
+_NO_FILE_METHODS = ("OPTIONS",)
+# Appended to a 2xx that sent no scanned file: the request routed to a path
+# outside the scan patterns, or was an OPTIONS request.
+NOT_SCANNED = "（対象外）"
 # The blog's host names in any spelling that reaches the same site: the Host
 # header is case-insensitive and may carry a trailing dot or a port.
 _BLOG_HOSTS = r"/(?i)^(www\.)?rewse\.jp\.?(:[0-9]+)?$/"
@@ -68,6 +81,9 @@ FINDING_LIMIT = 2000
 # run(argv, *, stdin=None, env=None, cwd=None, timeout=None) returns stdout and
 # raises subprocess.CalledProcessError when the command fails.
 Runner = Callable[..., str]
+# The host, request target without its query string, client, and method that
+# join a WAF row to the Apache responses it got.
+RequestKey = tuple[str, str, str, str]
 
 MAX_ROUNDS = 3
 MAX_QUERIES_PER_ROUND = 3
@@ -83,8 +99,13 @@ APEX = "rewse.jp"
 # A lowercase DNS name, as _normal_host returns it, for probe URLs.
 _HOSTNAME = re.compile(r"[a-z0-9-]+(\.[a-z0-9-]+)*")
 # vhost_combined and combined as roles/httpd/files/log-format.conf defines them;
-# %a is the real client because mod_remoteip trusts CloudFront.
-_REQUEST = r'(?P<ip>\S+) \S+ \S+ \[(?P<time>[^\]]+)\] "\S+ (?P<target>\S+)[^"]*" (?P<status>\d{3}) (?P<size>\d+|-) '
+# %a is the real client because mod_remoteip trusts CloudFront. The line ends
+# with %I and the quoted %U, inside which Apache escapes quotes and backslashes;
+# a line written before the format ended with %U has no path.
+_REQUEST = (
+    r'(?P<ip>\S+) \S+ \S+ \[(?P<time>[^\]]+)\] "(?P<method>\S+) (?P<target>\S+)[^"]*"'
+    r' (?P<status>\d{3}) (?P<size>\d+|-) (?:.* \d+ "(?P<path>(?:[^"\\]|\\.)*)"|.*)$'
+)
 _VHOST_LINE = re.compile(r"^(?P<host>[^\s:]+):\d+ " + _REQUEST)
 _COMBINED_LINE = re.compile(r"^" + _REQUEST)
 DEFAULT_CONFIG = pathlib.Path("/etc/cloudfront-waf-report/config.json")
@@ -114,7 +135,7 @@ _INSTRUCTIONS = """\
 - previous は前週の項目です。同じ問題が続いていれば continued を true にしてください。
 - 各項目の rule、host、country には、その項目の代表的な値を入れてください。
 - title、evidence、next_action は日本語で書いてください。
-- allowed_scans の各行の origin_status は、fox の Apache がそのリクエストに返した応答コードと件数です。「不明」は fox のログに見つからなかったもの（hotel が代わりに応答した期間など）で、中身が返ったかは分かりません。3xx と 4xx だけの行と、存在しないパスへの応答と同じ大きさの 2xx だけの行は渡していません。残っている 2xx は、本物のファイルが返った疑いがあるものです。
+- allowed_scans の各行の origin_status は、fox の Apache がそのリクエストに返した応答コードと件数です。「不明」は fox のログに見つからなかったもの（hotel が代わりに応答した期間など）で、中身が返ったかは分かりません。fox の応答は、メソッドと、クライアントが送ったままのパスが同じものを数えています。2xx に「（対象外）」が付いたものは、ドット区間などで走査対象ではないパスに解決されたか、OPTIONS への応答で、走査されたファイルは返っていません。3xx と 4xx と「（対象外）」の 2xx だけの行と、存在しないパスへの応答と同じ大きさの 2xx だけの行は渡していません。残っている 2xx は、本物のファイルが返った疑いがあるものです。
 
 応答は ```json で始まるコードブロック 1 つだけにしてください。形式は次の 2 つです。
 - 追加で調べたいとき: {{"queries": [{{"purpose": "...", "query": "<Logs Insights のクエリ>", "start": "<ISO 8601>", "end": "<ISO 8601>"}}]}}
@@ -173,7 +194,8 @@ def candidate_queries(office_cidrs: list[str]) -> dict[str, str]:
         "allowed_scans": _candidate(
             'action = "ALLOW" and terminatingRuleId != "AllowSecurityAgentPentest"'
             f" and not {origin} and httpRequest.uri like {_SCAN_PATHS}",
-            "httpRequest.host, httpRequest.country, httpRequest.clientIp, httpRequest.uri, ua",
+            "httpRequest.host, httpRequest.country, httpRequest.clientIp,"
+            " httpRequest.httpMethod, httpRequest.uri, ua",
         ),
     }
 
@@ -489,8 +511,20 @@ def _open_log(path: pathlib.Path):
     return path.open(encoding="utf-8", errors="replace")
 
 
+def _sent_scanned_file(method: str, path: str | None) -> bool:
+    # A line without %U keeps its 2xx, since the routed path is unknown.
+    if method in _NO_FILE_METHODS:
+        return False
+    return path is None or _ROUTED_SCAN_PATH.search(path) is not None
+
+
 def _apache_requests(log_dir: pathlib.Path, period: tuple[datetime, datetime]):
-    """Yield (key, status, size kind, size) for each Apache request in the period."""
+    """Yield (key, status, size kind, size) for each Apache request in the period.
+
+    The key is the host, the request target without its query string, the
+    client, and the method, which is what a WAF row records. A 2xx that sent no
+    scanned file is yielded with NOT_SCANNED appended to its status.
+    """
     start, end = period
     # vhost_combined logs %O, the bytes sent with headers; combined logs %b, the body.
     sources = [
@@ -511,9 +545,15 @@ def _apache_requests(log_dir: pathlib.Path, period: tuple[datetime, datetime]):
                     if not start <= when < end:
                         continue
                     host = _apache_host(match.groupdict().get("host") or APEX)
-                    key = (host, match["target"].split("?", 1)[0], match["ip"])
+                    target = match["target"].split("?", 1)[0]
+                    key = (host, target, match["ip"], match["method"])
+                    status = match["status"]
+                    if status.startswith("2") and not _sent_scanned_file(
+                        match["method"], match["path"]
+                    ):
+                        status += NOT_SCANNED
                     size = int(match["size"]) if match["size"].isdigit() else 0
-                    yield key, match["status"], kind, size
+                    yield key, status, kind, size
         except (OSError, EOFError):
             # An unreadable file leaves its requests unknown, which keeps them.
             continue
@@ -521,9 +561,9 @@ def _apache_requests(log_dir: pathlib.Path, period: tuple[datetime, datetime]):
 
 def origin_statuses(
     log_dir: pathlib.Path, period: tuple[datetime, datetime]
-) -> dict[tuple[str, str, str], collections.Counter[str]]:
-    """Count Apache status codes by host, path, and client within the period."""
-    statuses: dict[tuple[str, str, str], collections.Counter[str]] = {}
+) -> dict[RequestKey, collections.Counter[str]]:
+    """Count Apache status codes by host, path, client, and method within the period."""
+    statuses: dict[RequestKey, collections.Counter[str]] = {}
     for key, status, _, _ in _apache_requests(log_dir, period):
         statuses.setdefault(key, collections.Counter())[status] += 1
     return statuses
@@ -531,11 +571,11 @@ def origin_statuses(
 
 def success_sizes(
     log_dir: pathlib.Path, period: tuple[datetime, datetime]
-) -> dict[tuple[str, str, str], list[tuple[str, int]]]:
-    """Return the size kind and size of each 2xx response by host, path, and client."""
-    sizes: dict[tuple[str, str, str], list[tuple[str, int]]] = {}
+) -> dict[RequestKey, list[tuple[str, int]]]:
+    """Return the size kind and size of each 2xx that sent a scanned file, by key."""
+    sizes: dict[RequestKey, list[tuple[str, int]]] = {}
     for key, status, kind, size in _apache_requests(log_dir, period):
-        if status.startswith("2"):
+        if status.startswith("2") and not status.endswith(NOT_SCANNED):
             sizes.setdefault(key, []).append((kind, size))
     return sizes
 
@@ -592,14 +632,15 @@ def _is_fallback(sizes: list[tuple[str, int]], fallback: list[tuple[int, int]]) 
 
 def annotate_scans(
     rows: list[dict[str, str]],
-    statuses: dict[tuple[str, str, str], collections.Counter[str]],
-    sizes: dict[tuple[str, str, str], list[tuple[str, int]]] | None = None,
+    statuses: dict[RequestKey, collections.Counter[str]],
+    sizes: dict[RequestKey, list[tuple[str, int]]] | None = None,
     probe: Callable[[str], list[tuple[int, int]]] | None = None,
 ) -> list[dict[str, str]]:
     """Add the Apache status to each row and drop rows that need no action.
 
-    A row goes when Apache answered it only with 3xx or 4xx, or only with 2xx
-    pages the size of the host's answer to a path that cannot exist.
+    A row goes when Apache answered it only with 3xx, 4xx, or a 2xx that sent
+    no scanned file, or only with 2xx pages the size of the host's answer to a
+    path that cannot exist.
     """
     fallbacks: dict[str, list[tuple[int, int]]] = {}
     kept = []
@@ -608,13 +649,16 @@ def annotate_scans(
             _apache_host(row.get("httpRequest.host", "")),
             row.get("httpRequest.uri", ""),
             row.get("httpRequest.clientIp", ""),
+            row.get("httpRequest.httpMethod", ""),
         )
         # Hosts without their own vhost are answered by the default one, which
         # logs to access.log without a host name.
-        if key not in statuses:
-            key = (APEX, key[1], key[2]) if (APEX, key[1], key[2]) in statuses else key
+        if key not in statuses and (APEX, *key[1:]) in statuses:
+            key = (APEX, *key[1:])
         counts = statuses.get(key)
-        if counts and all(code[0] in "34" for code in counts):
+        if counts and all(
+            code[0] in "34" or code.endswith(NOT_SCANNED) for code in counts
+        ):
             continue
         if counts and probe is not None and all(code[0] in "234" for code in counts):
             host = _normal_host(row.get("httpRequest.host", ""))
