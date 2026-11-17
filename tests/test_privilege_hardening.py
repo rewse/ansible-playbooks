@@ -365,7 +365,7 @@ class HomeAssistantSecretFilesTest(unittest.TestCase):
 class EnecoqDataFetcherCredentialsTest(unittest.TestCase):
     # Any local user can read a process's command line, so the enecoQ
     # credentials reach the fetcher through its environment, set in a script
-    # that only root can read.
+    # that only root and the fetcher's own user can read.
     ROLE = REPO_ROOT / "roles" / "enecoq_data_fetcher"
     SCRIPT = "/usr/local/sbin/enecoq-data-fetcher"
 
@@ -389,7 +389,9 @@ class EnecoqDataFetcherCredentialsTest(unittest.TestCase):
 
     def test_script_is_private(self):
         task = template_tasks(self.ROLE / "tasks" / "service.yml")[self.SCRIPT]
-        self.assertEqual(task["mode"], "0700")
+        self.assertEqual(task["owner"], "root")
+        self.assertEqual(task["group"], "{{ enecoq_data_fetcher_user }}")
+        self.assertEqual(task["mode"], "0750")
 
 
 class SecretOutputTest(unittest.TestCase):
@@ -397,6 +399,7 @@ class SecretOutputTest(unittest.TestCase):
     # and into the transcript of an agent that runs the playbook.
     TASKS = (
         ("couchdb", "handlers/main.yml", "Run couchdb init script"),
+        ("enecoq_data_fetcher", "tasks/service.yml", "service | Install script"),
         ("homeassistant_ha_primary", "tasks/zabbix.yml", "zabbix | Copy curl config"),
         ("zabbix_mcp", "tasks/service.yml", "service | Deploy config"),
         ("zabbix_server", "tasks/frontend.yml", "frontend | Copy PHP config"),

@@ -1,6 +1,20 @@
 ---
 - name: browser | Install Chromium with Playwright
-  # Playwright manages its own browser builds; no package or module provides them.
-  ansible.builtin.command: npx playwright install chromium --force
-  environment: "{{ supply_chain_cooldown_environment }}"
-  changed_when: false
+  # Playwright manages its own browser builds; no package or module provides
+  # them. The Playwright release the fetcher depends on decides which build it
+  # launches, so the install goes through the same package, as the service user
+  # and into the service's cache. The package is this account's own and is
+  # adopted without a cooldown; its dependencies are not.
+  ansible.builtin.command:
+    cmd: >-
+      uvx --exclude-newer-package enecoq-data-fetcher={{ '%Y-%m-%dT%H:%M:%SZ' | strftime(utc=true) }}
+      --from enecoq-data-fetcher@latest playwright install chromium
+    chdir: "{{ enecoq_data_fetcher_home }}"
+  become: true
+  become_user: "{{ enecoq_data_fetcher_user }}"
+  environment: "{{ supply_chain_cooldown_environment | combine(enecoq_data_fetcher_environment) }}"
+  register: __enecoq_data_fetcher_chromium
+  changed_when: "'downloaded to' in __enecoq_data_fetcher_chromium.stdout"
+  # A dry run on a host without the user cannot switch to it, and the command
+  # would not run in check mode anyway.
+  when: not ansible_check_mode

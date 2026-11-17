@@ -5,17 +5,31 @@
     state: directory
     mode: "0755"
 
+- name: service | Create output directory
+  ansible.builtin.file:
+    path: "{{ enecoq_data_fetcher_output_dir }}"
+    state: directory
+    owner: "{{ enecoq_data_fetcher_user }}"
+    group: "{{ enecoq_data_fetcher_user }}"
+    mode: "0755"
+  register: __enecoq_data_fetcher_output_dir
+
 - name: service | Install script
   ansible.builtin.template:
     src: enecoq-data-fetcher.j2
     dest: /usr/local/sbin/enecoq-data-fetcher
     variable_start_string: "[%"
     variable_end_string: "%]"
-    mode: "0700"
+    # The script holds the credentials. root owns it so the service user, which
+    # runs it, cannot change what the next run does.
+    owner: root
+    group: "{{ enecoq_data_fetcher_user }}"
+    mode: "0750"
+  no_log: true
 
 - name: service | Install systemd service
-  ansible.builtin.copy:
-    src: enecoq-data-fetcher.service
+  ansible.builtin.template:
+    src: enecoq-data-fetcher.service.j2
     dest: /etc/systemd/system/enecoq-data-fetcher.service
     mode: "0644"
   notify: Reload systemd
@@ -33,3 +47,47 @@
     enabled: "{{ enecoq_data_fetcher_timer_enabled }}"
     state: "{{ 'started' if enecoq_data_fetcher_timer_enabled else 'stopped' }}"
     daemon_reload: true
+
+- name: service | Check output from the old path
+  ansible.builtin.stat:
+    path: /srv/homeassistant/config/data/enecoq_data.json
+  register: __enecoq_data_fetcher_old_output
+
+- name: service | Copy output from the old path
+  # Keeps Home Assistant's sensors fed until the service writes the new file.
+  ansible.builtin.copy:
+    src: /srv/homeassistant/config/data/enecoq_data.json
+    dest: "{{ enecoq_data_fetcher_output_dir }}/enecoq_data.json"
+    remote_src: true
+    force: false
+    owner: "{{ enecoq_data_fetcher_user }}"
+    group: "{{ enecoq_data_fetcher_user }}"
+    mode: "0644"
+  # A dry run does not create the output directory.
+  when:
+    - __enecoq_data_fetcher_old_output.stat.exists
+    - not (ansible_check_mode and __enecoq_data_fetcher_output_dir is changed)
+
+- name: service | Check output
+  ansible.builtin.stat:
+    path: "{{ enecoq_data_fetcher_output_dir }}/enecoq_data.json"
+  register: __enecoq_data_fetcher_output
+
+- name: service | Hand the output to the user
+  # The fetcher rewrites the file in place, so a copy left by root, from a run
+  # of the previous unit or a configuration push from the standby, would make
+  # every later run fail.
+  ansible.builtin.file:
+    path: "{{ enecoq_data_fetcher_output_dir }}/enecoq_data.json"
+    owner: "{{ enecoq_data_fetcher_user }}"
+    group: "{{ enecoq_data_fetcher_user }}"
+  when: __enecoq_data_fetcher_output.stat.exists
+
+- name: service | Remove legacy state
+  # The output and the browser builds of the fetcher when it ran as root.
+  ansible.builtin.file:
+    path: "{{ item }}"
+    state: absent
+  loop:
+    - /root/.cache/ms-playwright
+    - /srv/homeassistant/config/data/enecoq_data.json

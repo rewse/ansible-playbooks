@@ -1,7 +1,18 @@
 ---
+# uv and Playwright downloads, shared by the service and the browser install.
+enecoq_data_fetcher_cache_dir: /var/cache/enecoq-data-fetcher
 enecoq_data_fetcher_enecoq:
   email: "{{ lookup('pipe', 'op read op://ansible/ylie2zpjuu2nnp5sym3vejwlcq/username') }}"
   password: "{{ lookup('pipe', 'op read op://ansible/ylie2zpjuu2nnp5sym3vejwlcq/credential') }}"
+enecoq_data_fetcher_environment:
+  PLAYWRIGHT_BROWSERS_PATH: "{{ enecoq_data_fetcher_cache_dir }}/ms-playwright"
+  UV_CACHE_DIR: "{{ enecoq_data_fetcher_cache_dir }}/uv"
+# The home directory, where uv keeps the Python it downloads.
+enecoq_data_fetcher_home: /var/lib/enecoq-data-fetcher
+# The only directory the service may write. Home Assistant sees it as
+# /config/data/enecoq.
+enecoq_data_fetcher_output_dir: /srv/homeassistant/config/data/enecoq
 # Set to false while the enecoQ service is down, so the timer does not keep
 # sending logins that it rejects.
 enecoq_data_fetcher_timer_enabled: true
+enecoq_data_fetcher_user: enecoq-data-fetcher

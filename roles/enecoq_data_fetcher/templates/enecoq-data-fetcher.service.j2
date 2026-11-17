@@ -1,0 +1,24 @@
+{{ ansible_managed | comment }}
+[Unit]
+Description=Enecoq data fetcher
+After=network-online.target
+Wants=network-online.target
+OnFailure=failure-notify@%n.service
+
+[Service]
+Type=oneshot
+User={{ enecoq_data_fetcher_user }}
+Group={{ enecoq_data_fetcher_user }}
+# The home directory, which holds the Python uv downloads, and the uv and
+# Playwright caches.
+StateDirectory={{ enecoq_data_fetcher_home | basename }}
+CacheDirectory={{ enecoq_data_fetcher_cache_dir | basename }}
+{% for name, value in enecoq_data_fetcher_environment | dictsort %}
+Environment={{ name }}={{ value }}
+{% endfor %}
+ExecStart=/usr/local/sbin/enecoq-data-fetcher
+NoNewPrivileges=yes
+PrivateTmp=yes
+ProtectHome=yes
+ProtectSystem=strict
+ReadWritePaths={{ enecoq_data_fetcher_output_dir }}
