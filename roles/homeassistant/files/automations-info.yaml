@@ -4,7 +4,9 @@
     - trigger: state
       entity_id: sensor.aplus
   conditions:
-    - "{{ (as_timestamp(now()) - as_timestamp(state_attr('sensor.aplus', 'Date'))) < 180 }}"
+    # Only a message dated in the last three minutes, with a minute of clock
+    # skew, so neither an old nor a future-dated one notifies.
+    - "{{ -60 < as_timestamp(now()) - as_timestamp(state_attr('sensor.aplus', 'Date')) < 180 }}"
   actions:
     - delay:
         seconds: 5
@@ -22,7 +24,9 @@
     - trigger: state
       entity_id: sensor.hills_card
   conditions:
-    - "{{ (as_timestamp(now()) - as_timestamp(state_attr('sensor.hills_card', 'Date'))) < 180 }}"
+    # Only a message dated in the last three minutes, with a minute of clock
+    # skew, so neither an old nor a future-dated one notifies.
+    - "{{ -60 < as_timestamp(now()) - as_timestamp(state_attr('sensor.hills_card', 'Date')) < 180 }}"
     - condition: template
       value_template: >-
         {{
@@ -47,7 +51,9 @@
     - trigger: state
       entity_id: sensor.mamorail
   conditions:
-    - "{{ (as_timestamp(now()) - as_timestamp(state_attr('sensor.mamorail', 'Date'))) < 180 }}"
+    # Only a message dated in the last three minutes, with a minute of clock
+    # skew, so neither an old nor a future-dated one notifies.
+    - "{{ -60 < as_timestamp(now()) - as_timestamp(state_attr('sensor.mamorail', 'Date')) < 180 }}"
   actions:
     - delay:
         seconds: 5
@@ -85,7 +91,9 @@
     - trigger: state
       entity_id: sensor.mll
   conditions:
-    - "{{ (as_timestamp(now()) - as_timestamp(state_attr('sensor.mll', 'Date'))) < 180 }}"
+    # Only a message dated in the last three minutes, with a minute of clock
+    # skew, so neither an old nor a future-dated one notifies.
+    - "{{ -60 < as_timestamp(now()) - as_timestamp(state_attr('sensor.mll', 'Date')) < 180 }}"
   actions:
     - delay:
         seconds: 5
