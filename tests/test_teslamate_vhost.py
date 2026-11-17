@@ -1,6 +1,7 @@
 #!/usr/bin/env python3
 """Regression tests for the access rules of the TeslaMate virtual host."""
 
+import email.message
 import http.client
 import http.server
 import pathlib
@@ -12,6 +13,7 @@ import tempfile
 import threading
 import time
 import unittest
+from typing import ClassVar
 
 import jinja2
 
@@ -111,6 +113,14 @@ def grafana_vhost(port: int) -> str:
 
 
 class GrafanaVhostHeadersTest(unittest.TestCase):
+    def test_drops_client_forwarded_addresses(self):
+        # The unset runs in fixups, after mod_remoteip and before mod_proxy
+        # adds the restored address; an early unset would race mod_remoteip.
+        text = grafana_vhost(3000)
+        for header in ("X-Forwarded-For", "X-Real-IP"):
+            with self.subTest(header=header):
+                self.assertRegex(text, rf"(?m)^\s*RequestHeader unset {header}\s*$")
+
     def test_sets_browser_headers_on_every_response(self):
         headers = dict(
             re.findall(
@@ -135,8 +145,12 @@ class GrafanaVhostHeadersTest(unittest.TestCase):
 
 
 class _Backend(http.server.BaseHTTPRequestHandler):
-    # Stands in for Grafana and answers every request with 200.
+    # Stands in for Grafana, answers every request with 200, and keeps the
+    # headers of the last request it received.
+    last_headers: ClassVar[email.message.Message | None] = None
+
     def answer(self) -> None:
+        type(self).last_headers = self.headers
         length = int(self.headers.get("Content-Length") or 0)
         self.rfile.read(length)
         self.send_response(200)
@@ -183,6 +197,10 @@ class GrafanaVhostApacheTest(unittest.TestCase):
         ("GET", "/d/x/y?var-base_url=https://teslamate.rewse.jp", None),
         ("GET", "/d/x/y?var-base_url=https%3A%2F%2Fteslamate.rewse.jp", None),
         ("GET", "/d/x/y?var-car_id=1&x=%zz", None),
+        ("GET", "/d/x/y?var-temp_unit=C", None),
+        ("GET", "/d/x/y?var-car_id=1&var-temp_unit=F&var-length_unit=km", None),
+        ("GET", "/d/x/y?var-temp_unit=C&x=%zz", None),
+        ("GET", "/d/x/y?var-temp_units=x&temp_unit=x", None),
         ("GET", "/public/build/img/fav32.png", "cross-site"),
         ("PUT", "/api/user/password", "same-origin"),
         ("GET", "/user/password", None),
@@ -231,6 +249,21 @@ class GrafanaVhostApacheTest(unittest.TestCase):
         ("GET", "/d/x/y?var-pg_stat_statements_enabled=1", None),
         ("GET", "/d/x/y?var-pg%5fstat%5Fstatements_count=1", None),
         ("GET", "/goto/abc?var-base_url=x", None),
+        ("GET", "/d/x/y?var-temp_unit=x", None),
+        ("GET", "/d/x/y?var-temp_unit=", None),
+        ("GET", "/d/x/y?var-temp_unit", None),
+        ("GET", "/d/x/y?var-temp_unit&var-car_id=1", None),
+        ("GET", "/d/x/y?var-temp_unit=c", None),
+        ("GET", "/d/x/y?var-temp_unit=CC", None),
+        ("GET", "/d/x/y?var-temp_unit=C,slotlink", None),
+        ("GET", "/d/x/y?var-temp_unit=C%20AS%20x", None),
+        ("GET", "/d/x/y?var-temp_unit=C;x", None),
+        ("GET", "/d/x/y?var-temp_unit=%43", None),
+        ("GET", "/d/x/y?var-temp_unit=C&var-temp_unit=x", None),
+        ("GET", "/d/x/y?orgId=1&var-temp_unit=F%26x", "same-origin"),
+        ("GET", "/d/x/y?%76ar-temp%5Funit=x", None),
+        ("GET", "/d/x/y?VAR-TEMP_UNIT=x", None),
+        ("GET", "/goto/abc?var-temp_unit=x", None),
         ("GET", "/d-solo/x/y?panelId=1&var-base_url=x", None),
     )
 
@@ -266,6 +299,7 @@ class GrafanaVhostApacheTest(unittest.TestCase):
                 "proxy",
                 "proxy_http",
                 "proxy_wstunnel",
+                "remoteip",
                 "setenvif",
                 "unixd",
             )
@@ -283,6 +317,10 @@ class GrafanaVhostApacheTest(unittest.TestCase):
                     f"ErrorLog {root}/error.log",
                     "ServerName localhost",
                     f"DocumentRoot {root}",
+                    # As behind CloudFront, the client address comes from the
+                    # last X-Forwarded-For entry a trusted proxy added.
+                    "RemoteIPHeader X-Forwarded-For",
+                    "RemoteIPInternalProxy 127.0.0.1",
                     f"Include {root}/vhost.conf",
                 ]
             )
@@ -321,9 +359,13 @@ class GrafanaVhostApacheTest(unittest.TestCase):
         cls.tmp.cleanup()
 
     def request(
-        self, method: str, target: str, fetch_site: str | None
+        self,
+        method: str,
+        target: str,
+        fetch_site: str | None,
+        extra_headers: dict[str, str] | None = None,
     ) -> http.client.HTTPResponse:
-        headers = {"Host": GRAFANA_HOSTNAME}
+        headers = {"Host": GRAFANA_HOSTNAME, **(extra_headers or {})}
         if fetch_site is not None:
             headers["Sec-Fetch-Site"] = fetch_site
         connection = http.client.HTTPConnection("127.0.0.1", self.port, timeout=5)
@@ -346,6 +388,24 @@ class GrafanaVhostApacheTest(unittest.TestCase):
         for method, target, fetch_site in self.REFUSED:
             with self.subTest(method=method, target=target, fetch_site=fetch_site):
                 self.assertEqual(self.request(method, target, fetch_site).status, 403)
+
+    def test_grafana_sees_only_the_restored_client_address(self):
+        # Grafana records a session's address from X-Real-IP, or else from the
+        # first X-Forwarded-For entry, so neither may carry what a client sent.
+        response = self.request(
+            "POST",
+            "/login",
+            "same-origin",
+            {
+                "X-Forwarded-For": "203.0.113.9, 198.51.100.7",
+                "X-Real-IP": "203.0.113.9",
+            },
+        )
+        self.assertEqual(response.status, 200)
+        headers = _Backend.last_headers
+        assert headers is not None
+        self.assertEqual(headers.get_all("X-Forwarded-For"), ["198.51.100.7"])
+        self.assertIsNone(headers.get("X-Real-IP"))
 
     def test_browser_headers_are_on_proxied_and_refused_responses(self):
         for target in ("/login", "/user/password/reset"):

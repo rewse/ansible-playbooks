@@ -9,6 +9,16 @@
     ProxyRequests off
     RequestHeader set X-Forwarded-Proto "https"
 
+    # Grafana records the address of a new session from X-Real-IP, or else
+    # from the first X-Forwarded-For entry, and mod_proxy forwards X-Real-IP
+    # untouched and appends to an X-Forwarded-For the client sent. The unset
+    # runs in the fixups phase, after mod_remoteip has restored the client
+    # address and before mod_proxy appends it, so Grafana receives only the
+    # restored address. An early unset would race mod_remoteip for the same
+    # hook, as on nas.rewse.jp.
+    RequestHeader unset X-Forwarded-For
+    RequestHeader unset X-Real-IP
+
     Header always set Strict-Transport-Security "max-age=31536000"
     Header always set X-Content-Type-Options "nosniff"
     Header always set X-Frame-Options "SAMEORIGIN"
@@ -40,6 +50,13 @@
     # a name may arrive percent-encoded. The raw string is matched because
     # unescape() returns its input unchanged when any escape in it is malformed.
     <If "%{QUERY_STRING} =~ m#(^|&)(v|%76)(a|%61)(r|%72)(-|%2d)((b|%62)(a|%61)(s|%73)(e|%65)(_|%5f)(u|%75)(r|%72)(l|%6c)(?!=https(:|%3a)(/|%2f)(/|%2f){{ teslamate_hostname | replace('.', '[.]') }}(&|$))(=|&|$)|(p|%70)(g|%67)(_|%5f)(s|%73)(t|%74)(a|%61)(t|%74)(_|%5f)(s|%73)(t|%74)(a|%61)(t|%74)(e|%65)(m|%6d)(e|%65)(n|%6e)(t|%74)(s|%73)(_|%5f))#i">
+        Require all denied
+    </If>
+    # Dashboards also paste temp_unit into panel SQL unescaped. Its value is
+    # TeslaMate's temperature unit setting, which is C or F, so a var-temp_unit
+    # with any other value, including another case or a percent-encoded
+    # letter, is refused. Names are matched as above.
+    <If "%{QUERY_STRING} =~ m#(^|&)(v|%76)(a|%61)(r|%72)(-|%2d)(t|%74)(e|%65)(m|%6d)(p|%70)(_|%5f)(u|%75)(n|%6e)(i|%69)(t|%74)(?!=(?-i:[CF])(&|$))(=|&|$)#i">
         Require all denied
     </If>
 
