@@ -1245,6 +1245,10 @@ class FileBrowserBrowserPolicyTest(unittest.TestCase):
     def test_second_policy_covers_everything_but_scripts(self):
         # A second policy is enforced alongside the app's. It sets no
         # default-src or script-src, which would block the app's nonce scripts.
+        # The app submits no HTML form, since sign-in, passkeys and sign-out
+        # use fetch, so form-action allows none. Previews frame only files
+        # from this origin, and an EPUB chapter is a srcdoc frame that inherits
+        # this policy, so frames the chapter itself opens are limited too.
         lines = directive_lines(self.text, "Header always set Content-Security-Policy ")
         self.assertEqual(len(lines), 1)
         (policy,) = quoted_arguments(lines[0])
@@ -1258,8 +1262,9 @@ class FileBrowserBrowserPolicyTest(unittest.TestCase):
             {
                 "base-uri": ["'self'"],
                 "font-src": ["'self'", "data:"],
-                "form-action": ["'self'"],
+                "form-action": ["'none'"],
                 "frame-ancestors": ["'self'"],
+                "frame-src": ["'self'", "blob:", "data:"],
                 "img-src": ["'self'", "data:", "blob:"],
                 "media-src": ["'self'", "blob:"],
                 "object-src": ["'none'"],

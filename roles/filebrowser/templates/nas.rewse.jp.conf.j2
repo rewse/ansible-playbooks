@@ -46,9 +46,13 @@
     # A second policy, which browsers enforce alongside FileBrowser's, for
     # everything FileBrowser's leaves open. It has no default-src, which would
     # also govern scripts and block the nonce scripts FileBrowser's policy
-    # allows. connect-src, frame-src and worker-src stay open: the app calls
-    # only its own API, and previews are framed from the same origin.
-    Header always set Content-Security-Policy "object-src 'none'; base-uri 'self'; form-action 'self'; frame-ancestors 'self'; img-src 'self' data: blob:; font-src 'self' data:; style-src 'self' 'unsafe-inline'; media-src 'self' blob:"
+    # allows. connect-src and worker-src stay open: the app calls only its own
+    # API. The app submits no HTML form, since sign-in, passkeys and sign-out
+    # use fetch, so form-action allows none. Previews frame files from this
+    # origin, and the EPUB reader renders each chapter in a srcdoc frame,
+    # which inherits this policy, so frame-src also limits frames a previewed
+    # document opens itself.
+    Header always set Content-Security-Policy "object-src 'none'; base-uri 'self'; form-action 'none'; frame-ancestors 'self'; frame-src 'self' blob: data:; img-src 'self' data: blob:; font-src 'self' data:; style-src 'self' 'unsafe-inline'; media-src 'self' blob:"
     Header always set Cross-Origin-Opener-Policy "same-origin"
     Header always set Strict-Transport-Security "max-age=31536000"
     Header always set X-Content-Type-Options "nosniff"
