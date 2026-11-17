@@ -33,11 +33,18 @@
           | selectattr('service', 'equalto', 'CLOUDFRONT_ORIGIN_FACING')
           | map(attribute='ip_prefix') | unique | sort }}
 
+    # The prefixes become the only sources the WAN forward admits, so anything
+    # but one plain network, or a network broad enough to cover a large part of
+    # the internet, fails the play before the console changes.
     - name: cloudfront | Check CloudFront origin-facing prefixes
       ansible.builtin.assert:
         that:
           - __udm_cloudfront_prefixes | length > 0
-        fail_msg: ip-ranges.json lists no CLOUDFRONT_ORIGIN_FACING prefixes.
+          - __udm_cloudfront_prefixes | reject('ip_prefix', 8, 24) | list | length == 0
+        fail_msg: >-
+          ip-ranges.json lists no CLOUDFRONT_ORIGIN_FACING prefixes, or lists ones
+          that are not a network of at least /8 (IPv4) or /24 (IPv6):
+          {{ __udm_cloudfront_prefixes | reject('ip_prefix', 8, 24) | map('to_json') | join(', ') }}
         quiet: true
 
     - name: cloudfront | Get consoles

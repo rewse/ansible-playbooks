@@ -2,6 +2,7 @@
 """Regression tests for the CloudFront origin configuration."""
 
 import configparser
+import importlib.util
 import json
 import pathlib
 import re
@@ -9,6 +10,7 @@ import subprocess
 import sys
 import tempfile
 import unittest
+from typing import ClassVar
 
 import jinja2
 import yaml
@@ -444,6 +446,129 @@ class OriginGateTest(unittest.TestCase):
                 "tags": ["httpd_cloudfront_origin"],
             },
             imports,
+        )
+
+
+def load_ip_prefix():
+    path = REPO_ROOT / "plugins" / "test" / "ip_prefix.py"
+    spec = importlib.util.spec_from_file_location("ip_prefix", path)
+    assert spec is not None and spec.loader is not None
+    module = importlib.util.module_from_spec(spec)
+    spec.loader.exec_module(module)
+    return module
+
+
+def flatten_tasks(tasks: list[dict]) -> list[dict]:
+    flat = []
+    for task in tasks:
+        flat.append(task)
+        flat.extend(flatten_tasks(task.get("block", [])))
+    return flat
+
+
+class IpPrefixTestPluginTest(unittest.TestCase):
+    def setUp(self):
+        self.ip_prefix = load_ip_prefix().TestModule().tests()["ip_prefix"]
+
+    def test_accepts_canonical_networks_at_or_above_the_minimum(self):
+        for value in (
+            "1.0.0.0/8",
+            "130.176.0.0/18",
+            "2600:9000::/24",
+            "2600:9000:2000::/48",
+        ):
+            self.assertTrue(self.ip_prefix(value, 8, 24), value)
+
+    def test_rejects_anything_else(self):
+        for value in (
+            "0.0.0.0/0",
+            "130.176.0.0/7",
+            "2600:9000::/23",
+            "::/0",
+            "130.176.0.1/18",
+            "130.176.0.0/33",
+            "130.176.0.0",
+            "130.176.0.0/018",
+            "010.176.0.0/18",
+            "2600:9000:ABCD::/48",
+            "2600:9000:0000::/48",
+            "130.176.0.0/18\n",
+            "130.176.0.0/18\nignorecommand = /bin/true",
+            " 130.176.0.0/18",
+            "130.176.0.0/18 ",
+            "",
+            "abc",
+            None,
+            18,
+            ["130.176.0.0/18"],
+        ):
+            self.assertFalse(self.ip_prefix(value, 8, 24), repr(value))
+
+    def test_ansible_loads_test_plugins_from_the_repository(self):
+        config = configparser.ConfigParser()
+        config.read(REPO_ROOT / "ansible.cfg")
+        self.assertEqual(config["defaults"]["test_plugins"], "plugins/test")
+
+
+class CloudFrontPrefixCheckTest(unittest.TestCase):
+    """Every role that writes CloudFront prefixes into config checks them first."""
+
+    CONSUMERS: ClassVar[dict[pathlib.Path, str]] = {
+        HTTPD / "tasks" / "remoteip.yml": "__httpd_remoteip_cloudfront_prefixes",
+        ROLES / "udm" / "tasks" / "cloudfront.yml": "__udm_cloudfront_prefixes",
+    }
+
+    def setUp(self):
+        self.environment = jinja2.Environment(undefined=jinja2.StrictUndefined)
+        self.environment.tests.update(load_ip_prefix().TestModule().tests())
+
+    def checks(self, path: pathlib.Path, fact: str) -> list[str]:
+        tasks = flatten_tasks(yaml.safe_load(path.read_text()))
+        names = [task.get("name", "") for task in tasks]
+        setter = next(
+            index
+            for index, task in enumerate(tasks)
+            if fact in task.get("ansible.builtin.set_fact", {})
+        )
+        check = tasks[setter + 1]
+        self.assertIn("ansible.builtin.assert", check, names[setter + 1])
+        that = check["ansible.builtin.assert"]["that"]
+        return [that] if isinstance(that, str) else that
+
+    def passes(self, path: pathlib.Path, fact: str, prefixes: list) -> bool:
+        return all(
+            self.environment.compile_expression(check)(**{fact: prefixes})
+            for check in self.checks(path, fact)
+        )
+
+    def test_accepts_published_prefixes(self):
+        for path, fact in self.CONSUMERS.items():
+            self.assertTrue(
+                self.passes(path, fact, ["120.52.22.96/27", "130.176.0.0/18"]), path
+            )
+
+    def test_rejects_a_feed_with_any_malformed_or_broad_prefix(self):
+        for path, fact in self.CONSUMERS.items():
+            self.assertFalse(self.passes(path, fact, []), path)
+            for bad in (
+                "0.0.0.0/0",
+                "10.0.0.0/7",
+                "130.176.0.0/18\nignorecommand = /bin/true",
+                "130.176.0.0/18 192.168.0.0/16",
+                "130.176.0.1/18",
+            ):
+                self.assertFalse(
+                    self.passes(path, fact, ["130.176.0.0/18", bad]), f"{path}: {bad!r}"
+                )
+
+    def test_no_other_task_reads_cloudfront_origin_facing(self):
+        readers = sorted(
+            path.relative_to(REPO_ROOT)
+            for path in ROLES.glob("*/tasks/*.yml")
+            if "CLOUDFRONT_ORIGIN_FACING" in path.read_text()
+        )
+        self.assertEqual(
+            readers, sorted(path.relative_to(REPO_ROOT) for path in self.CONSUMERS)
         )
 
 
