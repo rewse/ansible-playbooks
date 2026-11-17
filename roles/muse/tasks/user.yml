@@ -20,3 +20,6 @@
     user: muse
     key: "{{ muse_ssh_public_key }}"
     exclusive: true
+  # As muse, so a symlink muse plants at ~/.ssh cannot redirect root's write.
+  become: true
+  become_user: muse
