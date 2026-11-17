@@ -16,6 +16,15 @@
     ProxyPass / http://127.0.0.1:{{ matterjs_server_port }}/
     ProxyPassReverse / http://127.0.0.1:{{ matterjs_server_port }}/
 
+    # Browsers apply no same-origin check to a WebSocket handshake, and this
+    # API has no login, so a page from any site, loaded by a browser at home or
+    # on the VPN, could otherwise drive it. The dashboard connects from its own
+    # page, so its handshake carries exactly its origin. mod_rewrite runs
+    # before mod_proxy maps the request, on the decoded and normalized path.
+    RewriteEngine on
+    RewriteCond %{HTTP:Origin} !=https://{{ matterjs_server_hostname }}
+    RewriteRule ^/ws - [F]
+
     # Home clients arrive from the home prefixes, over IPv6 usually from the
     # public one, since fox.rewse.jp has a global AAAA record. VPN clients
     # arrive through alfa.
