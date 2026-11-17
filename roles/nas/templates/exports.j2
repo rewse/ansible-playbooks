@@ -1,4 +1,6 @@
 {{ ansible_managed | comment }}
+# mp makes nfsd skip an export while Bay 2 is not mounted, so a client never
+# writes its backups into the empty directory left on the root filesystem.
 {% for client in nas_nfs_clients %}
-{{ nas_backup_path }}/{{ client.name }} {{ client.address }}(rw,sync,no_subtree_check,no_root_squash)
+{{ nas_backup_path }}/{{ client.name }} {{ client.address }}(rw,sync,no_subtree_check,no_root_squash,mp={{ nas_backup_path }})
 {% endfor %}
