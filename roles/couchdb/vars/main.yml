@@ -1,6 +1,10 @@
 ---
 # CouchDB settings that tasks/config.yml applies over the _config API.
 couchdb_config:
+  # Every request needs a login, whatever the init script of the release in
+  # use writes.
+  chttpd/require_valid_user: "true"
+  chttpd_auth/require_valid_user: "true"
   # Keeps the Fauxton session cookie out of cross-site requests.
   chttpd_auth/same_site: strict
   # The origins of Obsidian on the desktop and on iOS. Obsidian on Android

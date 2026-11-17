@@ -21,6 +21,7 @@
   ansible.builtin.import_tasks: config.yml
   tags:
     - couchdb_config
+    - update
 
 - name: Import security_agent tasks
   ansible.builtin.import_tasks: security_agent.yml
