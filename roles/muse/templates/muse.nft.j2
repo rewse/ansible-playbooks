@@ -1,0 +1,30 @@
+#!/usr/sbin/nft -f
+{{ ansible_managed | comment }}
+
+# Services on this host and in its containers rely on other machines being
+# unable to reach them, so these rules keep muse, a less trusted local account,
+# from connecting to them. Declaring and deleting the table first makes loading
+# the file replace this table alone and leaves the tables Docker and fail2ban
+# maintain untouched.
+table inet muse
+delete table inet muse
+
+table inet muse {
+	chain output {
+		type filter hook output priority filter; policy accept;
+		meta skuid {{ muse_uid }} meta l4proto tcp ct state new jump muse
+	}
+
+	chain muse {
+		# The Zabbix agent and trapper accept clients by source address, which
+		# muse shares with the host it runs on.
+		tcp dport { {{ muse_firewall_zabbix_ports | join(', ') }} } reject with tcp reset
+		fib daddr type local tcp dport { {{ muse_firewall_local_tcp_ports | join(', ') }} } return
+		fib daddr type local reject with tcp reset
+		# Docker rewrites connections to ports it publishes on this host's
+		# addresses into connections to the container, which leave through
+		# these bridges, as do connections to container addresses.
+		oifname "br-*" reject with tcp reset
+		oifname "docker0" reject with tcp reset
+	}
+}
