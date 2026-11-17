@@ -195,6 +195,43 @@ class ZabbixAgentTest(unittest.TestCase):
             ],
         )
 
+    def test_root_agent_denies_keys_that_read_files(self):
+        # The agent runs as root on Raspberry Pi, so these keys would return the
+        # contents or listing of any file to whoever can query the agent.
+        denied = [
+            line.removeprefix("DenyKey=")
+            for line in (ZABBIX_FILES / "deny-file-keys.conf").read_text().splitlines()
+            if line.startswith("DenyKey=")
+        ]
+        self.assertEqual(
+            denied,
+            [
+                "vfs.dir.get[*]",
+                "vfs.file.contents[*]",
+                "vfs.file.get[*]",
+                "vfs.file.regexp[*]",
+                "vfs.file.regmatch[*]",
+            ],
+        )
+        tasks = yaml.safe_load(
+            (ZABBIX_FILES.parent / "tasks" / "raspberrypi.yml").read_text()
+        )
+        sources = [task.get("ansible.builtin.copy", {}).get("src") for task in tasks]
+        self.assertIn("deny-file-keys.conf", sources)
+
+    def test_root_agent_keeps_file_metadata_keys(self):
+        # The OS templates monitor checksums and existence of system files.
+        rules = "\n".join(
+            line
+            for line in (ZABBIX_FILES / "deny-file-keys.conf").read_text().splitlines()
+            if re.match(r"(Allow|Deny)Key=", line)
+        )
+        self.assertNotIn("vfs.file[", rules)
+        self.assertNotIn("vfs.file.*", rules)
+        for key in ("cksum", "exists", "size", "time"):
+            with self.subTest(key=key):
+                self.assertNotIn(f"vfs.file.{key}", rules)
+
     def test_zabbix_sudo_grants_only_listed_commands(self):
         rules = [
             line
