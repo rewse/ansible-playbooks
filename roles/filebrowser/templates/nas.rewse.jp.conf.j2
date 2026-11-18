@@ -82,6 +82,13 @@
     RewriteCond %{THE_REQUEST} ^\S+\s+[^?\s]*(?://|/\.\.?/|%)
     RewriteRule ^/api/auth/ - [F]
 
+    # FileBrowser mints share view tokens under /public/api, which checks the
+    # share first. The private route also accepts a share hash, which the web
+    # client never sends to it, so a request that names one is refused there.
+    # FileBrowser unescapes query keys, so escaped letters count as well.
+    RewriteCond %{QUERY_STRING} (?:^|&)(?:h|%68)(?:a|%61)(?:s|%73)(?:h|%68)=[^&] [NC]
+    RewriteRule ^/api/resources/view-token$ - [F]
+
     RewriteCond %{HTTP:Upgrade} =websocket [NC]
     RewriteRule /(.*) ws://localhost:{{ filebrowser_port }}/$1 [P,L]
     RewriteCond %{HTTP:Upgrade} !=websocket [NC]

@@ -1340,6 +1340,52 @@ class FileBrowserBrowserPolicyTest(unittest.TestCase):
         engine = self.text.index("RewriteEngine on")
         self.assertLess(engine, self.text.index("RewriteCond"))
 
+    def test_private_view_token_refuses_a_share_hash(self):
+        # Share view tokens are minted under /public/api, which checks the
+        # share; the web client sends only source to the private route.
+        # FileBrowser decodes the query with Go's url.ParseQuery, which
+        # unescapes keys, so an escaped spelling of hash is refused as well.
+        block = re.search(
+            r"(?ms)^\s*RewriteCond %\{QUERY_STRING\} (\S+) \[NC\]\n"
+            r"\s*RewriteRule (\S+) - \[F\]$",
+            self.text,
+        )
+        self.assertIsNotNone(block)
+        assert block is not None
+        self.assertLess(block.start(), self.text.index("[P,L]"))
+        query, path = re.compile(block[1], re.IGNORECASE), re.compile(block[2])
+        self.assertIsNotNone(path.search("/api/resources/view-token"))
+        for other in (
+            "/api/resources/view-token/x",
+            "/api/resources/view",
+            "/public/api/resources/view-token",
+        ):
+            with self.subTest(path=other):
+                self.assertIsNone(path.search(other))
+        for refused in (
+            "hash=probe1",
+            "source=files&hash=abc",
+            "hash=abc&source=files",
+            "%68ash=abc",
+            "h%61%73%68=abc",
+            "%68%61%73%68=abc",
+            "hash=&hash=abc",
+        ):
+            with self.subTest(query=refused):
+                self.assertIsNotNone(query.search(refused))
+        for allowed in (
+            "",
+            "source=files",
+            "source=files&path=%2Fa.txt",
+            "hash=",
+            "hash=&source=files",
+            "xhash=abc",
+            "source=hash=abc",
+            "path=%2Fhash%3Dabc",
+        ):
+            with self.subTest(query=allowed):
+                self.assertIsNone(query.search(allowed))
+
 
 class GrafanaCookieTest(unittest.TestCase):
     def test_session_cookie_is_sent_over_https_only(self):
