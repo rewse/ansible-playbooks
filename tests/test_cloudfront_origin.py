@@ -383,18 +383,24 @@ class OriginGateTest(unittest.TestCase):
         # The fail2ban ban script writes deny-only sections, which
         # tests/test_fail2ban_apache.py checks. The CouchDB /_session query
         # rule, the Grafana request rules, and the Zabbix login rule are
-        # deny-only as well, so they can only narrow access; nothing else may
-        # write one.
+        # deny-only as well, so they can only narrow access. The control
+        # character rule only answers 400 and sets no access rule; nothing
+        # else may write one.
         deny_only = {
             ROLES / "couchdb" / "templates" / "couchdb.rewse.jp.conf.j2",
             ROLES / "teslamate" / "templates" / "grafana.rewse.jp.conf.j2",
             ROLES / "zabbix_server" / "templates" / "zabbix-api.conf.j2",
             ROLES / "zabbix_server" / "templates" / "zabbix.rewse.jp.conf.j2",
         }
-        allowed = {
-            HTTPD / "templates" / "cloudfront-origin.conf.j2",
-            HTTPD / "files" / "fail2ban-apache-deny",
-        } | deny_only
+        refuse_only = {HTTPD / "files" / "control-chars.conf"}
+        allowed = (
+            {
+                HTTPD / "templates" / "cloudfront-origin.conf.j2",
+                HTTPD / "files" / "fail2ban-apache-deny",
+            }
+            | deny_only
+            | refuse_only
+        )
         found = [
             str(path.relative_to(REPO_ROOT))
             for path in sorted(ROLES.rglob("*"))
@@ -412,6 +418,13 @@ class OriginGateTest(unittest.TestCase):
             self.assertEqual(len(bodies), len(re.findall(r"(?m)^\s*<If ", text)), path)
             for body in bodies:
                 self.assertEqual(body.strip(), "Require all denied", path)
+        for path in refuse_only:
+            text = path.read_text()
+            self.assertNotRegex(text, r"<(?:ElseIf|Else)\b", path)
+            bodies = re.findall(r'(?ms)^\s*<If "[^"]*">\n(.*?)^\s*</If>$', text)
+            self.assertEqual(len(bodies), len(re.findall(r"(?m)^\s*<If ", text)), path)
+            for body in bodies:
+                self.assertEqual(body.strip(), "Redirect 400", path)
 
     def test_hotel_gets_the_same_gate(self):
         dependencies = yaml.safe_load(

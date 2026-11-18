@@ -27,6 +27,20 @@
   changed_when: "'already enabled' not in __httpd_a2enconf_blog.stdout"
   notify: Reload Apache
 
+- name: conf | Copy control character config
+  ansible.builtin.copy:
+    src: control-chars.conf
+    dest: /etc/apache2/conf-available
+    mode: "0644"
+  notify: Reload Apache
+
+- name: conf | Enable control character config
+  # No module enables an Apache site or conf; the command reports whether it changed.
+  ansible.builtin.command: a2enconf control-chars
+  register: __httpd_a2enconf_control_chars
+  changed_when: "'already enabled' not in __httpd_a2enconf_control_chars.stdout"
+  notify: Reload Apache
+
 - name: conf | Copy log format config
   ansible.builtin.copy:
     src: log-format.conf
