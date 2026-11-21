@@ -1,4 +1,14 @@
 ---
+- name: container | Create service directory
+  ansible.builtin.file:
+    path: /srv/couchdb
+    state: directory
+    owner: root
+    group: root
+    # local.d holds the admin password hash and the cookie signing secret. The
+    # container reaches its bind mounts without traversing this directory.
+    mode: "0700"
+
 - name: container | Create data directories
   ansible.builtin.file:
     path: "{{ item }}"

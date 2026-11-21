@@ -4,6 +4,7 @@
     path: /srv/homeassistant/config/{{ item }}
     state: directory
     mode: "0755"
+    follow: false
   loop:
     - automations
     - blueprints/automation

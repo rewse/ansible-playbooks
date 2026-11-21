@@ -3,7 +3,12 @@
   ansible.builtin.file:
     path: /srv/homeassistant/config
     state: directory
-    mode: "0755"
+    owner: root
+    group: root
+    # Holds the integration tokens, the Zigbee network key, and the
+    # databases; Home Assistant runs as root in its container.
+    mode: "0700"
+    follow: false
 
 - name: tesla_fleet | Copy private key
   ansible.builtin.copy:

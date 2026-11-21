@@ -5,7 +5,12 @@
   ansible.builtin.file:
     path: /srv/homeassistant/config
     state: directory
-    mode: "0755"
+    owner: root
+    group: root
+    # Holds the integration tokens, the Zigbee network key, and the
+    # databases; Home Assistant runs as root in its container.
+    mode: "0700"
+    follow: false
 
 - name: fail2ban | Create Home Assistant log
   # homeassistant-sync excludes *.log*, so nothing else creates the file before a
@@ -19,6 +24,7 @@
     mode: "0644"
     access_time: preserve
     modification_time: preserve
+    follow: false
 
 - name: fail2ban | Copy filter
   ansible.builtin.copy:
