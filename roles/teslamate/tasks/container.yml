@@ -38,3 +38,44 @@
     pull: never
     state: present
   when: not ansible_check_mode
+
+- name: container | Check Grafana admin password
+  # Grafana reads GF_SECURITY_ADMIN_PASSWORD only when it creates the admin
+  # user, so a later 1Password value has to be applied separately. A 401 here
+  # means the stored password differs. The request goes to the loopback port,
+  # past Apache and its fail2ban jail.
+  ansible.builtin.uri:
+    url: "http://127.0.0.1:{{ teslamate_grafana_port }}/api/user"
+    user: "{{ teslamate_grafana_admin_username }}"
+    password: "{{ teslamate_grafana_admin_password }}"
+    force_basic_auth: true
+    status_code:
+      - 200
+      - 401
+  register: __teslamate_grafana_login
+  # Grafana may still be starting after the containers were recreated.
+  until: __teslamate_grafana_login.status in [200, 401]
+  retries: 30
+  delay: 2
+  no_log: true
+  when: not ansible_check_mode
+
+- name: container | Apply Grafana admin password
+  # reset-admin-password sets the user with ID 1, which is the login named by
+  # GF_SECURITY_ADMIN_USER. The password goes on stdin to stay off every argv.
+  community.docker.docker_container_exec:
+    container: teslamate-grafana
+    argv:
+      - grafana
+      - cli
+      - admin
+      - reset-admin-password
+      - --password-from-stdin
+    stdin: "{{ teslamate_grafana_admin_password }}"
+  register: __teslamate_grafana_reset
+  # docker_container_exec reports a non-zero exit code without failing.
+  failed_when: __teslamate_grafana_reset.rc != 0
+  no_log: true
+  when:
+    - not ansible_check_mode
+    - __teslamate_grafana_login.status == 401
