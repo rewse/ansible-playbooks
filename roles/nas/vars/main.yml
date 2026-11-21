@@ -52,8 +52,13 @@ nas_s3_repositories:
 nas_s3_check_schedule: 'Sun *-*-* 09:00:00'
 
 # Hosts that keep their restic repository on Bay 2 and reach it over NFS. Each
-# is exported its own subdirectory rather than the whole volume, so a client
-# cannot read another host's backups or the Time Machine shares.
+# is exported its own subdirectory rather than the whole volume. The directory
+# alone does not confine a client: the export shares one ext4 filesystem with
+# the other repositories and the Time Machine shares, and nfsd accepts any file
+# handle on that filesystem unless subtree_check makes it verify that the handle
+# lies inside the export. subtree_check returns stale handles for files renamed
+# into another directory while open, which restic never does: it writes each
+# file under a temporary name in its final directory and renames it there.
 #
 # no_root_squash is required because the client runs restic as root; combined
 # with sec=sys it means the export trusts the address, which is why one is

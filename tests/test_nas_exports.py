@@ -55,6 +55,13 @@ class ExportsTest(unittest.TestCase):
             self.assertTrue(path.startswith(self.backup_path + "/"), path)
             self.assertIn(f"mp={self.backup_path}", options, path)
 
+    def test_every_export_checks_its_subtree(self):
+        exports = self.exports()
+        self.assertTrue(exports)
+        for path, _, options in exports:
+            self.assertIn("subtree_check", options, path)
+            self.assertNotIn("no_subtree_check", options, path)
+
     def test_each_client_gets_only_its_own_directory(self):
         self.assertEqual(
             [(path, address) for path, address, _ in self.exports()],
