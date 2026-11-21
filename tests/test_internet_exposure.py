@@ -1353,13 +1353,15 @@ class FileBrowserBrowserPolicyTest(unittest.TestCase):
         policy = "script-src 'self' https://www.google.com.example"
         self.assertEqual(re.sub(pattern, replacement, policy), policy)
 
-    def test_second_policy_covers_everything_but_scripts(self):
-        # A second policy is enforced alongside the app's. It sets no
-        # default-src or script-src, which would block the app's nonce scripts.
-        # The app submits no HTML form, since sign-in, passkeys and sign-out
-        # use fetch, so form-action allows none. Previews frame only files
-        # from this origin, and an EPUB chapter is a srcdoc frame that inherits
-        # this policy, so frames the chapter itself opens are limited too.
+    def test_second_policy_keeps_every_fetch_on_the_origin(self):
+        # A second policy is enforced alongside the app's. Its default-src
+        # keeps prefetch and other requests from a previewed document on this
+        # origin, and its script-src is no stricter than the app's, which
+        # keeps the nonce requirement. The app submits no HTML form, since
+        # sign-in, passkeys and sign-out use fetch, so form-action allows none.
+        # Previews frame only files from this origin, and an EPUB chapter is a
+        # srcdoc frame that inherits this policy, so frames the chapter itself
+        # opens are limited too.
         lines = directive_lines(self.text, "Header always set Content-Security-Policy ")
         self.assertEqual(len(lines), 1)
         (policy,) = quoted_arguments(lines[0])
@@ -1372,14 +1374,19 @@ class FileBrowserBrowserPolicyTest(unittest.TestCase):
             directives,
             {
                 "base-uri": ["'self'"],
-                "font-src": ["'self'", "data:"],
+                "connect-src": ["'self'", "blob:", "data:"],
+                "default-src": ["'self'", "blob:", "data:"],
+                "font-src": ["'self'", "blob:", "data:"],
                 "form-action": ["'none'"],
                 "frame-ancestors": ["'self'"],
                 "frame-src": ["'self'", "blob:", "data:"],
-                "img-src": ["'self'", "data:", "blob:"],
+                "img-src": ["'self'", "blob:", "data:"],
+                "manifest-src": ["'self'"],
                 "media-src": ["'self'", "blob:"],
                 "object-src": ["'none'"],
+                "script-src": ["'self'", "'unsafe-inline'"],
                 "style-src": ["'self'", "'unsafe-inline'"],
+                "worker-src": ["'self'", "blob:"],
             },
         )
 

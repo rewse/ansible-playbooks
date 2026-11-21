@@ -43,16 +43,20 @@
     # always.
     Header edit* Content-Security-Policy " https://(?:cdn\.jsdelivr\.net|www\.google\.com|www\.gstatic\.com)(?=[ ;]|$)" ""
 
-    # A second policy, which browsers enforce alongside FileBrowser's, for
-    # everything FileBrowser's leaves open. It has no default-src, which would
-    # also govern scripts and block the nonce scripts FileBrowser's policy
-    # allows. connect-src and worker-src stay open: the app calls only its own
-    # API. The app submits no HTML form, since sign-in, passkeys and sign-out
-    # use fetch, so form-action allows none. Previews frame files from this
-    # origin, and the EPUB reader renders each chapter in a srcdoc frame,
-    # which inherits this policy, so frame-src also limits frames a previewed
-    # document opens itself.
-    Header always set Content-Security-Policy "object-src 'none'; base-uri 'self'; form-action 'none'; frame-ancestors 'self'; frame-src 'self' blob: data:; img-src 'self' data: blob:; font-src 'self' data:; style-src 'self' 'unsafe-inline'; media-src 'self' blob:"
+    # A second policy, which browsers enforce alongside FileBrowser's. Its
+    # default-src keeps every request without a directive of its own, such as
+    # a prefetch, on this origin, which also applies to an EPUB chapter: the
+    # reader renders each chapter in a srcdoc frame, which inherits this
+    # policy. script-src is no stricter than FileBrowser's own policy, which
+    # keeps the nonce requirement: 'unsafe-inline' admits the nonce scripts
+    # here and works only while this policy names no nonce or hash. The app
+    # calls its API and file-watcher event stream on this origin, the editor
+    # may start its worker from a blob, and the viewers build blob and data
+    # URLs, including the fonts of an EPUB. The app submits no HTML form,
+    # since sign-in, passkeys and sign-out use fetch, so form-action allows
+    # none. Previews frame files from this origin, so frame-src also limits
+    # frames a previewed document opens itself.
+    Header always set Content-Security-Policy "default-src 'self' blob: data:; script-src 'self' 'unsafe-inline'; worker-src 'self' blob:; connect-src 'self' blob: data:; manifest-src 'self'; object-src 'none'; base-uri 'self'; form-action 'none'; frame-ancestors 'self'; frame-src 'self' blob: data:; img-src 'self' blob: data:; font-src 'self' blob: data:; style-src 'self' 'unsafe-inline'; media-src 'self' blob:"
     Header always set Cross-Origin-Opener-Policy "same-origin"
     Header always set Strict-Transport-Security "max-age=31536000"
     Header always set X-Content-Type-Options "nosniff"
