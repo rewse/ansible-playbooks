@@ -1,13 +1,20 @@
 #!/usr/bin/env python3
 """Regression tests for services that grant remote access to root or secrets."""
 
+import base64
 import configparser
+import http.server
 import json
+import os
 import pathlib
 import re
 import subprocess
+import tempfile
+import textwrap
+import threading
 import unittest
 
+import jinja2
 import yaml
 
 REPO_ROOT = pathlib.Path(__file__).resolve().parents[1]
@@ -481,6 +488,145 @@ class HomeAssistantSecretFilesTest(unittest.TestCase):
                 self.assertEqual(task["mode"], "0700")
                 self.assertEqual(task["owner"], "root")
                 self.assertEqual(task["group"], "root")
+
+
+class CommandLineSecretsTest(unittest.TestCase):
+    # Any local user can read a process's command line from /proc, so
+    # credentials reach curl through stdin or a root-only file instead.
+    API_KEY = "test-api-key"
+
+    @staticmethod
+    def write_executable(path: pathlib.Path, content: str) -> None:
+        path.write_text(content)
+        path.chmod(0o755)
+
+    def test_unifi_api_key_reaches_curl_on_stdin(self):
+        root = pathlib.Path(self.enterContext(tempfile.TemporaryDirectory()))
+        environment = jinja2.Environment(
+            loader=jinja2.FileSystemLoader(SECONDARY / "templates"),
+            undefined=jinja2.StrictUndefined,
+            variable_start_string="[%",
+            variable_end_string="%]",
+        )
+        environment.filters["comment"] = lambda text: f"#\n# {text}\n#"
+        script = environment.get_template("homeassistant-name-switch.j2").render(
+            ansible_managed="Ansible managed",
+            homeassistant_ha_secondary_domain="hass.example.com",
+            homeassistant_ha_secondary_primary_ip="192.0.2.1",
+            homeassistant_ha_secondary_standby_ip="192.0.2.2",
+            homeassistant_ha_secondary_unifi_api_key=self.API_KEY,
+            homeassistant_ha_secondary_unifi_console="console",
+        )
+        script = script.replace("/var/lib/homeassistant-ha", str(root / "state"))
+        bin_dir = root / "bin"
+        bin_dir.mkdir()
+        # Records each argument on its own line and the headers read from
+        # stdin, then answers as an account without consoles.
+        self.write_executable(
+            bin_dir / "curl",
+            textwrap.dedent(
+                f"""\
+                #!/bin/sh
+                printf '%s\\n' "$@" >> '{root}/argv'
+                cat >> '{root}/stdin'
+                echo '{{"data":[]}}'
+                """
+            ),
+        )
+        self.write_executable(bin_dir / "logger", "#!/bin/sh\nexit 0\n")
+        self.write_executable(root / "name-switch", script)
+        result = subprocess.run(
+            [str(root / "name-switch"), "primary"],
+            capture_output=True,
+            check=False,
+            env={**os.environ, "PATH": f"{bin_dir}:{os.environ['PATH']}"},
+            stdin=subprocess.DEVNULL,
+            text=True,
+        )
+
+        self.assertIn("No console named console", result.stdout)
+        argv = (root / "argv").read_text()
+        self.assertIn("https://api.ui.com/ea/hosts", argv)
+        self.assertNotIn(self.API_KEY, argv)
+        self.assertEqual((root / "stdin").read_text(), f"X-API-KEY: {self.API_KEY}\n")
+
+    def test_regza_commands_read_credentials_from_netrc(self):
+        text = (HOMEASSISTANT / "templates" / "shell_commands.yaml.j2").read_text()
+        self.assertNotIn("homeassistant_regza", text)
+        self.assertNotIn("--user", text)
+        commands = yaml.safe_load(text.replace("[% ansible_managed | comment %]", ""))
+        self.assertTrue(commands)
+        for name, command in commands.items():
+            with self.subTest(name=name):
+                self.assertIn("--digest --netrc-file /config/regza.netrc", command)
+
+    def test_regza_netrc_is_private(self):
+        tasks = yaml.safe_load(
+            (HOMEASSISTANT / "tasks" / "configuration.yml").read_text()
+        )
+        task = next(
+            t
+            for t in tasks
+            if t.get("ansible.builtin.template", {}).get("dest")
+            == "/srv/homeassistant/config/regza.netrc"
+        )
+        template = task["ansible.builtin.template"]
+        # Home Assistant runs curl as root in its container.
+        self.assertEqual(
+            (template["owner"], template["group"], template["mode"]),
+            ("root", "root", "0600"),
+        )
+        self.assertIs(task["no_log"], True)
+
+    def test_regza_netrc_is_read_by_curl(self):
+        username = 'remote "user"'
+        password = 'p\\a"s s#'
+        environment = jinja2.Environment(
+            loader=jinja2.FileSystemLoader(HOMEASSISTANT / "templates"),
+            undefined=jinja2.StrictUndefined,
+        )
+        environment.filters["comment"] = lambda text: f"#\n# {text}\n#"
+        netrc = pathlib.Path(self.enterContext(tempfile.TemporaryDirectory()))
+        netrc /= "regza.netrc"
+        netrc.write_text(
+            environment.get_template("regza.netrc.j2").render(
+                ansible_managed="Ansible managed",
+                homeassistant_regza={"password": password, "username": username},
+            )
+        )
+        received: list[str] = []
+
+        class Handler(http.server.BaseHTTPRequestHandler):
+            def do_GET(self):  # name required by BaseHTTPRequestHandler
+                received.append(self.headers.get("Authorization", ""))
+                self.send_response(204)
+                self.end_headers()
+
+            def log_message(self, *args):  # pyright: ignore[reportIncompatibleMethodOverride]  # silences the request log
+                pass
+
+        server = http.server.HTTPServer(("127.0.0.1", 0), Handler)
+        self.addCleanup(server.server_close)
+        thread = threading.Thread(target=server.handle_request)
+        thread.start()
+        port = server.server_address[1]
+        subprocess.run(
+            [
+                "curl",
+                "--silent",
+                "--netrc-file",
+                str(netrc),
+                "--resolve",
+                f"regza.rewse.jp:{port}:127.0.0.1",
+                f"http://regza.rewse.jp:{port}/",
+            ],
+            check=True,
+            timeout=30,
+        )
+        thread.join(timeout=30)
+
+        credentials = f"{username}:{password}".encode()
+        self.assertEqual(received, ["Basic " + base64.b64encode(credentials).decode()])
 
 
 class EnecoqDataFetcherCredentialsTest(unittest.TestCase):

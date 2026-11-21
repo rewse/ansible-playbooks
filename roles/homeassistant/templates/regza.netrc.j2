@@ -1,0 +1,4 @@
+{{ ansible_managed | comment }}
+machine regza.rewse.jp
+login "{{ homeassistant_regza.username | replace('\\', '\\\\') | replace('"', '\\"') }}"
+password "{{ homeassistant_regza.password | replace('\\', '\\\\') | replace('"', '\\"') }}"
