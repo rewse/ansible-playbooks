@@ -79,10 +79,37 @@ class QueryTest(unittest.TestCase):
             ],
         )
 
-    def test_allowed_scans_excludes_pentest_and_self(self):
+    def test_allowed_scans_excludes_pentest_and_office_only(self):
+        # Japan is not excluded: a client there may be anyone, not the owner.
         q = report.candidate_queries(["192.0.2.0/24"])["allowed_scans"]
         self.assertIn('terminatingRuleId != "AllowSecurityAgentPentest"', q)
-        self.assertIn("not (", q)
+        self.assertIn('not (isIpv4InSubnet(httpRequest.clientIp, "192.0.2.0/24"))', q)
+        self.assertNotIn("httpRequest.country =", q)
+
+    def test_allowed_scans_without_office_excludes_no_client(self):
+        q = report.candidate_queries([])["allowed_scans"]
+        self.assertNotIn("isIpv4InSubnet", q)
+        self.assertNotIn("not (", q)
+
+    def test_prompt_says_allowed_scans_from_japan_are_not_self(self):
+        prompt = report.build_prompt(PERIOD, {}, [], [], final=False)
+        self.assertIn("allowed_scans の origin が japan", prompt)
+
+    def test_user_agent_parse_keeps_escaped_quotes(self):
+        q = report.candidate_queries([])["allowed_scans"]
+        pattern = re.search(r"^parse @message /(.*)/$", q, re.MULTILINE)
+        assert pattern is not None
+        regex = re.compile(pattern.group(1).replace("(?<ua>", "(?P<ua>"))
+        message = (
+            json.dumps(
+                {"headers": [{"name": "User-Agent", "value": 'curl "x" tail\\end'}]}
+            )
+            .replace(", ", ",")
+            .replace(": ", ":")
+        )
+        match = regex.search(message)
+        assert match is not None
+        self.assertEqual(match["ua"], 'curl \\"x\\" tail\\\\end')
 
     def test_allowed_scans_group_by_method(self):
         # The method joins each row to the Apache responses it got.
@@ -112,6 +139,14 @@ class SanitizeTest(unittest.TestCase):
 
     def test_sanitize_truncates_long_values(self):
         self.assertEqual(len(report.sanitize("x" * 500)), 200)
+
+    def test_sanitize_replaces_format_and_separator_characters(self):
+        # U+202E reorders the text after it, U+2028 and U+2029 break lines,
+        # and U+FEFF is invisible.
+        self.assertEqual(report.sanitize("a\u202eb\u2028c\u2029d\ufeffe"), "a b c d e")
+
+    def test_sanitize_keeps_other_text(self):
+        self.assertEqual(report.sanitize("対応不要 – ok"), "対応不要 – ok")
 
 
 class FollowupTest(unittest.TestCase):
@@ -542,6 +577,15 @@ class FinishTest(unittest.TestCase):
         self.assertEqual(rows[1]["origin"], "other")
         self.assertEqual(rows[1]["httpRequest.clientIp"], "203.0.113.1")
 
+    def test_prepare_rows_normalizes_the_host(self):
+        rows = report.prepare_rows(
+            [{"httpRequest.host": h} for h in ("NAS.Rewse.JP:443.", "nas.rewse.jp.")],
+            [],
+        )
+        self.assertEqual(
+            [r["httpRequest.host"] for r in rows], ["nas.rewse.jp", "nas.rewse.jp"]
+        )
+
     def test_describe_error_omits_command_arguments(self):
         error = subprocess.CalledProcessError(
             255,
@@ -747,6 +791,40 @@ class MainTest(unittest.TestCase):
             [c for c in run.calls if c["argv"][:2] == ["aws", "bedrock-runtime"]]
         )
 
+    def test_main_joins_apache_status_on_the_full_uri(self):
+        # A 404 to the first 200 characters of a long path is another request.
+        uri = "/.env/" + "a" * 300
+        logs = pathlib.Path(self.tmp.name) / "apache"
+        logs.mkdir()
+        (logs / "other_vhosts_access.log").write_text(
+            "".join(
+                f"nas.rewse.jp:443 203.0.113.7 - - [01/Nov/2026:10:00:00 +0900] "
+                f'"GET {path} HTTP/1.1" {status} 20000 "-" "UA" 533 "{path}"\n'
+                for path, status in ((uri, 200), (uri[:200], 404))
+            )
+        )
+        config = json.loads(self.config.read_text()) | {"apache_log_dir": str(logs)}
+        self.config.write_text(json.dumps(config))
+        scan = {
+            "httpRequest.host": "nas.rewse.jp",
+            "httpRequest.uri": uri,
+            "httpRequest.clientIp": "203.0.113.7",
+            "httpRequest.country": "US",
+            "httpRequest.httpMethod": "GET",
+        }
+        prompts = []
+
+        def answer(argv, env, cwd):
+            path = argv[argv.index("--messages") + 1].removeprefix("file://")
+            prompts.append(pathlib.Path(path).read_text())
+            return converse(fenced({"findings": []}))
+
+        run = self.answers([[], [], [], [scan]], bedrock=answer)
+        run.answers[:0] = [(["curl"], "404 271 300"), (["curl"], "404 271 300")]
+        self.assertEqual(self.main(run), 0)
+        self.assertEqual(len(prompts), 1)
+        self.assertIn('\\"origin_status\\": \\"200×1\\"', prompts[0])
+
     def test_dry_run_prints_the_json_instead_of_uploading(self):
         run = FakeRun(self.answers([[], [], [], []]).answers[:-1])
         out = io.StringIO()
@@ -813,6 +891,13 @@ class ReviewFixTest(unittest.TestCase):
         )
         self.assertEqual(found["title"], "fake [2J 対応不要")
         self.assertEqual(len(found["evidence"]), 2000)
+
+    def test_findings_normalize_the_host(self):
+        response = fenced({"findings": [FINDING | {"host": "HASS.rewse.jp:443."}]})
+        [found] = report.investigate(
+            FakeAws(), lambda _: response, PERIOD, {}, [], NOW, []
+        )
+        self.assertEqual(found["host"], "hass.rewse.jp")
 
     def test_prompt_stays_under_argument_limit(self):
         row = {
@@ -953,6 +1038,26 @@ class ApacheTest(unittest.TestCase):
             }
         ]
         self.assertEqual(report.annotate_scans(rows, statuses), [])
+
+    def test_annotate_scans_keeps_default_vhost_out_of_a_host_with_its_own(self):
+        # nas.rewse.jp logs to its own vhost, so an apex answer to the same
+        # client and path is a different request.
+        statuses = {
+            ("nas.rewse.jp", "/other", "1.1.1.1", "GET"): collections.Counter(
+                {"404": 1}
+            ),
+            ("rewse.jp", "/.env", "1.1.1.1", "GET"): collections.Counter({"404": 1}),
+        }
+        rows = [
+            {
+                "httpRequest.host": "nas.rewse.jp",
+                "httpRequest.uri": "/.env",
+                "httpRequest.clientIp": "1.1.1.1",
+                "httpRequest.httpMethod": "GET",
+            }
+        ]
+        kept = report.annotate_scans(rows, statuses)
+        self.assertEqual([r["origin_status"] for r in kept], ["不明"])
 
     def test_success_sizes_records_kind_per_log(self):
         (self.dir / "other_vhosts_access.log").write_text(
@@ -1252,6 +1357,7 @@ class NormalizationTest(unittest.TestCase):
             ("www.rewse.jp:443", "rewse.jp"),
             ("Rewse.JP", "rewse.jp"),
             ("NAS.rewse.jp.:443", "nas.rewse.jp"),
+            ("REWSE.JP:443.", "rewse.jp"),
             ("nas.rewse.jp", "nas.rewse.jp"),
         ):
             with self.subTest(host=host):
