@@ -28,6 +28,7 @@ import subprocess
 import sys
 import tempfile
 import time
+import unicodedata
 import uuid
 from collections.abc import Callable, Sequence
 from datetime import datetime
@@ -42,7 +43,10 @@ CANDIDATE_LIMIT = 50
 FOLLOWUP_LIMIT = 100
 MAX_QUERY_LENGTH = 2000
 
-_USER_AGENT = r'parse @message /"name":"[Uu]ser-[Aa]gent","value":"(?<ua>[^"]*)"/'
+# The value is a JSON string, inside which a quote is escaped with a backslash.
+_USER_AGENT = (
+    r'parse @message /"name":"[Uu]ser-[Aa]gent","value":"(?<ua>(?:[^"\\]|\\.)*)"/'
+)
 _RATE_LIMIT_RULES = '["RateLimitLogin", "RateLimitAll"]'
 # httpRequest.uri is the path as the client sent it, still percent-encoded, and
 # Logs Insights cannot decode it. Apache decodes %2E to a dot and %2D to a
@@ -69,7 +73,10 @@ NOT_SCANNED = "（対象外）"
 # The blog's host names in any spelling that reaches the same site: the Host
 # header is case-insensitive and may carry a trailing dot or a port.
 _BLOG_HOSTS = r"/(?i)^(www\.)?rewse\.jp\.?(:[0-9]+)?$/"
-_CONTROL = re.compile(r"[\x00-\x1f\x7f-\x9f]")
+# Control characters, plus format characters and line and paragraph separators
+# such as U+202E, U+FEFF, and U+2028, which change how the text around them
+# displays.
+_HIDDEN_CATEGORIES = frozenset(("Cc", "Cf", "Zl", "Zp"))
 OFFICE_IP_SET = "cloudfront-waf-office"
 POLL_INTERVAL = 2.0
 POLL_ATTEMPTS = 150
@@ -135,7 +142,7 @@ _INSTRUCTIONS = """\
 - previous は前週の項目です。同じ問題が続いていれば continued を true にしてください。
 - 各項目の rule、host、country には、その項目の代表的な値を入れてください。
 - title、evidence、next_action は日本語で書いてください。
-- allowed_scans の各行の origin_status は、fox の Apache がそのリクエストに返した応答コードと件数です。「不明」は fox のログに見つからなかったもの（hotel が代わりに応答した期間など）で、中身が返ったかは分かりません。fox の応答は、メソッドと、クライアントが送ったままのパスが同じものを数えています。2xx に「（対象外）」が付いたものは、ドット区間などで走査対象ではないパスに解決されたか、OPTIONS への応答で、走査されたファイルは返っていません。3xx と 4xx と「（対象外）」の 2xx だけの行と、存在しないパスへの応答と同じ大きさの 2xx だけの行は渡していません。残っている 2xx は、本物のファイルが返った疑いがあるものです。
+- allowed_scans の各行の origin_status は、fox の Apache がそのリクエストに返した応答コードと件数です。「不明」は fox のログに見つからなかったもの（hotel が代わりに応答した期間など）で、中身が返ったかは分かりません。fox の応答は、メソッドと、クライアントが送ったままのパスが同じものを数えています。2xx に「（対象外）」が付いたものは、ドット区間などで走査対象ではないパスに解決されたか、OPTIONS への応答で、走査されたファイルは返っていません。3xx と 4xx と「（対象外）」の 2xx だけの行と、存在しないパスへの応答と同じ大きさの 2xx だけの行は渡していません。残っている 2xx は、本物のファイルが返った疑いがあるものです。allowed_scans の origin が japan の行は日本の誰か（VPS や VPN を含む）からのもので、自分のアクセスとは限りません。
 
 応答は ```json で始まるコードブロック 1 つだけにしてください。形式は次の 2 つです。
 - 追加で調べたいとき: {{"queries": [{{"purpose": "...", "query": "<Logs Insights のクエリ>", "start": "<ISO 8601>", "end": "<ISO 8601>"}}]}}
@@ -154,12 +161,13 @@ def report_period(now: datetime) -> tuple[datetime, datetime]:
     return end - timedelta(days=7), end
 
 
+def _office_terms(office_cidrs: list[str]) -> list[str]:
+    return [f'isIpv4InSubnet(httpRequest.clientIp, "{cidr}")' for cidr in office_cidrs]
+
+
 def origin_filter(office_cidrs: list[str]) -> str:
     """Return a Logs Insights condition matching Japan and the office."""
-    terms = ['httpRequest.country = "JP"']
-    terms += [
-        f'isIpv4InSubnet(httpRequest.clientIp, "{cidr}")' for cidr in office_cidrs
-    ]
+    terms = ['httpRequest.country = "JP"', *_office_terms(office_cidrs)]
     return "(" + " or ".join(terms) + ")"
 
 
@@ -176,6 +184,10 @@ def _candidate(condition: str, fields: str) -> str:
 def candidate_queries(office_cidrs: list[str]) -> dict[str, str]:
     """Return the fixed queries that pick the report candidates."""
     origin = origin_filter(office_cidrs)
+    # A Japanese address may belong to anyone, so allowed scans exclude only
+    # the office, whose rows lose their address in prepare_rows.
+    office = _office_terms(office_cidrs)
+    not_office = f" and not ({' or '.join(office)})" if office else ""
     return {
         "blocked_from_self": _candidate(
             f'action = "BLOCK" and terminatingRuleId not in {_RATE_LIMIT_RULES} and {origin}',
@@ -193,7 +205,7 @@ def candidate_queries(office_cidrs: list[str]) -> dict[str, str]:
         ),
         "allowed_scans": _candidate(
             'action = "ALLOW" and terminatingRuleId != "AllowSecurityAgentPentest"'
-            f" and not {origin} and httpRequest.uri like {_SCAN_PATHS}",
+            f"{not_office} and httpRequest.uri like {_SCAN_PATHS}",
             "httpRequest.host, httpRequest.country, httpRequest.clientIp,"
             " httpRequest.httpMethod, httpRequest.uri, ua",
         ),
@@ -214,8 +226,11 @@ def label_origin(
 
 
 def sanitize(value: str, limit: int = 200) -> str:
-    """Replace control characters with spaces and cut the value to limit."""
-    return _CONTROL.sub(" ", value)[:limit]
+    """Replace control and format characters with spaces and cut to limit."""
+    return "".join(
+        " " if unicodedata.category(char) in _HIDDEN_CATEGORIES else char
+        for char in value[:limit]
+    )
 
 
 def _parse_time(value: object) -> datetime:
@@ -385,6 +400,7 @@ def _check_findings(items: list) -> list[dict]:
             field: sanitize(item.get(field, ""), FINDING_LIMIT)
             for field in FINDING_FIELDS
         }
+        finding["host"] = _normal_host(finding["host"])
         finding["continued"] = item.get("continued") is True
         findings.append(finding)
     return findings
@@ -484,6 +500,8 @@ def prepare_rows(
             office_networks,
         )
         clean = {key: sanitize(value) for key, value in row.items()}
+        if "httpRequest.host" in clean:
+            clean["httpRequest.host"] = _normal_host(clean["httpRequest.host"])
         if origin == "office":
             # The office ranges are not public; the label is enough to judge.
             clean.pop("httpRequest.clientIp", None)
@@ -495,7 +513,7 @@ def prepare_rows(
 def _normal_host(host: str) -> str:
     # The Host header is case-insensitive and may end with a dot or a port,
     # while Apache logs the ServerName of the vhost that answered.
-    host = host.lower()
+    host = host.lower().rstrip(".")
     host = re.sub(r":[0-9]+$", "", host)
     return host.rstrip(".")
 
@@ -643,6 +661,7 @@ def annotate_scans(
     path that cannot exist.
     """
     fallbacks: dict[str, list[tuple[int, int]]] = {}
+    vhosts = {host for host, *_ in statuses}
     kept = []
     for row in rows:
         key = (
@@ -652,8 +671,9 @@ def annotate_scans(
             row.get("httpRequest.httpMethod", ""),
         )
         # Hosts without their own vhost are answered by the default one, which
-        # logs to access.log without a host name.
-        if key not in statuses and (APEX, *key[1:]) in statuses:
+        # logs to access.log without a host name. A host that logs to its own
+        # vhost never reaches the default one.
+        if key[0] not in vhosts and (APEX, *key[1:]) in statuses:
             key = (APEX, *key[1:])
         counts = statuses.get(key)
         if counts and all(
@@ -848,17 +868,19 @@ def main(
         aws = Aws(run)
         networks = [ipaddress.IPv4Network(cidr) for cidr in aws.office_cidrs()]
         cidrs = [str(net) for net in networks]
-        candidates = {
-            name: prepare_rows(aws.query(query, *period), networks)
+        rows = {
+            name: aws.query(query, *period)
             for name, query in candidate_queries(cidrs).items()
         }
         log_dir = pathlib.Path(config.get("apache_log_dir", DEFAULT_APACHE_LOG_DIR))
-        candidates["allowed_scans"] = annotate_scans(
-            candidates["allowed_scans"],
+        # The join reads the full path, which prepare_rows cuts for the prompt.
+        rows["allowed_scans"] = annotate_scans(
+            rows["allowed_scans"],
             origin_statuses(log_dir, period),
             success_sizes(log_dir, period),
             lambda host: probe_fallback(host, run),
         )
+        candidates = {name: prepare_rows(r, networks) for name, r in rows.items()}
         findings: list[dict] = []
         if any(candidates.values()):
             try:
