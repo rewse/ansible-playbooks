@@ -9,6 +9,10 @@ Description: >-
 # rejects the short-form YAML tags.
 
 Parameters:
+  AlfaInstanceId:
+    Type: AWS::EC2::Instance::Id
+    Description: Instance ID of alfa, the only target of the alfa-ssm role.
+    Default: i-01abb0709bf742574
   HomePublicIpv4:
     Type: String
     Description: networks.home_public_ipv4 in inventory/group_vars/all/site.yml.
@@ -21,7 +25,53 @@ Parameters:
 Resources:
   # Each role is assumed from the default profile: the IAM user tats on fox,
   # hotel, and youth, and the Isengard Admin role on 7cf34ded5d65. Permissions
-  # are granted per service at full-access granularity.
+  # are granted per service at full-access granularity, except where noted.
+  #
+  # alfa-ssm carries SSH to alfa through Session Manager where the site-to-site
+  # VPN does not reach. It is limited to the AWS-StartSSHSession document so
+  # ssh still authenticates the login; Session Manager rejects the default
+  # shell document unless the policy names it.
+  AlfaSsmRole:
+    Type: AWS::IAM::Role
+    Properties:
+      RoleName: alfa-ssm
+      Description: Opens SSH sessions to alfa through Session Manager for the alfa-ssm profile.
+      MaxSessionDuration: 3600
+      AssumeRolePolicyDocument:
+        Version: "2012-10-17"
+        Statement:
+          - Effect: Allow
+            Principal:
+              AWS:
+                - Fn::Sub: arn:${AWS::Partition}:iam::${AWS::AccountId}:role/Admin
+                - Fn::Sub: arn:${AWS::Partition}:iam::${AWS::AccountId}:user/tats
+            Action: sts:AssumeRole
+      Policies:
+        - PolicyName: ssh-session
+          PolicyDocument:
+            Version: "2012-10-17"
+            Statement:
+              - Sid: StartSshSession
+                Effect: Allow
+                Action: ssm:StartSession
+                Resource:
+                  - Fn::Sub: arn:${AWS::Partition}:ec2:${AWS::Region}:${AWS::AccountId}:instance/${AlfaInstanceId}
+                  # AWS-owned documents carry no account ID in their ARN.
+                  - Fn::Sub: arn:${AWS::Partition}:ssm:${AWS::Region}:*:document/AWS-StartSSHSession
+              # Session Manager tags each session with the caller's user ID, so
+              # the role can resume and end only the sessions it started.
+              - Sid: OwnSessions
+                Effect: Allow
+                Action:
+                  - ssm:ResumeSession
+                  - ssm:TerminateSession
+                  - ssmmessages:OpenDataChannel
+                Resource:
+                  Fn::Sub: arn:${AWS::Partition}:ssm:${AWS::Region}:${AWS::AccountId}:session/*
+                Condition:
+                  StringEquals:
+                    ssm:resourceTag/aws:ssmmessages:session-id: "${aws:userid}"
+
   BedrockRole:
     Type: AWS::IAM::Role
     Properties:
@@ -186,6 +236,10 @@ Resources:
               Fn::Sub: arn:${AWS::Partition}:s3:::rewse-nas-bak/*
 
 Outputs:
+  AlfaSsmRoleArn:
+    Description: Role ARN for the alfa-ssm AWS CLI profile.
+    Value:
+      Fn::GetAtt: [AlfaSsmRole, Arn]
   BedrockRoleArn:
     Description: Role ARN for the bedrock AWS CLI profile.
     Value:
