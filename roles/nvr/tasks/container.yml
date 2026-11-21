@@ -28,7 +28,8 @@
     state: directory
     owner: root
     group: root
-    mode: "0755"
+    # frigate.db holds the password hashes of the web UI users.
+    mode: "0700"
 
 - name: container | Deploy configuration file
   # Part of the container component because its version key follows the image.

@@ -4,6 +4,7 @@
     path: /srv/homeassistant/config/custom_components
     state: directory
     mode: "0755"
+    follow: false
 
 - name: tuya | Resolve aged tag tuya-local
   ansible.builtin.set_fact:

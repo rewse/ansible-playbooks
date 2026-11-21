@@ -2,6 +2,7 @@
 """Regression tests for the enecoQ data fetcher role."""
 
 import configparser
+import json
 import pathlib
 import posixpath
 import re
@@ -194,15 +195,17 @@ class UnprivilegedServiceTest(unittest.TestCase):
         self.assertEqual(template["mode"], "0750")
 
 
-class HomeAssistantReadsTheOutputTest(unittest.TestCase):
-    def container_path(self, host_path: str) -> str:
-        compose = (HOMEASSISTANT / "templates" / "compose.yaml.j2").read_text()
-        volumes = re.findall(r"(?m)^\s+- (/srv/homeassistant/\S+):(/\S+)$", compose)
-        for source, target in volumes:
-            if host_path.startswith(source + "/"):
-                return target + host_path[len(source) :]
-        raise AssertionError(f"{host_path} is not mounted into Home Assistant")
+def home_assistant_mount(host_path: str) -> tuple[str, str]:
+    """Return the container path of host_path and the options of its mount."""
+    compose = (HOMEASSISTANT / "templates" / "compose.yaml.j2").read_text()
+    volumes = re.findall(r"(?m)^\s+- (/[^:\s]+):(/[^:\s]+)(?::(\w+))?$", compose)
+    for source, target, options in volumes:
+        if host_path.startswith(source + "/"):
+            return target + host_path[len(source) :], options
+    raise AssertionError(f"{host_path} is not mounted into Home Assistant")
 
+
+class HomeAssistantReadsTheOutputTest(unittest.TestCase):
     def test_sensors_read_the_file_the_fetcher_writes(self):
         sensors = yaml.safe_load(
             (HOMEASSISTANT / "files" / "command_lines.yaml").read_text()
@@ -212,7 +215,25 @@ class HomeAssistantReadsTheOutputTest(unittest.TestCase):
             for entry in sensors
             if "enecoq" in entry["sensor"]["unique_id"]
         }
-        self.assertEqual(commands, {f"cat {self.container_path(script_output())}"})
+        path, _ = home_assistant_mount(script_output())
+        self.assertEqual(commands, {f"cat {path}"})
+
+    def test_home_assistant_cannot_write_the_output(self):
+        _, options = home_assistant_mount(script_output())
+        self.assertEqual(options, "ro")
+
+    def test_output_is_outside_the_home_assistant_tree(self):
+        # The Home Assistant configuration is private to root, so the user could
+        # not reach a directory inside it. A mount nested in /config would make
+        # Docker create its mount point in that tree.
+        self.assertFalse(OUTPUT_DIR.startswith("/srv/homeassistant/"))
+        path, _ = home_assistant_mount(script_output())
+        self.assertFalse(path.startswith("/config/"))
+
+    def test_output_directory_cannot_be_swapped_for_a_link(self):
+        # Docker follows a link at the bind source, so the directory sits in one
+        # that only root can write.
+        self.assertEqual(posixpath.dirname(OUTPUT_DIR), "/srv")
 
 
 class BrowserInstallTest(unittest.TestCase):
@@ -239,31 +260,66 @@ class BrowserInstallTest(unittest.TestCase):
         self.assertNotIn("npx", command["cmd"])
 
 
-class LegacyStateTest(unittest.TestCase):
+class OutputDirectoryTest(unittest.TestCase):
     def tasks(self) -> list[dict[str, Any]]:
-        return load("tasks/service.yml")
+        return [
+            task
+            for path in ("tasks/service.yml", "tasks/user.yml")
+            for task in load(path)
+        ]
 
-    def test_old_output_moves_to_the_output_directory(self):
-        copy = named("tasks/service.yml", "service | Copy output from the old path")
-        spec = copy["ansible.builtin.copy"]
-        self.assertIs(spec["remote_src"], True)
-        self.assertIs(spec["force"], False)
-        self.assertEqual(spec["src"], "/srv/homeassistant/config/data/enecoq_data.json")
-        self.assertEqual(spec["owner"], "{{ enecoq_data_fetcher_user }}")
-        removed = [
+    def test_output_directory_does_not_follow_links(self):
+        task = named("tasks/service.yml", "service | Create output directory")
+        self.assertIs(task["ansible.builtin.file"]["follow"], False)
+
+    def test_root_leaves_the_files_of_the_user_alone(self):
+        # The user can replace its files with links, so a root task on one of
+        # them would act on whatever the link points to.
+        for task in self.tasks():
+            module = next((key for key in task if key.startswith("ansible.")), "")
+            spec = task.get(module)
+            if not isinstance(spec, dict):
+                continue
+            target = str(spec.get("path", spec.get("dest", spec.get("src", ""))))
+            with self.subTest(task=task["name"]):
+                self.assertFalse(
+                    target.startswith("{{ enecoq_data_fetcher_output_dir }}/")
+                )
+
+    def test_role_stays_out_of_the_home_assistant_tree(self):
+        for task in self.tasks():
+            spec = task.get("ansible.builtin.file") or task.get("ansible.builtin.copy")
+            if spec is None or spec.get("state") == "absent":
+                continue
+            with self.subTest(task=task["name"]):
+                self.assertNotIn("/srv/homeassistant", json.dumps(spec))
+
+    def test_new_output_directory_starts_a_fetch(self):
+        # Home Assistant's sensors would otherwise have no file until the timer.
+        task = named("tasks/service.yml", "service | Create output directory")
+        self.assertEqual(task.get("notify"), "Start enecoq-data-fetcher")
+        handler = named("handlers/main.yml", "Start enecoq-data-fetcher")
+        systemd = handler["ansible.builtin.systemd"]
+        self.assertEqual(systemd["name"], "enecoq-data-fetcher.service")
+        self.assertEqual(systemd["state"], "started")
+        # A fetch takes minutes and depends on enecoQ, so the run does not wait.
+        self.assertIs(systemd["no_block"], True)
+
+
+class LegacyStateTest(unittest.TestCase):
+    def removed(self) -> list[str]:
+        return [
             path
-            for t in self.tasks()
+            for t in load("tasks/service.yml")
             if t.get("ansible.builtin.file", {}).get("state") == "absent"
             for path in t.get("loop", [t["ansible.builtin.file"]["path"]])
         ]
-        self.assertIn("/srv/homeassistant/config/data/enecoq_data.json", removed)
-        self.assertIn("/root/.cache/ms-playwright", removed)
 
-    def test_output_is_handed_to_the_user(self):
-        task = named("tasks/service.yml", "service | Hand the output to the user")
-        spec = task["ansible.builtin.file"]
-        self.assertEqual(spec["owner"], "{{ enecoq_data_fetcher_user }}")
-        self.assertEqual(spec["group"], "{{ enecoq_data_fetcher_user }}")
+    def test_old_output_directory_is_removed(self):
+        self.assertIn("/srv/homeassistant/config/data", self.removed())
+
+    def test_old_root_checkout_is_removed(self):
+        self.assertIn("/opt/enecoq-fetch", self.removed())
 
 
 if __name__ == "__main__":

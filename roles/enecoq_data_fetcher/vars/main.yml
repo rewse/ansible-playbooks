@@ -9,9 +9,9 @@ enecoq_data_fetcher_environment:
   UV_CACHE_DIR: "{{ enecoq_data_fetcher_cache_dir }}/uv"
 # The home directory, where uv keeps the Python it downloads.
 enecoq_data_fetcher_home: /var/lib/enecoq-data-fetcher
-# The only directory the service may write. Home Assistant sees it as
-# /config/data/enecoq.
-enecoq_data_fetcher_output_dir: /srv/homeassistant/config/data/enecoq
+# The only directory the service may write. Home Assistant mounts it read-only
+# as /enecoq.
+enecoq_data_fetcher_output_dir: /srv/enecoq_data_fetcher
 # Set to false while the enecoQ service is down, so the timer does not keep
 # sending logins that it rejects.
 enecoq_data_fetcher_timer_enabled: true

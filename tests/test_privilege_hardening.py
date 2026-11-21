@@ -775,6 +775,83 @@ class UserOwnedPathTest(unittest.TestCase):
                     self.assertEqual(task.get("become_user"), spec["user"])
 
 
+# Service data that holds credentials, signing secrets, and device keys. Only
+# root and the containers that bind-mount them use these trees, and a container
+# reaches its mount without traversing the host path.
+PRIVATE_DATA_DIRECTORIES = ("/srv/couchdb", "/srv/homeassistant/config", "/srv/nvr")
+HOME_ASSISTANT_CONFIG = "/srv/homeassistant/config"
+
+
+def file_task_paths(task: dict) -> list[str]:
+    spec = task["ansible.builtin.file"]
+    path = str(spec.get("path", ""))
+    if "{{ item }}" in path:
+        return [path.replace("{{ item }}", str(item)) for item in task.get("loop", [])]
+    return [path]
+
+
+class PrivateDataDirectoryTest(unittest.TestCase):
+    def test_data_directories_are_private_to_root(self):
+        seen = set()
+        for path, tasks in task_lists():
+            for task in tasks:
+                if "ansible.builtin.file" not in task:
+                    continue
+                spec = task["ansible.builtin.file"]
+                for target in file_task_paths(task):
+                    if target not in PRIVATE_DATA_DIRECTORIES:
+                        continue
+                    seen.add(target)
+                    with self.subTest(file=str(path), task=task["name"]):
+                        self.assertEqual(spec["state"], "directory")
+                        self.assertEqual(spec["mode"], "0700")
+                        self.assertEqual(spec["owner"], "root")
+                        self.assertEqual(spec["group"], "root")
+        self.assertEqual(seen, set(PRIVATE_DATA_DIRECTORIES))
+
+    def test_couchdb_directory_is_locked_before_its_contents(self):
+        tasks = yaml.safe_load((COUCHDB / "tasks" / "container.yml").read_text())
+        paths = [
+            target
+            for task in tasks
+            if "ansible.builtin.file" in task
+            for target in file_task_paths(task)
+        ]
+        self.assertLess(paths.index("/srv/couchdb"), paths.index("/srv/couchdb/data"))
+
+    def test_standby_sync_carries_the_directory_mode(self):
+        # rsync --archive with a trailing slash applies the primary's mode to
+        # the standby's copy of the directory.
+        text = (SECONDARY / "templates" / "homeassistant-sync.j2").read_text()
+        self.assertIn("--archive", text)
+        self.assertIn(
+            f'SOURCE="[% admin_user %]@fox.rewse.jp:{HOME_ASSISTANT_CONFIG}/"', text
+        )
+
+
+class HomeAssistantConfigLinkTest(unittest.TestCase):
+    # Home Assistant runs as root in its container and can replace any entry
+    # under /config with a link, so a root task that follows one would change
+    # the host path it points to.
+    def test_file_tasks_do_not_follow_links(self):
+        checked = 0
+        for path, tasks in task_lists():
+            for task in tasks:
+                if "ansible.builtin.file" not in task:
+                    continue
+                spec = task["ansible.builtin.file"]
+                if spec.get("state") == "absent":
+                    continue
+                if not any(
+                    t.startswith(HOME_ASSISTANT_CONFIG) for t in file_task_paths(task)
+                ):
+                    continue
+                checked += 1
+                with self.subTest(file=str(path), task=task["name"]):
+                    self.assertIs(spec.get("follow"), False)
+        self.assertGreater(checked, 0)
+
+
 def home_assistant_service(role: pathlib.Path) -> dict:
     lines = [
         line

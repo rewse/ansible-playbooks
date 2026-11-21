@@ -17,6 +17,9 @@ services:
       - /dev/serial/by-id:/dev/serial/by-id
       - /etc/localtime:/etc/localtime:ro
       - /run/dbus:/run/dbus:ro
+      # Outside /config, so Docker creates no mount point in the configuration
+      # tree and the fetcher's user needs no access to that tree.
+      - /srv/enecoq_data_fetcher:/enecoq:ro
       - /srv/homeassistant/config:/config
     security_opt:
       - apparmor:unconfined

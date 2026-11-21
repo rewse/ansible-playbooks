@@ -4,6 +4,7 @@
     path: /srv/homeassistant/config/custom_components
     state: directory
     mode: "0755"
+    follow: false
 
 - name: frigate | Resolve aged tag frigate-hass-integration
   ansible.builtin.set_fact:

@@ -9,3 +9,15 @@
     state: restarted
     daemon_reload: true
   when: enecoq_data_fetcher_timer_enabled
+
+- name: Start enecoq-data-fetcher
+  # Writes the first file into a new output directory instead of leaving Home
+  # Assistant's sensors without one until the timer fires. A fetch takes
+  # minutes and depends on enecoQ, so the run does not wait for it.
+  ansible.builtin.systemd:
+    name: enecoq-data-fetcher.service
+    state: started
+    no_block: true
+    daemon_reload: true
+  # The unit may not exist yet in check mode.
+  when: enecoq_data_fetcher_timer_enabled and not ansible_check_mode
