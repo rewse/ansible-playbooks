@@ -126,6 +126,48 @@ class DefaultBranchPinTest(unittest.TestCase):
                 self.assertRegex(call, r", branch='[^']+'")
 
 
+class ZinitPinTest(unittest.TestCase):
+    """zinit is sourced by root's shell, so it is checked out at an aged tag."""
+
+    TASKS = ROLES / "ubuntu" / "tasks" / "zinit.yml"
+
+    def setUp(self):
+        self.text = self.TASKS.read_text()
+        self.tasks = yaml.safe_load(self.text)
+
+    def test_no_installer_or_self_update(self):
+        self.assertNotRegex(self.text, r"curl[^\n]*\|\s*(?:ba)?sh|bash -c \"\$\(curl")
+        self.assertNotIn("self-update", self.text)
+        self.assertNotIn("ansible.builtin.shell", self.text)
+        self.assertNotIn("ansible.builtin.command", self.text)
+
+    def test_checkout_is_the_aged_tag_commit(self):
+        lookups = [
+            value
+            for task in self.tasks
+            for value in task.get("ansible.builtin.set_fact", {}).values()
+        ]
+        lookup = (
+            "{{ lookup('aged_release', 'github-tag:zdharma-continuum/zinit',"
+            " branch='main') }}"
+        )
+        self.assertEqual(lookups, [lookup])
+        git = next(
+            t["ansible.builtin.git"] for t in self.tasks if "ansible.builtin.git" in t
+        )
+        # The installer cloned this URL, so existing checkouts keep their origin.
+        self.assertEqual(git["repo"], "https://github.com/zdharma-continuum/zinit")
+        self.assertEqual(git["dest"], "/usr/local/share/zinit/zinit.git")
+        self.assertEqual(git["version"], "{{ __ubuntu_zinit.commit }}")
+
+    def test_component_keeps_the_update_tag(self):
+        main = yaml.safe_load((ROLES / "ubuntu" / "tasks" / "main.yml").read_text())
+        task = next(
+            t for t in main if t.get("ansible.builtin.import_tasks") == "zinit.yml"
+        )
+        self.assertIn("update", task["tags"])
+
+
 class CouchdbInitScriptTest(unittest.TestCase):
     """The LiveSync init script runs with the CouchDB admin password."""
 

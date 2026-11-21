@@ -1,18 +1,22 @@
 ---
 # zinit itself is installed globally so root and the admin user share one copy.
-# Each user's plugins stay in their own ~/.local/share/zinit.
-- name: zinit | Install
-  # The vendor installer has no module. chezmoi owns .zshrc, so the installer
-  # leaves it alone.
-  ansible.builtin.shell: bash -c "$(curl --fail --show-error --silent --location https://raw.githubusercontent.com/zdharma-continuum/zinit/HEAD/scripts/install.sh)"
-  args:
-    creates: /usr/local/share/zinit/zinit.git/zinit.zsh
-  environment:
-    NO_EDIT: "1"
-    NO_INPUT: "1"
-    ZINIT_HOME: /usr/local/share/zinit
+# Each user's plugins stay in their own ~/.local/share/zinit. The vendor
+# installer clones the default branch head and edits .zshrc, which chezmoi
+# owns, so the checkout is managed directly at an aged release instead.
+- name: zinit | Create home
+  ansible.builtin.file:
+    path: /usr/local/share/zinit
+    state: directory
+    mode: "0755"
 
-- name: zinit | Update
-  # zinit updates itself from zsh; no module manages it.
-  ansible.builtin.command: zsh -c "source /usr/local/share/zinit/zinit.git/zinit.zsh && zinit self-update"
-  changed_when: false
+- name: zinit | Resolve aged release
+  ansible.builtin.set_fact:
+    __ubuntu_zinit: "{{ lookup('aged_release', 'github-tag:zdharma-continuum/zinit', branch='main') }}"
+
+- name: zinit | Check out zinit
+  # The URL matches the origin the vendor installer sets, so an installer
+  # checkout is moved to the pinned commit in place.
+  ansible.builtin.git:
+    repo: https://github.com/zdharma-continuum/zinit
+    dest: /usr/local/share/zinit/zinit.git
+    version: "{{ __ubuntu_zinit.commit }}"
