@@ -20,6 +20,15 @@
   changed_when: "'already enabled' not in __zabbix_server_a2enconf_api.stdout"
   notify: Reload Apache
 
+- name: frontend | Download Amazon RDS CA bundle
+  ansible.builtin.get_url:
+    url: "{{ zabbix_server_db_ca_url }}"
+    dest: "{{ zabbix_server_db_ca_file }}"
+    checksum: "{{ zabbix_server_db_ca_checksum }}"
+    owner: root
+    group: root
+    mode: "0644"
+
 - name: frontend | Copy PHP config
   ansible.builtin.template:
     src: zabbix.conf.php.j2
