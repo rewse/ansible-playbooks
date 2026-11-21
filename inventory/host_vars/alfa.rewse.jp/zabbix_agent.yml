@@ -1,2 +1,6 @@
 ---
+# The agent runs as zabbix here, and its syslog item reads /var/log/syslog
+# (syslog:adm 0640).
+zabbix_agent_groups:
+  - adm
 zabbix_agent_platform: ec2

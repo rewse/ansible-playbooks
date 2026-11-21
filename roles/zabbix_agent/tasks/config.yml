@@ -49,6 +49,13 @@
     mode: "0644"
   notify: Restart zabbix-agent
 
+- name: config | Copy file key restrictions
+  ansible.builtin.copy:
+    src: deny-file-keys.conf
+    dest: /etc/zabbix/zabbix_agentd.d
+    mode: "0644"
+  notify: Restart zabbix-agent
+
 - name: config | Create agentscripts directory
   ansible.builtin.file:
     path: /usr/lib/zabbix/agentscripts

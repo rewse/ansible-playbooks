@@ -13,13 +13,6 @@
     mode: "0644"
   notify: Restart zabbix-agent
 
-- name: raspberrypi | Copy file key restrictions
-  ansible.builtin.copy:
-    src: deny-file-keys.conf
-    dest: /etc/zabbix/zabbix_agentd.d
-    mode: "0644"
-  notify: Restart zabbix-agent
-
 - name: raspberrypi | Enable AllowRoot
   # The Raspberry Pi items read hardware that only root can open.
   ansible.builtin.lineinfile:
