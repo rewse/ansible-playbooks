@@ -1,4 +1,9 @@
 ---
+# Supplementary groups of the zabbix account; any other group is removed. Other
+# services also run as zabbix, so grant adm only where an unprivileged agent
+# reads an adm-owned log. The Raspberry Pi agent runs as root and needs none.
+zabbix_agent_groups: []
+
 # Hardware or cloud the host runs on; selects tasks/<platform>.yml.
 # ubuntu adds nothing to the common tasks.
 zabbix_agent_platform: ubuntu

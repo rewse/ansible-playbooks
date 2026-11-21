@@ -10,8 +10,9 @@
       - zabbix-sender
     update_cache: true
 
-- name: package | Add zabbix user to adm group
+- name: package | Set zabbix user groups
   ansible.builtin.user:
     name: zabbix
-    groups: zabbix,adm
+    groups: "{{ zabbix_agent_groups }}"
+    append: false
   notify: Restart zabbix-agent

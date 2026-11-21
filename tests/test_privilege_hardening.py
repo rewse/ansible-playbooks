@@ -195,17 +195,32 @@ class ZabbixAgentTest(unittest.TestCase):
             ],
         )
 
-    def test_root_agent_denies_keys_that_read_files(self):
-        # The agent runs as root on Raspberry Pi, so these keys would return the
-        # contents or listing of any file to whoever can query the agent.
-        denied = [
-            line.removeprefix("DenyKey=")
+    def key_rules(self) -> list[str]:
+        return [
+            line
             for line in (ZABBIX_FILES / "deny-file-keys.conf").read_text().splitlines()
-            if line.startswith("DenyKey=")
+            if re.match(r"(Allow|Deny)Key=", line)
+        ]
+
+    def copied_sources(self, task_file: str) -> list[str]:
+        tasks = yaml.safe_load((ZABBIX_FILES.parent / "tasks" / task_file).read_text())
+        return [task.get("ansible.builtin.copy", {}).get("src") for task in tasks]
+
+    def test_agent_denies_keys_that_read_files(self):
+        # These keys return the contents, matching lines, or listing of any file
+        # the agent's account can open to whoever can query the agent.
+        denied = [
+            rule.removeprefix("DenyKey=")
+            for rule in self.key_rules()
+            if rule.startswith("DenyKey=")
         ]
         self.assertEqual(
             denied,
             [
+                "log.count[*]",
+                "log[*]",
+                "logrt.count[*]",
+                "logrt[*]",
                 "vfs.dir.get[*]",
                 "vfs.file.contents[*]",
                 "vfs.file.get[*]",
@@ -213,19 +228,88 @@ class ZabbixAgentTest(unittest.TestCase):
                 "vfs.file.regmatch[*]",
             ],
         )
-        tasks = yaml.safe_load(
-            (ZABBIX_FILES.parent / "tasks" / "raspberrypi.yml").read_text()
-        )
-        sources = [task.get("ansible.builtin.copy", {}).get("src") for task in tasks]
-        self.assertIn("deny-file-keys.conf", sources)
 
-    def test_root_agent_keeps_file_metadata_keys(self):
-        # The OS templates monitor checksums and existence of system files.
-        rules = "\n".join(
-            line
-            for line in (ZABBIX_FILES / "deny-file-keys.conf").read_text().splitlines()
-            if re.match(r"(Allow|Deny)Key=", line)
+    def test_agent_allows_only_the_log_items_in_use(self):
+        # The agent applies the first rule a key matches, so each allowed key
+        # must come before the denials and name its log file literally.
+        rules = self.key_rules()
+        allowed = [
+            rule.removeprefix("AllowKey=")
+            for rule in rules
+            if rule.startswith("AllowKey=")
+        ]
+        self.assertEqual(
+            allowed,
+            [
+                (
+                    'log.count[/var/log/syslog,"nvme.*(controller is down|Unable to'
+                    ' change power state)",UTF-8,,skip]'
+                ),
+                "log[/var/log/remote.log,,UTF-8]",
+                "log[/var/log/syslog,,UTF-8]",
+            ],
         )
+        first_deny = next(
+            index for index, rule in enumerate(rules) if rule.startswith("DenyKey=")
+        )
+        self.assertTrue(
+            all(rule.startswith("AllowKey=") for rule in rules[:first_deny])
+        )
+        self.assertFalse(
+            any(rule.startswith("AllowKey=") for rule in rules[first_deny:])
+        )
+        for key in allowed:
+            with self.subTest(key=key):
+                path = key.split("[", 1)[1].split(",", 1)[0]
+                self.assertRegex(path, r"^/var/log/[a-z.]+$")
+
+    def test_every_platform_copies_the_key_restrictions(self):
+        self.assertIn("deny-file-keys.conf", self.copied_sources("config.yml"))
+        for platform in ("ec2.yml", "raspberrypi.yml"):
+            with self.subTest(platform=platform):
+                self.assertNotIn("deny-file-keys.conf", self.copied_sources(platform))
+
+    def test_zabbix_account_joins_adm_only_where_the_agent_needs_it(self):
+        # Other services also run as zabbix, and adm opens Apache, auth, and
+        # system logs. The Raspberry Pi agent runs as root; the unprivileged
+        # agent on EC2 needs adm for its syslog item.
+        defaults = yaml.safe_load(
+            (ZABBIX_FILES.parent / "defaults" / "main.yml").read_text()
+        )
+        self.assertEqual(defaults["zabbix_agent_groups"], [])
+        tasks = yaml.safe_load(
+            (ZABBIX_FILES.parent / "tasks" / "package.yml").read_text()
+        )
+        users = [
+            task["ansible.builtin.user"]
+            for task in tasks
+            if task.get("ansible.builtin.user", {}).get("name") == "zabbix"
+        ]
+        self.assertEqual(
+            users,
+            [
+                {
+                    "name": "zabbix",
+                    "groups": "{{ zabbix_agent_groups }}",
+                    "append": False,
+                }
+            ],
+        )
+        for path in sorted(
+            (REPO_ROOT / "inventory" / "host_vars").glob("*/zabbix_agent.yml")
+        ):
+            host_vars = yaml.safe_load(path.read_text())
+            with self.subTest(host=path.parent.name):
+                if host_vars["zabbix_agent_platform"] == "raspberrypi":
+                    self.assertEqual(host_vars.get("zabbix_agent_groups", []), [])
+                else:
+                    self.assertLessEqual(
+                        set(host_vars.get("zabbix_agent_groups", [])), {"adm"}
+                    )
+
+    def test_agent_keeps_file_metadata_keys(self):
+        # The OS templates monitor checksums and existence of system files.
+        rules = "\n".join(self.key_rules())
         self.assertNotIn("vfs.file[", rules)
         self.assertNotIn("vfs.file.*", rules)
         for key in ("cksum", "exists", "size", "time"):
