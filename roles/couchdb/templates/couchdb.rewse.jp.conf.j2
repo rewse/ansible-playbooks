@@ -56,6 +56,16 @@
         Require all denied
     </If>
 
+    # The decoy database is read-only for every network. Its design document's
+    # validate_doc_update never runs for _local documents, so Apache admits
+    # only GET, HEAD, OPTIONS, and POST to the read endpoints that take a query
+    # in the body. The database match ignores case so that no spelling slips
+    # past, while the methods and read endpoints match exactly. The design
+    # document still guards ordinary documents for callers on loopback.
+    <If "%{REQUEST_URI} =~ m#^/+{{ couchdb_security_agent_database | regex_escape }}(?:/|$)#i && ! (%{REQUEST_METHOD} in { 'GET', 'HEAD', 'OPTIONS' } || (%{REQUEST_METHOD} == 'POST' && %{REQUEST_URI} =~ m#^/+{{ couchdb_security_agent_database | regex_escape }}/+_(?:all_docs|bulk_get|changes|explain|find)/?$#))">
+        Require all denied
+    </If>
+
     SSLCertificateFile /etc/letsencrypt/live/rewse.jp/fullchain.pem
     SSLCertificateKeyFile /etc/letsencrypt/live/rewse.jp/privkey.pem
     Include /etc/letsencrypt/options-ssl-apache.conf
