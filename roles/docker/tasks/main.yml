@@ -18,3 +18,9 @@
   ansible.builtin.import_tasks: compose.yml
   tags:
     - docker_compose
+
+- name: Import prune tasks
+  ansible.builtin.import_tasks: prune.yml
+  tags:
+    - docker_prune
+    - update

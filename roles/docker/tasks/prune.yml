@@ -1,0 +1,16 @@
+---
+# Service roles depend on this role, so this runs before they pull: it removes
+# the images the previous run replaced, and keeps every image a container
+# refers to, stopped ones included. Containers, networks, and volumes are left
+# alone so the stopped standby container on the secondary and service data
+# survive.
+- name: prune | Remove unused images and build cache
+  community.docker.docker_prune:
+    builder_cache: true
+    builder_cache_all: true
+    images: true
+    images_filters:
+      dangling: false
+    # The default 60 s read timeout expires while the daemon deletes a backlog
+    # of large images.
+    timeout: 600
