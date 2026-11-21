@@ -1,6 +1,7 @@
 #!/usr/bin/env python3
 """Regression tests for the access rules of the TeslaMate virtual host."""
 
+import base64
 import email.message
 import http.client
 import http.server
@@ -41,6 +42,99 @@ def section(text: str, opening: str, closing: str) -> str:
     return match.group(1)
 
 
+def apache_module_dir() -> pathlib.Path | None:
+    return next(
+        (d for d in APACHE_MODULE_DIRS if (d / "mod_proxy_http.so").exists()), None
+    )
+
+
+def free_port() -> int:
+    with socket.socket() as probe:
+        probe.bind(("127.0.0.1", 0))
+        return probe.getsockname()[1]
+
+
+def start_apache(
+    root: pathlib.Path, vhost_text: str, port: int, directives: tuple[str, ...] = ()
+) -> subprocess.Popen[str]:
+    """Serves vhost_text over plain HTTP on port and waits until it listens."""
+    module_dir = apache_module_dir()
+    if module_dir is None:
+        raise unittest.SkipTest("no Apache proxy modules found")
+    vhost = "\n".join(
+        line.replace("*:443", f"127.0.0.1:{port}")
+        for line in vhost_text.splitlines()
+        if not line.strip().startswith(("SSL", "Include "))
+    )
+    (root / "vhost.conf").write_text(vhost)
+    modules = [
+        f"LoadModule {name}_module {module_dir}/mod_{name}.so"
+        for name in (
+            "mpm_prefork",
+            "authn_core",
+            "authn_file",
+            "authz_core",
+            "authz_user",
+            "auth_basic",
+            "headers",
+            "log_config",
+            "logio",
+            "proxy",
+            "proxy_http",
+            "proxy_wstunnel",
+            "remoteip",
+            "rewrite",
+            "setenvif",
+            "unixd",
+        )
+        if (module_dir / f"mod_{name}.so").exists()
+    ]
+    config = root / "httpd.conf"
+    config.write_text(
+        "\n".join(
+            [
+                *modules,
+                f"Define APACHE_LOG_DIR {root}",
+                f"DefaultRuntimeDir {root}",
+                f"Listen 127.0.0.1:{port}",
+                f"PidFile {root}/httpd.pid",
+                f"ErrorLog {root}/error.log",
+                "ServerName localhost",
+                f"DocumentRoot {root}",
+                *directives,
+                f"Include {root}/vhost.conf",
+            ]
+        )
+        + "\n"
+    )
+    binary = shutil.which("httpd") or shutil.which("apache2")
+    assert binary is not None
+    server = subprocess.Popen(
+        [binary, "-X", "-f", str(config)],
+        stdout=subprocess.DEVNULL,
+        stderr=subprocess.PIPE,
+        text=True,
+    )
+    try:
+        for _ in range(100):
+            if server.poll() is not None:
+                raise AssertionError(server.stderr.read() if server.stderr else "")
+            try:
+                with socket.create_connection(("127.0.0.1", port), timeout=1):
+                    return server
+            except OSError:
+                time.sleep(0.05)
+        raise AssertionError("Apache did not start")
+    except BaseException:
+        stop_apache(server)
+        raise
+
+
+def stop_apache(server: subprocess.Popen[str]) -> None:
+    server.terminate()
+    server.wait(timeout=10)
+
+
 class TeslamateVhostAuthTest(unittest.TestCase):
     def test_auth_covers_every_path(self):
         root = section(vhost(), '<Location "/">', "</Location>")
@@ -78,6 +172,20 @@ class TeslamateVhostCrossSiteTest(unittest.TestCase):
         )
         self.assertIsNotNone(rule)
 
+    def test_rejects_cross_site_subresources(self):
+        # Only a top-level document navigation from another site or a sibling
+        # subdomain gets through; the rule must precede the proxy mapping.
+        text = vhost()
+        rule = re.search(
+            r"(?m)^\s*RewriteCond %\{HTTP:Sec-Fetch-Site\} \^\(cross-site\|same-site\)\$"
+            r"\s*\n\s*RewriteCond %\{HTTP:Sec-Fetch-Mode\} !\^navigate\$ \[OR\]"
+            r"\s*\n\s*RewriteCond %\{HTTP:Sec-Fetch-Dest\} !\^document\$"
+            r"\s*\n\s*RewriteRule \^ - \[F\]\s*$",
+            text,
+        )
+        assert rule is not None
+        self.assertLess(rule.start(), text.index("ProxyPass "))
+
     def test_modules_are_enabled(self):
         tasks = (TESLAMATE / "tasks" / "apache.yml").read_text()
         for module in ("auth_basic", "headers", "rewrite"):
@@ -92,6 +200,8 @@ class TeslamateVhostHeadersTest(unittest.TestCase):
         self.assertEqual(
             headers,
             {
+                "Cross-Origin-Opener-Policy": "same-origin",
+                "Cross-Origin-Resource-Policy": "same-origin",
                 "Strict-Transport-Security": "max-age=31536000",
                 "X-Content-Type-Options": "nosniff",
                 "X-Frame-Options": "SAMEORIGIN",
@@ -269,91 +379,31 @@ class GrafanaVhostApacheTest(unittest.TestCase):
 
     @classmethod
     def setUpClass(cls):
-        module_dir = next(
-            (d for d in APACHE_MODULE_DIRS if (d / "mod_proxy_http.so").exists()),
-            None,
-        )
-        if module_dir is None:
-            raise unittest.SkipTest("no Apache proxy modules found")
         cls.tmp = tempfile.TemporaryDirectory()
-        root = pathlib.Path(cls.tmp.name)
         cls.backend = http.server.ThreadingHTTPServer(("127.0.0.1", 0), _Backend)
         threading.Thread(target=cls.backend.serve_forever, daemon=True).start()
-        with socket.socket() as probe:
-            probe.bind(("127.0.0.1", 0))
-            cls.port = probe.getsockname()[1]
-        vhost = "\n".join(
-            line.replace("*:443", f"127.0.0.1:{cls.port}")
-            for line in grafana_vhost(cls.backend.server_address[1]).splitlines()
-            if not line.strip().startswith(("SSL", "Include "))
-        )
-        (root / "vhost.conf").write_text(vhost)
-        modules = [
-            f"LoadModule {name}_module {module_dir}/mod_{name}.so"
-            for name in (
-                "mpm_prefork",
-                "authz_core",
-                "headers",
-                "log_config",
-                "logio",
-                "proxy",
-                "proxy_http",
-                "proxy_wstunnel",
-                "remoteip",
-                "setenvif",
-                "unixd",
-            )
-            if (module_dir / f"mod_{name}.so").exists()
-        ]
-        config = root / "httpd.conf"
-        config.write_text(
-            "\n".join(
-                [
-                    *modules,
-                    f"Define APACHE_LOG_DIR {root}",
-                    f"DefaultRuntimeDir {root}",
-                    f"Listen 127.0.0.1:{cls.port}",
-                    f"PidFile {root}/httpd.pid",
-                    f"ErrorLog {root}/error.log",
-                    "ServerName localhost",
-                    f"DocumentRoot {root}",
+        cls.port = free_port()
+        try:
+            cls.server = start_apache(
+                pathlib.Path(cls.tmp.name),
+                grafana_vhost(cls.backend.server_address[1]),
+                cls.port,
+                (
                     # As behind CloudFront, the client address comes from the
                     # last X-Forwarded-For entry a trusted proxy added.
                     "RemoteIPHeader X-Forwarded-For",
                     "RemoteIPInternalProxy 127.0.0.1",
-                    f"Include {root}/vhost.conf",
-                ]
+                ),
             )
-            + "\n"
-        )
-        binary = shutil.which("httpd") or shutil.which("apache2")
-        assert binary is not None
-        cls.server = subprocess.Popen(
-            [binary, "-X", "-f", str(config)],
-            stdout=subprocess.DEVNULL,
-            stderr=subprocess.PIPE,
-            text=True,
-        )
-        try:
-            for _ in range(100):
-                if cls.server.poll() is not None:
-                    raise AssertionError(
-                        cls.server.stderr.read() if cls.server.stderr else ""
-                    )
-                try:
-                    with socket.create_connection(("127.0.0.1", cls.port), timeout=1):
-                        return
-                except OSError:
-                    time.sleep(0.05)
-            raise AssertionError("Apache did not start")
         except BaseException:
-            cls.tearDownClass()
+            cls.backend.shutdown()
+            cls.backend.server_close()
+            cls.tmp.cleanup()
             raise
 
     @classmethod
     def tearDownClass(cls):
-        cls.server.terminate()
-        cls.server.wait(timeout=10)
+        stop_apache(cls.server)
         cls.backend.shutdown()
         cls.backend.server_close()
         cls.tmp.cleanup()
@@ -418,6 +468,200 @@ class GrafanaVhostApacheTest(unittest.TestCase):
                     response.getheader("X-Content-Type-Options"), "nosniff"
                 )
                 self.assertEqual(response.getheader("X-Frame-Options"), "SAMEORIGIN")
+
+
+TESLAMATE_USER = "owner"
+TESLAMATE_PASSWORD = "secret"
+
+
+def teslamate_vhost(port: int, htpasswd: pathlib.Path) -> str:
+    environment = jinja2.Environment(
+        loader=jinja2.FileSystemLoader(TESLAMATE / "templates"),
+        undefined=jinja2.StrictUndefined,
+    )
+    text = environment.get_template(VHOST.name).render(
+        ansible_managed="Ansible managed",
+        teslamate_hostname="teslamate.rewse.jp",
+        teslamate_port=port,
+    )
+    return text.replace("/etc/apache2/.teslamate.htpasswd", str(htpasswd))
+
+
+class _TeslamateBackend(http.server.BaseHTTPRequestHandler):
+    # Stands in for TeslaMate: accepts a WebSocket upgrade with 101 and
+    # answers every other request with 200.
+    def answer(self) -> None:
+        length = int(self.headers.get("Content-Length") or 0)
+        self.rfile.read(length)
+        if self.headers.get("Upgrade", "").lower() == "websocket":
+            self.close_connection = True
+            self.send_response(101)
+            self.send_header("Connection", "Upgrade")
+            self.send_header("Upgrade", "websocket")
+            self.end_headers()
+            return
+        self.send_response(200)
+        self.send_header("Content-Length", "3")
+        self.end_headers()
+        if self.command != "HEAD":
+            self.wfile.write(b"ok\n")
+
+    do_GET = do_HEAD = do_POST = answer
+
+    def log_message(self, format, *args):
+        pass
+
+
+@unittest.skipUnless(shutil.which("httpd") or shutil.which("apache2"), "no Apache")
+@unittest.skipUnless(shutil.which("htpasswd"), "no htpasswd")
+class TeslamateVhostApacheTest(unittest.TestCase):
+    WEBSOCKET: ClassVar[dict[str, str]] = {
+        "Connection": "Upgrade",
+        "Sec-WebSocket-Key": base64.b64encode(b"the sample nonce").decode(),
+        "Sec-WebSocket-Version": "13",
+        "Upgrade": "websocket",
+    }
+    # Fetch Metadata is (Sec-Fetch-Site, Sec-Fetch-Mode, Sec-Fetch-Dest), or
+    # None for a client that sends none of it. Requests that keep working with
+    # the credential: clients that are not browsers, bookmarks, links from
+    # Grafana dashboards and from other sites, the page's own assets and
+    # LiveView calls, and the LiveView socket.
+    ALLOWED = (
+        ("GET", "/", None, 200),
+        ("GET", "/", ("none", "navigate", "document"), 200),
+        ("GET", "/drives/1", ("same-site", "navigate", "document"), 200),
+        ("GET", "/charges/1", ("cross-site", "navigate", "document"), 200),
+        ("GET", "/assets/app.css", ("same-origin", "no-cors", "style"), 200),
+        ("GET", "/assets/app.js", ("same-origin", "no-cors", "script"), 200),
+        ("GET", "/images/favicon.png", ("same-origin", "no-cors", "image"), 200),
+        ("POST", "/drives/1", ("same-origin", "cors", "empty"), 200),
+        ("GET", "/live/websocket", ("same-origin", "websocket", "websocket"), 101),
+    )
+    # Requests another site or a sibling subdomain starts that are not
+    # top-level navigations, refused before authentication.
+    REFUSED = (
+        ("GET", "/drives/1", ("cross-site", "no-cors", "empty")),
+        ("GET", "/drives/1", ("same-site", "no-cors", "empty")),
+        ("GET", "/geo-fences/1/edit", ("cross-site", "no-cors", "empty")),
+        ("GET", "/", ("cross-site", "navigate", "iframe")),
+        ("GET", "/", ("same-site", "navigate", "iframe")),
+        ("GET", "/", ("cross-site", "cors", "empty")),
+        ("GET", "/", ("cross-site", "no-cors", "document")),
+        ("GET", "/assets/app.css", ("cross-site", "no-cors", "style")),
+        ("GET", "/assets/app.js", ("same-site", "no-cors", "script")),
+        ("GET", "/live/websocket", ("cross-site", "websocket", "websocket")),
+        ("GET", "/live/websocket", ("same-site", "websocket", "websocket")),
+        ("POST", "/drives/1", ("same-site", "navigate", "document")),
+    )
+
+    @classmethod
+    def setUpClass(cls):
+        cls.tmp = tempfile.TemporaryDirectory()
+        root = pathlib.Path(cls.tmp.name)
+        htpasswd = root / "htpasswd"
+        subprocess.run(
+            ["htpasswd", "-c", "-B", "-i", str(htpasswd), TESLAMATE_USER],
+            input=TESLAMATE_PASSWORD,
+            text=True,
+            check=True,
+            capture_output=True,
+        )
+        cls.backend = http.server.ThreadingHTTPServer(
+            ("127.0.0.1", 0), _TeslamateBackend
+        )
+        threading.Thread(target=cls.backend.serve_forever, daemon=True).start()
+        cls.port = free_port()
+        try:
+            cls.server = start_apache(
+                root, teslamate_vhost(cls.backend.server_address[1], htpasswd), cls.port
+            )
+        except BaseException:
+            cls.backend.shutdown()
+            cls.backend.server_close()
+            cls.tmp.cleanup()
+            raise
+
+    @classmethod
+    def tearDownClass(cls):
+        stop_apache(cls.server)
+        cls.backend.shutdown()
+        cls.backend.server_close()
+        cls.tmp.cleanup()
+
+    def request(
+        self,
+        method: str,
+        target: str,
+        fetch: tuple[str, str, str] | None,
+        authenticated: bool = True,
+    ) -> http.client.HTTPResponse:
+        headers = {"Host": "teslamate.rewse.jp"}
+        if fetch is not None:
+            site, mode, dest = fetch
+            headers |= {
+                "Sec-Fetch-Dest": dest,
+                "Sec-Fetch-Mode": mode,
+                "Sec-Fetch-Site": site,
+            }
+            if mode == "websocket":
+                headers |= self.WEBSOCKET
+        if authenticated:
+            token = base64.b64encode(
+                f"{TESLAMATE_USER}:{TESLAMATE_PASSWORD}".encode()
+            ).decode()
+            headers["Authorization"] = f"Basic {token}"
+        connection = http.client.HTTPConnection("127.0.0.1", self.port, timeout=5)
+        try:
+            connection.request(
+                method, target, body=b"" if method != "GET" else None, headers=headers
+            )
+            response = connection.getresponse()
+            response.read()
+            return response
+        finally:
+            connection.close()
+
+    def test_ordinary_requests_reach_teslamate(self):
+        for method, target, fetch, status in self.ALLOWED:
+            with self.subTest(method=method, target=target, fetch=fetch):
+                self.assertEqual(self.request(method, target, fetch).status, status)
+
+    def test_navigations_still_ask_for_the_credential(self):
+        for fetch in (None, ("cross-site", "navigate", "document")):
+            with self.subTest(fetch=fetch):
+                response = self.request("GET", "/", fetch, authenticated=False)
+                self.assertEqual(response.status, 401)
+                self.assertEqual(
+                    response.getheader("WWW-Authenticate"), 'Basic realm="TeslaMate"'
+                )
+
+    def test_refused_requests_answer_403_with_or_without_the_credential(self):
+        for method, target, fetch in self.REFUSED:
+            for authenticated in (False, True):
+                with self.subTest(
+                    method=method,
+                    target=target,
+                    fetch=fetch,
+                    authenticated=authenticated,
+                ):
+                    response = self.request(method, target, fetch, authenticated)
+                    self.assertEqual(response.status, 403)
+
+    def test_isolation_headers_are_on_every_response(self):
+        cases = (
+            (None, True),
+            (None, False),
+            (("cross-site", "no-cors", "empty"), False),
+        )
+        for fetch, authenticated in cases:
+            with self.subTest(fetch=fetch, authenticated=authenticated):
+                response = self.request("GET", "/", fetch, authenticated)
+                self.assertEqual(
+                    response.getheader("Cross-Origin-Opener-Policy"), "same-origin"
+                )
+                self.assertEqual(
+                    response.getheader("Cross-Origin-Resource-Policy"), "same-origin"
+                )
 
 
 if __name__ == "__main__":

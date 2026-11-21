@@ -9,20 +9,34 @@
     ProxyRequests off
     RequestHeader set X-Forwarded-Proto "https"
 
+    # Another site's window cannot keep a handle on a TeslaMate page, and its
+    # pages cannot embed TeslaMate responses as images, scripts, or styles.
+    Header always set Cross-Origin-Opener-Policy "same-origin"
+    Header always set Cross-Origin-Resource-Policy "same-origin"
     Header always set Strict-Transport-Security "max-age=31536000"
     Header always set X-Content-Type-Options "nosniff"
     Header always set X-Frame-Options "SAMEORIGIN"
 
     # mod_rewrite runs before mod_proxy maps the request and before
-    # authentication, so this rule rejects a request before it reaches
-    # TeslaMate. Browsers resend Basic credentials with any request to this
-    # name, including a form post another site starts, and Basic auth has no
-    # SameSite equivalent. Browsers mark those requests with Sec-Fetch-Site, so
-    # a write from another site or a sibling subdomain is refused. A request
-    # without the header, from a client that is not a browser, passes.
+    # authentication, so these rules reject a request before it reaches
+    # TeslaMate, with the same 403 whether or not the credential is valid.
+    # Browsers resend Basic credentials with any request to this name,
+    # including one another site starts, and Basic auth has no SameSite
+    # equivalent. Browsers mark those requests with Fetch Metadata headers.
+    # A request without them, from a client that is not a browser, passes.
     RewriteEngine on
+    # A write from another site or a sibling subdomain is refused.
     RewriteCond %{REQUEST_METHOD} !^(GET|HEAD|OPTIONS)$
     RewriteCond %{HTTP:Sec-Fetch-Site} ^(cross-site|same-site)$
+    RewriteRule ^ - [F]
+    # From another site or a sibling subdomain, only a top-level document
+    # navigation, such as a link from a Grafana dashboard, is accepted. A
+    # prefetch, fetch, frame, embedded asset, or WebSocket is refused, so the
+    # page cannot learn from load or error events which records exist. The
+    # page's own assets and LiveView socket are same-origin.
+    RewriteCond %{HTTP:Sec-Fetch-Site} ^(cross-site|same-site)$
+    RewriteCond %{HTTP:Sec-Fetch-Mode} !^navigate$ [OR]
+    RewriteCond %{HTTP:Sec-Fetch-Dest} !^document$
     RewriteRule ^ - [F]
 
     ProxyPass /live/websocket ws://127.0.0.1:{{ teslamate_port }}/live/websocket
