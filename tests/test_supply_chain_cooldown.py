@@ -80,6 +80,42 @@ class GitToolPinTest(unittest.TestCase):
     TASKS = ROLES / "ubuntu" / "tasks" / "uv.yml"
     REPO = "aws-samples/sample-agentcore-websearch-agent-skill"
 
+    def test_no_git_source_is_unpinned(self):
+        unpinned = re.compile(r"git\+https://[^\s'\"@]+(?=[\s'\"]|$)", re.MULTILINE)
+        for path in tracked_files(ROLES):
+            if path.suffix not in (".j2", ".yml"):
+                continue
+            with self.subTest(path=path.relative_to(REPO_ROOT).as_posix()):
+                self.assertIsNone(unpinned.search(path.read_text()))
+
+    def test_darwin_git_tool_installs_an_aged_commit(self):
+        tasks = yaml.safe_load((ROLES / "darwin" / "tasks" / "uv.yml").read_text())
+        commands = [
+            task["ansible.builtin.command"]
+            for task in tasks
+            if "ansible.builtin.command" in task
+        ]
+        self.assertIn(
+            (
+                f"uv tool install git+https://github.com/{self.REPO}"
+                "@{{ __darwin_agentcore_websearch.commit }}"
+            ),
+            commands,
+        )
+        lookups = [
+            value
+            for task in tasks
+            for value in task.get("ansible.builtin.set_fact", {}).values()
+        ]
+        self.assertIn(
+            f"{{{{ lookup('aged_release', 'github-commit:{self.REPO}', branch='main') }}}}",
+            lookups,
+        )
+        tools = yaml.safe_load((ROLES / "darwin" / "vars" / "main.yml").read_text())[
+            "darwin_uv_tools"
+        ]
+        self.assertFalse([t for t in tools if "git+" in t])
+
     def test_git_tool_installs_an_aged_commit(self):
         tasks = yaml.safe_load(self.TASKS.read_text())
         commands = [

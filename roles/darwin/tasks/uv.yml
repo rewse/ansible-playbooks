@@ -1,4 +1,20 @@
 ---
+# Web search through a Bedrock AgentCore Gateway, signed with local AWS
+# credentials. Published only as a sample repository without tags, so it installs
+# from an aged commit rather than PyPI. Needs the gateway from the repo's
+# CloudFormation template and AGENTCORE_GATEWAY_URL, which .zshenv exports.
+- name: uv | Resolve aged agentcore-websearch commit
+  ansible.builtin.set_fact:
+    __darwin_agentcore_websearch: "{{ lookup('aged_release', 'github-commit:aws-samples/sample-agentcore-websearch-agent-skill', branch='main') }}"
+
+- name: uv | Install agentcore-websearch
+  # uv has no Ansible module. uv reinstalls the tool when the commit changes and
+  # otherwise reports it as already installed.
+  ansible.builtin.command: uv tool install git+https://github.com/aws-samples/sample-agentcore-websearch-agent-skill@{{ __darwin_agentcore_websearch.commit }}
+  environment: "{{ supply_chain_cooldown_environment }}"
+  register: __darwin_agentcore_websearch_install
+  changed_when: "'is already installed' not in __darwin_agentcore_websearch_install.stderr"
+
 - name: uv | Install tools
   # uv has no Ansible module.
   ansible.builtin.command: uv tool install {{ item }}
