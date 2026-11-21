@@ -136,6 +136,7 @@ def render_vhost(role: pathlib.Path, name: str, **variables) -> str:
         undefined=jinja2.StrictUndefined,
     )
     environment.filters["comment"] = lambda text: f"#\n# {text}\n#"
+    environment.filters["regex_escape"] = re.escape
     return environment.get_template(name).render(
         ansible_managed="Ansible managed", networks=NETWORKS, **variables
     )
@@ -167,8 +168,17 @@ def vhost_deploy_task(role: pathlib.Path, hostname: str) -> dict:
     )
 
 
+COUCHDB_DECOY = load_yaml(COUCHDB / "vars" / "main.yml")[
+    "couchdb_security_agent_database"
+]
+
+
 def couchdb_vhost() -> str:
-    return render_vhost(COUCHDB, "couchdb.rewse.jp.conf.j2")
+    return render_vhost(
+        COUCHDB,
+        "couchdb.rewse.jp.conf.j2",
+        couchdb_security_agent_database=COUCHDB_DECOY,
+    )
 
 
 class CouchDBAdminPathTest(unittest.TestCase):
@@ -237,10 +247,14 @@ class CouchDBSessionQueryTest(unittest.TestCase):
     # Location header unchecked, and no client of this host sends a query
     # string there, so Apache refuses any.
     def test_vhost_refuses_a_session_query_string_from_every_network(self):
-        rules = re.findall(
-            r'(?ms)^\s*<If "([^"]+)">\n\s*Require all denied\n\s*</If>',
-            couchdb_vhost(),
-        )
+        rules = [
+            rule
+            for rule in re.findall(
+                r'(?ms)^\s*<If "([^"]+)">\n\s*Require all denied\n\s*</If>',
+                couchdb_vhost(),
+            )
+            if "_session" in rule
+        ]
         self.assertEqual(len(rules), 1)
         self.assertIn("%{QUERY_STRING}", rules[0])
         self.assertIn("_session", rules[0])
@@ -342,7 +356,7 @@ class _CouchDBStub(http.server.BaseHTTPRequestHandler):
         self.send_header("Content-Length", "0")
         self.end_headers()
 
-    do_DELETE = do_GET = do_HEAD = do_POST = do_PUT = answer
+    do_COPY = do_DELETE = do_GET = do_HEAD = do_OPTIONS = do_POST = do_PUT = answer
 
     def log_message(self, format: str, *args: object) -> None:
         pass
@@ -458,11 +472,19 @@ class CouchDBApacheTest(unittest.TestCase):
         cls.tmp.cleanup()
 
     def request(
-        self, method: str, target: str, source: str | None
+        self,
+        method: str,
+        target: str,
+        source: str | None,
+        extra_headers: dict[str, str] | None = None,
     ) -> http.client.HTTPResponse:
         # Apache runs as one process, so a kept-alive connection would hold it
         # until the next request times out.
-        headers = {"Connection": "close", "Host": "couchdb.rewse.jp"}
+        headers = {
+            "Connection": "close",
+            "Host": "couchdb.rewse.jp",
+            **(extra_headers or {}),
+        }
         if source is not None:
             headers["X-Forwarded-For"] = source
         connection = http.client.HTTPConnection("127.0.0.1", self.port, timeout=5)
@@ -474,9 +496,18 @@ class CouchDBApacheTest(unittest.TestCase):
         finally:
             connection.close()
 
-    def assert_status(self, method: str, target: str, source, expected: int):
+    def assert_status(
+        self,
+        method: str,
+        target: str,
+        source,
+        expected: int,
+        extra_headers: dict[str, str] | None = None,
+    ):
         with self.subTest(method=method, target=target, source=source):
-            self.assertEqual(self.request(method, target, source).status, expected)
+            self.assertEqual(
+                self.request(method, target, source, extra_headers).status, expected
+            )
 
     def test_database_paths_stay_open_to_every_network(self):
         for source in (None, self.TRUSTED, self.UNTRUSTED):
@@ -530,6 +561,82 @@ class CouchDBApacheTest(unittest.TestCase):
                     f"/obsidian/%5F{route[1:]}/x",
                 ):
                     self.assert_status("POST", target, source, 403)
+
+    def test_decoy_database_accepts_reads_from_every_network(self):
+        db = COUCHDB_DECOY
+        for source in (None, self.TRUSTED, self.UNTRUSTED):
+            for method in ("GET", "HEAD", "OPTIONS"):
+                for target in (
+                    f"/{db}",
+                    f"/{db}/",
+                    f"/{db}/_all_docs?include_docs=true",
+                    f"/{db}/_local/x",
+                    f"/{db}/sample",
+                ):
+                    self.assert_status(method, target, source, 200)
+            for route in ("_all_docs", "_bulk_get", "_changes", "_explain", "_find"):
+                for target in (
+                    f"/{db}/{route}",
+                    f"/{db}/{route}/",
+                    f"/{db}//{route}",
+                    f"//{db}/{route}?limit=1",
+                    f"/{db}/%5F{route[1:]}",
+                ):
+                    self.assert_status("POST", target, source, 200)
+
+    def test_decoy_database_refuses_writes_from_every_network(self):
+        # The design document's validate_doc_update never runs for _local
+        # documents, so Apache refuses every write to the decoy.
+        db = COUCHDB_DECOY
+        encoded = "".join(f"%{ord(c):02X}" for c in db)
+        for source in (None, self.TRUSTED, self.UNTRUSTED):
+            for method, target in (
+                ("DELETE", f"/{db}"),
+                ("DELETE", f"/{db}/_local/x"),
+                ("DELETE", f"/{db}/sample"),
+                ("POST", f"/{db}"),
+                ("POST", f"/{db}/"),
+                ("POST", f"/{db}/_bulk_docs"),
+                ("POST", f"/{db}/_compact"),
+                ("POST", f"/{db}/_FIND"),
+                ("POST", f"/{db}/_find/x"),
+                ("POST", f"/{db}/_purge"),
+                ("PUT", f"/{db}"),
+                ("PUT", f"/{db}/%5Flocal/x"),
+                ("PUT", f"/{db}/_local/x"),
+                ("PUT", f"/{db}/_security"),
+                ("PUT", f"/{db}//_local/x"),
+                ("PUT", f"/{db}/sample"),
+                ("PUT", f"/{db.upper()}/_local/x"),
+                ("PUT", f"/{encoded}/_local/x"),
+                ("PUT", f"//{db}/_local/x"),
+                ("get", f"/{db}/sample"),
+            ):
+                self.assert_status(method, target, source, 403)
+            for target, destination in (
+                (f"/{db}/_local/x", "y"),
+                (f"/{db}/sample", "_local/x"),
+            ):
+                self.assert_status(
+                    "COPY", target, source, 403, {"Destination": destination}
+                )
+
+    def test_decoy_rule_leaves_other_databases_writable(self):
+        db = COUCHDB_DECOY
+        for source in (None, self.TRUSTED, self.UNTRUSTED):
+            for method, target in (
+                ("DELETE", "/obsidian/_local/x"),
+                ("POST", "/obsidian"),
+                ("POST", f"/{db}2/_bulk_docs"),
+                ("PUT", "/obsidian/_local/checkpoint"),
+                ("PUT", "/obsidian/doc"),
+                ("PUT", f"/obsidian/{db}"),
+                ("PUT", f"/{db}-copy/_local/x"),
+            ):
+                self.assert_status(method, target, source, 200)
+            self.assert_status(
+                "COPY", "/obsidian/doc", source, 200, {"Destination": "_local/x"}
+            )
 
     def test_responses_carry_hsts_and_a_secure_session_cookie(self):
         for target, status, cookie in (
