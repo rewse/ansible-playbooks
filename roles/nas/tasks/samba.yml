@@ -64,14 +64,11 @@
     validate: testparm -s %s
   notify: Restart smbd
 
-- name: samba | Read Samba database
-  # No module reads the Samba password database.
-  ansible.builtin.command: pdbedit --list
-  register: __nas_pdbedit
-  changed_when: false
-
-- name: samba | Create Samba users
-  # No module manages the Samba password database.
+- name: samba | Set Samba passwords
+  # No module manages the Samba password database. smbpasswd -a adds a missing
+  # user and resets an existing one, so every run applies the 1Password value.
+  # It cannot tell whether the password differed, so the task never reports a
+  # change.
   ansible.builtin.command:
     cmd: "smbpasswd -a -s {{ item }}"
     # Passed on stdin rather than the command line so it stays out of the
@@ -80,8 +77,7 @@
   vars:
     nas_samba_password: "{{ lookup('pipe', 'op read \"op://ansible/' ~ nas_samba_item_ids[item] ~ '/password\"') }}"
   loop: "{{ nas_samba_users }}"
-  when: item not in __nas_pdbedit.stdout
-  changed_when: true
+  changed_when: false
   no_log: true
 
 - name: samba | Enable and start Samba
