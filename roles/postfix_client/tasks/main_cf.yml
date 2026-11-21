@@ -1,4 +1,15 @@
 ---
+- name: main_cf | Set authorized_submit_users
+  # sendmail and postdrop accept mail only from these login names. root covers
+  # failure-notify, cron, and unattended-upgrades; the admin user covers its own
+  # cron jobs. Plain names are required here: a table such as static:root
+  # answers every lookup key and would authorize every account.
+  ansible.builtin.lineinfile:
+    dest: /etc/postfix/main.cf
+    regexp: "^authorized_submit_users"
+    line: "authorized_submit_users = root, {{ admin_user }}"
+  notify: Reload postfix
+
 - name: main_cf | Set myhostname
   ansible.builtin.lineinfile:
     dest: /etc/postfix/main.cf
