@@ -1,7 +1,7 @@
 ---
 - name: terminal | Resolve aged commit
   ansible.builtin.set_fact:
-    __desktop_one_gnome_terminal: "{{ lookup('aged_release', 'github-commit:denysdovhan/one-gnome-terminal') }}"
+    __desktop_one_gnome_terminal: "{{ lookup('aged_release', 'github-commit:denysdovhan/one-gnome-terminal', branch='master') }}"
 
 - name: terminal | Check out one-gnome-terminal
   ansible.builtin.git:

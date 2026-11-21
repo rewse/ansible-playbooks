@@ -11,6 +11,7 @@ from datetime import datetime
 from datetime import timedelta
 
 import pytest
+import yaml
 from ansible.errors import AnsibleLookupError
 
 sys.path.insert(
@@ -920,3 +921,79 @@ def test_commit_message_is_part_of_the_cache_key(monkeypatch, tmp_path):
     assert lookup.run(["github-commit:o/r"], variables, message=RELEASE) == [
         {"version": "1.0.0", "commit": "rel"}
     ]
+
+
+def test_tag_on_the_expected_default_branch_is_taken():
+    run = tag_run({"v1.0.0": "s10"}, {"v1.0.0": 30}, {"s10": "ahead"})
+    assert resolve("github-tag:o/r", run, branch="main") == {
+        "version": "v1.0.0",
+        "commit": "s10",
+    }
+
+
+def test_tag_refuses_a_changed_default_branch():
+    # A commit aged on a side branch looks like an old commit of the default
+    # branch once that side branch becomes the default.
+    run = tag_run({"v1.0.0": "s10"}, {"v1.0.0": 30}, {"s10": "ahead"})
+    run.table["gh api repos/o/r"] = {"default_branch": "side"}
+    run.table[ACTIVITY.format("side")] = [[push("h", 5, ref="refs/heads/side")]]
+    with pytest.raises(
+        AnsibleLookupError, match="o/r: the default branch is side, not main"
+    ):
+        resolve("github-tag:o/r", run, branch="main")
+    assert compare("s10", "h") not in run.calls
+
+
+def test_commit_on_the_expected_default_branch_is_taken():
+    assert resolve("github-commit:o/r", aged_head_run("main"), branch="main") == {
+        "commit": "abc"
+    }
+
+
+def test_commit_refuses_a_changed_default_branch():
+    run = aged_head_run("side")
+    with pytest.raises(
+        AnsibleLookupError, match="o/r: the default branch is side, not main"
+    ):
+        resolve("github-commit:o/r", run, branch="main")
+    assert run.calls == ["gh api repos/o/r"]
+
+
+def test_commit_without_cooldown_refuses_a_changed_default_branch():
+    run = FakeRun({"gh api repos/o/r": {"default_branch": "side"}})
+    with pytest.raises(AnsibleLookupError, match="not main"):
+        resolve("github-commit:o/r", run, days=0, branch="main")
+
+
+def test_commit_message_refuses_a_changed_default_branch():
+    run = commits_run([("b", "Release 1.9.0")])
+    with pytest.raises(AnsibleLookupError, match="not main"):
+        resolve("github-commit:o/r", run, message=RELEASE, branch="main")
+
+
+@pytest.mark.parametrize("term", ["github-release:o/r", "oci:ghcr.io/o/img"])
+def test_branch_is_rejected_for_sources_without_a_branch(term):
+    with pytest.raises(AnsibleLookupError, match="branch"):
+        resolve(term, FakeRun({}), branch="main")
+
+
+def test_branch_is_part_of_the_cache_key(monkeypatch, tmp_path):
+    run = aged_head_run("main")
+    monkeypatch.setattr(aged_release, "_run", run)
+    monkeypatch.setattr(aged_release, "_now", lambda: NOW)
+    monkeypatch.setattr(aged_release, "_cache_path", lambda: tmp_path / "cache.json")
+    aged_release._CACHE.clear()
+    lookup = aged_release.LookupModule()
+    variables = {"supply_chain_cooldown_days": 4}
+    assert lookup.run(["github-commit:o/r"], variables, branch="main") == [
+        {"commit": "abc"}
+    ]
+    with pytest.raises(AnsibleLookupError, match="not master"):
+        lookup.run(["github-commit:o/r"], variables, branch="master")
+
+
+def test_documentation_is_valid_yaml():
+    # Ansible parses DOCUMENTATION when it loads the plugin and refuses to load
+    # one whose documentation is not YAML.
+    options = yaml.safe_load(aged_release.DOCUMENTATION)["options"]
+    assert "branch" in options

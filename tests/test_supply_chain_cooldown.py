@@ -80,6 +80,42 @@ class GitToolPinTest(unittest.TestCase):
     TASKS = ROLES / "ubuntu" / "tasks" / "uv.yml"
     REPO = "aws-samples/sample-agentcore-websearch-agent-skill"
 
+    def test_no_git_source_is_unpinned(self):
+        unpinned = re.compile(r"git\+https://[^\s'\"@]+(?=[\s'\"]|$)", re.MULTILINE)
+        for path in tracked_files(ROLES):
+            if path.suffix not in (".j2", ".yml"):
+                continue
+            with self.subTest(path=path.relative_to(REPO_ROOT).as_posix()):
+                self.assertIsNone(unpinned.search(path.read_text()))
+
+    def test_darwin_git_tool_installs_an_aged_commit(self):
+        tasks = yaml.safe_load((ROLES / "darwin" / "tasks" / "uv.yml").read_text())
+        commands = [
+            task["ansible.builtin.command"]
+            for task in tasks
+            if "ansible.builtin.command" in task
+        ]
+        self.assertIn(
+            (
+                f"uv tool install git+https://github.com/{self.REPO}"
+                "@{{ __darwin_agentcore_websearch.commit }}"
+            ),
+            commands,
+        )
+        lookups = [
+            value
+            for task in tasks
+            for value in task.get("ansible.builtin.set_fact", {}).values()
+        ]
+        self.assertIn(
+            f"{{{{ lookup('aged_release', 'github-commit:{self.REPO}', branch='main') }}}}",
+            lookups,
+        )
+        tools = yaml.safe_load((ROLES / "darwin" / "vars" / "main.yml").read_text())[
+            "darwin_uv_tools"
+        ]
+        self.assertFalse([t for t in tools if "git+" in t])
+
     def test_git_tool_installs_an_aged_commit(self):
         tasks = yaml.safe_load(self.TASKS.read_text())
         commands = [
@@ -103,8 +139,69 @@ class GitToolPinTest(unittest.TestCase):
             for value in task.get("ansible.builtin.set_fact", {}).values()
         ]
         self.assertIn(
-            f"{{{{ lookup('aged_release', 'github-commit:{self.REPO}') }}}}", lookups
+            f"{{{{ lookup('aged_release', 'github-commit:{self.REPO}', branch='main') }}}}",
+            lookups,
         )
+
+
+class DefaultBranchPinTest(unittest.TestCase):
+    """A repository lookup names the default branch it expects to follow."""
+
+    LOOKUP = re.compile(r"lookup\('aged_release', 'github-(?:tag|commit):[^']+'[^)]*\)")
+
+    def test_every_branch_lookup_names_its_branch(self):
+        calls = [
+            (path.relative_to(REPO_ROOT).as_posix(), call.group(0))
+            for path in tracked_files(REPO_ROOT / "roles")
+            if path.suffix in (".yml", ".j2")
+            for call in self.LOOKUP.finditer(path.read_text())
+        ]
+        self.assertTrue(calls)
+        for path, call in calls:
+            with self.subTest(path=path, call=call):
+                self.assertRegex(call, r", branch='[^']+'")
+
+
+class ZinitPinTest(unittest.TestCase):
+    """zinit is sourced by root's shell, so it is checked out at an aged tag."""
+
+    TASKS = ROLES / "ubuntu" / "tasks" / "zinit.yml"
+
+    def setUp(self):
+        self.text = self.TASKS.read_text()
+        self.tasks = yaml.safe_load(self.text)
+
+    def test_no_installer_or_self_update(self):
+        self.assertNotRegex(self.text, r"curl[^\n]*\|\s*(?:ba)?sh|bash -c \"\$\(curl")
+        self.assertNotIn("self-update", self.text)
+        self.assertNotIn("ansible.builtin.shell", self.text)
+        self.assertNotIn("ansible.builtin.command", self.text)
+
+    def test_checkout_is_the_aged_tag_commit(self):
+        lookups = [
+            value
+            for task in self.tasks
+            for value in task.get("ansible.builtin.set_fact", {}).values()
+        ]
+        lookup = (
+            "{{ lookup('aged_release', 'github-tag:zdharma-continuum/zinit',"
+            " branch='main') }}"
+        )
+        self.assertEqual(lookups, [lookup])
+        git = next(
+            t["ansible.builtin.git"] for t in self.tasks if "ansible.builtin.git" in t
+        )
+        # The installer cloned this URL, so existing checkouts keep their origin.
+        self.assertEqual(git["repo"], "https://github.com/zdharma-continuum/zinit")
+        self.assertEqual(git["dest"], "/usr/local/share/zinit/zinit.git")
+        self.assertEqual(git["version"], "{{ __ubuntu_zinit.commit }}")
+
+    def test_component_keeps_the_update_tag(self):
+        main = yaml.safe_load((ROLES / "ubuntu" / "tasks" / "main.yml").read_text())
+        task = next(
+            t for t in main if t.get("ansible.builtin.import_tasks") == "zinit.yml"
+        )
+        self.assertIn("update", task["tags"])
 
 
 class CouchdbInitScriptTest(unittest.TestCase):

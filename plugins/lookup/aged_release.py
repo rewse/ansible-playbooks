@@ -64,6 +64,13 @@ options:
     description: Image platform for oci:, such as linux/arm64.
   asset:
     description: Release asset name for github-release:; {version} expands to the tag.
+  branch:
+    description:
+      - "Default branch that github-tag: and github-commit: expect the
+        repository to have. The lookup fails when GitHub reports another one,
+        since a commit aged on a side branch would count as aged on the default
+        branch once that side branch becomes the default."
+      - "Rejected for oci: and github-release:, which follow no branch."
   message:
     description:
       - Regular expression for github-commit: that the commit subject must match.
@@ -380,7 +387,18 @@ def _on_branch(repo, sha, head, run):
     return status in ("ahead", "identical")
 
 
-def _tag(repo, pattern, days, run, now):
+def _default_branch(repo, expected, run):
+    """Return the repository's default branch, refusing one other than expected."""
+    branch = _json(run, ["gh", "api", f"repos/{repo}"])["default_branch"]
+    if expected is not None and branch != expected:
+        raise AnsibleLookupError(
+            f"{repo}: the default branch is {branch}, not {expected}; review the "
+            "repository before following the new branch"
+        )
+    return branch
+
+
+def _tag(repo, pattern, days, run, now, expected=None):
     tags = _pages(run, f"repos/{repo}/tags?per_page=100")
     shas = {t["name"]: t["commit"]["sha"] for t in tags}
     names = ordered(list(shas), pattern)
@@ -390,7 +408,7 @@ def _tag(repo, pattern, days, run, now):
             if _parse_time(commit["commit"]["committer"]["date"]) <= now:
                 return {"version": name, "commit": shas[name]}
     else:
-        chosen = _aged_tag(repo, names, shas, days, run, now)
+        chosen = _aged_tag(repo, names, shas, days, run, now, expected)
         if chosen is not None:
             return {"version": chosen, "commit": shas[chosen]}
     raise AnsibleLookupError(
@@ -398,7 +416,7 @@ def _tag(repo, pattern, days, run, now):
     )
 
 
-def _aged_tag(repo, names, shas, days, run, now):
+def _aged_tag(repo, names, shas, days, run, now, expected=None):
     """Return the newest tag whose release and commit are both days old."""
     published = {
         r["tag_name"]: _parse_time(r["published_at"])
@@ -415,7 +433,7 @@ def _aged_tag(repo, names, shas, days, run, now):
         if now - published[name] < timedelta(days=days):
             continue
         if head is None:
-            branch = _json(run, ["gh", "api", f"repos/{repo}"])["default_branch"]
+            branch = _default_branch(repo, expected, run)
             head = _pushed_head(repo, branch, days, run, now)
         # The release dates the tag name only; a tag can be moved, or an old
         # release renamed, onto a commit pushed a minute ago.
@@ -458,8 +476,8 @@ def _pushed_head(repo, branch, days, run, now):
     )
 
 
-def _commit(repo, days, run, now, message=None):
-    branch = _json(run, ["gh", "api", f"repos/{repo}"])["default_branch"]
+def _commit(repo, days, run, now, message=None, expected=None):
+    branch = _default_branch(repo, expected, run)
     if days == 0:
         query = f"sha={branch}&until={_iso(now)}"
     else:
@@ -498,19 +516,24 @@ def resolve(
     fetch: Callable[[str], str],
     now: datetime,
     message: str | None = None,
+    branch: str | None = None,
 ) -> dict:
     kind, sep, source = term.partition(":")
     if not sep or not source:
         raise AnsibleLookupError(f"aged_release: malformed term {term!r}")
+    if branch is not None and kind in ("oci", "github-release"):
+        raise AnsibleLookupError(
+            f"aged_release: {term}: branch applies only to github-tag: and github-commit:"
+        )
     try:
         if kind == "oci":
             return _oci(source, pattern, days, platform, run, fetch, now)
         if kind == "github-release":
             return _release(source, pattern, days, asset, run, now)
         if kind == "github-tag":
-            return _tag(source, pattern, days, run, now)
+            return _tag(source, pattern, days, run, now, branch)
         if kind == "github-commit":
-            return _commit(source, days, run, now, message)
+            return _commit(source, days, run, now, message, branch)
     except AnsibleLookupError:
         raise
     except Exception as exc:
@@ -591,9 +614,10 @@ class LookupModule(LookupBase):
         platform = kwargs.get("platform")
         asset = kwargs.get("asset")
         message = kwargs.get("message")
+        branch = kwargs.get("branch")
         results = []
         for term in terms:
-            key = (term, pattern, days, platform, asset, message)
+            key = (term, pattern, days, platform, asset, message, branch)
             results.append(
                 _cached(
                     key,
@@ -607,6 +631,7 @@ class LookupModule(LookupBase):
                         fetch=_fetch,
                         now=_now(),
                         message=message,
+                        branch=branch,
                     ),
                 )
             )

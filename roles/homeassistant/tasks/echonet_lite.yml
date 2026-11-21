@@ -8,7 +8,7 @@
 
 - name: echonet_lite | Resolve aged tag hems_echonet_lite
   ansible.builtin.set_fact:
-    __homeassistant_hems_echonet_lite: "{{ lookup('aged_release', 'github-tag:sayurin/hems_echonet_lite') }}"
+    __homeassistant_hems_echonet_lite: "{{ lookup('aged_release', 'github-tag:sayurin/hems_echonet_lite', branch='master') }}"
 
 - name: echonet_lite | Clone HEMS integration
   ansible.builtin.git:

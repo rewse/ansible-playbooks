@@ -1,7 +1,7 @@
 ---
 - name: app | Resolve aged tag
   ansible.builtin.set_fact:
-    __zabbix_mcp_source: "{{ lookup('aged_release', 'github-tag:initMAX/zabbix-mcp-server') }}"
+    __zabbix_mcp_source: "{{ lookup('aged_release', 'github-tag:initMAX/zabbix-mcp-server', branch='main') }}"
 
 - name: app | Check out repository
   ansible.builtin.git:

@@ -24,7 +24,7 @@
 # CloudFormation template and AGENTCORE_GATEWAY_URL, which .zshenv exports.
 - name: uv | Resolve aged agentcore-websearch commit
   ansible.builtin.set_fact:
-    __ubuntu_agentcore_websearch: "{{ lookup('aged_release', 'github-commit:aws-samples/sample-agentcore-websearch-agent-skill') }}"
+    __ubuntu_agentcore_websearch: "{{ lookup('aged_release', 'github-commit:aws-samples/sample-agentcore-websearch-agent-skill', branch='main') }}"
 
 - name: uv | Install agentcore-websearch
   # uv has no Ansible module. uv reinstalls the tool when the commit changes and

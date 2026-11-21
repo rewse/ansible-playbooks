@@ -8,7 +8,7 @@
 
 - name: tuya | Resolve aged tag tuya-local
   ansible.builtin.set_fact:
-    __homeassistant_tuya_local: "{{ lookup('aged_release', 'github-tag:make-all/tuya-local') }}"
+    __homeassistant_tuya_local: "{{ lookup('aged_release', 'github-tag:make-all/tuya-local', branch='main') }}"
 
 - name: tuya | Clone local integration
   ansible.builtin.git:
