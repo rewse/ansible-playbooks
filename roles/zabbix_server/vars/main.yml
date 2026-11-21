@@ -1,5 +1,10 @@
 ---
-zabbix_server_db_host: "{{ lookup('pipe', 'op read \"op://ansible/hrmsun2hbhhvrr6ou6yungdfwi/server\"') }}"
+zabbix_server_db_ca_checksum: sha256:e5bb2084ccf45087bda1c9bffdea0eb15ee67f0b91646106e466714f9de3c7e3
+zabbix_server_db_ca_file: /etc/zabbix/aws-rds-global-bundle.pem
+zabbix_server_db_ca_url: https://truststore.pki.rds.amazonaws.com/global/global-bundle.pem
+# The Aurora writer endpoint, which the server certificate names. Host
+# verification rejects a CNAME that points at it.
+zabbix_server_db_host: rewse-pg.cluster-c8xun5aepybs.ap-northeast-1.rds.amazonaws.com
 zabbix_server_db_password: "{{ lookup('pipe', 'op read \"op://ansible/hrmsun2hbhhvrr6ou6yungdfwi/password\"') }}"
 zabbix_server_hostname: zabbix.rewse.jp
 # The release series of the Zabbix apt repository. Moved to a new series by hand

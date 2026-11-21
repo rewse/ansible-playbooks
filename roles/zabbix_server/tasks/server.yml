@@ -12,6 +12,16 @@
     mode: "0644"
   notify: Restart zabbix-server
 
+- name: server | Download Amazon RDS CA bundle
+  ansible.builtin.get_url:
+    url: "{{ zabbix_server_db_ca_url }}"
+    dest: "{{ zabbix_server_db_ca_file }}"
+    checksum: "{{ zabbix_server_db_ca_checksum }}"
+    owner: root
+    group: root
+    mode: "0644"
+  notify: Restart zabbix-server
+
 - name: server | Set config file permissions
   ansible.builtin.file:
     path: /etc/zabbix/zabbix_server.conf
@@ -34,6 +44,22 @@
     regexp: "^DBPassword="
     line: "DBPassword={{ zabbix_server_db_password }}"
   no_log: true
+  notify: Restart zabbix-server
+
+- name: server | Set DBTLSConnect
+  ansible.builtin.lineinfile:
+    dest: /etc/zabbix/zabbix_server.conf
+    insertafter: "^# DBTLSConnect="
+    regexp: "^DBTLSConnect="
+    line: "DBTLSConnect=verify_full"
+  notify: Restart zabbix-server
+
+- name: server | Set DBTLSCAFile
+  ansible.builtin.lineinfile:
+    dest: /etc/zabbix/zabbix_server.conf
+    insertafter: "^# DBTLSCAFile="
+    regexp: "^DBTLSCAFile="
+    line: "DBTLSCAFile={{ zabbix_server_db_ca_file }}"
   notify: Restart zabbix-server
 
 - name: server | Set Timeout
