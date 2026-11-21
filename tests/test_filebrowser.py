@@ -2,6 +2,7 @@
 """Contract tests for the filebrowser role."""
 
 import pathlib
+import re
 import unittest
 
 import jinja2
@@ -29,6 +30,31 @@ def render_config() -> dict:
         filebrowser_token_expiration_hours=720,
     )
     return yaml.safe_load(text)
+
+
+def second_policy() -> dict[str, list[str]]:
+    """Returns the directives of the policy the vhost adds to FileBrowser's."""
+    environment = jinja2.Environment(
+        loader=jinja2.FileSystemLoader(ROLE / "templates"),
+        undefined=jinja2.StrictUndefined,
+    )
+    environment.filters["comment"] = lambda text: f"#\n# {text}\n#"
+    text = environment.get_template("nas.rewse.jp.conf.j2").render(
+        ansible_managed="Ansible managed",
+        filebrowser_hostname="nas.rewse.jp",
+        filebrowser_port=8080,
+    )
+    (line,) = [
+        line.strip()
+        for line in text.splitlines()
+        if line.strip().startswith("Header always set Content-Security-Policy ")
+    ]
+    (policy,) = re.findall(r'"([^"]*)"', line)
+    return {
+        part.split()[0]: part.split()[1:]
+        for part in (piece.strip() for piece in policy.split(";"))
+        if part
+    }
 
 
 def tasks(name: str) -> dict[str, dict]:
@@ -88,6 +114,54 @@ class FileBrowserConfigTest(unittest.TestCase):
         self.assertNotIn("key", render_config()["auth"])
         role_vars = yaml.safe_load((ROLE / "vars" / "main.yml").read_text())
         self.assertNotIn("filebrowser_jwt_secret", role_vars)
+
+
+class FileBrowserSecondPolicyTest(unittest.TestCase):
+    # Fetch directives that fall back to default-src.
+    FETCH_DIRECTIVES = (
+        "connect-src",
+        "default-src",
+        "font-src",
+        "frame-src",
+        "img-src",
+        "manifest-src",
+        "media-src",
+        "script-src",
+        "style-src",
+        "worker-src",
+    )
+
+    @classmethod
+    def setUpClass(cls):
+        cls.policy = second_policy()
+
+    def test_default_src_keeps_other_fetches_on_the_origin(self):
+        # Prefetch and any other request without its own directive, from the
+        # app or from a document previewed in a srcdoc frame, falls back here.
+        self.assertEqual(self.policy["default-src"], ["'self'", "blob:", "data:"])
+
+    def test_fetch_directives_name_no_other_origin(self):
+        local = {"'none'", "'self'", "'unsafe-inline'", "blob:", "data:"}
+        for directive in self.FETCH_DIRECTIVES:
+            with self.subTest(directive=directive):
+                self.assertIn(directive, self.policy)
+                self.assertLessEqual(set(self.policy[directive]), local)
+
+    def test_script_src_is_no_stricter_than_the_app_policy(self):
+        # The app's own policy allows 'self' and its per-page nonce. Both
+        # policies are enforced, so this one has to allow the nonce scripts.
+        # 'unsafe-inline' does that only while the policy names no nonce, hash
+        # or 'strict-dynamic', each of which would make browsers ignore it.
+        script_src = self.policy["script-src"]
+        self.assertEqual(script_src, ["'self'", "'unsafe-inline'"])
+
+    def test_app_requests_stay_allowed(self):
+        # The API and the file watcher's EventSource, the editor's blob
+        # worker, the web manifest, and blob or data URLs that viewers build.
+        self.assertEqual(self.policy["connect-src"], ["'self'", "blob:", "data:"])
+        self.assertEqual(self.policy["manifest-src"], ["'self'"])
+        self.assertEqual(self.policy["worker-src"], ["'self'", "blob:"])
+        self.assertEqual(self.policy["font-src"], ["'self'", "blob:", "data:"])
 
 
 class FileBrowserContainerTest(unittest.TestCase):
