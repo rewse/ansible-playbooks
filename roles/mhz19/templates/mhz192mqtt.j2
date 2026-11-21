@@ -8,8 +8,10 @@ set -euo pipefail
 readonly VENV_PATH="/opt/mhz19"
 readonly MQTT_HOST="hass.rewse.jp"
 readonly MQTT_PORT="1883"
-readonly MQTT_USER="pub_client"
-readonly MQTT_PASS="[% mhz19_mosquitto_password %]"
+# mosquitto_pub reads its credentials from the root-only options file
+# ${MQTT_OPTIONS_DIR}/mosquitto_pub, keeping them off its command line, which
+# any local user can read.
+readonly MQTT_OPTIONS_DIR="/etc/mhz19"
 readonly TOPIC_BASE="mhz19/[% mhz19_location %]"
 readonly STATE_FILE="/var/lib/mhz19/state"
 readonly MAX_CO2=4900
@@ -36,8 +38,7 @@ publish_mqtt() {
   # minutes out, which is long enough for the reading to be stale, and a failure
   # here raises a notification through OnFailure.
   for attempt in 1 2 3; do
-    if mosquitto_pub -r -t "${topic}" \
-      -u "${MQTT_USER}" -P "${MQTT_PASS}" \
+    if XDG_CONFIG_HOME="${MQTT_OPTIONS_DIR}" mosquitto_pub -r -t "${topic}" \
       -h "${MQTT_HOST}" -p "${MQTT_PORT}" \
       -m "${message}"; then
       return 0

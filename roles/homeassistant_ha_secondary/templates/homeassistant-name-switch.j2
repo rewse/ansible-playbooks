@@ -47,13 +47,15 @@ log() {
 
 api() {
     local method="$1" path="$2" body="${3:-}"
+    # curl reads the key header from stdin, which nothing else here feeds it,
+    # so the key stays off its command line, which any local user can read.
     local args=(--silent --show-error --max-time 30
-                -H "X-API-KEY: ${API_KEY}" -H "Accept: application/json"
+                -H @- -H "Accept: application/json"
                 -X "${method}" "${CLOUD}${path}")
     if [ -n "${body}" ]; then
         args+=(-H "Content-Type: application/json" -d "${body}")
     fi
-    curl "${args[@]}"
+    printf 'X-API-KEY: %s\n' "${API_KEY}" | curl "${args[@]}"
 }
 
 # jq is not installed here, and the shapes are small enough to pick apart in one

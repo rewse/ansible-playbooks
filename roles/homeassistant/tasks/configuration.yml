@@ -35,12 +35,21 @@
     # The file holds Home Assistant templates, which share Jinja's delimiters.
     variable_start_string: "[%"
     variable_end_string: "%]"
-    # Carries tokens and passwords. Home Assistant runs as root in its
-    # container, and the standby's sync reads it through sudo.
     owner: root
     group: root
     mode: "0600"
   notify: Restart Home Assistant
+
+- name: configuration | Deploy REGZA credentials
+  # The REGZA shell commands pass this to curl. Home Assistant runs as root in
+  # its container, and the standby's sync reads it through sudo.
+  ansible.builtin.template:
+    src: regza.netrc.j2
+    dest: /srv/homeassistant/config/regza.netrc
+    owner: root
+    group: root
+    mode: "0600"
+  no_log: true
 
 - name: configuration | Copy included files
   ansible.builtin.copy:

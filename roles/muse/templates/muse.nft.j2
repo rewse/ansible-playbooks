@@ -19,6 +19,8 @@ table inet muse {
 		# The Zabbix agent and trapper accept clients by source address, which
 		# muse shares with the host it runs on.
 		tcp dport { {{ muse_firewall_zabbix_ports | join(', ') }} } reject with tcp reset
+		# The MQTT broker accepts every client that knows its shared password.
+		tcp dport { {{ muse_firewall_mqtt_ports | join(', ') }} } reject with tcp reset
 		fib daddr type local tcp dport { {{ muse_firewall_local_tcp_ports | join(', ') }} } return
 		fib daddr type local reject with tcp reset
 		# Docker rewrites connections to ports it publishes on this host's

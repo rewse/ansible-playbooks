@@ -18,6 +18,25 @@
   register: __mhz19_pip
   changed_when: "'Installed' in __mhz19_pip.stderr"
 
+- name: publisher | Create MQTT options directory
+  ansible.builtin.file:
+    path: /etc/mhz19
+    state: directory
+    owner: root
+    group: root
+    mode: "0700"
+
+- name: publisher | Deploy MQTT options
+  # mosquitto_pub reads its default options from $XDG_CONFIG_HOME/mosquitto_pub,
+  # which keeps the broker password off its command line.
+  ansible.builtin.template:
+    src: mosquitto_pub.j2
+    dest: /etc/mhz19/mosquitto_pub
+    owner: root
+    group: root
+    mode: "0600"
+  no_log: true
+
 - name: publisher | Copy MQTT publisher script
   ansible.builtin.template:
     src: mhz192mqtt.j2
