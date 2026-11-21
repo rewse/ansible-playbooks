@@ -474,7 +474,7 @@ TESLAMATE_USER = "owner"
 TESLAMATE_PASSWORD = "secret"
 
 
-def teslamate_vhost(port: int, htpasswd: pathlib.Path) -> str:
+def teslamate_vhost(port: int, user_file: pathlib.Path) -> str:
     environment = jinja2.Environment(
         loader=jinja2.FileSystemLoader(TESLAMATE / "templates"),
         undefined=jinja2.StrictUndefined,
@@ -484,7 +484,7 @@ def teslamate_vhost(port: int, htpasswd: pathlib.Path) -> str:
         teslamate_hostname="teslamate.rewse.jp",
         teslamate_port=port,
     )
-    return text.replace("/etc/apache2/.teslamate.htpasswd", str(htpasswd))
+    return text.replace("/etc/apache2/.teslamate.htpasswd", str(user_file))
 
 
 class _TeslamateBackend(http.server.BaseHTTPRequestHandler):
@@ -558,9 +558,9 @@ class TeslamateVhostApacheTest(unittest.TestCase):
     def setUpClass(cls):
         cls.tmp = tempfile.TemporaryDirectory()
         root = pathlib.Path(cls.tmp.name)
-        htpasswd = root / "htpasswd"
+        user_file = root / "users"
         subprocess.run(
-            ["htpasswd", "-c", "-B", "-i", str(htpasswd), TESLAMATE_USER],
+            ["htpasswd", "-c", "-B", "-i", str(user_file), TESLAMATE_USER],
             input=TESLAMATE_PASSWORD,
             text=True,
             check=True,
@@ -573,7 +573,9 @@ class TeslamateVhostApacheTest(unittest.TestCase):
         cls.port = free_port()
         try:
             cls.server = start_apache(
-                root, teslamate_vhost(cls.backend.server_address[1], htpasswd), cls.port
+                root,
+                teslamate_vhost(cls.backend.server_address[1], user_file),
+                cls.port,
             )
         except BaseException:
             cls.backend.shutdown()
