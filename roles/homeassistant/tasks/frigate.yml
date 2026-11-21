@@ -8,7 +8,7 @@
 
 - name: frigate | Resolve aged tag frigate-hass-integration
   ansible.builtin.set_fact:
-    __homeassistant_frigate: "{{ lookup('aged_release', 'github-tag:blakeblackshear/frigate-hass-integration') }}"
+    __homeassistant_frigate: "{{ lookup('aged_release', 'github-tag:blakeblackshear/frigate-hass-integration', branch='master') }}"
 
 - name: frigate | Clone integration
   ansible.builtin.git:

@@ -103,8 +103,27 @@ class GitToolPinTest(unittest.TestCase):
             for value in task.get("ansible.builtin.set_fact", {}).values()
         ]
         self.assertIn(
-            f"{{{{ lookup('aged_release', 'github-commit:{self.REPO}') }}}}", lookups
+            f"{{{{ lookup('aged_release', 'github-commit:{self.REPO}', branch='main') }}}}",
+            lookups,
         )
+
+
+class DefaultBranchPinTest(unittest.TestCase):
+    """A repository lookup names the default branch it expects to follow."""
+
+    LOOKUP = re.compile(r"lookup\('aged_release', 'github-(?:tag|commit):[^']+'[^)]*\)")
+
+    def test_every_branch_lookup_names_its_branch(self):
+        calls = [
+            (path.relative_to(REPO_ROOT).as_posix(), call.group(0))
+            for path in tracked_files(REPO_ROOT / "roles")
+            if path.suffix in (".yml", ".j2")
+            for call in self.LOOKUP.finditer(path.read_text())
+        ]
+        self.assertTrue(calls)
+        for path, call in calls:
+            with self.subTest(path=path, call=call):
+                self.assertRegex(call, r", branch='[^']+'")
 
 
 class CouchdbInitScriptTest(unittest.TestCase):

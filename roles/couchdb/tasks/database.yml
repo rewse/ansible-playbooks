@@ -1,7 +1,7 @@
 ---
 - name: database | Resolve aged release of the init script
   ansible.builtin.set_fact:
-    __couchdb_livesync: "{{ lookup('aged_release', 'github-tag:vrtmrz/obsidian-livesync') }}"
+    __couchdb_livesync: "{{ lookup('aged_release', 'github-tag:vrtmrz/obsidian-livesync', branch='main') }}"
 
 - name: database | Create init script directories
   ansible.builtin.file:

@@ -8,7 +8,7 @@
 
 - name: card_mod | Resolve aged tag lovelace-card-mod
   ansible.builtin.set_fact:
-    __homeassistant_card_mod: "{{ lookup('aged_release', 'github-tag:thomasloven/lovelace-card-mod') }}"
+    __homeassistant_card_mod: "{{ lookup('aged_release', 'github-tag:thomasloven/lovelace-card-mod', branch='master') }}"
 
 - name: card_mod | Clone repository
   ansible.builtin.git:

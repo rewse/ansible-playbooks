@@ -8,7 +8,7 @@
 
 - name: frosted_glass | Resolve aged tag frosted-glass-manager
   ansible.builtin.set_fact:
-    __homeassistant_frosted_glass_manager: "{{ lookup('aged_release', 'github-tag:wessamlauf/frosted-glass-manager') }}"
+    __homeassistant_frosted_glass_manager: "{{ lookup('aged_release', 'github-tag:wessamlauf/frosted-glass-manager', branch='main') }}"
 
 - name: frosted_glass | Clone manager
   ansible.builtin.git:
@@ -36,7 +36,7 @@
 
 - name: frosted_glass | Resolve aged tag homeassistant-frosted-glass-themes
   ansible.builtin.set_fact:
-    __homeassistant_frosted_glass_themes: "{{ lookup('aged_release', 'github-tag:wessamlauf/homeassistant-frosted-glass-themes') }}"
+    __homeassistant_frosted_glass_themes: "{{ lookup('aged_release', 'github-tag:wessamlauf/homeassistant-frosted-glass-themes', branch='main') }}"
 
 - name: frosted_glass | Clone themes
   ansible.builtin.git:

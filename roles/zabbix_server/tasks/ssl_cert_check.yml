@@ -1,7 +1,7 @@
 ---
 - name: ssl_cert_check | Resolve aged commit
   ansible.builtin.set_fact:
-    __zabbix_server_ssl_cert_check: "{{ lookup('aged_release', 'github-commit:Matty9191/ssl-cert-check') }}"
+    __zabbix_server_ssl_cert_check: "{{ lookup('aged_release', 'github-commit:Matty9191/ssl-cert-check', branch='master') }}"
 
 - name: ssl_cert_check | Check out repository
   ansible.builtin.git:
