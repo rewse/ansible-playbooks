@@ -30,6 +30,37 @@
   max_exceeded: silent
   trace:
     stored_traces: 100
+# Sync Frigate Cameras disables a camera whenever its plug is not on, so an
+# unavailable plug stops recording without any other notice. Kept apart from
+# Plug Switch is Offline, which turns a plug back on when it reads off; Toggle
+# Camera Plugs switches the camera plugs off on purpose.
+- id: automation.alarm_camera_plug_unavailable
+  alias: "ALARM: Camera Plug is Unavailable"
+  triggers:
+    - trigger: state
+      entity_id:
+        - switch.dads_room_camera_plug
+        - switch.living_room_camera_plug
+        - switch.moms_room_camera_plug
+      to: "unavailable"
+      for:
+        minutes: 5
+  actions:
+    - action: notify.tats_devices
+      data:
+        title: "⚠ ALARM"
+        message: >-
+          {{
+            trigger.to_state.attributes.friendly_name or
+            trigger.entity_id.split('.')[1]
+          }} is Unavailable; Frigate recording is off
+        data:
+          url: "/dashboard-securities/"
+          push:
+            interruption-level: time-sensitive
+  mode: parallel
+  trace:
+    stored_traces: 100
 - id: automation.alarm_device_battery_level
   alias: "ALARM: Device Battery Level"
   triggers:
