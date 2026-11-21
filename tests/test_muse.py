@@ -28,6 +28,7 @@ def render_rules() -> str:
     return environment.get_template("muse.nft.j2").render(
         ansible_managed="Ansible managed",
         muse_firewall_local_tcp_ports=variables["muse_firewall_local_tcp_ports"],
+        muse_firewall_mqtt_ports=variables["muse_firewall_mqtt_ports"],
         muse_firewall_zabbix_ports=variables["muse_firewall_zabbix_ports"],
         muse_uid=variables["muse_uid"],
     )
@@ -95,6 +96,13 @@ class FirewallRulesTest(unittest.TestCase):
         rules = chain(render_rules(), "muse")
         self.assertEqual(role_vars()["muse_firewall_zabbix_ports"], [10050, 10051])
         self.assertEqual(rules[0], "tcp dport { 10050, 10051 } reject with tcp reset")
+
+    def test_muse_cannot_reach_mqtt_anywhere(self):
+        # The broker authenticates clients by one shared password and has no
+        # ACL, so muse is kept from connecting to it on any host.
+        rules = chain(render_rules(), "muse")
+        self.assertEqual(role_vars()["muse_firewall_mqtt_ports"], [1883, 8883])
+        self.assertEqual(rules[1], "tcp dport { 1883, 8883 } reject with tcp reset")
 
     def test_only_dns_and_https_on_this_host_are_allowed(self):
         rules = chain(render_rules(), "muse")

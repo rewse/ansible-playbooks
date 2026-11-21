@@ -8,6 +8,10 @@ muse_ssh_public_key: ssh-ed25519 AAAAC3NzaC1lZDI1NTE5AAAAIO1bAJl1D6WKx0PBV47KkLS
 muse_firewall_local_tcp_ports:
   - 53
   - 443
+# MQTT and MQTT over TLS, refused on every host.
+muse_firewall_mqtt_ports:
+  - 1883
+  - 8883
 muse_firewall_zabbix_ports:
   - 10050
   - 10051
