@@ -7,16 +7,30 @@
   changed_when: false
   check_mode: false
 
-# Some casks need sudo to upgrade; when this fails asking for a terminal, run
-# brew upgrade by hand.
-- name: upgrade | Upgrade all Homebrew packages
+- name: upgrade | Upgrade outdated formulae
   community.general.homebrew:
-    upgrade_all: true
+    name: "{{ __darwin_brew_outdated_formulae }}"
+    state: latest
+    update_homebrew: false
   vars:
-    __darwin_brew_outdated_json: "{{ __darwin_brew_outdated.stdout | from_json }}"
-  when: >-
-    (__darwin_brew_outdated_json.formulae | rejectattr('pinned') | list
-     + __darwin_brew_outdated_json.casks) | length > 0
+    __darwin_brew_outdated_formulae: >-
+      {{ (__darwin_brew_outdated.stdout | from_json).formulae
+         | rejectattr('pinned') | map(attribute='name') | list }}
+  when: __darwin_brew_outdated_formulae | length > 0
+
+# Homebrew cannot pin a cask, so held casks are left out here instead. Some
+# casks need sudo to upgrade; when this fails asking for a terminal, run
+# brew upgrade by hand.
+- name: upgrade | Upgrade outdated casks
+  community.general.homebrew_cask:
+    name: "{{ __darwin_brew_outdated_casks }}"
+    state: upgraded
+    update_homebrew: false
+  vars:
+    __darwin_brew_outdated_casks: >-
+      {{ (__darwin_brew_outdated.stdout | from_json).casks
+         | map(attribute='name') | reject('in', darwin_held_casks) | list }}
+  when: __darwin_brew_outdated_casks | length > 0
 
 - name: upgrade | Update npm
   ansible.builtin.command: npm install -g npm@latest

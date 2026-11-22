@@ -117,6 +117,12 @@ darwin_casks:
   - zed
   - zoom
 
+# Casks the upgrade component leaves at their installed version.
+# appcleaner: curl cannot verify the certificate of www.freemacsoft.net, so
+# the download fails. Remove it once the download succeeds.
+darwin_held_casks:
+  - appcleaner
+
 # Install by hand on every Mac; these have no Homebrew cask or App Store entry:
 #   DaVinci Resolve            https://www.blackmagicdesign.com/jp/products/davinciresolve/
 #   Insta360 Link Controller   https://www.insta360.com/download/insta360-link2c
