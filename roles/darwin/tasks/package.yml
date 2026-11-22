@@ -16,5 +16,5 @@
   changed_when: false
 
 - name: package | Install PowerShell with dotnet
-  ansible.builtin.command: dotnet tool install --global PowerShell
+  ansible.builtin.command: dotnet tool install --global PowerShell --version {{ darwin_powershell_version }}
   changed_when: false

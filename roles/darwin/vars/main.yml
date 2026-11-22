@@ -160,3 +160,9 @@ darwin_path_files:
   - local
 
 darwin_visual_explainer_prefix: "{{ ansible_facts['env']['HOME'] }}/.agents"
+
+# The 7.7.0 NuGet package lacks DotnetToolSettings.xml, so dotnet tool install
+# fails on it (https://github.com/PowerShell/PowerShell/issues/28392). Remove
+# this pin, and --version from the package component, once a fixed release
+# is published.
+darwin_powershell_version: 7.6.10
