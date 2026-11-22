@@ -37,13 +37,3 @@
   environment: "{{ supply_chain_cooldown_environment }}"
   changed_when: true
   when: __ubuntu_npm_updates | length > 0
-
-- name: npm | Keep the agent-browser binary executable
-  # The root npmrc sets ignore-scripts, which skips the postinstall that marks the
-  # platform binary executable. Run as root the CLI fixes this itself, but users
-  # such as zabbix cannot and fail with EPERM.
-  ansible.builtin.file:
-    path: /usr/lib/node_modules/agent-browser/bin/agent-browser-linux-{{ 'arm64' if ansible_facts['architecture'] == 'aarch64' else 'x64' }}
-    mode: "0755"
-  # A dry run on a new host installs nothing to mark.
-  when: not ansible_check_mode
