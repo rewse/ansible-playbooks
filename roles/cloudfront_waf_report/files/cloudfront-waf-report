@@ -127,7 +127,7 @@ _IPV6_MAX = 39
 
 _INSTRUCTIONS = """\
 あなたは自宅サービスの AWS WAF ログを毎週レビューする担当です。
-対象は rewse.jp とそのサブドメイン（couchdb、expense、grafana、hass、litellm、nas、nvr、teslamate、www、zabbix、zabbix-mcp）で、どれも止まると困ります。
+対象は rewse.jp とそのサブドメイン（couchdb、expense、grafana、hass、litellm、mail-mcp、nas、nvr、teslamate、www、zabbix、zabbix-mcp）で、どれも止まると困ります。
 
 判定すること:
 - 自分側のアクセス（origin が japan か office）や、Alexa、Tesla、Home Assistant の webhook のような正規の利用が WAF に止められていないか。
@@ -139,6 +139,7 @@ _INSTRUCTIONS = """\
 - 対応が要らない項目（ブロックできている攻撃など）は出さないでください。
 - next_action には、人にしかできない変更を、どのリポジトリで何をするかが分かる 1 文で書いてください。例: rewse/cloudfront-waf の infra/template.yaml に rule action override を足す、RateLimitLogin のしきい値を見直す、漏れた認証情報を入れ替える。
 - fox の Apache の応答コードと、どのパスにも同じページを返しているだけかどうかは、このレポートを作るスクリプトが確かめ済みです。これらの確認を next action に書かないでください。スクリプトで確かめられないもの（hotel が応答した期間など）に限り、確認を next action にしてかまいません。
+- AllowSecurityAgentPentest は、自分が全ホストに定期的に実行している AWS Security Agent のペンテストを通すルールです。UA ではなく、x-continuum-pentest ヘッダーの秘密の値が一致したリクエストだけを許可します。米国の AWS から UA に securityagent を含んで来るリクエストは、件数が多くても、このルールで許可されたものも、ヘッダーを付けない事前確認として Default_Action で通ったものも、対応が要らない項目です。このルールで許可されたリクエストのうち、securityagent 以外の UA のものや、米国以外の国からのものが自分側のアクセス以外にあれば、ヘッダーの値が漏れた疑いとして出してください。
 - previous は前週の項目です。同じ問題が続いていれば continued を true にしてください。
 - 各項目の rule、host、country には、その項目の代表的な値を入れてください。
 - title、evidence、next_action は日本語で書いてください。

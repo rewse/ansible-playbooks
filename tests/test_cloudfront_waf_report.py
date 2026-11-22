@@ -95,6 +95,29 @@ class QueryTest(unittest.TestCase):
         prompt = report.build_prompt(PERIOD, {}, [], [], final=False)
         self.assertIn("allowed_scans の origin が japan", prompt)
 
+    def test_prompt_lists_every_public_subdomain(self):
+        prompt = report.build_prompt(PERIOD, {}, [], [], final=False)
+        for name in (
+            "couchdb",
+            "expense",
+            "grafana",
+            "hass",
+            "litellm",
+            "mail-mcp",
+            "nas",
+            "nvr",
+            "teslamate",
+            "www",
+            "zabbix",
+            "zabbix-mcp",
+        ):
+            self.assertRegex(prompt, rf"[（、]{re.escape(name)}[、）]")
+
+    def test_prompt_says_pentest_rule_traffic_is_expected(self):
+        prompt = report.build_prompt(PERIOD, {}, [], [], final=False)
+        self.assertIn("AllowSecurityAgentPentest", prompt)
+        self.assertIn("x-continuum-pentest", prompt)
+
     def test_user_agent_parse_keeps_escaped_quotes(self):
         q = report.candidate_queries([])["allowed_scans"]
         pattern = re.search(r"^parse @message /(.*)/$", q, re.MULTILINE)
