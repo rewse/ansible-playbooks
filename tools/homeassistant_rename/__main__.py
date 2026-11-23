@@ -24,7 +24,9 @@ from .registry import plan_ops
 from .registry import remove_orphans
 from .registry import revert
 from .rewrite import check
+from .rewrite import count_problems
 from .rewrite import entity_id_map
+from .rewrite import new_problems
 from .rewrite import rewrite_repo
 from .rewrite import rewrite_storage
 from .snapshot import Snapshot
@@ -214,7 +216,21 @@ def run_check(args: argparse.Namespace) -> int:
         and row.status == "auto"
         and row.source == "yaml_unique_id"
     }
+    if args.write_baseline is not None:
+        # The baseline records what is already broken before the rewrite, so
+        # it treats today's IDs as valid; an old ID left after the rewrite is
+        # then a new problem.
+        problems = check(REPO_ROOT, current_ids, old_area_names, test_ids)
+        args.write_baseline.write_text(
+            json.dumps(count_problems(problems), ensure_ascii=False, indent=2) + "\n",
+            encoding="utf-8",
+        )
+        print(f"{args.write_baseline}: {len(problems)} problems")
+        return 0
     problems = check(REPO_ROOT, valid_ids, old_area_names, test_ids)
+    if args.baseline is not None:
+        baseline = json.loads(args.baseline.read_text(encoding="utf-8"))
+        problems = new_problems(problems, baseline)
     for problem in problems:
         print(problem)
     return 1 if problems else 0
@@ -259,6 +275,17 @@ def build_parser() -> argparse.ArgumentParser:
     )
     checking.add_argument("--mapping", required=True, type=pathlib.Path)
     checking.add_argument("--snapshot", required=True, type=pathlib.Path)
+    baselines = checking.add_mutually_exclusive_group()
+    baselines.add_argument(
+        "--baseline",
+        help="report only problems not in this file from --write-baseline",
+        type=pathlib.Path,
+    )
+    baselines.add_argument(
+        "--write-baseline",
+        help="save the problems of the repository before the rewrite",
+        type=pathlib.Path,
+    )
     checking.set_defaults(handler=run_check)
 
     mapping = subparsers.add_parser(

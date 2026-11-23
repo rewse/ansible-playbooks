@@ -37,6 +37,8 @@ from tools.homeassistant_rename.registry import plan_ops
 from tools.homeassistant_rename.registry import remove_orphans
 from tools.homeassistant_rename.registry import revert
 from tools.homeassistant_rename.rewrite import check
+from tools.homeassistant_rename.rewrite import count_problems
+from tools.homeassistant_rename.rewrite import new_problems
 from tools.homeassistant_rename.rewrite import rewrite_repo
 from tools.homeassistant_rename.rewrite import rewrite_storage
 from tools.homeassistant_rename.rewrite import rewrite_text
@@ -1208,29 +1210,105 @@ class RewriteTest(unittest.TestCase):
                 "    attributes:\n"
                 "      known: \"{{ states('sensor.dad_s_room_temperature') }}\"\n"
                 "      service: light.turn_on\n"
-                "      notify: notify.tats_devices\n",
+                "      notify: notify.tats_devices\n"
+                "      a: \"{{ area_entities('Dad’s Room') }}\"\n"
+                "      b: \"{{ 'Dad’s Room' | area_devices }}\"\n"
+                "      c: \"{{ area_name('sensor.dad_s_room_temperature') == 'Dad’s Room' }}\"\n"
+                "      d: \"{{ trigger.entity_id | area_name != 'Dad’s Room' }}\"\n"
+                "      e: \"{{ 'Dad’s Room' == area_name(trigger.entity_id) }}\"\n"
+                "      f: \"{{ area_id('Living Room') }}\"\n",
                 encoding="utf-8",
             )
             problems = check(root, {"sensor.dad_s_room_temperature"}, {"Dad’s Room"})
-        self.assertEqual(len(problems), 3, problems)
-        self.assertTrue(
-            any(
-                "templates.yaml:3:" in problem and "Dad’s Room" in problem
-                for problem in problems
-            ),
+        where = "roles/homeassistant/files/templates.yaml"
+        self.assertEqual(
             problems,
+            [
+                f"{where}:4: unknown entity ID sensor.dads_room_temperature",
+                f"{where}:5: entity ID built by concatenation",
+                f"{where}:10: old area name Dad’s Room",
+                f"{where}:11: old area name Dad’s Room",
+                f"{where}:12: old area name Dad’s Room",
+                f"{where}:13: old area name Dad’s Room",
+                f"{where}:14: old area name Dad’s Room",
+            ],
         )
-        self.assertTrue(
-            any(
-                "templates.yaml:4:" in problem
-                and "sensor.dads_room_temperature" in problem
-                for problem in problems
-            ),
-            problems,
+
+    def test_baseline_reports_only_new_problems(self):
+        before = [
+            "a.yaml:3: unknown entity ID sensor.x",
+            "a.yaml:5: entity ID built by concatenation",
+        ]
+        after = [
+            "a.yaml:4: unknown entity ID sensor.x",
+            "a.yaml:6: entity ID built by concatenation",
+            "a.yaml:7: entity ID built by concatenation",
+            "a.yaml:8: unknown entity ID sensor.y",
+        ]
+        baseline = count_problems(before)
+        self.assertEqual(
+            baseline,
+            {
+                "a.yaml: entity ID built by concatenation": 1,
+                "a.yaml: unknown entity ID sensor.x": 1,
+            },
         )
-        self.assertTrue(
-            any("templates.yaml:5:" in problem for problem in problems), problems
-        )
+        self.assertEqual(new_problems(before, baseline), [])
+        self.assertEqual(new_problems(after, baseline), after[1:])
+
+    def test_check_cli_compares_with_baseline(self):
+        with tempfile.TemporaryDirectory() as tmp:
+            root = pathlib.Path(tmp)
+            files = root / "roles" / "homeassistant" / "files"
+            files.mkdir(parents=True)
+            config = files / "automations-x.yaml"
+            config.write_text(
+                "- entity_id: sensor.old\n- entity_id: sensor.broken\n",
+                encoding="utf-8",
+            )
+            Snapshot(
+                areas=[], devices=[], entities=[{"entity_id": "sensor.old"}], states={}
+            ).save(root / "snapshot.json")
+            write_csv([entity_row("sensor.old", "sensor.new")], root / "mapping.csv")
+            common = [
+                "--mapping",
+                str(root / "mapping.csv"),
+                "--snapshot",
+                str(root / "snapshot.json"),
+            ]
+            baseline = root / "baseline.json"
+
+            def run(*args: str) -> tuple[int, str]:
+                with (
+                    mock.patch.object(cli_module, "REPO_ROOT", root),
+                    contextlib.redirect_stdout(io.StringIO()) as stdout,
+                ):
+                    status = cli_main(["check", *common, *args])
+                return status, stdout.getvalue()
+
+            self.assertEqual(run("--write-baseline", str(baseline))[0], 0)
+            self.assertEqual(
+                json.loads(baseline.read_text()),
+                {
+                    "roles/homeassistant/files/automations-x.yaml: "
+                    "unknown entity ID sensor.broken": 1
+                },
+            )
+            config.write_text(
+                "- entity_id: sensor.new\n- entity_id: sensor.broken\n",
+                encoding="utf-8",
+            )
+            self.assertEqual(run("--baseline", str(baseline))[0], 0)
+            self.assertEqual(run()[0], 1)
+            config.write_text(
+                "- entity_id: sensor.new\n- entity_id: sensor.broken\n"
+                "- entity_id: sensor.old\n",
+                encoding="utf-8",
+            )
+            status, output = run("--baseline", str(baseline))
+        self.assertEqual(status, 1)
+        self.assertIn("automations-x.yaml:3: unknown entity ID sensor.old", output)
+        self.assertNotIn("sensor.broken", output)
 
 
 class FakeClient:

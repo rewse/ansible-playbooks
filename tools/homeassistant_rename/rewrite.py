@@ -142,6 +142,20 @@ ENTITY_REFERENCE = re.compile(
 # Jinja that builds an ID from parts, such as 'sensor.' ~ room or ~ '_x'.
 CONCATENATION = re.compile(r"""['"]\^?[a-z_]+\\?\.['"]\s*~|~\s*['"]_""")
 
+# Strings that Home Assistant reads as an area name: the argument of an area
+# function or filter, and the value compared with area_name.
+AREA_FUNCTION = r"area_(?:devices|entities|id|name)\b"
+STRING = r"""(?P<quote>['"])(?P<text>.*?)(?P=quote)"""
+AREA_ARGUMENTS = (
+    re.compile(AREA_FUNCTION + r"\(\s*" + STRING),
+    re.compile(STRING + r"\s*\|\s*" + AREA_FUNCTION),
+    re.compile(r"\barea_name\b(?:\([^)]*\))?\s*[!=]=\s*" + STRING),
+    re.compile(STRING + r"\s*[!=]=\s*area_name\("),
+)
+
+# A problem line from check(): "<path>:<line>: <message>".
+PROBLEM = re.compile(r"^(?P<path>[^:]+):\d+: (?P<message>.*)$")
+
 RENAME_TEST = "test_homeassistant_rename.py"
 
 
@@ -365,8 +379,9 @@ def check(
     """Lists references the rewrite left for a person to resolve.
 
     Reports entity IDs not in valid_ids, IDs built by string concatenation,
-    and old area names. test_ids are also accepted in test files, where the
-    unique IDs of yaml_unique_id rows stay as lookup keys.
+    and old area names in strings that Home Assistant reads as an area name.
+    test_ids are also accepted in test files, where the unique IDs of
+    yaml_unique_id rows stay as lookup keys.
     """
     test_files = set(_test_files(root))
     problems = []
@@ -383,10 +398,46 @@ def check(
                         problems.append(f"{where}: unknown entity ID {entity_id}")
             if CONCATENATION.search(line):
                 problems.append(f"{where}: entity ID built by concatenation")
+            area_strings = [
+                match.group("text")
+                for pattern in AREA_ARGUMENTS
+                for match in pattern.finditer(line)
+            ]
             for name in sorted(old_area_names):
-                if name in line:
+                if any(name in text for text in area_strings):
                     problems.append(f"{where}: old area name {name}")
     return problems
+
+
+def _baseline_key(problem: str) -> str:
+    """Drops the line number, which the rewrite can shift."""
+    match = PROBLEM.match(problem)
+    if match is None:
+        raise ValueError(f"not a check problem: {problem!r}")
+    return f"{match.group('path')}: {match.group('message')}"
+
+
+def count_problems(problems: Iterable[str]) -> dict[str, int]:
+    """Counts problems by file and message, for a baseline."""
+    counts: dict[str, int] = {}
+    for problem in problems:
+        key = _baseline_key(problem)
+        counts[key] = counts.get(key, 0) + 1
+    return dict(sorted(counts.items()))
+
+
+def new_problems(problems: list[str], baseline: Mapping[str, int]) -> list[str]:
+    """Returns the problems whose file and message occur more than in baseline.
+
+    Problems are matched without their line numbers, so every occurrence of a
+    file and message that grew is returned.
+    """
+    counts = count_problems(problems)
+    return [
+        problem
+        for problem in problems
+        if counts[_baseline_key(problem)] > baseline.get(_baseline_key(problem), 0)
+    ]
 
 
 DEFAULT_DASHBOARD = "lovelace"
