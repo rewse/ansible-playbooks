@@ -393,10 +393,26 @@ DEFAULT_DASHBOARD = "lovelace"
 ENERGY = "energy"
 
 
-def _rewrite_json(value: Any, id_map: Mapping[str, str]) -> tuple[str, str]:
-    """Returns the JSON text of value and the text with IDs rewritten."""
-    text = json.dumps(value, ensure_ascii=False, indent=2, sort_keys=True)
-    return text, rewrite_text(text, id_map)
+def _rewrite_value(value: Any, id_map: Mapping[str, str]) -> Any:
+    """Returns value with IDs rewritten in every string and dict key.
+
+    Strings are rewritten decoded, so an ID after a newline or tab inside a
+    string is matched; dict key order is kept.
+    """
+    if isinstance(value, str):
+        return rewrite_text(value, id_map)
+    if isinstance(value, dict):
+        return {
+            rewrite_text(key, id_map): _rewrite_value(item, id_map)
+            for key, item in value.items()
+        }
+    if isinstance(value, list):
+        return [_rewrite_value(item, id_map) for item in value]
+    return value
+
+
+def _dump(value: Any) -> str:
+    return json.dumps(value, ensure_ascii=False, indent=2)
 
 
 def _back_up(backup_dir: pathlib.Path, name: str, text: str) -> None:
@@ -449,24 +465,24 @@ async def rewrite_storage(
         )
         if config is None:
             continue
-        text, new_text = _rewrite_json(config, id_map)
-        if new_text == text:
+        new_config = _rewrite_value(config, id_map)
+        if new_config == config:
             continue
         name = url_path or DEFAULT_DASHBOARD
         changed.append(name)
         if not dry_run:
-            _back_up(backup_dir, name, text)
+            _back_up(backup_dir, name, _dump(config))
             await client.call(
-                "lovelace/config/save", url_path=url_path, config=json.loads(new_text)
+                "lovelace/config/save", url_path=url_path, config=new_config
             )
     # Home Assistant answers not_found until the energy dashboard is set up.
     prefs = await _read(client, "energy/get_prefs", "not_found")
     if prefs is None:
         return changed
-    text, new_text = _rewrite_json(prefs, id_map)
-    if new_text != text:
+    new_prefs = _rewrite_value(prefs, id_map)
+    if new_prefs != prefs:
         changed.append(ENERGY)
         if not dry_run:
-            _back_up(backup_dir, ENERGY, text)
-            await client.call("energy/save_prefs", **json.loads(new_text))
+            _back_up(backup_dir, ENERGY, _dump(prefs))
+            await client.call("energy/save_prefs", **new_prefs)
     return changed

@@ -1505,6 +1505,69 @@ class StorageTest(unittest.IsolatedAsyncioTestCase):
                 ["dashboard-home.json"],
             )
 
+    async def test_storage_rewrites_ids_after_escaped_characters(self):
+        client = StorageClient(
+            configs={
+                "dashboard-home": {
+                    "type": "markdown",
+                    "content": "Lights:\nlight.dad\n\tlight.dad\r\nlight.dad_lamp",
+                    "e": "light.dad",
+                }
+            },
+            energy={},
+        )
+        with tempfile.TemporaryDirectory() as directory:
+            await rewrite_storage(
+                client,
+                STORAGE_ID_MAP,
+                dry_run=False,
+                backup_dir=pathlib.Path(directory),
+            )
+        saved = [
+            payload["config"]
+            for type_, payload in client.calls
+            if type_ == "lovelace/config/save"
+        ]
+        self.assertEqual(
+            saved,
+            [
+                {
+                    "type": "markdown",
+                    "content": (
+                        "Lights:\nlight.dads_room_ceiling\n\t"
+                        "light.dads_room_ceiling\r\nlight.dad_lamp"
+                    ),
+                    "e": "light.dads_room_ceiling",
+                }
+            ],
+        )
+        self.assertEqual(list(saved[0]), ["type", "content", "e"])
+
+    async def test_storage_rewrites_dict_keys(self):
+        client = StorageClient(
+            configs={"dashboard-home": {"entities": {"light.dad": {"name": "Dad"}}}},
+            energy={},
+        )
+        with tempfile.TemporaryDirectory() as directory:
+            await rewrite_storage(
+                client,
+                STORAGE_ID_MAP,
+                dry_run=False,
+                backup_dir=pathlib.Path(directory),
+            )
+        self.assertIn(
+            (
+                "lovelace/config/save",
+                {
+                    "config": {
+                        "entities": {"light.dads_room_ceiling": {"name": "Dad"}}
+                    },
+                    "url_path": "dashboard-home",
+                },
+            ),
+            client.calls,
+        )
+
     async def test_storage_rewrites_energy_prefs(self):
         client = self.storage_client()
         with tempfile.TemporaryDirectory() as directory:
