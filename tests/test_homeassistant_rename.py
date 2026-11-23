@@ -758,6 +758,8 @@ class MappingTest(unittest.TestCase):
         self.assertEqual(study.new_id, "automation.living_room_turn_on_light")
         self.assertEqual(study.status, "review")
         self.assertIn("North or side modifier", study.note)
+
+    def test_unchanged_rows_are_skipped(self):
         snapshot = mapping_snapshot(
             [device("d1", "living_room", "Thermometer")],
             [
