@@ -34,7 +34,7 @@ Home Assistant のデバイス名とエンティティ ID の付け方がそろ�
 - ネットワーク機器（UniFi のスイッチや AP など）のデバイスとエンティティ
 - エリアを設定していないデバイス（車、スマートフォンなど）と `person` のエンティティ。`<area>_` で始められないため対象にしない（実装者の判断）
 - YAML で定義したヘルパーの履歴。利用者は見返さないため、切れてよい
-- `restroom` エリアの整理
+- `restroom` エリアの整理。このエリアにはデバイスもエンティティもないため、改名の対象もない
 - Alexa の `entity_config` に書いた日本語の呼び名。ID の付け替えは行うが、呼び名は変えない
 - `alexa.yaml` の呼び名「ママの部屋の南側のの窓」のタイポ修正。音声コマンドとして使われている可能性があるため、利用者が別に判断する
 
@@ -51,14 +51,16 @@ Home Assistant のデバイス名とエンティティ ID の付け方がそろ�
 
 - エリアは部屋ごとに一つ作る。壁で仕切られていない空間はエリアを分けず、場所の違いはデバイス名の修飾語で表す。リビングのデスク側も `Living Room` エリアのままとし、`Study` と `Living Area` はエリア名にもデバイス名にも使わない
 - エリア名のアポストロフィは ASCII の `'` にする（`Dad's Room`、`Mom's Room`）。打ちやすさを優先し、その結果 ID が `dad_s_room`、`mom_s_room` になることを受け入れる
-- エンティティ ID の生成にエリア名ではなくエリア ID が使われる場合は、エリア名と ID が一致しないエリア（`dads_room`、`bedroom`）を新しい名前で作り直し、デバイスとエンティティを移してから古いエリアを消す。Home Assistant はエリア ID を作成後に変えられず、作成時の名前から ID を作るため（実装者の判断）
+- エンティティ ID の生成にはエリア ID ではなくエリア名が使われるため、エリアは作り直さず名前だけ変える。エリア ID（`dads_room`、`bedroom`）は内部に残るが ID には現れない
 
 ### デバイス名
 
 - デバイス名にエリア名を含めない。エリアは Home Assistant が表示時に足す
 - デバイス名は型番や製品名ではなく一般名称にする（`AV Receiver`、`TV`、`Robot Vacuum`、`Camera`）。メーカーと型番はデバイスの属性に任せる
 - 同じエリアに同じ種類のデバイスが一つしかなければ、修飾語を付けない（`Thermometer`）
-- 同じエリアに同じ種類のデバイスが複数あるときは、場所を表す修飾語を名前の末尾に付ける（`Floor Heater East`、`Window Sensor North`）
+- 同じエリアに同じ種類のデバイスが複数あるときは、場所を表す修飾語を名前の末尾に付ける（`Floor Heater North`、`Window Sensor North`）
+- リビングはデスク側を `North`、反対側を `South` とする。今 `Study` と呼んでいるデバイスは `North` 側になる
+- 同じ場所に置いた同じ種類のデバイスを役割で区別するときは、修飾語 `Primary` と `Secondary` を末尾に付ける。故障検知（`templates.yaml` の `*_disagreement`、`*_fault`）で比べる温湿度計の組がこれに当たり、Dad's Room と Mom's Room は Aqara を `Thermometer Primary`、SwitchBot Meter を `Thermometer Secondary` とする。Balcony は故障検知の対象ではないが同じ規則に従い、今 `sensor.balcony_temperature` を出している SwitchBot Outdoor Meter を `Thermometer Primary`、SwitchBot Meter を `Thermometer Secondary` とする。リビングの SwitchBot Hub 2 は故障検知の secondary だが、`Hub` という別の種類として呼べて名前がぶつからないため、`Thermometer` と `Hub` のままにする
 - 修飾語は略さない。方角は `North`、`Northeast` のように一語で書く。方角以外の修飾語（`Left`、`Right`、`Top`、`Bottom`、`Center`）も末尾に付ける（`Light Left`、`Lock Top`）
 - 連番（`2`）は使わず、修飾語に置き換える
 - 家電を補助デバイスで動かしているときは、補助デバイスを `<家電名> <役割>` と名付ける。役割は `Plug`（電源の判定と遮断）と `Switch`（SwitchBot でボタンを押す）とする。補助デバイスがプラグ一つだけの家電も `<家電名> Plug` とする
@@ -77,7 +79,7 @@ Home Assistant のデバイス名とエンティティ ID の付け方がそろ�
 
   ```
   sensor.living_room_thermometer_temperature
-  switch.living_room_floor_heater_east_operation_status
+  switch.living_room_floor_heater_north_operation_status
   switch.living_room_humidifier            # appliance (template)
   switch.living_room_humidifier_plug       # plug
   switch.living_room_humidifier_switch     # SwitchBot
@@ -105,24 +107,27 @@ Home Assistant のデバイス名とエンティティ ID の付け方がそろ�
 
 ## 進め方
 
-1. Home Assistant を 2026.11 に更新する。更新後に表示名の移行結果を確かめ、下の「2026.11 更新後に確かめること」を片付ける
-2. `roles/homeassistant/files/automations-alarm.yaml` の通知文で使っている `trigger.to_state.attributes.friendly_name` の 4 か所を、`area_name()`、`device_name()`、`entity_name()` を使う形に置き換えてデプロイする。2026.11 以降も `friendly_name` にはエリア名が入らないため、デバイス名からエリア名を外す前に済ませる
+1. Home Assistant を 2026.11 に更新する（2026.11.2 で完了。結果は「2026.11 更新後に確かめたこと」）
+2. `roles/homeassistant/files/automations-alarm.yaml` の通知文で使っている `trigger.to_state.attributes.friendly_name` の 5 か所を、`area_name()`、`device_name()`、`entity_name()` を使う形に置き換えてデプロイする。2026.11 以降も `friendly_name` にはエリア名が入らないため、デバイス名からエリア名を外す前に済ませる。Main entity では `entity_name()` が空文字を返すため、エリア、デバイス、エンティティのうち空でないものだけを空白でつなぐ
 3. マッピング表を作り、利用者がレビューする
 4. エリア名、デバイス名、エンティティ ID を API で変え、同じ日にリポジトリの参照を置き換えてデプロイする
-5. Home Assistant の外で ID を参照しているものを直す。Alexa は再検出して定型アクションを確かめる。HomeKit ブリッジは ID が変わったアクセサリが追加し直しになるため、ホームアプリでの部屋の割り当てとオートメーションを確かめる。ストレージ管理のダッシュボードとエネルギーダッシュボードの参照を置き換える
+5. Home Assistant の外で ID を参照しているものを直す。Alexa は再検出して定型アクションを確かめる。HomeKit ブリッジは ID が変わったアクセサリが追加し直しになるため、ホームアプリでの部屋の割り当てとオートメーションを確かめる。`homekit.yaml` の各エンティティには `entity_config` で部屋名を含む名前を付け、デバイス名からエリア名を外しても「AC」「CO2」のような同じ名前が並ばないようにする。ストレージ管理のダッシュボードとエネルギーダッシュボードの参照を置き換える。これら以外に ID を参照しているもの（Companion アプリのウィジェット、ショートカット、ほかのリポジトリ）はない
 6. 動作を確かめる。Home Assistant のログと Repairs に、存在しないエンティティへの参照が出ていないことを確かめる
 
-## 2026.11 更新後に確かめること
+## 2026.11 更新後に確かめたこと
 
-- 「設定 > システム > Entity ID format」の選択肢と、エンティティ ID の生成にエリア名とエリア ID のどちらが使われるか。エリア ID が使われるなら、命名ルールのとおりエリアを作り直す
-- デバイスに属さないエンティティにエリアを設定したとき、ID の生成にエリアが使われるか
-- 2026.11 の移行で、改名済みのエンティティ名がどう変わったか
-- `friendly_name` と `entity_name()`、`device_name()`、`area_name()` が実際に返す値
-- 子デバイスへの分割（MQTT、ESPHome、Tuya）が起きたデバイスと、そのエリアの割り当て
+2026-11-23 に 2026.11.2 で確かめた。
 
-## 利用者に決めてもらうこと
-
-- リビングのデスク側とその反対側がどの方角にあたるか
+- エンティティ ID の形式は設定が保存されておらず、標準の「エリア、親デバイス、デバイス、エンティティ」の順で生成される。エリアの部分には `helpers/entity_registry.py` の `_async_get_full_entity_name` がエリア名（`area.name`）を使う。デバイスの「Recreate entity IDs」は、この形式で ID を作り直す
+- エンティティ部分には、利用者が付けた名前があればそれを、なければインテグレーションの名前を使う。名前が空の Main entity では、エンティティ部分が省かれる
+- 「Recreate entity IDs」はデバイス単位の操作で、デバイスに属さないエンティティの ID は作り直さない。これらは手で変える。YAML で定義したヘルパーはキーで ID が決まるため、方針は変わらない
+- `entity_name()` は Main entity で空文字を返す。例: `switch.living_room_humidifier_plug` は `entity_name()` が空、`device_name()` が `Living Room Humidifier Plug`、`area_name()` が `Living Room`
+- 子デバイスは作られていない。デバイスレジストリの `child_devices` は空で、デバイスは 288 台のまま
+- UI で名前を付けていたデバイスのエンティティ 109 個は、ほとんどがデバイス名を外した形（`Power`、`Identify` など）に移行された。デバイス名で始まらない名前が残り、表示が崩れるものは次のとおりで、マッピング表で直す
+  - Frigate のカウント 8 個（`sensor.eufy_dad_person_count` の `Eufy-Dad Person Count` など）。デバイス名と重なって `Dad's Room Camera Eufy-Dad Person Count` のように表示される
+  - `light.dads_room_footlight`。エンティティ名が `Footlight` で、デバイス名が `Dad’s Room Floorlight`
+  - `sensor.dads_room_switchbot_meter_temperature`。エンティティ名が `Temeperature` で、綴りを誤っている
+- 上の Frigate のカウントでは、`friendly_name` が移行前の `Eufy-Dad Person Count` のまま残り、新しい表示名と一致しない
 
 ## 実装者に任せること
 
