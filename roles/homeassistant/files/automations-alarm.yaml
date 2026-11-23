@@ -107,7 +107,6 @@
         - sensor.moms_room_window_sensor_n_battery
         - sensor.moms_room_window_sensor_s_battery
         - sensor.roomba_combo_battery
-        - sensor.study_floor_heating_switch_battery
         - sensor.study_motion_sensor_battery
         - sensor.study_window_sensor_n_battery
         - sensor.study_window_sensor_s_battery
