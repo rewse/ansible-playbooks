@@ -19,7 +19,7 @@
 - YAML で `unique_id` か `id` を持つエンティティ（オートメーション、`templates.yaml`、`sensors.yaml`、`mqtt.yaml`、`utility_meters.yaml` など）も、登録情報の `new_entity_id` で ID を変え、`unique_id` と `id` の値は書き換えない。CO2 や電力量の長期統計を残すため（計画での判断）
 - キーで ID が決まる YAML のヘルパーとスクリプト（`input_numbers.yaml`、`input_selects.yaml`、`input_datetimes.yaml`、`input_booleans.yaml`、`scripts.yaml`）は、キーごと書き換える。適用前に値を控え、適用後に入れ直す
 - 一つの部屋は、Home Assistant とリポジトリを同じ日に切り替える
-- Home Assistant のトークンは `direnv exec /Volumes/ExternalHD/git/ansible-playbooks op read op://ansible/jdyfywcw5p3xcet3nxlkvlbonm/credential` で読み、環境変数 `HASS_TOKEN` で渡す。URL は `HASS_URL`（`https://hass.rewse.jp`）で渡す。トークンをファイル、ログ、CSV に書かない
+- Home Assistant のトークンは `direnv exec /Volumes/ExternalHD/git/ansible-playbooks op read op://ansible/5xhph5yv3c3vzkubj5v33cgkya/credential` で読み、環境変数 `HASS_TOKEN` で渡す。URL は `HASS_URL`（`https://hass.rewse.jp`）で渡す。トークンをファイル、ログ、CSV に書かない
 - マッピング CSV と適用の記録は `~/.local/state/homeassistant-rename/` に置き、リポジトリに入れない
 - `homeassistant_ha_secondary` が切り替え中（hotel の Home Assistant が動いている）なら、移行を始めない
 
@@ -194,7 +194,7 @@ Expected: PASS
 
 - [ ] **Step 5: 実機で読めることを確かめる**
 
-Run: `mkdir -p ~/.local/state/homeassistant-rename && HASS_URL=https://hass.rewse.jp HASS_TOKEN="$(direnv exec /Volumes/ExternalHD/git/ansible-playbooks op read op://ansible/jdyfywcw5p3xcet3nxlkvlbonm/credential)" uv run --with websockets --with pyyaml python -m tools.homeassistant_rename snapshot --out ~/.local/state/homeassistant-rename/snapshot.json`
+Run: `mkdir -p ~/.local/state/homeassistant-rename && HASS_URL=https://hass.rewse.jp HASS_TOKEN="$(direnv exec /Volumes/ExternalHD/git/ansible-playbooks op read op://ansible/5xhph5yv3c3vzkubj5v33cgkya/credential)" uv run --with websockets --with pyyaml python -m tools.homeassistant_rename snapshot --out ~/.local/state/homeassistant-rename/snapshot.json`
 Expected: exit 0。エリア 8、デバイス 288 前後、状態 1,840 前後が入っている
 
 - [ ] **Step 6: コミットする**
