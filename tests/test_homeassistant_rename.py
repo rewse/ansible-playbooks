@@ -406,6 +406,81 @@ class MappingTest(unittest.TestCase):
         self.assertEqual(row.status, "review")
         self.assertIn("study_", row.note)
 
+    def test_unknown_area_of_own_entity_needs_review(self):
+        cases = [
+            ("input_boolean.garage_light_auto", "garage"),
+            ("input_boolean.moms_room_light_auto", None),
+        ]
+        for entity_id, area_id in cases:
+            with self.subTest(entity_id):
+                snapshot = mapping_snapshot(
+                    [],
+                    [
+                        entity(
+                            entity_id,
+                            area_id=area_id,
+                            original_name="Light Auto",
+                            platform="input_boolean",
+                        )
+                    ],
+                )
+                row = rows_by_key(build_rows(snapshot, NO_YAML, fake_slugify))[
+                    entity_id
+                ]
+                self.assertEqual(row.status, "review")
+                self.assertIn("unknown area", row.note)
+                self.assertEqual(row.new_id, entity_id)
+
+    def test_unknown_area_of_device_entity_needs_review(self):
+        snapshot = mapping_snapshot(
+            [device("d1", "garage", "Garage Light")],
+            [entity("light.garage_light", "d1")],
+        )
+        row = rows_by_key(build_rows(snapshot, NO_YAML, fake_slugify))[
+            "light.garage_light"
+        ]
+        self.assertEqual(row.status, "review")
+        self.assertIn("unknown area garage", row.note)
+        self.assertEqual(row.new_id, "light.garage_light")
+
+    def test_product_names_need_review(self):
+        cases = [
+            ("Aventage", True),
+            ("Floor Heater North", False),
+            ("Roomba Combo", True),
+            ("SwitchBot Hub 2", True),
+            ("Thermometer", False),
+            ("eufy-ent", True),
+            ("regza", True),
+            ("switchbothub", True),
+        ]
+        for name, flagged in cases:
+            with self.subTest(name):
+                snapshot = mapping_snapshot(
+                    [device("d1", "living_room", f"Living Room {name}")], []
+                )
+                row = rows_by_key(build_rows(snapshot, NO_YAML, fake_slugify))["d1"]
+                if flagged:
+                    self.assertEqual(row.status, "review")
+                    self.assertIn("product name", row.note)
+                else:
+                    self.assertNotIn("product name", row.note)
+                    self.assertEqual(row.status, "auto")
+
+    def test_thermometer_pair_names_are_not_product_names(self):
+        snapshot = mapping_snapshot(
+            [
+                device("b1", "balcony", "Balcony SwitchBot Outdoor Meter", "switchbot"),
+                device("b2", "balcony", "Balcony SwitchBot Meter", "switchbot"),
+            ],
+            [],
+        )
+        rows = rows_by_key(build_rows(snapshot, NO_YAML, fake_slugify))
+        for key in ("b1", "b2"):
+            with self.subTest(key):
+                self.assertEqual(rows[key].status, "auto")
+                self.assertEqual(rows[key].note, "")
+
     def test_duplicate_targets_are_flagged(self):
         snapshot = mapping_snapshot(
             [

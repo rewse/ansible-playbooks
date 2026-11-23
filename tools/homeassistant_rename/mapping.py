@@ -51,6 +51,19 @@ THERMOMETER = "Thermometer"
 # Words that mix letters and digits but are generic names, not model numbers.
 GENERIC_ALPHANUMERIC_WORDS = frozenset({"CO2", "PM2.5"})
 
+# Brand and product words that a device name should describe instead of.
+PRODUCT_WORDS = (
+    "aqara",
+    "aventage",
+    "eufy",
+    "hue",
+    "regza",
+    "roomba",
+    "switchbot",
+    "tapo",
+    "vesync",
+)
+
 TOP_LEVEL_KEY = re.compile(r"^([A-Za-z0-9_]+):", re.MULTILINE)
 UNIQUE_ID = re.compile(r"^\s*(?:-\s+)?unique_id:\s*(\S+?)\s*$", re.MULTILINE)
 LIST_ITEM_ID = re.compile(r"^-\s+id:\s*(\S+?)\s*$", re.MULTILINE)
@@ -130,6 +143,20 @@ def looks_like_model_number(name: str) -> bool:
     )
 
 
+def looks_like_product_name(name: str) -> bool:
+    """Tells whether a name is a brand or product name rather than a role.
+
+    Names that contain a known brand or product word, start with a lowercase
+    letter, or contain a hyphen are typically the name the integration gave.
+    """
+    lowered = name.lower()
+    return (
+        any(word in lowered for word in PRODUCT_WORDS)
+        or name[:1].islower()
+        or "-" in name
+    )
+
+
 def device_display_name(device: dict[str, Any]) -> str:
     return device.get("name_by_user") or device.get("name") or ""
 
@@ -195,6 +222,10 @@ class _Builder:
                 reasons.append("numbered name needs a modifier")
             if looks_like_model_number(name):
                 reasons.append("name looks like a model number")
+            # The thermometer pair rule renames these product names by role.
+            is_thermometer = name in PRIMARY_THERMOMETERS | SECONDARY_THERMOMETERS
+            if not is_thermometer and looks_like_product_name(name):
+                reasons.append("product name")
             result[device_id] = (name, reasons)
         self._name_thermometers(result)
         return result
@@ -234,7 +265,7 @@ class _Builder:
     def device_entity_name(self, entity: dict[str, Any], area_id: str) -> str:
         """Joins the parts Home Assistant builds a device entity's ID from."""
         device = self.devices[entity["device_id"]]
-        parts = [self.new_area_names.get(area_id, "")]
+        parts = [self.new_area_names[area_id]]
         parent_id = device.get("parent_device_id")
         if parent_id is not None and parent_id in self.devices:
             parts.append(self.new_device_name(parent_id))
@@ -246,7 +277,9 @@ class _Builder:
         names = set(self.area_names.values()) | set(self.new_area_names.values())
         for entity in self.entities:
             area_id = self.effective_area(entity)
-            if entity.get("device_id") in self.devices and area_id is not None:
+            if area_id is None or area_id not in self.area_names:
+                continue
+            if entity.get("device_id") in self.devices:
                 names.add(self.device_entity_name(entity, area_id))
         return slugify(sorted(names))
 
@@ -345,10 +378,24 @@ class _Builder:
         area_id = self.effective_area(entity)
         if area_id is None or not rules.in_scope(device, entity, area_id):
             return
-        domain = row.old_id.split(".", 1)[0]
         row.room = area_id
+        if self._flag_unknown_area(row, area_id):
+            return
+        domain = row.old_id.split(".", 1)[0]
         row.new_id = f"{domain}.{self.slugs[self.device_entity_name(entity, area_id)]}"
         row.status = _status([], row.new_id != row.old_id)
+
+    def _flag_unknown_area(self, row: Row, area_id: str) -> bool:
+        """Marks a row for review when its area is not in the snapshot.
+
+        The row keeps its name and ID, since neither can be built without the
+        area's name.
+        """
+        if area_id in self.area_names:
+            return False
+        row.status = "review"
+        row.note = f"unknown area {area_id}"
+        return True
 
     def _fill_own_entity(self, row: Row, entity: dict[str, Any]) -> None:
         domain, object_id = row.old_id.split(".", 1)
@@ -357,6 +404,9 @@ class _Builder:
             self.room_prefixes[prefix] if prefix else None
         )
         if area_id is None or not rules.in_scope(None, entity, area_id):
+            return
+        row.room = area_id
+        if self._flag_unknown_area(row, area_id):
             return
         reasons: list[str] = []
         new_prefix = f"{self.slugs[self.new_area_names[area_id]]}_"
