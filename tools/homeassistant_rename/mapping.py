@@ -86,6 +86,22 @@ class Row:
     note: str
 
 
+@dataclasses.dataclass(frozen=True)
+class Override:
+    """A reviewed name, ID, or status that replaces the generated one.
+
+    new_name is the area or device name, or the entity's own name ("" for a
+    main entity). new_id pins an entity's ID; "" keeps the generated one.
+    status, when given, is final except for conflicts.
+    """
+
+    kind: Kind
+    key: str
+    new_name: str
+    new_id: str = ""
+    status: Status | None = None
+
+
 @dataclasses.dataclass
 class YamlSources:
     """IDs defined by the Home Assistant YAML configuration."""
@@ -182,20 +198,27 @@ def _status(reasons: list[str], changed: bool) -> Status:
 
 class _Builder:
     def __init__(
-        self, snapshot: Snapshot, yaml_sources: YamlSources, slugify: Slugify
+        self,
+        snapshot: Snapshot,
+        yaml_sources: YamlSources,
+        slugify: Slugify,
+        overrides: Iterable[Override],
     ) -> None:
         self.yaml_sources = yaml_sources
         self.devices = {device["id"]: device for device in snapshot.devices}
         self.area_names = {area["area_id"]: area["name"] for area in snapshot.areas}
+        self.entities = snapshot.entities
+        self.overrides = self._index_overrides(overrides)
+        self.used_overrides: set[tuple[Kind, str]] = set()
         self.new_area_names = {
-            area_id: rules.normalize_apostrophe(name)
+            area_id: self._override_name("area", area_id)
+            or rules.normalize_apostrophe(name)
             for area_id, name in self.area_names.items()
         }
         self.all_area_names = sorted(
             set(self.area_names.values()) | set(self.new_area_names.values())
         )
         self.areas = snapshot.areas
-        self.entities = snapshot.entities
         self.devices_in_scope = {
             device_id
             for device_id, device in self.devices.items()
@@ -204,32 +227,85 @@ class _Builder:
             )
         }
         self.device_names = self._device_names()
+        # Filled by build_rows once device conflicts are known.
+        self.device_statuses: dict[str, Status] = {}
         self.slugs = self._slugify_once(slugify)
         self.room_prefixes = self._room_prefixes()
 
+    def _index_overrides(
+        self, overrides: Iterable[Override]
+    ) -> dict[tuple[Kind, str], Override]:
+        known: dict[Kind, set[str]] = {
+            "area": set(self.area_names),
+            "device": set(self.devices),
+            "entity": {entity["entity_id"] for entity in self.entities},
+        }
+        result: dict[tuple[Kind, str], Override] = {}
+        for override in overrides:
+            if override.key not in known[override.kind]:
+                raise ValueError(f"override for unknown {override.kind} {override.key}")
+            if override.kind != "entity" and override.new_id:
+                raise ValueError(f"override for {override.key} sets new_id")
+            if override.kind != "entity" and not override.new_name:
+                raise ValueError(f"override for {override.key} has no new_name")
+            domain = override.key.split(".", 1)[0]
+            if override.new_id and not override.new_id.startswith(f"{domain}."):
+                raise ValueError(
+                    f"override for {override.key} moves it to another domain"
+                )
+            result[(override.kind, override.key)] = override
+        return result
+
+    def override(self, kind: Kind, key: str) -> Override | None:
+        """Returns the override of a row and records that it was used."""
+        override = self.overrides.get((kind, key))
+        if override is not None:
+            self.used_overrides.add((kind, key))
+        return override
+
+    def _override_name(self, kind: Kind, key: str) -> str | None:
+        override = self.override(kind, key)
+        return override.new_name if override else None
+
+    def unused_overrides(self) -> list[str]:
+        return sorted(
+            f"{kind} {key}"
+            for kind, key in self.overrides
+            if (kind, key) not in self.used_overrides
+        )
+
     def _device_names(self) -> dict[str, tuple[str, list[str]]]:
-        """Computes each device's new name and the reasons it needs review."""
+        """Computes each device's new name and the reasons it needs review.
+
+        An override replaces the generated name and is checked the same way.
+        """
         result: dict[str, tuple[str, list[str]]] = {}
         for device_id in self.devices_in_scope:
             old = device_display_name(self.devices[device_id])
-            reasons: list[str] = []
             stripped = rules.strip_area(old, self.all_area_names)
             if not stripped:
                 result[device_id] = (old, ["name is only the area name"])
                 continue
-            name, needs_review = rules.normalize_modifiers(stripped)
-            if needs_review:
-                reasons.append("numbered name needs a modifier")
-            if looks_like_model_number(name):
-                reasons.append("name looks like a model number")
+            name, _ = rules.normalize_modifiers(stripped)
             # The thermometer pair rule renames these product names by role.
             is_thermometer = name in PRIMARY_THERMOMETERS | SECONDARY_THERMOMETERS
-            if not is_thermometer and looks_like_product_name(name):
-                reasons.append("product name")
-            reasons += self.name_reasons(name)
-            result[device_id] = (name, reasons)
+            result[device_id] = (name, self.device_name_reasons(name, is_thermometer))
         self._name_thermometers(result)
+        for device_id in self.devices_in_scope:
+            name = self._override_name("device", device_id)
+            if name is not None:
+                result[device_id] = (name, self.device_name_reasons(name))
         return result
+
+    def device_name_reasons(self, name: str, is_thermometer: bool = False) -> list[str]:
+        reasons: list[str] = []
+        if any(word.isdigit() for word in name.split()):
+            reasons.append("numbered name needs a modifier")
+        if looks_like_model_number(name):
+            reasons.append("name looks like a model number")
+        if not is_thermometer and looks_like_product_name(name):
+            reasons.append("product name")
+        return reasons + self.name_reasons(name)
 
     def name_reasons(self, name: str) -> list[str]:
         """Lists the parts of a new name that the rules leave to a person."""
@@ -289,8 +365,21 @@ class _Builder:
         if parent_id is not None and parent_id in self.devices:
             parts.append(self.new_device_name(parent_id))
         parts.append(self.new_device_name(device["id"]))
-        parts.append(entity_part(entity))
+        parts.append(self.entity_name(entity))
         return " ".join(part for part in parts if part)
+
+    def entity_name(self, entity: dict[str, Any]) -> str:
+        """Returns the entity's new own name: its override, else its current one."""
+        override = self.overrides.get(("entity", entity["entity_id"]))
+        return override.new_name if override else entity_part(entity)
+
+    def device_under_review(self, device: dict[str, Any]) -> bool:
+        """Tells whether the device or its parent, whose names build IDs, is review."""
+        device_ids = [device["id"], device.get("parent_device_id")]
+        return any(
+            self.device_statuses.get(device_id or "") == "review"
+            for device_id in device_ids
+        )
 
     def _slugify_once(self, slugify: Slugify) -> dict[str, str]:
         names = set(self.area_names.values()) | set(self.new_area_names.values())
@@ -321,21 +410,21 @@ class _Builder:
         for area in self.areas:
             old = area["name"]
             new = self.new_area_names[area["area_id"]]
-            rows.append(
-                Row(
-                    room=area["area_id"],
-                    kind="area",
-                    source="registry",
-                    integration="",
-                    key=area["area_id"],
-                    old_name=old,
-                    new_name=new,
-                    old_id="",
-                    new_id="",
-                    status=_status([], old != new),
-                    note="",
-                )
+            row = Row(
+                room=area["area_id"],
+                kind="area",
+                source="registry",
+                integration="",
+                key=area["area_id"],
+                old_name=old,
+                new_name=new,
+                old_id="",
+                new_id="",
+                status="skip",
+                note="",
             )
+            _finish(row, [], old != new, self.override("area", row.key))
+            rows.append(row)
         return rows
 
     def device_rows(self) -> list[Row]:
@@ -361,8 +450,7 @@ class _Builder:
                 new, reasons = self.device_names[device_id]
                 row.room = area_id or ""
                 row.new_name = new
-                row.status = _status(reasons, old != new)
-                row.note = "; ".join(reasons)
+                _finish(row, reasons, old != new, self.override("device", device_id))
             rows.append(row)
         return rows
 
@@ -400,12 +488,18 @@ class _Builder:
         row.room = area_id
         if self._flag_unknown_area(row, area_id):
             return
+        override = self.override("entity", row.key)
         domain = row.old_id.split(".", 1)[0]
-        row.new_id = f"{domain}.{self.slugs[self.device_entity_name(entity, area_id)]}"
-        changed = row.new_id != row.old_id
+        row.new_name = self.entity_name(entity)
+        row.new_id = (override.new_id if override else "") or (
+            f"{domain}.{self.slugs[self.device_entity_name(entity, area_id)]}"
+        )
+        changed = row.new_id != row.old_id or row.new_name != row.old_name
         reasons = self.changed_reasons(row) if changed else []
-        row.status = _status(reasons, changed)
-        row.note = "; ".join(reasons)
+        # The ID is built from the device's name, which is not settled yet.
+        if override is None and self.device_under_review(device):
+            reasons.insert(0, "device under review")
+        _finish(row, reasons, changed, override)
 
     def changed_reasons(self, row: Row) -> list[str]:
         """Flags the new name and ID of an entity row that changes."""
@@ -434,6 +528,7 @@ class _Builder:
         row.room = area_id
         if self._flag_unknown_area(row, area_id):
             return
+        override = self.override("entity", row.key)
         reasons: list[str] = []
         new_prefix = f"{self.slugs[self.new_area_names[area_id]]}_"
         if prefix is None:
@@ -445,18 +540,35 @@ class _Builder:
             if prefix in MODIFIER_PREFIXES:
                 reasons.append(f"ID prefix {prefix} needs a North or side modifier")
             new_object_id = new_prefix + object_id[len(prefix) :]
+        if override is not None and override.new_id:
+            # The reasons above are about the generated ID, which is replaced.
+            reasons = []
+            row.new_id = override.new_id
+        else:
+            row.new_id = f"{domain}.{rules.expand_abbreviations(new_object_id)}"
         stripped = rules.strip_area(row.old_name, self.all_area_names)
-        if row.old_name and not stripped:
+        if override is not None:
+            row.new_name = override.new_name
+        elif row.old_name and not stripped:
             reasons.append("name is only the area name")
         else:
             row.new_name = expand_name_abbreviations(stripped)
-        row.room = area_id
-        row.new_id = f"{domain}.{rules.expand_abbreviations(new_object_id)}"
         changed = row.new_id != row.old_id or row.new_name != row.old_name
         if changed:
             reasons += self.changed_reasons(row)
-        row.status = _status(reasons, changed)
-        row.note = "; ".join(reasons)
+        _finish(row, reasons, changed, override)
+
+
+def _finish(
+    row: Row, reasons: list[str], changed: bool, override: Override | None
+) -> None:
+    """Sets a row's status: the override's when it has one, else the rules'."""
+    if override is not None and override.status is not None:
+        row.status = override.status
+        row.note = "status set by override"
+        return
+    row.status = _status(reasons, changed)
+    row.note = "; ".join(reasons)
 
 
 def _flag_conflicts(rows: Iterable[Row], kind: Kind, field: str) -> None:
@@ -487,16 +599,27 @@ KIND_ORDER = {"area": 0, "device": 1, "entity": 2}
 
 
 def build_rows(
-    snapshot: Snapshot, yaml_sources: YamlSources, slugify: Slugify
+    snapshot: Snapshot,
+    yaml_sources: YamlSources,
+    slugify: Slugify,
+    overrides: Iterable[Override] = (),
 ) -> list[Row]:
     """Maps every area, device, and entity to its name and ID under the rules.
 
     slugify is called once with every name whose slug the mapping needs.
+    overrides replace generated names, IDs, and statuses before the entity IDs
+    and conflicts are computed; one that matches no row in scope is an error.
     """
-    builder = _Builder(snapshot, yaml_sources, slugify)
-    rows = builder.area_rows() + builder.device_rows() + builder.entity_rows()
-    _flag_conflicts(rows, "device", "new_name")
-    _flag_conflicts(rows, "entity", "new_id")
+    builder = _Builder(snapshot, yaml_sources, slugify, overrides)
+    devices = builder.device_rows()
+    _flag_conflicts(devices, "device", "new_name")
+    builder.device_statuses = {row.key: row.status for row in devices}
+    entities = builder.entity_rows()
+    _flag_conflicts(entities, "entity", "new_id")
+    rows = builder.area_rows() + devices + entities
+    unused = builder.unused_overrides()
+    if unused:
+        raise ValueError(f"overrides match no row in scope: {', '.join(unused)}")
     rows.sort(key=lambda row: (row.room, KIND_ORDER[row.kind], row.old_id, row.key))
     return rows
 
@@ -528,3 +651,74 @@ def read_csv(path: str | pathlib.Path) -> list[Row]:
             values["status"] = _literal(record["status"], Status, "status")
             rows.append(Row(**values))
     return rows
+
+
+OVERRIDE_REQUIRED_FIELDS = ("kind", "key", "new_name")
+
+
+def read_overrides(path: str | pathlib.Path) -> list[Override]:
+    """Reads an overrides CSV with kind, key, new_name, and optional new_id, status.
+
+    Rows with the mapping's other columns are accepted, so reviewed rows can be
+    copied from a mapping CSV as they are.
+    """
+    overrides: list[Override] = []
+    seen: set[tuple[str, str]] = set()
+    with pathlib.Path(path).open(encoding="utf-8", newline="") as file:
+        reader = csv.DictReader(file)
+        missing = [
+            field
+            for field in OVERRIDE_REQUIRED_FIELDS
+            if field not in (reader.fieldnames or [])
+        ]
+        if missing:
+            raise ValueError(f"{path}: missing columns {', '.join(missing)}")
+        for record in reader:
+            kind = _literal(record["kind"], Kind, "kind")
+            key = record["key"]
+            if (kind, key) in seen:
+                raise ValueError(f"{path}: more than one override for {kind} {key}")
+            seen.add((kind, key))
+            status = record.get("status") or ""
+            overrides.append(
+                Override(
+                    kind=kind,
+                    key=key,
+                    new_name=record["new_name"] or "",
+                    new_id=record.get("new_id") or "",
+                    status=_literal(status, Status, "status") if status else None,
+                )
+            )
+    return overrides
+
+
+def validate(rows: list[Row], snapshot: Snapshot) -> list[str]:
+    """Lists what keeps a mapping from being applied.
+
+    Reports rows still under review, new IDs shared by auto rows, and new IDs
+    held by an entity that the mapping does not move away.
+    """
+    problems = [
+        f"{row.key}: still review" + (f" ({row.note})" if row.note else "")
+        for row in rows
+        if row.status == "review"
+    ]
+    auto = [row for row in rows if row.kind == "entity" and row.status == "auto"]
+    by_new_id: dict[str, list[str]] = defaultdict(list)
+    for row in auto:
+        by_new_id[row.new_id].append(row.old_id)
+    problems += [
+        f"{new_id}: new ID of {', '.join(sorted(old_ids))}"
+        for new_id, old_ids in sorted(by_new_id.items())
+        if len(old_ids) > 1
+    ]
+    moved = [row for row in auto if row.old_id != row.new_id]
+    vacated = {row.old_id for row in moved}
+    existing = {entity["entity_id"] for entity in snapshot.entities}
+    existing |= set(snapshot.states)
+    problems += [
+        f"{row.old_id}: new ID {row.new_id} is held by an entity that is not renamed"
+        for row in moved
+        if row.new_id in existing and row.new_id not in vacated
+    ]
+    return problems

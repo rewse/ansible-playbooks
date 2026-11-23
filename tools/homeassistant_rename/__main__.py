@@ -15,6 +15,8 @@ from .hass import slugify_all
 from .mapping import build_rows
 from .mapping import load_yaml_sources
 from .mapping import read_csv
+from .mapping import read_overrides
+from .mapping import validate
 from .mapping import write_csv
 from .registry import apply_ops
 from .registry import assign_areas
@@ -74,13 +76,25 @@ def hass_slugify(names: list[str]) -> dict[str, str]:
 
 
 def run_map(args: argparse.Namespace) -> None:
+    overrides = read_overrides(args.overrides) if args.overrides else []
     rows = build_rows(
-        Snapshot.load(args.snapshot), load_yaml_sources(args.files), hass_slugify
+        Snapshot.load(args.snapshot),
+        load_yaml_sources(args.files),
+        hass_slugify,
+        overrides,
     )
     write_csv(rows, args.out)
     counts = collections.Counter(row.status for row in rows)
     summary = ", ".join(f"{counts[status]} {status}" for status in sorted(counts))
     print(f"{args.out}: {len(rows)} rows ({summary})")
+
+
+def run_validate(args: argparse.Namespace) -> int:
+    problems = validate(read_csv(args.mapping), Snapshot.load(args.snapshot))
+    for problem in problems:
+        print(problem)
+    print(f"{args.mapping}: {len(problems)} problems")
+    return 1 if problems else 0
 
 
 def run_rewrite(args: argparse.Namespace) -> None:
@@ -243,6 +257,11 @@ def build_parser() -> argparse.ArgumentParser:
     )
     mapping.add_argument("--files", default=HOMEASSISTANT_FILES, type=pathlib.Path)
     mapping.add_argument("--out", required=True, type=pathlib.Path)
+    mapping.add_argument(
+        "--overrides",
+        help="CSV of reviewed rows (kind,key,new_name[,new_id][,status])",
+        type=pathlib.Path,
+    )
     mapping.add_argument("--snapshot", required=True, type=pathlib.Path)
     mapping.set_defaults(handler=run_map)
 
@@ -285,6 +304,13 @@ def build_parser() -> argparse.ArgumentParser:
     rewriting_storage.add_argument("--dry-run", action="store_true")
     rewriting_storage.add_argument("--mapping", required=True, type=pathlib.Path)
     rewriting_storage.set_defaults(handler=run_rewrite_storage)
+
+    validating = subparsers.add_parser(
+        "validate", help="list what keeps a mapping from being applied"
+    )
+    validating.add_argument("--mapping", required=True, type=pathlib.Path)
+    validating.add_argument("--snapshot", required=True, type=pathlib.Path)
+    validating.set_defaults(handler=run_validate)
 
     return parser
 

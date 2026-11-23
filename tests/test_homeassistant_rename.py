@@ -19,6 +19,7 @@ import tools.homeassistant_rename.__main__ as cli_module
 from tools.homeassistant_rename.__main__ import main as cli_main
 from tools.homeassistant_rename.hass import HassError
 from tools.homeassistant_rename.mapping import KEY_ID_FILES
+from tools.homeassistant_rename.mapping import Override
 from tools.homeassistant_rename.mapping import Row
 from tools.homeassistant_rename.mapping import Source
 from tools.homeassistant_rename.mapping import Status
@@ -26,6 +27,8 @@ from tools.homeassistant_rename.mapping import YamlSources
 from tools.homeassistant_rename.mapping import build_rows
 from tools.homeassistant_rename.mapping import load_yaml_sources
 from tools.homeassistant_rename.mapping import read_csv
+from tools.homeassistant_rename.mapping import read_overrides
+from tools.homeassistant_rename.mapping import validate
 from tools.homeassistant_rename.mapping import write_csv
 from tools.homeassistant_rename.registry import Op
 from tools.homeassistant_rename.registry import apply_ops
@@ -529,7 +532,9 @@ class MappingTest(unittest.TestCase):
             ),
             (
                 "sensor.living_room_camera_fps",
-                entity("sensor.living_room_camera_fps", "d2", original_name="Camera FPS"),
+                entity(
+                    "sensor.living_room_camera_fps", "d2", original_name="Camera FPS"
+                ),
                 "sensor.living_room_camera_camera_fps",
             ),
             (
@@ -721,6 +726,265 @@ def entity_row(
         status=status,
         note="",
     )
+
+
+def overrides_from(text: str) -> list[Override]:
+    with tempfile.TemporaryDirectory() as tmp:
+        path = pathlib.Path(tmp) / "overrides.csv"
+        path.write_text(text, encoding="utf-8")
+        return read_overrides(path)
+
+
+def hue_room_snapshot() -> Snapshot:
+    """A Hue room group named after its area, with a light and a scene."""
+    return mapping_snapshot(
+        [
+            device("d1", "dads_room", "Dad’s Room"),
+            device("d2", "dads_room", "Dad’s Room SwitchBot Meter", "switchbot"),
+        ],
+        [
+            entity("light.dads_room", "d1"),
+            entity("scene.dads_room_arise", "d1", original_name="Arise"),
+            entity(
+                "sensor.dads_room_switchbot_meter_temperature",
+                "d2",
+                original_name="Temeperature",
+                platform="switchbot",
+            ),
+        ],
+    )
+
+
+class OverrideTest(unittest.TestCase):
+    def test_entities_of_a_device_under_review_need_review(self):
+        rows = rows_by_key(build_rows(hue_room_snapshot(), NO_YAML, fake_slugify))
+        self.assertEqual(rows["d1"].status, "review")
+        for key in ("light.dads_room", "scene.dads_room_arise"):
+            with self.subTest(key):
+                self.assertEqual(rows[key].status, "review")
+                self.assertIn("device under review", rows[key].note)
+
+    def test_device_override_renames_its_entities(self):
+        overrides = overrides_from("kind,key,new_name\ndevice,d1,Ceiling Light\n")
+        rows = rows_by_key(
+            build_rows(hue_room_snapshot(), NO_YAML, fake_slugify, overrides)
+        )
+        self.assertEqual(rows["d1"].new_name, "Ceiling Light")
+        self.assertEqual(rows["d1"].status, "auto")
+        self.assertEqual(rows["d1"].note, "")
+        self.assertEqual(
+            rows["light.dads_room"].new_id, "light.dad_s_room_ceiling_light"
+        )
+        self.assertEqual(rows["light.dads_room"].status, "auto")
+        self.assertEqual(
+            rows["scene.dads_room_arise"].new_id,
+            "scene.dad_s_room_ceiling_light_arise",
+        )
+
+    def test_device_override_is_checked_like_a_generated_name(self):
+        overrides = overrides_from("kind,key,new_name\ndevice,d1,Light 2\n")
+        rows = rows_by_key(
+            build_rows(hue_room_snapshot(), NO_YAML, fake_slugify, overrides)
+        )
+        self.assertEqual(rows["d1"].status, "review")
+        self.assertIn("numbered", rows["d1"].note)
+        self.assertEqual(rows["light.dads_room"].status, "review")
+
+    def test_entity_override_sets_entity_name(self):
+        overrides = overrides_from(
+            "kind,key,new_name,new_id,status\n"
+            "entity,sensor.dads_room_switchbot_meter_temperature,Temperature,,\n"
+        )
+        rows = rows_by_key(
+            build_rows(hue_room_snapshot(), NO_YAML, fake_slugify, overrides)
+        )
+        row = rows["sensor.dads_room_switchbot_meter_temperature"]
+        self.assertEqual(row.new_name, "Temperature")
+        self.assertEqual(row.new_id, "sensor.dad_s_room_thermometer_temperature")
+        self.assertEqual(row.status, "auto")
+
+    def test_entity_override_pins_id_and_status(self):
+        overrides = overrides_from(
+            "kind,key,new_name,new_id,status\n"
+            "entity,light.dads_room,,light.dad_s_room_light_light,auto\n"
+            "entity,scene.dads_room_arise,Arise,scene.dad_s_room_arise,\n"
+        )
+        rows = rows_by_key(
+            build_rows(hue_room_snapshot(), NO_YAML, fake_slugify, overrides)
+        )
+        light = rows["light.dads_room"]
+        self.assertEqual(light.new_id, "light.dad_s_room_light_light")
+        self.assertEqual(light.status, "auto")
+        scene = rows["scene.dads_room_arise"]
+        self.assertEqual(scene.new_id, "scene.dad_s_room_arise")
+        self.assertEqual(scene.status, "auto", scene.note)
+
+    def test_own_entity_override_pins_id(self):
+        entity_id = "input_boolean.study_light_auto"
+        snapshot = mapping_snapshot(
+            [],
+            [entity(entity_id, original_name="Study Light Auto", platform="x")],
+        )
+        overrides = overrides_from(
+            "kind,key,new_name,new_id\n"
+            f"entity,{entity_id},Light Auto North,"
+            "input_boolean.living_room_light_auto_north\n"
+        )
+        row = rows_by_key(build_rows(snapshot, NO_YAML, fake_slugify, overrides))[
+            entity_id
+        ]
+        self.assertEqual(row.new_id, "input_boolean.living_room_light_auto_north")
+        self.assertEqual(row.new_name, "Light Auto North")
+        self.assertEqual(row.status, "auto", row.note)
+
+    def test_conflicts_are_recomputed_after_overrides(self):
+        overrides = overrides_from(
+            "kind,key,new_name,new_id,status\ndevice,d1,Thermometer,,auto\n"
+        )
+        rows = rows_by_key(
+            build_rows(hue_room_snapshot(), NO_YAML, fake_slugify, overrides)
+        )
+        for key in ("d1", "d2"):
+            with self.subTest(key):
+                self.assertEqual(rows[key].status, "review")
+                self.assertIn("conflict", rows[key].note)
+
+    def test_invalid_overrides_are_rejected(self):
+        cases = [
+            "kind,key,new_name\ndevice,missing,X\n",
+            "kind,key,new_name\nentity,light.missing,X\n",
+            "kind,key,new_name,new_id\nentity,light.dads_room,,switch.x\n",
+        ]
+        for text in cases:
+            with self.subTest(text), self.assertRaises(ValueError):
+                build_rows(
+                    hue_room_snapshot(),
+                    NO_YAML,
+                    fake_slugify,
+                    overrides_from(text),
+                )
+        for text in (
+            "kind,key\ndevice,d1\n",
+            "kind,key,new_name,status\ndevice,d1,X,done\n",
+            "kind,key,new_name\ndevice,d1,X\ndevice,d1,Y\n",
+        ):
+            with self.subTest(text), self.assertRaises(ValueError):
+                overrides_from(text)
+
+    def test_override_of_a_row_out_of_scope_is_rejected(self):
+        snapshot = mapping_snapshot(
+            [device("d1", None, "Hallway Bulb")], [entity("light.hallway_bulb", "d1")]
+        )
+        for text in (
+            "kind,key,new_name\ndevice,d1,Bulb\n",
+            "kind,key,new_name\nentity,light.hallway_bulb,Bulb\n",
+        ):
+            with self.subTest(text), self.assertRaises(ValueError):
+                build_rows(snapshot, NO_YAML, fake_slugify, overrides_from(text))
+
+    def test_map_cli_applies_overrides(self):
+        with tempfile.TemporaryDirectory() as tmp:
+            root = pathlib.Path(tmp)
+            hue_room_snapshot().save(root / "snapshot.json")
+            files = root / "files"
+            files.mkdir()
+            for name in KEY_ID_FILES.values():
+                (files / name).write_text("", encoding="utf-8")
+            (root / "overrides.csv").write_text(
+                "kind,key,new_name\ndevice,d1,Ceiling Light\n", encoding="utf-8"
+            )
+            with (
+                mock.patch.object(cli_module, "hass_slugify", fake_slugify),
+                contextlib.redirect_stdout(io.StringIO()),
+            ):
+                status = cli_main(
+                    [
+                        "map",
+                        "--files",
+                        str(files),
+                        "--out",
+                        str(root / "mapping.csv"),
+                        "--overrides",
+                        str(root / "overrides.csv"),
+                        "--snapshot",
+                        str(root / "snapshot.json"),
+                    ]
+                )
+            rows = rows_by_key(read_csv(root / "mapping.csv"))
+        self.assertEqual(status, 0)
+        self.assertEqual(
+            rows["light.dads_room"].new_id, "light.dad_s_room_ceiling_light"
+        )
+
+
+class ValidateTest(unittest.TestCase):
+    def test_lists_review_duplicate_and_held_ids(self):
+        snapshot = Snapshot(
+            areas=[],
+            devices=[],
+            entities=[
+                {"entity_id": "light.a"},
+                {"entity_id": "light.b"},
+                {"entity_id": "light.c"},
+                {"entity_id": "light.d"},
+                {"entity_id": "light.e"},
+            ],
+            states={"light.state_only": {}},
+        )
+        rows = [
+            entity_row("light.a", "light.x"),
+            entity_row("light.b", "light.x"),
+            entity_row("light.c", "light.d"),
+            entity_row("light.d", "light.y", status="review"),
+            entity_row("light.e", "light.state_only"),
+        ]
+        problems = validate(rows, snapshot)
+        self.assertEqual(
+            problems,
+            [
+                "light.d: still review",
+                "light.x: new ID of light.a, light.b",
+                "light.c: new ID light.d is held by an entity that is not renamed",
+                (
+                    "light.e: new ID light.state_only is held by an entity that is "
+                    "not renamed"
+                ),
+            ],
+        )
+
+    def test_chains_and_swaps_pass(self):
+        snapshot = Snapshot(
+            areas=[],
+            devices=[],
+            entities=[{"entity_id": "light.a"}, {"entity_id": "light.b"}],
+            states={},
+        )
+        rows = [entity_row("light.a", "light.b"), entity_row("light.b", "light.a")]
+        self.assertEqual(validate(rows, snapshot), [])
+
+    def test_validate_cli_exit_code(self):
+        snapshot = Snapshot(
+            areas=[], devices=[], entities=[{"entity_id": "light.a"}], states={}
+        )
+        for rows, expected in (
+            ([entity_row("light.a", "light.b")], 0),
+            ([entity_row("light.a", "light.b", status="review")], 1),
+        ):
+            with self.subTest(expected), tempfile.TemporaryDirectory() as tmp:
+                root = pathlib.Path(tmp)
+                snapshot.save(root / "snapshot.json")
+                write_csv(rows, root / "mapping.csv")
+                with contextlib.redirect_stdout(io.StringIO()) as stdout:
+                    status = cli_main(
+                        [
+                            "validate",
+                            "--mapping",
+                            str(root / "mapping.csv"),
+                            "--snapshot",
+                            str(root / "snapshot.json"),
+                        ]
+                    )
+                self.assertEqual(status, expected, stdout.getvalue())
 
 
 class RewriteTest(unittest.TestCase):
