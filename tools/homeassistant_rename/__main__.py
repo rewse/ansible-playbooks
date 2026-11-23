@@ -27,6 +27,7 @@ from .rewrite import check
 from .rewrite import count_problems
 from .rewrite import entity_id_map
 from .rewrite import new_problems
+from .rewrite import restore_storage
 from .rewrite import rewrite_repo
 from .rewrite import rewrite_storage
 from .snapshot import Snapshot
@@ -192,6 +193,16 @@ async def run_rewrite_storage(args: argparse.Namespace) -> None:
         print(name)
 
 
+async def run_restore_storage(args: argparse.Namespace) -> None:
+    client = await connect()
+    try:
+        restored = await restore_storage(client, args.backup_dir, args.dry_run)
+    finally:
+        await client.close()
+    for name in restored:
+        print(name)
+
+
 def run_check(args: argparse.Namespace) -> int:
     snapshot = Snapshot.load(args.snapshot)
     rows = read_csv(args.mapping)
@@ -316,6 +327,19 @@ def build_parser() -> argparse.ArgumentParser:
     )
     restoring.add_argument("--captured", required=True, type=pathlib.Path)
     restoring.set_defaults(handler=run_restore)
+
+    restoring_storage = subparsers.add_parser(
+        "restore-storage",
+        help="save the dashboard and energy backups of rewrite-storage back",
+    )
+    restoring_storage.add_argument(
+        "--backup-dir",
+        help=f"directory of the backups, usually {STORAGE_BACKUP_DIR}",
+        required=True,
+        type=pathlib.Path,
+    )
+    restoring_storage.add_argument("--dry-run", action="store_true")
+    restoring_storage.set_defaults(handler=run_restore_storage)
 
     reverting = subparsers.add_parser(
         "revert", help="undo the changes recorded in an apply journal"

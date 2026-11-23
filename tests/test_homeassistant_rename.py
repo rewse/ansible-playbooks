@@ -39,6 +39,7 @@ from tools.homeassistant_rename.registry import revert
 from tools.homeassistant_rename.rewrite import check
 from tools.homeassistant_rename.rewrite import count_problems
 from tools.homeassistant_rename.rewrite import new_problems
+from tools.homeassistant_rename.rewrite import restore_storage
 from tools.homeassistant_rename.rewrite import rewrite_repo
 from tools.homeassistant_rename.rewrite import rewrite_storage
 from tools.homeassistant_rename.rewrite import rewrite_text
@@ -2098,6 +2099,39 @@ class StorageTest(unittest.IsolatedAsyncioTestCase):
             )
         self.assertEqual(changed, ["dashboard-home"])
         self.assertFalse(any(call[0] == "energy/save_prefs" for call in client.calls))
+
+    async def test_restore_storage_saves_each_backup(self):
+        client = FakeClient()
+        with tempfile.TemporaryDirectory() as directory:
+            backup_dir = pathlib.Path(directory)
+            backups = {
+                "dashboard-home": {"views": [{"title": "Home"}]},
+                "energy": {"device_consumption": [], "energy_sources": []},
+                "lovelace": {"views": []},
+            }
+            for name, value in backups.items():
+                (backup_dir / f"{name}.json").write_text(json.dumps(value))
+            self.assertEqual(
+                await restore_storage(client, backup_dir, dry_run=True),
+                ["dashboard-home", "energy", "lovelace"],
+            )
+            self.assertEqual(client.calls, [])
+            restored = await restore_storage(client, backup_dir, dry_run=False)
+        self.assertEqual(restored, ["dashboard-home", "energy", "lovelace"])
+        self.assertEqual(
+            client.calls,
+            [
+                (
+                    "lovelace/config/save",
+                    {"config": backups["dashboard-home"], "url_path": "dashboard-home"},
+                ),
+                ("energy/save_prefs", backups["energy"]),
+                (
+                    "lovelace/config/save",
+                    {"config": backups["lovelace"], "url_path": None},
+                ),
+            ],
+        )
 
     async def test_storage_dry_run_writes_and_saves_nothing(self):
         client = self.storage_client()

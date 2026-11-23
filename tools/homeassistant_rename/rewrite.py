@@ -537,3 +537,25 @@ async def rewrite_storage(
             _back_up(backup_dir, ENERGY, _dump(prefs))
             await client.call("energy/save_prefs", **new_prefs)
     return changed
+
+
+async def restore_storage(
+    client: Client, backup_dir: pathlib.Path, dry_run: bool
+) -> list[str]:
+    """Saves each backup written by rewrite_storage back to Home Assistant.
+
+    lovelace.json is the default dashboard, energy.json the energy preferences,
+    and any other <name>.json the storage dashboard at url_path <name>. A dry
+    run saves nothing. Returns the names of the restored configurations.
+    """
+    names = sorted(path.stem for path in backup_dir.glob("*.json"))
+    if dry_run:
+        return names
+    for name in names:
+        value = json.loads((backup_dir / f"{name}.json").read_text(encoding="utf-8"))
+        if name == ENERGY:
+            await client.call("energy/save_prefs", **value)
+        else:
+            url_path = None if name == DEFAULT_DASHBOARD else name
+            await client.call("lovelace/config/save", url_path=url_path, config=value)
+    return names
