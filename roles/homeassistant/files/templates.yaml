@@ -793,7 +793,9 @@
     - action: shell_command.control_toggle_regza
     default_entity_id: switch.living_room_tv
     icon: mdi:television
-    availability: '{{ states(''switch.living_room_tv_plug'') }}'
+    # The TV plug's own switch is disabled so the TV's power cannot be cut;
+    # the TV is reachable whenever the plug reports its power draw.
+    availability: '{{ has_value(''sensor.living_room_tv_plug_power'') }}'
     name: "TV"
     state: '{{ float(states(''sensor.living_room_tv_plug_power'')) > 50 }}'
   # Mom’s Room
