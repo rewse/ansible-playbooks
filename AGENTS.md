@@ -149,6 +149,7 @@ Use only these tags, written as an indented YAML list:
 - Sort new peer entities alphabetically when their order has no behavior or priority.
 - To add a configuration domain, add its `!include` line to `roles/homeassistant/templates/configuration.yaml.j2`, add the file to `homeassistant_config_files` (or `homeassistant_reloadable_config_files` when Home Assistant reloads it without a restart) in `roles/homeassistant/vars/main.yml`, and put the file in `roles/homeassistant/files/`. Automation files named `automations-*.yaml` are deployed without being listed.
 - Give every `time_pattern` trigger a chosen `seconds` value from 0 through 59 so periodic automations do not start together.
+- `~/.local/state/homeassistant-rename/` holds the naming migration's snapshots, mapping, journal, and storage backups. At the start of a session, delete the directory once its files are 30 days past their last access.
 
 ### Subdomains
 
