@@ -32,6 +32,6 @@
   unique_id: bathroom_lights
   name: "Bathroom Lights"
   entities:
-    - light.bathroom_entrance_light
     - light.bathroom_light_left
+    - light.bathroom_light_middle
     - light.bathroom_light_right
