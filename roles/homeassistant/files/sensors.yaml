@@ -51,7 +51,7 @@
 - platform: statistics
   unique_id: sensor.dads_room_switchbot_meter_temperature_smoothed
   name: "SwitchBot Meter Temperature Smoothed"
-  entity_id: sensor.dad_s_room_thermometer_secondary_temeperature
+  entity_id: sensor.dad_s_room_thermometer_secondary_temperature
   state_characteristic: average_step
   max_age:
     hours: 1

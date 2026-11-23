@@ -142,25 +142,25 @@
   triggers:
     - trigger: state
       entity_id:
-        - binary_sensor.living_room_aqarahub
+        - binary_sensor.aqarahub
         - binary_sensor.atomlite_dad
-        - binary_sensor.living_room_aventage
-        - binary_sensor.dad_s_room_brother
-        - binary_sensor.dad_s_room_catloghome_dad
-        - binary_sensor.living_room_catloghome_liv
-        - binary_sensor.mom_s_room_catloghome_mom
-        - binary_sensor.dad_s_room_daikinac_dad
-        - binary_sensor.living_room_daikinac_liv
-        - binary_sensor.mom_s_room_daikinac_mom
-        - binary_sensor.entrance_eufy_ent
-        - binary_sensor.living_room_fancysyncbox
-        - binary_sensor.living_room_firetv_liv
-        - binary_sensor.living_room_firetv_liv_beta
-        - binary_sensor.dad_s_room_huebridge
-        - binary_sensor.living_room_regza
-        - binary_sensor.entrance_sesamehub
-        - binary_sensor.living_room_switchbothub
-        - binary_sensor.living_room_switchbothubmini
+        - binary_sensor.aventage
+        - binary_sensor.brother
+        - binary_sensor.catloghome_dad
+        - binary_sensor.catloghome_liv
+        - binary_sensor.catloghome_mom
+        - binary_sensor.daikinac_dad
+        - binary_sensor.daikinac_liv
+        - binary_sensor.daikinac_mom
+        - binary_sensor.eufy_ent
+        - binary_sensor.fancysyncbox
+        - binary_sensor.firetv_liv
+        - binary_sensor.firetv_liv_beta
+        - binary_sensor.huebridge
+        - binary_sensor.regza
+        - binary_sensor.sesamehub
+        - binary_sensor.switchbothub
+        - binary_sensor.switchbothubmini
       to: "off"
       for:
         minutes: 31

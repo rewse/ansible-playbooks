@@ -7,7 +7,7 @@
       state: "off"
     light.dad_s_room_chest_light:
       state: "off"
-    light.dad_s_room_floorlight_footlight:
+    light.dad_s_room_floorlight:
       state: "off"
   icon: "mdi:bed"
 - id: scene.living_room_daytime

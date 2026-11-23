@@ -22,7 +22,7 @@
         fault_unique_id: binary_sensor.dads_room_thermometer_fault
         prefix: dads_room
         primary_entity_id: sensor.dad_s_room_thermometer_primary_temperature
-        secondary_entity_id: sensor.dad_s_room_thermometer_secondary_temeperature
+        secondary_entity_id: sensor.dad_s_room_thermometer_secondary_temperature
         secondary_stale_seconds: 86400
         secondary_unavailable_seconds: 86400
         smoothed_sensors:
@@ -31,7 +31,7 @@
           - entity_id: sensor.dad_s_room_temperature_smoothed
             unique_id: sensor.dads_room_temperature_smoothed
         source_entity_ids:
-          - sensor.dad_s_room_thermometer_secondary_temeperature
+          - sensor.dad_s_room_thermometer_secondary_temperature
           - sensor.dad_s_room_thermometer_primary_temperature
       - alarm_file: automations-living-room.yaml
         alarm_id: automation.alarm_living_room_temperature_difference

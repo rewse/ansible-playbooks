@@ -41,7 +41,7 @@
                     light.dad_s_room_monitor_light:
                       state: "on"
                       brightness: 10
-                    light.dad_s_room_floorlight_footlight:
+                    light.dad_s_room_floorlight:
                       state: "on"
                       brightness: 10
   trace:

@@ -125,16 +125,16 @@
   - unique_id: binary_sensor.dads_room_thermometer_fault
     name: "Thermometer Fault"
     state: >-
-      {% set secondary = states('sensor.dad_s_room_thermometer_secondary_temeperature') %}
+      {% set secondary = states('sensor.dad_s_room_thermometer_secondary_temperature') %}
       {{
         is_state('binary_sensor.dad_s_room_thermometer_anomaly', 'on') or
         (
           not is_number(secondary) and
-          (now() - states.sensor.dad_s_room_thermometer_secondary_temeperature.last_changed).total_seconds() >= 86400
+          (now() - states.sensor.dad_s_room_thermometer_secondary_temperature.last_changed).total_seconds() >= 86400
         ) or
         (
           is_number(secondary) and
-          (now() - states.sensor.dad_s_room_thermometer_secondary_temeperature.last_reported).total_seconds() >= 86400
+          (now() - states.sensor.dad_s_room_thermometer_secondary_temperature.last_reported).total_seconds() >= 86400
         )
       }}
     device_class: problem

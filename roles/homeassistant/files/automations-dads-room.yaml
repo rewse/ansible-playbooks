@@ -39,7 +39,7 @@
         message: >-
           Dad’s Room temperature sensors may be faulty.
           Current: {{ states('sensor.dad_s_room_thermometer_primary_temperature') }}°C /
-          {{ states('sensor.dad_s_room_thermometer_secondary_temeperature') }}°C.
+          {{ states('sensor.dad_s_room_thermometer_secondary_temperature') }}°C.
           Smoothed difference:
           {% set primary_smoothed = states('sensor.dad_s_room_temperature_smoothed') %}
           {% set secondary_smoothed = states('sensor.dad_s_room_switchbot_meter_temperature_smoothed') %}
