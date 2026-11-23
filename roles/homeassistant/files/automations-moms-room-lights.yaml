@@ -2,12 +2,12 @@
   alias: "Push 1-Button Switch"
   triggers:
     - trigger: state
-      entity_id: event.mom_s_room_1_button_switch_button
+      entity_id: event.mom_s_room_1_button_switch
   actions:
     - choose:
         - conditions:
             - condition: state
-              entity_id: event.mom_s_room_1_button_switch_button
+              entity_id: event.mom_s_room_1_button_switch
               attribute: event_type
               state: "multi_press_1"
           sequence:
@@ -18,7 +18,7 @@
                 option: "Turned on"
         - conditions:
             - condition: state
-              entity_id: event.mom_s_room_1_button_switch_button
+              entity_id: event.mom_s_room_1_button_switch
               attribute: event_type
               state: "multi_press_2"
           sequence:
@@ -106,7 +106,7 @@
     # can turn on). Without this trigger, presence_mode stays off but never changes,
     # so the presence_mode-based trigger never fires again, leaving the lights on indefinitely.
     - trigger: state
-      entity_id: binary_sensor.mom_s_room_presence_sensor_occupancy
+      entity_id: binary_sensor.mom_s_room_presence_sensor
       to: "off"
       for:
         minutes: 1
@@ -196,7 +196,7 @@
                       for:
                         minutes: "{{ states('input_number.mom_s_room_light_auto_off_minutes') }}"
                     - condition: state
-                      entity_id: binary_sensor.mom_s_room_presence_sensor_occupancy
+                      entity_id: binary_sensor.mom_s_room_presence_sensor
                       state: "off"
           sequence:
             - action: input_select.select_option

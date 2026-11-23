@@ -32,7 +32,7 @@
       minutes: "/5"
       seconds: 18
     - trigger: state
-      entity_id: binary_sensor.living_room_motion_sensor_south_motion
+      entity_id: binary_sensor.living_room_motion_sensor_south
       to: "on"
     - trigger: homeassistant
       event: start
@@ -49,7 +49,7 @@
                       after: sunrise
                       before: sunset
                     - condition: state
-                      entity_id: binary_sensor.living_room_motion_sensor_south_motion
+                      entity_id: binary_sensor.living_room_motion_sensor_south
                       state: "on" 
             - condition: numeric_state
               entity_id: sensor.living_room_motion_sensor_south_illuminance

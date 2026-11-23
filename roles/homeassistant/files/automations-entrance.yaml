@@ -31,15 +31,15 @@
   triggers:
     - trigger: state
       entity_id:
-        - event.entrance_1_button_switch_button
-        - event.living_room_1_button_switch_button
+        - event.entrance_1_button_switch
+        - event.living_room_1_button_switch
   actions:
     - choose:
         - conditions:
             - condition: state
               entity_id:
-                - event.entrance_1_button_switch_button
-                - event.living_room_1_button_switch_button
+                - event.entrance_1_button_switch
+                - event.living_room_1_button_switch
               match: any
               attribute: event_type
               state: "multi_press_1"
@@ -58,8 +58,8 @@
         - conditions:
             - condition: state
               entity_id:
-                - event.entrance_1_button_switch_button
-                - event.living_room_1_button_switch_button
+                - event.entrance_1_button_switch
+                - event.living_room_1_button_switch
               match: any
               attribute: event_type
               state: "multi_press_2"

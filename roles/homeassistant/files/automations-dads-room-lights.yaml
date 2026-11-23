@@ -2,12 +2,12 @@
   alias: "Push 1-Button Switch"
   triggers:
     - trigger: state
-      entity_id: event.dad_s_room_1_button_switch_button
+      entity_id: event.dad_s_room_1_button_switch
   actions:
     - choose:
         - conditions:
             - condition: state
-              entity_id: event.dad_s_room_1_button_switch_button
+              entity_id: event.dad_s_room_1_button_switch
               attribute: event_type
               state: "multi_press_1"
           sequence:
@@ -18,7 +18,7 @@
                 option: "Turned on"
         - conditions:
             - condition: state
-              entity_id: event.dad_s_room_1_button_switch_button
+              entity_id: event.dad_s_room_1_button_switch
               attribute: event_type
               state: "multi_press_2"
           sequence:
@@ -29,7 +29,7 @@
                 option: "Turned off"
         - conditions:
             - condition: state
-              entity_id: event.dad_s_room_1_button_switch_button
+              entity_id: event.dad_s_room_1_button_switch
               attribute: event_type
               state:
                 - "long_press"

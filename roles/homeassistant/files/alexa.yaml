@@ -9,13 +9,13 @@ smart_home:
       - alarm_control_panel.home
       - automation.turn_down_living_area
       - automation.turn_down_living_area_more
-      - binary_sensor.bathroom_motion_sensor_motion
+      - binary_sensor.bathroom_motion_sensor
       - binary_sensor.mom_s_room_window_sensor_north
       - binary_sensor.mom_s_room_window_sensor_south
       - binary_sensor.entrance_door_sensor
-      - binary_sensor.living_room_motion_sensor_south_motion
+      - binary_sensor.living_room_motion_sensor_south
       - binary_sensor.living_room_window_sensor_south
-      - binary_sensor.living_room_motion_sensor_north_motion
+      - binary_sensor.living_room_motion_sensor_north
       - binary_sensor.living_room_window_sensor_north
       - binary_sensor.living_room_window_sensor_center
       - climate.moms_room_hvac
@@ -51,7 +51,7 @@ smart_home:
     automation.turn_down_living_area_more:
       name: リビングのもっとターンダウン
       display_categories: SCENE_TRIGGER
-    binary_sensor.bathroom_motion_sensor_motion:
+    binary_sensor.bathroom_motion_sensor:
       name: 浴室のモーションセンサー
     binary_sensor.mom_s_room_window_sensor_north:
       name: ママの部屋の北側の窓
@@ -59,11 +59,11 @@ smart_home:
       name: ママの部屋の南側のの窓
     binary_sensor.entrance_door_sensor:
       name: 玄関のドア
-    binary_sensor.living_room_motion_sensor_south_motion:
+    binary_sensor.living_room_motion_sensor_south:
       name: リビングのモーションセンサー
     binary_sensor.living_room_window_sensor_south:
       name: リビングの窓
-    binary_sensor.living_room_motion_sensor_north_motion:
+    binary_sensor.living_room_motion_sensor_north:
       name: 書斎のモーションセンサー
     binary_sensor.living_room_window_sensor_north:
       name: 書斎の北側の窓

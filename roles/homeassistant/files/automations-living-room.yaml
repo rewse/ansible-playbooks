@@ -139,8 +139,8 @@
   triggers:
     - trigger: state
       entity_id:
-        - binary_sensor.living_room_presence_sensor_east_occupancy
-        - binary_sensor.living_room_presence_sensor_south_occupancy
+        - binary_sensor.living_room_presence_sensor_east
+        - binary_sensor.living_room_presence_sensor_south
       for:
         minutes: 1
     - trigger: homeassistant
@@ -150,8 +150,8 @@
         - conditions:
             - condition: state
               entity_id:
-                - binary_sensor.living_room_presence_sensor_east_occupancy
-                # - binary_sensor.living_room_presence_sensor_south_occupancy
+                - binary_sensor.living_room_presence_sensor_east
+                # - binary_sensor.living_room_presence_sensor_south
               match: any
               state: "on"
               for:
@@ -163,8 +163,8 @@
         - conditions:
             - condition: state
               entity_id:
-                - binary_sensor.living_room_presence_sensor_east_occupancy
-                - binary_sensor.living_room_presence_sensor_south_occupancy
+                - binary_sensor.living_room_presence_sensor_east
+                - binary_sensor.living_room_presence_sensor_south
               state: "off"
               for:
                 minutes: 1

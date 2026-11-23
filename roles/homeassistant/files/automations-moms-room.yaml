@@ -97,7 +97,7 @@
     - trigger: state
       entity_id: sensor.mom_s_room_motion_count
     - trigger: state
-      entity_id: binary_sensor.mom_s_room_presence_sensor_occupancy
+      entity_id: binary_sensor.mom_s_room_presence_sensor
       for:
         minutes: 1
     - trigger: homeassistant
@@ -110,7 +110,7 @@
                   entity_id: sensor.mom_s_room_motion_count
                   above: 5
                 - condition: state
-                  entity_id: binary_sensor.mom_s_room_presence_sensor_occupancy
+                  entity_id: binary_sensor.mom_s_room_presence_sensor
                   state: "on"
                   for:
                     minutes: 1
@@ -123,7 +123,7 @@
               entity_id: sensor.mom_s_room_motion_count
               below: 6
             - condition: state
-              entity_id: binary_sensor.mom_s_room_presence_sensor_occupancy
+              entity_id: binary_sensor.mom_s_room_presence_sensor
               state: "off"
               for:
                 minutes: 1

@@ -279,7 +279,7 @@
   alias: "ALARM: Kitchen Water Leak"
   triggers:
     - trigger: state
-      entity_id: binary_sensor.kitchen_water_leak_sensor_water_leak
+      entity_id: binary_sensor.kitchen_water_leak_sensor
       to: "on"
   actions:
     - action: notify.all_devices
