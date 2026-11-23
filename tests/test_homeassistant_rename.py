@@ -1,5 +1,7 @@
 """Tests for the Home Assistant naming migration tool."""
 
+import contextlib
+import io
 import pathlib
 import re
 import sys
@@ -9,6 +11,8 @@ import unittest
 REPO_ROOT = pathlib.Path(__file__).resolve().parents[1]
 sys.path.insert(0, str(REPO_ROOT))
 
+from tools.homeassistant_rename.__main__ import main as cli_main
+from tools.homeassistant_rename.hass import HassError
 from tools.homeassistant_rename.mapping import KEY_ID_FILES
 from tools.homeassistant_rename.mapping import Row
 from tools.homeassistant_rename.mapping import Source
@@ -18,6 +22,12 @@ from tools.homeassistant_rename.mapping import build_rows
 from tools.homeassistant_rename.mapping import load_yaml_sources
 from tools.homeassistant_rename.mapping import read_csv
 from tools.homeassistant_rename.mapping import write_csv
+from tools.homeassistant_rename.registry import Op
+from tools.homeassistant_rename.registry import apply_ops
+from tools.homeassistant_rename.registry import assign_areas
+from tools.homeassistant_rename.registry import plan_ops
+from tools.homeassistant_rename.registry import remove_orphans
+from tools.homeassistant_rename.registry import revert
 from tools.homeassistant_rename.rewrite import check
 from tools.homeassistant_rename.rewrite import rewrite_repo
 from tools.homeassistant_rename.rewrite import rewrite_text
@@ -880,6 +890,290 @@ class RewriteTest(unittest.TestCase):
         )
         self.assertTrue(
             any("templates.yaml:5:" in problem for problem in problems), problems
+        )
+
+
+class FakeClient:
+    """Records calls and answers list commands from canned results."""
+
+    def __init__(self, results: dict[str, list] | None = None) -> None:
+        self.calls: list[tuple[str, dict]] = []
+        self.results = results or {}
+
+    async def call(self, type_: str, **payload):
+        self.calls.append((type_, payload))
+        return self.results.get(type_)
+
+
+def area_row(area_id: str, old_name: str, new_name: str) -> Row:
+    return Row(
+        room=area_id,
+        kind="area",
+        source="registry",
+        integration="",
+        key=area_id,
+        old_name=old_name,
+        new_name=new_name,
+        old_id="",
+        new_id="",
+        status="auto",
+        note="",
+    )
+
+
+def device_row(device_id: str, old_name: str, new_name: str) -> Row:
+    return Row(
+        room="dads_room",
+        kind="device",
+        source="registry",
+        integration="hue",
+        key=device_id,
+        old_name=old_name,
+        new_name=new_name,
+        old_id="",
+        new_id="",
+        status="auto",
+        note="",
+    )
+
+
+def renamed_ids(ops: list[Op]) -> list[tuple[str, str]]:
+    return [(op.payload["entity_id"], op.payload["new_entity_id"]) for op in ops]
+
+
+class RegistryTest(unittest.IsolatedAsyncioTestCase):
+    def test_order_is_area_device_entity(self):
+        rows = [
+            entity_row("light.a", "light.b"),
+            device_row("d1", "Dad’s Room Lamp", "Lamp"),
+            area_row("dads_room", "Dad’s Room", "Dad's Room"),
+        ]
+        ops = plan_ops(rows, {"light.a"})
+        self.assertEqual([op.kind for op in ops], ["area", "device", "entity"])
+        self.assertEqual(ops[0].payload, {"area_id": "dads_room", "name": "Dad's Room"})
+        self.assertEqual(ops[1].payload, {"device_id": "d1", "name_by_user": "Lamp"})
+
+    def test_swap_uses_temporary_ids(self):
+        rows = [entity_row("light.a", "light.b"), entity_row("light.b", "light.a")]
+        ops = plan_ops(rows, {"light.a", "light.b"})
+        self.assertEqual(
+            renamed_ids(ops),
+            [
+                ("light.a", "light.a_renaming"),
+                ("light.b", "light.a"),
+                ("light.a_renaming", "light.b"),
+            ],
+        )
+
+    def test_occupied_temporary_id_gets_a_number(self):
+        rows = [entity_row("light.a", "light.b"), entity_row("light.b", "light.a")]
+        ops = plan_ops(rows, {"light.a", "light.b", "light.a_renaming"})
+        self.assertEqual(ops[0].payload["new_entity_id"], "light.a_renaming_2")
+
+    def test_three_cycle_is_broken(self):
+        rows = [
+            entity_row("light.a", "light.b"),
+            entity_row("light.b", "light.c"),
+            entity_row("light.c", "light.a"),
+        ]
+        ops = plan_ops(rows, {"light.a", "light.b", "light.c"})
+        self.assertEqual(
+            renamed_ids(ops),
+            [
+                ("light.a", "light.a_renaming"),
+                ("light.c", "light.a"),
+                ("light.b", "light.c"),
+                ("light.a_renaming", "light.b"),
+            ],
+        )
+
+    def test_chain_is_ordered(self):
+        rows = [entity_row("light.a", "light.b"), entity_row("light.b", "light.c")]
+        ops = plan_ops(rows, {"light.a", "light.b"})
+        self.assertEqual(
+            renamed_ids(ops), [("light.b", "light.c"), ("light.a", "light.b")]
+        )
+
+    def test_target_held_by_another_entity_is_rejected(self):
+        rows = [entity_row("light.a", "light.b")]
+        with self.assertRaises(ValueError):
+            plan_ops(rows, {"light.a", "light.b"})
+
+    def test_only_auto_rows_produce_ops(self):
+        rows = [
+            entity_row("light.a", "light.b", status="review"),
+            entity_row("light.c", "light.d", status="skip"),
+        ]
+        self.assertEqual(plan_ops(rows, {"light.a", "light.c"}), [])
+
+    def test_entity_without_device_gets_its_room(self):
+        snapshot = Snapshot(
+            areas=[],
+            devices=[],
+            entities=[
+                {
+                    "area_id": None,
+                    "device_id": None,
+                    "entity_id": "sensor.dad_temp",
+                    "name": None,
+                },
+                {
+                    "area_id": None,
+                    "device_id": "d1",
+                    "entity_id": "light.dad_lamp",
+                    "name": None,
+                },
+            ],
+            states={},
+        )
+        rows = [
+            entity_row(
+                "sensor.dad_temp",
+                "sensor.dads_room_temperature",
+                source="yaml_unique_id",
+            ),
+            entity_row("light.dad_lamp", "light.dads_room_lamp"),
+        ]
+        ops = plan_ops(rows, {"sensor.dad_temp", "light.dad_lamp"}, snapshot)
+        by_key = {op.key: op for op in ops}
+        self.assertEqual(by_key["sensor.dad_temp"].payload["area_id"], "dads_room")
+        self.assertIsNone(by_key["sensor.dad_temp"].undo["area_id"])
+        self.assertNotIn("area_id", by_key["light.dad_lamp"].payload)
+
+    async def test_dry_run_sends_nothing(self):
+        client = FakeClient()
+        ops = plan_ops([entity_row("light.a", "light.b")], {"light.a"})
+        with tempfile.TemporaryDirectory() as tmp:
+            journal = pathlib.Path(tmp) / "journal.jsonl"
+            with contextlib.redirect_stdout(io.StringIO()):
+                await apply_ops(client, ops, journal, dry_run=True)
+            self.assertFalse(journal.exists())
+        self.assertEqual(client.calls, [])
+
+    async def test_journal_allows_revert(self):
+        rows = [
+            area_row("dads_room", "Dad’s Room", "Dad's Room"),
+            entity_row("light.a", "light.b"),
+            entity_row("light.b", "light.a"),
+        ]
+        ops = plan_ops(rows, {"light.a", "light.b"})
+        client = FakeClient()
+        with tempfile.TemporaryDirectory() as tmp:
+            journal = pathlib.Path(tmp) / "journal.jsonl"
+            await apply_ops(client, ops, journal, dry_run=False)
+            self.assertEqual(len(journal.read_text().splitlines()), len(ops))
+            applied = list(client.calls)
+            client.calls.clear()
+            await revert(client, journal)
+        self.assertEqual(
+            client.calls,
+            [
+                (
+                    "config/entity_registry/update",
+                    {"entity_id": "light.b", "new_entity_id": "light.a_renaming"},
+                ),
+                (
+                    "config/entity_registry/update",
+                    {"entity_id": "light.a", "new_entity_id": "light.b"},
+                ),
+                (
+                    "config/entity_registry/update",
+                    {"entity_id": "light.a_renaming", "new_entity_id": "light.a"},
+                ),
+                (
+                    "config/area_registry/update",
+                    {"area_id": "dads_room", "name": "Dad’s Room"},
+                ),
+            ],
+        )
+        self.assertEqual(len(applied), 4)
+
+    async def test_failed_call_keeps_earlier_entries(self):
+        class FailingClient(FakeClient):
+            async def call(self, type_: str, **payload):
+                if payload.get("entity_id") == "light.c":
+                    raise HassError("rejected")
+                return await super().call(type_, **payload)
+
+        rows = [entity_row("light.a", "light.b"), entity_row("light.c", "light.d")]
+        ops = plan_ops(rows, {"light.a", "light.c"})
+        with tempfile.TemporaryDirectory() as tmp:
+            journal = pathlib.Path(tmp) / "journal.jsonl"
+            with self.assertRaises(HassError):
+                await apply_ops(FailingClient(), ops, journal, dry_run=False)
+            self.assertEqual(len(journal.read_text().splitlines()), 1)
+
+    def test_apply_refuses_a_journal_with_changes(self):
+        with tempfile.TemporaryDirectory() as tmp:
+            journal = pathlib.Path(tmp) / "journal.jsonl"
+            journal.write_text("{}\n")
+            mapping = pathlib.Path(tmp) / "mapping.csv"
+            write_csv([], mapping)
+            with contextlib.redirect_stderr(io.StringIO()) as stderr:
+                status = cli_main(
+                    ["apply", "--mapping", str(mapping), "--journal", str(journal)]
+                )
+        self.assertEqual(status, 1)
+        self.assertIn("already records changes", stderr.getvalue())
+
+    def test_yaml_key_rows_are_not_sent_to_registry(self):
+        rows = [
+            entity_row(
+                "input_boolean.dad_away",
+                "input_boolean.dads_room_away",
+                source="yaml_key",
+            )
+        ]
+        self.assertEqual(plan_ops(rows, {"input_boolean.dad_away"}), [])
+
+    async def test_remove_orphans_skips_ids_with_state(self):
+        rows = [
+            entity_row("input_boolean.a", "input_boolean.x", source="yaml_key"),
+            entity_row("input_boolean.b", "input_boolean.y", source="yaml_key"),
+            entity_row("light.c", "light.z"),
+        ]
+        client = FakeClient(
+            {
+                "config/entity_registry/list": [
+                    {"entity_id": "input_boolean.a"},
+                    {"entity_id": "input_boolean.b"},
+                    {"entity_id": "light.c"},
+                ],
+                "get_states": [{"entity_id": "input_boolean.b"}],
+            }
+        )
+        removed = await remove_orphans(client, rows)
+        self.assertEqual(removed, ["input_boolean.a"])
+        self.assertIn(
+            ("config/entity_registry/remove", {"entity_id": "input_boolean.a"}),
+            client.calls,
+        )
+        self.assertEqual(
+            [call for call in client.calls if call[0].endswith("/remove")],
+            [("config/entity_registry/remove", {"entity_id": "input_boolean.a"})],
+        )
+
+    async def test_assign_areas_sets_room_on_registered_new_ids(self):
+        rows = [
+            entity_row("input_boolean.a", "input_boolean.x", source="yaml_key"),
+            entity_row("input_boolean.b", "input_boolean.y", source="yaml_key"),
+        ]
+        client = FakeClient(
+            {
+                "config/entity_registry/list": [
+                    {"area_id": None, "entity_id": "input_boolean.x"},
+                ]
+            }
+        )
+        await assign_areas(client, rows)
+        self.assertEqual(
+            client.calls[1:],
+            [
+                (
+                    "config/entity_registry/update",
+                    {"entity_id": "input_boolean.x", "area_id": "dads_room"},
+                )
+            ],
         )
 
 

@@ -15,6 +15,11 @@ from .mapping import build_rows
 from .mapping import load_yaml_sources
 from .mapping import read_csv
 from .mapping import write_csv
+from .registry import apply_ops
+from .registry import assign_areas
+from .registry import plan_ops
+from .registry import remove_orphans
+from .registry import revert
 from .rewrite import check
 from .rewrite import rewrite_repo
 from .snapshot import Snapshot
@@ -22,6 +27,13 @@ from .snapshot import fetch_snapshot
 
 REPO_ROOT = pathlib.Path(__file__).resolve().parents[2]
 HOMEASSISTANT_FILES = REPO_ROOT / "roles" / "homeassistant" / "files"
+DEFAULT_JOURNAL = (
+    pathlib.Path(
+        os.environ.get("XDG_STATE_HOME") or pathlib.Path.home() / ".local" / "state"
+    )
+    / "homeassistant-rename"
+    / "journal.jsonl"
+)
 
 
 async def connect() -> HassClient:
@@ -73,6 +85,58 @@ def run_rewrite(args: argparse.Namespace) -> None:
         print(path.relative_to(REPO_ROOT))
 
 
+async def run_apply(args: argparse.Namespace) -> int:
+    journal: pathlib.Path = args.journal
+    if not args.dry_run and journal.exists() and journal.stat().st_size > 0:
+        print(
+            f"{journal} already records changes; revert them or pass --journal "
+            "with a new file",
+            file=sys.stderr,
+        )
+        return 1
+    rows = read_csv(args.mapping)
+    if args.room is not None:
+        rows = [row for row in rows if row.room == args.room]
+    client = await connect()
+    try:
+        snapshot = await fetch_snapshot(client)
+        existing_ids = {entity["entity_id"] for entity in snapshot.entities}
+        existing_ids |= set(snapshot.states)
+        ops = plan_ops(rows, existing_ids, snapshot)
+        await apply_ops(client, ops, journal, args.dry_run)
+    finally:
+        await client.close()
+    if not args.dry_run:
+        print(f"{journal}: {len(ops)} changes applied")
+    return 0
+
+
+async def run_revert(args: argparse.Namespace) -> None:
+    client = await connect()
+    try:
+        await revert(client, args.journal)
+    finally:
+        await client.close()
+
+
+async def run_remove_orphans(args: argparse.Namespace) -> None:
+    client = await connect()
+    try:
+        removed = await remove_orphans(client, read_csv(args.mapping))
+    finally:
+        await client.close()
+    for entity_id in removed:
+        print(entity_id)
+
+
+async def run_assign_areas(args: argparse.Namespace) -> None:
+    client = await connect()
+    try:
+        await assign_areas(client, read_csv(args.mapping))
+    finally:
+        await client.close()
+
+
 def run_check(args: argparse.Namespace) -> int:
     snapshot = Snapshot.load(args.snapshot)
     rows = read_csv(args.mapping)
@@ -107,6 +171,21 @@ def build_parser() -> argparse.ArgumentParser:
     parser = argparse.ArgumentParser(prog="python -m tools.homeassistant_rename")
     subparsers = parser.add_subparsers(dest="command", required=True)
 
+    applying = subparsers.add_parser(
+        "apply", help="apply the auto rows of a mapping to the registries"
+    )
+    applying.add_argument("--dry-run", action="store_true")
+    applying.add_argument("--journal", default=DEFAULT_JOURNAL, type=pathlib.Path)
+    applying.add_argument("--mapping", required=True, type=pathlib.Path)
+    applying.add_argument("--room")
+    applying.set_defaults(handler=run_apply)
+
+    assigning = subparsers.add_parser(
+        "assign-areas", help="assign renamed YAML key entities to their rooms"
+    )
+    assigning.add_argument("--mapping", required=True, type=pathlib.Path)
+    assigning.set_defaults(handler=run_assign_areas)
+
     checking = subparsers.add_parser(
         "check", help="report references the rewrite cannot resolve"
     )
@@ -121,6 +200,19 @@ def build_parser() -> argparse.ArgumentParser:
     mapping.add_argument("--out", required=True, type=pathlib.Path)
     mapping.add_argument("--snapshot", required=True, type=pathlib.Path)
     mapping.set_defaults(handler=run_map)
+
+    removing = subparsers.add_parser(
+        "remove-orphans",
+        help="remove registry entries of renamed YAML keys that have no state",
+    )
+    removing.add_argument("--mapping", required=True, type=pathlib.Path)
+    removing.set_defaults(handler=run_remove_orphans)
+
+    reverting = subparsers.add_parser(
+        "revert", help="undo the changes recorded in an apply journal"
+    )
+    reverting.add_argument("--journal", default=DEFAULT_JOURNAL, type=pathlib.Path)
+    reverting.set_defaults(handler=run_revert)
 
     snapshot = subparsers.add_parser(
         "snapshot", help="save the registries and states to a JSON file"
