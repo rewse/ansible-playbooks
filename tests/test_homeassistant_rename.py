@@ -9,12 +9,20 @@ import unittest
 REPO_ROOT = pathlib.Path(__file__).resolve().parents[1]
 sys.path.insert(0, str(REPO_ROOT))
 
+from tools.homeassistant_rename.mapping import KEY_ID_FILES
 from tools.homeassistant_rename.mapping import Row
+from tools.homeassistant_rename.mapping import Source
+from tools.homeassistant_rename.mapping import Status
 from tools.homeassistant_rename.mapping import YamlSources
 from tools.homeassistant_rename.mapping import build_rows
 from tools.homeassistant_rename.mapping import load_yaml_sources
 from tools.homeassistant_rename.mapping import read_csv
 from tools.homeassistant_rename.mapping import write_csv
+from tools.homeassistant_rename.rewrite import check
+from tools.homeassistant_rename.rewrite import rewrite_repo
+from tools.homeassistant_rename.rewrite import rewrite_text
+from tools.homeassistant_rename.rewrite import rewrite_yaml_keys
+from tools.homeassistant_rename.rewrite import rewrite_yaml_names
 from tools.homeassistant_rename.rules import expand_abbreviations
 from tools.homeassistant_rename.rules import in_scope
 from tools.homeassistant_rename.rules import normalize_apostrophe
@@ -601,6 +609,277 @@ class MappingTest(unittest.TestCase):
         )
         self.assertEqual(
             sources.unique_ids, {"automation.x", "binary_sensor.dads_room_x"}
+        )
+
+
+def entity_row(
+    old_id: str,
+    new_id: str,
+    *,
+    source: Source = "registry",
+    status: Status = "auto",
+    old_name: str = "",
+    new_name: str = "",
+    room: str = "dads_room",
+) -> Row:
+    return Row(
+        room=room,
+        kind="entity",
+        source=source,
+        integration="",
+        key=old_id,
+        old_name=old_name,
+        new_name=new_name,
+        old_id=old_id,
+        new_id=new_id,
+        status=status,
+        note="",
+    )
+
+
+class RewriteTest(unittest.TestCase):
+    def test_rewrites_states_attribute_access(self):
+        self.assertEqual(
+            rewrite_text(
+                "states.sensor.living_room_temperature.last_changed",
+                {
+                    "sensor.living_room_temperature": (
+                        "sensor.living_room_thermometer_temperature"
+                    )
+                },
+            ),
+            "states.sensor.living_room_thermometer_temperature.last_changed",
+        )
+
+    def test_does_not_touch_longer_ids(self):
+        text = (
+            "switch.living_room_humidifier switch.living_room_humidifier_plug "
+            "switch.living_room_humidifier_switch"
+        )
+        out = rewrite_text(text, {"switch.living_room_humidifier": "switch.x"})
+        self.assertEqual(
+            out,
+            "switch.x switch.living_room_humidifier_plug "
+            "switch.living_room_humidifier_switch",
+        )
+
+    def test_does_not_chain_replacements(self):
+        out = rewrite_text(
+            "sensor.a sensor.b", {"sensor.a": "sensor.b", "sensor.b": "sensor.c"}
+        )
+        self.assertEqual(out, "sensor.b sensor.c")
+
+    def test_unique_id_and_id_values_are_kept(self):
+        text = (
+            "- id: automation.alarm_dads_room_co2\n"
+            '  alias: "ALARM: CO2"\n'
+            "  triggers:\n"
+            "    - trigger: numeric_state\n"
+            "      entity_id: sensor.dads_room_co2\n"
+            "sensor:\n"
+            "  - unique_id: sensor.dads_room_co2\n"
+            "    state: \"{{ states('sensor.dads_room_co2') }}\"\n"
+        )
+        id_map = {
+            "automation.alarm_dads_room_co2": "automation.alarm_dad_s_room_co2",
+            "sensor.dads_room_co2": "sensor.dad_s_room_co2",
+        }
+        out = rewrite_text(text, id_map).splitlines()
+        self.assertEqual(out[0], "- id: automation.alarm_dads_room_co2")
+        self.assertEqual(out[4], "      entity_id: sensor.dad_s_room_co2")
+        self.assertEqual(out[6], "  - unique_id: sensor.dads_room_co2")
+        self.assertEqual(out[7], "    state: \"{{ states('sensor.dad_s_room_co2') }}\"")
+
+    def test_yaml_keys_are_renamed(self):
+        text = (
+            "# Living Room\n"
+            "\n"
+            "living_room_temp_target:\n"
+            '  name: "Living Room Temp Target"\n'
+            "  min: 0\n"
+            "living_room_temp_target_away:\n"
+            '  name: "Living Room Temp Target Away"\n'
+            "  min: 0\n"
+        )
+        out = rewrite_yaml_keys(
+            text,
+            {
+                "living_room_temp_target": (
+                    "living_room_temperature_target",
+                    "Temperature Target",
+                )
+            },
+        )
+        self.assertEqual(
+            out,
+            "# Living Room\n"
+            "\n"
+            "living_room_temperature_target:\n"
+            '  name: "Temperature Target"\n'
+            "  min: 0\n"
+            "living_room_temp_target_away:\n"
+            '  name: "Living Room Temp Target Away"\n'
+            "  min: 0\n",
+        )
+
+    def test_script_alias_follows_key(self):
+        text = 'darken_living_room:\n  alias: "Darken Living Room"\n  sequence: []\n'
+        out = rewrite_yaml_keys(
+            text, {"darken_living_room": ("living_room_darken", "Darken")}
+        )
+        self.assertEqual(
+            out, 'living_room_darken:\n  alias: "Darken"\n  sequence: []\n'
+        )
+
+    def test_yaml_names_follow_unique_id(self):
+        text = (
+            "- binary_sensor:\n"
+            "  # Dad’s Room\n"
+            "  - unique_id: binary_sensor.dads_room_ac_cooldry\n"
+            '    name: "Dad’s Room AC CoolDry"\n'
+            "  - unique_id: binary_sensor.dads_room_humidity_disagreement\n"
+            '    name: "Dad’s Room Humidity Disagreement"\n'
+            "    delay_on:\n"
+            "      hours: 1\n"
+            "- platform: statistics\n"
+            '  name: "Dad’s Room Humidity Smoothed"\n'
+            "  unique_id: sensor.dads_room_humidity_smoothed\n"
+            "- id: automation.alarm_dads_room_co2\n"
+            '  alias: "ALARM: Dad’s Room CO2"\n'
+            "  triggers:\n"
+            "    - trigger: state\n"
+            "      id: t\n"
+        )
+        out = rewrite_yaml_names(
+            text,
+            {
+                "automation.alarm_dads_room_co2": "ALARM: CO2",
+                "binary_sensor.dads_room_humidity_disagreement": "Humidity Disagreement",
+                "sensor.dads_room_humidity_smoothed": 'Humidity "Smoothed"',
+            },
+        ).splitlines()
+        self.assertEqual(out[3], '    name: "Dad’s Room AC CoolDry"')
+        self.assertEqual(
+            out[4], "  - unique_id: binary_sensor.dads_room_humidity_disagreement"
+        )
+        self.assertEqual(out[5], '    name: "Humidity Disagreement"')
+        self.assertEqual(out[9], '  name: "Humidity \\"Smoothed\\""')
+        self.assertEqual(out[11], "- id: automation.alarm_dads_room_co2")
+        self.assertEqual(out[12], '  alias: "ALARM: CO2"')
+
+    def test_rewrite_repo_keeps_unique_ids_in_tests(self):
+        rows = [
+            entity_row(
+                "automation.alarm_dads_room_co2",
+                "automation.alarm_dad_s_room_co2",
+                source="yaml_unique_id",
+                old_name="ALARM: Dad’s Room CO2",
+                new_name="ALARM: CO2",
+            ),
+            entity_row(
+                "sensor.dads_room_temperature",
+                "sensor.dad_s_room_thermometer_temperature",
+            ),
+            entity_row("sensor.dads_room_humidity", "sensor.x", status="review"),
+        ]
+        with tempfile.TemporaryDirectory() as tmp:
+            root = pathlib.Path(tmp)
+            files = root / "roles" / "homeassistant" / "files"
+            role_tests = root / "roles" / "homeassistant" / "tests"
+            files.mkdir(parents=True)
+            role_tests.mkdir()
+            (root / "roles" / "homeassistant" / "templates").mkdir()
+            (root / "tests").mkdir()
+            for name in KEY_ID_FILES.values():
+                (files / name).write_text("", encoding="utf-8")
+            (files / "automations-alarm.yaml").write_text(
+                "- id: automation.alarm_dads_room_co2\n"
+                '  alias: "ALARM: Dad’s Room CO2"\n'
+                "  triggers:\n"
+                "    - entity_id: sensor.dads_room_temperature\n"
+                "    - entity_id: sensor.dads_room_humidity\n"
+                "    - entity_id: automation.alarm_dads_room_co2\n",
+                encoding="utf-8",
+            )
+            test_text = (
+                "alarm_id: automation.alarm_dads_room_co2\n"
+                "primary_entity_id: sensor.dads_room_temperature\n"
+            )
+            (role_tests / "x.yml").write_text(test_text, encoding="utf-8")
+            (root / "tests" / "test_homeassistant_x.py").write_text(
+                test_text, encoding="utf-8"
+            )
+            (root / "tests" / "test_homeassistant_rename.py").write_text(
+                test_text, encoding="utf-8"
+            )
+            changed = rewrite_repo(root, rows)
+            self.assertEqual(
+                sorted(path.relative_to(root).as_posix() for path in changed),
+                [
+                    "roles/homeassistant/files/automations-alarm.yaml",
+                    "roles/homeassistant/tests/x.yml",
+                    "tests/test_homeassistant_x.py",
+                ],
+            )
+            self.assertEqual(
+                (files / "automations-alarm.yaml").read_text(encoding="utf-8"),
+                "- id: automation.alarm_dads_room_co2\n"
+                '  alias: "ALARM: CO2"\n'
+                "  triggers:\n"
+                "    - entity_id: sensor.dad_s_room_thermometer_temperature\n"
+                "    - entity_id: sensor.dads_room_humidity\n"
+                "    - entity_id: automation.alarm_dad_s_room_co2\n",
+            )
+            expected_test_text = (
+                "alarm_id: automation.alarm_dads_room_co2\n"
+                "primary_entity_id: sensor.dad_s_room_thermometer_temperature\n"
+            )
+            self.assertEqual(
+                (role_tests / "x.yml").read_text(encoding="utf-8"), expected_test_text
+            )
+            self.assertEqual(
+                (root / "tests" / "test_homeassistant_rename.py").read_text(
+                    encoding="utf-8"
+                ),
+                test_text,
+            )
+
+    def test_check_reports_unknown_and_area_literals(self):
+        with tempfile.TemporaryDirectory() as tmp:
+            root = pathlib.Path(tmp)
+            files = root / "roles" / "homeassistant" / "files"
+            files.mkdir(parents=True)
+            (files / "templates.yaml").write_text(
+                "- sensor:\n"
+                "  - unique_id: sensor.dads_room_old\n"
+                '    name: "Dad’s Room Temperature"\n'
+                "    state: \"{{ states('sensor.dads_room_temperature') }}\"\n"
+                "    availability: \"{{ states('sensor.' ~ room ~ '_x') }}\"\n"
+                "    attributes:\n"
+                "      known: \"{{ states('sensor.dad_s_room_temperature') }}\"\n"
+                "      service: light.turn_on\n"
+                "      notify: notify.tats_devices\n",
+                encoding="utf-8",
+            )
+            problems = check(root, {"sensor.dad_s_room_temperature"}, {"Dad’s Room"})
+        self.assertEqual(len(problems), 3, problems)
+        self.assertTrue(
+            any(
+                "templates.yaml:3:" in problem and "Dad’s Room" in problem
+                for problem in problems
+            ),
+            problems,
+        )
+        self.assertTrue(
+            any(
+                "templates.yaml:4:" in problem
+                and "sensor.dads_room_temperature" in problem
+                for problem in problems
+            ),
+            problems,
+        )
+        self.assertTrue(
+            any("templates.yaml:5:" in problem for problem in problems), problems
         )
 
 
