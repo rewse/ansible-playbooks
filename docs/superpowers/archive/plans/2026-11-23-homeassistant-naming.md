@@ -8,7 +8,7 @@
 
 **Tech Stack:** Python 3（標準ライブラリ、`websockets`、`pyyaml`）、unittest と pytest、Ansible（`home-primary.yml`）、Home Assistant 2026.11.2 の WebSocket API
 
-**Spec:** `docs/superpowers/specs/2026-11-06-homeassistant-naming-design.md`
+**Spec:** `docs/superpowers/archive/specs/2026-11-06-homeassistant-naming-design.md`
 
 ## Global Constraints
 
