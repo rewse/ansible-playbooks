@@ -35,6 +35,16 @@ NETWORKS = {
     "home_public_ipv6": "2001:db8:bb::/64",
     "office_public_ipv4": ["198.51.100.0/24", "203.0.113.0/24"],
 }
+# Addresses of the host itself, inside the home prefixes and on a Docker bridge.
+HOST_FACTS = {
+    "all_ipv4_addresses": ["192.168.0.30", "172.17.0.1"],
+    "all_ipv6_addresses": [
+        "2001:db8:bb::30",
+        "fd00:db8::30",
+        "fe80::1",
+        "FE80::2",
+    ],
+}
 
 
 def role_vars() -> dict:
@@ -51,11 +61,15 @@ def render(name: str, **overrides) -> str:
         undefined=jinja2.StrictUndefined,
     )
     environment.filters["comment"] = lambda text: f"#\n# {text}\n#"
+    environment.tests["match"] = lambda value, pattern, ignorecase=False: bool(
+        re.match(pattern, value, re.IGNORECASE if ignorecase else 0)
+    )
     context = {
         **role_vars(),
         "__matterjs_server_image": {
             "ref": "ghcr.io/matter-js/matterjs-server:1.5.5@sha256:" + "0" * 64
         },
+        "ansible_facts": HOST_FACTS,
         "ansible_managed": "Ansible managed",
         "networks": NETWORKS,
     }
@@ -215,8 +229,6 @@ class MatterjsServerApacheTest(unittest.TestCase):
             sorted(allowed),
             sorted(
                 [
-                    "127.0.0.1",
-                    "::1",
                     NETWORKS["home_private_ipv4"],
                     NETWORKS["home_private_ipv6"],
                     NETWORKS["home_public_ipv4"],
@@ -229,6 +241,48 @@ class MatterjsServerApacheTest(unittest.TestCase):
         self.assertNotIn("Require all granted", vhost)
         for office in NETWORKS["office_public_ipv4"]:
             self.assertNotIn(office, vhost)
+
+    def test_the_host_itself_is_refused(self):
+        # Local accounts connect from the host's own addresses, which lie in
+        # the home prefixes, and can send any Origin header.
+        vhost = render("matter.rewse.jp.conf.j2")
+        refused = re.findall(r"(?m)^\s*Require not ip (\S+)$", vhost)
+        self.assertEqual(
+            sorted(refused),
+            sorted(
+                [
+                    "127.0.0.0/8",
+                    "::1",
+                    "192.168.0.30",
+                    "172.17.0.1",
+                    "2001:db8:bb::30",
+                    "fd00:db8::30",
+                ]
+            ),
+        )
+
+    def test_refused_addresses_keep_their_order(self):
+        # Facts list interfaces in kernel order, which changes when Docker
+        # recreates its bridges; a sorted list keeps the file unchanged.
+        def refused(facts: dict) -> list[str]:
+            vhost = render("matter.rewse.jp.conf.j2", ansible_facts=facts)
+            return re.findall(r"(?m)^\s*Require not ip (\S+)$", vhost)
+
+        reversed_facts = {key: value[::-1] for key, value in HOST_FACTS.items()}
+        self.assertEqual(refused(HOST_FACTS), refused(reversed_facts))
+
+    def test_refusal_and_allowlist_must_both_pass(self):
+        vhost = render("matter.rewse.jp.conf.j2")
+        location = re.search(r"(?s)<Location />(.*?)</Location>", vhost)
+        self.assertIsNotNone(location)
+        assert location is not None
+        body = location.group(1)
+        block = re.fullmatch(
+            r"(?s)\s*<RequireAll>\s*<RequireAny>((?:\s*Require ip \S+)+)\s*"
+            r"</RequireAny>((?:\s*Require not ip \S+)+)\s*</RequireAll>\s*",
+            body,
+        )
+        self.assertIsNotNone(block, body)
 
     def test_vhost_uses_the_wildcard_certificate(self):
         vhost = render("matter.rewse.jp.conf.j2")
@@ -318,15 +372,32 @@ class MatterjsServerVhostApacheTest(unittest.TestCase):
         with socket.socket() as probe:
             probe.bind(("127.0.0.1", 0))
             cls.port = probe.getsockname()[1]
-        vhost = "\n".join(
-            line.replace("*:443", f"127.0.0.1:{cls.port}")
-            for line in render(
-                "matter.rewse.jp.conf.j2",
-                matterjs_server_port=cls.backend.server_address[1],
-            ).splitlines()
-            if not line.strip().startswith(("SSL", "Include "))
+        with socket.socket() as probe:
+            probe.bind(("127.0.0.1", 0))
+            cls.refusing_port = probe.getsockname()[1]
+        # The test client connects from loopback, which the allowlist admits
+        # here as a home address. The vhost on cls.port drops the refusal of
+        # the host's own addresses so the origin checks can be exercised; the
+        # one on cls.refusing_port is rendered whole.
+        loopback_home = {**NETWORKS, "home_private_ipv4": "127.0.0.0/8"}
+
+        def vhost(port: int, keep_refusal: bool) -> str:
+            return "\n".join(
+                line.replace("*:443", f"127.0.0.1:{port}")
+                for line in render(
+                    "matter.rewse.jp.conf.j2",
+                    matterjs_server_port=cls.backend.server_address[1],
+                    networks=loopback_home,
+                ).splitlines()
+                if not line.strip().startswith(("SSL", "Include "))
+                and (keep_refusal or not line.strip().startswith("Require not "))
+            )
+
+        (root / "vhost.conf").write_text(
+            vhost(cls.port, keep_refusal=False)
+            + "\n"
+            + vhost(cls.refusing_port, keep_refusal=True)
         )
-        (root / "vhost.conf").write_text(vhost)
         modules = [
             f"LoadModule {name}_module {module_dir}/mod_{name}.so"
             for name in cls.MODULES
@@ -339,6 +410,7 @@ class MatterjsServerVhostApacheTest(unittest.TestCase):
                     *modules,
                     f"DefaultRuntimeDir {root}",
                     f"Listen 127.0.0.1:{cls.port}",
+                    f"Listen 127.0.0.1:{cls.refusing_port}",
                     f"PidFile {root}/httpd.pid",
                     f"ErrorLog {root}/error.log",
                     "ServerName localhost",
@@ -380,7 +452,9 @@ class MatterjsServerVhostApacheTest(unittest.TestCase):
         cls.backend.server_close()
         cls.tmp.cleanup()
 
-    def upgrade(self, target: str, origin: str | None) -> tuple[bytes, bytes]:
+    def upgrade(
+        self, target: str, origin: str | None, port: int | None = None
+    ) -> tuple[bytes, bytes]:
         # Returns the status line of the handshake and what came back after it.
         lines = [
             f"GET {target} HTTP/1.1",
@@ -392,7 +466,9 @@ class MatterjsServerVhostApacheTest(unittest.TestCase):
         ]
         if origin is not None:
             lines.append(f"Origin: {origin}")
-        with socket.create_connection(("127.0.0.1", self.port), timeout=5) as client:
+        with socket.create_connection(
+            ("127.0.0.1", port or self.port), timeout=5
+        ) as client:
             client.sendall(("\r\n".join(lines) + "\r\n\r\n").encode())
             received = b""
             while b"\r\n\r\n" not in received:
@@ -446,6 +522,24 @@ class MatterjsServerVhostApacheTest(unittest.TestCase):
             self.assertEqual(connection.getresponse().status, 200)
         finally:
             connection.close()
+
+    def test_loopback_is_refused_even_with_the_dashboard_origin(self):
+        _MatterServerStub.paths.clear()
+        status, _ = self.upgrade(
+            "/ws", "https://matter.rewse.jp", port=self.refusing_port
+        )
+        self.assertTrue(status.startswith(b"HTTP/1.1 403"), status)
+        connection = http.client.HTTPConnection(
+            "127.0.0.1", self.refusing_port, timeout=5
+        )
+        try:
+            connection.request(
+                "GET", "/", headers={"Connection": "close", "Host": "matter.rewse.jp"}
+            )
+            self.assertEqual(connection.getresponse().status, 403)
+        finally:
+            connection.close()
+        self.assertEqual(_MatterServerStub.paths, [])
 
 
 class MatterjsServerWiringTest(unittest.TestCase):

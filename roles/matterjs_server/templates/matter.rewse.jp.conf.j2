@@ -27,16 +27,25 @@
 
     # Home clients arrive from the home prefixes, over IPv6 usually from the
     # public one, since fox.rewse.jp has a global AAAA record. VPN clients
-    # arrive through alfa.
+    # arrive through alfa. Accounts on this host connect from its own
+    # addresses, which also lie in the home prefixes, and can send any Origin
+    # header, so those addresses are refused. Link-local addresses are outside
+    # every allowed prefix, so they need no entry.
+{% set refused = ['127.0.0.0/8', '::1'] + (ansible_facts['all_ipv4_addresses'] | sort) + (ansible_facts['all_ipv6_addresses'] | reject('match', 'fe80:', ignorecase=true) | sort) %}
     <Location />
-        Require ip 127.0.0.1
-        Require ip ::1
-        Require ip {{ networks.home_private_ipv4 }}
-        Require ip {{ networks.home_private_ipv6 }}
-        Require ip {{ networks.home_public_ipv4 }}
-        Require ip {{ networks.home_public_ipv6 }}
-        Require ip {{ networks.aws_private_ipv4 }}
-        Require ip {{ networks.aws_public_ipv6 }}
+        <RequireAll>
+            <RequireAny>
+                Require ip {{ networks.home_private_ipv4 }}
+                Require ip {{ networks.home_private_ipv6 }}
+                Require ip {{ networks.home_public_ipv4 }}
+                Require ip {{ networks.home_public_ipv6 }}
+                Require ip {{ networks.aws_private_ipv4 }}
+                Require ip {{ networks.aws_public_ipv6 }}
+            </RequireAny>
+{% for address in refused %}
+            Require not ip {{ address }}
+{% endfor %}
+        </RequireAll>
     </Location>
 
     SSLCertificateFile /etc/letsencrypt/live/rewse.jp/fullchain.pem
