@@ -7,12 +7,17 @@ dumping YAML.
 
 from __future__ import annotations
 
+import json
+import os
 import pathlib
 import re
 from collections.abc import Iterable, Mapping
+from typing import Any
 
+from .hass import HassError
 from .mapping import KEY_ID_FILES
 from .mapping import Row
+from .registry import Client
 
 # A YAML `id:` or `unique_id:` key. Its value is an opaque key whose history
 # Home Assistant keeps, so the value is never rewritten.
@@ -296,6 +301,15 @@ def _changed_entities(rows: Iterable[Row]) -> list[Row]:
     return [row for row in rows if row.kind == "entity" and row.status == "auto"]
 
 
+def entity_id_map(rows: Iterable[Row]) -> dict[str, str]:
+    """Maps the old ID of each auto entity row to its new ID when they differ."""
+    return {
+        row.old_id: row.new_id
+        for row in _changed_entities(rows)
+        if row.old_id != row.new_id
+    }
+
+
 def rewrite_repo(root: pathlib.Path, rows: list[Row]) -> list[pathlib.Path]:
     """Applies the auto rows to the Home Assistant files and tests.
 
@@ -303,7 +317,7 @@ def rewrite_repo(root: pathlib.Path, rows: list[Row]) -> list[pathlib.Path]:
     the IDs of yaml_unique_id rows stay as they are in test files.
     """
     entities = _changed_entities(rows)
-    id_map = {row.old_id: row.new_id for row in entities if row.old_id != row.new_id}
+    id_map = entity_id_map(rows)
     test_id_map = {
         row.old_id: row.new_id
         for row in entities
@@ -373,3 +387,86 @@ def check(
                 if name in line:
                     problems.append(f"{where}: old area name {name}")
     return problems
+
+
+DEFAULT_DASHBOARD = "lovelace"
+ENERGY = "energy"
+
+
+def _rewrite_json(value: Any, id_map: Mapping[str, str]) -> tuple[str, str]:
+    """Returns the JSON text of value and the text with IDs rewritten."""
+    text = json.dumps(value, ensure_ascii=False, indent=2, sort_keys=True)
+    return text, rewrite_text(text, id_map)
+
+
+def _back_up(backup_dir: pathlib.Path, name: str, text: str) -> None:
+    """Writes the original JSON once, keeping the first backup on reruns."""
+    backup_dir.mkdir(mode=0o700, parents=True, exist_ok=True)
+    backup_dir.chmod(0o700)
+    path = backup_dir / f"{name}.json"
+    if path.exists():
+        return
+    descriptor = os.open(path, os.O_WRONLY | os.O_CREAT | os.O_EXCL, 0o600)
+    with os.fdopen(descriptor, "w", encoding="utf-8") as backup:
+        backup.write(text + "\n")
+
+
+async def _read(
+    client: Client, type_: str, missing_code: str, **payload: Any
+) -> dict[str, Any] | None:
+    """Returns the result of type_, or None when it fails with missing_code."""
+    try:
+        return await client.call(type_, **payload)
+    except HassError as error:
+        if f": {missing_code}:" in str(error):
+            return None
+        raise
+
+
+async def rewrite_storage(
+    client: Client,
+    id_map: Mapping[str, str],
+    dry_run: bool,
+    backup_dir: pathlib.Path,
+) -> list[str]:
+    """Rewrites entity IDs in storage dashboards and the energy preferences.
+
+    Each changed configuration is backed up to backup_dir/<name>.json before
+    it is saved; the default dashboard is named lovelace. A dry run backs up
+    and saves nothing. Returns the names of the changed configurations.
+    """
+    dashboards = await client.call("lovelace/dashboards/list")
+    url_paths: list[str | None] = [None]
+    url_paths += [
+        dashboard["url_path"]
+        for dashboard in dashboards
+        if dashboard.get("mode") == "storage"
+    ]
+    changed = []
+    for url_path in url_paths:
+        config = await _read(
+            client, "lovelace/config", "config_not_found", url_path=url_path
+        )
+        if config is None:
+            continue
+        text, new_text = _rewrite_json(config, id_map)
+        if new_text == text:
+            continue
+        name = url_path or DEFAULT_DASHBOARD
+        changed.append(name)
+        if not dry_run:
+            _back_up(backup_dir, name, text)
+            await client.call(
+                "lovelace/config/save", url_path=url_path, config=json.loads(new_text)
+            )
+    # Home Assistant answers not_found until the energy dashboard is set up.
+    prefs = await _read(client, "energy/get_prefs", "not_found")
+    if prefs is None:
+        return changed
+    text, new_text = _rewrite_json(prefs, id_map)
+    if new_text != text:
+        changed.append(ENERGY)
+        if not dry_run:
+            _back_up(backup_dir, ENERGY, text)
+            await client.call("energy/save_prefs", **json.loads(new_text))
+    return changed

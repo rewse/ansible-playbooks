@@ -5,6 +5,7 @@ from __future__ import annotations
 import argparse
 import asyncio
 import collections
+import json
 import os
 import pathlib
 import sys
@@ -21,19 +22,24 @@ from .registry import plan_ops
 from .registry import remove_orphans
 from .registry import revert
 from .rewrite import check
+from .rewrite import entity_id_map
 from .rewrite import rewrite_repo
+from .rewrite import rewrite_storage
 from .snapshot import Snapshot
 from .snapshot import fetch_snapshot
+from .values import capture
+from .values import restore
 
 REPO_ROOT = pathlib.Path(__file__).resolve().parents[2]
 HOMEASSISTANT_FILES = REPO_ROOT / "roles" / "homeassistant" / "files"
-DEFAULT_JOURNAL = (
+STATE_DIR = (
     pathlib.Path(
         os.environ.get("XDG_STATE_HOME") or pathlib.Path.home() / ".local" / "state"
     )
     / "homeassistant-rename"
-    / "journal.jsonl"
 )
+DEFAULT_JOURNAL = STATE_DIR / "journal.jsonl"
+STORAGE_BACKUP_DIR = STATE_DIR / "storage-backup"
 
 
 async def connect() -> HassClient:
@@ -137,6 +143,37 @@ async def run_assign_areas(args: argparse.Namespace) -> None:
         await client.close()
 
 
+def run_capture(args: argparse.Namespace) -> None:
+    captured = capture(Snapshot.load(args.snapshot), read_csv(args.mapping))
+    args.out.write_text(
+        json.dumps(captured, ensure_ascii=False, indent=2, sort_keys=True) + "\n",
+        encoding="utf-8",
+    )
+    print(f"{args.out}: {len(captured)} helper values")
+
+
+async def run_restore(args: argparse.Namespace) -> None:
+    captured = json.loads(args.captured.read_text(encoding="utf-8"))
+    client = await connect()
+    try:
+        await restore(client, captured)
+    finally:
+        await client.close()
+
+
+async def run_rewrite_storage(args: argparse.Namespace) -> None:
+    id_map = entity_id_map(read_csv(args.mapping))
+    client = await connect()
+    try:
+        changed = await rewrite_storage(
+            client, id_map, args.dry_run, STORAGE_BACKUP_DIR
+        )
+    finally:
+        await client.close()
+    for name in changed:
+        print(name)
+
+
 def run_check(args: argparse.Namespace) -> int:
     snapshot = Snapshot.load(args.snapshot)
     rows = read_csv(args.mapping)
@@ -186,6 +223,14 @@ def build_parser() -> argparse.ArgumentParser:
     assigning.add_argument("--mapping", required=True, type=pathlib.Path)
     assigning.set_defaults(handler=run_assign_areas)
 
+    capturing = subparsers.add_parser(
+        "capture", help="save the values of renamed YAML key helpers to a JSON file"
+    )
+    capturing.add_argument("--mapping", required=True, type=pathlib.Path)
+    capturing.add_argument("--out", required=True, type=pathlib.Path)
+    capturing.add_argument("--snapshot", required=True, type=pathlib.Path)
+    capturing.set_defaults(handler=run_capture)
+
     checking = subparsers.add_parser(
         "check", help="report references the rewrite cannot resolve"
     )
@@ -208,6 +253,12 @@ def build_parser() -> argparse.ArgumentParser:
     removing.add_argument("--mapping", required=True, type=pathlib.Path)
     removing.set_defaults(handler=run_remove_orphans)
 
+    restoring = subparsers.add_parser(
+        "restore", help="set helper values saved by capture on their new IDs"
+    )
+    restoring.add_argument("--captured", required=True, type=pathlib.Path)
+    restoring.set_defaults(handler=run_restore)
+
     reverting = subparsers.add_parser(
         "revert", help="undo the changes recorded in an apply journal"
     )
@@ -226,6 +277,14 @@ def build_parser() -> argparse.ArgumentParser:
     rewrite.add_argument("--mapping", required=True, type=pathlib.Path)
     rewrite.add_argument("--room")
     rewrite.set_defaults(handler=run_rewrite)
+
+    rewriting_storage = subparsers.add_parser(
+        "rewrite-storage",
+        help="rewrite entity IDs in storage dashboards and energy preferences",
+    )
+    rewriting_storage.add_argument("--dry-run", action="store_true")
+    rewriting_storage.add_argument("--mapping", required=True, type=pathlib.Path)
+    rewriting_storage.set_defaults(handler=run_rewrite_storage)
 
     return parser
 

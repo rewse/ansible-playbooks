@@ -3,11 +3,13 @@
 import asyncio
 import contextlib
 import io
+import json
 import pathlib
 import re
 import sys
 import tempfile
 import unittest
+from typing import Any
 from unittest import mock
 
 REPO_ROOT = pathlib.Path(__file__).resolve().parents[1]
@@ -33,6 +35,7 @@ from tools.homeassistant_rename.registry import remove_orphans
 from tools.homeassistant_rename.registry import revert
 from tools.homeassistant_rename.rewrite import check
 from tools.homeassistant_rename.rewrite import rewrite_repo
+from tools.homeassistant_rename.rewrite import rewrite_storage
 from tools.homeassistant_rename.rewrite import rewrite_text
 from tools.homeassistant_rename.rewrite import rewrite_yaml_keys
 from tools.homeassistant_rename.rewrite import rewrite_yaml_names
@@ -42,6 +45,9 @@ from tools.homeassistant_rename.rules import normalize_apostrophe
 from tools.homeassistant_rename.rules import normalize_modifiers
 from tools.homeassistant_rename.rules import strip_area
 from tools.homeassistant_rename.snapshot import Snapshot
+from tools.homeassistant_rename.values import capture
+from tools.homeassistant_rename.values import restore
+from tools.homeassistant_rename.values import restore_calls
 
 
 def sample_snapshot() -> Snapshot:
@@ -899,7 +905,7 @@ class RewriteTest(unittest.TestCase):
 class FakeClient:
     """Records calls and answers list commands from canned results."""
 
-    def __init__(self, results: dict[str, list] | None = None) -> None:
+    def __init__(self, results: dict[str, Any] | None = None) -> None:
         self.calls: list[tuple[str, dict]] = []
         self.results = results or {}
 
@@ -1240,6 +1246,315 @@ class RegistryTest(unittest.IsolatedAsyncioTestCase):
                     {"entity_id": "input_boolean.x", "area_id": "dads_room"},
                 )
             ],
+        )
+
+
+def helper_state(entity_id: str, state: str, **attributes) -> dict:
+    return {"attributes": attributes, "entity_id": entity_id, "state": state}
+
+
+class ValuesTest(unittest.IsolatedAsyncioTestCase):
+    def test_capture_keys_yaml_key_states_by_new_id(self):
+        snapshot = Snapshot(
+            areas=[],
+            devices=[],
+            entities=[],
+            states={
+                "input_boolean.dad_away": helper_state("input_boolean.dad_away", "on"),
+                "light.a": helper_state("light.a", "on"),
+            },
+        )
+        rows = [
+            entity_row(
+                "input_boolean.dad_away",
+                "input_boolean.dads_room_away",
+                source="yaml_key",
+            ),
+            entity_row(
+                "input_boolean.missing", "input_boolean.other", source="yaml_key"
+            ),
+            entity_row(
+                "input_boolean.held",
+                "input_boolean.held_new",
+                source="yaml_key",
+                status="review",
+            ),
+            entity_row("light.a", "light.b"),
+        ]
+        self.assertEqual(
+            capture(snapshot, rows),
+            {
+                "input_boolean.dads_room_away": helper_state(
+                    "input_boolean.dad_away", "on"
+                )
+            },
+        )
+
+    def test_restore_calls_per_domain(self):
+        captured = {
+            "input_boolean.a": helper_state("input_boolean.old_a", "on"),
+            "input_boolean.b": helper_state("input_boolean.old_b", "off"),
+            "input_datetime.both": helper_state(
+                "input_datetime.old_both",
+                "2026-11-23 07:30:00",
+                has_date=True,
+                has_time=True,
+            ),
+            "input_datetime.date": helper_state(
+                "input_datetime.old_date", "2026-11-23", has_date=True, has_time=False
+            ),
+            "input_datetime.time": helper_state(
+                "input_datetime.old_time", "07:30:00", has_date=False, has_time=True
+            ),
+            "input_number.n": helper_state("input_number.old_n", "21.5"),
+            "input_select.s": helper_state("input_select.old_s", "Away"),
+            "script.x": helper_state("script.old_x", "off"),
+        }
+        self.assertEqual(
+            restore_calls(captured),
+            [
+                ("input_boolean", "turn_on", {"entity_id": "input_boolean.a"}),
+                ("input_boolean", "turn_off", {"entity_id": "input_boolean.b"}),
+                (
+                    "input_datetime",
+                    "set_datetime",
+                    {
+                        "datetime": "2026-11-23 07:30:00",
+                        "entity_id": "input_datetime.both",
+                    },
+                ),
+                (
+                    "input_datetime",
+                    "set_datetime",
+                    {"date": "2026-11-23", "entity_id": "input_datetime.date"},
+                ),
+                (
+                    "input_datetime",
+                    "set_datetime",
+                    {"entity_id": "input_datetime.time", "time": "07:30:00"},
+                ),
+                (
+                    "input_number",
+                    "set_value",
+                    {"entity_id": "input_number.n", "value": 21.5},
+                ),
+                (
+                    "input_select",
+                    "select_option",
+                    {"entity_id": "input_select.s", "option": "Away"},
+                ),
+            ],
+        )
+
+    def test_unavailable_values_are_not_restored(self):
+        captured = {
+            "input_boolean.a": helper_state("input_boolean.old_a", "unavailable"),
+            "input_number.n": helper_state("input_number.old_n", "unknown"),
+        }
+        self.assertEqual(restore_calls(captured), [])
+
+    def test_capture_cli_writes_json(self):
+        snapshot = Snapshot(
+            areas=[],
+            devices=[],
+            entities=[],
+            states={"input_number.a": helper_state("input_number.a", "3.0")},
+        )
+        rows = [entity_row("input_number.a", "input_number.b", source="yaml_key")]
+        with tempfile.TemporaryDirectory() as directory:
+            root = pathlib.Path(directory)
+            snapshot.save(root / "snapshot.json")
+            write_csv(rows, root / "mapping.csv")
+            with contextlib.redirect_stdout(io.StringIO()):
+                status = cli_main(
+                    [
+                        "capture",
+                        "--mapping",
+                        str(root / "mapping.csv"),
+                        "--out",
+                        str(root / "captured.json"),
+                        "--snapshot",
+                        str(root / "snapshot.json"),
+                    ]
+                )
+            self.assertEqual(status, 0)
+            self.assertEqual(
+                json.loads((root / "captured.json").read_text()),
+                {"input_number.b": helper_state("input_number.a", "3.0")},
+            )
+
+    async def test_restore_sends_call_service(self):
+        client = FakeClient()
+        await restore(
+            client, {"input_select.s": helper_state("input_select.old_s", "Away")}
+        )
+        self.assertEqual(
+            client.calls,
+            [
+                (
+                    "call_service",
+                    {
+                        "domain": "input_select",
+                        "service": "select_option",
+                        "service_data": {
+                            "entity_id": "input_select.s",
+                            "option": "Away",
+                        },
+                    },
+                )
+            ],
+        )
+
+
+class StorageClient(FakeClient):
+    """Answers lovelace/config per url_path and fails for missing configs."""
+
+    def __init__(self, configs: dict, energy: dict) -> None:
+        super().__init__(
+            {
+                "energy/get_prefs": energy,
+                "lovelace/dashboards/list": [
+                    {"mode": "storage", "url_path": "dashboard-home"},
+                    {"mode": "storage", "url_path": "dashboard-empty"},
+                    {"mode": "yaml", "url_path": "dashboard-yaml"},
+                ],
+            }
+        )
+        self.configs = configs
+
+    async def call(self, type_: str, **payload):
+        result = await super().call(type_, **payload)
+        if type_ == "lovelace/config":
+            if payload["url_path"] not in self.configs:
+                raise HassError(
+                    "lovelace/config failed: config_not_found: No config found."
+                )
+            return self.configs[payload["url_path"]]
+        if type_ == "energy/get_prefs" and result is None:
+            raise HassError("energy/get_prefs failed: not_found: No prefs")
+        return result
+
+
+STORAGE_ID_MAP = {"light.dad": "light.dads_room_ceiling"}
+
+
+class StorageTest(unittest.IsolatedAsyncioTestCase):
+    def storage_client(self) -> StorageClient:
+        return StorageClient(
+            configs={
+                None: {"views": [{"cards": [{"entity": "sensor.outdoor"}]}]},
+                "dashboard-home": {
+                    "views": [
+                        {
+                            "cards": [
+                                {"entity": "light.dad", "name": "Dad"},
+                                {"entity": "light.dad_lamp"},
+                            ],
+                            "title": "Home",
+                        }
+                    ]
+                },
+            },
+            energy={
+                "device_consumption": [{"stat_consumption": "sensor.fridge"}],
+                "energy_sources": [],
+            },
+        )
+
+    async def test_storage_rewrite_keeps_unrelated_text(self):
+        client = self.storage_client()
+        with tempfile.TemporaryDirectory() as directory:
+            backup_dir = pathlib.Path(directory) / "backup"
+            changed = await rewrite_storage(
+                client, STORAGE_ID_MAP, dry_run=False, backup_dir=backup_dir
+            )
+            saved = [call for call in client.calls if call[0].endswith("save")]
+            self.assertEqual(changed, ["dashboard-home"])
+            self.assertEqual(
+                saved,
+                [
+                    (
+                        "lovelace/config/save",
+                        {
+                            "config": {
+                                "views": [
+                                    {
+                                        "cards": [
+                                            {
+                                                "entity": "light.dads_room_ceiling",
+                                                "name": "Dad",
+                                            },
+                                            {"entity": "light.dad_lamp"},
+                                        ],
+                                        "title": "Home",
+                                    }
+                                ]
+                            },
+                            "url_path": "dashboard-home",
+                        },
+                    )
+                ],
+            )
+            self.assertEqual(
+                json.loads((backup_dir / "dashboard-home.json").read_text()),
+                client.configs["dashboard-home"],
+            )
+            self.assertEqual(backup_dir.stat().st_mode & 0o777, 0o700)
+            self.assertEqual(
+                sorted(path.name for path in backup_dir.iterdir()),
+                ["dashboard-home.json"],
+            )
+
+    async def test_storage_rewrites_energy_prefs(self):
+        client = self.storage_client()
+        with tempfile.TemporaryDirectory() as directory:
+            backup_dir = pathlib.Path(directory)
+            changed = await rewrite_storage(
+                client,
+                {"sensor.fridge": "sensor.kitchen_fridge_energy"},
+                dry_run=False,
+                backup_dir=backup_dir,
+            )
+            self.assertEqual(changed, ["energy"])
+            self.assertIn(
+                (
+                    "energy/save_prefs",
+                    {
+                        "device_consumption": [
+                            {"stat_consumption": "sensor.kitchen_fridge_energy"}
+                        ],
+                        "energy_sources": [],
+                    },
+                ),
+                client.calls,
+            )
+            self.assertTrue((backup_dir / "energy.json").exists())
+
+    async def test_storage_skips_missing_energy_prefs(self):
+        client = self.storage_client()
+        client.results["energy/get_prefs"] = None
+        with tempfile.TemporaryDirectory() as directory:
+            changed = await rewrite_storage(
+                client,
+                STORAGE_ID_MAP,
+                dry_run=False,
+                backup_dir=pathlib.Path(directory),
+            )
+        self.assertEqual(changed, ["dashboard-home"])
+        self.assertFalse(any(call[0] == "energy/save_prefs" for call in client.calls))
+
+    async def test_storage_dry_run_writes_and_saves_nothing(self):
+        client = self.storage_client()
+        with tempfile.TemporaryDirectory() as directory:
+            backup_dir = pathlib.Path(directory) / "backup"
+            changed = await rewrite_storage(
+                client, STORAGE_ID_MAP, dry_run=True, backup_dir=backup_dir
+            )
+            self.assertEqual(changed, ["dashboard-home"])
+            self.assertFalse(backup_dir.exists())
+        self.assertFalse(any(call[0].endswith("save") for call in client.calls))
+        self.assertNotIn(
+            ("lovelace/config", {"url_path": "dashboard-yaml"}), client.calls
         )
 
 
