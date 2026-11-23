@@ -1,15 +1,16 @@
 [% ansible_managed | comment %]
 # curl reads the TV's credentials from regza.netrc, keeping them off its command
-# line, which any user on the host can read.
+# line, which any user on the host can read. The folded scalars join their lines
+# with a space; a trailing backslash would escape that space and break the URL.
 control_toggle_regza: >-
-    curl -k --digest --netrc-file /config/regza.netrc \
+    curl -k --digest --netrc-file /config/regza.netrc
     https://regza.rewse.jp:4430/remote/remote.htm?key=40BF12
 control_volume_up_regza: >-
-    curl -k --digest --netrc-file /config/regza.netrc \
+    curl -k --digest --netrc-file /config/regza.netrc
     https://regza.rewse.jp:4430/remote/remote.htm?key=40BF1A
 control_volume_down_regza: >-
-    curl -k --digest --netrc-file /config/regza.netrc \
+    curl -k --digest --netrc-file /config/regza.netrc
     https://regza.rewse.jp:4430/remote/remote.htm?key=40BF1E
 control_mute_regza: >-
-    curl -k --digest --netrc-file /config/regza.netrc \
+    curl -k --digest --netrc-file /config/regza.netrc
     https://regza.rewse.jp:4430/remote/remote.htm?key=40BF10
