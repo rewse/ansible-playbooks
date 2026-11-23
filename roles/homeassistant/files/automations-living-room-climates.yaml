@@ -349,7 +349,7 @@
   trace:
     stored_traces: 100
 - id: automation.recover_from_living_room_ac_manual_internal_clean
-  alias: "Recover from Living Room AC Manual Internal Clean"
+  alias: "Recover from AC Manual Internal Clean"
   triggers:
     - trigger: time
       at: input_datetime.living_room_ac_manual_internal_clean
@@ -360,7 +360,7 @@
           - automation.living_room_adjust_ac_temperature
           - automation.living_room_change_ac_mode
           - automation.living_room_toggle_ac_cooldry
-          - automation.toggle_living_room_ac_heat
+          - automation.living_room_toggle_ac_heat
   trace:
     stored_traces: 100
 - id: automation.select_living_room_climate_mode
@@ -934,7 +934,7 @@
   trace:
     stored_traces: 100
 - id: automation.toggle_living_room_ac_heat
-  alias: "Toggle Living Room AC Heat"
+  alias: "Toggle AC Heat"
   triggers:
     - trigger: state
       entity_id:
@@ -1142,7 +1142,7 @@
   trace:
     stored_traces: 100
 - id: automation.turn_off_living_room_climate_ventilated
-  alias: "Turn off Living Room Climate Ventilated"
+  alias: "Turn off Climate Ventilated"
   triggers:
     - trigger: state
       entity_id: input_select.living_room_climate_mode
@@ -1236,7 +1236,7 @@
   trace:
     stored_traces: 100
 - id: automation.sync_living_area_floor_heater_operation_status
-  alias: "Sync Living Area Floor Heater Operation Status"
+  alias: "Sync Floor Heater Operation Status"
   description: >-
     Keep the living room and study floor heater operation statuses synchronized
     after either status remains stable for 10 seconds.

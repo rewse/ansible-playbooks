@@ -1,4 +1,4 @@
-- id: scene.dads_room_dark
+- id: scene.dad_s_room_dark
   name: "Dark"
   entities:
     light.dad_s_room_pendant_light:
@@ -121,7 +121,7 @@
     light.living_room_shelf_light:
       state: "off"
   icon: "mdi:bed"
-- id: scene.moms_room_dark
+- id: scene.mom_s_room_dark
   name: "Dark"
   entities:
     light.mom_s_room_light:

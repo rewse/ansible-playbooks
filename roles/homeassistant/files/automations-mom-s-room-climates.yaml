@@ -1,4 +1,4 @@
-- id: automation.adjust_moms_room_ac_temp
+- id: automation.adjust_mom_s_room_ac_temp
   alias: "Adjust Mom’s Room AC Temperature"
   triggers:
     - trigger: state
@@ -54,7 +54,7 @@
                 minutes: 9
   trace:
     stored_traces: 100
-- id: automation.change_moms_room_ac_from_heatcool
+- id: automation.change_mom_s_room_ac_from_heatcool
   alias: "Change AC from HeatCool"
   triggers:
     - trigger: state
@@ -123,7 +123,7 @@
                 temperature: "{{ int(states('input_number.mom_s_room_temperature_target_present_winter')) }}"
   trace:
     stored_traces: 100
-- id: automation.change_moms_room_ac_fan_mode
+- id: automation.change_mom_s_room_ac_fan_mode
   alias: "Change AC Fan Mode"
   triggers:
     - trigger: state
@@ -155,7 +155,7 @@
             fan_mode: "Auto"
   trace:
     stored_traces: 100
-- id: automation.change_moms_room_ac_mode
+- id: automation.change_mom_s_room_ac_mode
   alias: "Change AC Mode"
   triggers:
     - trigger: time_pattern
@@ -284,26 +284,26 @@
                 minutes: 29
   trace:
     stored_traces: 100
-- id: automation.notify_moms_room_climate
+- id: automation.notify_mom_s_room_climate
   alias: "Notify Climate"
   triggers:
     - trigger: event
-      event_type: "moms_room_humidity_too_high"
-      id: "moms_room_humidity_too_high"
+      event_type: "mom_s_room_humidity_too_high"
+      id: "mom_s_room_humidity_too_high"
     - trigger: event
-      event_type: "moms_room_humidity_too_low"
-      id: "moms_room_humidity_too_low"
+      event_type: "mom_s_room_humidity_too_low"
+      id: "mom_s_room_humidity_too_low"
     - trigger: event
-      event_type: "moms_room_temp_too_high"
-      id: "moms_room_temp_too_high"
+      event_type: "mom_s_room_temp_too_high"
+      id: "mom_s_room_temp_too_high"
     - trigger: event
-      event_type: "moms_room_temp_too_low"
-      id: "moms_room_temp_too_low"
+      event_type: "mom_s_room_temp_too_low"
+      id: "mom_s_room_temp_too_low"
   actions:
     - choose:
         - conditions:
             - condition: trigger
-              id: "moms_room_humidity_too_high"
+              id: "mom_s_room_humidity_too_high"
           sequence:
             - action: notify.all_devices
               data:
@@ -318,7 +318,7 @@
                 hours: 2
         - conditions:
             - condition: trigger
-              id: "moms_room_humidity_too_low"
+              id: "mom_s_room_humidity_too_low"
           sequence:
             - action: notify.all_devices
               data:
@@ -333,7 +333,7 @@
                 hours: 2
         - conditions:
             - condition: trigger
-              id: "moms_room_temp_too_high"
+              id: "mom_s_room_temp_too_high"
           sequence:
             - action: notify.all_devices
               data:
@@ -348,7 +348,7 @@
                 hours: 2
         - conditions:
             - condition: trigger
-              id: "moms_room_temp_too_low"
+              id: "mom_s_room_temp_too_low"
           sequence:
             - action: notify.all_devices
               data:
@@ -363,7 +363,7 @@
                 hours: 2
   trace:
     stored_traces: 100
-- id: automation.plan_to_turn_on_moms_room_ac_internal_clean
+- id: automation.plan_to_turn_on_mom_s_room_ac_internal_clean
   alias: "Plan to Turn on AC Internal Clean"
   triggers:
     - trigger: state
@@ -380,8 +380,8 @@
           - automation.mom_s_room_turn_on_ac_internal_clean
   trace:
     stored_traces: 100
-- id: automation.recover_moms_room_ac_manual_internal_clean
-  alias: "Recover from Mom’s Room AC Manual Internal Clean"
+- id: automation.recover_mom_s_room_ac_manual_internal_clean
+  alias: "Recover from AC Manual Internal Clean"
   triggers:
     - trigger: time
       at: input_datetime.mom_s_room_ac_manual_internal_clean
@@ -395,7 +395,7 @@
           - automation.mom_s_room_toggle_ac_heat
   trace:
     stored_traces: 100
-- id: automation.select_moms_room_climate_mode
+- id: automation.select_mom_s_room_climate_mode
   alias: "Select Climate Mode"
   triggers:
     - trigger: state
@@ -591,7 +591,7 @@
                 option: "Absent Winter"
   trace:
     stored_traces: 100
-- id: automation.select_moms_room_humiture_target
+- id: automation.select_mom_s_room_humiture_target
   alias: "Select Humiture Target"
   triggers:
     - trigger: state
@@ -793,7 +793,7 @@
                     value: "{{ states(repeat.item.src) }}"
   trace:
     stored_traces: 100
-- id: automation.toggle_moms_room_ac_cooldry
+- id: automation.toggle_mom_s_room_ac_cooldry
   alias: "Toggle AC CoolDry"
   triggers:
     - trigger: state
@@ -840,7 +840,7 @@
                       for:
                         minutes: 10
                   sequence:
-                    - event: "moms_room_temp_too_high"
+                    - event: "mom_s_room_temp_too_high"
                 - conditions:
                     - condition: state
                       entity_id: input_boolean.mom_s_room_window_mode
@@ -887,7 +887,7 @@
                       for:
                         minutes: 10
                   sequence:
-                    - event: "moms_room_humidity_too_high"
+                    - event: "mom_s_room_humidity_too_high"
                 - conditions:
                     - condition: state
                       entity_id: input_boolean.mom_s_room_window_mode
@@ -945,7 +945,7 @@
                 hours: 2
   trace:
     stored_traces: 100
-- id: automation.toggle_moms_room_ac_heat
+- id: automation.toggle_mom_s_room_ac_heat
   alias: "Toggle AC Heat"
   triggers:
     - trigger: state
@@ -994,7 +994,7 @@
                       for:
                         minutes: 10
                   sequence:
-                    - event: "moms_room_temp_too_low"
+                    - event: "mom_s_room_temp_too_low"
                 - conditions:
                     - condition: state
                       entity_id: input_boolean.mom_s_room_window_mode
@@ -1047,8 +1047,8 @@
                 hours: 2
   trace:
     stored_traces: 100
-- id: automation.toggle_moms_room_air_purifier
-  alias: "Toggle Mom’s Room Air Purifier"
+- id: automation.toggle_mom_s_room_air_purifier
+  alias: "Toggle Air Purifier"
   triggers:
     - trigger: state
       entity_id: alarm_control_panel.home
@@ -1082,7 +1082,7 @@
                 preset_mode: "pet"
   trace:
     stored_traces: 100
-- id: automation.toggle_moms_room_humidifier
+- id: automation.toggle_mom_s_room_humidifier
   alias: "Toggle Humidifier"
   triggers:
     - trigger: state
@@ -1121,7 +1121,7 @@
                       for:
                         minutes: 10
                   sequence:
-                    - event: "moms_room_humidity_too_low"
+                    - event: "mom_s_room_humidity_too_low"
                 - conditions:
                     - condition: state
                       entity_id: input_boolean.mom_s_room_window_mode
@@ -1165,7 +1165,7 @@
                 hours: 1
   trace:
     stored_traces: 100
-- id: automation.turn_off_moms_room_ac_internal_clean
+- id: automation.turn_off_mom_s_room_ac_internal_clean
   alias: "Turn Off AC Internal Clean"
   triggers:
     - trigger: state
@@ -1187,7 +1187,7 @@
           - automation.mom_s_room_turn_on_ac_internal_clean
   trace:
     stored_traces: 100
-- id: automation.turn_off_moms_room_climate_ventilated
+- id: automation.turn_off_mom_s_room_climate_ventilated
   alias: "Turn off Climate Ventilated"
   triggers:
     - trigger: state
@@ -1231,7 +1231,7 @@
               url: "/lovelace/overview"
   trace:
     stored_traces: 100
-- id: automation.turn_on_moms_room_ac_internal_clean
+- id: automation.turn_on_mom_s_room_ac_internal_clean
   alias: "Turn on AC Internal Clean"
   triggers:
     - trigger: state
@@ -1247,7 +1247,7 @@
         hvac_mode: "fan_only"
   trace:
     stored_traces: 100
-- id: automation.turn_on_moms_room_ac_streamer
+- id: automation.turn_on_mom_s_room_ac_streamer
   alias: "Turn on AC Streamer"
   triggers:
     - trigger: state

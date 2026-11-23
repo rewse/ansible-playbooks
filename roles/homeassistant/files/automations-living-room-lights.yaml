@@ -205,7 +205,7 @@
   trace:
     stored_traces: 100
 - id: automation.restart_living_room_tv_light
-  alias: "Restart Living Room TV Light"
+  alias: "Restart TV Light"
   triggers:
     - trigger: state
       entity_id: light.living_room_tv_light

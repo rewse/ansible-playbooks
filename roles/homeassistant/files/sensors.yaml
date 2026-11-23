@@ -26,14 +26,14 @@
 
 # Provides a stable value for comparison with the paired sensor.
 - platform: statistics
-  unique_id: sensor.dads_room_humidity_smoothed
+  unique_id: sensor.dad_s_room_humidity_smoothed
   name: "Thermometer Primary Humidity Smoothed"
   entity_id: sensor.dad_s_room_thermometer_primary_humidity
   state_characteristic: average_step
   max_age:
     hours: 1
 - platform: statistics
-  unique_id: sensor.dads_room_motion_count
+  unique_id: sensor.dad_s_room_motion_count
   name: "Motion Count"
   entity_id: binary_sensor.dad_s_room_motion_sensor
   state_characteristic: count
@@ -41,7 +41,7 @@
     minutes: 10
 # Provides a stable value for comparison with the paired sensor.
 - platform: statistics
-  unique_id: sensor.dads_room_switchbot_meter_humidity_smoothed
+  unique_id: sensor.dad_s_room_switchbot_meter_humidity_smoothed
   name: "Thermometer Secondary Humidity Smoothed"
   entity_id: sensor.dad_s_room_thermometer_secondary_humidity
   state_characteristic: average_step
@@ -49,7 +49,7 @@
     hours: 1
 # Provides a stable value for comparison with the paired sensor.
 - platform: statistics
-  unique_id: sensor.dads_room_switchbot_meter_temperature_smoothed
+  unique_id: sensor.dad_s_room_switchbot_meter_temperature_smoothed
   name: "Thermometer Secondary Temperature Smoothed"
   entity_id: sensor.dad_s_room_thermometer_secondary_temperature
   state_characteristic: average_step
@@ -57,14 +57,14 @@
     hours: 1
 # Provides a stable value for comparison with the paired sensor.
 - platform: statistics
-  unique_id: sensor.dads_room_temperature_smoothed
+  unique_id: sensor.dad_s_room_temperature_smoothed
   name: "Thermometer Primary Temperature Smoothed"
   entity_id: sensor.dad_s_room_thermometer_primary_temperature
   state_characteristic: average_step
   max_age:
     hours: 1
 - platform: integration
-  unique_id: sensor.dads_room_youth_energy_total
+  unique_id: sensor.dad_s_room_youth_energy_total
   name: "youth Energy Total"
   source: sensor.dad_s_room_youth_power_current_corrected
   unit_prefix: k
@@ -118,14 +118,14 @@
 
 # Provides a stable value for comparison with the paired sensor.
 - platform: statistics
-  unique_id: sensor.moms_room_humidity_smoothed
+  unique_id: sensor.mom_s_room_humidity_smoothed
   name: "Thermometer Primary Humidity Smoothed"
   entity_id: sensor.mom_s_room_thermometer_primary_humidity
   state_characteristic: average_step
   max_age:
     hours: 1
 - platform: statistics
-  unique_id: sensor.moms_room_motion_count
+  unique_id: sensor.mom_s_room_motion_count
   name: "Motion Count"
   entity_id: binary_sensor.mom_s_room_motion_sensor
   state_characteristic: count
@@ -133,7 +133,7 @@
     minutes: 10
 # Provides a stable value for comparison with the paired sensor.
 - platform: statistics
-  unique_id: sensor.moms_room_switchbot_meter_humidity_smoothed
+  unique_id: sensor.mom_s_room_switchbot_meter_humidity_smoothed
   name: "Thermometer Secondary Humidity Smoothed"
   entity_id: sensor.mom_s_room_thermometer_secondary_humidity
   state_characteristic: average_step
@@ -141,7 +141,7 @@
     hours: 1
 # Provides a stable value for comparison with the paired sensor.
 - platform: statistics
-  unique_id: sensor.moms_room_switchbot_meter_temperature_smoothed
+  unique_id: sensor.mom_s_room_switchbot_meter_temperature_smoothed
   name: "Thermometer Secondary Temperature Smoothed"
   entity_id: sensor.mom_s_room_thermometer_secondary_temperature
   state_characteristic: average_step
@@ -149,7 +149,7 @@
     hours: 1
 # Provides a stable value for comparison with the paired sensor.
 - platform: statistics
-  unique_id: sensor.moms_room_temperature_smoothed
+  unique_id: sensor.mom_s_room_temperature_smoothed
   name: "Thermometer Primary Temperature Smoothed"
   entity_id: sensor.mom_s_room_thermometer_primary_temperature
   state_characteristic: average_step

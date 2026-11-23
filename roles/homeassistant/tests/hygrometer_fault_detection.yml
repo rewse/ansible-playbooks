@@ -5,44 +5,44 @@
   gather_facts: false
   vars:
     retired_sensor_ids:
-      - sensor.dads_room_humidity_difference
-      - sensor.dads_room_humidity_difference_average
-      - sensor.dads_room_temp_difference
-      - sensor.dads_room_temp_difference_average
+      - sensor.dad_s_room_humidity_difference
+      - sensor.dad_s_room_humidity_difference_average
+      - sensor.dad_s_room_temp_difference
+      - sensor.dad_s_room_temp_difference_average
       - sensor.living_room_humidity_difference
       - sensor.living_room_humidity_difference_average
       - sensor.living_room_temp_difference
       - sensor.living_room_temp_difference_average
-      - sensor.moms_room_humidity_difference
-      - sensor.moms_room_humidity_difference_average
-      - sensor.moms_room_temp_difference
-      - sensor.moms_room_temp_difference_average
+      - sensor.mom_s_room_humidity_difference
+      - sensor.mom_s_room_humidity_difference_average
+      - sensor.mom_s_room_temp_difference
+      - sensor.mom_s_room_temp_difference_average
     room_contracts:
-      - alarm_file: automations-dads-room.yaml
-        alarm_id: automation.alarm_dads_room_humidity_difference
+      - alarm_file: automations-dad-s-room.yaml
+        alarm_id: automation.alarm_dad_s_room_humidity_difference
         anomaly_entity_id: binary_sensor.dad_s_room_hygrometer_anomaly
-        anomaly_unique_id: binary_sensor.dads_room_hygrometer_anomaly
-        climate_file: automations-dads-room-climates.yaml
+        anomaly_unique_id: binary_sensor.dad_s_room_hygrometer_anomaly
+        climate_file: automations-dad-s-room-climates.yaml
         control_automation_ids:
-          - automation.adjust_dads_room_ac_temp
-          - automation.change_dads_room_ac_from_heatcool
-          - automation.change_dads_room_ac_mode
-          - automation.toggle_dads_room_ac_cooldry
-          - automation.toggle_dads_room_ac_heat
+          - automation.adjust_dad_s_room_ac_temp
+          - automation.change_dad_s_room_ac_from_heatcool
+          - automation.change_dad_s_room_ac_mode
+          - automation.toggle_dad_s_room_ac_cooldry
+          - automation.toggle_dad_s_room_ac_heat
         disagreement_entity_id: binary_sensor.dad_s_room_humidity_disagreement
-        disagreement_unique_id: binary_sensor.dads_room_humidity_disagreement
+        disagreement_unique_id: binary_sensor.dad_s_room_humidity_disagreement
         fault_entity_id: binary_sensor.dad_s_room_hygrometer_fault
-        fault_unique_id: binary_sensor.dads_room_hygrometer_fault
-        prefix: dads_room
+        fault_unique_id: binary_sensor.dad_s_room_hygrometer_fault
+        prefix: dad_s_room
         primary_entity_id: sensor.dad_s_room_thermometer_primary_humidity
         secondary_entity_id: sensor.dad_s_room_thermometer_secondary_humidity
         secondary_stale_seconds: 86400
         secondary_unavailable_seconds: 86400
         smoothed_sensors:
           - entity_id: sensor.dad_s_room_thermometer_primary_humidity_smoothed
-            unique_id: sensor.dads_room_humidity_smoothed
+            unique_id: sensor.dad_s_room_humidity_smoothed
           - entity_id: sensor.dad_s_room_thermometer_secondary_humidity_smoothed
-            unique_id: sensor.dads_room_switchbot_meter_humidity_smoothed
+            unique_id: sensor.dad_s_room_switchbot_meter_humidity_smoothed
         source_entity_ids:
           - sensor.dad_s_room_thermometer_primary_humidity
           - sensor.dad_s_room_thermometer_secondary_humidity
@@ -75,31 +75,31 @@
         source_entity_ids:
           - sensor.living_room_thermometer_humidity
           - sensor.living_room_switchbot_hub_humidity
-      - alarm_file: automations-moms-room.yaml
-        alarm_id: automation.alarm_moms_room_humidity_difference
+      - alarm_file: automations-mom-s-room.yaml
+        alarm_id: automation.alarm_mom_s_room_humidity_difference
         anomaly_entity_id: binary_sensor.mom_s_room_hygrometer_anomaly
-        anomaly_unique_id: binary_sensor.moms_room_hygrometer_anomaly
-        climate_file: automations-moms-room-climates.yaml
+        anomaly_unique_id: binary_sensor.mom_s_room_hygrometer_anomaly
+        climate_file: automations-mom-s-room-climates.yaml
         control_automation_ids:
-          - automation.adjust_moms_room_ac_temp
-          - automation.change_moms_room_ac_from_heatcool
-          - automation.change_moms_room_ac_mode
-          - automation.toggle_moms_room_ac_cooldry
-          - automation.toggle_moms_room_ac_heat
+          - automation.adjust_mom_s_room_ac_temp
+          - automation.change_mom_s_room_ac_from_heatcool
+          - automation.change_mom_s_room_ac_mode
+          - automation.toggle_mom_s_room_ac_cooldry
+          - automation.toggle_mom_s_room_ac_heat
         disagreement_entity_id: binary_sensor.mom_s_room_humidity_disagreement
-        disagreement_unique_id: binary_sensor.moms_room_humidity_disagreement
+        disagreement_unique_id: binary_sensor.mom_s_room_humidity_disagreement
         fault_entity_id: binary_sensor.mom_s_room_hygrometer_fault
-        fault_unique_id: binary_sensor.moms_room_hygrometer_fault
-        prefix: moms_room
+        fault_unique_id: binary_sensor.mom_s_room_hygrometer_fault
+        prefix: mom_s_room
         primary_entity_id: sensor.mom_s_room_thermometer_primary_humidity
         secondary_entity_id: sensor.mom_s_room_thermometer_secondary_humidity
         secondary_stale_seconds: 86400
         secondary_unavailable_seconds: 86400
         smoothed_sensors:
           - entity_id: sensor.mom_s_room_thermometer_primary_humidity_smoothed
-            unique_id: sensor.moms_room_humidity_smoothed
+            unique_id: sensor.mom_s_room_humidity_smoothed
           - entity_id: sensor.mom_s_room_thermometer_secondary_humidity_smoothed
-            unique_id: sensor.moms_room_switchbot_meter_humidity_smoothed
+            unique_id: sensor.mom_s_room_switchbot_meter_humidity_smoothed
         source_entity_ids:
           - sensor.mom_s_room_thermometer_primary_humidity
           - sensor.mom_s_room_thermometer_secondary_humidity

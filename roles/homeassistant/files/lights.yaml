@@ -21,7 +21,7 @@
     - light.living_room_shelf_light
     - light.living_room_downlights_north
 - platform: group
-  unique_id: dads_room_lights
+  unique_id: dad_s_room_lights
   name: "Dad’s Room Lights"
   entities:
     - light.dad_s_room_pendant_light

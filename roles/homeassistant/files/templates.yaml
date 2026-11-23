@@ -1,6 +1,6 @@
 - binary_sensor:
   # Dad’s Room
-  - unique_id: binary_sensor.dads_room_ac_cooldry
+  - unique_id: binary_sensor.dad_s_room_ac_cooldry
     name: "AC CoolDry"
     state: >-
       {{
@@ -10,7 +10,7 @@
     device_class: cold
     icon: "mdi:snowflake"
   # Reports a persistent mismatch between the paired sensors.
-  - unique_id: binary_sensor.dads_room_humidity_disagreement
+  - unique_id: binary_sensor.dad_s_room_humidity_disagreement
     name: "Humidity Disagreement"
     state: >-
       {{
@@ -24,7 +24,7 @@
     delay_on:
       hours: 1
     device_class: problem
-  - unique_id: binary_sensor.dads_room_humidity_high
+  - unique_id: binary_sensor.dad_s_room_humidity_high
     name: "Humidity High"
     state: >-
       {{
@@ -33,7 +33,7 @@
         float(states('input_number.dad_s_room_humidity_maximum_difference'))
       }}
     icon: "mdi:water-percent-alert"
-  - unique_id: binary_sensor.dads_room_humidity_low
+  - unique_id: binary_sensor.dad_s_room_humidity_low
     name: "Humidity Low"
     state: >-
       {{
@@ -44,7 +44,7 @@
     icon: "mdi:water-percent-alert"
   # Reports a reading missing for 10 minutes, unreported for 2 hours, or in
   # persistent disagreement; clears as soon as none holds.
-  - unique_id: binary_sensor.dads_room_hygrometer_anomaly
+  - unique_id: binary_sensor.dad_s_room_hygrometer_anomaly
     name: "Hygrometer Anomaly"
     state: >-
       {% set primary = states('sensor.dad_s_room_thermometer_primary_humidity') %}
@@ -55,7 +55,7 @@
       }}
     device_class: problem
   # Combines reading anomalies with secondary sensor outages, which clear immediately.
-  - unique_id: binary_sensor.dads_room_hygrometer_fault
+  - unique_id: binary_sensor.dad_s_room_hygrometer_fault
     name: "Hygrometer Fault"
     state: >-
       {% set secondary = states('sensor.dad_s_room_thermometer_secondary_humidity') %}
@@ -71,7 +71,7 @@
         )
       }}
     device_class: problem
-  - unique_id: binary_sensor.dads_room_temp_high
+  - unique_id: binary_sensor.dad_s_room_temp_high
     name: "Temperature High"
     state: >-
       {{
@@ -80,7 +80,7 @@
         float(states('input_number.dad_s_room_temperature_maximum_difference'))
       }}
     icon: "mdi:thermometer-high"
-  - unique_id: binary_sensor.dads_room_temp_low
+  - unique_id: binary_sensor.dad_s_room_temp_low
     name: "Temperature Low"
     state: >-
       {{
@@ -90,7 +90,7 @@
       }}
     icon: "mdi:thermometer-low"
   # Reports a persistent mismatch between the paired sensors.
-  - unique_id: binary_sensor.dads_room_temperature_disagreement
+  - unique_id: binary_sensor.dad_s_room_temperature_disagreement
     name: "Temperature Disagreement"
     state: >-
       {{
@@ -106,7 +106,7 @@
     device_class: problem
   # Reports a reading missing for 10 minutes, unreported for 2 hours, or in
   # persistent disagreement; clears as soon as none holds.
-  - unique_id: binary_sensor.dads_room_thermometer_anomaly
+  - unique_id: binary_sensor.dad_s_room_thermometer_anomaly
     name: "Thermometer Anomaly"
     state: >-
       {% set primary = states('sensor.dad_s_room_thermometer_primary_temperature') %}
@@ -116,13 +116,13 @@
         is_state('binary_sensor.dad_s_room_temperature_disagreement', 'on')
       }}
     device_class: problem
-  - unique_id: binary_sensor.dads_room_thermometer_connectivity
+  - unique_id: binary_sensor.dad_s_room_thermometer_connectivity
     name: "Thermometer Connectivity"
     state: >-
       {{ (now() - states.sensor.dad_s_room_thermometer_primary_temperature.last_reported).total_seconds() < 3600 }}
     device_class: connectivity
   # Combines reading anomalies with secondary sensor outages, which clear immediately.
-  - unique_id: binary_sensor.dads_room_thermometer_fault
+  - unique_id: binary_sensor.dad_s_room_thermometer_fault
     name: "Thermometer Fault"
     state: >-
       {% set secondary = states('sensor.dad_s_room_thermometer_secondary_temperature') %}
@@ -319,7 +319,7 @@
       }}
     icon: "mdi:car-clock"
   # Mom’s Room
-  - unique_id: binary_sensor.moms_room_ac_cooldry
+  - unique_id: binary_sensor.mom_s_room_ac_cooldry
     name: "AC CoolDry"
     state: >-
       {{
@@ -329,7 +329,7 @@
     device_class: cold
     icon: "mdi:snowflake"
   # Reports a persistent mismatch between the paired sensors.
-  - unique_id: binary_sensor.moms_room_humidity_disagreement
+  - unique_id: binary_sensor.mom_s_room_humidity_disagreement
     name: "Humidity Disagreement"
     state: >-
       {{
@@ -343,7 +343,7 @@
     delay_on:
       hours: 1
     device_class: problem
-  - unique_id: binary_sensor.moms_room_humidity_high
+  - unique_id: binary_sensor.mom_s_room_humidity_high
     name: "Humidity High"
     state: >-
       {{
@@ -352,7 +352,7 @@
         float(states('input_number.mom_s_room_humidity_maximum_difference'))
       }}
     icon: "mdi:water-percent-alert"
-  - unique_id: binary_sensor.moms_room_humidity_low
+  - unique_id: binary_sensor.mom_s_room_humidity_low
     name: "Humidity Low"
     state: >-
       {{
@@ -363,7 +363,7 @@
     icon: "mdi:water-percent-alert"
   # Reports a reading missing for 10 minutes, unreported for 2 hours, or in
   # persistent disagreement; clears as soon as none holds.
-  - unique_id: binary_sensor.moms_room_hygrometer_anomaly
+  - unique_id: binary_sensor.mom_s_room_hygrometer_anomaly
     name: "Hygrometer Anomaly"
     state: >-
       {% set primary = states('sensor.mom_s_room_thermometer_primary_humidity') %}
@@ -374,7 +374,7 @@
       }}
     device_class: problem
   # Combines reading anomalies with secondary sensor outages, which clear immediately.
-  - unique_id: binary_sensor.moms_room_hygrometer_fault
+  - unique_id: binary_sensor.mom_s_room_hygrometer_fault
     name: "Hygrometer Fault"
     state: >-
       {% set secondary = states('sensor.mom_s_room_thermometer_secondary_humidity') %}
@@ -390,7 +390,7 @@
         )
       }}
     device_class: problem
-  - unique_id: binary_sensor.moms_room_temp_high
+  - unique_id: binary_sensor.mom_s_room_temp_high
     name: "Temperature High"
     state: >-
       {{
@@ -399,7 +399,7 @@
         float(states('input_number.mom_s_room_temperature_maximum_difference'))
       }}
     icon: "mdi:thermometer-high"
-  - unique_id: binary_sensor.moms_room_temp_low
+  - unique_id: binary_sensor.mom_s_room_temp_low
     name: "Temperature Low"
     state: >-
       {{
@@ -409,7 +409,7 @@
       }}
     icon: "mdi:thermometer-low"
   # Reports a persistent mismatch between the paired sensors.
-  - unique_id: binary_sensor.moms_room_temperature_disagreement
+  - unique_id: binary_sensor.mom_s_room_temperature_disagreement
     name: "Temperature Disagreement"
     state: >-
       {{
@@ -425,7 +425,7 @@
     device_class: problem
   # Reports a reading missing for 10 minutes, unreported for 2 hours, or in
   # persistent disagreement; clears as soon as none holds.
-  - unique_id: binary_sensor.moms_room_thermometer_anomaly
+  - unique_id: binary_sensor.mom_s_room_thermometer_anomaly
     name: "Thermometer Anomaly"
     state: >-
       {% set primary = states('sensor.mom_s_room_thermometer_primary_temperature') %}
@@ -435,13 +435,13 @@
         is_state('binary_sensor.mom_s_room_temperature_disagreement', 'on')
       }}
     device_class: problem
-  - unique_id: binary_sensor.moms_room_thermometer_connectivity
+  - unique_id: binary_sensor.mom_s_room_thermometer_connectivity
     name: "Thermometer Connectivity"
     state: >-
       {{ (now() - states.sensor.mom_s_room_thermometer_primary_temperature.last_reported).total_seconds() < 3600 }}
     device_class: connectivity
   # Combines reading anomalies with secondary sensor outages, which clear immediately.
-  - unique_id: binary_sensor.moms_room_thermometer_fault
+  - unique_id: binary_sensor.mom_s_room_thermometer_fault
     name: "Thermometer Fault"
     state: >-
       {% set secondary = states('sensor.mom_s_room_thermometer_secondary_temperature') %}
@@ -540,18 +540,18 @@
     device_class: temperature
     icon: "mdi:thermometer-water"
   # Dad’s Room
-  - unique_id: sensor.dads_room_ac_mode
+  - unique_id: sensor.dad_s_room_ac_mode
     name: "AC Mode"
     state: "{{ states('climate.dad_s_room_ac') }}"
     icon: "mdi:thermostat"
-  - unique_id: sensor.dads_room_ac_temp
+  - unique_id: sensor.dad_s_room_ac_temp
     name: "AC Temperature"
     state: "{{ state_attr('climate.dad_s_room_ac', 'temperature') }}"
     unit_of_measurement: "°C"
     state_class: measurement
     device_class: temperature
     icon: "mdi:thermometer-check"
-  - unique_id: sensor.dads_room_wbgt
+  - unique_id: sensor.dad_s_room_wbgt
     name: "WBGT"
     state: >-
       {{
@@ -566,13 +566,13 @@
     state_class: measurement
     device_class: temperature
     icon: "mdi:thermometer-water"
-  - unique_id: sensor.dads_room_youth_power_average_corrected
+  - unique_id: sensor.dad_s_room_youth_power_average_corrected
     name: "Youth Power Average Corrected"
     state: "{{ (float(states('sensor.dad_s_room_youth_power_average'), 0) * 1.2) }}"
     unit_of_measurement: "W"
     device_class: power
     state_class: measurement
-  - unique_id: sensor.dads_room_youth_power_current_corrected
+  - unique_id: sensor.dad_s_room_youth_power_current_corrected
     name: "Youth Power Current Corrected"
     state: "{{ (float(states('sensor.dad_s_room_youth_power_current'), 0) * 1.2) }}"
     unit_of_measurement: "W"
@@ -606,18 +606,18 @@
     device_class: temperature
     icon: "mdi:thermometer-water"
   # Mom’s Room
-  - unique_id: sensor.moms_room_ac_mode
+  - unique_id: sensor.mom_s_room_ac_mode
     name: "AC Mode"
     state: "{{ states('climate.mom_s_room_ac') }}"
     icon: "mdi:thermostat"
-  - unique_id: sensor.moms_room_ac_temp
+  - unique_id: sensor.mom_s_room_ac_temp
     name: "AC Temperature"
     state: "{{ state_attr('climate.mom_s_room_ac', 'temperature') }}"
     unit_of_measurement: "°C"
     state_class: measurement
     device_class: temperature
     icon: "mdi:thermometer-check"
-  - unique_id: sensor.moms_room_wbgt
+  - unique_id: sensor.mom_s_room_wbgt
     name: "WBGT"
     state: >-
       {{
@@ -753,7 +753,7 @@
       {% endif %}
 - switch:
   # Dad’s Room
-  - unique_id: switch.dads_room_humidifier
+  - unique_id: switch.dad_s_room_humidifier
     turn_on:
     - action: switch.toggle
       target:
@@ -806,7 +806,7 @@
     name: "TV"
     state: '{{ float(states(''sensor.living_room_tv_plug_power'')) > 50 }}'
   # Mom’s Room
-  - unique_id: switch.moms_room_humidifier
+  - unique_id: switch.mom_s_room_humidifier
     turn_on:
     - action: switch.toggle
       target:
