@@ -13,7 +13,7 @@
       ansible.builtin.set_fact:
         homeassistant_floor_heater_sync_automations: >-
           {{ homeassistant_living_room_climate_automations
-             | selectattr('id', 'equalto', 'automation.sync_living_area_floor_heater_operation_status')
+             | selectattr('id', 'equalto', 'automation.living_room_sync_floor_heater_operation_status')
              | list }}
 
     - name: Verify automation exists

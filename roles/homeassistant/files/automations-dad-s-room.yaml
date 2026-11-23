@@ -1,4 +1,4 @@
-- id: automation.alarm_dad_s_room_humidity_difference
+- id: automation.dad_s_room_alarm_humidity_difference
   alias: "ALARM: Humidity Difference"
   triggers:
     - trigger: state
@@ -26,7 +26,7 @@
           url: "/lovelace/overview"
   trace:
     stored_traces: 100
-- id: automation.alarm_dad_s_room_temp_difference
+- id: automation.dad_s_room_alarm_temperature_difference
   alias: "ALARM: Temperature Difference"
   triggers:
     - trigger: state
@@ -54,7 +54,7 @@
           url: "/lovelace/overview"
   trace:
     stored_traces: 100
-- id: automation.alarm_dad_s_room_co2
+- id: automation.dad_s_room_alarm_co2
   alias: "ALARM: CO2"
   triggers:
     - trigger: time_pattern
@@ -80,7 +80,7 @@
         hours: 1
   trace:
     stored_traces: 100
-- id: automation.select_dad_s_room_presence_mode
+- id: automation.dad_s_room_select_presence_mode
   alias: "Select Presence Mode"
   triggers:
     - trigger: state

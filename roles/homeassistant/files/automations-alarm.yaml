@@ -39,7 +39,7 @@
 # unavailable plug stops recording without any other notice. Kept apart from
 # Plug Switch is Offline, which turns a plug back on when it reads off; Toggle
 # Camera Plugs switches the camera plugs off on purpose.
-- id: automation.alarm_camera_plug_unavailable
+- id: automation.alarm_camera_plug_is_unavailable
   alias: "ALARM: Camera Plug is Unavailable"
   triggers:
     - trigger: state
@@ -291,7 +291,7 @@
             interruption-level: time-sensitive
   trace:
     stored_traces: 100
-- id: automation.alarm_matter_sensor_offline
+- id: automation.alarm_matter_sensor_is_offline
   alias: "ALARM: Matter Sensor is Offline"
   triggers:
     - trigger: state
@@ -382,7 +382,7 @@
           warning for the 15-day insurance limit
   trace:
     stored_traces: 100
-- id: automation.alarm_plug_switch_offline
+- id: automation.alarm_plug_switch_is_offline
   alias: "ALARM: Plug Switch is Offline"
   triggers:
     - trigger: state

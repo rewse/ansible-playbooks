@@ -1,4 +1,4 @@
-- id: automation.select_living_room_light_mode
+- id: automation.living_room_select_light_mode
   alias: "Select Light Mode"
   triggers:
     - trigger: state
@@ -83,7 +83,7 @@
                 option: "Midnight"
   trace:
     stored_traces: 100
-- id: automation.select_living_room_scene
+- id: automation.living_room_select_scene
   alias: "Select Scene"
   triggers:
     - trigger: state
@@ -154,7 +154,7 @@
                 option: scene.living_room_dark
   trace:
     stored_traces: 100
-- id: automation.select_living_room_tv_light_scene
+- id: automation.living_room_select_tv_light_scene
   alias: "Select TV Light Scene"
   triggers:
     - trigger: state
@@ -191,7 +191,7 @@
                 option: "leisure"
   trace:
     stored_traces: 100
-- id: automation.turn_on_living_room_scene
+- id: automation.living_room_turn_on_scene
   alias: "Turn on Scene"
   triggers:
     - trigger: state
@@ -204,7 +204,7 @@
         entity_id: "{{ states('input_select.living_room_scene') }}"
   trace:
     stored_traces: 100
-- id: automation.restart_living_room_tv_light
+- id: automation.living_room_restart_tv_light
   alias: "Restart TV Light"
   triggers:
     - trigger: state
@@ -261,7 +261,7 @@
             entity_id: automation.living_room_turn_on_tv_light_scene
   trace:
     stored_traces: 100
-- id: automation.turn_on_living_room_tv_light_scene
+- id: automation.living_room_turn_on_tv_light_scene
   alias: "Turn on TV Light Scene"
   triggers:
     - trigger: state

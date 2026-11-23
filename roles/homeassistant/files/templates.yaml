@@ -71,7 +71,7 @@
         )
       }}
     device_class: problem
-  - unique_id: binary_sensor.dad_s_room_temp_high
+  - unique_id: binary_sensor.dad_s_room_temperature_high
     name: "Temperature High"
     state: >-
       {{
@@ -80,7 +80,7 @@
         float(states('input_number.dad_s_room_temperature_maximum_difference'))
       }}
     icon: "mdi:thermometer-high"
-  - unique_id: binary_sensor.dad_s_room_temp_low
+  - unique_id: binary_sensor.dad_s_room_temperature_low
     name: "Temperature Low"
     state: >-
       {{
@@ -210,7 +210,7 @@
         )
       }}
     device_class: problem
-  - unique_id: binary_sensor.living_room_temp_high
+  - unique_id: binary_sensor.living_room_temperature_high
     name: "Temperature High"
     state: >-
       {{
@@ -219,7 +219,7 @@
         float(states('input_number.living_room_temperature_maximum_difference'))
       }}
     icon: "mdi:thermometer-high"
-  - unique_id: binary_sensor.living_room_temp_low
+  - unique_id: binary_sensor.living_room_temperature_low
     name: "Temperature Low"
     state: >-
       {{
@@ -390,7 +390,7 @@
         )
       }}
     device_class: problem
-  - unique_id: binary_sensor.mom_s_room_temp_high
+  - unique_id: binary_sensor.mom_s_room_temperature_high
     name: "Temperature High"
     state: >-
       {{
@@ -399,7 +399,7 @@
         float(states('input_number.mom_s_room_temperature_maximum_difference'))
       }}
     icon: "mdi:thermometer-high"
-  - unique_id: binary_sensor.mom_s_room_temp_low
+  - unique_id: binary_sensor.mom_s_room_temperature_low
     name: "Temperature Low"
     state: >-
       {{
@@ -511,7 +511,7 @@
     unit_of_measurement: "pt"
     state_class: measurement
     icon: "mdi:water-percent-alert"
-  - unique_id: sensor.balcony_temp_difference
+  - unique_id: sensor.balcony_temperature_difference
     name: "Temperature Difference"
     state: >-
       {{
@@ -544,7 +544,7 @@
     name: "AC Mode"
     state: "{{ states('climate.dad_s_room_ac') }}"
     icon: "mdi:thermostat"
-  - unique_id: sensor.dad_s_room_ac_temp
+  - unique_id: sensor.dad_s_room_ac_temperature
     name: "AC Temperature"
     state: "{{ state_attr('climate.dad_s_room_ac', 'temperature') }}"
     unit_of_measurement: "°C"
@@ -583,7 +583,7 @@
     name: "AC Mode"
     state: "{{ states('climate.living_room_ac') }}"
     icon: "mdi:thermostat"
-  - unique_id: sensor.living_room_ac_temp
+  - unique_id: sensor.living_room_ac_target_temperature
     name: "AC Target Temperature"
     state: "{{ state_attr('climate.living_room_ac', 'temperature') }}"
     unit_of_measurement: "°C"
@@ -610,7 +610,7 @@
     name: "AC Mode"
     state: "{{ states('climate.mom_s_room_ac') }}"
     icon: "mdi:thermostat"
-  - unique_id: sensor.mom_s_room_ac_temp
+  - unique_id: sensor.mom_s_room_ac_temperature
     name: "AC Temperature"
     state: "{{ state_attr('climate.mom_s_room_ac', 'temperature') }}"
     unit_of_measurement: "°C"

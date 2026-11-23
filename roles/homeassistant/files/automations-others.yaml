@@ -17,7 +17,7 @@
   mode: single
   trace:
     stored_traces: 100
-- id: automation.start_roomba_combo
+- id: automation.living_room_start_roomba_combo
   alias: "Start Roomba Combo"
   triggers:
     - trigger: time_pattern

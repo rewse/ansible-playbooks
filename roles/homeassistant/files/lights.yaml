@@ -1,17 +1,17 @@
 - platform: group
-  unique_id: living_area_dimming_downlights
+  unique_id: light.living_room_dimming_downlights
   name: "Living Area Dimming Downlights"
   entities:
     - light.living_room_dimming_downlights_south
     - light.living_room_dimming_downlights_north
 - platform: group
-  unique_id: living_area_downlights
+  unique_id: light.living_room_downlights
   name: "Living Area Downlights"
   entities:
     - light.living_room_downlights_south
     - light.living_room_downlights_north
 - platform: group
-  unique_id: living_room_lights
+  unique_id: light.living_room_lights
   name: "Living Room Lights"
   entities:
     - light.living_room_downlights_south
@@ -21,7 +21,7 @@
     - light.living_room_shelf_light
     - light.living_room_downlights_north
 - platform: group
-  unique_id: dad_s_room_lights
+  unique_id: light.dad_s_room_lights
   name: "Dad’s Room Lights"
   entities:
     - light.dad_s_room_pendant_light
@@ -29,7 +29,7 @@
     - light.dad_s_room_floorlight
     - light.dad_s_room_chest_light
 - platform: group
-  unique_id: bathroom_lights
+  unique_id: light.bathroom_lights
   name: "Bathroom Lights"
   entities:
     - light.bathroom_light_left

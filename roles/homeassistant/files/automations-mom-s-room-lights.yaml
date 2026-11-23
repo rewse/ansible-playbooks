@@ -1,4 +1,4 @@
-- id: automation.push_mom_s_room_1_button_switch
+- id: automation.mom_s_room_push_1_button_switch
   alias: "Push 1-Button Switch"
   triggers:
     - trigger: state
@@ -29,7 +29,7 @@
                 option: "Turned off"
   trace:
     stored_traces: 100
-- id: automation.push_mom_s_room_4_button_switch
+- id: automation.mom_s_room_push_4_button_switch
   alias: "Push 4-Button Switch"
   triggers:
     - trigger: state
@@ -84,7 +84,7 @@
                 option: "Turned off"
   trace:
     stored_traces: 100
-- id: automation.select_mom_s_room_light_mode
+- id: automation.mom_s_room_select_light_mode
   alias: "Select Light Mode"
   triggers:
     - trigger: state
@@ -271,7 +271,7 @@
                 option: "Midnight"
   trace:
     stored_traces: 100
-- id: automation.select_mom_s_room_scene
+- id: automation.mom_s_room_select_scene
   alias: "Select Scene"
   triggers:
     - trigger: state
@@ -346,7 +346,7 @@
                 option: scene.mom_s_room_dark
   trace:
     stored_traces: 100
-- id: automation.turn_on_mom_s_room_scene
+- id: automation.mom_s_room_turn_on_scene
   alias: "Turn on Scene"
   triggers:
     - trigger: state

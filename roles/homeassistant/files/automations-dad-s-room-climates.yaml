@@ -1,4 +1,4 @@
-- id: automation.adjust_dad_s_room_ac_temp
+- id: automation.dad_s_room_adjust_ac_temperature
   alias: "Adjust Dad’s Room AC Temperature"
   triggers:
     - trigger: state
@@ -54,7 +54,7 @@
                 minutes: 9
   trace:
     stored_traces: 100
-- id: automation.change_dad_s_room_ac_from_heatcool
+- id: automation.dad_s_room_change_ac_from_heatcool
   alias: "Change AC from HeatCool"
   triggers:
     - trigger: state
@@ -123,7 +123,7 @@
                 temperature: "{{ int(states('input_number.dad_s_room_temperature_target_present_winter')) }}"
   trace:
     stored_traces: 100
-- id: automation.change_dad_s_room_ac_fan_mode
+- id: automation.dad_s_room_change_ac_fan_mode
   alias: "Change AC Fan Mode"
   triggers:
     - trigger: state
@@ -155,7 +155,7 @@
             fan_mode: "Auto"
   trace:
     stored_traces: 100
-- id: automation.change_dad_s_room_ac_mode
+- id: automation.dad_s_room_change_ac_mode
   alias: "Change AC Mode"
   triggers:
     - trigger: time_pattern
@@ -284,7 +284,7 @@
                 minutes: 29
   trace:
     stored_traces: 100
-- id: automation.plan_to_turn_on_dad_s_room_ac_internal_clean
+- id: automation.dad_s_room_plan_to_turn_on_ac_internal_clean
   alias: "Plan to Turn on AC Internal Clean"
   triggers:
     - trigger: state
@@ -301,7 +301,7 @@
           - automation.dad_s_room_turn_on_ac_internal_clean
   trace:
     stored_traces: 100
-- id: automation.recover_from_dad_s_room_ac_manual_internal_clean
+- id: automation.dad_s_room_recover_from_ac_manual_internal_clean
   alias: "Recover from AC Manual Internal Clean"
   triggers:
     - trigger: time
@@ -316,7 +316,7 @@
           - automation.dad_s_room_toggle_ac_heat
   trace:
     stored_traces: 100
-- id: automation.select_dad_s_room_climate_mode
+- id: automation.dad_s_room_select_climate_mode
   alias: "Select Climate Mode"
   triggers:
     - trigger: state
@@ -492,7 +492,7 @@
                 option: "Absent Winter"
   trace:
     stored_traces: 100
-- id: automation.select_dad_s_room_humiture_target
+- id: automation.dad_s_room_select_humiture_target
   alias: "Select Humiture Target"
   triggers:
     - trigger: state
@@ -694,7 +694,7 @@
                     value: "{{ states(repeat.item.src) }}"
   trace:
     stored_traces: 100
-- id: automation.toggle_dad_s_room_ac_cooldry
+- id: automation.dad_s_room_toggle_ac_cooldry
   alias: "Toggle AC CoolDry"
   triggers:
     - trigger: state
@@ -803,7 +803,7 @@
         hours: 2
   trace:
     stored_traces: 100
-- id: automation.toggle_dad_s_room_ac_heat
+- id: automation.dad_s_room_toggle_ac_heat
   alias: "Toggle AC Heat"
   triggers:
     - trigger: state
@@ -881,7 +881,7 @@
         hours: 2
   trace:
     stored_traces: 100
-- id: automation.toggle_dad_s_room_air_purifier
+- id: automation.dad_s_room_toggle_air_purifier
   alias: "Toggle Air Purifier"
   triggers:
     - trigger: state
@@ -916,7 +916,7 @@
                 preset_mode: "pet"
   trace:
     stored_traces: 100
-- id: automation.toggle_dad_s_room_humidifier
+- id: automation.dad_s_room_toggle_humidifier
   alias: "Toggle Humidifier"
   triggers:
     - trigger: state
@@ -978,7 +978,7 @@
         hours: 1
   trace:
     stored_traces: 100
-- id: automation.turn_off_dad_s_room_ac_internal_clean
+- id: automation.dad_s_room_turn_off_ac_internal_clean
   alias: "Turn Off AC Internal Clean"
   triggers:
     - trigger: state
@@ -1000,7 +1000,7 @@
           - automation.dad_s_room_turn_on_ac_internal_clean
   trace:
     stored_traces: 100
-- id: automation.turn_off_dad_s_room_floor_heating
+- id: automation.dad_s_room_turn_off_floor_heating
   alias: "Turn off Floor Heating"
   triggers:
     - trigger: state
@@ -1024,7 +1024,7 @@
           url: "/lovelace/overview"
   trace:
     stored_traces: 100
-- id: automation.turn_on_dad_s_room_ac_internal_clean
+- id: automation.dad_s_room_turn_on_ac_internal_clean
   alias: "Turn on AC Internal Clean"
   triggers:
     - trigger: state
@@ -1040,7 +1040,7 @@
         hvac_mode: "fan_only"
   trace:
     stored_traces: 100
-- id: automation.turn_on_dad_s_room_ac_streamer
+- id: automation.dad_s_room_turn_on_ac_streamer
   alias: "Turn on AC Streamer"
   triggers:
     - trigger: state

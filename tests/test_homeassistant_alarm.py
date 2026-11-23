@@ -24,7 +24,7 @@ class CameraPlugUnavailableTest(unittest.TestCase):
 
     def setUp(self):
         self.alarm = load_automations("automations-alarm.yaml")[
-            "automation.alarm_camera_plug_unavailable"
+            "automation.alarm_camera_plug_is_unavailable"
         ]
         sync = load_automations("automations-securities.yaml")[
             "automation.sync_frigate_cameras"
@@ -73,10 +73,10 @@ class NotificationDisplayNameTest(unittest.TestCase):
 
     NAMED_AUTOMATIONS = (
         "automation.alarm_armed_vacation_windows",
-        "automation.alarm_camera_plug_unavailable",
+        "automation.alarm_camera_plug_is_unavailable",
         "automation.alarm_device_battery_level",
         "automation.alarm_device_offline",
-        "automation.alarm_matter_sensor_offline",
+        "automation.alarm_matter_sensor_is_offline",
     )
 
     CASES = (

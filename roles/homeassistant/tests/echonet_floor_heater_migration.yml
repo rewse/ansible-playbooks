@@ -36,11 +36,11 @@
       ansible.builtin.set_fact:
         homeassistant_toggle_floor_heating_automations: >-
           {{ homeassistant_living_room_climate_automations
-             | selectattr('id', 'equalto', 'automation.toggle_living_area_floor_heating')
+             | selectattr('id', 'equalto', 'automation.living_room_toggle_floor_heating')
              | list }}
         homeassistant_toggle_living_room_ac_heat_automations: >-
           {{ homeassistant_living_room_climate_automations
-             | selectattr('id', 'equalto', 'automation.toggle_living_room_ac_heat')
+             | selectattr('id', 'equalto', 'automation.living_room_toggle_ac_heat')
              | list }}
 
     - name: Verify automations exist

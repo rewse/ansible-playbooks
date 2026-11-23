@@ -6,16 +6,16 @@
   vars:
     room_contracts:
       - alarm_file: automations-dad-s-room.yaml
-        alarm_id: automation.alarm_dad_s_room_temp_difference
+        alarm_id: automation.dad_s_room_alarm_temperature_difference
         anomaly_entity_id: binary_sensor.dad_s_room_thermometer_anomaly
         anomaly_unique_id: binary_sensor.dad_s_room_thermometer_anomaly
         climate_file: automations-dad-s-room-climates.yaml
         control_automation_ids:
-          - automation.adjust_dad_s_room_ac_temp
-          - automation.change_dad_s_room_ac_from_heatcool
-          - automation.change_dad_s_room_ac_mode
-          - automation.toggle_dad_s_room_ac_cooldry
-          - automation.toggle_dad_s_room_ac_heat
+          - automation.dad_s_room_adjust_ac_temperature
+          - automation.dad_s_room_change_ac_from_heatcool
+          - automation.dad_s_room_change_ac_mode
+          - automation.dad_s_room_toggle_ac_cooldry
+          - automation.dad_s_room_toggle_ac_heat
         disagreement_entity_id: binary_sensor.dad_s_room_temperature_disagreement
         disagreement_unique_id: binary_sensor.dad_s_room_temperature_disagreement
         fault_entity_id: binary_sensor.dad_s_room_thermometer_fault
@@ -27,24 +27,24 @@
         secondary_unavailable_seconds: 86400
         smoothed_sensors:
           - entity_id: sensor.dad_s_room_thermometer_secondary_temperature_smoothed
-            unique_id: sensor.dad_s_room_switchbot_meter_temperature_smoothed
+            unique_id: sensor.dad_s_room_thermometer_secondary_temperature_smoothed
           - entity_id: sensor.dad_s_room_thermometer_primary_temperature_smoothed
-            unique_id: sensor.dad_s_room_temperature_smoothed
+            unique_id: sensor.dad_s_room_thermometer_primary_temperature_smoothed
         source_entity_ids:
           - sensor.dad_s_room_thermometer_secondary_temperature
           - sensor.dad_s_room_thermometer_primary_temperature
       - alarm_file: automations-living-room.yaml
-        alarm_id: automation.alarm_living_room_temperature_difference
+        alarm_id: automation.living_room_alarm_temperature_difference
         anomaly_entity_id: binary_sensor.living_room_thermometer_anomaly
         anomaly_unique_id: binary_sensor.living_room_thermometer_anomaly
         climate_file: automations-living-room-climates.yaml
         control_automation_ids:
-          - automation.adjust_living_room_ac_temp
-          - automation.change_living_room_ac_from_heatcool
-          - automation.change_living_room_ac_mode
-          - automation.toggle_living_area_floor_heating
-          - automation.toggle_living_room_ac_cooldry
-          - automation.toggle_living_room_ac_heat
+          - automation.living_room_adjust_ac_temperature
+          - automation.living_room_change_ac_from_heatcool
+          - automation.living_room_change_ac_mode
+          - automation.living_room_toggle_floor_heating
+          - automation.living_room_toggle_ac_cooldry
+          - automation.living_room_toggle_ac_heat
         disagreement_entity_id: binary_sensor.living_room_temperature_disagreement
         disagreement_unique_id: binary_sensor.living_room_temperature_disagreement
         fault_entity_id: binary_sensor.living_room_thermometer_fault
@@ -56,23 +56,23 @@
         secondary_unavailable_seconds: 86400
         smoothed_sensors:
           - entity_id: sensor.living_room_switchbot_hub_temperature_smoothed
-            unique_id: sensor.living_room_switchbot_hub_2_temperature_smoothed
+            unique_id: sensor.living_room_switchbot_hub_temperature_smoothed
           - entity_id: sensor.living_room_thermometer_temperature_smoothed
-            unique_id: sensor.living_room_temperature_smoothed
+            unique_id: sensor.living_room_thermometer_temperature_smoothed
         source_entity_ids:
           - sensor.living_room_switchbot_hub_temperature
           - sensor.living_room_thermometer_temperature
       - alarm_file: automations-mom-s-room.yaml
-        alarm_id: automation.alarm_mom_s_room_temp_difference
+        alarm_id: automation.mom_s_room_alarm_temperature_difference
         anomaly_entity_id: binary_sensor.mom_s_room_thermometer_anomaly
         anomaly_unique_id: binary_sensor.mom_s_room_thermometer_anomaly
         climate_file: automations-mom-s-room-climates.yaml
         control_automation_ids:
-          - automation.adjust_mom_s_room_ac_temp
-          - automation.change_mom_s_room_ac_from_heatcool
-          - automation.change_mom_s_room_ac_mode
-          - automation.toggle_mom_s_room_ac_cooldry
-          - automation.toggle_mom_s_room_ac_heat
+          - automation.mom_s_room_adjust_ac_temperature
+          - automation.mom_s_room_change_ac_from_heatcool
+          - automation.mom_s_room_change_ac_mode
+          - automation.mom_s_room_toggle_ac_cooldry
+          - automation.mom_s_room_toggle_ac_heat
         disagreement_entity_id: binary_sensor.mom_s_room_temperature_disagreement
         disagreement_unique_id: binary_sensor.mom_s_room_temperature_disagreement
         fault_entity_id: binary_sensor.mom_s_room_thermometer_fault
@@ -84,9 +84,9 @@
         secondary_unavailable_seconds: 86400
         smoothed_sensors:
           - entity_id: sensor.mom_s_room_thermometer_secondary_temperature_smoothed
-            unique_id: sensor.mom_s_room_switchbot_meter_temperature_smoothed
+            unique_id: sensor.mom_s_room_thermometer_secondary_temperature_smoothed
           - entity_id: sensor.mom_s_room_thermometer_primary_temperature_smoothed
-            unique_id: sensor.mom_s_room_temperature_smoothed
+            unique_id: sensor.mom_s_room_thermometer_primary_temperature_smoothed
         source_entity_ids:
           - sensor.mom_s_room_thermometer_secondary_temperature
           - sensor.mom_s_room_thermometer_primary_temperature

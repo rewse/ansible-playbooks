@@ -17,7 +17,7 @@
              | list }}
         homeassistant_start_automations: >-
           {{ homeassistant_other_automations
-             | selectattr('id', 'equalto', 'automation.start_roomba_combo')
+             | selectattr('id', 'equalto', 'automation.living_room_start_roomba_combo')
              | list }}
 
     - name: Verify last cleaning record contract

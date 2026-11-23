@@ -1,4 +1,4 @@
-- id: automation.auto_lock_entrance_locks
+- id: automation.entrance_auto_lock_locks
   alias: "Auto-Lock Locks"
   triggers:
     - trigger: time_pattern
@@ -26,7 +26,7 @@
           - lock.entrance_lock_top
   trace:
     stored_traces: 100
-- id: automation.push_entrance_1_button_switch
+- id: automation.entrance_push_1_button_switch
   alias: "Push 1-Button Switch"
   triggers:
     - trigger: state
@@ -78,7 +78,7 @@
   mode: restart
   trace:
     stored_traces: 100
-- id: automation.restart_entrance_sesame_hub
+- id: automation.entrance_restart_sesame_hub
   alias: "Restart Sesame Hub"
   triggers:
     - trigger: state
@@ -129,7 +129,7 @@
         hours: 2
   trace:
     stored_traces: 100
-- id: automation.select_entrance_alarm_control
+- id: automation.entrance_select_alarm_control
   alias: "Select Alarm Control"
   triggers:
     - trigger: state
@@ -153,7 +153,7 @@
             entity_id: alarm_control_panel.entrance
   trace:
     stored_traces: 100
-- id: automatin.select_entrance_auto_lock_time
+- id: automation.entrance_select_auto_lock_time
   alias: "Select Entrance Auto-Lock Time"
   triggers:
     - trigger: state

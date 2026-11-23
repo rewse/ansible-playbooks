@@ -1,4 +1,4 @@
-- id: automation.alarm_mom_s_room_humidity_difference
+- id: automation.mom_s_room_alarm_humidity_difference
   alias: "ALARM: Humidity Difference"
   triggers:
     - trigger: state
@@ -26,7 +26,7 @@
           url: "/lovelace/overview"
   trace:
     stored_traces: 100
-- id: automation.alarm_mom_s_room_temp_difference
+- id: automation.mom_s_room_alarm_temperature_difference
   alias: "ALARM: Temperature Difference"
   triggers:
     - trigger: state
@@ -54,7 +54,7 @@
           url: "/lovelace/overview"
   trace:
     stored_traces: 100
-- id: automation.open_mom_s_room_curtains_nobody
+- id: automation.mom_s_room_open_curtains_nobody
   alias: "Open Curtains Nobody"
   triggers:
     - trigger: sun
@@ -91,7 +91,7 @@
     - action: cover.open_cover
       target:
         entity_id: cover.mom_s_room_curtains
-- id: automation.select_mom_s_room_presence_mode
+- id: automation.mom_s_room_select_presence_mode
   alias: "Select Presence Mode"
   triggers:
     - trigger: state
@@ -133,7 +133,7 @@
                 entity_id: input_boolean.mom_s_room_presence_mode
   trace:
     stored_traces: 100
-- id: automatic.select_mom_s_room_window_mode
+- id: automation.mom_s_room_select_window_mode
   alias: "Select Mom’s Room Window Mode"
   triggers:
     - trigger: state

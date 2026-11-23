@@ -1,4 +1,4 @@
-- id: automation.adjust_living_room_ac_temp
+- id: automation.living_room_adjust_ac_temperature
   alias: "Adjust Living Room AC Temperature"
   triggers:
     - trigger: state
@@ -54,7 +54,7 @@
                 minutes: 9
   trace:
     stored_traces: 100
-- id: automation.change_living_room_ac_from_heatcool
+- id: automation.living_room_change_ac_from_heatcool
   alias: "Change AC from HeatCool"
   triggers:
     - trigger: state
@@ -123,7 +123,7 @@
                 temperature: "{{ int(states('input_number.living_room_temperature_target_present_winter')) }}"
   trace:
     stored_traces: 100
-- id: automation.notify_living_room_climate
+- id: automation.living_room_notify_climate
   alias: "Notify Climate"
   triggers:
     - trigger: event
@@ -202,7 +202,7 @@
                 hours: 2
   trace:
     stored_traces: 100
-- id: automation.change_living_room_ac_mode
+- id: automation.living_room_change_ac_mode
   alias: "Change AC Mode"
   triggers:
     - trigger: time_pattern
@@ -331,7 +331,7 @@
                 minutes: 29
   trace:
     stored_traces: 100
-- id: automation.plan_to_turn_on_living_room_ac_internal_clean
+- id: automation.living_room_plan_to_turn_on_ac_internal_clean
   alias: "Plan to Turn on AC Internal Clean"
   triggers:
     - trigger: state
@@ -348,7 +348,7 @@
           - automation.living_room_turn_on_ac_internal_clean
   trace:
     stored_traces: 100
-- id: automation.recover_from_living_room_ac_manual_internal_clean
+- id: automation.living_room_recover_from_ac_manual_internal_clean
   alias: "Recover from AC Manual Internal Clean"
   triggers:
     - trigger: time
@@ -363,7 +363,7 @@
           - automation.living_room_toggle_ac_heat
   trace:
     stored_traces: 100
-- id: automation.select_living_room_climate_mode
+- id: automation.living_room_select_climate_mode
   alias: "Select Climate Mode"
   triggers:
     - trigger: state
@@ -559,7 +559,7 @@
                 option: "Absent Winter"
   trace:
     stored_traces: 100
-- id: automation.select_living_room_humiture_target
+- id: automation.living_room_select_humiture_target
   alias: "Select Humiture Target"
   triggers:
     - trigger: state
@@ -761,7 +761,7 @@
                     value: "{{ states(repeat.item.src) }}"
   trace:
     stored_traces: 100
-- id: automation.toggle_living_room_ac_cooldry
+- id: automation.living_room_toggle_ac_cooldry
   alias: "Toggle AC CoolDry"
   triggers:
     - trigger: state
@@ -933,7 +933,7 @@
                 hours: 2
   trace:
     stored_traces: 100
-- id: automation.toggle_living_room_ac_heat
+- id: automation.living_room_toggle_ac_heat
   alias: "Toggle AC Heat"
   triggers:
     - trigger: state
@@ -1028,7 +1028,7 @@
                 hours: 2
   trace:
     stored_traces: 100
-- id: automation.toggle_living_room_humidifier
+- id: automation.living_room_toggle_humidifier
   alias: "Toggle Humidifier"
   triggers:
     - trigger: state
@@ -1119,7 +1119,7 @@
                 hours: 1
   trace:
     stored_traces: 100
-- id: automation.turn_off_living_room_ac_internal_clean
+- id: automation.living_room_turn_off_ac_internal_clean
   alias: "Turn Off AC Internal Clean"
   triggers:
     - trigger: state
@@ -1141,7 +1141,7 @@
           - automation.living_room_turn_on_ac_internal_clean
   trace:
     stored_traces: 100
-- id: automation.turn_off_living_room_climate_ventilated
+- id: automation.living_room_turn_off_climate_ventilated
   alias: "Turn off Climate Ventilated"
   triggers:
     - trigger: state
@@ -1185,7 +1185,7 @@
               url: "/lovelace/overview"
   trace:
     stored_traces: 100
-- id: automation.turn_on_living_room_ac_internal_clean
+- id: automation.living_room_turn_on_ac_internal_clean
   alias: "Turn on AC Internal Clean"
   triggers:
     - trigger: state
@@ -1201,7 +1201,7 @@
         hvac_mode: "fan_only"
   trace:
     stored_traces: 100
-- id: automation.toggle_living_room_fan
+- id: automation.living_room_toggle_fan
   alias: "Toggle Fan"
   triggers:
     - trigger: time_pattern
@@ -1235,7 +1235,7 @@
                 entity_id: fan.living_room_fan
   trace:
     stored_traces: 100
-- id: automation.sync_living_area_floor_heater_operation_status
+- id: automation.living_room_sync_floor_heater_operation_status
   alias: "Sync Floor Heater Operation Status"
   description: >-
     Keep the living room and study floor heater operation statuses synchronized
@@ -1311,7 +1311,7 @@
   max: 4
   trace:
     stored_traces: 100
-- id: automation.toggle_living_area_floor_heating
+- id: automation.living_room_toggle_floor_heating
   alias: "Toggle Floor Heating"
   triggers:
     - trigger: state

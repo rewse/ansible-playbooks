@@ -1,4 +1,4 @@
-- id: automation.push_bathroom_1_button_switch
+- id: automation.bathroom_push_1_button_switch
   alias: "Push 1-Button Switch"
   triggers:
     - trigger: state
@@ -29,7 +29,7 @@
                 option: "Turned off"
   trace:
     stored_traces: 100
-- id: automation.select_bathroom_light_mode
+- id: automation.bathroom_select_light_mode
   alias: "Select Light Mode"
   triggers:
     - trigger: state
@@ -71,7 +71,7 @@
                 option: "Dark"
   trace:
     stored_traces: 100
-- id: automation.select_bathroom_scene
+- id: automation.bathroom_select_scene
   alias: "Select Scene"
   triggers:
     - trigger: state
@@ -119,7 +119,7 @@
                 option: "scene.bathroom_dark"
   trace:
     stored_traces: 100
-- id: automation.turn_on_bathroom_scene
+- id: automation.bathroom_turn_on_scene
   alias: "Turn on Scene"
   triggers:
     - trigger: state
