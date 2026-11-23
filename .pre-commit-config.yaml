@@ -32,4 +32,4 @@ repos:
     rev: a11caebebdbf797e1e96611123db279b334a7675  # frozen: 1.40.2
     hooks:
       - id: basedpyright
-        additional_dependencies: [ansible-core, pytest]
+        additional_dependencies: [ansible-core, pytest, pyyaml, websockets]
