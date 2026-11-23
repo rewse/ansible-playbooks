@@ -1,5 +1,6 @@
 """Tests for the Home Assistant naming migration tool."""
 
+import asyncio
 import contextlib
 import io
 import pathlib
@@ -7,10 +8,12 @@ import re
 import sys
 import tempfile
 import unittest
+from unittest import mock
 
 REPO_ROOT = pathlib.Path(__file__).resolve().parents[1]
 sys.path.insert(0, str(REPO_ROOT))
 
+import tools.homeassistant_rename.__main__ as cli_module
 from tools.homeassistant_rename.__main__ import main as cli_main
 from tools.homeassistant_rename.hass import HassError
 from tools.homeassistant_rename.mapping import KEY_ID_FILES
@@ -1087,6 +1090,69 @@ class RegistryTest(unittest.IsolatedAsyncioTestCase):
             ],
         )
         self.assertEqual(len(applied), 4)
+
+    async def test_revert_resumes_after_a_failure(self):
+        class FailingClient(FakeClient):
+            async def call(self, type_: str, **payload):
+                if payload.get("entity_id") == "light.a":
+                    raise HassError("connection lost")
+                return await super().call(type_, **payload)
+
+        rows = [entity_row("light.a", "light.b"), entity_row("light.b", "light.a")]
+        ops = plan_ops(rows, {"light.a", "light.b"})
+        with tempfile.TemporaryDirectory() as tmp:
+            journal = pathlib.Path(tmp) / "journal.jsonl"
+            await apply_ops(FakeClient(), ops, journal, dry_run=False)
+            with self.assertRaises(HassError):
+                await revert(FailingClient(), journal)
+            self.assertEqual(len(journal.read_text().splitlines()), 2)
+            client = FakeClient()
+            await revert(client, journal)
+        self.assertEqual(
+            client.calls,
+            [
+                (
+                    "config/entity_registry/update",
+                    {"entity_id": "light.a", "new_entity_id": "light.b"},
+                ),
+                (
+                    "config/entity_registry/update",
+                    {"entity_id": "light.a_renaming", "new_entity_id": "light.a"},
+                ),
+            ],
+        )
+
+    def test_apply_after_a_full_revert_is_not_refused(self):
+        class ClosingClient(FakeClient):
+            async def close(self) -> None:
+                pass
+
+        async def fake_connect():
+            return ClosingClient(
+                {
+                    "config/area_registry/list": [],
+                    "config/device_registry/list": [],
+                    "config/entity_registry/list": [],
+                    "get_states": [],
+                }
+            )
+
+        ops = plan_ops([entity_row("light.a", "light.b")], {"light.a"})
+        with tempfile.TemporaryDirectory() as tmp:
+            journal = pathlib.Path(tmp) / "journal.jsonl"
+            asyncio.run(apply_ops(FakeClient(), ops, journal, dry_run=False))
+            asyncio.run(revert(FakeClient(), journal))
+            self.assertFalse(journal.exists())
+            self.assertTrue((pathlib.Path(tmp) / "journal.jsonl.reverted").exists())
+            mapping = pathlib.Path(tmp) / "mapping.csv"
+            write_csv([], mapping)
+            with (
+                mock.patch.object(cli_module, "DEFAULT_JOURNAL", journal),
+                mock.patch.object(cli_module, "connect", fake_connect),
+                contextlib.redirect_stdout(io.StringIO()),
+            ):
+                status = cli_main(["apply", "--mapping", str(mapping)])
+        self.assertEqual(status, 0)
 
     async def test_failed_call_keeps_earlier_entries(self):
         class FailingClient(FakeClient):

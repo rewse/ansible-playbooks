@@ -4,6 +4,7 @@ from __future__ import annotations
 
 import dataclasses
 import json
+import os
 import pathlib
 from typing import Any, Literal, Protocol
 
@@ -235,12 +236,34 @@ async def apply_ops(
             file.flush()
 
 
+def _rewrite_journal(journal: pathlib.Path, lines: list[str]) -> None:
+    """Replaces the journal with lines, so a crash leaves the old or new file."""
+    staging = journal.with_name(journal.name + ".tmp")
+    with staging.open("w", encoding="utf-8") as file:
+        file.writelines(line + "\n" for line in lines)
+        file.flush()
+        os.fsync(file.fileno())
+    staging.replace(journal)
+
+
 async def revert(client: Client, journal: pathlib.Path) -> None:
-    """Applies the undo of every journal entry, newest first."""
-    lines = journal.read_text(encoding="utf-8").splitlines()
-    records = [json.loads(line) for line in lines if line.strip()]
-    for record in reversed(records):
+    """Applies the undo of every journal entry, newest first.
+
+    Each undone entry is dropped from the journal as soon as it succeeds, so a
+    revert that stops partway resumes where it stopped. The emptied journal is
+    renamed to <name>.reverted, which frees its path for the next apply.
+    """
+    lines = [
+        line
+        for line in journal.read_text(encoding="utf-8").splitlines()
+        if line.strip()
+    ]
+    while lines:
+        record = json.loads(lines[-1])
         await client.call(record["type"], **record["undo"])
+        lines.pop()
+        _rewrite_journal(journal, lines)
+    journal.replace(journal.with_name(journal.name + ".reverted"))
 
 
 def _yaml_key_renames(rows: list[Row]) -> list[Row]:
