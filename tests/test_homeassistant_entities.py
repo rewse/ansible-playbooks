@@ -5,6 +5,8 @@ import pathlib
 import re
 import unittest
 
+import yaml
+
 REPO_ROOT = pathlib.Path(__file__).resolve().parents[1]
 FILES = REPO_ROOT / "roles" / "homeassistant" / "files"
 
@@ -23,6 +25,21 @@ class AlarmPanelReferenceTest(unittest.TestCase):
             for entity in ALARM_PANEL_REFERENCE.findall(path.read_text()):
                 with self.subTest(file=path.name, entity=entity):
                     self.assertIn(entity, ALARM_PANELS)
+
+
+class HomeKitNameTest(unittest.TestCase):
+    def test_every_included_entity_has_a_unique_name(self):
+        (bridge,) = yaml.safe_load((FILES / "homekit.yaml").read_text())
+        entity_config = bridge.get("entity_config", {})
+        names = []
+        for entity in bridge["filter"]["include_entities"]:
+            with self.subTest(entity=entity):
+                name = entity_config.get(entity, {}).get("name")
+                self.assertTrue(name)
+                # Accessory names use the ASCII apostrophe.
+                self.assertNotIn("\u2019", name)
+                names.append(name)
+        self.assertEqual(len(names), len(set(names)))
 
 
 if __name__ == "__main__":
