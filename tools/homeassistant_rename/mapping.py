@@ -226,9 +226,28 @@ class _Builder:
             is_thermometer = name in PRIMARY_THERMOMETERS | SECONDARY_THERMOMETERS
             if not is_thermometer and looks_like_product_name(name):
                 reasons.append("product name")
+            reasons += self.name_reasons(name)
             result[device_id] = (name, reasons)
         self._name_thermometers(result)
         return result
+
+    def name_reasons(self, name: str) -> list[str]:
+        """Lists the parts of a new name that the rules leave to a person."""
+        reasons = [
+            f"direction abbreviation {word}"
+            for word in rules.direction_abbreviations(name)
+        ]
+        reasons += [
+            f"area name {area} in name"
+            for area in rules.area_names_in(name, self.all_area_names)
+        ]
+        return reasons
+
+    @staticmethod
+    def id_reasons(entity_id: str) -> list[str]:
+        """Flags a new ID with a word repeated, such as camera_camera_fps."""
+        run = rules.repeated_tokens(entity_id.split(".", 1)[1])
+        return [f"repeated {run} in ID"] if run else []
 
     def _name_thermometers(self, names: dict[str, tuple[str, list[str]]]) -> None:
         by_room: dict[str, list[str]] = defaultdict(list)
@@ -383,7 +402,14 @@ class _Builder:
             return
         domain = row.old_id.split(".", 1)[0]
         row.new_id = f"{domain}.{self.slugs[self.device_entity_name(entity, area_id)]}"
-        row.status = _status([], row.new_id != row.old_id)
+        changed = row.new_id != row.old_id
+        reasons = self.changed_reasons(row) if changed else []
+        row.status = _status(reasons, changed)
+        row.note = "; ".join(reasons)
+
+    def changed_reasons(self, row: Row) -> list[str]:
+        """Flags the new name and ID of an entity row that changes."""
+        return self.name_reasons(row.new_name) + self.id_reasons(row.new_id)
 
     def _flag_unknown_area(self, row: Row, area_id: str) -> bool:
         """Marks a row for review when its area is not in the snapshot.
@@ -427,6 +453,8 @@ class _Builder:
         row.room = area_id
         row.new_id = f"{domain}.{rules.expand_abbreviations(new_object_id)}"
         changed = row.new_id != row.old_id or row.new_name != row.old_name
+        if changed:
+            reasons += self.changed_reasons(row)
         row.status = _status(reasons, changed)
         row.note = "; ".join(reasons)
 

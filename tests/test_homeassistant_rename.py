@@ -494,6 +494,73 @@ class MappingTest(unittest.TestCase):
                     self.assertNotIn("product name", row.note)
                     self.assertEqual(row.status, "auto")
 
+    def test_names_with_rule_gaps_need_review(self):
+        cases = [
+            ("Living Room Study Window Sensor N", "direction abbreviation N"),
+            ("Living Room Window Sensor NE Left", "direction abbreviation NE"),
+            ("Dad’s Room Camera (Dad's Room Camera)", "area name Dad's Room"),
+            ("Living Room Lamp (living room)", "area name Living Room"),
+        ]
+        for name, reason in cases:
+            with self.subTest(name):
+                snapshot = mapping_snapshot([device("d1", "dads_room", name)], [])
+                row = rows_by_key(build_rows(snapshot, NO_YAML, fake_slugify))["d1"]
+                self.assertEqual(row.status, "review")
+                self.assertIn(reason, row.note)
+
+    def test_words_that_contain_a_direction_or_area_are_not_flagged(self):
+        snapshot = mapping_snapshot(
+            [device("d1", "living_room", "Living Room Nest Balconyx Window Sensor")],
+            [],
+        )
+        row = rows_by_key(build_rows(snapshot, NO_YAML, fake_slugify))["d1"]
+        self.assertEqual(row.status, "auto", row.note)
+
+    def test_repeated_tokens_in_new_ids_need_review(self):
+        cases = [
+            (
+                "switch.living_room_motion_sensor_motion",
+                entity(
+                    "switch.living_room_motion_sensor_motion",
+                    "d1",
+                    original_name="Motion Sensor Enabled",
+                ),
+                "switch.living_room_motion_sensor_motion_sensor_enabled",
+            ),
+            (
+                "sensor.living_room_camera_fps",
+                entity("sensor.living_room_camera_fps", "d2", original_name="Camera FPS"),
+                "sensor.living_room_camera_camera_fps",
+            ),
+            (
+                "sensor.dads_room_room_wbgt",
+                entity("sensor.dads_room_room_wbgt", platform="template"),
+                "sensor.dad_s_room_room_wbgt",
+            ),
+        ]
+        snapshot = mapping_snapshot(
+            [
+                device("d1", "living_room", "Living Room Motion Sensor"),
+                device("d2", "living_room", "Living Room Camera"),
+            ],
+            [case[1] for case in cases],
+        )
+        rows = rows_by_key(build_rows(snapshot, NO_YAML, fake_slugify))
+        for key, _, new_id in cases:
+            with self.subTest(key):
+                self.assertEqual(rows[key].new_id, new_id)
+                self.assertEqual(rows[key].status, "review")
+                self.assertIn("repeated", rows[key].note)
+
+    def test_unchanged_rows_are_not_flagged(self):
+        snapshot = mapping_snapshot(
+            [], [entity("sensor.dad_s_room_room_wbgt", platform="template")]
+        )
+        row = rows_by_key(build_rows(snapshot, NO_YAML, fake_slugify))[
+            "sensor.dad_s_room_room_wbgt"
+        ]
+        self.assertEqual(row.status, "skip")
+
     def test_thermometer_pair_names_are_not_product_names(self):
         snapshot = mapping_snapshot(
             [
