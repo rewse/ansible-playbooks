@@ -778,8 +778,27 @@ class UserOwnedPathTest(unittest.TestCase):
 # Service data that holds credentials, signing secrets, and device keys. Only
 # root and the containers that bind-mount them use these trees, and a container
 # reaches its mount without traversing the host path.
-PRIVATE_DATA_DIRECTORIES = ("/srv/couchdb", "/srv/homeassistant/config", "/srv/nvr")
+PRIVATE_DATA_DIRECTORIES = (
+    "/srv/couchdb",
+    "/srv/homeassistant/config",
+    "/srv/nas/data/nvr",
+    "/srv/nvr",
+)
 HOME_ASSISTANT_CONFIG = "/srv/homeassistant/config"
+
+
+def resolve_path(path: str, variables: dict[str, str]) -> str:
+    # Expands role variables such as "{{ nvr_media_dir }}", which may refer to
+    # further variables. A path that needs anything else is returned as is.
+    environment = jinja2.Environment(undefined=jinja2.StrictUndefined)
+    for _ in range(5):
+        if "{{" not in path:
+            break
+        try:
+            path = environment.from_string(path).render(**variables)
+        except jinja2.TemplateError:
+            break
+    return path
 
 
 def file_task_paths(task: dict) -> list[str]:
@@ -787,7 +806,7 @@ def file_task_paths(task: dict) -> list[str]:
     path = str(spec.get("path", ""))
     if "{{ item }}" in path:
         return [path.replace("{{ item }}", str(item)) for item in task.get("loop", [])]
-    return [path]
+    return [resolve_path(path, role_variables())]
 
 
 class PrivateDataDirectoryTest(unittest.TestCase):
