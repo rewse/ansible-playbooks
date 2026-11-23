@@ -32,6 +32,9 @@
       icon: "mdi:clock-outline"
     - name: "Tokyo Weather Max Temp"
       unique_id: "sensor.tokyo_weather_max_temp"
+      # The forecast drops a temperature once its time has passed, such as today's
+      # maximum in the evening; int() would then fail and the sensor would not load.
+      availability: "{{ value_json is not none and value_json.forecasts[0].temperature.max.celsius is not none }}"
       value_template: "{{ int(value_json.forecasts[0].temperature.max.celsius) }}"
       unit_of_measurement: "°C"
       device_class: temperature
@@ -80,6 +83,7 @@
       icon: "mdi:weather-partly-cloudy"
     - name: "Tokyo Weather Max Temp Day 1"
       unique_id: "sensor.tokyo_weather_max_temp_1"
+      availability: "{{ value_json is not none and value_json.forecasts[1].temperature.max.celsius is not none }}"
       value_template: "{{ int(value_json.forecasts[1].temperature.max.celsius) }}"
       unit_of_measurement: "°C"
       device_class: temperature
@@ -87,6 +91,7 @@
       icon: "mdi:thermometer"
     - name: "Tokyo Weather Min Temp Day 1"
       unique_id: "sensor.tokyo_weather_min_temp_1"
+      availability: "{{ value_json is not none and value_json.forecasts[1].temperature.min.celsius is not none }}"
       value_template: "{{ int(value_json.forecasts[1].temperature.min.celsius) }}"
       unit_of_measurement: "°C"
       device_class: temperature
@@ -135,6 +140,7 @@
       icon: "mdi:weather-partly-cloudy"
     - name: "Tokyo Weather Max Temp Day 2"
       unique_id: "sensor.tokyo_weather_max_temp_2"
+      availability: "{{ value_json is not none and value_json.forecasts[2].temperature.max.celsius is not none }}"
       value_template: "{{ int(value_json.forecasts[2].temperature.max.celsius) }}"
       unit_of_measurement: "°C"
       device_class: temperature
@@ -142,6 +148,7 @@
       icon: "mdi:thermometer"
     - name: "Tokyo Weather Min Temp Day 2"
       unique_id: "sensor.tokyo_weather_min_temp_2"
+      availability: "{{ value_json is not none and value_json.forecasts[2].temperature.min.celsius is not none }}"
       value_template: "{{ int(value_json.forecasts[2].temperature.min.celsius) }}"
       unit_of_measurement: "°C"
       device_class: temperature
