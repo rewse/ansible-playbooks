@@ -485,11 +485,20 @@ git commit -m "feat(homeassistant): preserve helper values and rewrite dashboard
 Run: Task 3 Step 5 の `snapshot`、続けて `... python -m tools.homeassistant_rename map --snapshot ~/.local/state/homeassistant-rename/snapshot.json --out ~/.local/state/homeassistant-rename/mapping.csv`
 Expected: exit 0。`review` の行数と `conflict` の行数を数えて報告する
 
-- [ ] **Step 2: 利用者に CSV を確かめてもらう**
+- [ ] **Step 2: 利用者に review の行を埋めてもらう**
 
-`review` の行（修飾語、一般名称、Plug と Switch の役割、Hue のルームグループの新しい名前、`South` 側のデバイス）を利用者に埋めてもらう。すべての行が `auto` か `skip` になるまで繰り返す。`conflict` が残ったまま次に進まない
+`review` の行（修飾語、一般名称、Plug と Switch の役割、Hue のルームグループの新しい名前、`South` 側のデバイス）の答えを、利用者に `~/.local/state/homeassistant-rename/overrides.csv` へ書いてもらう。列は `kind,key,new_name,new_id,status` で、`new_id` と `status` は省いてよい。`map` を作り直すと `mapping.csv` は上書きされるので、`mapping.csv` を直接直さない。
 
-- [ ] **Step 3: 消去方針を AGENTS.md に足してコミットする**
+- デバイスの行の `new_name` は、そのデバイスのエンティティの ID にも使われる。デバイスが `review` のあいだ、そのエンティティも `device under review` として `review` になる
+- エンティティの行の `new_name` はエンティティ自身の名前で、Main entity なら空にする。`new_id` を書くと、その ID に固定する
+- `status` を書くと、衝突を除いてその値になる。書かなければ、生成した名前と同じ検査を受ける
+
+- [ ] **Step 3: 答えを当ててマッピングを作り直し、検証する**
+
+Run: `... python -m tools.homeassistant_rename map --snapshot ~/.local/state/homeassistant-rename/snapshot.json --overrides ~/.local/state/homeassistant-rename/overrides.csv --out ~/.local/state/homeassistant-rename/mapping.csv`、続けて `... python -m tools.homeassistant_rename validate --mapping ~/.local/state/homeassistant-rename/mapping.csv --snapshot ~/.local/state/homeassistant-rename/snapshot.json`
+Expected: `validate` が exit 0。exit 1 なら、出力の行（残った `review`、重なる新しい ID、移さないエンティティが持つ新しい ID）の答えを `overrides.csv` に足してもらい、Step 3 を繰り返す。`validate` が通るまで次に進まない
+
+- [ ] **Step 4: 消去方針を AGENTS.md に足してコミットする**
 
 ```bash
 git add AGENTS.md
@@ -501,21 +510,26 @@ git commit -m "docs: add a purge policy for the Home Assistant rename state"
 **Files:**
 - Modify: `roles/homeassistant/files/*`、`roles/homeassistant/tests/*`、`tests/test_homeassistant_*.py`（ツールが書き換える）
 
-- [ ] **Step 1: 書き換える**
+- [ ] **Step 1: 書き換える前の問題を控える**
+
+Run: `... python -m tools.homeassistant_rename check --snapshot ~/.local/state/homeassistant-rename/snapshot.json --mapping ~/.local/state/homeassistant-rename/mapping.csv --write-baseline ~/.local/state/homeassistant-rename/check-baseline.json`
+Expected: exit 0。今の ID を正しいものとして数えた、書き換える前からある問題の件数を報告する
+
+- [ ] **Step 2: 書き換える**
 
 Run: `... python -m tools.homeassistant_rename rewrite --mapping ~/.local/state/homeassistant-rename/mapping.csv`
 
-- [ ] **Step 2: 移行後の ID で参照を検査する**
+- [ ] **Step 3: 移行後の ID で参照を検査する**
 
-Run: `... python -m tools.homeassistant_rename check --snapshot ~/.local/state/homeassistant-rename/snapshot.json --mapping ~/.local/state/homeassistant-rename/mapping.csv`
-Expected: 問題が 0 件
+Run: `... python -m tools.homeassistant_rename check --snapshot ~/.local/state/homeassistant-rename/snapshot.json --mapping ~/.local/state/homeassistant-rename/mapping.csv --baseline ~/.local/state/homeassistant-rename/check-baseline.json`
+Expected: exit 0。控えにない問題が 0 件。書き換えで残った古い ID は控えにないので、ここで問題として出る
 
-- [ ] **Step 3: テストと lint を通す**
+- [ ] **Step 4: テストと lint を通す**
 
 Run: `uv run --with pytest --with ansible-core pytest tests -q`、`for f in roles/homeassistant/tests/*.yml; do ansible-playbook "$f" || break; done`、`uvx --with pre-commit-uv==4.3.0 pre-commit@4.6.2 run --all-files --show-diff-on-failure`
 Expected: すべて exit 0
 
-- [ ] **Step 4: コミットする（まだデプロイしない）**
+- [ ] **Step 5: コミットする（まだデプロイしない）**
 
 ```bash
 git add roles/homeassistant tests
@@ -524,7 +538,9 @@ git commit -m "refactor(homeassistant): rename entity references to the unified 
 
 ### Task 11: 移行する
 
-一日で家全体を切り替える。途中で止めるときは、`revert` で登録情報を戻し、Task 10 のコミットをデプロイしないまま残す。
+一日で家全体を切り替える。
+
+**途中で止めるとき:** `revert --journal ~/.local/state/homeassistant-rename/journal.jsonl` は、Step 3 で変えたエリア名、デバイス名、エンティティの名前と ID を新しい順に戻す。`restore-storage --backup-dir ~/.local/state/homeassistant-rename/storage-backup` は、Step 6 で書き換えたダッシュボードとエネルギー設定を書き換える前の内容で保存し直す。Task 10 のコミットをデプロイしなければ、Home Assistant の YAML は古いキーと古い ID のまま残る。Step 4 でデプロイしたあとなら、Task 10 の前のコミットをデプロイし直す。Step 5 で消した古い登録と、入れ直したヘルパーの値は戻らない。古いキーのヘルパーはデプロイし直すと登録が作り直され、値は初期値から始まる。
 
 - [ ] **Step 1: 前提を確かめる**
 
@@ -547,8 +563,8 @@ Expected: exit 0。再起動が終わってから次に進む
 
 - [ ] **Step 5: 値を入れ直し、古い登録を消す**
 
-Run: `restore --captured ~/.local/state/homeassistant-rename/captured.json`、`assign-areas --mapping ...`、`remove-orphans --mapping ...`
-Expected: 新しい ID のヘルパーが控えた値になり、エリアが付いている
+Run: `restore --captured ~/.local/state/homeassistant-rename/captured.json`、`assign-areas --mapping ... --snapshot ...`（Step 2 のスナップショット）、`remove-orphans --mapping ... --dry-run`、出力を確かめてから `remove-orphans --mapping ...`
+Expected: 新しい ID のヘルパーが控えた値になり、エリアと古い登録のラベルが付いている。キーを変えないヘルパーにもエリアが付いている。`--dry-run` の出力は、キーを変えた `yaml_key` 行の古い ID だけで、再起動のあとに `restored: true` の `unavailable` として残っているものも含む
 
 - [ ] **Step 6: ダッシュボードとエネルギー設定を書き換える**
 
@@ -560,7 +576,7 @@ Alexa アプリでデバイスを検出し直し、定型アクションが動�
 
 - [ ] **Step 8: 動作を確かめる**
 
-`sudo docker logs homeassistant` と Repairs に、存在しないエンティティへの参照がない。新しいスナップショットで `check` が 0 件。`sensor.living_room_thermometer_temperature` の履歴に移行前の値が残っている。故障検知のテンプレート（`binary_sensor.*_thermometer_fault`）が `off` になっている
+`sudo docker logs homeassistant` と Repairs に、存在しないエンティティへの参照がない。新しいスナップショットで `check --baseline ~/.local/state/homeassistant-rename/check-baseline.json` が 0 件。`sensor.living_room_thermometer_temperature` の履歴に移行前の値が残っている。故障検知のテンプレート（`binary_sensor.*_thermometer_fault`）が `off` になっている
 
 - [ ] **Step 9: プッシュする**
 
