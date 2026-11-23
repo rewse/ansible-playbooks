@@ -19,10 +19,15 @@
       data:
         title: "⚠️ ALARM"
         message: >-
-          {{
-            trigger.to_state.attributes.friendly_name or
-            trigger.entity_id.split('.')[1]
-          }} opend
+          {%- set area = area_name(trigger.entity_id) or '' -%}
+          {%- set device = device_name(trigger.entity_id) or '' -%}
+          {%- set entity = entity_name(trigger.entity_id) or '' -%}
+          {%- set has_area = area and (
+            (device ~ ' ').startswith(area ~ ' ') or
+            (entity ~ ' ').startswith(area ~ ' ')
+          ) -%}
+          {%- set parts = [device, entity] if has_area else [area, device, entity] -%}
+          {{ parts | select | join(' ') or trigger.entity_id.split('.')[1] }} opend
         data:
           url: "/dashboard-securities/"
     - delay:
@@ -50,10 +55,15 @@
       data:
         title: "⚠ ALARM"
         message: >-
-          {{
-            trigger.to_state.attributes.friendly_name or
-            trigger.entity_id.split('.')[1]
-          }} is Unavailable; Frigate recording is off
+          {%- set area = area_name(trigger.entity_id) or '' -%}
+          {%- set device = device_name(trigger.entity_id) or '' -%}
+          {%- set entity = entity_name(trigger.entity_id) or '' -%}
+          {%- set has_area = area and (
+            (device ~ ' ').startswith(area ~ ' ') or
+            (entity ~ ' ').startswith(area ~ ' ')
+          ) -%}
+          {%- set parts = [device, entity] if has_area else [area, device, entity] -%}
+          {{ parts | select | join(' ') or trigger.entity_id.split('.')[1] }} is Unavailable; Frigate recording is off
         data:
           url: "/dashboard-securities/"
           push:
@@ -109,10 +119,15 @@
       data:
         title: "⚠️ ALARM"
         message: >-
-          {{
-            trigger.to_state.attributes.friendly_name or
-            trigger.entity_id.split('.')[1]
-          }}’s battery level is low
+          {%- set area = area_name(trigger.entity_id) or '' -%}
+          {%- set device = device_name(trigger.entity_id) or '' -%}
+          {%- set entity = entity_name(trigger.entity_id) or '' -%}
+          {%- set has_area = area and (
+            (device ~ ' ').startswith(area ~ ' ') or
+            (entity ~ ' ').startswith(area ~ ' ')
+          ) -%}
+          {%- set parts = [device, entity] if has_area else [area, device, entity] -%}
+          {{ parts | select | join(' ') or trigger.entity_id.split('.')[1] }}’s battery level is low
           Current: {{ trigger.to_state.state }}%
         data:
           url: "/dashboard-internal/internal"
@@ -155,10 +170,15 @@
       data:
         title: "⚠️ ALARM"
         message: >-
-          {{
-            trigger.to_state.attributes.friendly_name or
-            trigger.entity_id.split('.')[1]
-          }} is Offline
+          {%- set area = area_name(trigger.entity_id) or '' -%}
+          {%- set device = device_name(trigger.entity_id) or '' -%}
+          {%- set entity = entity_name(trigger.entity_id) or '' -%}
+          {%- set has_area = area and (
+            (device ~ ' ').startswith(area ~ ' ') or
+            (entity ~ ' ').startswith(area ~ ' ')
+          ) -%}
+          {%- set parts = [device, entity] if has_area else [area, device, entity] -%}
+          {{ parts | select | join(' ') or trigger.entity_id.split('.')[1] }} is Offline
         data:
           url: "/dashboard-internal/internal"
           push:
@@ -288,10 +308,15 @@
       data:
         title: "⚠️ ALARM"
         message: >-
-          {{
-            trigger.to_state.attributes.friendly_name or
-            trigger.entity_id.split('.')[1]
-          }} has a problem
+          {%- set area = area_name(trigger.entity_id) or '' -%}
+          {%- set device = device_name(trigger.entity_id) or '' -%}
+          {%- set entity = entity_name(trigger.entity_id) or '' -%}
+          {%- set has_area = area and (
+            (device ~ ' ').startswith(area ~ ' ') or
+            (entity ~ ' ').startswith(area ~ ' ')
+          ) -%}
+          {%- set parts = [device, entity] if has_area else [area, device, entity] -%}
+          {{ parts | select | join(' ') or trigger.entity_id.split('.')[1] }} has a problem
         data:
           url: "/dashboard-internal/internal"
           push:
