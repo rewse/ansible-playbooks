@@ -787,9 +787,16 @@
     name: "Humidifier"
     state: '{{ float(states(''sensor.living_room_humidifier_plug_power'')) > 3 }}'
   - unique_id: switch.living_room_tv
+    # The REGZA power key toggles, so send it only when the TV is in the other state.
     turn_on:
+    - condition: state
+      entity_id: switch.living_room_tv
+      state: "off"
     - action: shell_command.control_toggle_regza
     turn_off:
+    - condition: state
+      entity_id: switch.living_room_tv
+      state: "on"
     - action: shell_command.control_toggle_regza
     default_entity_id: switch.living_room_tv
     icon: mdi:television

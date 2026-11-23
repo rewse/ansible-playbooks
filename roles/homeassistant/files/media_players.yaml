@@ -1,14 +1,22 @@
 - platform: universal
-  name: "Regza"
+  unique_id: media_player.living_room_tv
+  name: "TV"
+  device_class: tv
+  # The REGZA reports nothing back; the TV switch derives on/off from the
+  # plug's power draw.
+  state_template: "{{ states('switch.living_room_tv') }}"
   commands:
     turn_on:
-      service: shell_command.control_toggle_regza
+      action: switch.turn_on
+      target:
+        entity_id: switch.living_room_tv
     turn_off:
-      service: shell_command.control_toggle_regza
-    volume_up:
-      service: shell_command.control_volume_up_regza
+      action: switch.turn_off
+      target:
+        entity_id: switch.living_room_tv
     volume_down:
-      service: shell_command.control_volume_down_regza
+      action: shell_command.control_volume_down_regza
     volume_mute:
-      service: shell_command.control_mute_regza
-  device_class: tv
+      action: shell_command.control_mute_regza
+    volume_up:
+      action: shell_command.control_volume_up_regza
