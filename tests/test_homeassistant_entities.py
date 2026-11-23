@@ -42,5 +42,22 @@ class HomeKitNameTest(unittest.TestCase):
         self.assertEqual(len(names), len(set(names)))
 
 
+class SceneOptionTest(unittest.TestCase):
+    # Hue provides the light group scenes; scenes.yaml defines the others.
+    HUE_SCENE = re.compile(r"^scene\.[a-z0-9_]+_light_group_[a-z0-9_]+$")
+
+    def test_every_scene_option_is_defined(self):
+        defined = {
+            scene["id"] for scene in yaml.safe_load((FILES / "scenes.yaml").read_text())
+        }
+        input_selects = yaml.safe_load((FILES / "input_selects.yaml").read_text())
+        for key, config in input_selects.items():
+            for option in config["options"]:
+                if not option.startswith("scene.") or self.HUE_SCENE.match(option):
+                    continue
+                with self.subTest(input_select=key, scene=option):
+                    self.assertIn(option, defined)
+
+
 if __name__ == "__main__":
     unittest.main()

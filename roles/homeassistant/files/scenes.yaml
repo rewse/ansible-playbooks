@@ -1,3 +1,13 @@
+- id: scene.bathroom_dark
+  name: "Dark"
+  entities:
+    light.bathroom_light_left:
+      state: "off"
+    light.bathroom_light_middle:
+      state: "off"
+    light.bathroom_light_right:
+      state: "off"
+  icon: "mdi:bed"
 - id: scene.dad_s_room_dark
   name: "Dark"
   entities:
