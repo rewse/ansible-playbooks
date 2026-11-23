@@ -14,7 +14,7 @@
       for:
         minutes: "{{ int(states('input_number.entrance_auto_lock_minutes')) }}"
     - condition: state
-      entity_id: binary_sensor.entrance_door_sensor_door
+      entity_id: binary_sensor.entrance_door_sensor
       state: "off"
       for:
         minutes: "{{ int(states('input_number.entrance_auto_lock_minutes')) }}"
@@ -82,7 +82,7 @@
   alias: "Restart Sesame Hub"
   triggers:
     - trigger: state
-      entity_id: binary_sensor.entrance_door_sensor_door
+      entity_id: binary_sensor.entrance_door_sensor
       to: "off"
       for:
         minutes: "{{ int(states('input_number.entrance_auto_lock_minutes')) + 10 }}"

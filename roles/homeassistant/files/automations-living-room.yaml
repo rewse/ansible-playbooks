@@ -66,9 +66,9 @@
       above: 1000
     - condition: state
       entity_id:
-        - binary_sensor.living_room_window_sensor_south_door
-        - binary_sensor.living_room_window_sensor_north_door
-        - binary_sensor.living_room_window_sensor_center_door
+        - binary_sensor.living_room_window_sensor_south
+        - binary_sensor.living_room_window_sensor_north
+        - binary_sensor.living_room_window_sensor_center
       state: "off"
   actions:
     - action: notify.all_devices
@@ -179,9 +179,9 @@
   triggers:
     - trigger: state
       entity_id:
-        - binary_sensor.living_room_window_sensor_south_door
-        - binary_sensor.living_room_window_sensor_north_door
-        - binary_sensor.living_room_window_sensor_center_door
+        - binary_sensor.living_room_window_sensor_south
+        - binary_sensor.living_room_window_sensor_north
+        - binary_sensor.living_room_window_sensor_center
     - trigger: homeassistant
       event: start
   actions:
@@ -189,9 +189,9 @@
         - conditions:
             - condition: state
               entity_id:
-                - binary_sensor.living_room_window_sensor_south_door
-                - binary_sensor.living_room_window_sensor_north_door
-                - binary_sensor.living_room_window_sensor_center_door
+                - binary_sensor.living_room_window_sensor_south
+                - binary_sensor.living_room_window_sensor_north
+                - binary_sensor.living_room_window_sensor_center
               match: any
               state: "on"
           sequence:
@@ -201,9 +201,9 @@
         - conditions:
             - condition: state
               entity_id:
-                - binary_sensor.living_room_window_sensor_south_door
-                - binary_sensor.living_room_window_sensor_north_door
-                - binary_sensor.living_room_window_sensor_center_door
+                - binary_sensor.living_room_window_sensor_south
+                - binary_sensor.living_room_window_sensor_north
+                - binary_sensor.living_room_window_sensor_center
               state: "off"
           sequence:
             - action: input_boolean.turn_off

@@ -3,12 +3,12 @@
   triggers:
     - trigger: state
       entity_id:
-        - binary_sensor.entrance_door_sensor_door
-        - binary_sensor.living_room_window_sensor_south_door
-        - binary_sensor.living_room_window_sensor_north_door
-        - binary_sensor.living_room_window_sensor_center_door
-        - binary_sensor.mom_s_room_window_sensor_north_door
-        - binary_sensor.mom_s_room_window_sensor_south_door
+        - binary_sensor.entrance_door_sensor
+        - binary_sensor.living_room_window_sensor_south
+        - binary_sensor.living_room_window_sensor_north
+        - binary_sensor.living_room_window_sensor_center
+        - binary_sensor.mom_s_room_window_sensor_north
+        - binary_sensor.mom_s_room_window_sensor_south
       to: "on"
   conditions:
     - condition: state

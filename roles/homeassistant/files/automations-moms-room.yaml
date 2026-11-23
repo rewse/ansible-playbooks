@@ -138,8 +138,8 @@
   triggers:
     - trigger: state
       entity_id:
-        - binary_sensor.mom_s_room_window_sensor_north_door
-        - binary_sensor.mom_s_room_window_sensor_south_door
+        - binary_sensor.mom_s_room_window_sensor_north
+        - binary_sensor.mom_s_room_window_sensor_south
     - trigger: homeassistant
       event: start
   actions:
@@ -147,8 +147,8 @@
         - conditions:
             - condition: state
               entity_id:
-                - binary_sensor.mom_s_room_window_sensor_north_door
-                - binary_sensor.mom_s_room_window_sensor_south_door
+                - binary_sensor.mom_s_room_window_sensor_north
+                - binary_sensor.mom_s_room_window_sensor_south
               match: any
               state: "on"
           sequence:
@@ -158,8 +158,8 @@
         - conditions:
             - condition: state
               entity_id:
-                - binary_sensor.mom_s_room_window_sensor_north_door
-                - binary_sensor.mom_s_room_window_sensor_south_door
+                - binary_sensor.mom_s_room_window_sensor_north
+                - binary_sensor.mom_s_room_window_sensor_south
               state: "off"
           sequence:
             - action: input_boolean.turn_off
