@@ -1556,6 +1556,88 @@ class RegistryTest(unittest.IsolatedAsyncioTestCase):
             [("config/entity_registry/remove", {"entity_id": "input_boolean.a"})],
         )
 
+    async def test_remove_orphans_treats_restored_states_as_missing(self):
+        rows = [
+            entity_row("input_boolean.a", "input_boolean.x", source="yaml_key"),
+            entity_row("input_boolean.b", "input_boolean.y", source="yaml_key"),
+        ]
+        results = {
+            "config/entity_registry/list": [
+                {"entity_id": "input_boolean.a"},
+                {"entity_id": "input_boolean.b"},
+            ],
+            "get_states": [
+                {
+                    "attributes": {"restored": True},
+                    "entity_id": "input_boolean.a",
+                    "state": "unavailable",
+                },
+                {"attributes": {}, "entity_id": "input_boolean.b", "state": "on"},
+            ],
+        }
+        client = FakeClient(results)
+        self.assertEqual(
+            await remove_orphans(client, rows, dry_run=True), ["input_boolean.a"]
+        )
+        self.assertFalse(any(call[0].endswith("/remove") for call in client.calls))
+        client = FakeClient(results)
+        self.assertEqual(await remove_orphans(client, rows), ["input_boolean.a"])
+        self.assertEqual(
+            [call for call in client.calls if call[0].endswith("/remove")],
+            [("config/entity_registry/remove", {"entity_id": "input_boolean.a"})],
+        )
+
+    async def test_assign_areas_covers_unchanged_keys_and_copies_labels(self):
+        rows = [
+            entity_row("input_boolean.a", "input_boolean.x", source="yaml_key"),
+            entity_row("input_boolean.s", "input_boolean.s", source="yaml_key"),
+            entity_row(
+                "input_boolean.r", "input_boolean.q", source="yaml_key", status="review"
+            ),
+            entity_row("input_boolean.done", "input_boolean.done", source="yaml_key"),
+        ]
+        snapshot = Snapshot(
+            areas=[],
+            devices=[],
+            entities=[
+                {"entity_id": "input_boolean.a", "labels": ["heating"]},
+                {"entity_id": "input_boolean.s", "labels": ["kept"]},
+            ],
+            states={},
+        )
+        client = FakeClient(
+            {
+                "config/entity_registry/list": [
+                    {"area_id": None, "entity_id": "input_boolean.x", "labels": []},
+                    {"area_id": None, "entity_id": "input_boolean.s", "labels": []},
+                    {"area_id": None, "entity_id": "input_boolean.q", "labels": []},
+                    {
+                        "area_id": "dads_room",
+                        "entity_id": "input_boolean.done",
+                        "labels": [],
+                    },
+                ]
+            }
+        )
+        await assign_areas(client, rows, snapshot)
+        self.assertEqual(
+            client.calls[1:],
+            [
+                (
+                    "config/entity_registry/update",
+                    {
+                        "area_id": "dads_room",
+                        "entity_id": "input_boolean.x",
+                        "labels": ["heating"],
+                    },
+                ),
+                (
+                    "config/entity_registry/update",
+                    {"area_id": "dads_room", "entity_id": "input_boolean.s"},
+                ),
+            ],
+        )
+
     async def test_assign_areas_sets_room_on_registered_new_ids(self):
         rows = [
             entity_row("input_boolean.a", "input_boolean.x", source="yaml_key"),
@@ -1568,13 +1650,15 @@ class RegistryTest(unittest.IsolatedAsyncioTestCase):
                 ]
             }
         )
-        await assign_areas(client, rows)
+        await assign_areas(
+            client, rows, Snapshot(areas=[], devices=[], entities=[], states={})
+        )
         self.assertEqual(
             client.calls[1:],
             [
                 (
                     "config/entity_registry/update",
-                    {"entity_id": "input_boolean.x", "area_id": "dads_room"},
+                    {"area_id": "dads_room", "entity_id": "input_boolean.x"},
                 )
             ],
         )

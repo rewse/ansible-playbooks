@@ -142,7 +142,9 @@ async def run_revert(args: argparse.Namespace) -> None:
 async def run_remove_orphans(args: argparse.Namespace) -> None:
     client = await connect()
     try:
-        removed = await remove_orphans(client, read_csv(args.mapping))
+        removed = await remove_orphans(
+            client, read_csv(args.mapping), dry_run=args.dry_run
+        )
     finally:
         await client.close()
     for entity_id in removed:
@@ -152,7 +154,7 @@ async def run_remove_orphans(args: argparse.Namespace) -> None:
 async def run_assign_areas(args: argparse.Namespace) -> None:
     client = await connect()
     try:
-        await assign_areas(client, read_csv(args.mapping))
+        await assign_areas(client, read_csv(args.mapping), Snapshot.load(args.snapshot))
     finally:
         await client.close()
 
@@ -232,9 +234,16 @@ def build_parser() -> argparse.ArgumentParser:
     applying.set_defaults(handler=run_apply)
 
     assigning = subparsers.add_parser(
-        "assign-areas", help="assign renamed YAML key entities to their rooms"
+        "assign-areas",
+        help="assign YAML key entities to their rooms and carry over labels",
     )
     assigning.add_argument("--mapping", required=True, type=pathlib.Path)
+    assigning.add_argument(
+        "--snapshot",
+        help="snapshot taken before the rename, for the labels of old entries",
+        required=True,
+        type=pathlib.Path,
+    )
     assigning.set_defaults(handler=run_assign_areas)
 
     capturing = subparsers.add_parser(
@@ -268,6 +277,9 @@ def build_parser() -> argparse.ArgumentParser:
     removing = subparsers.add_parser(
         "remove-orphans",
         help="remove registry entries of renamed YAML keys that have no state",
+    )
+    removing.add_argument(
+        "--dry-run", action="store_true", help="list the entries without removing"
     )
     removing.add_argument("--mapping", required=True, type=pathlib.Path)
     removing.set_defaults(handler=run_remove_orphans)

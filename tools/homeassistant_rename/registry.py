@@ -266,46 +266,75 @@ async def revert(client: Client, journal: pathlib.Path) -> None:
     journal.replace(journal.with_name(journal.name + ".reverted"))
 
 
-def _yaml_key_renames(rows: list[Row]) -> list[Row]:
+def _yaml_key_rows(rows: list[Row]) -> list[Row]:
     return [
         row
         for row in rows
-        if row.kind == "entity"
-        and row.source == "yaml_key"
-        and row.status == "auto"
-        and row.old_id != row.new_id
+        if row.kind == "entity" and row.source == "yaml_key" and row.status == "auto"
     ]
 
 
-async def remove_orphans(client: Client, rows: list[Row]) -> list[str]:
+def _yaml_key_renames(rows: list[Row]) -> list[Row]:
+    return [row for row in _yaml_key_rows(rows) if row.old_id != row.new_id]
+
+
+def _has_state(state: dict[str, Any] | None) -> bool:
+    """Tells whether a state comes from a loaded entity.
+
+    After a restart Home Assistant keeps a registered entity that nothing
+    loads as an unavailable placeholder with the attribute restored: true.
+    """
+    return state is not None and not (state.get("attributes") or {}).get("restored")
+
+
+async def remove_orphans(
+    client: Client, rows: list[Row], dry_run: bool = False
+) -> list[str]:
     """Removes registry entries left behind by renamed YAML keys.
 
-    An old ID is removed only when it is registered and has no state, which
-    means the deployed YAML no longer defines it.
+    An old ID is removed only when it is registered and has no state other
+    than a restored placeholder, which means the deployed YAML no longer
+    defines it. A dry run returns the IDs without removing them.
     """
     registered = {
         entity["entity_id"]
         for entity in await client.call("config/entity_registry/list")
     }
-    states = {state["entity_id"] for state in await client.call("get_states")}
+    states = {state["entity_id"]: state for state in await client.call("get_states")}
     removed = []
     for row in _yaml_key_renames(rows):
-        if row.old_id in registered and row.old_id not in states:
-            await client.call("config/entity_registry/remove", entity_id=row.old_id)
+        if row.old_id in registered and not _has_state(states.get(row.old_id)):
+            if not dry_run:
+                await client.call("config/entity_registry/remove", entity_id=row.old_id)
             removed.append(row.old_id)
     return removed
 
 
-async def assign_areas(client: Client, rows: list[Row]) -> None:
-    """Assigns each renamed YAML key entity to its room once it is registered."""
+async def assign_areas(client: Client, rows: list[Row], snapshot: Snapshot) -> None:
+    """Gives each YAML key entity its room once it is registered.
+
+    A renamed key is a new registry entry, so it also gets the labels the old
+    entry had in the snapshot.
+    """
     registered = {
         entity["entity_id"]: entity
         for entity in await client.call("config/entity_registry/list")
     }
-    for row in _yaml_key_renames(rows):
+    old_entities = {entity["entity_id"]: entity for entity in snapshot.entities}
+    for row in _yaml_key_rows(rows):
         entity = registered.get(row.new_id)
-        if entity is None or not row.room or entity.get("area_id") == row.room:
+        if entity is None or not row.room:
             continue
-        await client.call(
-            "config/entity_registry/update", entity_id=row.new_id, area_id=row.room
-        )
+        changes: dict[str, Any] = {}
+        if entity.get("area_id") != row.room:
+            changes["area_id"] = row.room
+        if row.old_id != row.new_id:
+            old_labels = (old_entities.get(row.old_id) or {}).get("labels") or []
+            labels = list(entity.get("labels") or [])
+            missing = [label for label in old_labels if label not in labels]
+            if missing:
+                changes["labels"] = labels + missing
+        if changes:
+            await client.call(
+                "config/entity_registry/update", entity_id=row.new_id, **changes
+            )
