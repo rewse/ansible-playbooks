@@ -4,12 +4,22 @@ from __future__ import annotations
 
 import argparse
 import asyncio
+import collections
 import os
 import pathlib
 import sys
 
 from .hass import HassClient
+from .hass import slugify_all
+from .mapping import build_rows
+from .mapping import load_yaml_sources
+from .mapping import write_csv
+from .snapshot import Snapshot
 from .snapshot import fetch_snapshot
+
+HOMEASSISTANT_FILES = (
+    pathlib.Path(__file__).resolve().parents[2] / "roles" / "homeassistant" / "files"
+)
 
 
 async def connect() -> HassClient:
@@ -30,9 +40,40 @@ async def run_snapshot(args: argparse.Namespace) -> None:
     )
 
 
+def hass_slugify(names: list[str]) -> dict[str, str]:
+    """Slugifies names with Home Assistant over one connection."""
+
+    async def run() -> dict[str, str]:
+        client = await connect()
+        try:
+            return await slugify_all(client, names)
+        finally:
+            await client.close()
+
+    return asyncio.run(run())
+
+
+def run_map(args: argparse.Namespace) -> None:
+    rows = build_rows(
+        Snapshot.load(args.snapshot), load_yaml_sources(args.files), hass_slugify
+    )
+    write_csv(rows, args.out)
+    counts = collections.Counter(row.status for row in rows)
+    summary = ", ".join(f"{counts[status]} {status}" for status in sorted(counts))
+    print(f"{args.out}: {len(rows)} rows ({summary})")
+
+
 def build_parser() -> argparse.ArgumentParser:
     parser = argparse.ArgumentParser(prog="python -m tools.homeassistant_rename")
     subparsers = parser.add_subparsers(dest="command", required=True)
+
+    mapping = subparsers.add_parser(
+        "map", help="write the old-to-new naming mapping to a CSV file"
+    )
+    mapping.add_argument("--files", default=HOMEASSISTANT_FILES, type=pathlib.Path)
+    mapping.add_argument("--out", required=True, type=pathlib.Path)
+    mapping.add_argument("--snapshot", required=True, type=pathlib.Path)
+    mapping.set_defaults(handler=run_map)
 
     snapshot = subparsers.add_parser(
         "snapshot", help="save the registries and states to a JSON file"
@@ -45,7 +86,9 @@ def build_parser() -> argparse.ArgumentParser:
 
 def main(argv: list[str] | None = None) -> int:
     args = build_parser().parse_args(argv)
-    asyncio.run(args.handler(args))
+    result = args.handler(args)
+    if asyncio.iscoroutine(result):
+        asyncio.run(result)
     return 0
 
 
