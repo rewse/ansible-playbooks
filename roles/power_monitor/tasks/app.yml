@@ -27,13 +27,30 @@
         )
       }}
 
+- name: app | Create staging directory
+  # The package is installed as root, so it is staged in a directory that only
+  # root can write rather than at a fixed path another account could create
+  # first.
+  ansible.builtin.tempfile:
+    state: directory
+    prefix: power-monitor.
+  become: true
+  register: __power_monitor_staging
+  when:
+    - __power_monitor_install_required
+    - not ansible_check_mode
+
 - name: app | Download package
   ansible.builtin.get_url:
     url: "{{ __power_monitor_package.url }}"
-    dest: "/tmp/PowerMonitor_{{ __power_monitor_package.version }}.pkg"
+    dest: "{{ __power_monitor_staging.path }}/PowerMonitor_{{ __power_monitor_package.version }}.pkg"
     checksum: "{{ __power_monitor_package.checksum | default(omit, true) }}"
-    mode: "0644"
-  when: __power_monitor_install_required
+    mode: "0600"
+    force: true
+  become: true
+  when:
+    - __power_monitor_install_required
+    - not ansible_check_mode
 
 - name: app | Install package
   # No module installs a macOS .pkg.
@@ -41,11 +58,20 @@
     argv:
       - /usr/sbin/installer
       - -pkg
-      - "/tmp/PowerMonitor_{{ __power_monitor_package.version }}.pkg"
+      - "{{ __power_monitor_staging.path }}/PowerMonitor_{{ __power_monitor_package.version }}.pkg"
       - -target
       - /
   become: true
   changed_when: true
+  when:
+    - __power_monitor_install_required
+    - not ansible_check_mode
+
+- name: app | Remove staging directory
+  ansible.builtin.file:
+    path: "{{ __power_monitor_staging.path }}"
+    state: absent
+  become: true
   when:
     - __power_monitor_install_required
     - not ansible_check_mode

@@ -4,21 +4,55 @@
     path: /nix/var/nix/profiles/default/bin/nix
   register: __nix_binary
 
+- name: nix | Create staging directory
+  # The installer runs as root, so it is staged in a directory that only root
+  # can write rather than at a fixed path another account could create first.
+  ansible.builtin.tempfile:
+    state: directory
+    prefix: nix-install.
+  become: true
+  register: __nix_staging
+  when:
+    - not __nix_binary.stat.exists
+    - not ansible_check_mode
+
 - name: nix | Download installer
   ansible.builtin.get_url:
     url: https://nixos.org/nix/install
-    dest: /tmp/nix-install.sh
-    mode: "0755"
-  become: "{{ not ansible_check_mode }}"
-  when: not __nix_binary.stat.exists
+    dest: "{{ __nix_staging.path }}/nix-install.sh"
+    mode: "0700"
+    force: true
+  become: true
+  when:
+    - not __nix_binary.stat.exists
+    - not ansible_check_mode
 
 - name: nix | Install
   # The vendor installer has no module.
-  ansible.builtin.command: sh /tmp/nix-install.sh --yes
+  ansible.builtin.command: sh {{ __nix_staging.path }}/nix-install.sh --yes
   args:
     creates: /nix/var/nix/profiles/default/bin/nix
-  become: "{{ not ansible_check_mode }}"
-  when: not __nix_binary.stat.exists
+  become: true
+  when:
+    - not __nix_binary.stat.exists
+    - not ansible_check_mode
+
+- name: nix | Remove staging directory
+  ansible.builtin.file:
+    path: "{{ __nix_staging.path }}"
+    state: absent
+  become: true
+  when:
+    - not __nix_binary.stat.exists
+    - not ansible_check_mode
+
+- name: nix | Report deferred install in check mode
+  ansible.builtin.debug:
+    msg: Nix installation is deferred in check mode because the installer is not downloaded.
+    verbosity: 0
+  when:
+    - not __nix_binary.stat.exists
+    - ansible_check_mode
 
 - name: nix | Check current version
   ansible.builtin.command: /nix/var/nix/profiles/default/bin/nix --version

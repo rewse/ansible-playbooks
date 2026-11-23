@@ -701,6 +701,83 @@ class AnsibleConfigTest(unittest.TestCase):
         self.assertTrue(remote_tmp.startswith("~/"), remote_tmp)
 
 
+def walk_tasks(tasks: list[dict]):
+    for task in tasks:
+        yield task
+        for key in ("block", "rescue", "always"):
+            yield from walk_tasks(task.get(key, []))
+
+
+class SharedTempDirectoryTest(unittest.TestCase):
+    # For the same reason as remote_tmp, a task must not name a fixed path in
+    # a directory every local user can write: another account can create the
+    # path first, and a download without force keeps that file for root to
+    # run or install.
+    SHARED = re.compile(r"(?<![\w.~-])/(?:private/)?(?:var/)?tmp/")
+
+    def test_tasks_name_no_path_in_shared_temp_directories(self):
+        for path, tasks in task_lists():
+            for task in walk_tasks(tasks):
+                body = {k: v for k, v in task.items() if k != "name"}
+                with self.subTest(file=str(path), task=task.get("name")):
+                    self.assertIsNone(
+                        self.SHARED.search(yaml.safe_dump(body, width=1000))
+                    )
+
+
+class StagedInstallerTest(unittest.TestCase):
+    # Installers that root runs are downloaded into a fresh directory that
+    # only root can write, replacing any file there, and the directory is
+    # removed after the install.
+    CASES = (
+        ("nix", "nix.yml", "nix | Download installer", "nix | Install"),
+        (
+            "power_monitor",
+            "app.yml",
+            "app | Download package",
+            "app | Install package",
+        ),
+    )
+
+    def test_installers_are_staged_in_a_root_directory(self):
+        for role, file, download_name, install_name in self.CASES:
+            with self.subTest(role=role):
+                tasks = yaml.safe_load(
+                    (REPO_ROOT / "roles" / role / "tasks" / file).read_text()
+                )
+                names = [t["name"] for t in tasks]
+                by_name = {t["name"]: t for t in tasks}
+                staging = next(t for t in tasks if "ansible.builtin.tempfile" in t)
+                self.assertEqual(
+                    staging["ansible.builtin.tempfile"]["state"], "directory"
+                )
+                self.assertIs(staging["become"], True)
+                directory = "{{ " + staging["register"] + ".path }}"
+
+                download = by_name[download_name]
+                spec = download["ansible.builtin.get_url"]
+                self.assertTrue(spec["dest"].startswith(directory + "/"))
+                self.assertIs(spec["force"], True)
+                self.assertIs(download["become"], True)
+
+                install = by_name[install_name]
+                self.assertIs(install["become"], True)
+                self.assertIn(spec["dest"], yaml.safe_dump(install, width=1000))
+
+                removal = next(
+                    t
+                    for t in tasks
+                    if t.get("ansible.builtin.file", {}).get("state") == "absent"
+                    and t["ansible.builtin.file"]["path"] == directory
+                )
+                self.assertIs(removal["become"], True)
+                self.assertLess(
+                    names.index(staging["name"]), names.index(download_name)
+                )
+                self.assertLess(names.index(download_name), names.index(install_name))
+                self.assertLess(names.index(install_name), names.index(removal["name"]))
+
+
 # Home and state directories of accounts that are less trusted than root. Their
 # owners can replace any entry in them with a symlink, so a task that writes
 # there as root would write wherever the link points.
