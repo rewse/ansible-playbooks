@@ -14,7 +14,9 @@
     state: directory
     owner: root
     group: root
-    mode: "0755"
+    # Frigate writes as root, and nothing else on the host reads the
+    # recordings, so other local accounts are kept out of the camera video.
+    mode: "0700"
 
 - name: container | Resolve aged image
   ansible.builtin.set_fact:
