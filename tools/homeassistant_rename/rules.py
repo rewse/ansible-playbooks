@@ -102,6 +102,49 @@ def area_names_in(name: str, area_names: Iterable[str]) -> list[str]:
     return found
 
 
+def remove_token_runs(object_id: str, runs: Iterable[str]) -> tuple[str, list[str]]:
+    """Removes every occurrence of the "_"-separated runs from object_id.
+
+    Runs match whole tokens only, longest first. Returns the remaining object
+    ID and the runs that were removed, in the order they were tried.
+    """
+    tokens = object_id.split("_")
+    removed = []
+    for run in sorted(set(runs), key=lambda run: (-len(run.split("_")), run)):
+        run_tokens = run.split("_")
+        size = len(run_tokens)
+        kept: list[str] = []
+        index = 0
+        while index < len(tokens):
+            if tokens[index : index + size] == run_tokens:
+                index += size
+                if run not in removed:
+                    removed.append(run)
+            else:
+                kept.append(tokens[index])
+                index += 1
+        tokens = kept
+    return "_".join(tokens), removed
+
+
+def drop_number_suffix(object_id: str) -> str:
+    """Drops a trailing "_<digits>" that Home Assistant adds to a taken ID."""
+    return re.sub(r"(?<=[^_])_\d+$", "", object_id)
+
+
+def remove_area_names(name: str, area_names: Iterable[str]) -> str:
+    """Removes every whole-word, case-insensitive area name and collapses spaces.
+
+    Either apostrophe form of an area name matches either form in name.
+    """
+    for area in sorted(
+        {normalize_apostrophe(area) for area in area_names}, key=len, reverse=True
+    ):
+        pattern = re.escape(area).replace("'", "['\u2019]")
+        name = re.sub(r"(?<!\w)" + pattern + r"(?!\w)", " ", name, flags=re.IGNORECASE)
+    return " ".join(name.split())
+
+
 def repeated_tokens(object_id: str) -> str | None:
     """Returns the first token or token pair that repeats right after itself.
 

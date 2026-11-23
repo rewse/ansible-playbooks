@@ -92,7 +92,8 @@ class Override:
 
     new_name is the area or device name, or the entity's own name ("" for a
     main entity). new_id pins an entity's ID; "" keeps the generated one.
-    status, when given, is final except for conflicts.
+    status, when given, is final for a device even when its name is shared;
+    an entity row still goes to review when its new ID is shared.
     """
 
     kind: Kind
@@ -274,6 +275,14 @@ class _Builder:
             if (kind, key) not in self.used_overrides
         )
 
+    def settled_devices(self) -> set[str]:
+        """Lists the devices whose status an override sets."""
+        return {
+            key
+            for (kind, key), override in self.overrides.items()
+            if kind == "device" and override.status is not None
+        }
+
     def _device_names(self) -> dict[str, tuple[str, list[str]]]:
         """Computes each device's new name and the reasons it needs review.
 
@@ -405,6 +414,22 @@ class _Builder:
         ]
         return max(matches, key=len) if matches else None
 
+    def room_token_runs(self, area_id: str) -> set[str]:
+        """Lists the object-ID token runs that name a room, such as moms_room."""
+        return {
+            prefix.removesuffix("_")
+            for prefix, prefix_area in self.room_prefixes.items()
+            if prefix_area == area_id
+        } | {self.slugs[self.new_area_names[area_id]]}
+
+    def room_names(self, area_id: str) -> set[str]:
+        """Lists the names that call a room, such as "Bedroom" for bedroom."""
+        return {
+            self.area_names[area_id],
+            self.new_area_names[area_id],
+            area_id.replace("_", " "),
+        }
+
     def area_rows(self) -> list[Row]:
         rows = []
         for area in self.areas:
@@ -473,7 +498,12 @@ class _Builder:
                 status="skip",
                 note="",
             )
-            if device is not None:
+            if entity.get("disabled_by") is not None:
+                # A disabled entity keeps its ID; validate still reports a
+                # target that it holds.
+                row.room = self.effective_area(entity) or ""
+                row.note = "disabled"
+            elif device is not None:
                 self._fill_device_entity(row, entity)
             else:
                 self._fill_own_entity(row, entity)
@@ -532,8 +562,16 @@ class _Builder:
         reasons: list[str] = []
         new_prefix = f"{self.slugs[self.new_area_names[area_id]]}_"
         if prefix is None:
-            reasons.append("ID does not start with a room")
-            new_object_id = object_id
+            remaining, removed = rules.remove_token_runs(
+                object_id, self.room_token_runs(area_id)
+            )
+            reasons += [
+                f"ID prefix {run}_ needs a North or side modifier"
+                for run in removed
+                if f"{run}_" in MODIFIER_PREFIXES
+            ]
+            new_object_id = new_prefix + rules.drop_number_suffix(remaining)
+            new_object_id = new_object_id.rstrip("_")
         else:
             if self.room_prefixes[prefix] != area_id:
                 reasons.append(f"ID prefix {prefix} names another area")
@@ -546,7 +584,10 @@ class _Builder:
             row.new_id = override.new_id
         else:
             row.new_id = f"{domain}.{rules.expand_abbreviations(new_object_id)}"
-        stripped = rules.strip_area(row.old_name, self.all_area_names)
+        if prefix is None:
+            stripped = rules.remove_area_names(row.old_name, self.room_names(area_id))
+        else:
+            stripped = rules.strip_area(row.old_name, self.all_area_names)
         if override is not None:
             row.new_name = override.new_name
         elif row.old_name and not stripped:
@@ -571,7 +612,16 @@ def _finish(
     row.note = "; ".join(reasons)
 
 
-def _flag_conflicts(rows: Iterable[Row], kind: Kind, field: str) -> None:
+def _flag_conflicts(
+    rows: Iterable[Row], kind: Kind, field: str, settled: Iterable[str] = ()
+) -> None:
+    """Marks rows that share a new name or ID for review.
+
+    Two devices only conflict when both change: a skipped device keeps the name
+    it already shares. A device in settled has its status set by an override,
+    which accepts the shared name for that device.
+    """
+    settled = set(settled)
     groups: dict[tuple[str, str], list[Row]] = defaultdict(list)
     for row in rows:
         if row.kind != kind:
@@ -586,9 +636,13 @@ def _flag_conflicts(rows: Iterable[Row], kind: Kind, field: str) -> None:
         scope = row.room if kind == "device" else ""
         groups[(scope, value)].append(row)
     for (_, value), group in groups.items():
+        if kind == "device":
+            group = [row for row in group if row.status != "skip"]
         if len(group) < 2:
             continue
         for row in group:
+            if row.key in settled:
+                continue
             others = ", ".join(other.key for other in group if other is not row)
             row.status = "review"
             note = f"conflict: {field} {value} also used by {others}"
@@ -612,7 +666,7 @@ def build_rows(
     """
     builder = _Builder(snapshot, yaml_sources, slugify, overrides)
     devices = builder.device_rows()
-    _flag_conflicts(devices, "device", "new_name")
+    _flag_conflicts(devices, "device", "new_name", builder.settled_devices())
     builder.device_statuses = {row.key: row.status for row in devices}
     entities = builder.entity_rows()
     _flag_conflicts(entities, "entity", "new_id")

@@ -268,6 +268,7 @@ def entity(
     device_id: str | None = None,
     *,
     area_id: str | None = None,
+    disabled_by: str | None = None,
     name: str | None = None,
     original_name: str | None = None,
     platform: str = "hue",
@@ -276,6 +277,7 @@ def entity(
     return {
         "area_id": area_id,
         "device_id": device_id,
+        "disabled_by": disabled_by,
         "entity_id": entity_id,
         "name": name,
         "original_name": original_name,
@@ -600,7 +602,162 @@ class MappingTest(unittest.TestCase):
                 self.assertEqual(rows[key].status, "review")
                 self.assertIn("conflict", rows[key].note)
 
-    def test_unchanged_rows_are_skipped(self):
+    def test_device_name_conflict_ignores_skipped_rows(self):
+        snapshot = mapping_snapshot(
+            [
+                device("d1", "living_room", "Lamp"),
+                device("d2", "living_room", "Lamp"),
+                device("d3", "dads_room", "Desk Light"),
+                device("d4", "dads_room", "Dad’s Room Desk Light"),
+            ],
+            [],
+        )
+        rows = rows_by_key(build_rows(snapshot, NO_YAML, fake_slugify))
+        for key, status in (("d1", "skip"), ("d2", "skip"), ("d3", "skip")):
+            with self.subTest(key):
+                self.assertEqual(rows[key].status, status)
+                self.assertEqual(rows[key].note, "")
+        self.assertEqual(rows["d4"].new_name, "Desk Light")
+        self.assertEqual(rows["d4"].status, "auto", rows["d4"].note)
+
+    def test_device_override_status_wins_over_name_conflict(self):
+        snapshot = mapping_snapshot(
+            [
+                device("d1", "living_room", "Matter Bridge", "matter"),
+                device("d2", "living_room", "Living Room Bridge", "switchbot"),
+            ],
+            [
+                entity("button.matter_bridge_identify", "d1", original_name="Identify"),
+                entity("button.bridge_identify", "d2", original_name="Identify"),
+            ],
+        )
+        overrides = overrides_from(
+            "kind,key,new_name,new_id,status\n"
+            "device,d1,Bridge,,auto\n"
+            "device,d2,Bridge,,auto\n"
+        )
+        rows = rows_by_key(build_rows(snapshot, NO_YAML, fake_slugify, overrides))
+        for key in ("d1", "d2"):
+            with self.subTest(key):
+                self.assertEqual(rows[key].new_name, "Bridge")
+                self.assertEqual(rows[key].status, "auto")
+                self.assertNotIn("conflict", rows[key].note)
+        for key in ("button.matter_bridge_identify", "button.bridge_identify"):
+            with self.subTest(key):
+                self.assertEqual(rows[key].new_id, "button.living_room_bridge_identify")
+                self.assertEqual(rows[key].status, "review")
+                self.assertIn("conflict: new_id", rows[key].note)
+
+    def test_disabled_entities_are_skipped(self):
+        snapshot = mapping_snapshot(
+            [device("d1", "living_room", "Living Room Thermometer")],
+            [
+                entity(
+                    "button.living_room_thermometer_identify_4",
+                    "d1",
+                    disabled_by="integration",
+                    original_name="Identify",
+                ),
+                entity(
+                    "scene.living_room_bright_disabled",
+                    area_id="living_room",
+                    disabled_by="user",
+                    platform="homeassistant",
+                ),
+                entity(
+                    "input_boolean.dads_room_light_auto",
+                    disabled_by="user",
+                    platform="input_boolean",
+                ),
+            ],
+        )
+        rows = rows_by_key(build_rows(snapshot, NO_YAML, fake_slugify))
+        for key in (
+            "button.living_room_thermometer_identify_4",
+            "scene.living_room_bright_disabled",
+            "input_boolean.dads_room_light_auto",
+        ):
+            with self.subTest(key):
+                self.assertEqual(rows[key].status, "skip")
+                self.assertEqual(rows[key].note, "disabled")
+                self.assertEqual(rows[key].new_id, key)
+                self.assertEqual(rows[key].new_name, rows[key].old_name)
+
+    def test_own_entities_are_renamed_room_first(self):
+        snapshot = Snapshot(
+            areas=[
+                area("balcony", "Balcony"),
+                area("bathroom", "Bathroom"),
+                area("bedroom", "Mom’s Room"),
+                area("living_room", "Living Room"),
+            ],
+            devices=[],
+            entities=[
+                entity(
+                    "automation.select_bathroom_light_mode",
+                    area_id="bathroom",
+                    original_name="Select Bathroom Light Mode",
+                    platform="automation",
+                ),
+                entity(
+                    "automation.alarm_moms_room_temp_difference",
+                    area_id="bedroom",
+                    original_name="ALARM: Mom’s Room Temperature Difference",
+                    platform="automation",
+                ),
+                entity(
+                    "automation.open_moms_room_curtains_workday_2",
+                    area_id="bedroom",
+                    original_name="Open Bedroom Curtains Workday",
+                    platform="automation",
+                ),
+                entity(
+                    "automation.alarm_balcony_humidity_difference",
+                    area_id="balcony",
+                    original_name="ALARM: Balcony Humidity Difference",
+                    platform="automation",
+                ),
+                entity(
+                    "automation.turn_on_study_light",
+                    area_id="living_room",
+                    original_name="Turn On Study Light",
+                    platform="automation",
+                ),
+            ],
+            states={},
+        )
+        rows = rows_by_key(build_rows(snapshot, NO_YAML, fake_slugify))
+        cases = [
+            (
+                "automation.select_bathroom_light_mode",
+                "automation.bathroom_select_light_mode",
+                "Select Light Mode",
+            ),
+            (
+                "automation.alarm_moms_room_temp_difference",
+                "automation.mom_s_room_alarm_temperature_difference",
+                "ALARM: Temperature Difference",
+            ),
+            (
+                "automation.open_moms_room_curtains_workday_2",
+                "automation.mom_s_room_open_curtains_workday",
+                "Open Curtains Workday",
+            ),
+            (
+                "automation.alarm_balcony_humidity_difference",
+                "automation.balcony_alarm_humidity_difference",
+                "ALARM: Humidity Difference",
+            ),
+        ]
+        for key, new_id, new_name in cases:
+            with self.subTest(key):
+                self.assertEqual(rows[key].new_id, new_id)
+                self.assertEqual(rows[key].new_name, new_name)
+                self.assertEqual(rows[key].status, "auto", rows[key].note)
+        study = rows["automation.turn_on_study_light"]
+        self.assertEqual(study.new_id, "automation.living_room_turn_on_light")
+        self.assertEqual(study.status, "review")
+        self.assertIn("North or side modifier", study.note)
         snapshot = mapping_snapshot(
             [device("d1", "living_room", "Thermometer")],
             [
@@ -847,10 +1004,10 @@ class OverrideTest(unittest.TestCase):
         rows = rows_by_key(
             build_rows(hue_room_snapshot(), NO_YAML, fake_slugify, overrides)
         )
-        for key in ("d1", "d2"):
-            with self.subTest(key):
-                self.assertEqual(rows[key].status, "review")
-                self.assertIn("conflict", rows[key].note)
+        # The override's status stands; the other device is still flagged.
+        self.assertEqual(rows["d1"].status, "auto")
+        self.assertEqual(rows["d2"].status, "review")
+        self.assertIn("conflict: new_name Thermometer also used by d1", rows["d2"].note)
 
     def test_invalid_overrides_are_rejected(self):
         cases = [
