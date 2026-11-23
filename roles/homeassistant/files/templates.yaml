@@ -14,11 +14,11 @@
     name: "Humidity Disagreement"
     state: >-
       {{
-        is_number(states('sensor.dad_s_room_humidity_smoothed')) and
-        is_number(states('sensor.dad_s_room_switchbot_meter_humidity_smoothed')) and
+        is_number(states('sensor.dad_s_room_thermometer_primary_humidity_smoothed')) and
+        is_number(states('sensor.dad_s_room_thermometer_secondary_humidity_smoothed')) and
         (
-          states('sensor.dad_s_room_humidity_smoothed') | float -
-          states('sensor.dad_s_room_switchbot_meter_humidity_smoothed') | float
+          states('sensor.dad_s_room_thermometer_primary_humidity_smoothed') | float -
+          states('sensor.dad_s_room_thermometer_secondary_humidity_smoothed') | float
         ) | abs > 10
       }}
     delay_on:
@@ -94,11 +94,11 @@
     name: "Temperature Disagreement"
     state: >-
       {{
-        is_number(states('sensor.dad_s_room_switchbot_meter_temperature_smoothed')) and
-        is_number(states('sensor.dad_s_room_temperature_smoothed')) and
+        is_number(states('sensor.dad_s_room_thermometer_secondary_temperature_smoothed')) and
+        is_number(states('sensor.dad_s_room_thermometer_primary_temperature_smoothed')) and
         (
-          states('sensor.dad_s_room_switchbot_meter_temperature_smoothed') | float -
-          states('sensor.dad_s_room_temperature_smoothed') | float
+          states('sensor.dad_s_room_thermometer_secondary_temperature_smoothed') | float -
+          states('sensor.dad_s_room_thermometer_primary_temperature_smoothed') | float
         ) | abs > 1.5
       }}
     delay_on:
@@ -153,11 +153,11 @@
     name: "Humidity Disagreement"
     state: >-
       {{
-        is_number(states('sensor.living_room_humidity_smoothed')) and
-        is_number(states('sensor.living_room_switchbot_hub_2_humidity_smoothed')) and
+        is_number(states('sensor.living_room_thermometer_humidity_smoothed')) and
+        is_number(states('sensor.living_room_switchbot_hub_humidity_smoothed')) and
         (
-          states('sensor.living_room_humidity_smoothed') | float -
-          states('sensor.living_room_switchbot_hub_2_humidity_smoothed') | float
+          states('sensor.living_room_thermometer_humidity_smoothed') | float -
+          states('sensor.living_room_switchbot_hub_humidity_smoothed') | float
         ) | abs > 10
       }}
     delay_on:
@@ -233,11 +233,11 @@
     name: "Temperature Disagreement"
     state: >-
       {{
-        is_number(states('sensor.living_room_switchbot_hub_2_temperature_smoothed')) and
-        is_number(states('sensor.living_room_temperature_smoothed')) and
+        is_number(states('sensor.living_room_switchbot_hub_temperature_smoothed')) and
+        is_number(states('sensor.living_room_thermometer_temperature_smoothed')) and
         (
-          states('sensor.living_room_switchbot_hub_2_temperature_smoothed') | float -
-          states('sensor.living_room_temperature_smoothed') | float
+          states('sensor.living_room_switchbot_hub_temperature_smoothed') | float -
+          states('sensor.living_room_thermometer_temperature_smoothed') | float
         ) | abs > 1.5
       }}
     delay_on:
@@ -333,11 +333,11 @@
     name: "Humidity Disagreement"
     state: >-
       {{
-        is_number(states('sensor.mom_s_room_humidity_smoothed')) and
-        is_number(states('sensor.mom_s_room_switchbot_meter_humidity_smoothed')) and
+        is_number(states('sensor.mom_s_room_thermometer_primary_humidity_smoothed')) and
+        is_number(states('sensor.mom_s_room_thermometer_secondary_humidity_smoothed')) and
         (
-          states('sensor.mom_s_room_humidity_smoothed') | float -
-          states('sensor.mom_s_room_switchbot_meter_humidity_smoothed') | float
+          states('sensor.mom_s_room_thermometer_primary_humidity_smoothed') | float -
+          states('sensor.mom_s_room_thermometer_secondary_humidity_smoothed') | float
         ) | abs > 10
       }}
     delay_on:
@@ -413,11 +413,11 @@
     name: "Temperature Disagreement"
     state: >-
       {{
-        is_number(states('sensor.mom_s_room_switchbot_meter_temperature_smoothed')) and
-        is_number(states('sensor.mom_s_room_temperature_smoothed')) and
+        is_number(states('sensor.mom_s_room_thermometer_secondary_temperature_smoothed')) and
+        is_number(states('sensor.mom_s_room_thermometer_primary_temperature_smoothed')) and
         (
-          states('sensor.mom_s_room_switchbot_meter_temperature_smoothed') | float -
-          states('sensor.mom_s_room_temperature_smoothed') | float
+          states('sensor.mom_s_room_thermometer_secondary_temperature_smoothed') | float -
+          states('sensor.mom_s_room_thermometer_primary_temperature_smoothed') | float
         ) | abs > 1.5
       }}
     delay_on:

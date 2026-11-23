@@ -13,8 +13,8 @@
           Current: {{ states('sensor.mom_s_room_thermometer_primary_humidity') }}% /
           {{ states('sensor.mom_s_room_thermometer_secondary_humidity') }}%.
           Smoothed difference:
-          {% set primary_smoothed = states('sensor.mom_s_room_humidity_smoothed') %}
-          {% set secondary_smoothed = states('sensor.mom_s_room_switchbot_meter_humidity_smoothed') %}
+          {% set primary_smoothed = states('sensor.mom_s_room_thermometer_primary_humidity_smoothed') %}
+          {% set secondary_smoothed = states('sensor.mom_s_room_thermometer_secondary_humidity_smoothed') %}
           {% if is_number(primary_smoothed) and is_number(secondary_smoothed) %}
             {{ (primary_smoothed | float - secondary_smoothed | float) | abs | round(2) }}pt
           {% else %}
@@ -41,8 +41,8 @@
           Current: {{ states('sensor.mom_s_room_thermometer_primary_temperature') }}°C /
           {{ states('sensor.mom_s_room_thermometer_secondary_temperature') }}°C.
           Smoothed difference:
-          {% set primary_smoothed = states('sensor.mom_s_room_temperature_smoothed') %}
-          {% set secondary_smoothed = states('sensor.mom_s_room_switchbot_meter_temperature_smoothed') %}
+          {% set primary_smoothed = states('sensor.mom_s_room_thermometer_primary_temperature_smoothed') %}
+          {% set secondary_smoothed = states('sensor.mom_s_room_thermometer_secondary_temperature_smoothed') %}
           {% if is_number(primary_smoothed) and is_number(secondary_smoothed) %}
             {{ (primary_smoothed | float - secondary_smoothed | float) | abs | round(2) }}°C
           {% else %}

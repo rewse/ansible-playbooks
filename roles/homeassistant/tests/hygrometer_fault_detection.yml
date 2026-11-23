@@ -39,9 +39,9 @@
         secondary_stale_seconds: 86400
         secondary_unavailable_seconds: 86400
         smoothed_sensors:
-          - entity_id: sensor.dad_s_room_humidity_smoothed
+          - entity_id: sensor.dad_s_room_thermometer_primary_humidity_smoothed
             unique_id: sensor.dads_room_humidity_smoothed
-          - entity_id: sensor.dad_s_room_switchbot_meter_humidity_smoothed
+          - entity_id: sensor.dad_s_room_thermometer_secondary_humidity_smoothed
             unique_id: sensor.dads_room_switchbot_meter_humidity_smoothed
         source_entity_ids:
           - sensor.dad_s_room_thermometer_primary_humidity
@@ -68,9 +68,9 @@
         secondary_stale_seconds: 86400
         secondary_unavailable_seconds: 86400
         smoothed_sensors:
-          - entity_id: sensor.living_room_humidity_smoothed
+          - entity_id: sensor.living_room_thermometer_humidity_smoothed
             unique_id: sensor.living_room_humidity_smoothed
-          - entity_id: sensor.living_room_switchbot_hub_2_humidity_smoothed
+          - entity_id: sensor.living_room_switchbot_hub_humidity_smoothed
             unique_id: sensor.living_room_switchbot_hub_2_humidity_smoothed
         source_entity_ids:
           - sensor.living_room_thermometer_humidity
@@ -96,9 +96,9 @@
         secondary_stale_seconds: 86400
         secondary_unavailable_seconds: 86400
         smoothed_sensors:
-          - entity_id: sensor.mom_s_room_humidity_smoothed
+          - entity_id: sensor.mom_s_room_thermometer_primary_humidity_smoothed
             unique_id: sensor.moms_room_humidity_smoothed
-          - entity_id: sensor.mom_s_room_switchbot_meter_humidity_smoothed
+          - entity_id: sensor.mom_s_room_thermometer_secondary_humidity_smoothed
             unique_id: sensor.moms_room_switchbot_meter_humidity_smoothed
         source_entity_ids:
           - sensor.mom_s_room_thermometer_primary_humidity
