@@ -17,16 +17,3 @@
     dest: /srv/homeassistant/config/automations
     mode: "0644"
   with_fileglob: automations-*.yaml
-
-- name: automation | Remove renamed files
-  # The renamed files hold the same automation IDs, so leftovers would load as duplicates.
-  ansible.builtin.file:
-    path: /srv/homeassistant/config/automations/{{ item }}
-    state: absent
-  loop:
-    - automations-dads-room-climates.yaml
-    - automations-dads-room-lights.yaml
-    - automations-dads-room.yaml
-    - automations-moms-room-climates.yaml
-    - automations-moms-room-lights.yaml
-    - automations-moms-room.yaml
