@@ -77,9 +77,9 @@
   triggers:
     - trigger: state
       entity_id:
-        - switch.dads_room_camera_plug
+        - switch.dad_s_room_camera_plug
         - switch.living_room_camera_plug
-        - switch.moms_room_camera_plug
+        - switch.mom_s_room_camera_plug
       to: ~
     - trigger: mqtt
       topic: "frigate/available"
@@ -88,11 +88,11 @@
     - repeat:
         for_each:
           - camera: "eufy-dad"
-            plug: "switch.dads_room_camera_plug"
+            plug: "switch.dad_s_room_camera_plug"
           - camera: "eufy-liv"
             plug: "switch.living_room_camera_plug"
           - camera: "eufy-mom"
-            plug: "switch.moms_room_camera_plug"
+            plug: "switch.mom_s_room_camera_plug"
         sequence:
           - action: mqtt.publish
             data:
@@ -119,8 +119,8 @@
             - condition: state
               entity_id:
                 - switch.living_room_camera_plug
-                - switch.dads_room_camera_plug
-                - switch.moms_room_camera_plug
+                - switch.dad_s_room_camera_plug
+                - switch.mom_s_room_camera_plug
               match: any
               state: "off"
           sequence:
@@ -128,8 +128,8 @@
               target:
                 entity_id:
                   - switch.living_room_camera_plug
-                  - switch.dads_room_camera_plug
-                  - switch.moms_room_camera_plug
+                  - switch.dad_s_room_camera_plug
+                  - switch.mom_s_room_camera_plug
             - variables:
                 action: "on"
         - conditions:
@@ -139,8 +139,8 @@
             - condition: state
               entity_id:
                 - switch.living_room_camera_plug
-                - switch.dads_room_camera_plug
-                - switch.moms_room_camera_plug
+                - switch.dad_s_room_camera_plug
+                - switch.mom_s_room_camera_plug
               match: any
               state: "on"
           sequence:
@@ -148,8 +148,8 @@
               target:
                 entity_id:
                   - switch.living_room_camera_plug
-                  - switch.dads_room_camera_plug
-                  - switch.moms_room_camera_plug
+                  - switch.dad_s_room_camera_plug
+                  - switch.mom_s_room_camera_plug
             - variables:
                 action: "off"
       default:

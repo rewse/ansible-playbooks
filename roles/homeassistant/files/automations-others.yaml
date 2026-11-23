@@ -4,7 +4,7 @@
   alias: "Record Roomba Combo Last Cleaning"
   triggers:
     - trigger: state
-      entity_id: vacuum.roomba_combo
+      entity_id: vacuum.living_room_robot_vacuum
       to: cleaning
       for:
         minutes: 30
@@ -33,9 +33,9 @@
       for:
         minutes: 10
     - condition: state
-      entity_id: vacuum.roomba_combo
+      entity_id: vacuum.living_room_robot_vacuum
       state: docked
-    - "{{ states('sensor.roomba_combo_battery') | int(0) >= 50 }}"
+    - "{{ states('sensor.living_room_robot_vacuum_battery') | int(0) >= 50 }}"
     - >-
       {{
         now().timestamp() -
@@ -45,7 +45,7 @@
   actions:
     - action: vacuum.start
       target:
-        entity_id: vacuum.roomba_combo
+        entity_id: vacuum.living_room_robot_vacuum
     - action: notify.tats_devices
       data:
         message: "Start Roomba Combo"

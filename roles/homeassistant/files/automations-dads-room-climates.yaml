@@ -2,7 +2,7 @@
   alias: "Adjust Dad’s Room AC Temperature"
   triggers:
     - trigger: state
-      entity_id: input_number.dads_room_temp_target
+      entity_id: input_number.dad_s_room_temperature_target
     - trigger: time_pattern
       minutes: "/5"
       seconds: 21
@@ -10,13 +10,13 @@
       event: start
   conditions:
     - condition: state
-      entity_id: binary_sensor.dads_room_thermometer_fault
+      entity_id: binary_sensor.dad_s_room_thermometer_fault
       state: "off"
     - condition: state
-      entity_id: binary_sensor.dads_room_hygrometer_fault
+      entity_id: binary_sensor.dad_s_room_hygrometer_fault
       state: "off"
     - condition: state
-      entity_id: climate.dads_room_ac
+      entity_id: climate.dad_s_room_ac
       state:
         - "cool"
         - "heat"
@@ -27,45 +27,45 @@
         - conditions:
             - >-
               {{
-                float(states('sensor.dads_room_temperature')) -
-                float(states('input_number.dads_room_temp_target')) < -0.5
+                float(states('sensor.dad_s_room_thermometer_primary_temperature')) -
+                float(states('input_number.dad_s_room_temperature_target')) < -0.5
               }}
           sequence:
             - action: climate.set_temperature
               target:
-                entity_id: climate.dads_room_ac
+                entity_id: climate.dad_s_room_ac
               data:
-                temperature: "{{ int(states('sensor.dads_room_ac_temp')) + 1 }}"
+                temperature: "{{ int(states('sensor.dad_s_room_ac_temperature')) + 1 }}"
             - delay:
                 minutes: 9
         - conditions:
             - >-
               {{
-                float(states('sensor.dads_room_temperature')) -
-                float(states('input_number.dads_room_temp_target')) > 0.5
+                float(states('sensor.dad_s_room_thermometer_primary_temperature')) -
+                float(states('input_number.dad_s_room_temperature_target')) > 0.5
               }}
           sequence:
             - action: climate.set_temperature
               target:
-                entity_id: climate.dads_room_ac
+                entity_id: climate.dad_s_room_ac
               data:
-                temperature: "{{ int(states('sensor.dads_room_ac_temp')) - 1 }}"
+                temperature: "{{ int(states('sensor.dad_s_room_ac_temperature')) - 1 }}"
             - delay:
                 minutes: 9
   trace:
     stored_traces: 100
 - id: automation.change_dads_room_ac_from_heatcool
-  alias: "Change Dad’s Room AC from HeatCool"
+  alias: "Change AC from HeatCool"
   triggers:
     - trigger: state
-      entity_id: climate.dads_room_ac
+      entity_id: climate.dad_s_room_ac
       to: "heat_cool"
   conditions:
     - condition: state
-      entity_id: binary_sensor.dads_room_thermometer_fault
+      entity_id: binary_sensor.dad_s_room_thermometer_fault
       state: "off"
     - condition: state
-      entity_id: binary_sensor.dads_room_hygrometer_fault
+      entity_id: binary_sensor.dad_s_room_hygrometer_fault
       state: "off"
   actions:
     - choose:
@@ -75,20 +75,20 @@
               state: "Summer"
             - >-
               {{
-                float(states('sensor.dads_room_humidity')) >
-                float(states('input_number.dads_room_humidity_target_present_summer')) +
-                float(states('input_number.dads_room_humidity_max_diff_present_summer'))
+                float(states('sensor.dad_s_room_thermometer_primary_humidity')) >
+                float(states('input_number.dad_s_room_humidity_target_present_summer')) +
+                float(states('input_number.dad_s_room_humidity_maximum_difference_present_summer'))
               }}
             - >-
               {{
-                float(states('sensor.dads_room_temperature')) <
-                float(states('input_number.dads_room_temp_target_present_summer')) -
-                float(states('input_number.dads_room_temp_min_diff_present_summer'))
+                float(states('sensor.dad_s_room_thermometer_primary_temperature')) <
+                float(states('input_number.dad_s_room_temperature_target_present_summer')) -
+                float(states('input_number.dad_s_room_temperature_minimum_difference_present_summer'))
               }}
           sequence:
             - action: climate.set_hvac_mode
               target:
-                entity_id: climate.dads_room_ac
+                entity_id: climate.dad_s_room_ac
               data:
                 hvac_mode: dry
         - conditions:
@@ -98,14 +98,14 @@
           sequence:
             - action: climate.set_hvac_mode
               target:
-                entity_id: climate.dads_room_ac
+                entity_id: climate.dad_s_room_ac
               data:
                 hvac_mode: cool
             - action: climate.set_temperature
               target:
-                entity_id: climate.dads_room_ac
+                entity_id: climate.dad_s_room_ac
               data:
-                temperature: "{{ int(states('input_number.dads_room_temp_target_present_summer')) }}"
+                temperature: "{{ int(states('input_number.dad_s_room_temperature_target_present_summer')) }}"
         - conditions:
             - condition: state
               entity_id: input_select.season_mode
@@ -113,21 +113,21 @@
           sequence:
             - action: climate.set_hvac_mode
               target:
-                entity_id: climate.dads_room_ac
+                entity_id: climate.dad_s_room_ac
               data:
                 hvac_mode: heat
             - action: climate.set_temperature
               target:
-                entity_id: climate.dads_room_ac
+                entity_id: climate.dad_s_room_ac
               data:
-                temperature: "{{ int(states('input_number.dads_room_temp_target_present_winter')) }}"
+                temperature: "{{ int(states('input_number.dad_s_room_temperature_target_present_winter')) }}"
   trace:
     stored_traces: 100
 - id: automation.change_dads_room_ac_fan_mode
-  alias: "Change Dad’s Room AC Fan Mode"
+  alias: "Change AC Fan Mode"
   triggers:
     - trigger: state
-      entity_id: climate.dads_room_ac
+      entity_id: climate.dad_s_room_ac
       not_to:
         - "off"
     - trigger: state
@@ -144,19 +144,19 @@
       then:
         - action: climate.set_fan_mode
           target:
-            entity_id: climate.dads_room_ac
+            entity_id: climate.dad_s_room_ac
           data:
             fan_mode: "Silence"
       else:
         - action: climate.set_fan_mode
           target:
-            entity_id: climate.dads_room_ac
+            entity_id: climate.dad_s_room_ac
           data:
             fan_mode: "Auto"
   trace:
     stored_traces: 100
 - id: automation.change_dads_room_ac_mode
-  alias: "Change Dad’s Room AC Mode"
+  alias: "Change AC Mode"
   triggers:
     - trigger: time_pattern
       minutes: "/5"
@@ -165,13 +165,13 @@
       event: start
   conditions:
     - condition: state
-      entity_id: binary_sensor.dads_room_thermometer_fault
+      entity_id: binary_sensor.dad_s_room_thermometer_fault
       state: "off"
     - condition: state
-      entity_id: binary_sensor.dads_room_hygrometer_fault
+      entity_id: binary_sensor.dad_s_room_hygrometer_fault
       state: "off"
     - condition: state
-      entity_id: climate.dads_room_ac
+      entity_id: climate.dad_s_room_ac
       state:
         - "cool"
         - "dry"
@@ -181,78 +181,78 @@
     - choose:
         - conditions:
             - condition: state
-              entity_id: climate.dads_room_ac
+              entity_id: climate.dad_s_room_ac
               state: "dry"
             - or:
                 - and:
                     - >-
                         {{
-                          float(states('sensor.dads_room_temperature')) <
-                          float(states('input_number.dads_room_temp_target'))
+                          float(states('sensor.dad_s_room_thermometer_primary_temperature')) <
+                          float(states('input_number.dad_s_room_temperature_target'))
                         }}
                     - >-
                         {{
-                          float(states('sensor.dads_room_humidity')) <
-                          float(states('input_number.dads_room_humidity_target'))
+                          float(states('sensor.dad_s_room_thermometer_primary_humidity')) <
+                          float(states('input_number.dad_s_room_humidity_target'))
                         }}
                 - and:
                     - >-
                         {{
-                          float(states('sensor.dads_room_temperature')) <
-                          float(states('input_number.dads_room_temp_target'))
+                          float(states('sensor.dad_s_room_thermometer_primary_temperature')) <
+                          float(states('input_number.dad_s_room_temperature_target'))
                         }}
                     - >-
                         {{
-                          float(states('sensor.dads_room_humidity')) >
-                          float(states('input_number.dads_room_humidity_target'))
+                          float(states('sensor.dad_s_room_thermometer_primary_humidity')) >
+                          float(states('input_number.dad_s_room_humidity_target'))
                         }}
                     - >-
                         {{
                           (
-                            float(states('input_number.dads_room_temp_target')) -
-                            float(states('sensor.dads_room_temperature'))
-                          ) / float(states('input_number.dads_room_temp_min_diff')) >
+                            float(states('input_number.dad_s_room_temperature_target')) -
+                            float(states('sensor.dad_s_room_thermometer_primary_temperature'))
+                          ) / float(states('input_number.dad_s_room_temperature_minimum_difference')) >
                           (
-                            float(states('sensor.dads_room_humidity')) -
-                            float(states('input_number.dads_room_humidity_target'))
-                          ) / float(states('input_number.dads_room_humidity_max_diff'))
+                            float(states('sensor.dad_s_room_thermometer_primary_humidity')) -
+                            float(states('input_number.dad_s_room_humidity_target'))
+                          ) / float(states('input_number.dad_s_room_humidity_maximum_difference'))
                         }}
           sequence:
             - action: climate.set_hvac_mode
               target:
-                entity_id: climate.dads_room_ac
+                entity_id: climate.dad_s_room_ac
               data:
                 hvac_mode: "cool"
             - delay:
                 seconds: 5
             - action: climate.set_temperature
               target:
-                entity_id: climate.dads_room_ac
+                entity_id: climate.dad_s_room_ac
               data:
-                temperature: "{{ int(states('sensor.dads_room_ac_temp')) + 1 }}"
+                temperature: "{{ int(states('sensor.dad_s_room_ac_temperature')) + 1 }}"
             - delay:
                 minutes: 29
         - conditions:
             - >-
               {{
-                float(states('sensor.dads_room_temperature')) >
-                float(states('input_number.dads_room_temp_target'))
+                float(states('sensor.dad_s_room_thermometer_primary_temperature')) >
+                float(states('input_number.dad_s_room_temperature_target'))
               }}
             - >-
               {{
                 (
-                  float(states('sensor.dads_room_temperature')) -
-                  float(states('input_number.dads_room_temp_target'))
-                ) / float(states('input_number.dads_room_temp_max_diff')) >
+                  float(states('sensor.dad_s_room_thermometer_primary_temperature')) -
+                  float(states('input_number.dad_s_room_temperature_target'))
+                ) / float(states('input_number.dad_s_room_temperature_maximum_difference')) >
                 (
-                  float(states('sensor.dads_room_humidity')) -
-                  float(states('input_number.dads_room_humidity_target'))
-                ) / float(states('input_number.dads_room_humidity_max_diff'))
+                  float(states('sensor.dad_s_room_thermometer_primary_humidity')) -
+                  float(states('input_number.dad_s_room_humidity_target'))
+                ) / float(states('input_number.dad_s_room_humidity_maximum_difference'))
               }}
           sequence:
             - action: climate.set_hvac_mode
               target:
-                entity_id: climate.dads_room_ac
+                entity_id: climate.dad_s_room_ac
               data:
                 hvac_mode: "cool"
             - delay:
@@ -260,24 +260,24 @@
         - conditions:
             - >-
               {{
-                float(states('sensor.dads_room_humidity')) >
-                float(states('input_number.dads_room_humidity_target'))
+                float(states('sensor.dad_s_room_thermometer_primary_humidity')) >
+                float(states('input_number.dad_s_room_humidity_target'))
               }}
             - >-
               {{
                 (
-                  float(states('sensor.dads_room_temperature')) -
-                  float(states('input_number.dads_room_temp_target'))
-                ) / float(states('input_number.dads_room_temp_max_diff')) <
+                  float(states('sensor.dad_s_room_thermometer_primary_temperature')) -
+                  float(states('input_number.dad_s_room_temperature_target'))
+                ) / float(states('input_number.dad_s_room_temperature_maximum_difference')) <
                 (
-                  float(states('sensor.dads_room_humidity')) -
-                  float(states('input_number.dads_room_humidity_target'))
-                ) / float(states('input_number.dads_room_humidity_max_diff'))
+                  float(states('sensor.dad_s_room_thermometer_primary_humidity')) -
+                  float(states('input_number.dad_s_room_humidity_target'))
+                ) / float(states('input_number.dad_s_room_humidity_maximum_difference'))
               }}
           sequence:
             - action: climate.set_hvac_mode
               target:
-                entity_id: climate.dads_room_ac
+                entity_id: climate.dad_s_room_ac
               data:
                 hvac_mode: "dry"
             - delay:
@@ -285,10 +285,10 @@
   trace:
     stored_traces: 100
 - id: automation.plan_to_turn_on_dads_room_ac_internal_clean
-  alias: "Plan to Turn on Dad’s Room AC Internal Clean"
+  alias: "Plan to Turn on AC Internal Clean"
   triggers:
     - trigger: state
-      entity_id: climate.dads_room_ac
+      entity_id: climate.dad_s_room_ac
       to:
         - "cool"
         - "dry"
@@ -298,50 +298,50 @@
     - action: automation.turn_on
       target:
         entity_id:
-          - automation.turn_on_dads_room_ac_internal_clean
+          - automation.dad_s_room_turn_on_ac_internal_clean
   trace:
     stored_traces: 100
 - id: automation.recover_from_dads_room_ac_manual_internal_clean
   alias: "Recover from Dad’s Room AC Manual Internal Clean"
   triggers:
     - trigger: time
-      at: input_datetime.dads_room_ac_manual_internal_clean
+      at: input_datetime.dad_s_room_ac_manual_internal_clean
   actions:
     - action: automation.turn_on
       target:
         entity_id:
-          - automation.adjust_dads_room_ac_temperature
-          - automation.change_dads_room_ac_mode
-          - automation.toggle_dads_room_ac_cooldry
-          - automation.toggle_dads_room_ac_heat
+          - automation.dad_s_room_adjust_ac_temperature
+          - automation.dad_s_room_change_ac_mode
+          - automation.dad_s_room_toggle_ac_cooldry
+          - automation.dad_s_room_toggle_ac_heat
   trace:
     stored_traces: 100
 - id: automation.select_dads_room_climate_mode
-  alias: "Select Dad’s Room Climate Mode"
+  alias: "Select Climate Mode"
   triggers:
     - trigger: state
       entity_id:
         - input_select.season_mode
         - input_select.time_mode
     - trigger: state
-      entity_id: input_boolean.dads_room_presence_mode
+      entity_id: input_boolean.dad_s_room_presence_mode
       for:
-        minutes: "{{ states('input_number.dads_room_presence_sensitivity_minutes') }}"
+        minutes: "{{ states('input_number.dad_s_room_presence_sensitivity_minutes') }}"
     - trigger: state
-      entity_id: input_boolean.dads_room_presence_mode
+      entity_id: input_boolean.dad_s_room_presence_mode
       to: "off"
       for:
-        minutes: "{{ states('input_number.dads_room_climate_auto_off_minutes') }}"
+        minutes: "{{ states('input_number.dad_s_room_climate_auto_off_minutes') }}"
     - trigger: homeassistant
       event: start
   actions:
     - choose:
         - conditions:
             - condition: state
-              entity_id: input_boolean.dads_room_presence_mode
+              entity_id: input_boolean.dad_s_room_presence_mode
               state: "on"
               for:
-                minutes: "{{ states('input_number.dads_room_presence_sensitivity_minutes') }}"
+                minutes: "{{ states('input_number.dad_s_room_presence_sensitivity_minutes') }}"
             - condition: state
               entity_id: input_select.season_mode
               state: "Summer"
@@ -354,15 +354,15 @@
           sequence:
             - action: input_select.select_option
               target:
-                entity_id: input_select.dads_room_climate_mode
+                entity_id: input_select.dad_s_room_climate_mode
               data:
                 option: "Present Summer"
         - conditions:
             - condition: state
-              entity_id: input_boolean.dads_room_presence_mode
+              entity_id: input_boolean.dad_s_room_presence_mode
               state: "on"
               for:
-                minutes: "{{ states('input_number.dads_room_presence_sensitivity_minutes') }}"
+                minutes: "{{ states('input_number.dad_s_room_presence_sensitivity_minutes') }}"
             - condition: state
               entity_id: input_select.season_mode
               state: "Winter"
@@ -375,15 +375,15 @@
           sequence:
             - action: input_select.select_option
               target:
-                entity_id: input_select.dads_room_climate_mode
+                entity_id: input_select.dad_s_room_climate_mode
               data:
                 option: "Present Winter"
         - conditions:
             - condition: state
-              entity_id: input_boolean.dads_room_presence_mode
+              entity_id: input_boolean.dad_s_room_presence_mode
               state: "on"
               for:
-                minutes: "{{ states('input_number.dads_room_presence_sensitivity_minutes') }}"
+                minutes: "{{ states('input_number.dad_s_room_presence_sensitivity_minutes') }}"
             - condition: state
               entity_id: input_select.season_mode
               state: "Summer"
@@ -395,15 +395,15 @@
           sequence:
             - action: input_select.select_option
               target:
-                entity_id: input_select.dads_room_climate_mode
+                entity_id: input_select.dad_s_room_climate_mode
               data:
                 option: "Present Summer Midnight"
         - conditions:
             - condition: state
-              entity_id: input_boolean.dads_room_presence_mode
+              entity_id: input_boolean.dad_s_room_presence_mode
               state: "on"
               for:
-                minutes: "{{ states('input_number.dads_room_presence_sensitivity_minutes') }}"
+                minutes: "{{ states('input_number.dad_s_room_presence_sensitivity_minutes') }}"
             - condition: state
               entity_id: input_select.season_mode
               state: "Winter"
@@ -415,127 +415,127 @@
           sequence:
             - action: input_select.select_option
               target:
-                entity_id: input_select.dads_room_climate_mode
+                entity_id: input_select.dad_s_room_climate_mode
               data:
                 option: "Present Winter Midnight"
         - conditions:
             - or:
                 - and:
                     - condition: state
-                      entity_id: climate.dads_room_ac
+                      entity_id: climate.dad_s_room_ac
                       state:
                         - "fan_only"
                         - "off"
                     - condition: state
-                      entity_id: input_boolean.dads_room_presence_mode
+                      entity_id: input_boolean.dad_s_room_presence_mode
                       state: "off"
                       for:
-                        minutes: "{{ states('input_number.dads_room_presence_sensitivity_minutes') }}"
+                        minutes: "{{ states('input_number.dad_s_room_presence_sensitivity_minutes') }}"
                     - condition: state
                       entity_id: input_select.season_mode
                       state: "Summer"
                 - and:
                     - condition: state
-                      entity_id: climate.dads_room_ac
+                      entity_id: climate.dad_s_room_ac
                       state:
                         - "cool"
                         - "dry"
                         - "heat"
                     - condition: state
-                      entity_id: input_boolean.dads_room_presence_mode
+                      entity_id: input_boolean.dad_s_room_presence_mode
                       state: "off"
                       for:
-                        minutes: "{{ states('input_number.dads_room_climate_auto_off_minutes') }}"
+                        minutes: "{{ states('input_number.dad_s_room_climate_auto_off_minutes') }}"
                     - condition: state
                       entity_id: input_select.season_mode
                       state: "Summer"
           sequence:
             - action: input_select.select_option
               target:
-                entity_id: input_select.dads_room_climate_mode
+                entity_id: input_select.dad_s_room_climate_mode
               data:
                 option: "Absent Summer"
         - conditions:
             - or:
                 - and:
                     - condition: state
-                      entity_id: climate.dads_room_ac
+                      entity_id: climate.dad_s_room_ac
                       state: "off"
                     - condition: state
-                      entity_id: input_boolean.dads_room_presence_mode
+                      entity_id: input_boolean.dad_s_room_presence_mode
                       state: "off"
                       for:
-                        minutes: "{{ states('input_number.dads_room_presence_sensitivity_minutes') }}"
+                        minutes: "{{ states('input_number.dad_s_room_presence_sensitivity_minutes') }}"
                     - condition: state
                       entity_id: input_select.season_mode
                       state: "Winter"
                 - and:
                     - condition: state
-                      entity_id: climate.dads_room_ac
+                      entity_id: climate.dad_s_room_ac
                       state:
                         - "cool"
                         - "dry"
                         - "heat"
                     - condition: state
-                      entity_id: input_boolean.dads_room_presence_mode
+                      entity_id: input_boolean.dad_s_room_presence_mode
                       state: "off"
                       for:
-                        minutes: "{{ states('input_number.dads_room_climate_auto_off_minutes') }}"
+                        minutes: "{{ states('input_number.dad_s_room_climate_auto_off_minutes') }}"
                     - condition: state
                       entity_id: input_select.season_mode
                       state: "Winter"
           sequence:
             - action: input_select.select_option
               target:
-                entity_id: input_select.dads_room_climate_mode
+                entity_id: input_select.dad_s_room_climate_mode
               data:
                 option: "Absent Winter"
   trace:
     stored_traces: 100
 - id: automation.select_dads_room_humiture_target
-  alias: "Select Dad’s Room Humiture Target"
+  alias: "Select Humiture Target"
   triggers:
     - trigger: state
       entity_id:
-        - input_select.dads_room_climate_mode
-        - input_number.dads_room_temp_target_present_summer
-        - input_number.dads_room_temp_target_present_winter
-        - input_number.dads_room_temp_target_present_summer_midnight
-        - input_number.dads_room_temp_target_present_winter_midnight
-        - input_number.dads_room_temp_target_absent_winter
-        - input_number.dads_room_humidity_target_present_summer
-        - input_number.dads_room_humidity_target_present_winter
-        - input_number.dads_room_humidity_target_present_summer_midnight
-        - input_number.dads_room_humidity_target_present_winter_midnight
-        - input_number.dads_room_humidity_target_absent_winter
-        - input_number.dads_room_temp_max_diff_present_summer
-        - input_number.dads_room_temp_max_diff_present_winter
-        - input_number.dads_room_temp_max_diff_present_summer_midnight
-        - input_number.dads_room_temp_max_diff_present_winter_midnight
-        - input_number.dads_room_temp_max_diff_absent_winter
-        - input_number.dads_room_humidity_max_diff_present_summer
-        - input_number.dads_room_humidity_max_diff_present_winter
-        - input_number.dads_room_humidity_max_diff_present_summer_midnight
-        - input_number.dads_room_humidity_max_diff_present_winter_midnight
-        - input_number.dads_room_humidity_max_diff_absent_winter
-        - input_number.dads_room_temp_min_diff_present_summer
-        - input_number.dads_room_temp_min_diff_present_winter
-        - input_number.dads_room_temp_min_diff_present_summer_midnight
-        - input_number.dads_room_temp_min_diff_present_winter_midnight
-        - input_number.dads_room_temp_min_diff_absent_winter
-        - input_number.dads_room_humidity_min_diff_present_summer
-        - input_number.dads_room_humidity_min_diff_present_winter
-        - input_number.dads_room_humidity_min_diff_present_summer_midnight
-        - input_number.dads_room_humidity_min_diff_present_winter_midnight
-        - input_number.dads_room_humidity_min_diff_absent_winter
+        - input_select.dad_s_room_climate_mode
+        - input_number.dad_s_room_temperature_target_present_summer
+        - input_number.dad_s_room_temperature_target_present_winter
+        - input_number.dad_s_room_temperature_target_present_summer_midnight
+        - input_number.dad_s_room_temperature_target_present_winter_midnight
+        - input_number.dad_s_room_temperature_target_absent_winter
+        - input_number.dad_s_room_humidity_target_present_summer
+        - input_number.dad_s_room_humidity_target_present_winter
+        - input_number.dad_s_room_humidity_target_present_summer_midnight
+        - input_number.dad_s_room_humidity_target_present_winter_midnight
+        - input_number.dad_s_room_humidity_target_absent_winter
+        - input_number.dad_s_room_temperature_maximum_difference_present_summer
+        - input_number.dad_s_room_temperature_maximum_difference_present_winter
+        - input_number.dad_s_room_temperature_maximum_difference_present_summer_midnight
+        - input_number.dad_s_room_temperature_maximum_difference_present_winter_midnight
+        - input_number.dad_s_room_temperature_maximum_difference_absent_winter
+        - input_number.dad_s_room_humidity_maximum_difference_present_summer
+        - input_number.dad_s_room_humidity_maximum_difference_present_winter
+        - input_number.dad_s_room_humidity_maximum_difference_present_summer_midnight
+        - input_number.dad_s_room_humidity_maximum_difference_present_winter_midnight
+        - input_number.dad_s_room_humidity_maximum_difference_absent_winter
+        - input_number.dad_s_room_temperature_minimum_difference_present_summer
+        - input_number.dad_s_room_temperature_minimum_difference_present_winter
+        - input_number.dad_s_room_temperature_minimum_difference_present_summer_midnight
+        - input_number.dad_s_room_temperature_minimum_difference_present_winter_midnight
+        - input_number.dad_s_room_temperature_minimum_difference_absent_winter
+        - input_number.dad_s_room_humidity_minimum_difference_present_summer
+        - input_number.dad_s_room_humidity_minimum_difference_present_winter
+        - input_number.dad_s_room_humidity_minimum_difference_present_summer_midnight
+        - input_number.dad_s_room_humidity_minimum_difference_present_winter_midnight
+        - input_number.dad_s_room_humidity_minimum_difference_absent_winter
     - trigger: state
       entity_id:
-        - input_number.dads_room_temp_max_diff
-        - input_number.dads_room_humidity_max_diff
-        - input_number.dads_room_temp_min_diff
-        - input_number.dads_room_humidity_min_diff
-        - input_number.dads_room_temp_target
-        - input_number.dads_room_humidity_target
+        - input_number.dad_s_room_temperature_maximum_difference
+        - input_number.dad_s_room_humidity_maximum_difference
+        - input_number.dad_s_room_temperature_minimum_difference
+        - input_number.dad_s_room_humidity_minimum_difference
+        - input_number.dad_s_room_temperature_target
+        - input_number.dad_s_room_humidity_target
       for:
         hours: 2
     - trigger: homeassistant
@@ -544,23 +544,23 @@
     - choose:
         - conditions:
             - condition: state
-              entity_id: input_select.dads_room_climate_mode
+              entity_id: input_select.dad_s_room_climate_mode
               state: "Present Summer"
           sequence:
             repeat:
               for_each:
-                - src: input_number.dads_room_temp_max_diff_present_summer
-                  dest: input_number.dads_room_temp_max_diff
-                - src: input_number.dads_room_humidity_max_diff_present_summer
-                  dest: input_number.dads_room_humidity_max_diff
-                - src: input_number.dads_room_temp_min_diff_present_summer
-                  dest: input_number.dads_room_temp_min_diff
-                - src: input_number.dads_room_humidity_min_diff_present_summer
-                  dest: input_number.dads_room_humidity_min_diff
-                - src: input_number.dads_room_temp_target_present_summer
-                  dest: input_number.dads_room_temp_target
-                - src: input_number.dads_room_humidity_target_present_summer
-                  dest: input_number.dads_room_humidity_target
+                - src: input_number.dad_s_room_temperature_maximum_difference_present_summer
+                  dest: input_number.dad_s_room_temperature_maximum_difference
+                - src: input_number.dad_s_room_humidity_maximum_difference_present_summer
+                  dest: input_number.dad_s_room_humidity_maximum_difference
+                - src: input_number.dad_s_room_temperature_minimum_difference_present_summer
+                  dest: input_number.dad_s_room_temperature_minimum_difference
+                - src: input_number.dad_s_room_humidity_minimum_difference_present_summer
+                  dest: input_number.dad_s_room_humidity_minimum_difference
+                - src: input_number.dad_s_room_temperature_target_present_summer
+                  dest: input_number.dad_s_room_temperature_target
+                - src: input_number.dad_s_room_humidity_target_present_summer
+                  dest: input_number.dad_s_room_humidity_target
               sequence:
                 - action: input_number.set_value
                   target:
@@ -569,23 +569,23 @@
                     value: "{{ states(repeat.item.src) }}"
         - conditions:
             - condition: state
-              entity_id: input_select.dads_room_climate_mode
+              entity_id: input_select.dad_s_room_climate_mode
               state: "Present Winter"
           sequence:
             repeat:
               for_each:
-                - src: input_number.dads_room_temp_max_diff_present_winter
-                  dest: input_number.dads_room_temp_max_diff
-                - src: input_number.dads_room_humidity_max_diff_present_winter
-                  dest: input_number.dads_room_humidity_max_diff
-                - src: input_number.dads_room_temp_min_diff_present_winter
-                  dest: input_number.dads_room_temp_min_diff
-                - src: input_number.dads_room_humidity_min_diff_present_winter
-                  dest: input_number.dads_room_humidity_min_diff
-                - src: input_number.dads_room_temp_target_present_winter
-                  dest: input_number.dads_room_temp_target
-                - src: input_number.dads_room_humidity_target_present_winter
-                  dest: input_number.dads_room_humidity_target
+                - src: input_number.dad_s_room_temperature_maximum_difference_present_winter
+                  dest: input_number.dad_s_room_temperature_maximum_difference
+                - src: input_number.dad_s_room_humidity_maximum_difference_present_winter
+                  dest: input_number.dad_s_room_humidity_maximum_difference
+                - src: input_number.dad_s_room_temperature_minimum_difference_present_winter
+                  dest: input_number.dad_s_room_temperature_minimum_difference
+                - src: input_number.dad_s_room_humidity_minimum_difference_present_winter
+                  dest: input_number.dad_s_room_humidity_minimum_difference
+                - src: input_number.dad_s_room_temperature_target_present_winter
+                  dest: input_number.dad_s_room_temperature_target
+                - src: input_number.dad_s_room_humidity_target_present_winter
+                  dest: input_number.dad_s_room_humidity_target
               sequence:
                 - action: input_number.set_value
                   target:
@@ -594,23 +594,23 @@
                     value: "{{ states(repeat.item.src) }}"
         - conditions:
             - condition: state
-              entity_id: input_select.dads_room_climate_mode
+              entity_id: input_select.dad_s_room_climate_mode
               state: "Present Summer Midnight"
           sequence:
             repeat:
               for_each:
-                - src: input_number.dads_room_temp_max_diff_present_summer_midnight
-                  dest: input_number.dads_room_temp_max_diff
-                - src: input_number.dads_room_humidity_max_diff_present_summer_midnight
-                  dest: input_number.dads_room_humidity_max_diff
-                - src: input_number.dads_room_temp_min_diff_present_summer_midnight
-                  dest: input_number.dads_room_temp_min_diff
-                - src: input_number.dads_room_humidity_min_diff_present_summer_midnight
-                  dest: input_number.dads_room_humidity_min_diff
-                - src: input_number.dads_room_temp_target_present_summer_midnight
-                  dest: input_number.dads_room_temp_target
-                - src: input_number.dads_room_humidity_target_present_summer_midnight
-                  dest: input_number.dads_room_humidity_target
+                - src: input_number.dad_s_room_temperature_maximum_difference_present_summer_midnight
+                  dest: input_number.dad_s_room_temperature_maximum_difference
+                - src: input_number.dad_s_room_humidity_maximum_difference_present_summer_midnight
+                  dest: input_number.dad_s_room_humidity_maximum_difference
+                - src: input_number.dad_s_room_temperature_minimum_difference_present_summer_midnight
+                  dest: input_number.dad_s_room_temperature_minimum_difference
+                - src: input_number.dad_s_room_humidity_minimum_difference_present_summer_midnight
+                  dest: input_number.dad_s_room_humidity_minimum_difference
+                - src: input_number.dad_s_room_temperature_target_present_summer_midnight
+                  dest: input_number.dad_s_room_temperature_target
+                - src: input_number.dad_s_room_humidity_target_present_summer_midnight
+                  dest: input_number.dad_s_room_humidity_target
               sequence:
                 - action: input_number.set_value
                   target:
@@ -619,23 +619,23 @@
                     value: "{{ states(repeat.item.src) }}"
         - conditions:
             - condition: state
-              entity_id: input_select.dads_room_climate_mode
+              entity_id: input_select.dad_s_room_climate_mode
               state: "Present Winter Midnight"
           sequence:
             repeat:
               for_each:
-                - src: input_number.dads_room_temp_max_diff_present_winter_midnight
-                  dest: input_number.dads_room_temp_max_diff
-                - src: input_number.dads_room_humidity_max_diff_present_winter_midnight
-                  dest: input_number.dads_room_humidity_max_diff
-                - src: input_number.dads_room_temp_min_diff_present_winter_midnight
-                  dest: input_number.dads_room_temp_min_diff
-                - src: input_number.dads_room_humidity_min_diff_present_winter_midnight
-                  dest: input_number.dads_room_humidity_min_diff
-                - src: input_number.dads_room_temp_target_present_winter_midnight
-                  dest: input_number.dads_room_temp_target
-                - src: input_number.dads_room_humidity_target_present_winter_midnight
-                  dest: input_number.dads_room_humidity_target
+                - src: input_number.dad_s_room_temperature_maximum_difference_present_winter_midnight
+                  dest: input_number.dad_s_room_temperature_maximum_difference
+                - src: input_number.dad_s_room_humidity_maximum_difference_present_winter_midnight
+                  dest: input_number.dad_s_room_humidity_maximum_difference
+                - src: input_number.dad_s_room_temperature_minimum_difference_present_winter_midnight
+                  dest: input_number.dad_s_room_temperature_minimum_difference
+                - src: input_number.dad_s_room_humidity_minimum_difference_present_winter_midnight
+                  dest: input_number.dad_s_room_humidity_minimum_difference
+                - src: input_number.dad_s_room_temperature_target_present_winter_midnight
+                  dest: input_number.dad_s_room_temperature_target
+                - src: input_number.dad_s_room_humidity_target_present_winter_midnight
+                  dest: input_number.dad_s_room_humidity_target
               sequence:
                 - action: input_number.set_value
                   target:
@@ -644,23 +644,23 @@
                     value: "{{ states(repeat.item.src) }}"
         - conditions:
             - condition: state
-              entity_id: input_select.dads_room_climate_mode
+              entity_id: input_select.dad_s_room_climate_mode
               state: "Absent Summer"
           sequence:
             repeat:
               for_each:
-                - src: input_number.dads_room_temp_max_diff_absent_summer
-                  dest: input_number.dads_room_temp_max_diff
-                - src: input_number.dads_room_humidity_max_diff_absent_summer
-                  dest: input_number.dads_room_humidity_max_diff
-                - src: input_number.dads_room_temp_min_diff_absent_summer
-                  dest: input_number.dads_room_temp_min_diff
-                - src: input_number.dads_room_humidity_min_diff_absent_summer
-                  dest: input_number.dads_room_humidity_min_diff
-                - src: input_number.dads_room_temp_target_absent_summer
-                  dest: input_number.dads_room_temp_target
-                - src: input_number.dads_room_humidity_target_absent_summer
-                  dest: input_number.dads_room_humidity_target
+                - src: input_number.dad_s_room_temperature_maximum_difference_absent_summer
+                  dest: input_number.dad_s_room_temperature_maximum_difference
+                - src: input_number.dad_s_room_humidity_maximum_difference_absent_summer
+                  dest: input_number.dad_s_room_humidity_maximum_difference
+                - src: input_number.dad_s_room_temperature_minimum_difference_absent_summer
+                  dest: input_number.dad_s_room_temperature_minimum_difference
+                - src: input_number.dad_s_room_humidity_minimum_difference_absent_summer
+                  dest: input_number.dad_s_room_humidity_minimum_difference
+                - src: input_number.dad_s_room_temperature_target_absent_summer
+                  dest: input_number.dad_s_room_temperature_target
+                - src: input_number.dad_s_room_humidity_target_absent_summer
+                  dest: input_number.dad_s_room_humidity_target
               sequence:
                 - action: input_number.set_value
                   target:
@@ -669,23 +669,23 @@
                     value: "{{ states(repeat.item.src) }}"
         - conditions:
             - condition: state
-              entity_id: input_select.dads_room_climate_mode
+              entity_id: input_select.dad_s_room_climate_mode
               state: "Absent Winter"
           sequence:
             repeat:
               for_each:
-                - src: input_number.dads_room_temp_max_diff_absent_winter
-                  dest: input_number.dads_room_temp_max_diff
-                - src: input_number.dads_room_humidity_max_diff_absent_winter
-                  dest: input_number.dads_room_humidity_max_diff
-                - src: input_number.dads_room_temp_min_diff_absent_winter
-                  dest: input_number.dads_room_temp_min_diff
-                - src: input_number.dads_room_humidity_min_diff_absent_winter
-                  dest: input_number.dads_room_humidity_min_diff
-                - src: input_number.dads_room_temp_target_absent_winter
-                  dest: input_number.dads_room_temp_target
-                - src: input_number.dads_room_humidity_target_absent_winter
-                  dest: input_number.dads_room_humidity_target
+                - src: input_number.dad_s_room_temperature_maximum_difference_absent_winter
+                  dest: input_number.dad_s_room_temperature_maximum_difference
+                - src: input_number.dad_s_room_humidity_maximum_difference_absent_winter
+                  dest: input_number.dad_s_room_humidity_maximum_difference
+                - src: input_number.dad_s_room_temperature_minimum_difference_absent_winter
+                  dest: input_number.dad_s_room_temperature_minimum_difference
+                - src: input_number.dad_s_room_humidity_minimum_difference_absent_winter
+                  dest: input_number.dad_s_room_humidity_minimum_difference
+                - src: input_number.dad_s_room_temperature_target_absent_winter
+                  dest: input_number.dad_s_room_temperature_target
+                - src: input_number.dad_s_room_humidity_target_absent_winter
+                  dest: input_number.dad_s_room_humidity_target
               sequence:
                 - action: input_number.set_value
                   target:
@@ -695,13 +695,13 @@
   trace:
     stored_traces: 100
 - id: automation.toggle_dads_room_ac_cooldry
-  alias: "Toggle Dad’s Room AC CoolDry"
+  alias: "Toggle AC CoolDry"
   triggers:
     - trigger: state
       entity_id:
-        - input_number.dads_room_temp_target
-        - input_number.dads_room_temp_max_diff
-        - input_number.dads_room_temp_min_diff
+        - input_number.dad_s_room_temperature_target
+        - input_number.dad_s_room_temperature_maximum_difference
+        - input_number.dad_s_room_temperature_minimum_difference
     - trigger: time_pattern
       minutes: "/5"
       seconds: 31
@@ -709,10 +709,10 @@
       event: start
   conditions:
     - condition: state
-      entity_id: binary_sensor.dads_room_thermometer_fault
+      entity_id: binary_sensor.dad_s_room_thermometer_fault
       state: "off"
     - condition: state
-      entity_id: binary_sensor.dads_room_hygrometer_fault
+      entity_id: binary_sensor.dad_s_room_hygrometer_fault
       state: "off"
     - condition: state
       entity_id: input_select.season_mode
@@ -726,39 +726,39 @@
     - choose:
         - conditions:
             - condition: state
-              entity_id: binary_sensor.dads_room_temp_high
+              entity_id: binary_sensor.dad_s_room_temperature_high
               state: "on"
             - not:
                 - condition: state
-                  entity_id: climate.dads_room_ac
+                  entity_id: climate.dad_s_room_ac
                   state: "cool"
           sequence:
             - action: climate.set_temperature
               target:
-                entity_id: climate.dads_room_ac
+                entity_id: climate.dad_s_room_ac
               data:
                 hvac_mode: "cool"
-                temperature: "{{ int(states('input_number.dads_room_temp_target')) }}"
+                temperature: "{{ int(states('input_number.dad_s_room_temperature_target')) }}"
             - variables:
                 action: "on"
                 mode: "Cool"
         - conditions:
             - condition: state
-              entity_id: binary_sensor.dads_room_humidity_high
+              entity_id: binary_sensor.dad_s_room_humidity_high
               state: "on"
             - condition: state
-              entity_id: binary_sensor.dads_room_temp_high
+              entity_id: binary_sensor.dad_s_room_temperature_high
               state: "off"
             - not:
                 - condition: state
-                  entity_id: climate.dads_room_ac
+                  entity_id: climate.dad_s_room_ac
                   state:
                     - "fan_only"
                     - "dry"
           sequence:
             - action: climate.set_hvac_mode
               target:
-                entity_id: climate.dads_room_ac
+                entity_id: climate.dad_s_room_ac
               data:
                 hvac_mode: "dry"
             - variables:
@@ -766,35 +766,35 @@
                 mode: "Dry"
         - conditions:
             - condition: state
-              entity_id: binary_sensor.dads_room_humidity_low
+              entity_id: binary_sensor.dad_s_room_humidity_low
               state: "on"
               for:
                 hours: 1
             - condition: state
-              entity_id: binary_sensor.dads_room_temp_low
+              entity_id: binary_sensor.dad_s_room_temperature_low
               state: "on"
               for:
                 hours: 1
             - condition: state
-              entity_id: binary_sensor.dads_room_ac_cooldry
+              entity_id: binary_sensor.dad_s_room_ac_cooldry
               state: "on"
               for:
                 hours: 1
           sequence:
             - action: climate.turn_off
               target:
-                entity_id: climate.dads_room_ac
+                entity_id: climate.dad_s_room_ac
             - variables:
                 action: "off"
                 mode: "off"
       default:
-        - stop: "sensor.dads_room_temperature is good"
+        - stop: "sensor.dad_s_room_thermometer_primary_temperature is good"
     - action: notify.tats_devices
       data:
         message: >-
           Turned {{ action }} Dad’s Room AC.
-          Current: {{ states('sensor.dads_room_temperature') }}°C,
-          {{ states('sensor.dads_room_humidity') }}%
+          Current: {{ states('sensor.dad_s_room_thermometer_primary_temperature') }}°C,
+          {{ states('sensor.dad_s_room_thermometer_primary_humidity') }}%
         data:
           push:
             interruption-level: time-sensitive
@@ -804,13 +804,13 @@
   trace:
     stored_traces: 100
 - id: automation.toggle_dads_room_ac_heat
-  alias: "Toggle Dad’s Room AC Heat"
+  alias: "Toggle AC Heat"
   triggers:
     - trigger: state
       entity_id:
-        - input_number.dads_room_temp_target
-        - input_number.dads_room_temp_max_diff
-        - input_number.dads_room_temp_min_diff
+        - input_number.dad_s_room_temperature_target
+        - input_number.dad_s_room_temperature_maximum_difference
+        - input_number.dad_s_room_temperature_minimum_difference
     - trigger: time_pattern
       minutes: "/5"
       seconds: 44
@@ -818,10 +818,10 @@
       event: start
   conditions:
     - condition: state
-      entity_id: binary_sensor.dads_room_thermometer_fault
+      entity_id: binary_sensor.dad_s_room_thermometer_fault
       state: "off"
     - condition: state
-      entity_id: binary_sensor.dads_room_hygrometer_fault
+      entity_id: binary_sensor.dad_s_room_hygrometer_fault
       state: "off"
     - condition: state
       entity_id: input_select.season_mode
@@ -834,45 +834,45 @@
     - choose:
         - conditions:
             - condition: state
-              entity_id: binary_sensor.dads_room_temp_low
+              entity_id: binary_sensor.dad_s_room_temperature_low
               state: "on"
             - not:
                 - condition: state
-                  entity_id: climate.dads_room_ac
+                  entity_id: climate.dad_s_room_ac
                   state: "heat"
           sequence:
             - action: climate.set_temperature
               target:
-                entity_id: climate.dads_room_ac
+                entity_id: climate.dad_s_room_ac
               data:
                 hvac_mode: "heat"
-                temperature: "{{ int(states('input_number.dads_room_temp_target')) }}"
+                temperature: "{{ int(states('input_number.dad_s_room_temperature_target')) }}"
             - variables:
                 action: "on"
         - conditions:
             - condition: state
-              entity_id: binary_sensor.dads_room_temp_high
+              entity_id: binary_sensor.dad_s_room_temperature_high
               state: "on"
               for:
                 hours: 1
             - condition: state
-              entity_id: climate.dads_room_ac
+              entity_id: climate.dad_s_room_ac
               state: "heat"
               for:
                 hours: 1
           sequence:
             - action: climate.turn_off
               target:
-                entity_id: climate.dads_room_ac
+                entity_id: climate.dad_s_room_ac
             - variables:
                 action: "off"
       default:
-        - stop: "sensor.dads_room_temperature is good"
+        - stop: "sensor.dad_s_room_thermometer_primary_temperature is good"
     - action: notify.tats_devices
       data:
         message: >-
           Turned {{ action }} Dad’s Room AC Heat.
-          Current: {{ states('sensor.dads_room_temperature') }}°C
+          Current: {{ states('sensor.dad_s_room_thermometer_primary_temperature') }}°C
         data:
           push:
             interruption-level: time-sensitive
@@ -899,7 +899,7 @@
           sequence:
             - action: fan.set_preset_mode
               target:
-                entity_id: fan.dads_room_air_purifier
+                entity_id: fan.dad_s_room_air_purifier
               data:
                 preset_mode: "auto"
         - conditions:
@@ -911,19 +911,19 @@
           sequence:
             - action: fan.set_preset_mode
               target:
-                entity_id: fan.dads_room_air_purifier
+                entity_id: fan.dad_s_room_air_purifier
               data:
                 preset_mode: "pet"
   trace:
     stored_traces: 100
 - id: automation.toggle_dads_room_humidifier
-  alias: "Toggle Dad’s Room Humidifier"
+  alias: "Toggle Humidifier"
   triggers:
     - trigger: state
       entity_id:
-        - input_number.dads_room_humidity_target
-        - input_number.dads_room_humidity_max_diff
-        - input_number.dads_room_humidity_min_diff
+        - input_number.dad_s_room_humidity_target
+        - input_number.dad_s_room_humidity_maximum_difference
+        - input_number.dad_s_room_humidity_minimum_difference
     - trigger: time_pattern
       minutes: "/5"
       seconds: 54
@@ -941,10 +941,10 @@
     - choose:
         - conditions:
             - condition: state
-              entity_id: binary_sensor.dads_room_humidity_low
+              entity_id: binary_sensor.dad_s_room_humidity_low
               state: "on"
             - condition: state
-              entity_id: switch.dads_room_humidifier
+              entity_id: switch.dad_s_room_humidifier
               state: "off"
               for:
                 hours: 1
@@ -953,23 +953,23 @@
                 action: "on"
         - conditions:
             - condition: state
-              entity_id: binary_sensor.dads_room_humidity_high
+              entity_id: binary_sensor.dad_s_room_humidity_high
               state: "on"
             - condition: state
-              entity_id: switch.dads_room_humidifier
+              entity_id: switch.dad_s_room_humidifier
               state: "on"
           sequence:
             - variables:
                 action: "off"
       default:
-        - stop: "sensor.dads_room_humidity is good"
+        - stop: "sensor.dad_s_room_thermometer_primary_humidity is good"
     - action: switch.toggle
-      entity_id: switch.dads_room_humidifier
+      entity_id: switch.dad_s_room_humidifier
     - action: notify.tats_devices
       data:
         message: >-
           Turned {{ action }} Dad’s Room Humidifier.
-          Current: {{ states('sensor.dads_room_humidity') }}%
+          Current: {{ states('sensor.dad_s_room_thermometer_primary_humidity') }}%
         data:
           push:
             interruption-level: time-sensitive
@@ -979,42 +979,42 @@
   trace:
     stored_traces: 100
 - id: automation.turn_off_dads_room_ac_internal_clean
-  alias: "Turn Off Dad’s Room AC Internal Clean"
+  alias: "Turn Off AC Internal Clean"
   triggers:
     - trigger: state
-      entity_id: climate.dads_room_ac
+      entity_id: climate.dad_s_room_ac
       to: "fan_only"
       for:
         minutes: 120
     - trigger: state
-      entity_id: climate.dads_room_ac
+      entity_id: climate.dad_s_room_ac
       from: "fan_only"
       to: "off"
   actions:
     - action: climate.turn_off
       target:
-        entity_id: climate.dads_room_ac
+        entity_id: climate.dad_s_room_ac
     - action: automation.turn_off
       target:
         entity_id:
-          - automation.turn_on_dads_room_ac_internal_clean
+          - automation.dad_s_room_turn_on_ac_internal_clean
   trace:
     stored_traces: 100
 - id: automation.turn_off_dads_room_floor_heating
-  alias: "Turn off Dad’s Room Floor Heating"
+  alias: "Turn off Floor Heating"
   triggers:
     - trigger: state
-      entity_id: input_select.dads_room_climate_mode
+      entity_id: input_select.dad_s_room_climate_mode
       to:
        - "Absent Summer"
        - "Absent Winter"
   conditions:
     - condition: state
-      entity_id: switch.dads_room_floor_heating_plug
+      entity_id: switch.dad_s_room_floor_heating_plug
       state: "on"
   actions:
     - action: switch.turn_off
-      entity_id: switch.dads_room_floor_heating_plug
+      entity_id: switch.dad_s_room_floor_heating_plug
     - action: notify.tats_devices
       data:
         message: "Turned off Dad’s Room Floor Heating"
@@ -1025,32 +1025,32 @@
   trace:
     stored_traces: 100
 - id: automation.turn_on_dads_room_ac_internal_clean
-  alias: "Turn on Dad’s Room AC Internal Clean"
+  alias: "Turn on AC Internal Clean"
   triggers:
     - trigger: state
-      entity_id: climate.dads_room_ac
+      entity_id: climate.dad_s_room_ac
       to: "off"
       for:
         seconds: 10
   actions:
     - action: climate.set_hvac_mode
       target:
-        entity_id: climate.dads_room_ac
+        entity_id: climate.dad_s_room_ac
       data:
         hvac_mode: "fan_only"
   trace:
     stored_traces: 100
 - id: automation.turn_on_dads_room_ac_streamer
-  alias: "Turn on Dad’s Room AC Streamer"
+  alias: "Turn on AC Streamer"
   triggers:
     - trigger: state
-      entity_id: climate.dads_room_ac
+      entity_id: climate.dad_s_room_ac
       not_to: "off"
       for:
         seconds: 10
   actions:
     - action: switch.turn_on
       target:
-        entity_id: switch.dads_room_ac_streamer
+        entity_id: switch.dad_s_room_ac_streamer
   trace:
     stored_traces: 100

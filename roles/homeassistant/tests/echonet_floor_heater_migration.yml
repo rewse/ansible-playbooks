@@ -5,8 +5,8 @@
   gather_facts: false
   vars:
     floor_heater_operation_status_entities:
-      - switch.living_room_floor_heater_operation_status
-      - switch.study_floor_heater_operation_status
+      - switch.living_room_floor_heater_south_operation_status
+      - switch.living_room_floor_heater_north_operation_status
   tasks:
     - name: Check retired switch file
       ansible.builtin.stat:
@@ -62,7 +62,7 @@
           - not homeassistant_switches_file.stat.exists
           - "'binary_sensor.living_room_floor_thermometer_connectivity' not in homeassistant_templates_raw"
           - "'sensor.living_room_floor_heating_effect' not in homeassistant_templates_raw"
-          - "'sensor.living_room_floor_temperature' not in homeassistant_templates_raw"
+          - "'sensor.living_room_floor_thermometer_temperature' not in homeassistant_templates_raw"
           - "'switch.living_room_floor_heating' not in homeassistant_templates_raw"
           - "'switch.study_floor_heating' not in homeassistant_templates_raw"
           - "'switch.living_room_floor_heating' not in homeassistant_customize_raw"
@@ -70,8 +70,8 @@
           - "'sensor.living_room_floor_thermometer_battery' not in homeassistant_alarm_automations_raw"
           - "'binary_sensor.living_room_floor_thermometer_connectivity' not in homeassistant_alarm_automations_raw"
           - "'switch.living_area_floor_heatings' not in homeassistant_alexa_raw"
-          - "'switch.study_floor_heater_operation_status' not in homeassistant_alexa_raw"
-          - "'switch.living_room_floor_heater_operation_status' in homeassistant_alexa_raw"
+          - "'switch.living_room_floor_heater_north_operation_status' not in homeassistant_alexa_raw"
+          - "'switch.living_room_floor_heater_south_operation_status' in homeassistant_alexa_raw"
           - "'switch: !include switches.yaml' not in homeassistant_configuration_raw"
           - "'switches.yaml' not in homeassistant_role_vars_raw"
           - "'template: !include templates.yaml' in homeassistant_configuration_raw"
@@ -91,7 +91,7 @@
           - >-
             homeassistant_toggle_floor_heating.actions[0].choose[0].sequence[0].choose[1].sequence[0].target.entity_id
             == floor_heater_operation_status_entities
-          - homeassistant_toggle_floor_heating.actions[0].choose[1].conditions[0].entity_id == 'binary_sensor.living_room_temp_high'
+          - homeassistant_toggle_floor_heating.actions[0].choose[1].conditions[0].entity_id == 'binary_sensor.living_room_temperature_high'
           - homeassistant_toggle_floor_heating.actions[0].choose[1].conditions[0]['for'].hours == 1
           - >-
             homeassistant_toggle_floor_heating.actions[0].choose[1].conditions[1].entity_id

@@ -1,8 +1,8 @@
 - id: automation.alarm_moms_room_humidity_difference
-  alias: "ALARM: Mom’s Room Humidity Difference"
+  alias: "ALARM: Humidity Difference"
   triggers:
     - trigger: state
-      entity_id: binary_sensor.moms_room_hygrometer_fault
+      entity_id: binary_sensor.mom_s_room_hygrometer_fault
       to: "on"
   actions:
     - action: notify.tats_devices
@@ -10,11 +10,11 @@
         title: "⚠️ ALARM"
         message: >-
           Mom’s Room humidity sensors may be faulty.
-          Current: {{ states('sensor.moms_room_humidity') }}% /
-          {{ states('sensor.moms_room_switchbot_meter_humidity') }}%.
+          Current: {{ states('sensor.mom_s_room_thermometer_primary_humidity') }}% /
+          {{ states('sensor.mom_s_room_thermometer_secondary_humidity') }}%.
           Smoothed difference:
-          {% set primary_smoothed = states('sensor.moms_room_humidity_smoothed') %}
-          {% set secondary_smoothed = states('sensor.moms_room_switchbot_meter_humidity_smoothed') %}
+          {% set primary_smoothed = states('sensor.mom_s_room_humidity_smoothed') %}
+          {% set secondary_smoothed = states('sensor.mom_s_room_switchbot_meter_humidity_smoothed') %}
           {% if is_number(primary_smoothed) and is_number(secondary_smoothed) %}
             {{ (primary_smoothed | float - secondary_smoothed | float) | abs | round(2) }}pt
           {% else %}
@@ -27,10 +27,10 @@
   trace:
     stored_traces: 100
 - id: automation.alarm_moms_room_temp_difference
-  alias: "ALARM: Mom’s Room Temperature Difference"
+  alias: "ALARM: Temperature Difference"
   triggers:
     - trigger: state
-      entity_id: binary_sensor.moms_room_thermometer_fault
+      entity_id: binary_sensor.mom_s_room_thermometer_fault
       to: "on"
   actions:
     - action: notify.tats_devices
@@ -38,11 +38,11 @@
         title: "⚠️ ALARM"
         message: >-
           Mom’s Room temperature sensors may be faulty.
-          Current: {{ states('sensor.moms_room_temperature') }}°C /
-          {{ states('sensor.moms_room_switchbot_meter_temperature') }}°C.
+          Current: {{ states('sensor.mom_s_room_thermometer_primary_temperature') }}°C /
+          {{ states('sensor.mom_s_room_thermometer_secondary_temperature') }}°C.
           Smoothed difference:
-          {% set primary_smoothed = states('sensor.moms_room_temperature_smoothed') %}
-          {% set secondary_smoothed = states('sensor.moms_room_switchbot_meter_temperature_smoothed') %}
+          {% set primary_smoothed = states('sensor.mom_s_room_temperature_smoothed') %}
+          {% set secondary_smoothed = states('sensor.mom_s_room_switchbot_meter_temperature_smoothed') %}
           {% if is_number(primary_smoothed) and is_number(secondary_smoothed) %}
             {{ (primary_smoothed | float - secondary_smoothed | float) | abs | round(2) }}°C
           {% else %}
@@ -61,7 +61,7 @@
       event: sunrise
       offset: "02:00:00"
     - trigger: state
-      entity_id: input_boolean.moms_room_presence_mode
+      entity_id: input_boolean.mom_s_room_presence_mode
       to: "off"
       for:
         hours: 1
@@ -78,7 +78,7 @@
       after_offset: "02:00:00"
       before: sunset
     - condition: state
-      entity_id: input_boolean.moms_room_presence_mode
+      entity_id: input_boolean.mom_s_room_presence_mode
       state: "off"
       for:
         hours: 1
@@ -90,14 +90,14 @@
   actions:
     - action: cover.open_cover
       target:
-        entity_id: cover.moms_room_curtains
+        entity_id: cover.mom_s_room_curtains
 - id: automation.select_moms_room_presence_mode
-  alias: "Select Mom’s Room Presence Mode"
+  alias: "Select Presence Mode"
   triggers:
     - trigger: state
-      entity_id: sensor.moms_room_motion_count
+      entity_id: sensor.mom_s_room_motion_count
     - trigger: state
-      entity_id: binary_sensor.moms_room_presence
+      entity_id: binary_sensor.mom_s_room_presence_sensor_occupancy
       for:
         minutes: 1
     - trigger: homeassistant
@@ -107,30 +107,30 @@
         - conditions:
             - or:
                 - condition: numeric_state
-                  entity_id: sensor.moms_room_motion_count
+                  entity_id: sensor.mom_s_room_motion_count
                   above: 5
                 - condition: state
-                  entity_id: binary_sensor.moms_room_presence
+                  entity_id: binary_sensor.mom_s_room_presence_sensor_occupancy
                   state: "on"
                   for:
                     minutes: 1
           sequence:
             - action: input_boolean.turn_on
               target:
-                entity_id: input_boolean.moms_room_presence_mode
+                entity_id: input_boolean.mom_s_room_presence_mode
         - conditions:
             - condition: numeric_state
-              entity_id: sensor.moms_room_motion_count
+              entity_id: sensor.mom_s_room_motion_count
               below: 6
             - condition: state
-              entity_id: binary_sensor.moms_room_presence
+              entity_id: binary_sensor.mom_s_room_presence_sensor_occupancy
               state: "off"
               for:
                 minutes: 1
           sequence:
             - action: input_boolean.turn_off
               target:
-                entity_id: input_boolean.moms_room_presence_mode
+                entity_id: input_boolean.mom_s_room_presence_mode
   trace:
     stored_traces: 100
 - id: automatic.select_moms_room_window_mode
@@ -138,8 +138,8 @@
   triggers:
     - trigger: state
       entity_id:
-        - binary_sensor.moms_room_window_n
-        - binary_sensor.moms_room_window_s
+        - binary_sensor.mom_s_room_window_sensor_north_door
+        - binary_sensor.mom_s_room_window_sensor_south_door
     - trigger: homeassistant
       event: start
   actions:
@@ -147,23 +147,23 @@
         - conditions:
             - condition: state
               entity_id:
-                - binary_sensor.moms_room_window_n
-                - binary_sensor.moms_room_window_s
+                - binary_sensor.mom_s_room_window_sensor_north_door
+                - binary_sensor.mom_s_room_window_sensor_south_door
               match: any
               state: "on"
           sequence:
             - action: input_boolean.turn_on
               target:
-                entity_id: input_boolean.moms_room_window_mode
+                entity_id: input_boolean.mom_s_room_window_mode
         - conditions:
             - condition: state
               entity_id:
-                - binary_sensor.moms_room_window_n
-                - binary_sensor.moms_room_window_s
+                - binary_sensor.mom_s_room_window_sensor_north_door
+                - binary_sensor.mom_s_room_window_sensor_south_door
               state: "off"
           sequence:
             - action: input_boolean.turn_off
               target:
-                entity_id: input_boolean.moms_room_window_mode
+                entity_id: input_boolean.mom_s_room_window_mode
   trace:
     stored_traces: 100

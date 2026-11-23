@@ -3,12 +3,12 @@
   triggers:
     - trigger: state
       entity_id:
-        - binary_sensor.entrance_door
-        - binary_sensor.living_room_window
-        - binary_sensor.study_window_n
-        - binary_sensor.study_window_s
-        - binary_sensor.moms_room_window_n
-        - binary_sensor.moms_room_window_s
+        - binary_sensor.entrance_door_sensor_door
+        - binary_sensor.living_room_window_sensor_south_door
+        - binary_sensor.living_room_window_sensor_north_door
+        - binary_sensor.living_room_window_sensor_center_door
+        - binary_sensor.mom_s_room_window_sensor_north_door
+        - binary_sensor.mom_s_room_window_sensor_south_door
       to: "on"
   conditions:
     - condition: state
@@ -44,9 +44,9 @@
   triggers:
     - trigger: state
       entity_id:
-        - switch.dads_room_camera_plug
+        - switch.dad_s_room_camera_plug
         - switch.living_room_camera_plug
-        - switch.moms_room_camera_plug
+        - switch.mom_s_room_camera_plug
       to: "unavailable"
       for:
         minutes: 5
@@ -77,39 +77,39 @@
     - trigger: numeric_state
       entity_id:
         - sensor.balcony_camera_battery
-        - sensor.balcony_switchbot_meter_battery
-        - sensor.balcony_switchbot_outdoor_meter_battery
+        - sensor.balcony_thermometer_secondary_battery
+        - sensor.balcony_thermometer_primary_battery
         - sensor.bathroom_motion_sensor_battery
-        - sensor.cage_camera_battery
-        - sensor.dads_room_1_button_switch_battery
-        - sensor.dads_room_4_button_switch_battery
-        - sensor.dads_room_humidifier_battery
-        - sensor.dads_room_motion_sensor_battery
-        - sensor.dads_room_switchbot_meter_battery
-        - sensor.dads_room_thermometer_battery
+        - sensor.living_room_camera_north_battery
+        - sensor.dad_s_room_1_button_switch_battery
+        - sensor.dad_s_room_4_button_switch_battery
+        - sensor.dad_s_room_humidifier_switch_battery
+        - sensor.dad_s_room_motion_sensor_battery
+        - sensor.dad_s_room_thermometer_secondary_battery
+        - sensor.dad_s_room_thermometer_primary_battery
         - sensor.entrance_1_button_switch_battery
         - sensor.entrance_door_sensor_battery
         - sensor.living_room_1_button_switch_battery
         - sensor.living_room_floor_heating_battery
-        - sensor.living_room_humidifer_battery
-        - sensor.living_room_motion_sensor_battery
+        - sensor.living_room_humidifier_switch_battery
+        - sensor.living_room_motion_sensor_south_battery
         - sensor.living_room_thermometer_battery
-        - sensor.living_room_window_sensor_battery
+        - sensor.living_room_window_sensor_south_battery
         - sensor.model_y_battery
-        - sensor.moms_room_1_button_switch_battery
-        - sensor.moms_room_4_button_switch_battery
-        - sensor.moms_room_curtain_left_battery
-        - sensor.moms_room_curtain_right_battery
-        - sensor.moms_room_curtains_remote_battery
-        - sensor.moms_room_humidifier_battery
-        - sensor.moms_room_switchbot_meter_battery
-        - sensor.moms_room_thermometer_battery
-        - sensor.moms_room_window_sensor_n_battery
-        - sensor.moms_room_window_sensor_s_battery
-        - sensor.roomba_combo_battery
-        - sensor.study_motion_sensor_battery
-        - sensor.study_window_sensor_n_battery
-        - sensor.study_window_sensor_s_battery
+        - sensor.mom_s_room_1_button_switch_battery
+        - sensor.mom_s_room_4_button_switch_battery
+        - sensor.mom_s_room_curtain_left_battery
+        - sensor.mom_s_room_curtain_right_battery
+        - sensor.mom_s_room_curtains_remote_battery
+        - sensor.mom_s_room_humidifier_switch_battery
+        - sensor.mom_s_room_thermometer_secondary_battery
+        - sensor.mom_s_room_thermometer_primary_battery
+        - sensor.mom_s_room_window_sensor_north_battery
+        - sensor.mom_s_room_window_sensor_south_battery
+        - sensor.living_room_robot_vacuum_battery
+        - sensor.living_room_motion_sensor_north_battery
+        - sensor.living_room_window_sensor_north_battery
+        - sensor.living_room_window_sensor_center_battery
       below: 20
       for:
         minutes: 31
@@ -142,25 +142,25 @@
   triggers:
     - trigger: state
       entity_id:
-        - binary_sensor.aqarahub
+        - binary_sensor.living_room_aqarahub
         - binary_sensor.atomlite_dad
-        - binary_sensor.aventage
-        - binary_sensor.brother
-        - binary_sensor.catloghome_dad
-        - binary_sensor.catloghome_liv
-        - binary_sensor.catloghome_mom
-        - binary_sensor.daikinac_dad
-        - binary_sensor.daikinac_liv
-        - binary_sensor.daikinac_mom
-        - binary_sensor.eufy_ent
-        - binary_sensor.fancysyncbox
-        - binary_sensor.firetv_liv
-        - binary_sensor.firetv_liv_beta
-        - binary_sensor.huebridge
-        - binary_sensor.regza
-        - binary_sensor.sesamehub
-        - binary_sensor.switchbothub
-        - binary_sensor.switchbothubmini
+        - binary_sensor.living_room_aventage
+        - binary_sensor.dad_s_room_brother
+        - binary_sensor.dad_s_room_catloghome_dad
+        - binary_sensor.living_room_catloghome_liv
+        - binary_sensor.mom_s_room_catloghome_mom
+        - binary_sensor.dad_s_room_daikinac_dad
+        - binary_sensor.living_room_daikinac_liv
+        - binary_sensor.mom_s_room_daikinac_mom
+        - binary_sensor.entrance_eufy_ent
+        - binary_sensor.living_room_fancysyncbox
+        - binary_sensor.living_room_firetv_liv
+        - binary_sensor.living_room_firetv_liv_beta
+        - binary_sensor.dad_s_room_huebridge
+        - binary_sensor.living_room_regza
+        - binary_sensor.entrance_sesamehub
+        - binary_sensor.living_room_switchbothub
+        - binary_sensor.living_room_switchbothubmini
       to: "off"
       for:
         minutes: 31
@@ -279,7 +279,7 @@
   alias: "ALARM: Kitchen Water Leak"
   triggers:
     - trigger: state
-      entity_id: binary_sensor.kitchen_water_leak
+      entity_id: binary_sensor.kitchen_water_leak_sensor_water_leak
       to: "on"
   actions:
     - action: notify.all_devices
@@ -296,9 +296,9 @@
   triggers:
     - trigger: state
       entity_id:
-        - binary_sensor.dads_room_thermometer_connectivity
+        - binary_sensor.dad_s_room_thermometer_connectivity
         - binary_sensor.living_room_thermometer_connectivity
-        - binary_sensor.moms_room_thermometer_connectivity
+        - binary_sensor.mom_s_room_thermometer_connectivity
       to: "off"
       for:
         minutes: 60

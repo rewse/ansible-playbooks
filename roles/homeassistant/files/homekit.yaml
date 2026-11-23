@@ -2,32 +2,32 @@
       include_entities:
         - alarm_control_panel.entrance
         - alarm_control_panel.home
-        - climate.dads_room_ac
+        - climate.dad_s_room_ac
         - climate.living_room_ac
-        - climate.moms_room_ac
+        - climate.mom_s_room_ac
         - light.living_room_lights
-        - light.living_room_footlight
+        - light.living_room_footlight_plug
         - light.living_room_shelf_light
-        - sensor.dads_room_co2
+        - sensor.dad_s_room_co2
         - sensor.living_room_co2
     entity_config:
       alarm_control_panel.entrance:
         name: "Entrance Alarm"
       alarm_control_panel.home:
         name: "Home Alarm"
-      climate.dads_room_ac:
+      climate.dad_s_room_ac:
         name: "Dad's Room AC"
       climate.living_room_ac:
         name: "Living Room AC"
-      climate.moms_room_ac:
+      climate.mom_s_room_ac:
         name: "Mom's Room AC"
-      light.living_room_footlight:
+      light.living_room_footlight_plug:
         name: "Living Room Footlight"
       light.living_room_lights:
         name: "Living Room Lights"
       light.living_room_shelf_light:
         name: "Living Room Shelf Light"
-      sensor.dads_room_co2:
+      sensor.dad_s_room_co2:
         name: "Dad's Room CO2"
       sensor.living_room_co2:
         name: "Living Room CO2"

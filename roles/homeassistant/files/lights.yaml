@@ -2,36 +2,36 @@
   unique_id: living_area_dimming_downlights
   name: "Living Area Dimming Downlights"
   entities:
-    - light.living_room_dimming_downlights
-    - light.study_dimming_downlights
+    - light.living_room_dimming_downlights_south
+    - light.living_room_dimming_downlights_north
 - platform: group
   unique_id: living_area_downlights
   name: "Living Area Downlights"
   entities:
-    - light.living_room_downlights
-    - light.study_downlights
+    - light.living_room_downlights_south
+    - light.living_room_downlights_north
 - platform: group
   unique_id: living_room_lights
   name: "Living Room Lights"
   entities:
-    - light.living_room_downlights
-    - light.living_room_entrance_light
+    - light.living_room_downlights_south
+    - light.living_room_light_entrance
     - light.living_room_tv_light
-    - light.living_room_footlight
+    - light.living_room_footlight_plug
     - light.living_room_shelf_light
-    - light.study_downlights
+    - light.living_room_downlights_north
 - platform: group
   unique_id: dads_room_lights
   name: "Dad’s Room Lights"
   entities:
-    - light.dads_room_pendant_light
-    - light.dads_room_monitor_light
-    - light.dads_room_footlight
-    - light.dads_room_chest_light
+    - light.dad_s_room_pendant_light
+    - light.dad_s_room_monitor_light
+    - light.dad_s_room_floorlight_footlight
+    - light.dad_s_room_chest_light
 - platform: group
   unique_id: bathroom_lights
   name: "Bathroom Lights"
   entities:
     - light.bathroom_entrance_light
-    - light.bathroom_left_light
-    - light.bathroom_right_light
+    - light.bathroom_light_left
+    - light.bathroom_light_right

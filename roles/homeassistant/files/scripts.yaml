@@ -27,16 +27,16 @@ darken_living_room:
     - if:
         - condition: state
           entity_id:
-            - switch.living_room_floor_heater_operation_status
-            - switch.study_floor_heater_operation_status
+            - switch.living_room_floor_heater_south_operation_status
+            - switch.living_room_floor_heater_north_operation_status
           match: any
           state: "on"
       then:
         - action: switch.turn_off
           target:
             entity_id:
-              - switch.living_room_floor_heater_operation_status
-              - switch.study_floor_heater_operation_status
+              - switch.living_room_floor_heater_south_operation_status
+              - switch.living_room_floor_heater_north_operation_status
         - action: notify.tats_devices
           data:
             message: "Turned off Living Area Floor Heating"
@@ -108,37 +108,37 @@ open_entrance_door:
               push:
                 interruption-level: time-sensitive
   icon: "mdi:door-open"
-prepare_for_dads_room_ac_manual_internal_clean:
-  alias: "Prepare for Dad's Room AC Manual Internal Clean"
+dad_s_room_prepare_for_ac_manual_internal_clean:
+  alias: "Prepare for AC Manual Internal Clean"
   sequence:
     - action: automation.turn_off
       target:
         entity_id:
-          - automation.adjust_dads_room_ac_temperature
-          - automation.change_dads_room_ac_mode
-          - automation.toggle_dads_room_ac_cooldry
-          - automation.toggle_dads_room_ac_heat
-          - automation.turn_on_dads_room_ac_internal_clean
+          - automation.dad_s_room_adjust_ac_temperature
+          - automation.dad_s_room_change_ac_mode
+          - automation.dad_s_room_toggle_ac_cooldry
+          - automation.dad_s_room_toggle_ac_heat
+          - automation.dad_s_room_turn_on_ac_internal_clean
     - action: climate.turn_off
       target:
-        entity_id: climate.dads_room_ac
+        entity_id: climate.dad_s_room_ac
     - action: input_datetime.set_datetime
       target:
-        entity_id: input_datetime.dads_room_ac_manual_internal_clean
+        entity_id: input_datetime.dad_s_room_ac_manual_internal_clean
       data:
         datetime: "{{ now() + timedelta(hours = 3) }}"
   icon: "mdi:robot-off"
-prepare_for_living_room_ac_manual_internal_clean:
-  alias: "Prepare for Living Room AC Manual Internal Clean"
+living_room_prepare_for_ac_manual_internal_clean:
+  alias: "Prepare for AC Manual Internal Clean"
   sequence:
     - action: automation.turn_off
       target:
         entity_id:
-          - automation.adjust_living_room_ac_temperature
-          - automation.change_living_room_ac_mode
-          - automation.toggle_living_room_ac_cooldry
-          - automation.toggle_living_area_floor_heating
-          - automation.turn_on_living_room_ac_internal_clean
+          - automation.living_room_adjust_ac_temperature
+          - automation.living_room_change_ac_mode
+          - automation.living_room_toggle_ac_cooldry
+          - automation.living_room_toggle_floor_heating
+          - automation.living_room_turn_on_ac_internal_clean
     - action: climate.turn_off
       target:
         entity_id: climate.living_room_ac
@@ -148,23 +148,23 @@ prepare_for_living_room_ac_manual_internal_clean:
       data:
         datetime: "{{ now() + timedelta(hours = 3) }}"
   icon: "mdi:robot-off"
-prepare_for_moms_room_ac_manual_internal_clean:
-  alias: "Prepare for Mom's Room AC Manual Internal Clean"
+mom_s_room_prepare_for_ac_manual_internal_clean:
+  alias: "Prepare for AC Manual Internal Clean"
   sequence:
     - action: automation.turn_off
       target:
         entity_id:
-          - automation.adjust_moms_room_ac_temperature
-          - automation.change_moms_room_ac_mode
-          - automation.toggle_moms_room_ac_cooldry
-          - automation.toggle_moms_room_ac_heat
-          - automation.turn_on_moms_room_ac_internal_clean
+          - automation.mom_s_room_adjust_ac_temperature
+          - automation.mom_s_room_change_ac_mode
+          - automation.mom_s_room_toggle_ac_cooldry
+          - automation.mom_s_room_toggle_ac_heat
+          - automation.mom_s_room_turn_on_ac_internal_clean
     - action: climate.turn_off
       target:
-        entity_id: climate.moms_room_ac
+        entity_id: climate.mom_s_room_ac
     - action: input_datetime.set_datetime
       target:
-        entity_id: input_datetime.moms_room_ac_manual_internal_clean
+        entity_id: input_datetime.mom_s_room_ac_manual_internal_clean
       data:
         datetime: "{{ now() + timedelta(hours = 3) }}"
   icon: "mdi:robot-off"

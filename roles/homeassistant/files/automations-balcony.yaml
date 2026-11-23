@@ -1,8 +1,8 @@
 - id: automation.alarm_balcony_humidity_difference
-  alias: "ALARM: Balcony Humidity Difference"
+  alias: "ALARM: Humidity Difference"
   triggers:
     - trigger: state
-      entity_id: sensor.balcony_switchbot_meter_humidity
+      entity_id: sensor.balcony_thermometer_secondary_humidity
   conditions:
     - condition: numeric_state
       entity_id:
@@ -15,8 +15,8 @@
         title: "⚠️ ALARM"
         message: >-
           Balcony Humidity Difference is Too Large.
-          Current: {{ states('sensor.balcony_humidity') }}% /
-          {{ states('sensor.balcony_switchbot_meter_humidity') }}%
+          Current: {{ states('sensor.balcony_thermometer_primary_humidity') }}% /
+          {{ states('sensor.balcony_thermometer_secondary_humidity') }}%
         data:
           push:
             interruption-level: time-sensitive
@@ -29,12 +29,12 @@
   alias: "ALARM: Balcony Temperature Difference"
   triggers:
     - trigger: state
-      entity_id: sensor.balcony_switchbot_meter_temperature
+      entity_id: sensor.balcony_thermometer_secondary_temperature
   conditions:
     - condition: numeric_state
       entity_id:
-        - sensor.balcony_temp_difference
-        - sensor.balcony_temp_difference_average
+        - sensor.balcony_temperature_difference
+        - sensor.balcony_temperature_difference_average
       above: 10
   actions:
     - action: notify.tats_devices
@@ -42,8 +42,8 @@
         title: "⚠️ ALARM"
         message: >-
           Balcony Temperature Difference is Too Large.
-          Current: {{ states('sensor.balcony_temperature') }}°C /
-          {{ states('sensor.balcony_switchbot_meter_temperature') }}°C
+          Current: {{ states('sensor.balcony_thermometer_primary_temperature') }}°C /
+          {{ states('sensor.balcony_thermometer_secondary_temperature') }}°C
         data:
           push:
             interruption-level: time-sensitive

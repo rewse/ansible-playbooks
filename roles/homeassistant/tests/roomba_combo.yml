@@ -30,7 +30,7 @@
           - homeassistant_record_automations | length == 1
           - >-
             homeassistant_record_automations[0].triggers
-            == [{'trigger': 'state', 'entity_id': 'vacuum.roomba_combo', 'to': 'cleaning', 'for': {'minutes': 30}}]
+            == [{'trigger': 'state', 'entity_id': 'vacuum.living_room_robot_vacuum', 'to': 'cleaning', 'for': {'minutes': 30}}]
           - homeassistant_record_automations[0].actions | length == 1
           - homeassistant_record_automations[0].actions[0].action == 'input_datetime.set_datetime'
           - >-

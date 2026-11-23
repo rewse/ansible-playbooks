@@ -1,7 +1,7 @@
 # Dad’s Room
 
-dads_room_ac_manual_internal_clean:
-  name: "Dad's Room Manual Internal Clean"
+dad_s_room_ac_manual_internal_clean:
+  name: "Manual Internal Clean"
   has_date: true
   has_time: true
   icon: "mdi:broom"
@@ -9,7 +9,7 @@ dads_room_ac_manual_internal_clean:
 # Living Room
 
 living_room_ac_manual_internal_clean:
-  name: "Living Room Manual Internal Clean"
+  name: "Manual Internal Clean"
   has_date: true
   has_time: true
   icon: "mdi:broom"
@@ -24,8 +24,8 @@ model_y_battery_last_full_charge:
 
 # Mom’s Room
 
-moms_room_ac_manual_internal_clean:
-  name: "Mom’s Room Manual Internal Clean"
+mom_s_room_ac_manual_internal_clean:
+  name: "Manual Internal Clean"
   has_date: true
   has_time: true
   icon: "mdi:broom"

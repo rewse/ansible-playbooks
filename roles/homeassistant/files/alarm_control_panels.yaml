@@ -1,6 +1,6 @@
 - platform: manual
   unique_id: alarm_control_panel.entrance
-  name: "Entrance Alarm Control Panel"
+  name: "Alarm Control Panel"
   code_arm_required: false
   delay_time: 0
   arming_time: 0

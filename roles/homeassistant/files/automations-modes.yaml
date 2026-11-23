@@ -9,7 +9,7 @@
   actions:
     - if:
         - condition: numeric_state
-          entity_id: sensor.balcony_temp_average
+          entity_id: sensor.balcony_temperature_average
           above: input_number.season_mode_temp
       then:
         - action: input_select.select_option
@@ -32,7 +32,7 @@
       minutes: "/5"
       seconds: 18
     - trigger: state
-      entity_id: binary_sensor.living_room_motion
+      entity_id: binary_sensor.living_room_motion_sensor_south_motion
       to: "on"
     - trigger: homeassistant
       event: start
@@ -49,10 +49,10 @@
                       after: sunrise
                       before: sunset
                     - condition: state
-                      entity_id: binary_sensor.living_room_motion
+                      entity_id: binary_sensor.living_room_motion_sensor_south_motion
                       state: "on" 
             - condition: numeric_state
-              entity_id: sensor.living_room_light_level
+              entity_id: sensor.living_room_motion_sensor_south_illuminance
               below: input_number.time_mode_twilight_light_level
           sequence:
             - action: input_select.select_option

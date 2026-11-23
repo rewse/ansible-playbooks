@@ -1,20 +1,20 @@
-light.living_area_dimming_downlights:
-  assumed_state: true
-light.living_area_downlights:
-  assumed_state: true
 light.living_room_dimming_downlights:
   assumed_state: true
 light.living_room_downlights:
   assumed_state: true
+light.living_room_dimming_downlights_south:
+  assumed_state: true
+light.living_room_downlights_south:
+  assumed_state: true
 light.living_room_lights:
   assumed_state: true
-light.study_dimming_downlights:
+light.living_room_dimming_downlights_north:
   assumed_state: true
-light.study_downlights:
+light.living_room_downlights_north:
   assumed_state: true
 media_player.living_room_fire_tv:
   device_class: receiver
-switch.dads_room_ac_streamer:
+switch.dad_s_room_ac_streamer:
   assumed_state: true
-switch.moms_room_ac_streamer:
+switch.mom_s_room_ac_streamer:
   assumed_state: true

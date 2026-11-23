@@ -1,8 +1,8 @@
 - id: automation.alarm_dads_room_humidity_difference
-  alias: "ALARM: Dad’s Room Humidity Difference"
+  alias: "ALARM: Humidity Difference"
   triggers:
     - trigger: state
-      entity_id: binary_sensor.dads_room_hygrometer_fault
+      entity_id: binary_sensor.dad_s_room_hygrometer_fault
       to: "on"
   actions:
     - action: notify.tats_devices
@@ -10,11 +10,11 @@
         title: "⚠️ ALARM"
         message: >-
           Dad’s Room humidity sensors may be faulty.
-          Current: {{ states('sensor.dads_room_humidity') }}% /
-          {{ states('sensor.dads_room_switchbot_meter_humidity') }}%.
+          Current: {{ states('sensor.dad_s_room_thermometer_primary_humidity') }}% /
+          {{ states('sensor.dad_s_room_thermometer_secondary_humidity') }}%.
           Smoothed difference:
-          {% set primary_smoothed = states('sensor.dads_room_humidity_smoothed') %}
-          {% set secondary_smoothed = states('sensor.dads_room_switchbot_meter_humidity_smoothed') %}
+          {% set primary_smoothed = states('sensor.dad_s_room_humidity_smoothed') %}
+          {% set secondary_smoothed = states('sensor.dad_s_room_switchbot_meter_humidity_smoothed') %}
           {% if is_number(primary_smoothed) and is_number(secondary_smoothed) %}
             {{ (primary_smoothed | float - secondary_smoothed | float) | abs | round(2) }}pt
           {% else %}
@@ -27,10 +27,10 @@
   trace:
     stored_traces: 100
 - id: automation.alarm_dads_room_temp_difference
-  alias: "ALARM: Dad’s Room Temperature Difference"
+  alias: "ALARM: Temperature Difference"
   triggers:
     - trigger: state
-      entity_id: binary_sensor.dads_room_thermometer_fault
+      entity_id: binary_sensor.dad_s_room_thermometer_fault
       to: "on"
   actions:
     - action: notify.tats_devices
@@ -38,11 +38,11 @@
         title: "⚠️ ALARM"
         message: >-
           Dad’s Room temperature sensors may be faulty.
-          Current: {{ states('sensor.dads_room_temperature') }}°C /
-          {{ states('sensor.dads_room_switchbot_meter_temperature') }}°C.
+          Current: {{ states('sensor.dad_s_room_thermometer_primary_temperature') }}°C /
+          {{ states('sensor.dad_s_room_thermometer_secondary_temeperature') }}°C.
           Smoothed difference:
-          {% set primary_smoothed = states('sensor.dads_room_temperature_smoothed') %}
-          {% set secondary_smoothed = states('sensor.dads_room_switchbot_meter_temperature_smoothed') %}
+          {% set primary_smoothed = states('sensor.dad_s_room_temperature_smoothed') %}
+          {% set secondary_smoothed = states('sensor.dad_s_room_switchbot_meter_temperature_smoothed') %}
           {% if is_number(primary_smoothed) and is_number(secondary_smoothed) %}
             {{ (primary_smoothed | float - secondary_smoothed | float) | abs | round(2) }}°C
           {% else %}
@@ -55,23 +55,23 @@
   trace:
     stored_traces: 100
 - id: automation.alarm_dads_room_co2
-  alias: "ALARM: Dad’s Room CO2"
+  alias: "ALARM: CO2"
   triggers:
     - trigger: time_pattern
       minutes: "/5"
       seconds: 55
   conditions:
     - condition: numeric_state
-      entity_id: sensor.dads_room_co2
+      entity_id: sensor.dad_s_room_co2
       above: 1000
     - condition: state
-      entity_id: input_boolean.dads_room_presence_mode
+      entity_id: input_boolean.dad_s_room_presence_mode
       state: "on"
   actions:
     - action: notify.tats_devices
       data:
         title: "⚠️ ALARM"
-        message: "Dad’s Room CO2 is too high. Current: {{ states('sensor.dads_room_co2') }}ppm"
+        message: "Dad’s Room CO2 is too high. Current: {{ states('sensor.dad_s_room_co2') }}ppm"
         data:
           push:
             interruption-level: time-sensitive
@@ -81,15 +81,15 @@
   trace:
     stored_traces: 100
 - id: automation.select_dads_room_presence_mode
-  alias: "Select Dad’s Room Presence Mode"
+  alias: "Select Presence Mode"
   triggers:
     - trigger: state
       entity_id:
-        - sensor.dads_room_motion_count
+        - sensor.dad_s_room_motion_count
         - binary_sensor.atom_focus
         - sensor.atom_battery_state
     - trigger: state
-      entity_id: binary_sensor.dads_room_presence
+      entity_id: binary_sensor.dad_s_room_presence_sensor
       for:
         minutes: 1
     - trigger: homeassistant
@@ -99,10 +99,10 @@
         - conditions:
             - or:
                 - condition: numeric_state
-                  entity_id: sensor.dads_room_motion_count
+                  entity_id: sensor.dad_s_room_motion_count
                   above: 5
                 - condition: state
-                  entity_id: binary_sensor.dads_room_presence
+                  entity_id: binary_sensor.dad_s_room_presence_sensor
                   state: "on"
                   for:
                     minutes: 1
@@ -120,13 +120,13 @@
           sequence:
             - action: input_boolean.turn_on
               target: 
-                entity_id: input_boolean.dads_room_presence_mode
+                entity_id: input_boolean.dad_s_room_presence_mode
         - conditions:
             - condition: numeric_state
-              entity_id: sensor.dads_room_motion_count
+              entity_id: sensor.dad_s_room_motion_count
               below: 6
             - condition: state
-              entity_id: binary_sensor.dads_room_presence
+              entity_id: binary_sensor.dad_s_room_presence_sensor
               state: "off"
               for:
                 minutes: 1
@@ -145,6 +145,6 @@
           sequence:
             - action: input_boolean.turn_off
               target: 
-                entity_id: input_boolean.dads_room_presence_mode
+                entity_id: input_boolean.dad_s_room_presence_mode
   trace:
     stored_traces: 1000

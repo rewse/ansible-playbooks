@@ -18,15 +18,15 @@
          | list }}
     homeassistant_test_room_anomaly_sensors: >-
       {{ homeassistant_template_binary_sensors
-         | selectattr('unique_id', 'equalto', room_contract.anomaly_entity_id)
+         | selectattr('unique_id', 'equalto', room_contract.anomaly_unique_id)
          | list }}
     homeassistant_test_room_disagreement_sensors: >-
       {{ homeassistant_template_binary_sensors
-         | selectattr('unique_id', 'equalto', 'binary_sensor.' ~ room_contract.prefix ~ '_humidity_disagreement')
+         | selectattr('unique_id', 'equalto', room_contract.disagreement_unique_id)
          | list }}
     homeassistant_test_room_fault_sensors: >-
       {{ homeassistant_template_binary_sensors
-         | selectattr('unique_id', 'equalto', room_contract.fault_entity_id)
+         | selectattr('unique_id', 'equalto', room_contract.fault_unique_id)
          | list }}
     homeassistant_test_room_smoothed_sensors: >-
       {{ homeassistant_sensors
@@ -56,16 +56,18 @@
       - item.entity_id in room_contract.source_entity_ids
       - item.state_characteristic == 'average_step'
       - item.max_age.hours == 1
-      - item.unique_id in room_contract.smoothed_entity_ids
+      - item.unique_id in (room_contract.smoothed_sensors | map(attribute='unique_id') | list)
   loop: "{{ homeassistant_test_room_smoothed_sensors }}"
 
 - name: tests | hygrometer_fault_detection_room | Verify smoothed wiring for {{ room_contract.prefix }}
   ansible.builtin.assert:
     that:
-      - "(\"states('\" ~ item ~ \"')\") in homeassistant_test_room_disagreement_sensor.state"
-      - "(\"is_number(states('\" ~ item ~ \"'))\") in homeassistant_test_room_disagreement_sensor.state"
-      - "(\"states('\" ~ item ~ \"')\") in homeassistant_test_room_alarm_automation_value.actions[0].data.message"
-  loop: "{{ room_contract.smoothed_entity_ids }}"
+      - "(\"states('\" ~ item.entity_id ~ \"')\") in homeassistant_test_room_disagreement_sensor.state"
+      - "(\"is_number(states('\" ~ item.entity_id ~ \"'))\") in homeassistant_test_room_disagreement_sensor.state"
+      - "(\"states('\" ~ item.entity_id ~ \"')\") in homeassistant_test_room_alarm_automation_value.actions[0].data.message"
+  loop: "{{ room_contract.smoothed_sensors }}"
+  loop_control:
+    label: "{{ item.entity_id }}"
 
 - name: tests | hygrometer_fault_detection_room | Verify anomaly persistence for {{ room_contract.prefix }}
   ansible.builtin.assert:
@@ -88,8 +90,8 @@
       - homeassistant_test_room_anomaly_sensor.state | regex_findall('>= 7200') | length == 1
       - "('states.' ~ room_contract.primary_entity_id ~ '.last_reported') in homeassistant_test_room_anomaly_sensor.state"
       - >-
-        ("is_state('binary_sensor." ~ room_contract.prefix ~
-         "_humidity_disagreement', 'on')") in homeassistant_test_room_anomaly_sensor.state
+        ("is_state('" ~ room_contract.disagreement_entity_id ~
+         "', 'on')") in homeassistant_test_room_anomaly_sensor.state
       - "'86400' not in homeassistant_test_room_anomaly_sensor.state"
 
 - name: tests | hygrometer_fault_detection_room | Verify fault aggregation for {{ room_contract.prefix }}

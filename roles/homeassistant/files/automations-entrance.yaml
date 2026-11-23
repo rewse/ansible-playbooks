@@ -1,5 +1,5 @@
 - id: automation.auto_lock_entrance_locks
-  alias: "Auto-Lock Entrance Locks"
+  alias: "Auto-Lock Locks"
   triggers:
     - trigger: time_pattern
       minutes: "/5"
@@ -14,7 +14,7 @@
       for:
         minutes: "{{ int(states('input_number.entrance_auto_lock_minutes')) }}"
     - condition: state
-      entity_id: binary_sensor.entrance_door
+      entity_id: binary_sensor.entrance_door_sensor_door
       state: "off"
       for:
         minutes: "{{ int(states('input_number.entrance_auto_lock_minutes')) }}"
@@ -27,7 +27,7 @@
   trace:
     stored_traces: 100
 - id: automation.push_entrance_1_button_switch
-  alias: "Push Entrance 1-Button Switch"
+  alias: "Push 1-Button Switch"
   triggers:
     - trigger: state
       entity_id:
@@ -79,10 +79,10 @@
   trace:
     stored_traces: 100
 - id: automation.restart_entrance_sesame_hub
-  alias: "Restart Entrance Sesame Hub"
+  alias: "Restart Sesame Hub"
   triggers:
     - trigger: state
-      entity_id: binary_sensor.entrance_door
+      entity_id: binary_sensor.entrance_door_sensor_door
       to: "off"
       for:
         minutes: "{{ int(states('input_number.entrance_auto_lock_minutes')) + 10 }}"
@@ -130,7 +130,7 @@
   trace:
     stored_traces: 100
 - id: automation.select_entrance_alarm_control
-  alias: "Select Entrance Alarm Control"
+  alias: "Select Alarm Control"
   triggers:
     - trigger: state
       entity_id: input_select.time_mode

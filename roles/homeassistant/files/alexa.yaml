@@ -9,34 +9,34 @@ smart_home:
       - alarm_control_panel.home
       - automation.turn_down_living_area
       - automation.turn_down_living_area_more
-      - binary_sensor.bathroom_motion
-      - binary_sensor.moms_room_window_n
-      - binary_sensor.moms_room_window_s
-      - binary_sensor.entrance_door
-      - binary_sensor.living_room_motion
-      - binary_sensor.living_room_window
-      - binary_sensor.study_motion
-      - binary_sensor.study_window_n
-      - binary_sensor.study_window_s
+      - binary_sensor.bathroom_motion_sensor_motion
+      - binary_sensor.mom_s_room_window_sensor_north_door
+      - binary_sensor.mom_s_room_window_sensor_south_door
+      - binary_sensor.entrance_door_sensor_door
+      - binary_sensor.living_room_motion_sensor_south_motion
+      - binary_sensor.living_room_window_sensor_south_door
+      - binary_sensor.living_room_motion_sensor_north_motion
+      - binary_sensor.living_room_window_sensor_north_door
+      - binary_sensor.living_room_window_sensor_center_door
       - climate.moms_room_hvac
       - climate.living_room_hvac
-      - cover.moms_room_curtains
+      - cover.mom_s_room_curtains
       - fan.living_room_ceiling_fans
-      - switch.living_room_floor_heater_operation_status
+      - switch.living_room_floor_heater_south_operation_status
       - light.bathroom_lights
-      - light.moms_room_light
-      - light.living_area_dimming_downlights
-      - light.living_area_downlights
-      - light.living_room_entrance_light
-      - light.living_room_footlight
+      - light.mom_s_room_light
+      - light.living_room_dimming_downlights
+      - light.living_room_downlights
+      - light.living_room_light_entrance
+      - light.living_room_footlight_plug
       - light.living_room_tv_light
       - lock.entrance_locks
-      - media_player.appletv
-      - media_player.aventage
-      - sensor.balcony_temperature
-      - sensor.bathroom_temperature
-      - sensor.moms_room_temperature
-      - sensor.living_room_temperature
+      - media_player.living_room_apple_tv
+      - media_player.living_room_av_receiver
+      - sensor.balcony_thermometer_primary_temperature
+      - sensor.bathroom_motion_sensor_temperature
+      - sensor.mom_s_room_thermometer_primary_temperature
+      - sensor.living_room_thermometer_temperature
       - sensor.study_temperature
       - switch.living_room_humidifier
       - switch.living_room_hvac_cleaner
@@ -51,68 +51,68 @@ smart_home:
     automation.turn_down_living_area_more:
       name: リビングのもっとターンダウン
       display_categories: SCENE_TRIGGER
-    binary_sensor.bathroom_motion:
+    binary_sensor.bathroom_motion_sensor_motion:
       name: 浴室のモーションセンサー
-    binary_sensor.moms_room_window_n:
+    binary_sensor.mom_s_room_window_sensor_north_door:
       name: ママの部屋の北側の窓
-    binary_sensor.moms_room_window_s:
+    binary_sensor.mom_s_room_window_sensor_south_door:
       name: ママの部屋の南側のの窓
-    binary_sensor.entrance_door:
+    binary_sensor.entrance_door_sensor_door:
       name: 玄関のドア
-    binary_sensor.living_room_motion:
+    binary_sensor.living_room_motion_sensor_south_motion:
       name: リビングのモーションセンサー
-    binary_sensor.living_room_window:
+    binary_sensor.living_room_window_sensor_south_door:
       name: リビングの窓
-    binary_sensor.study_motion:
+    binary_sensor.living_room_motion_sensor_north_motion:
       name: 書斎のモーションセンサー
-    binary_sensor.study_window_n:
+    binary_sensor.living_room_window_sensor_north_door:
       name: 書斎の北側の窓
-    binary_sensor.study_window_s:
+    binary_sensor.living_room_window_sensor_center_door:
       name: 書斎の南側の窓
     camera.eufy_mom:
       name: ママの部屋のカメラ
     camera.eufy_liv:
       name: リビングのカメラ
-    climate.moms_room_ac:
+    climate.mom_s_room_ac:
       name: ママの部屋のエアコン
     climate.living_room_hvac:
       name: リビングのエアコン
-    cover.moms_room_curtains:
+    cover.mom_s_room_curtains:
       name: ママの部屋のカーテン
     fan.living_room_ceiling_fans:
       name: リビングのシーリングファン
-    switch.living_room_floor_heater_operation_status:
+    switch.living_room_floor_heater_south_operation_status:
       name: リビングの床暖房
       display_categories: SWITCH
     light.bathroom_lights:
       name: 浴室の照明
-    light.moms_room_light:
+    light.mom_s_room_light:
       name: 寝室の照明
-    light.living_area_dimming_downlights:
+    light.living_room_dimming_downlights:
       name: リビングのダウンライトの調光
-    light.living_area_downlights:
+    light.living_room_downlights:
       name: リビングのダウンライト
-    light.living_room_entrance_light:
+    light.living_room_light_entrance:
       name: リビングの入り口の照明
-    light.living_room_footlight:
+    light.living_room_footlight_plug:
       name: リビングのフットライト
     light.living_room_tv_light:
       name: リビングのテレビの照明
     lock.entrance_locks:
       name: 玄関の鍵
-    media_player.appletv:
+    media_player.living_room_apple_tv:
       name: Apple TV
       display_categories: STREAMING_DEVICE
-    media_player.aventage:
+    media_player.living_room_av_receiver:
       name: アンプ
       display_categories: MUSIC_SYSTEM
-    sensor.balcony_temperature:
+    sensor.balcony_thermometer_primary_temperature:
       name: ベランダの温度計
-    sensor.bathroom_temperature:
+    sensor.bathroom_motion_sensor_temperature:
       name: 浴室の温度計
-    sensor.moms_room_temperature:
+    sensor.mom_s_room_thermometer_primary_temperature:
       name: 寝室の温度計
-    sensor.living_room_temperature:
+    sensor.living_room_thermometer_temperature:
       name: リビングの温度計
     sensor.study_temperature:
       name: 書斎の温度計

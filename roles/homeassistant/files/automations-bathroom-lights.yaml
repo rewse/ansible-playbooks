@@ -1,5 +1,5 @@
 - id: automation.push_bathroom_1_button_switch
-  alias: "Push Bathroom 1-Button Switch"
+  alias: "Push 1-Button Switch"
   triggers:
     - trigger: state
       entity_id: event.bathroom_1_button_switch_button
@@ -30,12 +30,12 @@
   trace:
     stored_traces: 100
 - id: automation.select_bathroom_light_mode
-  alias: "Select Bathroom Light Mode"
+  alias: "Select Light Mode"
   triggers:
     - trigger: state
       entity_id: input_select.bathroom_light_remote_mode
     - trigger: state
-      entity_id: light.bathroom_middle_light
+      entity_id: light.bathroom_light_middle
       to: "off"
   actions:
     - choose:
@@ -61,7 +61,7 @@
                 option: "Turned on Natural Light"
         - conditions:
             - condition: state
-              entity_id: light.bathroom_middle_light
+              entity_id: light.bathroom_light_middle
               state: "off"
           sequence:
             - action: input_select.select_option
@@ -72,7 +72,7 @@
   trace:
     stored_traces: 100
 - id: automation.select_bathroom_scene
-  alias: "Select Bathroom Scene"
+  alias: "Select Scene"
   triggers:
     - trigger: state
       entity_id: input_select.bathroom_light_mode
@@ -94,7 +94,7 @@
               target: 
                 entity_id: input_select.bathroom_scene
               data:
-                option: "scene.bathroom_arise"
+                option: "scene.bathroom_light_group_arise"
         - conditions:
             - condition: state
               entity_id: input_select.bathroom_light_mode
@@ -105,7 +105,7 @@
               target: 
                 entity_id: input_select.bathroom_scene
               data:
-                option: "scene.bathroom_natural_light"
+                option: "scene.bathroom_light_group_natural_light"
         - conditions:
             - condition: state
               entity_id: input_select.bathroom_light_mode
@@ -120,7 +120,7 @@
   trace:
     stored_traces: 100
 - id: automation.turn_on_bathroom_scene
-  alias: "Turn on Bathroom Scene"
+  alias: "Turn on Scene"
   triggers:
     - trigger: state
       entity_id: input_select.bathroom_scene

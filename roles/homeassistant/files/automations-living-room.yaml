@@ -1,5 +1,5 @@
 - id: automation.alarm_living_room_humidity_difference
-  alias: "ALARM: Living Room Humidity Difference"
+  alias: "ALARM: Humidity Difference"
   triggers:
     - trigger: state
       entity_id: binary_sensor.living_room_hygrometer_fault
@@ -10,8 +10,8 @@
         title: "⚠️ ALARM"
         message: >-
           Living Room humidity sensors may be faulty.
-          Current: {{ states('sensor.living_room_humidity') }}% /
-          {{ states('sensor.living_room_switchbot_hub_2_humidity') }}%.
+          Current: {{ states('sensor.living_room_thermometer_humidity') }}% /
+          {{ states('sensor.living_room_switchbot_hub_humidity') }}%.
           Smoothed difference:
           {% set primary_smoothed = states('sensor.living_room_humidity_smoothed') %}
           {% set secondary_smoothed = states('sensor.living_room_switchbot_hub_2_humidity_smoothed') %}
@@ -27,7 +27,7 @@
   trace:
     stored_traces: 100
 - id: automation.alarm_living_room_temperature_difference
-  alias: "ALARM: Living Room Temperature Difference"
+  alias: "ALARM: Temperature Difference"
   triggers:
     - trigger: state
       entity_id: binary_sensor.living_room_thermometer_fault
@@ -38,8 +38,8 @@
         title: "⚠️ ALARM"
         message: >-
           Living Room temperature sensors may be faulty.
-          Current: {{ states('sensor.living_room_temperature') }}°C /
-          {{ states('sensor.living_room_switchbot_hub_2_temperature') }}°C.
+          Current: {{ states('sensor.living_room_thermometer_temperature') }}°C /
+          {{ states('sensor.living_room_switchbot_hub_temperature') }}°C.
           Smoothed difference:
           {% set primary_smoothed = states('sensor.living_room_temperature_smoothed') %}
           {% set secondary_smoothed = states('sensor.living_room_switchbot_hub_2_temperature_smoothed') %}
@@ -55,7 +55,7 @@
   trace:
     stored_traces: 100
 - id: automation.alarm_living_room_co2
-  alias: "ALARM: Living Room CO2"
+  alias: "ALARM: CO2"
   triggers:
     - trigger: time_pattern
       minutes: "/5"
@@ -66,9 +66,9 @@
       above: 1000
     - condition: state
       entity_id:
-        - binary_sensor.living_room_window
-        - binary_sensor.study_window_n
-        - binary_sensor.study_window_s
+        - binary_sensor.living_room_window_sensor_south_door
+        - binary_sensor.living_room_window_sensor_north_door
+        - binary_sensor.living_room_window_sensor_center_door
       state: "off"
   actions:
     - action: notify.all_devices
@@ -84,15 +84,15 @@
   trace:
     stored_traces: 100
 - id: automation.select_living_room_regza_content_type_mode
-  alias: "Select Living Room Regza Content Type Mode"
+  alias: "Select Regza Content Type Mode"
   triggers:
     - trigger: state
-      entity_id: media_player.aventage
+      entity_id: media_player.living_room_av_receiver
       attribute: source
       for:
         seconds: 5
     - trigger: state
-      entity_id: media_player.aventage
+      entity_id: media_player.living_room_av_receiver
       to: "off"
       for:
         seconds: 5
@@ -102,7 +102,7 @@
     - choose:
         - conditions:
             - condition: state
-              entity_id: media_player.aventage
+              entity_id: media_player.living_room_av_receiver
               attribute: source
               state: "TV"
           sequence:
@@ -113,11 +113,11 @@
                 option: "Internal"
         - conditions:
             - condition: state
-              entity_id: media_player.aventage
+              entity_id: media_player.living_room_av_receiver
               state: "playing"
             - not:
                 - condition: state
-                  entity_id: media_player.aventage
+                  entity_id: media_player.living_room_av_receiver
                   attribute: source
                   state: "TV"
           sequence:
@@ -135,12 +135,12 @@
   trace:
     stored_traces: 100
 - id: automation.select_living_room_presence_mode
-  alias: "Select Living Room Presence Mode"
+  alias: "Select Presence Mode"
   triggers:
     - trigger: state
       entity_id:
-        - binary_sensor.living_room_presence_e
-        - binary_sensor.living_room_presence_s
+        - binary_sensor.living_room_presence_sensor_east_occupancy
+        - binary_sensor.living_room_presence_sensor_south_occupancy
       for:
         minutes: 1
     - trigger: homeassistant
@@ -150,8 +150,8 @@
         - conditions:
             - condition: state
               entity_id:
-                - binary_sensor.living_room_presence_e
-                # - binary_sensor.living_room_presence_s
+                - binary_sensor.living_room_presence_sensor_east_occupancy
+                # - binary_sensor.living_room_presence_sensor_south_occupancy
               match: any
               state: "on"
               for:
@@ -163,8 +163,8 @@
         - conditions:
             - condition: state
               entity_id:
-                - binary_sensor.living_room_presence_e
-                - binary_sensor.living_room_presence_s
+                - binary_sensor.living_room_presence_sensor_east_occupancy
+                - binary_sensor.living_room_presence_sensor_south_occupancy
               state: "off"
               for:
                 minutes: 1
@@ -179,9 +179,9 @@
   triggers:
     - trigger: state
       entity_id:
-        - binary_sensor.living_room_window
-        - binary_sensor.study_window_n
-        - binary_sensor.study_window_s
+        - binary_sensor.living_room_window_sensor_south_door
+        - binary_sensor.living_room_window_sensor_north_door
+        - binary_sensor.living_room_window_sensor_center_door
     - trigger: homeassistant
       event: start
   actions:
@@ -189,9 +189,9 @@
         - conditions:
             - condition: state
               entity_id:
-                - binary_sensor.living_room_window
-                - binary_sensor.study_window_n
-                - binary_sensor.study_window_s
+                - binary_sensor.living_room_window_sensor_south_door
+                - binary_sensor.living_room_window_sensor_north_door
+                - binary_sensor.living_room_window_sensor_center_door
               match: any
               state: "on"
           sequence:
@@ -201,9 +201,9 @@
         - conditions:
             - condition: state
               entity_id:
-                - binary_sensor.living_room_window
-                - binary_sensor.study_window_n
-                - binary_sensor.study_window_s
+                - binary_sensor.living_room_window_sensor_south_door
+                - binary_sensor.living_room_window_sensor_north_door
+                - binary_sensor.living_room_window_sensor_center_door
               state: "off"
           sequence:
             - action: input_boolean.turn_off

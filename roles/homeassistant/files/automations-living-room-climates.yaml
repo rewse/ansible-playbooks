@@ -2,7 +2,7 @@
   alias: "Adjust Living Room AC Temperature"
   triggers:
     - trigger: state
-      entity_id: input_number.living_room_temp_target
+      entity_id: input_number.living_room_temperature_target
     - trigger: time_pattern
       minutes: "/5"
       seconds: 24
@@ -27,35 +27,35 @@
         - conditions:
             - >-
               {{
-                float(states('sensor.living_room_temperature')) -
-                float(states('input_number.living_room_temp_target')) < -0.5
+                float(states('sensor.living_room_thermometer_temperature')) -
+                float(states('input_number.living_room_temperature_target')) < -0.5
               }}
           sequence:
             - action: climate.set_temperature
               target:
                 entity_id: climate.living_room_ac
               data:
-                temperature: "{{ int(states('sensor.living_room_ac_temp')) + 1 }}"
+                temperature: "{{ int(states('sensor.living_room_ac_target_temperature')) + 1 }}"
             - delay:
                 minutes: 9
         - conditions:
             - >-
               {{
-                float(states('sensor.living_room_temperature')) -
-                float(states('input_number.living_room_temp_target')) > 0.5
+                float(states('sensor.living_room_thermometer_temperature')) -
+                float(states('input_number.living_room_temperature_target')) > 0.5
               }}
           sequence:
             - action: climate.set_temperature
               target:
                 entity_id: climate.living_room_ac
               data:
-                temperature: "{{ int(states('sensor.living_room_ac_temp')) - 1 }}"
+                temperature: "{{ int(states('sensor.living_room_ac_target_temperature')) - 1 }}"
             - delay:
                 minutes: 9
   trace:
     stored_traces: 100
 - id: automation.change_living_room_ac_from_heatcool
-  alias: "Change Living Room AC from HeatCool"
+  alias: "Change AC from HeatCool"
   triggers:
     - trigger: state
       entity_id: climate.living_room_ac
@@ -75,15 +75,15 @@
               state: "Summer"
             - >-
               {{
-                float(states('sensor.living_room_humidity')) >
+                float(states('sensor.living_room_thermometer_humidity')) >
                 float(states('input_number.living_room_humidity_target_present_summer')) +
-                float(states('input_number.living_room_humidity_max_diff_present_summer'))
+                float(states('input_number.living_room_humidity_maximum_difference_present_summer'))
               }}
             - >-
               {{
-                float(states('sensor.living_room_temperature')) <
-                float(states('input_number.living_room_temp_target_present_summer')) -
-                float(states('input_number.living_room_temp_min_diff_present_summer'))
+                float(states('sensor.living_room_thermometer_temperature')) <
+                float(states('input_number.living_room_temperature_target_present_summer')) -
+                float(states('input_number.living_room_temperature_minimum_difference_present_summer'))
               }}
           sequence:
             - action: climate.set_hvac_mode
@@ -105,7 +105,7 @@
               target:
                 entity_id: climate.living_room_ac
               data:
-                temperature: "{{ int(states('input_number.living_room_temp_target_present_summer')) }}"
+                temperature: "{{ int(states('input_number.living_room_temperature_target_present_summer')) }}"
         - conditions:
             - condition: state
               entity_id: input_select.season_mode
@@ -120,11 +120,11 @@
               target:
                 entity_id: climate.living_room_ac
               data:
-                temperature: "{{ int(states('input_number.living_room_temp_target_present_winter')) }}"
+                temperature: "{{ int(states('input_number.living_room_temperature_target_present_winter')) }}"
   trace:
     stored_traces: 100
 - id: automation.notify_living_room_climate
-  alias: "Notify Living Room Climate"
+  alias: "Notify Climate"
   triggers:
     - trigger: event
       event_type: "living_room_humidity_too_high"
@@ -148,7 +148,7 @@
               data:
                 message: >-
                   Living Room Humidity is Too High.
-                  Current: {{ states('sensor.living_room_humidity') }}%
+                  Current: {{ states('sensor.living_room_thermometer_humidity') }}%
                 data:
                   push:
                     interruption-level: time-sensitive
@@ -163,7 +163,7 @@
               data:
                 message: >-
                   Living Room Humidity is Too Low.
-                  Current: {{ states('sensor.living_room_humidity') }}%
+                  Current: {{ states('sensor.living_room_thermometer_humidity') }}%
                 data:
                   push:
                     interruption-level: time-sensitive
@@ -178,7 +178,7 @@
               data:
                 message: >-
                   Living Room Temperature is Too High.
-                  Current: {{ states('sensor.living_room_temperature') }}°C
+                  Current: {{ states('sensor.living_room_thermometer_temperature') }}°C
                 data:
                   push:
                     interruption-level: time-sensitive
@@ -193,7 +193,7 @@
               data:
                 message: >-
                   Living Room Temperature is Too low.
-                  Current: {{ states('sensor.living_room_temperature') }}°C
+                  Current: {{ states('sensor.living_room_thermometer_temperature') }}°C
                 data:
                   push:
                     interruption-level: time-sensitive
@@ -203,7 +203,7 @@
   trace:
     stored_traces: 100
 - id: automation.change_living_room_ac_mode
-  alias: "Change Living Room AC Mode"
+  alias: "Change AC Mode"
   triggers:
     - trigger: time_pattern
       minutes: "/5"
@@ -234,35 +234,35 @@
                 - and:
                     - >-
                         {{
-                          float(states('sensor.living_room_temperature')) <
-                          float(states('input_number.living_room_temp_target'))
+                          float(states('sensor.living_room_thermometer_temperature')) <
+                          float(states('input_number.living_room_temperature_target'))
                         }}
                     - >-
                         {{
-                          float(states('sensor.living_room_humidity')) <
+                          float(states('sensor.living_room_thermometer_humidity')) <
                           float(states('input_number.living_room_humidity_target'))
                         }}
                 - and:
                     - >-
                         {{
-                          float(states('sensor.living_room_temperature')) <
-                          float(states('input_number.living_room_temp_target'))
+                          float(states('sensor.living_room_thermometer_temperature')) <
+                          float(states('input_number.living_room_temperature_target'))
                         }}
                     - >-
                         {{
-                          float(states('sensor.living_room_humidity')) >
+                          float(states('sensor.living_room_thermometer_humidity')) >
                           float(states('input_number.living_room_humidity_target'))
                         }}
                     - >-
                         {{
                           (
-                            float(states('input_number.living_room_temp_target')) -
-                            float(states('sensor.living_room_temperature'))
-                          ) / float(states('input_number.living_room_temp_min_diff')) >
+                            float(states('input_number.living_room_temperature_target')) -
+                            float(states('sensor.living_room_thermometer_temperature'))
+                          ) / float(states('input_number.living_room_temperature_minimum_difference')) >
                           (
-                            float(states('sensor.living_room_humidity')) -
+                            float(states('sensor.living_room_thermometer_humidity')) -
                             float(states('input_number.living_room_humidity_target'))
-                          ) / float(states('input_number.living_room_humidity_max_diff'))
+                          ) / float(states('input_number.living_room_humidity_maximum_difference'))
                         }}
           sequence:
             - action: climate.set_hvac_mode
@@ -276,25 +276,25 @@
               target:
                 entity_id: climate.living_room_ac
               data:
-                temperature: "{{ int(states('sensor.living_room_ac_temp')) + 1 }}"
+                temperature: "{{ int(states('sensor.living_room_ac_target_temperature')) + 1 }}"
             - delay:
                 minutes: 29
         - conditions:
             - >-
               {{
-                float(states('sensor.living_room_temperature')) >
-                float(states('input_number.living_room_temp_target'))
+                float(states('sensor.living_room_thermometer_temperature')) >
+                float(states('input_number.living_room_temperature_target'))
               }}
             - >-
               {{
                 (
-                  float(states('sensor.living_room_temperature')) -
-                  float(states('input_number.living_room_temp_target'))
-                ) / float(states('input_number.living_room_temp_max_diff')) >
+                  float(states('sensor.living_room_thermometer_temperature')) -
+                  float(states('input_number.living_room_temperature_target'))
+                ) / float(states('input_number.living_room_temperature_maximum_difference')) >
                 (
-                  float(states('sensor.living_room_humidity')) -
+                  float(states('sensor.living_room_thermometer_humidity')) -
                   float(states('input_number.living_room_humidity_target'))
-                ) / float(states('input_number.living_room_humidity_max_diff'))
+                ) / float(states('input_number.living_room_humidity_maximum_difference'))
               }}
           sequence:
             - action: climate.set_hvac_mode
@@ -307,19 +307,19 @@
         - conditions:
             - >-
               {{
-                float(states('sensor.living_room_humidity')) >
+                float(states('sensor.living_room_thermometer_humidity')) >
                 float(states('input_number.living_room_humidity_target'))
               }}
             - >-
               {{
                 (
-                  float(states('sensor.living_room_temperature')) -
-                  float(states('input_number.living_room_temp_target'))
-                ) / float(states('input_number.living_room_temp_max_diff')) <
+                  float(states('sensor.living_room_thermometer_temperature')) -
+                  float(states('input_number.living_room_temperature_target'))
+                ) / float(states('input_number.living_room_temperature_maximum_difference')) <
                 (
-                  float(states('sensor.living_room_humidity')) -
+                  float(states('sensor.living_room_thermometer_humidity')) -
                   float(states('input_number.living_room_humidity_target'))
-                ) / float(states('input_number.living_room_humidity_max_diff'))
+                ) / float(states('input_number.living_room_humidity_maximum_difference'))
               }}
           sequence:
             - action: climate.set_hvac_mode
@@ -332,7 +332,7 @@
   trace:
     stored_traces: 100
 - id: automation.plan_to_turn_on_living_room_ac_internal_clean
-  alias: "Plan to Turn on Living Room AC Internal Clean"
+  alias: "Plan to Turn on AC Internal Clean"
   triggers:
     - trigger: state
       entity_id: climate.living_room_ac
@@ -345,7 +345,7 @@
     - action: automation.turn_on
       target:
         entity_id:
-          - automation.turn_on_living_room_ac_internal_clean
+          - automation.living_room_turn_on_ac_internal_clean
   trace:
     stored_traces: 100
 - id: automation.recover_from_living_room_ac_manual_internal_clean
@@ -357,14 +357,14 @@
     - action: automation.turn_on
       target:
         entity_id:
-          - automation.adjust_living_room_ac_temperature
-          - automation.change_living_room_ac_mode
-          - automation.toggle_living_room_ac_cooldry
+          - automation.living_room_adjust_ac_temperature
+          - automation.living_room_change_ac_mode
+          - automation.living_room_toggle_ac_cooldry
           - automation.toggle_living_room_ac_heat
   trace:
     stored_traces: 100
 - id: automation.select_living_room_climate_mode
-  alias: "Select Living Room Climate Mode"
+  alias: "Select Climate Mode"
   triggers:
     - trigger: state
       entity_id:
@@ -560,48 +560,48 @@
   trace:
     stored_traces: 100
 - id: automation.select_living_room_humiture_target
-  alias: "Select Living Room Humiture Target"
+  alias: "Select Humiture Target"
   triggers:
     - trigger: state
       entity_id:
         - input_select.living_room_climate_mode
-        - input_number.living_room_temp_target_present_summer
-        - input_number.living_room_temp_target_present_winter
-        - input_number.living_room_temp_target_present_summer_midnight
-        - input_number.living_room_temp_target_present_winter_midnight
-        - input_number.living_room_temp_target_absent_winter
+        - input_number.living_room_temperature_target_present_summer
+        - input_number.living_room_temperature_target_present_winter
+        - input_number.living_room_temperature_target_present_summer_midnight
+        - input_number.living_room_temperature_target_present_winter_midnight
+        - input_number.living_room_temperature_target_absent_winter
         - input_number.living_room_humidity_target_present_summer
         - input_number.living_room_humidity_target_present_winter
         - input_number.living_room_humidity_target_present_summer_midnight
         - input_number.living_room_humidity_target_present_winter_midnight
         - input_number.living_room_humidity_target_absent_winter
-        - input_number.living_room_temp_max_diff_present_summer
-        - input_number.living_room_temp_max_diff_present_winter
-        - input_number.living_room_temp_max_diff_present_summer_midnight
-        - input_number.living_room_temp_max_diff_present_winter_midnight
-        - input_number.living_room_temp_max_diff_absent_winter
-        - input_number.living_room_humidity_max_diff_present_summer
-        - input_number.living_room_humidity_max_diff_present_winter
-        - input_number.living_room_humidity_max_diff_present_summer_midnight
-        - input_number.living_room_humidity_max_diff_present_winter_midnight
-        - input_number.living_room_humidity_max_diff_absent_winter
-        - input_number.living_room_temp_min_diff_present_summer
-        - input_number.living_room_temp_min_diff_present_winter
-        - input_number.living_room_temp_min_diff_present_summer_midnight
-        - input_number.living_room_temp_min_diff_present_winter_midnight
-        - input_number.living_room_temp_min_diff_absent_winter
-        - input_number.living_room_humidity_min_diff_present_summer
-        - input_number.living_room_humidity_min_diff_present_winter
-        - input_number.living_room_humidity_min_diff_present_summer_midnight
-        - input_number.living_room_humidity_min_diff_present_winter_midnight
-        - input_number.living_room_humidity_min_diff_absent_winter
+        - input_number.living_room_temperature_maximum_difference_present_summer
+        - input_number.living_room_temperature_maximum_difference_present_winter
+        - input_number.living_room_temperature_maximum_difference_present_summer_midnight
+        - input_number.living_room_temperature_maximum_difference_present_winter_midnight
+        - input_number.living_room_temperature_maximum_difference_absent_winter
+        - input_number.living_room_humidity_maximum_difference_present_summer
+        - input_number.living_room_humidity_maximum_difference_present_winter
+        - input_number.living_room_humidity_maximum_difference_present_summer_midnight
+        - input_number.living_room_humidity_maximum_difference_present_winter_midnight
+        - input_number.living_room_humidity_maximum_difference_absent_winter
+        - input_number.living_room_temperature_minimum_difference_present_summer
+        - input_number.living_room_temperature_minimum_difference_present_winter
+        - input_number.living_room_temperature_minimum_difference_present_summer_midnight
+        - input_number.living_room_temperature_minimum_difference_present_winter_midnight
+        - input_number.living_room_temperature_minimum_difference_absent_winter
+        - input_number.living_room_humidity_minimum_difference_present_summer
+        - input_number.living_room_humidity_minimum_difference_present_winter
+        - input_number.living_room_humidity_minimum_difference_present_summer_midnight
+        - input_number.living_room_humidity_minimum_difference_present_winter_midnight
+        - input_number.living_room_humidity_minimum_difference_absent_winter
     - trigger: state
       entity_id:
-        - input_number.living_room_temp_max_diff
-        - input_number.living_room_humidity_max_diff
-        - input_number.living_room_temp_min_diff
-        - input_number.living_room_humidity_min_diff
-        - input_number.living_room_temp_target
+        - input_number.living_room_temperature_maximum_difference
+        - input_number.living_room_humidity_maximum_difference
+        - input_number.living_room_temperature_minimum_difference
+        - input_number.living_room_humidity_minimum_difference
+        - input_number.living_room_temperature_target
         - input_number.living_room_humidity_target
       for:
         hours: 2
@@ -616,16 +616,16 @@
           sequence:
             repeat:
               for_each:
-                - src: input_number.living_room_temp_max_diff_present_summer
-                  dest: input_number.living_room_temp_max_diff
-                - src: input_number.living_room_humidity_max_diff_present_summer
-                  dest: input_number.living_room_humidity_max_diff
-                - src: input_number.living_room_temp_min_diff_present_summer
-                  dest: input_number.living_room_temp_min_diff
-                - src: input_number.living_room_humidity_min_diff_present_summer
-                  dest: input_number.living_room_humidity_min_diff
-                - src: input_number.living_room_temp_target_present_summer
-                  dest: input_number.living_room_temp_target
+                - src: input_number.living_room_temperature_maximum_difference_present_summer
+                  dest: input_number.living_room_temperature_maximum_difference
+                - src: input_number.living_room_humidity_maximum_difference_present_summer
+                  dest: input_number.living_room_humidity_maximum_difference
+                - src: input_number.living_room_temperature_minimum_difference_present_summer
+                  dest: input_number.living_room_temperature_minimum_difference
+                - src: input_number.living_room_humidity_minimum_difference_present_summer
+                  dest: input_number.living_room_humidity_minimum_difference
+                - src: input_number.living_room_temperature_target_present_summer
+                  dest: input_number.living_room_temperature_target
                 - src: input_number.living_room_humidity_target_present_summer
                   dest: input_number.living_room_humidity_target
               sequence:
@@ -641,16 +641,16 @@
           sequence:
             repeat:
               for_each:
-                - src: input_number.living_room_temp_max_diff_present_winter
-                  dest: input_number.living_room_temp_max_diff
-                - src: input_number.living_room_humidity_max_diff_present_winter
-                  dest: input_number.living_room_humidity_max_diff
-                - src: input_number.living_room_temp_min_diff_present_winter
-                  dest: input_number.living_room_temp_min_diff
-                - src: input_number.living_room_humidity_min_diff_present_winter
-                  dest: input_number.living_room_humidity_min_diff
-                - src: input_number.living_room_temp_target_present_winter
-                  dest: input_number.living_room_temp_target
+                - src: input_number.living_room_temperature_maximum_difference_present_winter
+                  dest: input_number.living_room_temperature_maximum_difference
+                - src: input_number.living_room_humidity_maximum_difference_present_winter
+                  dest: input_number.living_room_humidity_maximum_difference
+                - src: input_number.living_room_temperature_minimum_difference_present_winter
+                  dest: input_number.living_room_temperature_minimum_difference
+                - src: input_number.living_room_humidity_minimum_difference_present_winter
+                  dest: input_number.living_room_humidity_minimum_difference
+                - src: input_number.living_room_temperature_target_present_winter
+                  dest: input_number.living_room_temperature_target
                 - src: input_number.living_room_humidity_target_present_winter
                   dest: input_number.living_room_humidity_target
               sequence:
@@ -666,16 +666,16 @@
           sequence:
             repeat:
               for_each:
-                - src: input_number.living_room_temp_max_diff_present_summer_midnight
-                  dest: input_number.living_room_temp_max_diff
-                - src: input_number.living_room_humidity_max_diff_present_summer_midnight
-                  dest: input_number.living_room_humidity_max_diff
-                - src: input_number.living_room_temp_min_diff_present_summer_midnight
-                  dest: input_number.living_room_temp_min_diff
-                - src: input_number.living_room_humidity_min_diff_present_summer_midnight
-                  dest: input_number.living_room_humidity_min_diff
-                - src: input_number.living_room_temp_target_present_summer_midnight
-                  dest: input_number.living_room_temp_target
+                - src: input_number.living_room_temperature_maximum_difference_present_summer_midnight
+                  dest: input_number.living_room_temperature_maximum_difference
+                - src: input_number.living_room_humidity_maximum_difference_present_summer_midnight
+                  dest: input_number.living_room_humidity_maximum_difference
+                - src: input_number.living_room_temperature_minimum_difference_present_summer_midnight
+                  dest: input_number.living_room_temperature_minimum_difference
+                - src: input_number.living_room_humidity_minimum_difference_present_summer_midnight
+                  dest: input_number.living_room_humidity_minimum_difference
+                - src: input_number.living_room_temperature_target_present_summer_midnight
+                  dest: input_number.living_room_temperature_target
                 - src: input_number.living_room_humidity_target_present_summer_midnight
                   dest: input_number.living_room_humidity_target
               sequence:
@@ -691,16 +691,16 @@
           sequence:
             repeat:
               for_each:
-                - src: input_number.living_room_temp_max_diff_present_winter_midnight
-                  dest: input_number.living_room_temp_max_diff
-                - src: input_number.living_room_humidity_max_diff_present_winter_midnight
-                  dest: input_number.living_room_humidity_max_diff
-                - src: input_number.living_room_temp_min_diff_present_winter_midnight
-                  dest: input_number.living_room_temp_min_diff
-                - src: input_number.living_room_humidity_min_diff_present_winter_midnight
-                  dest: input_number.living_room_humidity_min_diff
-                - src: input_number.living_room_temp_target_present_winter_midnight
-                  dest: input_number.living_room_temp_target
+                - src: input_number.living_room_temperature_maximum_difference_present_winter_midnight
+                  dest: input_number.living_room_temperature_maximum_difference
+                - src: input_number.living_room_humidity_maximum_difference_present_winter_midnight
+                  dest: input_number.living_room_humidity_maximum_difference
+                - src: input_number.living_room_temperature_minimum_difference_present_winter_midnight
+                  dest: input_number.living_room_temperature_minimum_difference
+                - src: input_number.living_room_humidity_minimum_difference_present_winter_midnight
+                  dest: input_number.living_room_humidity_minimum_difference
+                - src: input_number.living_room_temperature_target_present_winter_midnight
+                  dest: input_number.living_room_temperature_target
                 - src: input_number.living_room_humidity_target_present_winter_midnight
                   dest: input_number.living_room_humidity_target
               sequence:
@@ -716,16 +716,16 @@
           sequence:
             repeat:
               for_each:
-                - src: input_number.living_room_temp_max_diff_absent_summer
-                  dest: input_number.living_room_temp_max_diff
-                - src: input_number.living_room_humidity_max_diff_absent_summer
-                  dest: input_number.living_room_humidity_max_diff
-                - src: input_number.living_room_temp_min_diff_absent_summer
-                  dest: input_number.living_room_temp_min_diff
-                - src: input_number.living_room_humidity_min_diff_absent_summer
-                  dest: input_number.living_room_humidity_min_diff
-                - src: input_number.living_room_temp_target_absent_summer
-                  dest: input_number.living_room_temp_target
+                - src: input_number.living_room_temperature_maximum_difference_absent_summer
+                  dest: input_number.living_room_temperature_maximum_difference
+                - src: input_number.living_room_humidity_maximum_difference_absent_summer
+                  dest: input_number.living_room_humidity_maximum_difference
+                - src: input_number.living_room_temperature_minimum_difference_absent_summer
+                  dest: input_number.living_room_temperature_minimum_difference
+                - src: input_number.living_room_humidity_minimum_difference_absent_summer
+                  dest: input_number.living_room_humidity_minimum_difference
+                - src: input_number.living_room_temperature_target_absent_summer
+                  dest: input_number.living_room_temperature_target
                 - src: input_number.living_room_humidity_target_absent_summer
                   dest: input_number.living_room_humidity_target
               sequence:
@@ -741,16 +741,16 @@
           sequence:
             repeat:
               for_each:
-                - src: input_number.living_room_temp_max_diff_absent_winter
-                  dest: input_number.living_room_temp_max_diff
-                - src: input_number.living_room_humidity_max_diff_absent_winter
-                  dest: input_number.living_room_humidity_max_diff
-                - src: input_number.living_room_temp_min_diff_absent_winter
-                  dest: input_number.living_room_temp_min_diff
-                - src: input_number.living_room_humidity_min_diff_absent_winter
-                  dest: input_number.living_room_humidity_min_diff
-                - src: input_number.living_room_temp_target_absent_winter
-                  dest: input_number.living_room_temp_target
+                - src: input_number.living_room_temperature_maximum_difference_absent_winter
+                  dest: input_number.living_room_temperature_maximum_difference
+                - src: input_number.living_room_humidity_maximum_difference_absent_winter
+                  dest: input_number.living_room_humidity_maximum_difference
+                - src: input_number.living_room_temperature_minimum_difference_absent_winter
+                  dest: input_number.living_room_temperature_minimum_difference
+                - src: input_number.living_room_humidity_minimum_difference_absent_winter
+                  dest: input_number.living_room_humidity_minimum_difference
+                - src: input_number.living_room_temperature_target_absent_winter
+                  dest: input_number.living_room_temperature_target
                 - src: input_number.living_room_humidity_target_absent_winter
                   dest: input_number.living_room_humidity_target
               sequence:
@@ -762,13 +762,13 @@
   trace:
     stored_traces: 100
 - id: automation.toggle_living_room_ac_cooldry
-  alias: "Toggle Living Room AC CoolDry"
+  alias: "Toggle AC CoolDry"
   triggers:
     - trigger: state
       entity_id:
-        - input_number.living_room_temp_target
-        - input_number.living_room_temp_max_diff
-        - input_number.living_room_temp_min_diff
+        - input_number.living_room_temperature_target
+        - input_number.living_room_temperature_maximum_difference
+        - input_number.living_room_temperature_minimum_difference
     - trigger: state
       entity_id: input_boolean.living_room_window_mode
       to: "off"
@@ -793,7 +793,7 @@
     - choose:
         - conditions:
             - condition: state
-              entity_id: binary_sensor.living_room_temp_high
+              entity_id: binary_sensor.living_room_temperature_high
               state: "on"
             - not:
                 - condition: state
@@ -829,12 +829,12 @@
                         entity_id: climate.living_room_ac
                       data:
                         hvac_mode: "cool"
-                        temperature: "{{ int(states('input_number.living_room_temp_target')) }}"
+                        temperature: "{{ int(states('input_number.living_room_temperature_target')) }}"
                     - action: notify.all_devices
                       data:
                         message: >-
                           Turned on Living Room AC Cool.
-                          Current: {{ states('sensor.living_room_temperature') }}°C
+                          Current: {{ states('sensor.living_room_thermometer_temperature') }}°C
                         data:
                           push:
                             interruption-level: time-sensitive
@@ -846,7 +846,7 @@
               entity_id: binary_sensor.living_room_humidity_high
               state: "on"
             - condition: state
-              entity_id: binary_sensor.living_room_temp_high
+              entity_id: binary_sensor.living_room_temperature_high
               state: "off"
             - not:
                 - condition: state
@@ -888,7 +888,7 @@
                       data:
                         message: >-
                           Turned on Living Room AC Dry.
-                          Current: {{ states('sensor.living_room_humidity') }}%
+                          Current: {{ states('sensor.living_room_thermometer_humidity') }}%
                         data:
                           push:
                             interruption-level: time-sensitive
@@ -897,7 +897,7 @@
                         hours: 2
         - conditions:
             - condition: state
-              entity_id: binary_sensor.living_room_temp_low
+              entity_id: binary_sensor.living_room_temperature_low
               state: "on"
               for:
                 hours: 1
@@ -923,8 +923,8 @@
               data:
                 message: >-
                   Turned off Living Room AC.
-                  Current: {{ states('sensor.living_room_temperature') }}°C, 
-                  {{ states('sensor.living_room_humidity') }}%
+                  Current: {{ states('sensor.living_room_thermometer_temperature') }}°C, 
+                  {{ states('sensor.living_room_thermometer_humidity') }}%
                 data:
                   push:
                     interruption-level: time-sensitive
@@ -938,9 +938,9 @@
   triggers:
     - trigger: state
       entity_id:
-        - input_number.living_room_temp_target
-        - input_number.living_room_temp_max_diff
-        - input_number.living_room_temp_min_diff
+        - input_number.living_room_temperature_target
+        - input_number.living_room_temperature_maximum_difference
+        - input_number.living_room_temperature_minimum_difference
     - trigger: state
       entity_id: input_boolean.living_room_window_mode
       to: "off"
@@ -965,12 +965,12 @@
     - choose:
         - conditions:
             - condition: state
-              entity_id: binary_sensor.living_room_temp_low
+              entity_id: binary_sensor.living_room_temperature_low
               state: "on"
             - condition: state
               entity_id:
-                - switch.living_room_floor_heater_operation_status
-                - switch.study_floor_heater_operation_status
+                - switch.living_room_floor_heater_south_operation_status
+                - switch.living_room_floor_heater_north_operation_status
               match: any
               state: "on"
             - condition: state
@@ -992,12 +992,12 @@
                 entity_id: climate.living_room_ac
               data:
                 hvac_mode: "heat"
-                temperature: "{{ int(states('input_number.living_room_temp_target')) }}"
+                temperature: "{{ int(states('input_number.living_room_temperature_target')) }}"
             - action: notify.all_devices
               data:
                 message: >-
                   Turned on Living Room AC Heat.
-                  Current: {{ states('sensor.living_room_temperature') }}°C
+                  Current: {{ states('sensor.living_room_thermometer_temperature') }}°C
                 data:
                   push:
                     interruption-level: time-sensitive
@@ -1006,7 +1006,7 @@
                 hours: 2
         - conditions:
             - condition: state
-              entity_id: binary_sensor.living_room_temp_high
+              entity_id: binary_sensor.living_room_temperature_high
               state: "on"
             - condition: state
               entity_id: climate.living_room_ac
@@ -1019,7 +1019,7 @@
               data:
                 message: >-
                   Turned off Living Room AC Heat.
-                  Current: {{ states('sensor.living_room_temperature') }}°C
+                  Current: {{ states('sensor.living_room_thermometer_temperature') }}°C
                 data:
                   push:
                     interruption-level: time-sensitive
@@ -1029,13 +1029,13 @@
   trace:
     stored_traces: 100
 - id: automation.toggle_living_room_humidifier
-  alias: "Toggle Living Room Humidifier"
+  alias: "Toggle Humidifier"
   triggers:
     - trigger: state
       entity_id:
         - input_number.living_room_humidity_target
-        - input_number.living_room_humidity_max_diff
-        - input_number.living_room_humidity_min_diff
+        - input_number.living_room_humidity_maximum_difference
+        - input_number.living_room_humidity_minimum_difference
     - trigger: time_pattern
       minutes: "/5"
       seconds: 43
@@ -1089,7 +1089,7 @@
                       data:
                         message: >-
                           Turned on Living Room Humidifier.
-                          Current: {{ states('sensor.living_room_humidity') }}%
+                          Current: {{ states('sensor.living_room_thermometer_humidity') }}%
                         data:
                           push:
                             interruption-level: time-sensitive
@@ -1110,7 +1110,7 @@
               data:
                 message: >-
                   Turned off Living Room Humidifier.
-                  Current: {{ states('sensor.living_room_humidity') }}%
+                  Current: {{ states('sensor.living_room_thermometer_humidity') }}%
                 data:
                   push:
                     interruption-level: time-sensitive
@@ -1120,7 +1120,7 @@
   trace:
     stored_traces: 100
 - id: automation.turn_off_living_room_ac_internal_clean
-  alias: "Turn Off Living Room AC Internal Clean"
+  alias: "Turn Off AC Internal Clean"
   triggers:
     - trigger: state
       entity_id: climate.living_room_ac
@@ -1138,7 +1138,7 @@
     - action: automation.turn_off
       target:
         entity_id:
-          - automation.turn_on_living_room_ac_internal_clean
+          - automation.living_room_turn_on_ac_internal_clean
   trace:
     stored_traces: 100
 - id: automation.turn_off_living_room_climate_ventilated
@@ -1186,7 +1186,7 @@
   trace:
     stored_traces: 100
 - id: automation.turn_on_living_room_ac_internal_clean
-  alias: "Turn on Living Room AC Internal Clean"
+  alias: "Turn on AC Internal Clean"
   triggers:
     - trigger: state
       entity_id: climate.living_room_ac
@@ -1202,7 +1202,7 @@
   trace:
     stored_traces: 100
 - id: automation.toggle_living_room_fan
-  alias: "Toggle Living Room Fan"
+  alias: "Toggle Fan"
   triggers:
     - trigger: time_pattern
       minutes: "/5"
@@ -1213,7 +1213,7 @@
     - choose:
         - conditions:
             - condition: numeric_state
-              entity_id: sensor.study_motion_count
+              entity_id: sensor.living_room_motion_count_north
               above: 5
             - condition: state
               entity_id: fan.living_room_fan
@@ -1224,7 +1224,7 @@
                 entity_id: fan.living_room_fan
         - conditions:
             - condition: numeric_state
-              entity_id: sensor.study_motion_count
+              entity_id: sensor.living_room_motion_count_north
               below: 5
             - condition: state
               entity_id: fan.living_room_fan
@@ -1243,25 +1243,25 @@
   triggers:
     - id: living_room_off
       trigger: state
-      entity_id: switch.living_room_floor_heater_operation_status
+      entity_id: switch.living_room_floor_heater_south_operation_status
       to: "off"
       for:
         seconds: 10
     - id: living_room_on
       trigger: state
-      entity_id: switch.living_room_floor_heater_operation_status
+      entity_id: switch.living_room_floor_heater_south_operation_status
       to: "on"
       for:
         seconds: 10
     - id: study_off
       trigger: state
-      entity_id: switch.study_floor_heater_operation_status
+      entity_id: switch.living_room_floor_heater_north_operation_status
       to: "off"
       for:
         seconds: 10
     - id: study_on
       trigger: state
-      entity_id: switch.study_floor_heater_operation_status
+      entity_id: switch.living_room_floor_heater_north_operation_status
       to: "on"
       for:
         seconds: 10
@@ -1271,54 +1271,54 @@
             - condition: trigger
               id: living_room_off
             - condition: state
-              entity_id: switch.study_floor_heater_operation_status
+              entity_id: switch.living_room_floor_heater_north_operation_status
               state: "on"
           sequence:
             - action: switch.turn_off
               target:
-                entity_id: switch.study_floor_heater_operation_status
+                entity_id: switch.living_room_floor_heater_north_operation_status
         - conditions:
             - condition: trigger
               id: living_room_on
             - condition: state
-              entity_id: switch.study_floor_heater_operation_status
+              entity_id: switch.living_room_floor_heater_north_operation_status
               state: "off"
           sequence:
             - action: switch.turn_on
               target:
-                entity_id: switch.study_floor_heater_operation_status
+                entity_id: switch.living_room_floor_heater_north_operation_status
         - conditions:
             - condition: trigger
               id: study_off
             - condition: state
-              entity_id: switch.living_room_floor_heater_operation_status
+              entity_id: switch.living_room_floor_heater_south_operation_status
               state: "on"
           sequence:
             - action: switch.turn_off
               target:
-                entity_id: switch.living_room_floor_heater_operation_status
+                entity_id: switch.living_room_floor_heater_south_operation_status
         - conditions:
             - condition: trigger
               id: study_on
             - condition: state
-              entity_id: switch.living_room_floor_heater_operation_status
+              entity_id: switch.living_room_floor_heater_south_operation_status
               state: "off"
           sequence:
             - action: switch.turn_on
               target:
-                entity_id: switch.living_room_floor_heater_operation_status
+                entity_id: switch.living_room_floor_heater_south_operation_status
   mode: queued
   max: 4
   trace:
     stored_traces: 100
 - id: automation.toggle_living_area_floor_heating
-  alias: "Toggle Living Area Floor Heating"
+  alias: "Toggle Floor Heating"
   triggers:
     - trigger: state
       entity_id:
-        - input_number.living_room_temp_target
-        - input_number.living_room_temp_max_diff
-        - input_number.living_room_temp_min_diff
+        - input_number.living_room_temperature_target
+        - input_number.living_room_temperature_maximum_difference
+        - input_number.living_room_temperature_minimum_difference
     - trigger: state
       entity_id: input_boolean.living_room_window_mode
       to: "off"
@@ -1343,12 +1343,12 @@
     - choose:
         - conditions:
             - condition: state
-              entity_id: binary_sensor.living_room_temp_low
+              entity_id: binary_sensor.living_room_temperature_low
               state: "on"
             - condition: state
               entity_id:
-                - switch.living_room_floor_heater_operation_status
-                - switch.study_floor_heater_operation_status
+                - switch.living_room_floor_heater_south_operation_status
+                - switch.living_room_floor_heater_north_operation_status
               match: any
               state: "off"
             - not:
@@ -1379,13 +1379,13 @@
                     - action: switch.turn_on
                       target:
                         entity_id:
-                          - switch.living_room_floor_heater_operation_status
-                          - switch.study_floor_heater_operation_status
+                          - switch.living_room_floor_heater_south_operation_status
+                          - switch.living_room_floor_heater_north_operation_status
                     - action: notify.all_devices
                       data:
                         message: >-
                           Turned on Living Area Floor Heating.
-                          Current: {{ states('sensor.living_room_temperature') }}°C
+                          Current: {{ states('sensor.living_room_thermometer_temperature') }}°C
                         data:
                           push:
                             interruption-level: time-sensitive
@@ -1394,14 +1394,14 @@
                         hours: 2
         - conditions:
             - condition: state
-              entity_id: binary_sensor.living_room_temp_high
+              entity_id: binary_sensor.living_room_temperature_high
               state: "on"
               for:
                 hours: 1
             - condition: state
               entity_id:
-                - switch.living_room_floor_heater_operation_status
-                - switch.study_floor_heater_operation_status
+                - switch.living_room_floor_heater_south_operation_status
+                - switch.living_room_floor_heater_north_operation_status
               match: any
               state: "on"
             - not:
@@ -1412,13 +1412,13 @@
             - action: switch.turn_off
               target:
                 entity_id:
-                  - switch.living_room_floor_heater_operation_status
-                  - switch.study_floor_heater_operation_status
+                  - switch.living_room_floor_heater_south_operation_status
+                  - switch.living_room_floor_heater_north_operation_status
             - action: notify.all_devices
               data:
                 message: >-
                   Turned off Living Area Floor Heating.
-                  Current: {{ states('sensor.living_room_temperature') }}°C
+                  Current: {{ states('sensor.living_room_thermometer_temperature') }}°C
                 data:
                   push:
                     interruption-level: time-sensitive

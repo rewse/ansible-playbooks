@@ -7,7 +7,8 @@
     room_contracts:
       - alarm_file: automations-dads-room.yaml
         alarm_id: automation.alarm_dads_room_temp_difference
-        anomaly_entity_id: binary_sensor.dads_room_thermometer_anomaly
+        anomaly_entity_id: binary_sensor.dad_s_room_thermometer_anomaly
+        anomaly_unique_id: binary_sensor.dads_room_thermometer_anomaly
         climate_file: automations-dads-room-climates.yaml
         control_automation_ids:
           - automation.adjust_dads_room_ac_temp
@@ -15,21 +16,27 @@
           - automation.change_dads_room_ac_mode
           - automation.toggle_dads_room_ac_cooldry
           - automation.toggle_dads_room_ac_heat
-        fault_entity_id: binary_sensor.dads_room_thermometer_fault
+        disagreement_entity_id: binary_sensor.dad_s_room_temperature_disagreement
+        disagreement_unique_id: binary_sensor.dads_room_temperature_disagreement
+        fault_entity_id: binary_sensor.dad_s_room_thermometer_fault
+        fault_unique_id: binary_sensor.dads_room_thermometer_fault
         prefix: dads_room
-        primary_entity_id: sensor.dads_room_temperature
-        secondary_entity_id: sensor.dads_room_switchbot_meter_temperature
+        primary_entity_id: sensor.dad_s_room_thermometer_primary_temperature
+        secondary_entity_id: sensor.dad_s_room_thermometer_secondary_temeperature
         secondary_stale_seconds: 86400
         secondary_unavailable_seconds: 86400
-        smoothed_entity_ids:
-          - sensor.dads_room_switchbot_meter_temperature_smoothed
-          - sensor.dads_room_temperature_smoothed
+        smoothed_sensors:
+          - entity_id: sensor.dad_s_room_switchbot_meter_temperature_smoothed
+            unique_id: sensor.dads_room_switchbot_meter_temperature_smoothed
+          - entity_id: sensor.dad_s_room_temperature_smoothed
+            unique_id: sensor.dads_room_temperature_smoothed
         source_entity_ids:
-          - sensor.dads_room_switchbot_meter_temperature
-          - sensor.dads_room_temperature
+          - sensor.dad_s_room_thermometer_secondary_temeperature
+          - sensor.dad_s_room_thermometer_primary_temperature
       - alarm_file: automations-living-room.yaml
         alarm_id: automation.alarm_living_room_temperature_difference
         anomaly_entity_id: binary_sensor.living_room_thermometer_anomaly
+        anomaly_unique_id: binary_sensor.living_room_thermometer_anomaly
         climate_file: automations-living-room-climates.yaml
         control_automation_ids:
           - automation.adjust_living_room_ac_temp
@@ -38,21 +45,27 @@
           - automation.toggle_living_area_floor_heating
           - automation.toggle_living_room_ac_cooldry
           - automation.toggle_living_room_ac_heat
+        disagreement_entity_id: binary_sensor.living_room_temperature_disagreement
+        disagreement_unique_id: binary_sensor.living_room_temperature_disagreement
         fault_entity_id: binary_sensor.living_room_thermometer_fault
+        fault_unique_id: binary_sensor.living_room_thermometer_fault
         prefix: living_room
-        primary_entity_id: sensor.living_room_temperature
-        secondary_entity_id: sensor.living_room_switchbot_hub_2_temperature
+        primary_entity_id: sensor.living_room_thermometer_temperature
+        secondary_entity_id: sensor.living_room_switchbot_hub_temperature
         secondary_stale_seconds: 86400
         secondary_unavailable_seconds: 86400
-        smoothed_entity_ids:
-          - sensor.living_room_switchbot_hub_2_temperature_smoothed
-          - sensor.living_room_temperature_smoothed
+        smoothed_sensors:
+          - entity_id: sensor.living_room_switchbot_hub_2_temperature_smoothed
+            unique_id: sensor.living_room_switchbot_hub_2_temperature_smoothed
+          - entity_id: sensor.living_room_temperature_smoothed
+            unique_id: sensor.living_room_temperature_smoothed
         source_entity_ids:
-          - sensor.living_room_switchbot_hub_2_temperature
-          - sensor.living_room_temperature
+          - sensor.living_room_switchbot_hub_temperature
+          - sensor.living_room_thermometer_temperature
       - alarm_file: automations-moms-room.yaml
         alarm_id: automation.alarm_moms_room_temp_difference
-        anomaly_entity_id: binary_sensor.moms_room_thermometer_anomaly
+        anomaly_entity_id: binary_sensor.mom_s_room_thermometer_anomaly
+        anomaly_unique_id: binary_sensor.moms_room_thermometer_anomaly
         climate_file: automations-moms-room-climates.yaml
         control_automation_ids:
           - automation.adjust_moms_room_ac_temp
@@ -60,18 +73,23 @@
           - automation.change_moms_room_ac_mode
           - automation.toggle_moms_room_ac_cooldry
           - automation.toggle_moms_room_ac_heat
-        fault_entity_id: binary_sensor.moms_room_thermometer_fault
+        disagreement_entity_id: binary_sensor.mom_s_room_temperature_disagreement
+        disagreement_unique_id: binary_sensor.moms_room_temperature_disagreement
+        fault_entity_id: binary_sensor.mom_s_room_thermometer_fault
+        fault_unique_id: binary_sensor.moms_room_thermometer_fault
         prefix: moms_room
-        primary_entity_id: sensor.moms_room_temperature
-        secondary_entity_id: sensor.moms_room_switchbot_meter_temperature
+        primary_entity_id: sensor.mom_s_room_thermometer_primary_temperature
+        secondary_entity_id: sensor.mom_s_room_thermometer_secondary_temperature
         secondary_stale_seconds: 86400
         secondary_unavailable_seconds: 86400
-        smoothed_entity_ids:
-          - sensor.moms_room_switchbot_meter_temperature_smoothed
-          - sensor.moms_room_temperature_smoothed
+        smoothed_sensors:
+          - entity_id: sensor.mom_s_room_switchbot_meter_temperature_smoothed
+            unique_id: sensor.moms_room_switchbot_meter_temperature_smoothed
+          - entity_id: sensor.mom_s_room_temperature_smoothed
+            unique_id: sensor.moms_room_temperature_smoothed
         source_entity_ids:
-          - sensor.moms_room_switchbot_meter_temperature
-          - sensor.moms_room_temperature
+          - sensor.mom_s_room_thermometer_secondary_temperature
+          - sensor.mom_s_room_thermometer_primary_temperature
   tasks:
     - name: Parse shared configuration
       ansible.builtin.set_fact:
