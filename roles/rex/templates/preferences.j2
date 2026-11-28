@@ -1,0 +1,14 @@
+{{ ansible_managed | comment }}
+# Ubuntu also ships an unrelated package named rex, the Perl automation
+# framework (R)?ex, whose version sorts above every Rex release. The first
+# record makes apt take rex from the Rex repository. The second forbids any
+# other rex, which keeps unattended-upgrades and a repository that is turned
+# off during a release upgrade from replacing Rex with (R)?ex. apt applies the
+# first record that matches a version, so the order matters.
+Package: rex
+Pin: origin pkgs.superlogical.com
+Pin-Priority: 1001
+
+Package: rex
+Pin: release *
+Pin-Priority: -1

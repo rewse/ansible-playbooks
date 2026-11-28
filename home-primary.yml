@@ -79,6 +79,9 @@
     - role: nvr
       tags:
         - nvr
+    - role: rex
+      tags:
+        - rex
     - role: syslogd
       tags:
         - syslogd

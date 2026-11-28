@@ -1,0 +1,29 @@
+---
+- name: apt | Download apt key
+  ansible.builtin.get_url:
+    url: "{{ rex_apt_key_url }}"
+    dest: "{{ rex_apt_keyring }}"
+    mode: "0644"
+
+- name: apt | Pin rex to the Rex repository
+  ansible.builtin.template:
+    src: preferences.j2
+    dest: /etc/apt/preferences.d/rex
+    mode: "0644"
+  register: __rex_apt_pin
+
+- name: apt | Add apt repository
+  ansible.builtin.deb822_repository:
+    name: rex
+    types: deb
+    uris: "{{ rex_apt_uri }}"
+    suites: "{{ rex_apt_channel }}"
+    components: main
+    architectures: "{{ rex_apt_architectures[ansible_facts['architecture']] }}"
+    signed_by: "{{ rex_apt_keyring }}"
+  register: __rex_apt_repo
+
+- name: apt | Install rex
+  ansible.builtin.apt:
+    name: rex
+    update_cache: "{{ __rex_apt_pin is changed or __rex_apt_repo is changed }}"
