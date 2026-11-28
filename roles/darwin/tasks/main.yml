@@ -45,6 +45,11 @@
     - darwin_security
     - update
 
+- name: Import sshd tasks
+  ansible.builtin.import_tasks: sshd.yml
+  tags:
+    - darwin_sshd
+
 - name: Import path tasks
   ansible.builtin.import_tasks: path.yml
   tags:
