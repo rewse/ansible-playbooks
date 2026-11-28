@@ -40,9 +40,7 @@ class AdminAuthorizedKeysTest(unittest.TestCase):
     def test_without_extra_keys_the_file_equals_ubuntu_keys(self):
         self.assertEqual(render(BASE, None), BASE)
         self.assertEqual(render(BASE, []), BASE)
-        self.assertEqual(
-            render("ssh-ed25519 AAAA1 mac", []), "ssh-ed25519 AAAA1 mac"
-        )
+        self.assertEqual(render("ssh-ed25519 AAAA1 mac", []), "ssh-ed25519 AAAA1 mac")
 
     def test_extra_keys_follow_ubuntu_keys(self):
         self.assertEqual(

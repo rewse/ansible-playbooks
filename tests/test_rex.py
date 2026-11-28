@@ -49,7 +49,9 @@ class AptTest(unittest.TestCase):
             [line for line in block.splitlines() if line and not line.startswith("#")]
             for block in render_preferences().split("\n\n")
         ]
-        records = [dict(line.split(": ", 1) for line in block) for block in blocks if block]
+        records = [
+            dict(line.split(": ", 1) for line in block) for block in blocks if block
+        ]
         self.assertEqual(
             records,
             [
