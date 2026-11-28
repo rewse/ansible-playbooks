@@ -1,0 +1,39 @@
+---
+- name: server | Look up admin
+  ansible.builtin.getent:
+    database: passwd
+    key: "{{ admin_user }}"
+
+# No module manages lingering. It keeps the admin's user manager, and the Rex
+# server with it, running from boot and after logout.
+- name: server | Enable linger for admin
+  ansible.builtin.command:
+    cmd: loginctl enable-linger {{ admin_user }}
+    creates: /var/lib/systemd/linger/{{ admin_user }}
+  changed_when: true
+
+- name: server | Check socket unit
+  ansible.builtin.stat:
+    path: /usr/lib/systemd/user/rex.socket
+  register: __rex_server_unit
+
+- name: server | Check admin runtime directory
+  ansible.builtin.stat:
+    path: /run/user/{{ ansible_facts['getent_passwd'][admin_user][1] }}
+  register: __rex_server_runtime
+
+# This is what `rex server install` does for the packaged rex: the socket
+# starts rex.service on the first connection and again after it stops. A dry
+# run before the package or lingering exists has no unit or user manager to
+# ask, so it skips this task.
+- name: server | Enable socket
+  ansible.builtin.systemd_service:
+    name: rex.socket
+    scope: user
+    enabled: true
+    state: started
+  become: true
+  become_user: "{{ admin_user }}"
+  environment:
+    XDG_RUNTIME_DIR: /run/user/{{ ansible_facts['getent_passwd'][admin_user][1] }}
+  when: not ansible_check_mode or (__rex_server_unit.stat.exists and __rex_server_runtime.stat.exists)

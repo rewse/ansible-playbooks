@@ -105,5 +105,65 @@ class AptTest(unittest.TestCase):
         self.assertEqual(play["roles"][roles.index("rex")]["tags"], ["rex"])
 
 
+class ServerTest(unittest.TestCase):
+    RUNTIME_DIR = "/run/user/{{ ansible_facts['getent_passwd'][admin_user][1] }}"
+
+    def test_linger_comes_before_the_socket_is_enabled(self):
+        names = [
+            t["name"]
+            for t in yaml.safe_load((ROLE / "tasks" / "server.yml").read_text())
+        ]
+        self.assertLess(
+            names.index("server | Enable linger for admin"),
+            names.index("server | Enable socket"),
+        )
+        linger = task("server.yml", "server | Enable linger for admin")
+        self.assertEqual(
+            linger["ansible.builtin.command"]["cmd"],
+            "loginctl enable-linger {{ admin_user }}",
+        )
+        self.assertEqual(
+            linger["ansible.builtin.command"]["creates"],
+            "/var/lib/systemd/linger/{{ admin_user }}",
+        )
+        self.assertIn("changed_when", linger)
+
+    # rex.socket is the unit `rex server install` enables for the packaged rex.
+    def test_admin_socket_starts_the_server_on_demand(self):
+        start = task("server.yml", "server | Enable socket")
+        unit = start["ansible.builtin.systemd_service"]
+        self.assertEqual(
+            (unit["name"], unit["scope"], unit["state"], unit["enabled"]),
+            ("rex.socket", "user", "started", True),
+        )
+        self.assertEqual(start["become_user"], "{{ admin_user }}")
+
+    def test_user_scope_tasks_reach_the_user_manager(self):
+        start = task("server.yml", "server | Enable socket")
+        self.assertEqual(start["environment"]["XDG_RUNTIME_DIR"], self.RUNTIME_DIR)
+
+    def test_socket_task_skips_in_check_mode_before_install(self):
+        unit = task("server.yml", "server | Check socket unit")
+        self.assertEqual(
+            unit["ansible.builtin.stat"]["path"], "/usr/lib/systemd/user/rex.socket"
+        )
+        self.assertEqual(unit["register"], "__rex_server_unit")
+        runtime = task("server.yml", "server | Check admin runtime directory")
+        self.assertEqual(runtime["ansible.builtin.stat"]["path"], self.RUNTIME_DIR)
+        self.assertEqual(runtime["register"], "__rex_server_runtime")
+        self.assertEqual(
+            task("server.yml", "server | Enable socket")["when"],
+            "not ansible_check_mode or"
+            " (__rex_server_unit.stat.exists and __rex_server_runtime.stat.exists)",
+        )
+
+    def test_server_is_imported_with_its_tag(self):
+        imports = yaml.safe_load((ROLE / "tasks" / "main.yml").read_text())
+        self.assertEqual(
+            [(t["ansible.builtin.import_tasks"], t["tags"]) for t in imports],
+            [("apt.yml", ["rex_apt"]), ("server.yml", ["rex_server"])],
+        )
+
+
 if __name__ == "__main__":
     unittest.main()
