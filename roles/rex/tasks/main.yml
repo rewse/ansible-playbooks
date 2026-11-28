@@ -1,0 +1,10 @@
+---
+- name: Import apt tasks
+  ansible.builtin.import_tasks: apt.yml
+  tags:
+    - rex_apt
+
+- name: Import server tasks
+  ansible.builtin.import_tasks: server.yml
+  tags:
+    - rex_server
