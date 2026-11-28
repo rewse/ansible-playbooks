@@ -25,6 +25,7 @@ darwin_sshd_authorized_keys:
   - ecdsa-sha2-nistp256 AAAAE2VjZHNhLXNoYTItbmlzdHAyNTYAAAAIbmlzdHAyNTYAAABBBCAzliRBVJsNQ/W5Ap+37N3VCseoAEIAc5WZHI9GkYB9XNGcfXwV89g8IqRTDqkAX/4+v6316qAvDi0MtqlR/kQ= rex@atom
   # Rex for iOS on the iPad.
   - ecdsa-sha2-nistp256 AAAAE2VjZHNhLXNoYTItbmlzdHAyNTYAAAAIbmlzdHAyNTYAAABBBLaaeaihr3SD59CmB/XcnSZtQAwMcH73oupyJ+gER0GaaBYSeQmj2vvmmolD0amBU66G/FlmTrcbeH7rCWnskp0= rex@chemical
+
 # Install by hand; these have no Homebrew cask or App Store entry:
 #   adbLink                    https://adblink.me/download/
 #   HoudahGPS                  https://www.houdah.com/houdahGPS/download.html
