@@ -2,3 +2,5 @@
 ubuntu_admin_extra_authorized_keys:
   # Rex for iOS on the iPhone, connecting to the admin's Rex server.
   - ecdsa-sha2-nistp256 AAAAE2VjZHNhLXNoYTItbmlzdHAyNTYAAAAIbmlzdHAyNTYAAABBBCAzliRBVJsNQ/W5Ap+37N3VCseoAEIAc5WZHI9GkYB9XNGcfXwV89g8IqRTDqkAX/4+v6316qAvDi0MtqlR/kQ= rex@atom
+  # Rex for iOS on the iPad.
+  - ecdsa-sha2-nistp256 AAAAE2VjZHNhLXNoYTItbmlzdHAyNTYAAAAIbmlzdHAyNTYAAABBBLaaeaihr3SD59CmB/XcnSZtQAwMcH73oupyJ+gER0GaaBYSeQmj2vvmmolD0amBU66G/FlmTrcbeH7rCWnskp0= rex@chemical
