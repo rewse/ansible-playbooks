@@ -1,0 +1,33 @@
+---
+- name: sshd | Check key-only configuration
+  ansible.builtin.stat:
+    path: "{{ darwin_sshd_config_path }}"
+    checksum_algorithm: sha1
+  register: __darwin_sshd_config
+  when: darwin_sshd_authorized_keys is defined
+
+# /etc/ssh needs root. Comparing first keeps a run that changes nothing from
+# asking for the become password; run the playbook with -K when the file
+# differs. A broken file would stop sshd from starting for the next
+# connection, so it is validated before it is put in place.
+- name: sshd | Copy key-only configuration
+  ansible.builtin.copy:
+    src: 000-key-only.conf
+    dest: "{{ darwin_sshd_config_path }}"
+    owner: root
+    group: wheel
+    mode: "0644"
+    validate: /usr/sbin/sshd -t -f %s
+  become: true
+  when:
+    - darwin_sshd_authorized_keys is defined
+    - __darwin_sshd_config.stat.checksum | default('') != (lookup('ansible.builtin.file', '000-key-only.conf', rstrip=false)) | hash('sha1')
+
+- name: sshd | Authorize keys
+  ansible.posix.authorized_key:
+    user: "{{ ansible_facts['user_id'] }}"
+    key: "{{ item }}"
+  loop: "{{ darwin_sshd_authorized_keys | default([]) }}"
+  loop_control:
+    label: "{{ item.split()[-1] }}"
+  when: darwin_sshd_authorized_keys is defined

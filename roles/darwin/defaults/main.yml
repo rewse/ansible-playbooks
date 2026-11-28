@@ -4,3 +4,7 @@
 darwin_extra_packages: []
 darwin_extra_casks: []
 darwin_extra_mas_apps: []
+# Public keys added to the user's authorized_keys, one key per item. Setting
+# it also makes sshd accept only keys; hosts without it get no sshd changes.
+# darwin_sshd_authorized_keys:
+#   - ecdsa-sha2-nistp256 AAAA... iphone

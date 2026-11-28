@@ -165,6 +165,8 @@ darwin_path_files:
   - homebrew
   - local
 
+darwin_sshd_config_path: /etc/ssh/sshd_config.d/000-key-only.conf
+
 darwin_visual_explainer_prefix: "{{ ansible_facts['env']['HOME'] }}/.agents"
 
 # The 7.7.0 NuGet package lacks DotnetToolSettings.xml, so dotnet tool install
