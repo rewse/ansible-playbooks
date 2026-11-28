@@ -32,11 +32,19 @@
     state: directory
     mode: "0700"
 
-- name: user | Copy authorized_keys for admin
-  ansible.builtin.copy:
+- name: user | Read authorized_keys of ubuntu
+  ansible.builtin.slurp:
     src: /home/ubuntu/.ssh/authorized_keys
+  register: __ubuntu_authorized_keys
+
+# The admin gets ubuntu's keys followed by ubuntu_admin_extra_authorized_keys.
+# Without extra keys the file is a byte-for-byte copy of ubuntu's.
+- name: user | Write authorized_keys for admin
+  ansible.builtin.copy:
+    content: "{{ __ubuntu_base_keys ~ ((('' if __ubuntu_base_keys[-1:] == '\n' else '\n') ~ (ubuntu_admin_extra_authorized_keys | join('\n')) ~ '\n') if ubuntu_admin_extra_authorized_keys | default([]) else '') }}"
     dest: /home/{{ admin_user }}/.ssh/authorized_keys
-    remote_src: true
     owner: "{{ admin_user }}"
     group: "{{ admin_user }}"
     mode: "0600"
+  vars:
+    __ubuntu_base_keys: "{{ __ubuntu_authorized_keys.content | b64decode }}"

@@ -1,0 +1,5 @@
+---
+# Public keys appended to the admin's authorized_keys after ubuntu's keys,
+# one key per item.
+# ubuntu_admin_extra_authorized_keys:
+#   - ssh-ed25519 AAAA... iphone
