@@ -124,11 +124,20 @@ class ServerTest(unittest.TestCase):
             linger["ansible.builtin.command"]["cmd"],
             "loginctl enable-linger {{ admin_user }}",
         )
+        self.assertIn("changed_when", linger)
+
+    # changed_when overrides a creates skip, so the task must not run at all
+    # once lingering is on, or every run reports a change.
+    def test_linger_runs_only_while_it_is_off(self):
+        check = task("server.yml", "server | Check linger for admin")
         self.assertEqual(
-            linger["ansible.builtin.command"]["creates"],
+            check["ansible.builtin.stat"]["path"],
             "/var/lib/systemd/linger/{{ admin_user }}",
         )
-        self.assertIn("changed_when", linger)
+        self.assertEqual(check["register"], "__rex_server_linger")
+        linger = task("server.yml", "server | Enable linger for admin")
+        self.assertEqual(linger["when"], "not __rex_server_linger.stat.exists")
+        self.assertNotIn("creates", linger["ansible.builtin.command"])
 
     # rex.socket is the unit `rex server install` enables for the packaged rex.
     def test_admin_socket_starts_the_server_on_demand(self):

@@ -5,12 +5,18 @@
     key: "{{ admin_user }}"
 
 # No module manages lingering. It keeps the admin's user manager, and the Rex
-# server with it, running from boot and after logout.
+# server with it, running from boot and after logout. The stat keeps the task
+# from running, and reporting a change, once lingering is on.
+- name: server | Check linger for admin
+  ansible.builtin.stat:
+    path: /var/lib/systemd/linger/{{ admin_user }}
+  register: __rex_server_linger
+
 - name: server | Enable linger for admin
   ansible.builtin.command:
     cmd: loginctl enable-linger {{ admin_user }}
-    creates: /var/lib/systemd/linger/{{ admin_user }}
   changed_when: true
+  when: not __rex_server_linger.stat.exists
 
 - name: server | Check socket unit
   ansible.builtin.stat:
