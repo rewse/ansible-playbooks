@@ -8,7 +8,7 @@
 
 **Tech Stack:** Ansible（`stat`、`copy`、`ansible.posix.authorized_key`）、pytest + unittest、PyYAML。
 
-**Spec:** `docs/superpowers/specs/2026-11-29-darwin-sshd-design.md`
+**Spec:** `docs/superpowers/archive/specs/2026-11-29-darwin-sshd-design.md`
 
 ## Global Constraints
 
